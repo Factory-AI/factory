@@ -1,0 +1,52 @@
+---
+title: "PagerDuty"
+description: "Step-by-step guide to connect Factory with your PagerDuty incidents."
+---
+
+## PagerDuty + Factory Integration Benefits
+
+- **Bring PagerDuty context into Factory's AI workflow.** Paste or mention any PagerDuty incident URL in chat and Factory automatically pulls in the full incident timeline, alerts, responders and notes.
+- **Accelerate incident triage.** Engineers see enriched incident details side-by-side with code, logs and other context, reducing tool-switching needs.
+- **Generate fixes faster.** Factory can analyze the imported PagerDuty data, identify likely root causes and propose remediation PRs.
+- **Zero-maintenance integration.** OAuth-based—no service keys, Event Rules or manual configuration inside PagerDuty.
+
+## How it Works
+
+- A Factory user connects their PagerDuty account using OAuth with read-only scope.
+- When a PagerDuty incident URL is pasted into Factory chat, Factory retrieves the incident's details, alerts and notes to help root cause the problem.
+- Factory displays this parsed information in the Context Panel and incorporates it in its responses and suggestions.
+
+## Requirements
+
+- A PagerDuty user who can authorize OAuth applications.
+- A Factory account with permission to manage personal integrations.
+
+## Support
+
+If you need help with this integration, please contact **support@factory.ai**.
+
+## Integration Walkthrough
+
+### In PagerDuty
+
+No configuration is required in PagerDuty. This integration uses OAuth authentication with read-only scope, so there's no need to create services, integrations, or event rules in your PagerDuty account. All setup is completed within Factory.
+
+### In Factory
+
+1. Sign in to Factory and open **Settings**.
+2. Locate **PagerDuty** and click **Connect**.
+3. A popup redirects to PagerDuty's OAuth screen. Select the account you wish to authorize and click **Allow Access**.
+4. When the popup closes, PagerDuty will display as **Connected** with a green dot. You're done—no further steps in PagerDuty are necessary.
+
+#### Verifying the Integration
+
+1. Copy a PagerDuty incident URL, e.g. `https://acme.pagerduty.com/incidents/PRD1234`.
+2. Paste it into any Factory chat.
+3. The incident details should appear in the Context Panel within a few seconds.
+
+## How to Uninstall
+
+1. In PagerDuty, navigate to **User Settings → Authorized Applications**.
+2. Locate **Factory** and click **Revoke Access**.
+
+This immediately invalidates the OAuth token; Factory will stop retrieving data.

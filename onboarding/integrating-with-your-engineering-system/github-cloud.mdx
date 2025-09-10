@@ -1,0 +1,70 @@
+---
+title: "GitHub Cloud"
+description: "Step-by-step guide to connect Factory with your GitHub Cloud repositories"
+---
+
+This guide will walk you through the process of integrating Factory with GitHub Cloud, enabling the Factory platform to access and work with your repositories.
+
+## Prerequisites
+
+- A Factory account with admin privileges
+- Admin access to your GitHub organization
+
+## Integration Steps
+
+<Steps>
+  <Step title="Access Factory Platform">
+    Log in to your Factory account and navigate to the Integrations section in your Settings.
+  </Step>
+  <Step title="Initiate GitHub Integration">
+    Click on "Connect" next to Github to start the integration process. Select Manage Github Permissions.
+  </Step>
+  <Step title="Authorize Factory's GitHub App">
+    You'll be redirected to GitHub. Click "Authorize" to allow Factory's secure OAuth2 GitHub Application access to your organization.
+  </Step>
+  <Step title="Configure Repository Access">
+    Select the repositories you want Factory to access. You can choose specific repositories or grant access to all current and future repositories.
+  </Step>
+  <Step title="Set Up Permissions">
+    Factory requires specific permissions to function optimally. Review and approve the following permissions:
+
+    - **Actions and Metadata** (Read Access): Allows Factory to access GitHub Actions data for understanding CI processes and diagnosing test failures.
+    - **Code** (Read and Write Access): Necessary for Factory to review code and create pull requests. Note that Factory cannot merge code autonomously.
+    - **Commit Statuses** (Read and Write Access): Enables Factory to track and update commit statuses.
+    - **Discussions** (Read and Write Access): Allows Factory to analyze and participate in repository discussions.
+    - **Issues** (Read and Write Access): Enables Factory to interact with issues for automated ticket handling.
+    - **Pull Requests** (Read and Write Access): Necessary for Factory to analyze and facilitate code reviews.
+    - **Workflows** (Read and Write Access): Allows Factory to manage and potentially correct failed CI runs.
+  </Step>
+  <Step title="Confirm Integration">
+    After granting permissions, you'll be redirected back to Factory. Confirm that the integration status shows as "Connected".
+  </Step>
+</Steps>
+
+## Verification
+
+To ensure the integration is working correctly:
+
+1. Create a test repository or use an existing one with minimal sensitive data.
+2. Initiate a simple workflow, such as creating a pull request.
+3. Verify that Factory can access and interact with the repository as expected.
+
+## Best Practices
+
+- Regularly review and audit the permissions granted to Factory.
+- Use repository-specific settings to fine-tune access levels for sensitive projects.
+- Keep your GitHub organization's security settings up-to-date.
+
+## Troubleshooting
+
+If you encounter issues during integration:
+
+- Ensure you have the necessary admin rights on both Factory and GitHub.
+- Check GitHub's audit logs for any permission-related issues.
+- Verify that your organization doesn't have conflicting third-party application restrictions.
+
+For persistent problems, contact Factory support with specific error messages or screenshots.
+
+<Card title="Security and Compliance" icon="shield-check" href="/user-guides/build-with-factory/security-compliance">
+  Learn about Factory's security measures and how we protect your data
+</Card>

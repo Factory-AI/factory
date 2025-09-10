@@ -1,0 +1,84 @@
+---
+title: "Jira"
+description: "Step-by-step guide to connect Factory with your Jira workspace"
+---
+
+This guide will walk you through the process of integrating Factory with Jira, enabling the Factory platform to interact with your Jira boards and issues.
+
+## Prerequisites
+
+- Admin access to your Jira workspace
+- A Factory account with admin privileges
+
+## Integration Steps
+
+<Steps>
+  <Step title="Create a Jira Service Account">
+    <Steps>
+      <Step title="Create New User">
+        1. In your Jira workspace, create a new user.
+        2. Name the user "Factory Droid".
+        3. Narrow the scopes to only the projects you want Factory to access.
+      </Step>
+      <Step title="Set Permissions">
+        Configure the service account's permissions to limit access to only the necessary Jira boards and projects.
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="Initiate Jira Integration in Factory">
+    <Steps>
+      <Step title="Access Integrations">
+        Log in to your Factory account and navigate to Integrations in your Settings.
+      </Step>
+      <Step title="Connect Jira">
+        Click on "Connect Jira" to start the integration process.
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="Authorize Factory's Jira Application">
+    <Steps>
+      <Step title="Switch to Service Account">
+        Before authorizing, switch to an incognito browser window and log in with the "Factory Droid" service account you created.
+      </Step>
+      <Step title="Authorize Application">
+        Review the requested permissions and click "Authorize" to allow Factory access to your Jira workspace.
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="Confirm Integration">
+    After authorization, you'll be redirected back to the Factory platform. Verify that the integration status shows as "Connected".
+  </Step>
+  <Step title="Create a New Session">
+    Create a New Session directly from Jira with this ticket in context by clicking the "🔗 Factory - Open in Factory" link
+
+    - Note that clicking this link will always create a **new session**.
+  </Step>
+</Steps>
+
+## Verification
+
+To ensure the integration is working correctly:
+
+1. Create a test issue in one of the authorized Jira projects.
+2. Use Factory to interact with this issue (e.g., comment on it or change its status).
+3. Verify that the changes are reflected in Jira.
+
+## Best Practices
+
+- Regularly review and audit the permissions granted to the Factory Droid service account.
+- Use Jira's project-level settings to manage access efficiently.
+- Periodically rotate the API token if you're using the token-based setup method.
+
+## Troubleshooting
+
+If you encounter issues during integration:
+
+- Ensure you're logged in as the service account when authorizing the integration.
+- Check Jira's audit logs for any permission-related issues.
+- Verify that the service account has the necessary permissions for the intended projects.
+
+For persistent problems, contact Factory support with specific error messages or screenshots.
+
+<Card title="Security and Compliance" icon="shield-check" href="/user-guides/build-with-factory/security-compliance">
+  Learn about Factory's security measures and how we protect your data
+</Card>

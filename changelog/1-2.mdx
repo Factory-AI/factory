@@ -1,0 +1,28 @@
+---
+title: Factory Release 1.2
+description: "Improved Long Running Agents and Workspace Customization"
+---
+
+Factory 1.2 comes with major improvements to the Droids’ ability to work across long sessions, additional customization for remote workspaces, and tons of stability and bug fixes.
+
+
+### Long Running Agents
+
+We’ve heard that during longer sessions, Droids can have difficulty maintaining context and holding focus, leading to a drop in overall experience quality. To address this, we’ve introduced a new tool for the Droids to maintain critical context at the session level. In addition, we’ve implemented several improvements to how Droids compress past actions when sessions get lengthy and context fills up, allowing them to better sustain goal-directed behavior over longer time horizons. With these changes, sessions can now run for hundreds of turns without getting off track.
+
+### Workspace Customization & Secrets
+
+Inject API keys and config flags directly into Factory workspaces—securely and reproducibly.
+
+**How it works**
+
+Open Workspace Settings → “Environment Variables,” add a key/value pair, and Factory mounts them into every terminal and agent run inside that workspace. Values are encrypted at rest and redacted in logs. Variables persist across sessions, enabling tasks like `npm test` or container builds to run without manual export commands. Rotate or revoke with a single toggle to keep secrets fresh.
+
+
+### Bug Fixes & Stability
+
+- File downloads & env-var injection now work reliably in Remote Machines.
+- Pull requests now link back to their originating Factory session.
+- Path handling fixes on Windows, preventing execution errors.
+- Resolved freezes when loading very large histories.
+- Improved regex handling in code search.

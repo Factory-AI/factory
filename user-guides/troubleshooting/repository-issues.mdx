@@ -1,0 +1,165 @@
+---
+title: Repository Troubleshooting
+description: Learn how to resolve common repository-related issues in Factory, including size limits, sync problems, and integration challenges
+---
+
+## Common Repository Issues
+
+### Size Limit Exceeded
+
+<Accordion title="Repository Too Large for Local Indexing">
+  **Problem**: Your repository exceeds the 5M token limit for local indexing.
+
+  **Solution**:
+
+  1. Use remote repository integration:
+
+     * Connect via GitHub or GitLab
+
+     * Access full context features
+
+     * Enable automatic updates
+
+  2. Continue with local file sync:
+
+     * Real-time file updates
+
+     * Active development support
+
+  **Learn More**: Visit our [Local File Sync](/user-guides/managing-context/local-file-sync) guide
+</Accordion>
+
+### Sync Issues
+
+<Accordion title="Local File Sync Not Working">
+  **Common Causes**:
+
+  * Missing `.git` directory
+
+  * Insufficient permissions
+
+  * Network connectivity issues
+
+  **Solutions**:
+
+  1. Verify repository structure:
+
+     ```bash
+     ls -la .git  # Should show git directory contents
+     ```
+
+  2. Check permissions:
+
+     ```bash
+     ls -l .  # Should show write permissions
+     ```
+
+  3. Test network connection:
+
+     ```bash
+     ping app.factory.ai
+     ```
+</Accordion>
+
+### Integration Problems
+
+<AccordionGroup>
+  <Accordion title="GitHub Integration Issues">
+    **Common Issues**:
+
+    * OAuth token expiration
+
+    * Repository access permissions
+
+    * Organization access settings
+
+    **Solutions**:
+
+    1. Verify OAuth status in settings
+
+    2. Check repository permissions
+
+    3. Review organization settings
+  </Accordion>
+
+  <Accordion title="GitLab Integration Issues">
+    **Common Issues**:
+
+    * API access token expiration
+
+    * Instance connectivity
+
+    * Project visibility settings
+
+    **Solutions**:
+
+    1. Regenerate API token
+
+    2. Verify instance accessibility
+
+    3. Check project permissions
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Regular Maintenance" icon="broom">
+    * Keep repositories clean
+
+    * Remove unused files
+
+    * Archive old branches
+  </Card>
+
+  <Card title="Permission Management" icon="lock">
+    * Regular access review
+
+    * Principle of least privilege
+
+    * Token rotation
+  </Card>
+</CardGroup>
+
+## Diagnostic Tools
+
+Use these commands to diagnose common issues:
+
+```bash
+# Check repository size
+git count-objects -vH
+
+# Verify remote connections
+git remote -v
+
+# Test API access
+curl -I https://api.github.com/user
+```
+
+## Next Steps
+
+<Steps>
+  <Step title="Check Documentation">
+    Review our [integration guides](/onboarding/integrating-with-your-engineering-system/github-cloud) for detailed setup instructions
+  </Step>
+
+  <Step title="Verify Settings">
+    Visit your [integration settings](https://app.factory.ai/settings/integrations) to confirm configurations
+  </Step>
+
+  <Step title="Contact Support">
+    If issues persist, reach out to our [support team](https://support.factory.ai)
+  </Step>
+</Steps>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Local File Sync Guide" icon="laptop-code" href="/user-guides/managing-context/local-file-sync">
+    Learn about local development workflows
+  </Card>
+
+  <Card title="Remote Integration Guide" icon="cloud" href="/onboarding/creating-your-factory/basic-integrations">
+    Set up remote repository access
+  </Card>
+</CardGroup>

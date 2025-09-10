@@ -1,0 +1,81 @@
+---
+title: "Sentry"
+description: "Step-by-step guide to connect Factory with your Sentry error tracking system"
+---
+
+This guide will walk you through the process of integrating Factory with Sentry, enabling the Factory platform to access and work with your error tracking data.
+
+## Prerequisites
+
+- A Factory account with admin privileges
+- Admin access to your Sentry organization
+- Sentry projects set up for your applications
+
+## Integration Steps
+
+<Steps>
+  <Step title="Access Factory Platform">
+    Log in to your Factory account and navigate to the Integrations section in your Settings.
+  </Step>
+  <Step title="Initiate Sentry Integration">
+    Click on "Connect" next to Sentry to start the integration process.
+  </Step>
+  <Step title="Install Factory's Sentry Integration">
+    You'll be redirected to Sentry. Review and approve the installation of Factory's Sentry integration in your organization.
+  </Step>
+  <Step title="Configure Access Permissions">
+    Factory requires specific permissions to function optimally:
+
+    - **Issue & Event Access** (Read Access): Allows Factory to retrieve issue details, stack traces, and related events
+    - **Organization Access** (Read Access): Enables Factory to access organization-wide settings and metadata
+    - **Project Access** (Read Access): Permits Factory to access project-specific information and settings
+  </Step>
+  <Step title="Confirm Integration">
+    After granting permissions, you'll be redirected back to Factory. Verify that the integration status shows as "Connected".
+  </Step>
+</Steps>
+
+## Usage
+
+Once integrated, Factory can:
+
+1. **Access Issue Details**: View comprehensive information about errors, including stack traces, breadcrumbs, and context data
+2. **Search Issues**: Find specific issues across your Sentry projects
+3. **Analyze Error Patterns**: Understand error trends and common failure points
+4. **Context Integration**: Use Sentry data as context when discussing code changes or debugging
+
+### Issue Context
+
+When you share a Sentry issue URL in a Factory chat, the assistant will automatically:
+
+1. Retrieve the issue details
+2. Extract relevant stack traces
+3. Include error context and breadcrumbs
+4. Provide insights based on the error information
+
+Example Sentry issue URL format:
+
+```
+https://sentry.io/organizations/your-org/issues/12345/
+```
+
+## Best Practices
+
+- Regularly review and audit the permissions granted to Factory
+- Use Sentry's project-level settings to fine-tune access control
+- Keep your Sentry organization's security settings up-to-date
+- Periodically review the integration's usage and effectiveness
+
+## Troubleshooting
+
+If you encounter issues during integration:
+
+- Ensure you have the necessary admin rights in both Factory and Sentry
+- Check Sentry's audit logs for any permission-related issues
+- Verify that your organization doesn't have conflicting third-party application restrictions
+
+For persistent problems, contact Factory support with specific error messages or screenshots.
+
+<Card title="Security and Compliance" icon="shield-check" href="/user-guides/build-with-factory/security-compliance">
+  Learn about Factory's security measures and how we protect your data
+</Card>

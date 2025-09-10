@@ -1,0 +1,145 @@
+---
+title: Remote Workspaces – Installation & Usage
+description: Set up, connect to, and use Remote Workspaces inside Factory sessions
+---
+
+A **remote workspace** is a fully-configured, on-demand development environment that lives in the cloud. Remote workspaces give you the same tools and dependencies you'd expect locally—without any machine-setup friction—so you can build, test, and run code directly from Factory.
+
+## System Requirements
+
+- A repository enabled in Factory
+- A valid `devcontainer.json` (see below)
+- Manager role or higher to create remote workspaces
+
+<Steps>
+
+  <Step title="Open Session Settings">
+    1. In Factory, click the **Settings** icon from the left sidebar.  
+    2. Select **Session**.
+    3. Scroll down to **Remote Workspaces**.
+  </Step>
+
+  <Step title="Create a New Remote Workspace">
+    1. Click **Create Workspace**.  
+    2. Enter the repository you want to use.  
+    3. Give your workspace a friendly name (e.g., “frontend-workspace”).  
+    4. (Optional) Upload a custom <code>devcontainer.json</code>.  
+    5. Click **Create**.
+    <Note>
+      Factory clones your repo and prepares the environment—this can take a minute for large projects.
+    </Note>
+  </Step>
+
+  <Step title="Verify Workspace Ready">
+    The new workspace appears in the list with a status indicator. Once it shows **Ready**, you can use it from any session.
+  </Step>
+
+</Steps>
+
+---
+
+## Understanding Devcontainers
+
+A _devcontainer_ defines everything your remote workspace needs—language runtimes, tools, and commands—so every workspace is identical and reproducible.
+
+### Minimal JavaScript Example
+
+```jsonc
+{
+  "name": "Node.js",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20-bullseye",
+  "forwardPorts": [3000],
+  "postCreateCommand": "npm install",
+  "settings": {
+    "terminal.integrated.scrollback": 10000
+  }
+}
+```
+
+Save this file as `.devcontainer/devcontainer.json` in your repo or upload it when creating the workspace.
+
+<AccordionGroup>
+
+  <Accordion title="Do I need a devcontainer?">
+    Factory can generate a basic environment automatically, but adding your own devcontainer guarantees the exact toolchain your project requires.
+  </Accordion>
+
+  <Accordion title="Updating devcontainer settings">
+    Re-upload a new <code>devcontainer.json</code> from the workspace menu and click **Rebuild**. The remote workspace is rebuilt on the next launch.
+  </Accordion>
+
+</AccordionGroup>
+
+---
+
+## Launching a Remote Workspace inside a Session
+
+<Steps>
+
+  <Step title="Open or Start a Session">
+    Join any Factory session as usual.
+  </Step>
+
+  <Step title="Connect to Cloud Machine">
+    1. Click the **CPU** icon in the top-right toolbar.  
+    2. Choose **Remote Machine**.  
+    3. Select the workspace you created earlier.  
+    4. Factory attaches the remote workspace to your session.
+  </Step>
+
+  <Step title="Confirm Connection">
+    A green indicator and machine name appear next to the CPU icon. You’re now interacting with the cloud workspace.
+  </Step>
+
+</Steps>
+
+---
+
+## Everyday Usage
+
+<CardGroup cols={2}>
+
+  <Card title="Run CLI Commands" icon="terminal">
+    Use the **Terminal** toolkit to execute commands like:
+    <pre>npm run dev
+pytest
+git status</pre>
+    Output streams live into chat and logs.
+  </Card>
+
+  <Card title="Edit & Save Files" icon="file-code">
+    Open files from the repo, make changes, and save.  
+    Files persist in the remote workspace and can be committed upstream when ready.
+  </Card>
+
+  <Card title="Port Forwarding" icon="globe">
+    If your devcontainer exposes ports (e.g., 3000), Factory auto-detects and adds them to the **Ports** panel for browser preview.
+  </Card>
+
+  <Card title="Auto-Save Controls" icon="save">
+    Auto-save is disabled by default—enable it from the **Session Settings** panel whenever you want live file syncing.
+  </Card>
+
+</CardGroup>
+
+---
+
+## Troubleshooting & Help
+
+<AccordionGroup>
+
+  <Accordion title="Can't connect from session">
+    Ensure you:  
+    1. Selected **Remote Machine** (not Local).  
+    2. Refresh the page, or try again in a different session
+  </Accordion>
+
+  <Accordion title="Command not found">
+    Verify the binary is installed in your devcontainer and that <code>postCreateCommand</code> completes without errors.
+  </Accordion>
+
+</AccordionGroup>
+
+<Card title="Need More Help?" icon="life-ring" href="/user-guides/remote-workspaces/troubleshooting">
+  Visit the full Remote Workspace Troubleshooting Guide
+</Card>

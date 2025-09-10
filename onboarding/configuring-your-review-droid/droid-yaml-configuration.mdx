@@ -1,0 +1,93 @@
+---
+title: Configuring Your Droid YAML
+description: Learn how to customize Droid behavior using the .droid.yaml file
+---
+
+The `.droid.yaml` file at the root of your project allows you to customize Droid behavior through a simple YAML configuration. This powerful tool enables you to tailor Factory's AI-driven assistance to your specific needs.
+
+<Note>
+  We are constantly adding new options to configure Droid through the .droid.yaml. Your feedback helps us prioritize which options we make available first.
+</Note>
+
+## Basic Structure
+
+Here's an overview of the `.droid.yaml` structure:
+
+```yaml
+review:
+  guidelines:
+    # Review guidelines
+  auto_review:
+    # Auto-review settings
+  # Other review settings
+```
+
+Let's dive into each section in detail.
+
+## Review Settings
+
+The `review` section configures how Droid performs code reviews.
+
+### Guidelines
+
+```yaml
+review:
+  guidelines:
+    - path: "**/example"
+      guideline: "example guideline"
+```
+
+- `path`: An fnmatch pattern specifying which files the guideline applies to.
+- `guideline`: The specific instruction for Droid to follow during reviews.
+
+### Auto-Review Settings
+
+```yaml
+review:
+  auto_review:
+    enabled: true
+    draft: false
+    bot: false
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT MERGE"
+    ignore_labels:
+      - "droid-skip"
+    excluded_base_branches:
+      - "example_branch"
+```
+
+- `enabled`: Enable automatic code review on pull request open (default: false).
+- `draft`: Enable automatic code review on draft pull requests (default: false).
+- `bot`: Enable automatic code review on pull requests authored by bots (default: false).
+- `ignore_title_keywords`: Skip review for pull requests with these keywords in the title.
+- `ignore_labels`: Skip review for pull requests with these labels.
+- `excluded_base_branches`: Skip review for pull requests on these base branches.
+
+### Other Review Settings
+
+```yaml
+review:
+  pr_summary: true
+  file_summaries: true
+  tips: true
+  github_action_repair: true
+  path_filters:
+    - "!**/*.log"
+  enable_skip_reason_comments: true
+```
+
+- `pr_summary`: Generate a summary of the pull request (default: true).
+- `file_summaries`: Generate summaries of modified files (default: true).
+- `tips`: Include Droid Tips in the review (default: true).
+- `github_action_repair`: Suggest solutions to GitHub Action failures (default: true).
+- `path_filters`: Patterns to include/exclude for review. Use cautiously.
+- `enable_skip_reason_comments`: Add comments explaining why Droid skipped a review.
+
+## Validation
+
+If you have access to Review Droid, it will automatically verify your `.droid.yaml` when modified in a pull request. Otherwise, use a YAML validation tool to ensure valid YAML syntax.
+
+<Card title="Review Droid Guidelines" icon="book" href="/onboarding/configuring-your-review-droid/review-droid-guidelines">
+  Learn how to set up effective guidelines for Review Droid
+</Card>

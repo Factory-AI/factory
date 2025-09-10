@@ -1,0 +1,146 @@
+---
+title: Codebase Explorer
+description: Learn how to navigate and manage your codebase context efficiently using Factory's Codebase Explorer
+---
+
+The Codebase Explorer is a powerful feature in Factory that allows you to navigate, select, and manage the context of your codebase visually. This tool enhances your ability to work with large codebases by providing an intuitive interface for selecting relevant files and folders for your current task.
+
+## Key Features
+
+* Visual representation of your codebase structure
+
+* Selective context inclusion of files and folders
+
+* Quick navigation with file search and autocomplete
+
+* Real-time token count and size information
+
+* Flexible selection modes for precise context management
+
+### Understanding Folder Selection
+
+When you select a folder in Codebase Explorer, you're not adding all of its contents to your context. Instead, you're adding a semantic summary that describes what the folder contains and its purpose in the codebase. This is much more token-efficient than including all individual files.
+
+For example:
+
+* Selecting the "utils/" folder adds a summary like "This folder contains utility functions for date formatting, string manipulation, and common mathematical operations"
+
+* Selecting individual files within that folder would add their actual contents to your context
+
+## Using Codebase Explorer
+
+### Accessing Codebase Explorer
+
+<Steps>
+  <Step title="Open Context Panel">
+    In your Factory session, navigate to the context panel.
+  </Step>
+
+  <Step title="Launch Codebase Explorer">
+    Click the graph icon in the top right corner to open the Codebase Explorer.
+  </Step>
+</Steps>
+
+### Navigating Your Repositories
+
+<Accordion title="Repository Selection">
+  * Click on the "Add Remote Repository" node to select from your org's available remote repositories.
+
+  * Click on the "Add Local Repository" node to select a local repository from your machine.
+
+  * The file tree will update to show the selected repository's structure.
+</Accordion>
+
+### Selecting Files and Folders
+
+<Steps>
+  <Step title="Basic Selection">
+    Click on a file to toggle it. Click on a folder to toggle visibility of its children.
+  </Step>
+
+  <Step title="Precise Selection">
+    Command+click (or Ctrl+click on Windows) on a folder to toggle its summary without affecting its children.
+  </Step>
+
+  <Step title="Folder Selection">
+    Shift+click a folder to select summaries for it and all its children.
+  </Step>
+
+  <Step title="Remove Descendants">
+    Option+click (or Alt+click on Windows) a folder to remove an entire folder and its descendants from selection.
+  </Step>
+
+  <Step title="Pending Changes">
+    The right panel shows a list of all pending changes to your context.
+  </Step>
+
+  <Step title="Apply or Undo">
+    Use the "Apply" button to apply all pending changes or "Undo All" to remove all selections.
+  </Step>
+</Steps>
+
+<Note>
+  Remember: Selecting a folder adds a high-level description of its purpose and contents, while selecting individual files adds their actual contents to the context.
+</Note>
+
+### Quick Navigation
+
+<Accordion title="File Search">
+  * Use the search bar at the top left to quickly find files.
+
+  * Autocomplete suggestions appear as you type.
+</Accordion>
+
+### Viewing File and Folder Information
+
+<Accordion title="Size and Token Information">
+  * Hover over any file or folder to see its size and token count.
+
+  * This helps in managing your context size efficiently.
+</Accordion>
+
+### Managing Context Size
+
+<Steps>
+  <Step title="Monitor Token Usage">
+    Keep an eye on the token count displayed at the bottom of the interface.
+  </Step>
+
+  <Step title="Remove Pending Changes">
+    Click on an item in the right panel to remove it from pending changes.
+  </Step>
+</Steps>
+
+<Note>
+  Changes are not applied automatically. You must click "Apply" to update your session's context with the new selections.
+</Note>
+
+## Best Practices
+
+1. **Start Broad, Then Refine**: Begin by selecting high-level folders to get semantic summaries of different areas of your codebase. Then narrow down to specific files when you need their actual contents.
+
+2. **Use Precise Selection**: Leverage Command+click for granular control over your context.
+
+3. **Balance Context Size**: Keep an eye on the token count to ensure you're not overloading your context.
+
+4. **Utilize Search**: For large codebases, use the search function to quickly locate relevant files.
+
+5. **Regular Updates**: As your task evolves, revisit Codebase Explorer to adjust your context.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Context Too Large">
+    If you exceed the token limit, try:
+
+    * Removing large folders or files that aren't immediately necessary
+
+    * Using more specific file selections instead of entire folders
+
+    * Breaking your task into smaller, more focused sessions
+  </Accordion>
+
+  <Accordion title="Changes Not Reflected">
+    Remember to click "Apply" after making your selections. Changes are not automatic.
+  </Accordion>
+</AccordionGroup>

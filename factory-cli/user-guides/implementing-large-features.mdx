@@ -1,0 +1,221 @@
+---
+title: Implementing Large Features
+description: A systematic approach to tackling complex, multi-phase development projects using specification planning and iterative implementation.
+---
+
+Large-scale features require careful planning and systematic execution to avoid overwhelming complexity. This guide outlines a proven workflow for breaking down massive projects into manageable phases, using specification mode for planning and iterative implementation with frequent validation.
+
+<CardGroup cols={2}>
+  <Card title="Systematic Planning" icon="map">
+    Break complex features into discrete, manageable phases with clear
+    boundaries
+  </Card>
+  <Card title="Incremental Progress" icon="stairs">
+    Implement one phase at a time with validation and testing at each step
+  </Card>
+  <Card title="Version Control Strategy" icon="code-branch">
+    Use git commits and PRs to track progress and enable safe rollbacks
+  </Card>
+  <Card title="Continuous Validation" icon="check-circle">
+    Test functionality incrementally rather than waiting until the end
+  </Card>
+</CardGroup>
+
+## When to use this workflow
+
+This approach is ideal for:
+
+**Massive refactors** - Touching 100+ files across your entire codebase
+
+```
+"Migrate from REST API to GraphQL across all frontend components"
+```
+
+**Major component migrations** - Replacing core system dependencies
+
+```
+"Switch from Stripe to a new billing provider across the entire payment system"
+```
+
+**Large feature implementations** - New functionality spanning 30+ files
+
+```
+"Add comprehensive user roles and permissions system to the existing application"
+```
+
+## The workflow
+
+<Steps>
+  <Step title="Create the master plan">
+    Use Specification Mode to create comprehensive documentation breaking the
+    project into major phases.
+  </Step>
+  <Step title="Phase-by-phase implementation">
+    Start new sessions for each phase, referencing the master plan document.
+  </Step>
+  <Step title="Frequent commits and PRs">
+    Create git commits and pull requests corresponding to each completed phase.
+  </Step>
+  <Step title="Incremental validation">
+    Test and validate functionality after each phase rather than at the end.
+  </Step>
+  <Step title="Update the plan">
+    Mark completed phases and adjust remaining work based on learnings.
+  </Step>
+</Steps>
+
+## Phase 1: Master planning with Specification Mode
+
+Start by using **Shift+Tab** to enter Specification Mode and create a comprehensive breakdown:
+
+**Example prompt:**
+
+```
+Create a detailed implementation plan for migrating our entire authentication system
+from Firebase Auth to Auth0. This affects user login, registration, session management,
+role-based access control, and integrations across 50+ components.
+
+Break this into major phases that can be implemented independently with clear
+testing and validation points. Each phase should be completable in 1-2 days
+and have minimal dependencies on other phases.
+```
+
+**Specification Mode will generate:**
+
+- **Phase breakdown** - 4-6 major implementation phases
+- **Dependencies mapping** - Which phases must be completed before others
+- **Testing strategy** - How to validate each phase works correctly
+- **Risk assessment** - Potential issues and mitigation strategies
+- **Rollback plan** - How to safely revert if needed
+
+**Save the plan** - Approve the specification and save it as `IMPLEMENTATION_PLAN.md` in your project root.
+
+## Phase 2: Iterative implementation
+
+For each phase in your plan:
+
+### Start a fresh session
+
+Begin each phase with a new droid session to maintain focus and clean context.
+
+### Reference the master plan
+
+**Example prompt for Phase 1:**
+
+```
+I'm implementing Phase 1 of the authentication migration plan documented in
+IMPLEMENTATION_PLAN.md.
+
+Phase 1 focuses on setting up Auth0 configuration and creating the basic
+authentication service without affecting existing Firebase integration.
+
+Please read the plan document and implement this phase, then update the
+document to mark Phase 1 as complete.
+```
+
+### Use Specification Mode for complex phases
+
+For phases involving significant changes, use **Shift+Tab** to get detailed planning:
+
+```
+Following IMPLEMENTATION_PLAN.md, implement Phase 3: Update all login components
+to use the new Auth0 service while maintaining backward compatibility with
+the existing Firebase auth as fallback.
+```
+
+### Commit frequently
+
+After each phase completion, ask Droid to commit your changes:
+
+```
+Commit all changes for Phase 1 of the auth migration with a detailed message.
+```
+
+```
+Create a commit for the Auth0 service setup work with bullet points for each major change.
+```
+
+Droid will stage all changes and create the commit with proper co-authorship attribution.
+
+### Create phase-specific PRs
+
+Ask Droid to create pull requests for each completed phase:
+
+```
+Create a PR for the auth migration Phase 1 work on a new branch called auth-migration-phase-1.
+```
+
+```
+Open a pull request with a comprehensive description of what was completed and testing done.
+```
+
+Droid will create the branch, push the changes, and generate a detailed PR description based on the commits and changes made.
+
+## Phase 3: Validation and testing strategy
+
+### Test each phase independently
+
+Don't wait until the end - validate functionality after each phase:
+
+**Phase 1 completion:**
+
+```
+Run the authentication tests and verify the Auth0 service works in isolation.
+Test user registration, login, and logout with the new service.
+```
+
+**Phase 2 completion:**
+
+```
+Test the migration script with a subset of test users. Verify data integrity
+and that users can log in with both old and new systems.
+```
+
+### Use feature flags for gradual rollout
+
+```
+Add a feature flag for auth0-migration with 10% rollout that can be controlled by environment variable.
+```
+
+```
+Implement progressive rollout logic using feature flags to gradually migrate users from Firebase to Auth0.
+```
+
+### Automated testing at phase boundaries
+
+```
+Run the full test suite after each phase including unit, integration, and e2e tests.
+```
+
+```
+Set up automated testing that validates auth migration functionality at each phase boundary.
+```
+
+## Best practices
+
+**Start with read-only changes** - Begin phases with analysis and preparation before making modifications.
+
+**Maintain backward compatibility** - Keep old systems working while new ones are being built.
+
+**Use feature toggles** - Allow gradual rollout and quick rollback if needed.
+
+**Document learnings** - Update your plan based on discoveries during implementation.
+
+**Test boundary conditions** - Focus testing on the interfaces between old and new systems.
+
+**Plan for rollback** - Each phase should be reversible if critical issues are discovered.
+
+**Communicate progress** - Keep stakeholders updated with regular progress reports.
+
+## Recovery strategies
+
+If a phase encounters major issues:
+
+1. **Immediate rollback** - Use git to revert to the last stable state
+2. **Issue analysis** - Document what went wrong and why
+3. **Plan adjustment** - Update remaining phases based on learnings
+4. **Stakeholder communication** - Update timelines and expectations
+
+The systematic approach ensures large features are delivered reliably while maintaining code quality and system stability throughout the process.
+
+Ready to tackle your next large-scale feature? Start with **Shift+Tab** to create your master implementation plan!

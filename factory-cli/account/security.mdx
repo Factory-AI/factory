@@ -1,0 +1,120 @@
+---
+title: Security
+description: How Factory CLI keeps your code and data secure with built-in protections and best practices.
+---
+
+## Security-First Design
+
+Factory CLI (Droid) is built with security at its core. Your code stays secure through encrypted authentication, strict permissions, and enterprise-grade protections.
+
+---
+
+## Key Security Features
+
+<CardGroup cols={2}>
+  <Card title="Secure Authentication" icon="shield-check">
+    OAuth login with encrypted token storage. Tokens auto-rotate every 30 days and are stored with OS-level file permissions.
+  </Card>
+  <Card title="Permission Controls" icon="user-lock">
+    All risky operations require explicit approval. Configure tool permissions from allow/ask/reject per your security needs.
+  </Card>
+  <Card title="Data Encryption" icon="lock">
+    All data encrypted in transit (TLS 1.3) and at rest (AES-256 with AWS KMS). Factory never trains on your code.
+  </Card>
+  <Card title="Local Execution" icon="computer">
+    Shell commands and file edits run locally. Only necessary context and diffs are sent to Factory's secure cloud.
+  </Card>
+</CardGroup>
+
+---
+
+## Security Best Practices
+
+<Warning>
+  Always review suggested code and commands before approval. You control what Droid can access and execute.
+</Warning>
+
+### Essential Security Guidelines
+
+<AccordionGroup>
+  <Accordion title="Review before approving">
+    **Always verify proposed commands and file changes**, especially:
+    - Commands that install packages or modify system files
+    - Operations involving sensitive data or credentials  
+    - Network requests to external services
+    - File operations outside your project directory
+  </Accordion>
+  
+  <Accordion title="Use isolated environments">
+    **Run Droid in containers or VMs** when working with:
+    - Untrusted code repositories
+    - External APIs or web services
+    - Experimental or potentially risky operations
+    - Shared development environments
+  </Accordion>
+  
+  <Accordion title="Manage permissions carefully">
+    **Configure tool permissions** to match your security requirements:
+    - Set high-risk commands to "reject" by default
+    - Use "ask" for medium-risk operations requiring oversight
+    - Only "allow" low-risk commands you trust completely
+    - Review permissions regularly with the Settings menu
+  </Accordion>
+  
+  <Accordion title="Protect sensitive data">
+    **Never include secrets in prompts:**
+    - Use environment variables for API keys and tokens
+    - Store credentials in secure credential managers
+    - Exclude sensitive files from Droid's working directory
+    - Use the FACTORY_TOKEN environment variable for CI/CD
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Built-in Protections
+
+Factory CLI includes multiple layers of security:
+
+- **Write access restriction**: Can only modify files in the project directory and subdirectories
+- **Command approval**: Risky operations require explicit user confirmation
+- **Prompt injection detection**: Analyzes requests for potentially harmful instructions
+- **Network request controls**: Web-fetching tools require approval by default
+- **Input sanitization**: Prevents command injection attacks
+- **Session isolation**: Each conversation maintains separate, secure context
+
+---
+
+## Enterprise Security
+
+<CardGroup cols={2}>
+  <Card title="SSO & Identity" icon="user-shield">
+    SAML 2.0 / OIDC single sign-on with SCIM provisioning and role-based access controls.
+  </Card>
+  <Card title="Data Governance" icon="database">
+    Zero data retention mode, customer-managed encryption keys (BYOK), and private cloud deployments.
+  </Card>
+  <Card title="Compliance" icon="certificate">
+    SOC 2 Type II certified, GDPR compliant, with regular penetration testing and supply chain security.
+  </Card>
+  <Card title="Audit & Monitoring" icon="chart-line">
+    Complete session logging, OpenTelemetry metrics, and enterprise-managed security policies.
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+<CardGroup cols={2}>
+  <Card title="Security Questions" icon="envelope">
+    Email our security team: **security@factory.ai**
+  </Card>
+  <Card title="Trust Center" icon="globe">
+    Visit **[trust.factory.ai](https://trust.factory.ai)** for compliance documents, certifications, and security resources.
+  </Card>
+</CardGroup>
+
+<Note>
+  Report security vulnerabilities through our responsible disclosure program. Contact security@factory.ai for details.
+</Note>

@@ -1,0 +1,224 @@
+---
+title: How to Talk to a Droid
+description: Proven techniques for writing prompts that get high-quality results from Factory's AI agents.
+---
+
+Droid works best with clear, specific instructions. Like pairing with a skilled engineer, the quality of your communication directly affects the results. This guide shows practical patterns that get better outcomes with fewer iterations.
+
+## Core principles
+
+**Be explicit about what you want.** Instead of "can you improve the auth system?" try "add rate limiting to login attempts with exponential backoff following the pattern in middleware/rateLimit.ts." Droid performs best when you clearly state your goal.
+
+**Provide context upfront.** Include error messages, file paths, screenshots, or relevant documentation. If you're implementing something from a Jira ticket or design doc, paste the link—droid can automatically read context from platforms you've integrated in Factory's dashboard.
+
+**Choose your approach.** For complex features, consider using Specification Mode for automatic planning. For routine tasks, droid can proceed directly while still showing you all changes for review. See the [Planning versus doing](#planning-versus-doing) section for detailed guidance.
+
+**Define success.** Tell droid how to verify the work is complete—run specific tests, check that a service starts cleanly, or confirm a UI matches a mockup.
+
+## Writing effective prompts
+
+The best prompts are direct and include relevant details:
+
+```
+Add comprehensive error handling to the payment processor in src/payments/processor.ts.
+Catch gateway timeouts and retry up to 3 times with exponential backoff.
+Similar retry logic exists in src/notifications/sender.ts.
+Run the payment integration tests to verify it works.
+```
+
+```
+Run the build and fix all TypeScript errors. Focus on the auth module first.
+```
+
+```
+Review my uncommitted changes with git diff and suggest improvements before I commit.
+```
+
+```
+The login form allows empty submissions. Add client-side validation and return proper error messages.
+Check that localhost:3000/login shows validation errors when fields are empty.
+```
+
+```
+Refactor the database connection logic into a separate module but don't change any query interfaces.
+```
+
+Notice these examples:
+
+- State the goal clearly in the first sentence
+- Include specific files or commands when known
+- Mention related code that might help
+- Explain how to test the result
+- Keep it conversational but direct
+
+## Planning versus doing
+
+For complex features, use [Specification Mode](/factory-cli/user-guides/specification-mode) which automatically provides planning and review before implementation:
+
+```
+Add user preferences API with key-value storage following REST conventions.
+Include validation and comprehensive tests.
+```
+
+For straightforward tasks, droid can proceed directly while still showing you changes for approval:
+
+```
+Fix the failing test in tests/auth.test.ts line 42
+```
+
+```
+Add logging to the startup sequence with appropriate log levels.
+```
+
+## Managing context
+
+**Use AGENTS.md files** to document build commands, testing procedures, and coding standards. Droid reads these automatically, so you don't have to repeat project conventions. See the [AGENTS.md guide](/factory-cli/configuration/agents-md) for detailed setup instructions.
+
+**Mention specific files** when you know where the code lives. Use `@filename` to reference files directly, or include file paths in your prompts. This focuses droid's attention and saves time.
+
+**Set boundaries** for changes. "Only modify files in the auth directory" or "don't change the public API" helps contain the scope.
+
+**Reference external resources** by including URLs to tickets, docs, designs, or specs. Droid can fetch and use this information.
+
+## Common workflows
+
+**Understanding code:**
+
+```
+Explain how user authentication flows through this system.
+```
+
+```
+What are the main components in the frontend and how do they interact?
+```
+
+**Implementing features:**
+
+```
+Add a PATCH /users/:id endpoint with email uniqueness validation.
+Update the OpenAPI spec and add integration tests.
+Similar patterns exist in src/routes/users/get.ts.
+```
+
+**Fixing bugs:**
+
+```
+Users report file uploads fail randomly. Error in browser console: "Network timeout".
+Upload logic is in src/upload/handler.ts. Check for timeout handling.
+```
+
+**Code review:**
+
+```
+Look at git diff and review these changes for security issues and maintainability.
+```
+
+**Refactoring:**
+
+```
+Extract the email sending logic into a separate service class.
+Keep the same interfaces but make it testable in isolation.
+```
+
+## Enterprise integration
+
+Reference your team's tools by pasting links to tickets or documents:
+
+```
+Implement the feature described in this Jira ticket: https://company.atlassian.net/browse/PROJ-123
+Follow our security standards from the compliance docs.
+```
+
+If you've integrated these platforms in Factory's dashboard, droid can automatically read context from Jira, Notion, Slack, and other sources. For additional tool connections, droid also supports MCP integrations.
+
+For security-sensitive work:
+
+```
+Add file upload functionality with proper validation to prevent directory traversal attacks.
+Follow the security patterns used in our document upload feature.
+```
+
+## Session management
+
+Start new conversations when context gets cluttered or when switching to unrelated tasks. Fresh context often works better than accumulated noise from failed attempts.
+
+For large projects, break work into phases:
+
+```
+First implement the database schema changes. Don't add the API endpoints yet.
+```
+
+Then in a follow-up:
+
+```
+Now add the REST endpoints using the new schema. Include validation and error handling.
+```
+
+## Advanced techniques
+
+**Test-driven development:**
+
+```
+Write comprehensive tests for the user registration flow first.
+Don't implement the actual registration logic yet.
+```
+
+**Plan-driven development:**
+
+```
+Create a markdown file outlining the plan for updating both backend API and React components.
+Include the shared data structure and implementation order.
+Then implement each part following the documented plan.
+```
+
+## Examples of good prompts
+
+Here are real examples that work well:
+
+```
+Run git blame on the file I have open and figure out who added the rate limiting logic.
+```
+
+```
+Look at git diff staged and remove any debug statements before I commit.
+```
+
+```
+Convert these 5 React components to use TypeScript. Use proper interfaces for props.
+```
+
+```
+Find the commit that introduced the caching mechanism and explain how it works.
+```
+
+```
+Add input validation to all the forms in the admin panel. Return 400 with clear error messages.
+```
+
+```
+Check the production logs for any errors in the last hour and suggest fixes for the most common ones.
+```
+
+## What doesn't work well
+
+Avoid vague requests:
+
+- "Make the app better" → too broad
+- "Fix the database" → not specific enough
+- "Can you help with the frontend?" → unclear goal
+
+Don't make droid guess:
+
+- If you know the file path, include it
+- If you know the command to run, mention it
+- If there's related code, point to it
+
+## Getting better results
+
+Treat droid like a capable teammate. Provide the same context and guidance you'd give a colleague working on the task. Be specific about quality standards and business requirements.
+
+Remember that droid learns your organization's patterns over time. The more consistently you use it within your codebase, the better it becomes at following your conventions.
+
+Most importantly, review the changes droid proposes. You maintain full control through the approval workflow, so take time to understand modifications and provide feedback for better future results.
+
+Ready to try these patterns? Head back to the [Quickstart](/factory-cli/getting-started/quickstart) and practice with your own code.

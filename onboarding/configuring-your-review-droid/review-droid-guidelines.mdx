@@ -1,0 +1,129 @@
+---
+title: "Review Droid Guidelines"
+description: "Learn how to set up effective guidelines for Review Droid to enhance your code review process"
+---
+
+Review Droid Guidelines are targeted instructions that Review Droid follows when reviewing your code. These guidelines ensure that Droid-provided code review comments are desirable, consistent, and specific to your codebase. They are particularly useful for maintaining code quality and enforcing best practices across a project.
+
+## Configuring Guidelines
+
+Guidelines are configured in your `.droid.yaml` file under the `guidelines` field within the `review` section. This configuration allows you to define different instructions based on file paths, ensuring that the guidelines are contextually relevant.
+
+### Basic Structure
+
+Here's an example of how guidelines are structured in the `.droid.yaml` file:
+
+<CodeGroup>
+
+```yaml
+review:
+  guidelines:
+    - path: "src/*.py"
+      guideline: "Do not use multi-line nested list comprehensions."
+    - path: "src/*"
+      guideline: "Do not leave in commented out code. Delete it."
+    - path: "*"
+      guideline: "Correct grammar and spelling mistakes. Do not comment on writing style. Allow for flexible capitalization and abbreviation for variable names."
+    - path: "*.ts"
+      guideline: "Follow our TypeScript style guide."
+      context_document_path: "docs/CONTRIBUTING.md"
+    - path: "*"
+      guideline: "Follow all of our engineering best practices."
+      context_document_path: "https://factory-ai.atlassian.net/wiki/spaces/factory/pages/9338882/Best+Practices"
+```
+
+</CodeGroup>
+
+### Components of a Guideline
+
+- `path`: An fnmatch pattern specifying which file paths this guideline applies to.
+- `guideline`: The specific issue you want Droid to comment on, preferably including a suggestion for how to fix it.
+- `context_document_path` (optional): Specifies a document that provides additional context to Review Droid when enforcing the guideline. This can be either:
+  - A path to a document from the repository root
+  - A URL to a Confluence page
+
+## Best Practices for Writing Guidelines
+
+To make the most of Review Droid Guidelines, follow these best practices:
+
+1. **Be Specific and Actionable**: Ensure your guidelines are clear and lead to actionable changes. Vague guidelines can result in inconsistent reviews and misunderstandings.
+2. **Complement Existing Tools**: Guidelines should complement other tools like linters and type checkers, not replace them. Use guidelines for aspects that are not easily automated, such as code structure and logic.
+3. **Maintain Contextual Relevance**: Tailor your guidelines to the specific context of the code. Different parts of the codebase may require different focus areas during review.
+4. **Use Examples**: When possible, provide examples of both good and bad practices in your guidelines to make them more clear and effective.
+5. **Keep Guidelines Up-to-Date**: Regularly review and update your guidelines as your project evolves and coding standards change.
+
+## Guideline Examples
+
+Here are some examples of effective guidelines for different aspects of code review:
+
+### Bugs & Errors
+
+<CodeGroup>
+
+```yaml
+- path: "src/*"
+  guideline: "Catch obvious bugs"
+```
+
+</CodeGroup>
+
+### Readability
+
+<CodeGroup>
+
+```yaml
+- path: "src/*.py"
+  guideline: "Don't use multi-line nested list comprehensions. Break them down into multiple statements for better readability."
+```
+
+</CodeGroup>
+
+### Error Handling
+
+<CodeGroup>
+
+```yaml
+- path: "src/*.py"
+  guideline: "Ensure all file operations are wrapped in try/except blocks to handle I/O errors gracefully."
+```
+
+</CodeGroup>
+
+### Security
+
+<CodeGroup>
+
+```yaml
+- path: "src/*.py"
+  guideline: "Validate all user inputs to prevent SQL injection and XSS attacks. Use parameterized queries and escape HTML output."
+```
+
+</CodeGroup>
+
+### Documentation
+
+<CodeGroup>
+
+```yaml
+- path: "src/*.py"
+  guideline: "Ensure all public functions have docstrings that describe their purpose, parameters, and return values."
+```
+
+</CodeGroup>
+
+## Feedback Mechanism
+
+Review Droid incorporates a feedback mechanism to continuously improve the effectiveness of the guidelines. During the review process, reviewers can provide feedback on each guideline using thumbs up or thumbs down reactions.
+
+- **Thumbs Up**: Indicates that the guideline was helpful and should continue to be used in future reviews.
+- **Thumbs Down**: Indicates that the guideline was not helpful or needs improvement.
+
+This feedback loop ensures that the guidelines evolve over time based on real-world usage and reviewer experiences, leading to more accurate and valuable review comments.
+
+## Conclusion
+
+By setting up effective Review Droid Guidelines, you can significantly enhance the quality and consistency of your code reviews. Remember to start with a few key guidelines and gradually expand as you learn what works best for your team and project.
+
+<Card title="Next: Cloud Development Environments" icon="cloud" href="/user-guides/remote-workspaces/installation-and-usage">
+  Learn how to set up Cloud Development Environments for optimal Droid performance
+</Card>

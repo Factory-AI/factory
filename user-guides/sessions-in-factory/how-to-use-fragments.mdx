@@ -1,0 +1,295 @@
+---
+title: How to Use Fragments
+description: Fragments in Factory are powerful tools that allow you to generate, preview, and integrate various types of code snippets and visualizations directly within your development environment. This guide will walk you through the different types of fragments available and how to use them effectively.
+
+---
+
+## What are Fragments?
+
+Fragments are self-contained pieces of code or content that Factory can generate, display, and allow you to interact with. They come in several types, each suited for different purposes:
+
+* HTML
+
+* SVG
+
+* React
+
+* Mermaid
+
+* Python
+
+## General Fragment Usage
+
+<Steps>
+  <Step title="Generate a Fragment">
+    Ask Factory to create a specific type of fragment. For example:
+    "Create a React component for a user profile card"
+  </Step>
+
+  <Step title="View the Fragment">
+    The generated fragment will appear in the Fragment Viewer.
+  </Step>
+
+  <Step title="Interact and Refine">
+    You can ask Factory to modify the fragment, explain parts of it, or generate variations.
+  </Step>
+
+  <Step title="Copy or Export">
+    Once satisfied, you can copy the fragment to use in your project or export it as a file.
+  </Step>
+</Steps>
+
+Now, let's dive into each fragment type in detail.
+
+## HTML Fragments
+
+HTML fragments allow you to create and preview web content, including styling and interactivity.
+
+<Accordion title="HTML Fragment Features">
+  * Combine HTML, CSS, and JavaScript in a single fragment
+
+  * Import libraries from CDNJS for enhanced functionality
+
+  * Preview the rendered result directly in Factory
+</Accordion>
+
+### Example: Creating an Interactive HTML Fragment
+
+<Steps>
+  <Step title="Request an HTML Fragment">
+    Ask Factory: "Create an HTML fragment for a responsive navigation menu with a dropdown"
+  </Step>
+
+  <Step title="View and Refine">
+    Factory will generate the HTML, CSS, and JavaScript for the menu. You can ask for modifications, such as:
+    "Add a search bar to the navigation menu"
+  </Step>
+
+  <Step title="Import External Library">
+    To add animations, you might say:
+    "Import the Animate.css library from CDNJS and apply a fade-in animation to the dropdown"
+  </Step>
+</Steps>
+
+<CodeGroup>
+  ```html HTML Fragment Example
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Responsive Nav with Dropdown</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+      <style>
+          /* Your CSS here */
+      </style>
+  </head>
+  <body>
+      <nav>
+          <!-- Navigation HTML here -->
+      </nav>
+      <script>
+          // Your JavaScript here
+      </script>
+  </body>
+  </html>
+  ```
+</CodeGroup>
+
+## SVG Fragments
+
+SVG fragments are perfect for creating scalable graphics and animations.
+
+<Accordion title="SVG Fragment Features">
+  * Create vector graphics that scale perfectly
+
+  * Design logos, icons, or complex illustrations
+
+  * Add animations to your SVG elements
+</Accordion>
+
+### Example: Generating an Animated SVG Logo
+
+<Steps>
+  <Step title="Request an SVG Fragment">
+    Ask Factory: "Create an SVG fragment for an animated logo of a rocket launching"
+  </Step>
+
+  <Step title="Refine the Design">
+    You can request changes like:
+    "Make the rocket trail change colors as it animates"
+  </Step>
+</Steps>
+
+<CodeGroup>
+  ```svg SVG Fragment Example
+  <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Definitions for gradients, animations, etc. -->
+    </defs>
+    <g id="rocket">
+      <!-- Rocket shape here -->
+    </g>
+    <path id="trail">
+      <!-- Animated trail path -->
+    </path>
+    <animate xlink:href="#trail" attributeName="stroke" values="red;orange;yellow" dur="1s" repeatCount="indefinite" />
+  </svg>
+  ```
+</CodeGroup>
+
+## React Fragments
+
+React fragments allow you to create powerful, interactive components with access to popular libraries.
+
+<Accordion title="React Fragment Features">
+  * Utilize Shadcn UI components for rapid development
+
+  * Implement complex UIs with React Flow
+
+  * Style components easily with Tailwind CSS
+
+  * Preview components directly in Factory
+</Accordion>
+
+### Example: Building a Data Visualization Component
+
+<Steps>
+  <Step title="Request a React Fragment">
+    Ask Factory: "Create a React component for a data dashboard using Shadcn UI"
+  </Step>
+
+  <Step title="Add Interactivity">
+    Refine the component by saying:
+    "Add a filter functionality to the dashboard using Shadcn's Select component"
+  </Step>
+
+  <Step title="Style with Tailwind">
+    Enhance the styling:
+    "Apply Tailwind classes to make the dashboard responsive and add a dark mode toggle"
+  </Step>
+</Steps>
+
+<CodeGroup>
+  ```jsx React Fragment Example
+  import React, { useState } from 'react';
+  import { Select } from "@/components/ui/select"
+  import { useTheme } from "@/components/ui/theme-provider"
+
+  const DataDashboard = () => {
+    const [filter, setFilter] = useState('all');
+    const { theme, setTheme } = useTheme()
+
+    // Component logic here
+
+    return (
+      <div className="p-4 dark:bg-gray-800">
+        <Select onValueChange={setFilter}>
+          {/* Filter options */}
+        </Select>
+        <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+          Toggle Theme
+        </button>
+      </div>
+    );
+  };
+
+  export default DataDashboard;
+  ```
+</CodeGroup>
+
+## Mermaid Fragments
+
+Mermaid fragments enable you to create various types of diagrams using a simple markdown-like syntax.
+
+<Accordion title="Mermaid Fragment Features">
+  * Create flowcharts, sequence diagrams, Gantt charts, and more
+
+  * Use a simple text-based syntax to define complex diagrams
+
+  * Preview the rendered diagram directly in Factory
+</Accordion>
+
+### Example: Creating a System Architecture Diagram
+
+<Steps>
+  <Step title="Request a Mermaid Fragment">
+    Ask Factory: "Create a Mermaid diagram showing the architecture of a microservices-based e-commerce system"
+  </Step>
+
+  <Step title="Refine the Diagram">
+    You can ask for changes like:
+    "Add a database component to the user service in the diagram"
+  </Step>
+</Steps>
+
+<Frame>
+  ```mermaid Mermaid Fragment Example
+  graph TD
+      A[Client] -->|API Gateway| B(API Gateway)
+      B --> C{Load Balancer}
+      C -->|/users| D[User Service]
+      C -->|/products| E[Product Service]
+      C -->|/orders| F[Order Service]
+      D --> G[(User DB)]
+      E --> H[(Product DB)]
+      F --> I[(Order DB)]
+  ```
+</Frame>
+
+## Python Fragments
+
+Python fragments are ideal for data analysis, scientific computing, and creating quick visualizations.
+
+<Accordion title="Python Fragment Features">
+  * Access to popular data science libraries like pandas and matplotlib
+
+  * Execute code and see results directly in Factory
+
+  * Create data visualizations and perform statistical analyses
+</Accordion>
+
+### Example: Analyzing and Visualizing Sales Data
+
+<Steps>
+  <Step title="Request a Python Fragment">
+    Ask Factory: "Create a Python fragment to analyze monthly sales data and visualize the trend"
+  </Step>
+
+  <Step title="Refine the Analysis">
+    You can request additional analysis:
+    "Add a comparison of this year's sales to last year's"
+  </Step>
+</Steps>
+
+<CodeGroup>
+  ```python Python Fragment Example
+  import pandas as pd
+  import matplotlib.pyplot as plt
+
+  # Load and prepare data
+  df = pd.read_csv('sales_data.csv')
+  df['date'] = pd.to_datetime(df['date'])
+  monthly_sales = df.resample('M', on='date')['sales'].sum()
+
+  # Create plot
+  plt.figure(figsize=(10, 5))
+  monthly_sales.plot(kind='bar')
+  plt.title('Monthly Sales')
+  plt.xlabel('Date')
+  plt.ylabel('Total Sales')
+  plt.show()
+  ```
+</CodeGroup>
+
+## Best Practices for Using Fragments
+
+1. **Start Simple, Then Refine**: Begin with a basic request and iteratively refine your fragment.
+
+2. **Combine Fragment Types**: Use different fragment types together for comprehensive solutions.
+
+3. **Version Control**: Save important fragments and track changes as you refine them.
+
+4. **Documentation**: Add comments to your fragments to explain complex logic or usage.
+
+5. **Reusability**: Design fragments with reusability in mind, using parameters where appropriate.

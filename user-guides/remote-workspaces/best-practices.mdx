@@ -1,0 +1,96 @@
+---
+title: Best Practices for Remote Workspaces
+description: Proven tips and workflows to get the most out of remote workspaces in Factory
+---
+
+Remote workspaces let you spin up consistent, production-ready development environments in seconds. Below are field-tested practices that keep workspaces fast, predictable, and team-friendly.
+
+## 1. Optimize Your Devcontainer
+
+| Practice                       | Why it matters                                        | How to do it                                                                                          |
+| ------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Start from the right image** | Lean images build faster and consume fewer resources. | Choose the _closest_ official image (e.g., `javascript-node:20`) and layer tools on top.              |
+| **Cache heavy tooling**        | Re-downloading large packages slows rebuilds.         | Move expensive installs (e.g., Chrome, large SDKs) to the image stage instead of `postCreateCommand`. |
+| **Shrink build context**       | Huge contexts = slow uploads.                         | Add `**/node_modules`, build artifacts, and secrets to `.dockerignore`.                               |
+| **Forward only needed ports**  | Too many ports clutter the UI.                        | Keep `forwardPorts` to the handful you actually use.                                                  |
+
+> **Tip:** Test locally with the Dev Containers CLI (`devcontainer up`) before committing.
+
+---
+
+## 2. Git Workflows Inside a Remote Workspace
+
+<CardGroup cols={2}>
+
+  <Card title="Branch Fast" icon="git-branch">
+    Create feature branches as you would locally:
+    `git checkout -b feature/workspace-improvements`.
+  </Card>
+
+  <Card title="Commit Often" icon="git-commit">
+    Short commit cycles reduce merge pain and keep your workspace snapshot small.
+  </Card>
+
+  <Card title="Push via HTTPS" icon="cloud-upload">
+    Remote credentials are injected automatically—no need to copy SSH keys.
+  </Card>
+
+  <Card title="Use Rebase for Clean History" icon="layers">
+    `git pull --rebase origin main` keeps your branch up-to-date without noisy merge commits.
+  </Card>
+
+</CardGroup>
+
+<Note>
+  Remember: everything you do in a remote workspace happens **inside the cloud environment**. Your local machine stays untouched until you pull changes down.
+</Note>
+
+---
+
+## 3. Workflow Patterns That Scale
+
+<AccordionGroup>
+
+  <Accordion title="Spin-Up-Per-Task">
+    Treat remote workspaces as disposable: create one per ticket or PR, then archive when merged.  
+    **Benefits:** perfect isolation, zero “works on my machine” drift.
+  </Accordion>
+
+  <Accordion title="Shared Review Environments">
+    For larger features, keep a named workspace (e.g., “design-review”) that teammates can attach to for demos or QA.  
+    **How:** Grant workspace visibility to your team and share the session URL.
+  </Accordion>
+
+  <Accordion title="Parallel Environments">
+    Need to test multiple branches? Launch two workspaces and attach them to separate sessions; switch context without killing processes.
+  </Accordion>
+
+</AccordionGroup>
+
+---
+
+## 4. Team Collaboration Tips
+
+| Tip                         | Details                                                                                                     |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Name workspaces clearly** | Use `service-purpose-branch` (e.g., `api-auth-refactor`) so teammates know what’s running.                  |
+| **Document entry commands** | Add a `README_REMOTE_WORKSPACE.md` with common tasks (`npm run dev`, `pytest`)—new hires onboard instantly. |
+
+## 5. Troubleshooting at a Glance
+
+| Symptom                      | Resolution                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| **Rebuild is slow**          | Verify `.dockerignore`, cache heavy installs in image, use lighter base.     |
+| **Git asks for credentials** | Ensure repository integration is enabled in **Integrations → Repositories**. |
+| **Out-of-disk errors**       | Prune package caches (`npm cache clean --force`) or rebuild workspace.       |
+
+---
+
+### Quick Checklist Before Merging Code
+
+- [ ] All tests pass inside remote workspace
+- [ ] Linter is green
+- [ ] Devcontainer changes committed
+- [ ] Workspace hibernated or archived
+
+Following these practices keeps your remote workspaces fast, secure, and collaborative—so you can focus on shipping code, not configuring machines.

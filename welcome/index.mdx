@@ -1,0 +1,131 @@
+---
+mode: "custom"
+---
+
+export function openSearch() {
+  document.getElementById("search-bar-entry").click();
+}
+
+<div
+  className="relative w-full flex items-center justify-center"
+  style={{
+    height: '24rem',
+    overflow: 'hidden',
+    backgroundImage: "url('https://mintlify-assets.b-cdn.net/san_fran.jpg')",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'
+  }}
+>
+  <div
+    className="absolute inset-0 bg-primary dark:bg-primary"
+    style={{ opacity: 0.6 }}
+  />
+
+  <div style={{ position: 'absolute', textAlign: 'center', padding: '0 1rem' }}>
+    <div
+      className="text-primary-light"
+      style={{
+        fontWeight: '600',
+        fontSize: '28px',
+        margin: '0',
+        color: '#ffffff',
+      }}
+    >
+      Welcome to <span className="text-primary-light">Factory</span>
+    </div>
+
+    <div
+      style={{
+        marginTop: '1rem',
+        maxWidth: '42rem',
+        color: '#ffffff',
+      }}
+    >
+      <p
+        style={{
+          color: '#ffffff !important',
+          fontWeight: '400',
+          fontSize: '16px',
+          margin: 0,
+        }}
+      >
+        <span style={{ color: '#ffffff' }}>
+        Learn more about Factory to transform how you build software with agents
+        </span>
+      </p>
+    </div>
+
+    <div className="flex items-center justify-center">
+      <button
+        type="button"
+        className="flex w-full max-w-[44rem] items-center text-sm leading-6 rounded-lg py-1.5 pl-2.5 pr-3 shadow-sm text-gray-400 dark:text-white/50 bg-background-light dark:bg-background-dark dark:brightness-[1.1] dark:ring-1 dark:hover:brightness-[1.25] ring-1 ring-gray-400/20 hover:ring-gray-600/25 dark:ring-gray-600/30 dark:hover:ring-gray-500/30 focus:outline-primary"
+        id="home-search-entry"
+        style={{
+          marginTop: '2rem',
+        }}
+        onClick={openSearch}
+      >
+        <svg
+          className="h-4 w-4 ml-1.5 mr-3 flex-none bg-gray-500 hover:bg-gray-600 dark:bg-white/50 dark:hover:bg-white/70"
+          style={{
+            maskImage:
+              `url("https://mintlify.b-cdn.net/v6.5.1/solid/magnifying-glass.svg")`,
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center center',
+          }}
+        />
+        Search or ask anything
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div
+  style={{marginTop: '3rem', marginBottom: '4rem', maxWidth: '70rem', marginLeft: 'auto',
+   marginRight: 'auto', paddingLeft: '1.25rem',
+   paddingRight: '1.25rem' }}
+>
+<p
+  className="text-gray-900 dark:text-gray-200 text-left"
+  style={{ marginTop: '16px', fontSize: '24px', marginBottom: '16px', fontWeight: '600' }}
+>Get started in 5 minutes</p>
+  <div >
+    <CardGroup cols={3}>
+      <Card title="CLI" icon="square-terminal" href="factory-cli/getting-started/quickstart">
+        Get up and running with Factory CLI interface in 5 minutes
+      </Card>
+      <Card title="Web" icon="browser" href="/user-guides/get-started/quickstart">
+        Get up and running with Factory's web interface in 5 minutes
+      </Card>
+      <Card title="Enterprise" icon="building" href="/onboarding/index">
+        Get started on setting up a Factory enterprise instance
+      </Card>
+    </CardGroup>
+  </div>
+<p
+  className="text-gray-900 dark:text-gray-200 text-left"
+  style={{ marginTop: '16px', fontSize: '24px', marginBottom: '16px', fontWeight: '600' }}
+>Choose a topic below or <a href="/user-guides/get-started/quickstart" className="text-primary dark:text-primary-light">get started in 5 minutes</a></p>
+<CardGroup cols={3}>
+  <Card title="Managing Context" icon="brain-circuit" href="/user-guides/managing-context/understanding-context">
+    Learn how to bring together and manage context from across your engineering
+    system
+  </Card>
+  <Card title="Factory Droids" icon="robot" href="/user-guides/droids/understanding-droids">
+    Specialized AI assistants designed for specific development tasks
+  </Card>
+  <Card title="Sessions & Interface" icon="window-maximize" href="/user-guides/sessions-in-factory/chat-interface">
+    Master Factory's malleable interface and collaborative sessions
+  </Card>
+  <Card title="Use Cases" icon="lightbulb" href="/user-guides/sessions-in-factory/use-cases">
+    Explore real-world applications and examples
+  </Card>
+  <Card title="Retrieving Context" icon="book-open" href="/user-guides/managing-context/context-retrieval">
+    Allow Factory to retrieve context from across your engineering system
+  </Card>
+  <Card title="Codebase Explorer" icon="compass" href="/user-guides/managing-context/codebase-explorer">
+    Leverage our Codebase Explorer to manage multi-repo code context
+  </Card>
+</CardGroup>
+</div>

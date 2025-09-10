@@ -1,0 +1,68 @@
+---
+title: "GitLab Cloud Integration"
+description: "Step-by-step guide to connect Factory with your GitLab Cloud repositories"
+---
+
+This guide will walk you through the process of integrating Factory with GitLab Cloud, enabling the Factory platform to seamlessly work with your GitLab repositories.
+
+## Prerequisites
+
+- A Factory account with admin privileges
+- Admin access to your GitLab Cloud organization
+
+## Integration Steps
+
+<Steps>
+  <Step title="Access Factory Platform">
+    Log in to your Factory account and navigate to the Integrations section in your Settings.
+  </Step>
+  <Step title="Initiate GitLab Integration">
+    Click on "Connect" next to Gitlab to start the integration process. Select Manage Gitlab Permissions.
+  </Step>
+  <Step title="Authorize Factory's GitLab Application">
+    You'll be redirected to GitLab. Review the requested permissions and click "Authorize" to allow Factory's secure OAuth2 GitLab Application access to your organization.
+  </Step>
+  <Step title="Review and Approve Permissions">
+    Factory requires two main OAuth scopes to function optimally:
+
+    - **api**: This comprehensive scope allows Factory to read from and write to your repositories, manage issues and merge requests, and comment on commits.
+    - **read_user**: This scope enables Factory to access user information, providing better context for various operations.
+
+    Ensure these scopes are selected before proceeding.
+  </Step>
+  <Step title="Configure Repository Access">
+    Select the repositories you want Factory to access. You can choose specific repositories or grant access to all current and future repositories within the authorized groups or personal namespace.
+  </Step>
+  <Step title="Confirm Integration">
+    After granting permissions, you'll be redirected back to Factory. Confirm that the integration status shows as "Connected".
+  </Step>
+</Steps>
+
+## Verification
+
+To ensure the integration is working correctly:
+
+1. Create a test repository or use an existing one with minimal sensitive data.
+2. Initiate a simple workflow, such as creating a merge request.
+3. Verify that Factory can access and interact with the repository as expected.
+
+## Best Practices
+
+- Regularly review and audit the permissions granted to Factory.
+- Use GitLab's group-level settings to manage access for multiple projects efficiently.
+- Keep your GitLab organization's security settings up-to-date.
+- Periodically review the list of authorized applications in your GitLab settings.
+
+## Troubleshooting
+
+If you encounter issues during integration:
+
+- Ensure you have the necessary admin rights on both Factory and GitLab.
+- Check GitLab's audit logs for any permission-related issues.
+- Verify that the OAuth application is properly authorized in your GitLab settings.
+
+For persistent problems, contact Factory support with specific error messages or screenshots.
+
+<Card title="Security and Compliance" icon="shield-check" href="/user-guides/build-with-factory/security-compliance">
+  Learn about Factory's security measures and how we protect your data
+</Card>

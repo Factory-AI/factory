@@ -1,0 +1,70 @@
+---
+title: Settings
+description: Configure how droid behaves and integrates with your workflow.
+---
+
+## Accessing settings
+
+To configure droid settings:
+
+1. Run `droid`
+2. Enter `/settings`
+3. Adjust your preferences interactively
+
+Changes take effect immediately and are saved to your settings file.
+
+## Where settings live
+
+| OS        | Location                               |
+| --------- | -------------------------------------- |
+| macOS / Linux | `~/.factory/settings.json` |
+| Windows   | `%USERPROFILE%\.factory\settings.json` |
+
+If the file doesn't exist, it's created with defaults the first time you run **droid**.
+
+## Available settings
+
+| Setting | Options | Default | Description |
+| ------- | ------- | ------- | ----------- |
+| `model` | `sonnet`, `opus`, `GPT-5` | `sonnet` | The AI model used by droid |
+| `diffMode` | `github`, `diff` | `github` | How code changes are displayed |
+| `persistToCloud` | `true`, `false` | `false` | Sync CLI sessions to Factory web UI |
+
+### Model
+
+Choose the AI model that powers your droid:
+
+- **`sonnet`** - Balanced performance and speed (recommended)
+- **`opus`** - Most capable model for complex tasks  
+- **`GPT-5`** - Latest OpenAI model
+
+### Diff mode
+
+Control how droid displays code changes:
+
+- **`github`** - Side-by-side, higher quality render (recommended)
+- **`diff`** - Traditional git diff format
+
+### Persist to cloud
+
+When enabled, syncs your CLI sessions to your Factory web sessions so you can view them in the web UI:
+
+- **`true`** - CLI sessions appear in Factory web interface
+- **`false`** - CLI sessions remain local only
+
+## Example configuration
+
+```json
+{
+  "model": "sonnet",
+  "diffMode": "github", 
+  "persistToCloud": true
+}
+```
+
+---
+
+### Need more?
+
+• [CLI Reference](/factory-cli/configuration/cli-reference) – command flags & options
+• [IDE Integrations](/factory-cli/configuration/ide-integrations) – editor-specific setup

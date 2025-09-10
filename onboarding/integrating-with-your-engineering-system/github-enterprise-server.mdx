@@ -1,0 +1,126 @@
+---
+title: "GitHub Enterprise Server"
+description: "Detailed guide for connecting Factory with your self-hosted GitHub Enterprise Server"
+---
+
+This guide provides a comprehensive walkthrough for integrating Factory with your GitHub Enterprise Server (GHES) instance. This integration enables the Factory platform to securely access and work with your on-premise repositories.
+
+> Connecting to a GitHub Enterprise Server is only supported in the Enterprise plan.
+
+## Prerequisites
+
+- Admin access to your GitHub Enterprise Server instance
+- Network access between your GHES instance and Factory's AWS VPC
+- A Factory account with an Enterprise plan and admin privileges 
+
+## Integration Process
+
+<Steps>
+  <Step title="Initial Setup & Information Gathering">
+    <Steps>
+      <Step title="Create GitHub App">
+        1. Navigate to your GHES instance settings.
+        2. Go to GitHub Apps and click "New GitHub App".
+        3. Fill in the app details:
+           - Name: "Factory Integration"
+           - Homepage URL: https://factory.ai
+           - Webhook URL: (Provided by Factory)
+        4. Set permissions as outlined in the "Required Permissions" section below.
+        5. Generate and securely store a private key for the app.
+      </Step>
+      <Step title="Collect Integration Information">
+        Gather the following details:
+
+        - GitHub App ID
+        - Client ID
+        - Client Secret
+        - Webhook Secret
+        - Private Key (generated in previous step)
+        - Your GHES instance hostname
+      </Step>
+      <Step title="Submit Information to Factory">
+        Securely send the collected information to your Factory representative.
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="Network Security Configuration">
+    <Steps>
+      <Step title="Evaluate Network Policy">
+        Review your current network security policies to identify potential connectivity barriers with Factory's AWS VPC.
+      </Step>
+      <Step title="Establish Connectivity">
+        Choose one of the following methods:
+
+        1. VPC Peering (if your GHES is on AWS):
+           - Initiate a VPC peering request.
+           - Exchange VPC IDs with Factory.
+           - Configure route tables for direct network routes.
+        2. VPN Connection:
+           - Establish a VPN between your network and Factory's.
+           - Ensure VPN settings (e.g., IPsec) are compatible on both ends.
+      </Step>
+      <Step title="Firewall Configuration">
+        - Allow outbound connections to Factory's services (HTTPS and SSH traffic).
+        - Ensure your GHES instance can communicate with the Factory-provided Lambda function URL.
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="Webhook Setup">
+    Configure the webhook in your GHES to send events to the Factory-provided cloud function URL.
+  </Step>
+  <Step title="Required Permissions">
+    Ensure the GitHub App has the following permissions:
+
+    - Actions and Metadata (Read)
+    - Code (Read & Write)
+    - Commit Statuses (Read & Write)
+    - Discussions (Read & Write)
+    - Issues (Read & Write)
+    - Pull Requests (Read & Write)
+    - Workflows (Read & Write)
+  </Step>
+  <Step title="Testing and Validation">
+    <Steps>
+      <Step title="Preliminary Testing">
+        Work with Factory to conduct initial tests of webhook connectivity and data exchange.
+      </Step>
+      <Step title="Comprehensive Testing">
+        Test all GitHub events that trigger Tools within Factory, including:
+
+        - Creating pull requests
+        - Pushing code
+        - Opening issues
+      </Step>
+      <Step title="Validation">
+        Verify that Factory Tools respond correctly to these events.
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="Final Adjustments and Go-Live">
+    <Steps>
+      <Step title="Feedback and Adjustments">
+        Provide feedback on any issues encountered during testing. Work with Factory to make necessary adjustments.
+      </Step>
+      <Step title="Go-Live">
+        Agree on a go-live date with Factory.
+      </Step>
+      <Step title="Monitoring">
+        Implement continuous monitoring for the initial days post-launch to quickly address any unforeseen issues.
+      </Step>
+    </Steps>
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- If webhook events aren't being received, check your network configuration and firewall rules.
+- For permission-related issues, review the GitHub App settings in your GHES instance.
+- If Factory isn't responding as expected, verify that all required events are being sent and that permissions are correctly set.
+
+## Support
+
+For any specific issues or detailed support needs, contact the Factory team through your designated support channel.
+
+<Card title="Security and Compliance" icon="shield-check" href="/user-guides/build-with-factory/security-compliance">
+  Learn about Factory's security measures for enterprise integrations
+</Card>

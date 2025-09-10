@@ -1,0 +1,178 @@
+---
+title: "Agent Driven Development"
+description: "A disciplined approach to building software with autonomous agents"
+sidebarTitle: ""
+---
+
+# Agent Driven Development: How to Build Software with AI
+
+When used correctly, AI agents provide massive leverage for software development. Many developers acknowledge this reality and want to adapt their workflows. Yet a question that has been left unanswered: how do you actually build with agents the right way?
+
+Standard software development practices have been built in a very human‑centric way. In the pre-AI era, the largest bottleneck was writing lines of code. With AI, that is quickly changing. But without best practices, a new, similarly large bottleneck will emerge at later parts in the software development lifecycle: review and validation.
+
+Agent‑Driven Development (ADD) is a disciplined approach to building software with autonomous agents. It allows you to dramatically increase your coding output, while addressing common failure patterns through thorough planning and clear verification procedures.
+
+Development is agent‑driven when the agent runs the full inner loop: gather context, plan, implement, run validation, and submit a reviewable change. Along the way, it leaves a clear trace of its reasoning and decisions. Humans still make architectural decisions, set guardrails, and intervene when an agent makes mistakes.
+
+## Core Foundations
+
+![Three Principles](/images/add-principles.png)
+
+Building software with agents has three main principles:
+
+- Make the request precise enough such that success can be demonstrated
+- Keep the task small enough such that any wrong assumption gets addressed before compounding
+- Create an environment that lends itself to automatic, objective verification over manual review
+
+## Specification is Everything
+
+A guiding principle when working with agents is that you get out what you put in. The more precise your guidance – or "specification" – for the task at hand, the more likely the agent is to accomplish that task to your liking. Ask yourself, "what guidance would I need to provide a capable new hire such that they would not need to interrupt me more than once?" Use that as a gut check for precision.
+
+Generally, it is clear when an ask is underspecified: "fix the bug preventing users from signing in" or "improve performance in our query API" or "add SSO with Google to the app." There's no anchor. No boundary. No measurable success. The agent will dutifully explore and guess, but will inevitably violate assumptions that you had, but did not explicitly state.
+
+Let's compare a loose specification with a precise specification:
+
+![Wrong vs. Right Side-by-side](/images/add-specifications.png)
+
+<Info>
+**Loose:**
+
+"Token refresh is broken because it's dropping the new token. Can you please fix this?"
+</Info>
+
+<Info>
+**Precise:**
+
+"I think concurrent refresh calls sometimes drop the newly issued token. This logic is handled in packages/session/refresh.ts. I've been reproducing this by running yarn test session_refresh_race. I would like all tests to pass, with no reduction in existing coverage, no new dependencies, and only files inside packages/session/ touched."
+</Info>
+
+Notice what the precise version does not do. It does not prescribe the internal algorithm, name every file, or drown in internal jargon. It marks a starting locus, the failure signal, boundaries, and the definition of "done." That's enough to keep the loop narrow while leaving design freedom for the agent.
+
+If you're having trouble writing a precise spec, you can leverage your agent to help write a more precise spec. A simple request "Help me turn this rough idea into a proper spec" can add the precision and structure needed for success.
+
+<Warning>
+A quick self‑check: Can you point to (1) where the agent should start reading and (2) the artifact that proves completion? If either answer is mushy, you're still brainstorming. You cannot delegate what you cannot define.
+</Warning>
+
+## Practical Workflows That Work
+
+![Explore → plan → code → verify](/images/add-workflow.png)
+
+Here are some practical workflows that you can pick up to see success with agents today.
+
+### Explore → Plan → Code → Verify
+
+Begin with a loop that mirrors a thoughtful human workflow:
+
+1. **Explore** – Ask the agent to explore the specific parts of the codebase you know are relevant.
+2. **Plan** – Ask the agent to come up with a plan to implement the task you have in mind. Review the agent's proposed steps. Tighten the scope or boundaries before any edits occur.
+3. **Code** – Approve small, well-scoped changes. Encourage checkpoint commits so you can bisect if necessary.
+4. **Verify** – Require objective proof: tests, lint, type check, and a diff confined to agreed paths. A commit message should explain intent, not just "fix stuff."
+
+![Test Driven Development Graphic](/images/add-tdd.png)
+
+For pure logic bugs, flip to Test-First Development. The agent writes a failing test, confirms it fails, then implements a fix until the suite is green with no coverage loss.
+
+![Visual Iteration Loop Graphic](/images/add-visual.png)
+
+For UI work, use a Visual Iteration Loop. Provide a screenshot or running preview, let the agent implement, capture a snapshot, then iterate until the visual diff is negligible.
+
+Choose the loop that matches the task rather than forcing one pattern everywhere.
+
+## Setting Up an Environment For Success
+
+Keep a short AGENTS.md file at the repo root that answers three questions:
+
+- How do I build, test, and lint?
+- How is the codebase organized at a high level?
+- What evidence must accompany a pull request?
+
+<Example>
+```
+build: npm run build
+test: npm test
+lint: npm run lint
+Paths for auth: /packages/session/*
+No new runtime deps in /core without explanation. CI gates: green tests, eslint clean, coverage ≥ baseline.
+```
+</Example>
+
+Update this file whenever you see your agents consistently missing the ball.
+
+## Boundaries and Permissions
+
+Consider setting your risk profile based on the types of commands you're willing to run automatically.
+
+<CardGroup>
+  <Card title="Low risk" icon="shield-check">
+    File edits, formatting, local test runs
+  </Card>
+  <Card title="Medium risk" icon="shield-exclamation">
+    Commits, dependency bumps, schema dry-runs
+  </Card>
+  <Card title="High risk" icon="shield-xmark">
+    Destructive scripts, production data, sensitive directories
+  </Card>
+</CardGroup>
+
+Automate the low / medium tier, and insist on human confirmation for high-risk actions.
+
+### Deterministic & Verifiable Environments
+
+Agents thrive when every run is verifiable and repeatable. You should have:
+
+- Highly opinionated format and lint checks to catch style drift
+- Unit test and/or component tests to confirm and preserve local behavior
+- When applicable, newly added failing tests prove you reproduced the bug or requirement
+- Static scan and/or security scan to ensure you did not ship a known vulnerability
+- A review-oriented agent in CI that flags more complex design patterns and maintainability concerns
+
+## Real-World Examples
+
+### Bug Fix: Issue to PR
+
+Write a precise spec that names the starting file, the reproduction command, and the proof of success. The agent adds a failing test, watches it fail, patches only the allowed path, re-runs the narrow test set, then the full suite. A one-paragraph commit message explains the root cause and the fix.
+
+### Feature Development in 2–6 Hours
+
+Draft a mini-PRD in the prompt: user story, affected components, constraints, and done definition. Ask for a plan first. Break execution into checkpoints—backend API, frontend stub, polish. After each checkpoint, run targeted tests and one manual verification check before green-lighting the next stage.
+
+### Maintenance and Upkeep
+
+Delegate drudge work that already has clear rails: formatting bursts inside one package, changelog-aware library bumps, or doc updates after a merge. Still gate each PR on the same objective checks; automation should never bypass quality bars.
+
+## When Things Go Wrong
+
+There are warning signs of agent drift, if you see them you should interrupt and intervene:
+
+- Plans that rewrite themselves mid-execution
+- Edits outside the declared paths
+- Fixes claimed without failing tests to prove they work
+- Diffs bloated with unrelated changes
+
+Fixing before things get too off-track will save you time in the long run.
+
+### Recovery Playbook
+
+![Recovery Playbook](/images/add-recovery.png)
+
+<CardGroup>
+  <Card title="Tighten the spec">
+    Narrow the directory or test the agent may touch.
+  </Card>
+  <Card title="Salvage the good">
+    Keep valid artifacts such as a failing test; revert noisy edits.
+  </Card>
+  <Card title="Restart clean">
+    Launch a fresh session with improved instructions.
+  </Card>
+  <Card title="Take over">
+    When you can tell the agent is failing to succeed, pair program the final changes.
+  </Card>
+</CardGroup>
+
+Deciding to restart when rescuing the branch will cost more attention than re-running the task cleanly.
+
+## You Can Start Today
+
+Pick one modest bug or small feature from your backlog. Write three clear sentences that state where to begin, how to reproduce the issue, and what proof signals completion. Run the agent through Explore → Plan → Code → Verify, review the evidence, and merge. Repeat a handful of times. You will spend less energy on boilerplate and more on design, while the agent handles the grind. The sooner you start the loop, the sooner you compound its gains. ADD will show you both the limits and the power of agents in your software development lifecycle.

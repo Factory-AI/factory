@@ -1,0 +1,153 @@
+---
+title: Codebase Search
+description: Learn how to effectively search across multiple repositories in Factory using powerful regex-based queries
+---
+
+Factory's codebase search feature allows you to quickly find and reference code across multiple repositories. This powerful tool uses regex-based queries to provide flexible and precise search capabilities, enhancing your ability to navigate and understand large codebases.
+
+## Getting Started with Codebase Search
+
+To use the codebase search in Factory, you'll interact with a running server that indexes multiple repositories. Here's how to get started:
+
+<Steps>
+  <Step title="Access the Context Menu">
+    In your Factory session, switch to the context panel from the upper left corner of any panel.
+  </Step>
+
+  <Step title="Enter Your Query">
+    Type your search query into the provided search bar. Remember, every query is treated as a regex pattern.
+  </Step>
+
+  <Step title="Review Results">
+    The search results will display matching code snippets, file names, and repository information.
+  </Step>
+</Steps>
+
+## Query Syntax Basics
+
+Understanding the query syntax is key to effective codebase searching. Here are the fundamental concepts:
+
+<Accordion title="Basic Regex Patterns">
+  * `.` (dot) is a wildcard character matching any single character
+
+  * `\.` (escaped dot) matches a literal dot
+
+  * `?` matches zero or one of the preceding character
+
+  * `*` matches zero or more of the preceding character
+
+  * `+` matches one or more of the preceding character
+
+  Example: `print.+` would match "print" followed by one or more characters
+</Accordion>
+
+<Accordion title="Multiline Search">
+  Use `OR[[:space:]]IMPLIED` for multiline search patterns.
+
+  Example: `function OR[[:space:]]IMPLIED return` would match functions that contain a return statement, even if "return" is on a different line.
+</Accordion>
+
+<Accordion title="Filtering Results">
+  Narrow down your search using these filters:
+
+  * `file:` or `f:` - Filter by filename
+
+  * `repo:` or `r:` - Filter by repository name
+
+  * `branch:` or `b:` - Filter by branch name
+
+  * `lang:` - Filter by programming language
+
+  Example: `file:README test` searches for "test" in README files
+</Accordion>
+
+## Advanced Search Techniques
+
+Take your codebase search to the next level with these advanced features:
+
+### Symbol Search
+
+Search for symbol definitions (as identified by universal-ctags):
+
+```
+sym:main
+sym:Test[A-Z]
+```
+
+### Case Sensitivity
+
+By default, all-lowercase queries are case-insensitive, while queries with any uppercase characters are case-sensitive. Override this behavior with `case:`:
+
+```
+readme vs readme case:yes  # Case-sensitive search for "readme"
+README vs README case:no   # Case-insensitive search for "README"
+```
+
+### Quoted Queries
+
+Use double quotes for queries containing spaces:
+
+```
+"run the test"
+"goto considered harmful"
+```
+
+### Logical Composition
+
+Combine search expressions for more complex queries:
+
+<Accordion title="Logical Operators">
+  * `-` (dash) negates an expression
+
+  * Implicit `AND` between expressions
+
+  * `or` for explicit OR operations
+
+  * Use parentheses `()` to group expressions
+
+  Examples:
+
+  ```
+  this -without_this
+  (file:test or file:spec) lang:ruby
+  (database or db) -mysql
+  ```
+</Accordion>
+
+## Best Practices for Effective Codebase Search
+
+1. **Start Broad, Then Refine**: Begin with a general search and use filters to narrow down results.
+
+2. **Use Regex Wisely**: Leverage regex patterns for flexible matching, but be cautious of overly complex patterns.
+
+3. **Combine Filters**: Use multiple filters together to pinpoint specific code areas.
+
+4. **Leverage Symbol Search**: For finding function or class definitions quickly.
+
+5. **Consider Case Sensitivity**: Be explicit about case when it matters for your search.
+
+## Common Search Scenarios
+
+Here are some example scenarios and how to approach them with codebase search:
+
+<AccordionGroup>
+  <Accordion title="Finding API Usage">
+    Search: `api\.call\(`
+    Explanation: This finds instances of "api.call(" across the codebase, useful for tracking API usage.
+  </Accordion>
+
+  <Accordion title="Locating Test Files">
+    Search: `file:test lang:python def test_`
+    Explanation: This finds Python test function definitions in files with "test" in the name.
+  </Accordion>
+
+  <Accordion title="Identifying TODO Comments">
+    Search: `// TODO:`
+    Explanation: Finds TODO comments in code (adjust comment syntax for different languages).
+  </Accordion>
+
+  <Accordion title="Finding Deprecated Code">
+    Search: `@deprecated or [Dd]eprecated`
+    Explanation: Locates usage of deprecation markers in comments or annotations.
+  </Accordion>
+</AccordionGroup>

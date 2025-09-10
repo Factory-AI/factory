@@ -1,0 +1,60 @@
+---
+title: "GitLab Self-Hosted"
+description: "Comprehensive guide for connecting Factory with your self-hosted GitLab instance"
+---
+
+This guide provides detailed instructions for integrating Factory with your self-hosted GitLab instance, allowing the Factory platform to securely access and work with your on-premise repositories.
+
+> Connecting to a self-hosted GitLab instance is only supported in the Enterprise plan.
+
+## Prerequisites
+
+- Admin access to your self-hosted GitLab instance
+- A Factory account with an Enterpise plan and admin privileges
+
+## Integration Process
+
+<Steps>
+  <Step title="Create GitLab Application">
+    1. In your GitLab instance, go to Admin Area \> Applications.
+    2. Click "Add new application" and fill in the details:
+        - Name: `Factory Integration`
+        - Redirect URI: `https://app.factory.ai/api/integrations/redirect/gitlab-sh`
+        - Trusted: yes
+        - Scopes:
+          - `api`
+          - `read_api`
+          - `read_user`
+          - `read_repository`
+          - `write_repository`
+          - `read_observability`
+          - `write_observability`
+    3. Save the application and note the Application ID and Secret.
+  </Step>
+  <Step title="Create Factory Droid User Account">
+    1. In your GitLab instance, go to Admin Area \> Users.
+    2. Click "New User" and fill in the details:
+        - Name: `Factory Droid`
+        - Username: `factory-droid`
+        - Email: [any]
+    3. Once the user is created, log in as or Impersonate the user before moving on to the next step.
+  </Step>
+  <Step title="Configure Gitlab Self-Hosted in Factory">
+    1. Navigate to https://app.factory.ai/settings/integrations, click on "Connect" next to GitLab, and toggle "Self-Hosted" in the bottom left.
+    2. In the Self-Hosted Setup panel, enter your GitLab Self-Hosted Application details:
+        - **Domain:** the url of your GitLab instance, such as https://gitlab.example.com. If you have separate internal and external domains, enter your external domain.
+        - **Application ID:** from the application created in the previous part.
+        - **Secret:** from the application created in the previous part.
+    3. Save the configuration.
+    4. Click "Manage Gitlab Self-Hosted Permissions" in the top right. This will open a pop-up window that will authorize the integration. IMPORTANT: you must be logged in as or impersonating the `factory-droid` user before performing this step.
+    5. Your repositories should now appear in the Repository Selection panel. Navigate there and enable repositories for Factory.
+  </Step>
+</Steps>
+
+## Support
+
+For any specific issues or detailed support needs, contact the Factory team through your designated support channel.
+
+<Card title="Security and Compliance" icon="shield-check" href="/user-guides/build-with-factory/security-compliance">
+  Learn about Factory's security measures for enterprise integrations
+</Card>
