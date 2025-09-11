@@ -25,19 +25,6 @@ What happens under the hood:
 - Build runs with 4 CPUs and 4 GiB RAM.
 - Errors are surfaced clearly (e.g., `Setup command failed: ...`) for quick fixes.
 
-API usage:
-- POST `/api/workspaces/create` with:
-```json
-{
-  "repoUrl": "https://github.com/org/repo",
-  "workspaceName": "my-workspace",
-  "environmentVariables": [{ "key": "API_KEY", "value": "****" }],
-  "customCommands": [
-    "npm ci",
-    "npm run build"
-  ]
-}
-
 ## 2. Troubleshooting Tips
 
 | Issue | Fix |
