@@ -5,16 +5,18 @@ description: Proven tips and workflows to get the most out of remote workspaces 
 
 Remote workspaces let you spin up consistent, production-ready development environments in seconds. Below are field-tested practices that keep workspaces fast, predictable, and team-friendly.
 
-## 1. Optimize Your Devcontainer
+## 1. Smart Custom Commands Setup
 
-| Practice                       | Why it matters                                        | How to do it                                                                                          |
-| ------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Start from the right image** | Lean images build faster and consume fewer resources. | Choose the _closest_ official image (e.g., `javascript-node:20`) and layer tools on top.              |
-| **Cache heavy tooling**        | Re-downloading large packages slows rebuilds.         | Move expensive installs (e.g., Chrome, large SDKs) to the image stage instead of `postCreateCommand`. |
-| **Shrink build context**       | Huge contexts = slow uploads.                         | Add `**/node_modules`, build artifacts, and secrets to `.dockerignore`.                               |
-| **Forward only needed ports**  | Too many ports clutter the UI.                        | Keep `forwardPorts` to the handful you actually use.                                                  |
+| Practice                           | Why it matters                                        | How to do it                                                                                          |
+| ---------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Order commands by dependency**   | Later commands may depend on earlier installs.       | Run package installation first: `npm ci && npm run build` or `pip install -r requirements.txt && pytest -q` |
+| **Use exact package managers**     | Consistent lockfiles prevent version drift.          | Use `npm ci` (not `npm install`), `pnpm -w i`, or `pip install -r requirements.txt` for reproducible builds |
+| **Chain related steps with &&**    | Stops build on first failure, saves debugging time.  | `npm ci && npm run build && npm run test` fails fast if any step breaks |
+| **Make scripts executable early**  | Avoid permission errors mid-build.                   | Add `chmod +x ./scripts/setup.sh && bash ./scripts/setup.sh` or use `bash ./scripts/setup.sh` directly |
+| **Keep commands idempotent**       | Re-running setup shouldn't break things.             | Use flags like `pip install --no-deps` or check for existing files before creating them |
+| **Minimize heavy operations**      | Long builds slow down workspace creation.             | Focus on essential setup; defer optional tools to manual installation later |
 
-> **Tip:** Test locally with the Dev Containers CLI (`devcontainer up`) before committing.
+> **Tip:** Test your setup commands locally first. Each command runs with `bash` strict mode (`set -euo pipefail`) at the repo root.
 
 ---
 
