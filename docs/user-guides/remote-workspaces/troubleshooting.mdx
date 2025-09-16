@@ -9,7 +9,7 @@ Even the smoothest remote workspace can hit a snag. This guide walks you through
 
 | Category               | Typical Symptoms                                                              |
 | ---------------------- | ----------------------------------------------------------------------------- |
-| **Workspace Creation** | “Provisioning” forever, cloning errors, devcontainer upload fails             |
+| **Workspace Creation** | “Provisioning” forever, cloning errors, custom commands fails             |
 | **Connection**         | Can’t attach from session, pairing spinner never stops, “Machine unavailable” |
 | **Performance**        | Slow rebuilds, high latency in terminal, laggy editor                         |
 | **Devcontainer**       | Build errors, “command not found”, ports not reachable                        |
@@ -29,18 +29,6 @@ Even the smoothest remote workspace can hit a snag. This guide walks you through
     **Resolve**
     1. Verify the repo is enabled and displays **Connected** in Integrations
     2. Refresh your OAuth token if prompted
-
-  </Accordion>
-
-  <Accordion title="Devcontainer upload error">
-    **Diagnose**  
-    - Upload modal closes with *“Failed to save devcontainer”*  
-    - File larger than 1 MB or not JSON?
-
-    **Resolve**
-    1. Confirm file is named **devcontainer.json** and under 1 MB
-    2. Validate JSON with an online linter
-    3. Re-upload and click **Create Workspace**
 
   </Accordion>
 
@@ -77,36 +65,7 @@ Even the smoothest remote workspace can hit a snag. This guide walks you through
 
 ---
 
-## 4. Devcontainer Configuration Errors
-
-<AccordionGroup>
-
-  <Accordion title="Build fails with 'command not found'">
-    **Diagnose** – The failing command runs inside `postCreateCommand`.
-
-    **Resolve**
-    1. Ensure the binary is installed earlier in the image or via your package manager (`apt-get`, `npm`, `pip`).
-    2. Rebuild locally:
-       <pre>devcontainer up --workspace-folder .</pre>
-       Fix until it succeeds, then push changes and rebuild the workspace.
-
-  </Accordion>
-
-  <Accordion title="Environment variable undefined">
-    **Diagnose** – Script prints blank when echoing `$MY_SECRET`.
-
-    **Resolve**
-    1. Check **Integrations → Secrets** for correct name and value.
-    2. Redeploy the workspace (hibernating won’t reload new secrets).
-    3. Avoid exporting secrets during image build; read them at runtime.
-
-  </Accordion>
-
-</AccordionGroup>
-
----
-
-## 5. General Usage Troubles
+## 4. General Usage Troubles
 
 | Issue                              | Resolution                                                                                                               |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -120,7 +79,6 @@ Even the smoothest remote workspace can hit a snag. This guide walks you through
 
 ## Need More Help?
 
-- **Docs** – Review [Configure Your Devcontainer](/user-guides/remote-workspaces/devcontainer-configuration)
 - **Best Practices** – Optimize performance with the [Remote Workspace Best Practices guide](/user-guides/remote-workspaces/best-practices)
 - **Support** – Reach out in your Factory support channel with workspace ID and error message
 
