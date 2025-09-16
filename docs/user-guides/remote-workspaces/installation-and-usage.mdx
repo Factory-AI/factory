@@ -8,7 +8,6 @@ A **remote workspace** is a fully-configured, on-demand development environment 
 ## System Requirements
 
 - A repository enabled in Factory
-- A valid `devcontainer.json` (see below)
 - Manager role or higher to create remote workspaces
 
 <Steps>
@@ -23,9 +22,8 @@ A **remote workspace** is a fully-configured, on-demand development environment 
     1. Click **Create Workspace**.  
     2. Enter the repository you want to use.  
     3. Give your workspace a friendly name (e.g., “frontend-workspace”).  
-    4. (Optional) Upload a custom <code>devcontainer.json</code>.  
-    5. (Optional) Enter custom commands to run.
-    6. Click **Create**.
+    4. (Optional) Enter custom commands to run.
+    5. Click **Create**.
     <Note>
       Factory clones your repo and prepares the environment—this can take a minute for large projects.
     </Note>
@@ -36,40 +34,6 @@ A **remote workspace** is a fully-configured, on-demand development environment 
   </Step>
 
 </Steps>
-
----
-
-## Understanding Devcontainers
-
-A _devcontainer_ defines everything your remote workspace needs—language runtimes, tools, and commands—so every workspace is identical and reproducible.
-
-### Minimal JavaScript Example
-
-```jsonc
-{
-  "name": "Node.js",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:20-bullseye",
-  "forwardPorts": [3000],
-  "postCreateCommand": "npm install",
-  "settings": {
-    "terminal.integrated.scrollback": 10000
-  }
-}
-```
-
-Save this file as `.devcontainer/devcontainer.json` in your repo or upload it when creating the workspace.
-
-<AccordionGroup>
-
-  <Accordion title="Do I need a devcontainer?">
-    Factory can generate a basic environment automatically, but adding your own devcontainer guarantees the exact toolchain your project requires.
-  </Accordion>
-
-  <Accordion title="Updating devcontainer settings">
-    Re-upload a new <code>devcontainer.json</code> from the workspace menu and click **Rebuild**. The remote workspace is rebuilt on the next launch.
-  </Accordion>
-
-</AccordionGroup>
 
 ---
 
@@ -113,10 +77,6 @@ git status</pre>
     Files persist in the remote workspace and can be committed upstream when ready.
   </Card>
 
-  <Card title="Port Forwarding" icon="globe">
-    If your devcontainer exposes ports (e.g., 3000), Factory auto-detects and adds them to the **Ports** panel for browser preview.
-  </Card>
-
   <Card title="Auto-Save Controls" icon="save">
     Auto-save is disabled by default—enable it from the **Session Settings** panel whenever you want live file syncing.
   </Card>
@@ -133,10 +93,6 @@ git status</pre>
     Ensure you:  
     1. Selected **Remote Machine** (not Local).  
     2. Refresh the page, or try again in a different session
-  </Accordion>
-
-  <Accordion title="Command not found">
-    Verify the binary is installed in your devcontainer and that <code>postCreateCommand</code> completes without errors.
   </Accordion>
 
 </AccordionGroup>
