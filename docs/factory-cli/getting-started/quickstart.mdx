@@ -26,7 +26,11 @@ curl -fsSL https://app.factory.ai/cli | sh
 irm https://app.factory.ai/cli/windows | iex
 
 # Add to PATH (required)
-$env:PATH += ";C:\Windows\system32\config\systemprofile\bin"
+# Current session:
+$env:PATH += ";$Env:USERPROFILE\bin"
+# Persist for your user:
+setx PATH "$Env:Path;$Env:USERPROFILE\bin"
+# Then restart your terminal or IDE to pick up the change
 ```
 
 </CodeGroup>
@@ -39,9 +43,7 @@ Then navigate to your project and start the droid CLI.
 cd /path/to/your/project
 
 # Start interactive session
-
 droid
-
 ```
 
 </CodeGroup>

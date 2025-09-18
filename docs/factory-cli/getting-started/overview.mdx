@@ -29,27 +29,19 @@ droid
 irm https://app.factory.ai/cli/windows | iex
 
 # Add to PATH (required)
-$env:PATH += ";C:\Windows\system32\config\systemprofile\bin"
+# Current session:
+$env:PATH += ";$Env:USERPROFILE\bin"
+# Persist for your user:
+setx PATH "$Env:Path;$Env:USERPROFILE\bin"
+# Then restart your terminal or IDE to pick up the change
 
 # Navigate to your project
 cd your-project
 
 # Start your development session
 droid
-```
-</CodeGroup>
+````
 
-**Installation only:**
-
-<CodeGroup>
-```bash macOS/Linux
-curl -fsSL https://app.factory.ai/cli | sh
-```
-
-```powershell Windows
-irm https://app.factory.ai/cli/windows | iex
-$env:PATH += ";C:\Windows\system32\config\systemprofile\bin"
-```
 </CodeGroup>
 
 You're now connected to Factory's development agent from your terminal. [Try the 5-minute quickstart →](/factory-cli/getting-started/quickstart)
