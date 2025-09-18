@@ -1,0 +1,49 @@
+---
+title: Custom Models
+description: Register and use custom models with `droid`
+---
+
+## Where to configure
+Add custom models in `~/.factory/config.json` under the `custom_models` array.
+
+## Supported fields
+- `model`: The name of the model
+- `base_url`: The API base url for the provider
+- `api_key`: The API key for the provider
+- `provider`: One of:
+  - `anthropic` (for endpoints compatible with Anthropic’s Messages API)
+  - `openai` (for endpoints compatible with OpenAI's Responses API)
+
+## Example configuration
+Place this in `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model": "claude-sonnet-4-20250514",
+      "base_url": "https://api.anthropic.com",
+      "api_key": "<api_key>",
+      "provider": "anthropic"
+    },
+    {
+      "model": "gpt-4.1",
+      "base_url": "https://api.openai.com/v1",
+      "api_key": "<api_key>",
+      "provider": "openai"
+    }
+  ]
+}
+```
+
+## Using custom models with droid
+- Use the `/model` command to open the Model Selector.
+- Custom models will appear below Factory provided models.
+
+## Billing
+- Custom models are free to use with Factory.
+- You are responsible for any charges incurred with the model provider for custom model usage.
+
+## Disclaimers
+- Use custom models at your own risk.
+- Factory does not guarantee output quality for custom models.
