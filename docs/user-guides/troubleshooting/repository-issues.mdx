@@ -5,64 +5,6 @@ description: Learn how to resolve common repository-related issues in Factory, i
 
 ## Common Repository Issues
 
-### Size Limit Exceeded
-
-<Accordion title="Repository Too Large for Local Indexing">
-  **Problem**: Your repository exceeds the 5M token limit for local indexing.
-
-  **Solution**:
-
-  1. Use remote repository integration:
-
-     * Connect via GitHub or GitLab
-
-     * Access full context features
-
-     * Enable automatic updates
-
-  2. Continue with local file sync:
-
-     * Real-time file updates
-
-     * Active development support
-
-  **Learn More**: Visit our [Local File Sync](/user-guides/managing-context/local-file-sync) guide
-</Accordion>
-
-### Sync Issues
-
-<Accordion title="Local File Sync Not Working">
-  **Common Causes**:
-
-  * Missing `.git` directory
-
-  * Insufficient permissions
-
-  * Network connectivity issues
-
-  **Solutions**:
-
-  1. Verify repository structure:
-
-     ```bash
-     ls -la .git  # Should show git directory contents
-     ```
-
-  2. Check permissions:
-
-     ```bash
-     ls -l .  # Should show write permissions
-     ```
-
-  3. Test network connection:
-
-     ```bash
-     ping app.factory.ai
-     ```
-</Accordion>
-
-### Integration Problems
-
 <AccordionGroup>
   <Accordion title="GitHub Integration Issues">
     **Common Issues**:
@@ -126,9 +68,6 @@ description: Learn how to resolve common repository-related issues in Factory, i
 Use these commands to diagnose common issues:
 
 ```bash
-# Check repository size
-git count-objects -vH
-
 # Verify remote connections
 git remote -v
 
@@ -155,10 +94,6 @@ curl -I https://api.github.com/user
 ## Related Resources
 
 <CardGroup cols={2}>
-  <Card title="Local File Sync Guide" icon="laptop-code" href="/user-guides/managing-context/local-file-sync">
-    Learn about local development workflows
-  </Card>
-
   <Card title="Remote Integration Guide" icon="cloud" href="/onboarding/creating-your-factory/basic-integrations">
     Set up remote repository access
   </Card>
