@@ -1,0 +1,69 @@
+---
+title: Choosing Your Model
+description: Balance accuracy, speed, and cost by picking the right model and reasoning level for each CLI task.
+---
+
+Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Wednesday, September 24th 2025.
+
+---
+
+## 1 · Current stack rank (September 2025)
+
+| Rank | Model                               | Why we reach for it                                                                                                                                    |
+| ---- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1    | **Claude Opus 4.1**                 | Highest reliability on complex planning, architecture decisions, and long edits. Slight lead in reasoning and code quality, but also the highest cost. |
+| 2    | **GPT‑5 Codex**                     | Nearly Opus-level output with noticeably lower latency and ~5× lower cost. Great daily driver for implementation work.                                 |
+| 3    | **GPT‑5** <br/> **Claude Sonnet 4** | Solid generalists. We see similar behavior between them; pick based on preference, latency, or cost.                                                   |
+
+<Note>
+  We ship model updates regularly. When a new release overtakes the list above,
+  we update this page and the CLI defaults.
+</Note>
+
+---
+
+## 2 · Match the model to the job
+
+| Scenario                                                         | Recommended model                                                                                                                                    |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.1**. Switch down if you only need execution after the plan is locked.                                                            |
+| **Full-feature development, large refactors**                    | **GPT‑5 Codex** balances quality and speed; Opus is a good fallback if Codex struggles.                                                              |
+| **Repeatable edits, summarization, boilerplate generation**      | **GPT‑5** or **Sonnet 4** keep costs low while staying accurate.                                                                                     |
+| **CI/CD or automation loops**                                    | Favor **GPT‑5 Codex** or **Sonnet 4** for predictable throughput. Promote the critical planning steps to **Opus 4.1** when correctness matters most. |
+
+Tip: you can swap models mid-session with `/model` or by toggling in the settings panel (`Shift+Tab` → **Settings**).
+
+---
+
+## 3 · Switching models mid-session
+
+- Use `/model` (or **Shift+Tab → Settings → Model**) to swap without losing your chat history.
+- If you change providers (e.g. Anthropc to OpenAI), the CLI converts the session transcript between Anthropic and OpenAI formats. The translation is lossy—provider-specific metadata is dropped—but we have not seen accuracy regressions in practice.
+- For the best context continuity, switch models at natural milestones: after a commit, once a PR lands, or when you abandon a failed approach and reset the plan.
+- If you flip back and forth rapidly, expect the assistant to spend a turn re-grounding itself; consider summarizing recent progress when you switch.
+
+---
+
+## 4 · Reasoning effort settings
+
+- Anthropic models (Opus/Sonnet) show modest gains between Low and High.
+- GPT models respond much more to higher reasoning effort—bumping **GPT‑5** or **GPT‑5 Codex** to **High** can materially improve planning and debugging.
+- Reasoning effort increases latency and cost, so start Low for simple work and escalate when you need more depth.
+
+<Tip>
+  Change reasoning effort from `/model` → **Reasoning effort**, or via the
+  settings menu.
+</Tip>
+
+---
+
+## 5 · Bring Your Own Keys (BYOK)
+
+Factory ships with managed Anthropic and OpenAI access. If you prefer to run against your own accounts, BYOK is opt-in—see [Bring Your Own Keys](/cli/configuration/byok) for setup steps, supported providers, and billing notes.
+
+---
+
+## 6 · Keep notes on what works
+
+- Track high-impact workflows (e.g., spec generation vs. quick edits) and which combinations of model + reasoning effort feel best.
+- Ping the community or your Factory contact when you notice a model regression so we can benchmark and update this guidance quickly.

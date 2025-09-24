@@ -189,13 +189,24 @@ This approach allows you to validate each phase before proceeding to the next.
 
 ## Specification approval options
 
-After droid presents the specification, you have three options:
+After droid presents the specification, choose how to continue:
 
-1. **Approve and continue** - Proceed with the implementation using normal execution mode
-2. **Approve and continue with auto-run enabled** - Proceed with implementation and automatically enable [auto-run mode](/cli/user-guides/auto-run) for faster execution
-3. **Reject, continue editing** - Decline the specification and remain in Specification Mode to refine your request
+1. **Proceed with implementation** – Approve the plan and keep normal (manual) execution controls.
+2. **Proceed, and allow file edits and read-only commands (Low)** – Enable low autonomy auto-run so droid can edit files and run safe read-only commands automatically.
+3. **Proceed, and allow reversible commands (Medium)** – Enable medium autonomy auto-run so droid can also run reversible commands without additional prompts.
+4. **Proceed, and allow all commands (High)** – Enable high autonomy auto-run for fully automated execution, including commands that are not easily reversible.
+5. **No, keep iterating on spec** – Stay in Specification Mode to refine the plan before implementation.
 
-The third option keeps you in Specification Mode, allowing you to iterate on your request until the specification meets your requirements.
+Selecting any auto-run option sets the corresponding autonomy level for the rest of the session. Choosing to keep iterating leaves Specification Mode active so you can continue shaping the plan.
+
+## Saving your specifications as Markdown
+
+Specification Mode can automatically write the approved plan to disk. Open the CLI settings and enable **Save spec as Markdown** to turn this on.
+
+- By default, plans are saved to `.factory/docs` inside the nearest project-level `.factory` directory. If none exists, the CLI falls back to `~/.factory/docs` in your home directory.
+- Use the **Spec save directory** setting to pick between the project directory, your home directory, or a custom path. Custom values support absolute paths, `~` expansion, `.factory/...` shortcuts, and relative paths from the current workspace.
+- The CLI creates the target directory if it does not exist and writes the Markdown exactly as shown in the approval dialog.
+- Files are named `YYYY-MM-DD-slug.md`, where the slug comes from the spec title or first heading, and a counter is appended if a file with the same name already exists.
 
 ## What happens after approval
 
