@@ -5,11 +5,16 @@ description: Create specialized subagents with their own prompts, tool access, a
 
 Custom droids are reusable subagents defined in Markdown. Each droid carries its own system prompt, model preference, and tooling policy so you can hand off focused tasks—like code review, security checks, or research—without re-typing instructions.
 
+<Warning>
+  Custom Droids are experimental. You must enable them in settings before they
+  will be picked up.
+</Warning>
+
 ---
 
 ## 1 · What are custom droids?
 
-Custom droids live as text files under either your project’s `.factory/droids/` or your personal `~/.factory/droids/` directory. When enabled, the CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the **Task** tool. This lets the primary assistant spin up purpose-built helpers mid-session.
+Custom droids live as `.md` files under either your project’s `.factory/droids/` or your personal `~/.factory/droids/` directory. When enabled, the CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the **Task** tool. This lets the primary assistant spin up purpose-built helpers mid-session.
 
 - **Project droids** sit in `<repo>/.factory/droids/` and are shared with teammates.
 - **Personal droids** live in `~/.factory/droids/` and follow you across workspaces.
@@ -71,7 +76,7 @@ Key metadata fields:
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`                  | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                                                                     |
 | `description`           | Optional. Shown in the UI list. Keep ≤500 chars.                                                                                                                                  |
-| `model`                 | `claude-opus-4-1-20250805`, `claude-sonnet-4-20250514`, `gpt-5-2025-08-07`, or `inherit` (use the parent session’s model). The validator rejects other strings.              |
+| `model`                 | `claude-opus-4-1-20250805`, `claude-sonnet-4-20250514`, `gpt-5-2025-08-07`, or `inherit` (use the parent session’s model). The validator rejects other strings.                   |
 | `tools`                 | `all`, a category (`read-only`, `edit`, `execution`, `web`, `mcp`), or an explicit list of tool IDs (e.g. `"Read"`, `"Execute"`). Default is `all`, which enables every CLI tool. |
 | `createdAt`/`updatedAt` | Auto-filled when using the wizard; optional otherwise.                                                                                                                            |
 | `version`               | Optional string to track revisions.                                                                                                                                               |
@@ -80,13 +85,13 @@ Prompts must start with YAML frontmatter containing at least `name` and include 
 
 ### Tool categories → concrete tools
 
-| Category     | Tools granted (LLM IDs)                     |
-| ------------ | ------------------------------------------- |
-| `read-only`  | `Read`, `Grep`, `Glob`, `LS`                |
-| `edit`       | `Edit`, `MultiEdit`, `Create`               |
-| `execution`  | `Execute`                                   |
-| `web`        | `WebSearch`, `FetchUrl`                     |
-| `mcp`        | Dynamically populated MCP tools (if any)    |
+| Category    | Tools granted (LLM IDs)                  |
+| ----------- | ---------------------------------------- |
+| `read-only` | `Read`, `Grep`, `Glob`, `LS`             |
+| `edit`      | `Edit`, `MultiEdit`, `Create`            |
+| `execution` | `Execute`                                |
+| `web`       | `WebSearch`, `FetchUrl`                  |
+| `mcp`       | Dynamically populated MCP tools (if any) |
 
 Explicit arrays must use the tool names above (case-sensitive). Unknown names cause validation errors.
 
@@ -94,13 +99,11 @@ Explicit arrays must use the tool names above (case-sensitive). Unknown names ca
 
 ## 5 · Managing droids in the UI
 
-`/droids` opens an Ink UI with:
+`/droids` opens a modal with:
 
 - **Create a new Droid** – launches the guided flow above.
 - **List of droids** – shows name, summary, and location badge (Project / Personal).
 - Selecting a droid lets you **View**, **Edit**, **Delete**, or go **Back**.
-
-Edits run through `DroidStorageService`, which keeps timestamps up to date and re-validates on save. Delete removes the underlying Markdown file. Import/export helpers exist (`DroidStorageService.importDroid` / `exportDroid`) and are wired into future UI work, but the current manager only targets local files.
 
 The “Generate from description” flow in the creator is stubbed today—it seeds placeholder content while the generation pipeline is under construction.
 
@@ -108,19 +111,12 @@ The “Generate from description” flow in the creator is stubbed today—it se
 
 ## 6 · Using custom droids effectively
 
-- **Invoke via the Task tool** – when custom droids are enabled, the registry exposes the **Task** tool. droid may call it autonomously, or you can request it directly (“Use the Task tool with subagent `security-auditor` on this change”).
+- **Invoke via the Task tool** – when custom droids are enabled, the droid may call it autonomously, or you can request it directly (“Use the subagent `security-auditor` on this change”).
 - **Switch models intentionally** – the subagent respects the `model` field. Use `inherit` when you want it to follow the parent session’s active provider and reasoning effort.
 - **Limit tool access** – prefer categories (e.g. `read-only`) or explicit lists so the subagent can’t execute unexpected shell commands.
 - **Version in git** – check `.factory/droids/*.md` into your repo to share prompts and review changes like code.
-- **Review logs** – the Task executor shells out to the Python `droid` binary as `droid task <name> <prompt> --output-format debug`, consuming JSONL debug output. Only assistant messages are surfaced, and the CLI appends stderr/exit-code details when something fails.
 
-Structuring the prompt to emit sections like `Summary:` and `Findings:` helps the Task tool UI summarize results—the renderer keys off those markers when available.
-
-<Note>
-  Make sure your local `droid` binary is on a build that ships the `task` command. Older versions will exit immediately with a Typer usage message when the Task tool runs.
-</Note>
-
-Recommendation: switch core models after milestones (post-commit, after a PR review, or when restarting a plan) so the lossy but low-impact provider translation only happens on clean state transitions.
+Structuring the prompt to emit sections like `Summary:` and `Findings:` helps the Task tool UI summarize results.
 
 ---
 
@@ -151,7 +147,7 @@ Findings:
 - <action or leave blank>
 ```
 
-Use: “Run the Task tool with subagent `code-reviewer` on the staged diff.”
+Use: “Run the subagent `code-reviewer` on the staged diff.”
 
 ### Security sweeper (personal scope)
 
