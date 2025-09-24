@@ -1,10 +1,14 @@
 # Factory
 
-<p align="center">
+The agent-native development platform. Works across CLI, Web, Slack/Teams, Linear/Jira and Mobile.
+
+Our agent, Droid, is top performing in terminal benchmarks.
+
+<p align="left">
   <img src="docs/images/droid_ascii.gif" alt="Droid logo" height="220" />
 </p>
 
-<p align="center"><strong>The agent-native development platform built for shipping software faster.</strong></p>
+<p align="left"><strong>The agent-native development platform built for shipping software faster.</strong></p>
 
 ## ⚡️ Quick Links
 
