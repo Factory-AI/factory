@@ -1,0 +1,186 @@
+---
+title: Custom Droids (Subagents)
+description: Create specialized subagents with their own prompts, tool access, and models that droid can delegate work to.
+---
+
+Custom droids are reusable subagents defined in Markdown. Each droid carries its own system prompt, model preference, and tooling policy so you can hand off focused tasks—like code review, security checks, or research—without re-typing instructions.
+
+---
+
+## 1 · What are custom droids?
+
+Custom droids live as text files under either your project’s `.factory/droids/` or your personal `~/.factory/droids/` directory. When enabled, the CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the **Task** tool. This lets the primary assistant spin up purpose-built helpers mid-session.
+
+- **Project droids** sit in `<repo>/.factory/droids/` and are shared with teammates.
+- **Personal droids** live in `~/.factory/droids/` and follow you across workspaces.
+- Project definitions override personal ones when the names match.
+
+---
+
+## 2 · Why use them?
+
+- **Faster delegation** – encode complex checklists once and reuse them with a single tool call.
+- **Stricter safety** – limit an agent to read-only, edit-only, or curated tool sets.
+- **Context isolation** – each subagent runs with a fresh context window, avoiding prompt bloat.
+- **Repeatable reviews** – capture team-specific review, testing, or release gates as code you can version.
+
+---
+
+## 3 · Quick start
+
+1. Open **Settings** (`Shift+Tab` → **Settings**) and toggle **Custom Droids** under the _Experimental_ section. This persists `"enableCustomDroids"` in `~/.factory/settings.json` and registers the Task tool.
+2. Run `/droids` to launch the Droids menu.
+3. Choose **Create a new Droid**, pick a storage location (project or personal), then follow the wizard to set an identifier, system prompt, tools, and model.
+4. Save. The CLI writes `<name>.md` into the chosen `droids/` directory and normalizes the filename (lowercase, hyphenated).
+5. Ask droid to use it, e.g. “Run the Task tool with subagent `code-reviewer` to review this diff,” or trigger it from automation.
+
+The loader caches scans for ~5 seconds. The current UI instantiates a fresh loader on every open, so changes usually show up on the next visit; a long-running watch is not yet enabled by default.
+
+---
+
+## 4 · Configuration
+
+Each droid file is Markdown with YAML frontmatter.
+
+```md
+---
+name: code-reviewer
+description: Focused reviewer that checks diffs for correctness risks
+model: claude-opus-4-1-20250805 # or claude-sonnet-4-20250514, gpt-5-2025-08-07, inherit
+tools: read-only # all | read-only | edit | execution | web | mcp | ["Read", "Edit", ...]
+version: v1
+---
+
+You are the team’s senior reviewer. Examine the diff the parent agent shares and:
+
+- flag correctness, security, and migration risks
+- list targeted follow-up tasks if changes are required
+- confirm tests or manual validation needed before merge
+
+Respond with:
+Summary: <one-line finding>
+Findings:
+
+- <bullet>
+- <bullet>
+```
+
+Key metadata fields:
+
+| Field                   | Notes                                                                                                                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                  | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                                                                     |
+| `description`           | Optional. Shown in the UI list. Keep ≤500 chars.                                                                                                                                  |
+| `model`                 | `claude-opus-4-1-20250805`, `claude-sonnet-4-20250514`, `gpt-5-2025-08-07`, or `inherit` (use the parent session’s model). The validator rejects other strings.              |
+| `tools`                 | `all`, a category (`read-only`, `edit`, `execution`, `web`, `mcp`), or an explicit list of tool IDs (e.g. `"Read"`, `"Execute"`). Default is `all`, which enables every CLI tool. |
+| `createdAt`/`updatedAt` | Auto-filled when using the wizard; optional otherwise.                                                                                                                            |
+| `version`               | Optional string to track revisions.                                                                                                                                               |
+
+Prompts must start with YAML frontmatter containing at least `name` and include a non-empty body. `DroidValidator` surfaces errors (invalid names, unknown models, unknown tools) and warnings (missing description, duplicated tools, unrestricted `all`). Validation issues appear in the CLI logs when a file fails to load.
+
+### Tool categories → concrete tools
+
+| Category     | Tools granted (LLM IDs)                     |
+| ------------ | ------------------------------------------- |
+| `read-only`  | `Read`, `Grep`, `Glob`, `LS`                |
+| `edit`       | `Edit`, `MultiEdit`, `Create`               |
+| `execution`  | `Execute`                                   |
+| `web`        | `WebSearch`, `FetchUrl`                     |
+| `mcp`        | Dynamically populated MCP tools (if any)    |
+
+Explicit arrays must use the tool names above (case-sensitive). Unknown names cause validation errors.
+
+---
+
+## 5 · Managing droids in the UI
+
+`/droids` opens an Ink UI with:
+
+- **Create a new Droid** – launches the guided flow above.
+- **List of droids** – shows name, summary, and location badge (Project / Personal).
+- Selecting a droid lets you **View**, **Edit**, **Delete**, or go **Back**.
+
+Edits run through `DroidStorageService`, which keeps timestamps up to date and re-validates on save. Delete removes the underlying Markdown file. Import/export helpers exist (`DroidStorageService.importDroid` / `exportDroid`) and are wired into future UI work, but the current manager only targets local files.
+
+The “Generate from description” flow in the creator is stubbed today—it seeds placeholder content while the generation pipeline is under construction.
+
+---
+
+## 6 · Using custom droids effectively
+
+- **Invoke via the Task tool** – when custom droids are enabled, the registry exposes the **Task** tool. droid may call it autonomously, or you can request it directly (“Use the Task tool with subagent `security-auditor` on this change”).
+- **Switch models intentionally** – the subagent respects the `model` field. Use `inherit` when you want it to follow the parent session’s active provider and reasoning effort.
+- **Limit tool access** – prefer categories (e.g. `read-only`) or explicit lists so the subagent can’t execute unexpected shell commands.
+- **Version in git** – check `.factory/droids/*.md` into your repo to share prompts and review changes like code.
+- **Review logs** – the Task executor shells out to the Python `droid` binary as `droid task <name> <prompt> --output-format debug`, consuming JSONL debug output. Only assistant messages are surfaced, and the CLI appends stderr/exit-code details when something fails.
+
+Structuring the prompt to emit sections like `Summary:` and `Findings:` helps the Task tool UI summarize results—the renderer keys off those markers when available.
+
+<Note>
+  Make sure your local `droid` binary is on a build that ships the `task` command. Older versions will exit immediately with a Typer usage message when the Task tool runs.
+</Note>
+
+Recommendation: switch core models after milestones (post-commit, after a PR review, or when restarting a plan) so the lossy but low-impact provider translation only happens on clean state transitions.
+
+---
+
+## 7 · Examples
+
+### Code reviewer (project scope)
+
+```md
+---
+name: code-reviewer
+description: Reviews diffs for correctness, tests, and migration fallout
+model: claude-opus-4-1-20250805
+tools: read-only
+---
+
+You are the team’s principal reviewer. Given the diff and context:
+
+- Summarize the intent of the change.
+- Flag correctness risks, missing tests, or rollback hazards.
+- Call out any migrations or data changes that need coordination.
+
+Reply with:
+Summary: <one-line>
+Findings:
+
+- <issue or ✅ No blockers>
+  Follow-up:
+- <action or leave blank>
+```
+
+Use: “Run the Task tool with subagent `code-reviewer` on the staged diff.”
+
+### Security sweeper (personal scope)
+
+```md
+---
+name: security-sweeper
+description: Looks for insecure patterns in recently edited files
+model: gpt-5-2025-08-07
+tools:
+  - Read
+  - Grep
+  - WebSearch
+---
+
+Investigate the files referenced in the prompt for security issues:
+
+- Identify injection, insecure transport, privilege escalation, or secrets exposure.
+- Suggest concrete mitigations.
+- Link to relevant CWE or internal standards when helpful.
+
+Respond with:
+Summary: <headline>
+Findings:
+
+- <file>: <issue>
+  Mitigations:
+- <recommendation>
+```
+
+---
+
+With custom droids, you capture tribal knowledge as code. Compose specialized prompts once, assign the right tools, and let the primary assistant delegate heavy lifts to the subagents you design.

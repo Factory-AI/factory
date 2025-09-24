@@ -1,165 +1,97 @@
 ---
 title: Auto-Run Mode
-description: Enable automatic execution of file edits and creation without manual approval for faster development workflows.
+description: Choose low, medium, or high autonomy so droid can execute work that matches your risk tolerance without repeated confirmations.
 ---
 
-Auto-Run Mode eliminates the need for manual confirmation when droid makes file changes. Instead of stopping to ask for approval before each edit or file creation, droid automatically executes these changes, creating a seamless and faster development experience.
+Auto-Run Mode lets you decide how much autonomy droid has after you approve a plan. Instead of confirming every tool call, pick the level of risk you are comfortable with and droid will keep moving while still surfacing everything it does.
 
 <CardGroup cols={2}>
-  <Card title="Automatic Execution" icon="bolt">
-    File edits and creation happen instantly without approval prompts
+  <Card title="Configurable Autonomy" icon="slider">
+    Switch between Low, Medium, and High depending on the type of work in front of you.
   </Card>
-  <Card title="Faster Workflows" icon="rocket">
-    Eliminate waiting time between file operations for rapid iteration
+  <Card title="Risk-Aware Execution" icon="shield-check">
+    Commands run automatically only when their risk rating is at or below your chosen level.
   </Card>
-  <Card title="Batch Operations" icon="layer-group">
-    Perfect for multi-file changes across your entire codebase
+  <Card title="No Surprises" icon="eye">
+    Dangerous commands and command substitutions always require an explicit approval.
   </Card>
-  <Card title="Streamlined Experience" icon="gauge-high">
-    Focus on results rather than approving individual operations
+  <Card title="Persistent Preference" icon="floppy">
+    Your autonomy level is saved in settings and restored for the next session.
   </Card>
 </CardGroup>
 
-## How it works
+## Autonomy levels at a glance
 
-<Steps>
-  <Step title="Enable Auto-Run">
-    Activate Auto-Run Mode in the CLI or through settings to bypass file operation confirmations.
-  </Step>
-  <Step title="Droid makes changes">
-    When droid needs to edit or create files, it executes these operations immediately without waiting for your approval.
-  </Step>
-  <Step title="View the results">
-    See all changes as they happen in real-time, with full visibility into what was modified or created.
-  </Step>
-  <Step title="Review when complete">
-    Once the task is finished, review all changes at once rather than approving each individual operation.
-  </Step>
-</Steps>
+| Level | What runs automatically | Typical examples |
+| --- | --- | --- |
+| **Auto (Low)** | File edits, file creation, and read-only commands from the built-in allowlist | `Edit`, `Create`, `ls`, `git status`, `rg` |
+| **Auto (Medium)** | Everything from Low plus reversible commands that change your workspace | `npm install`, `pip install`, `git commit`, `mv`, `cp`, build tooling |
+| **Auto (High)** | All commands that are not explicitly blocked for safety | `docker compose up`, `git push` (if allowed), migrations, custom scripts |
 
-## Example workflow
+Auto-Run always shows streamed output and highlights every file change, regardless of the autonomy level.
 
-**Normal mode:**
+## Risk classification
+
+Every command sent through the CLI includes a risk rating (`low`, `medium`, or `high`) along with a short justification. Auto-Run compares that rating to your selected autonomy level:
+
+- **Low risk** – read-only operations and changes that cannot create irreversible damage (listing files, showing logs, git diff).
+- **Medium risk** – actions that alter your workspace but are straightforward to undo (package installs, moving files, local git operations, builds).
+- **High risk** – commands that could be destructive, hard to roll back, or security sensitive (sudo, wiping directories, deploying, piping remote scripts).
+
+Commands run automatically only when their risk level is less than or equal to your current setting. If a tool labels a command above your threshold, the CLI pauses and asks for confirmation.
+
+## How Auto-Run decides what to execute
+
+- **File tools** (`Create`, `Edit`, `MultiEdit`, `ApplyPatch`) are treated as low risk and run instantly whenever Auto-Run is active.
+- **Execute commands** follow the risk threshold. Low autonomy auto-accepts only read-only allowlisted commands. Medium adds reversible commands. High accepts any command with a declared risk level, except for those blocked below.
+- **Safety interlocks** always trigger confirmation, even in Auto (High): dangerous patterns (`rm -rf /`, `dd of=/dev/*`, etc.), command substitution (`$(...)`, backticks), or anything explicitly flagged by the CLI security checks.
+- **Allowlist expansion** – when you approve a command, you can add it to the session allowlist so future occurrences run without another prompt.
+
+## Enabling and switching modes
+
+- **Cycle from the keyboard** – press **Shift+Tab** (or `Ctrl+T` on Windows) to move through Normal → Spec → Auto (Low) → Auto (Medium) → Auto (High) → back to Normal. The active mode is shown in the status banner and Help popup.
+- **Set a default in Settings** – open the CLI settings menu, choose your preferred autonomy level, and the CLI persists it for future sessions.
+- **Choose it after a spec** – when approving a Specification Mode plan, pick “Proceed” (manual), or enable Auto-Run at Low, Medium, or High for the implementation phase.
+- **Return to manual control** at any time by cycling back to Normal; droid will resume asking for each file change and command.
+
+## Workflow examples
+
+**Auto (Low)** – quick file updates and reconnaissance
 ```
-Droid: "I need to edit config.js to add the new API endpoint"
-You: [Approve] ✓
-Droid: "I need to create a new routes/api.js file"
-You: [Approve] ✓
-Droid: "I need to update package.json with the new dependency"
-You: [Approve] ✓
+- Update docs/README.md with new instructions
+- Run ls, git status, and rg searches as needed
 ```
+All edits and read-only checks happen without prompts, while anything that modifies dependencies still asks first.
 
-**Auto-Run mode:**
+**Auto (Medium)** – feature work that needs tooling
 ```
-Droid: "Adding new API endpoint..."
-✓ Edited config.js
-✓ Created routes/api.js  
-✓ Updated package.json
-Task complete!
+- Add a new React component (multiple file edits)
+- npm install @acme/widget
+- npm run lint
 ```
+File changes, dependency installs, and build scripts execute automatically so long as they are reversible.
 
-<Note>
-Auto-Run Mode can be toggled on/off at any time during your session. It only affects file editing and creation operations.
-</Note>
-
-## How to enable Auto-Run Mode
-
-**In the CLI:** Use the keyboard shortcut **Shift+Tab** to toggle Auto-Run Mode on or off during your session.
-
-**From Specification Mode:** When approving a specification, choose "Approve and continue with auto-run enabled" to automatically enable Auto-Run for the implementation.
-
-## What Auto-Run affects
-
-**Automatically executed:**
-- Creating new files
-- Editing existing files  
-- Saving file changes
-
-**Still requires approval:**
-- Running shell commands
-- Installing packages
-- Making git commits
-- Deleting files or directories
-
-Auto-Run Mode is designed specifically for the most common and safe file operations that developers typically want to happen quickly.
-
-## When to use Auto-Run Mode
-
-**Perfect for:**
-- Refactoring across multiple files
-- Adding features that span several components
-- Code cleanup and formatting tasks
-- Generating boilerplate code
-- Applying consistent changes across your codebase
-
-**Consider normal mode for:**
-- Working with unfamiliar codebases
-- Making changes to critical system files
-- When you want to review each change individually
-- Learning how droid approaches problems
-
-## Benefits
-
-<CardGroup cols={2}>
-  <Card title="Speed" icon="gauge-high">
-    Eliminate the back-and-forth of approving each file operation for faster development.
-  </Card>
-  <Card title="Flow State" icon="brain">
-    Stay focused on the problem rather than clicking through approval prompts.
-  </Card>
-  <Card title="Batch Operations" icon="layer-group">
-    Handle large refactoring tasks efficiently without constant interruption.
-  </Card>
-  <Card title="Trust Building" icon="handshake">
-    As you become comfortable with droid's capabilities, reduce friction in your workflow.
-  </Card>
-</CardGroup>
-
-## Safety features
-
-Auto-Run Mode includes built-in safety measures:
-
-**File operation limits:** Droid will pause and ask for confirmation if it needs to modify an unusually large number of files (typically 20+).
-
-**Critical file protection:** Changes to package.json, configuration files, and other critical files may still prompt for approval depending on the scope.
-
-**Easy toggle:** You can instantly disable Auto-Run Mode with Shift+Tab if you want to return to manual approval.
-
-**Full visibility:** Every change is logged and displayed as it happens, so you always know what's being modified.
-
-## Example use cases
-
-**Multi-file refactoring:**
+**Auto (High)** – migrations or integration tests
 ```
-"Rename the UserService class to AccountService throughout the codebase"
+- Run database migration script
+- docker compose up test-environment
+- git push origin feature/autonomy-docs
 ```
+Droid executes the entire sequence without pauses while still blocking obviously dangerous commands.
 
-With Auto-Run enabled, droid will automatically:
-- Update all import statements
-- Rename the class file
-- Modify all references in components
-- Update related tests
+## When you will still get prompted
 
-**Feature implementation:**
-```
-"Add user authentication to the existing API endpoints"
-```
+- A command is rated above your current autonomy level.
+- The CLI detects command substitution or a dangerous pattern.
+- A tool requests something outside the session allowlist and you are in Auto (Low).
+- Droid needs clarity (e.g., missing context, ambiguous edits) and asks for input.
+- You manually interrupt with **Esc**.
 
-Droid will automatically create and edit the necessary files for:
-- Middleware functions
-- Route protections  
-- Database schema updates
-- Test files
+## Best practices
 
-**Code organization:**
-```
-"Move all utility functions to a shared utils directory"
-```
+- Start new or high-stakes work in Normal or Auto (Low) until you trust the plan.
+- Use Auto (Medium) for day-to-day feature development and refactors that rely on package managers or build steps.
+- Reserve Auto (High) for well-understood pipelines where you expect droid to run end-to-end scripts.
+- If you spot a suspect command, interrupt, provide guidance, and resume at the autonomy level that fits the remaining risk.
 
-Auto-Run handles:
-- Creating the new directory structure
-- Moving files to appropriate locations
-- Updating all import paths
-- Maintaining code functionality
-
-Ready to try Auto-Run Mode? Enable it with **Shift+Tab** and experience faster, more fluid development with droid.
+Ready to try it? Cycle into the level you need with **Shift+Tab**, or pick the desired option when you approve your next spec.
