@@ -1,0 +1,237 @@
+---
+title: Dynamic Repository Context
+description: How Factory automatically retrieves and manages code context during your development sessions
+---
+
+## Overview
+
+Dynamic repository context refers to the code, files, and information that Factory's droid automatically retrieves and manages as you work. This intelligent system ensures you always have the relevant code context without manually tracking every file.
+
+<Note>
+  The droid proactively fetches files, searches codebases, and gathers information based on your current task, reducing the need for manual context management.
+</Note>
+
+## How Dynamic Retrieval Works
+
+Factory's droid continuously analyzes your conversation and task to determine what context is needed:
+
+<Steps>
+  <Step title="Task Analysis">
+    The droid understands your current objective from the conversation and any external context (tickets, PRs) you've added.
+  </Step>
+
+  <Step title="Intelligent Discovery">
+    Automatically searches for relevant files, functions, and patterns across your codebase using advanced search capabilities.
+  </Step>
+
+  <Step title="Context Loading">
+    Retrieves identified files and code segments, adding them to your session's working context.
+  </Step>
+
+  <Step title="Continuous Updates">
+    As you work and make changes, the droid fetches additional files and updates context to stay current with your needs.
+  </Step>
+</Steps>
+
+## Types of Dynamic Context
+
+### Code Files and Directories
+
+The droid automatically retrieves:
+
+- **Implementation Files**: Source code files relevant to your current task
+- **Test Files**: Associated unit tests, integration tests, and test utilities  
+- **Configuration Files**: Package manifests, build configs, environment settings
+- **Documentation**: README files, inline documentation, API specs
+- **Dependencies**: Related modules, imported libraries, shared utilities
+
+<Tip>
+  While the droid handles most file retrieval automatically, you can always use `@file` to explicitly add specific files you want included.
+</Tip>
+
+### Code Analysis
+
+Factory analyzes your codebase to find:
+
+- **Function Definitions**: Locates where functions and methods are defined
+- **Usage Patterns**: Finds all places where specific code is used
+- **Type Definitions**: Discovers interfaces, types, and data structures
+- **Import Chains**: Traces dependencies and module relationships
+
+### Repository Structure
+
+The droid builds understanding of:
+
+- **Project Layout**: Directory structure and organization patterns
+- **Module Boundaries**: Package structures and architectural divisions
+- **File Relationships**: How files connect and depend on each other
+- **Naming Conventions**: Patterns in file and directory naming
+- **Build Systems**: Understanding of build tools and processes
+
+### Runtime Context
+
+As you execute commands, Factory captures:
+
+- **Build Output**: Compilation results, warnings, and errors
+- **Test Results**: Test execution output, failures, and coverage
+- **Linter Output**: Style violations and code quality issues
+- **Error Messages**: Stack traces and debugging information
+- **Command Output**: Results from any executed terminal commands
+
+## When Dynamic Retrieval Occurs
+
+### Automatic Triggers
+
+The droid fetches context when:
+
+- 🎯 **Starting a Task**: Initial context gathering based on ticket/PR description
+- 🔍 **Exploring Code**: Searching for implementations or understanding flow
+- ✏️ **Making Changes**: Loading files before editing them
+- 🐛 **Debugging**: Retrieving error locations and related code
+- 🧪 **Running Tests**: Gathering test files and test output
+- 🔗 **Following References**: Tracing function calls and imports
+
+### Examples of Dynamic Retrieval
+
+<Accordion title="Example: Bug Fix Task">
+When you share a bug ticket, the droid will:
+1. Identify files mentioned in the error or ticket
+2. Find the files containing the problematic code
+3. Retrieve related test files
+4. Load configuration that might affect the issue
+5. Gather recent changes to these files
+</Accordion>
+
+<Accordion title="Example: Feature Implementation">
+For a new feature request, the droid will:
+1. Find similar existing features for reference
+2. Load relevant interfaces and types
+3. Retrieve test patterns used in the project
+4. Discover configuration files that need updates
+5. Identify integration points with other modules
+</Accordion>
+
+<Accordion title="Example: Code Review">
+When reviewing a pull request, the droid will:
+1. Load all changed files from the PR
+2. Retrieve tests covering the changed code
+3. Find usage of modified functions
+4. Gather related documentation
+5. Check for impacted dependencies
+</Accordion>
+
+## Managing Dynamic Context
+
+### Supplementing with Manual Additions
+
+While the droid handles most retrieval, you can supplement when needed:
+
+```
+@file src/specific/file.ts  // Add a specific file
+@file tests/edge-case.test.js  // Include additional test
+```
+
+Common reasons to manually add files:
+- Including example or reference implementations
+- Adding files from different repositories
+- Ensuring specific edge cases are considered
+- Including documentation or design files
+
+### Context Optimization
+
+The droid optimizes context by:
+
+- **Prioritizing Relevance**: Most relevant files are loaded first
+- **Managing Size**: Avoids loading unnecessary large files
+- **Smart Truncation**: Shows relevant portions of very large files
+- **Deduplication**: Prevents loading the same content multiple times
+- **Lazy Loading**: Retrieves additional context only when needed
+
+### Understanding What's Loaded
+
+You can see dynamically loaded context in the Context Panel:
+
+1. Open the **Context Panel** in the chat interface
+2. Look for the **Files** section showing loaded code
+3. Review **Search Results** from code searches
+4. Check **Command Output** from executed commands
+
+<Info>
+  The Context Panel shows a 📎 icon next to manually added files and a 🤖 icon next to dynamically retrieved content.
+</Info>
+
+## Best Practices
+
+### Working with Dynamic Retrieval
+
+<CardGroup cols={2}>
+  <Card title="Trust the Process" icon="robot">
+    Let the droid handle initial context gathering. It's designed to find relevant files based on your task.
+  </Card>
+
+  <Card title="Provide Clear Context" icon="message">
+    The clearer your task description, the better the droid can retrieve relevant context.
+  </Card>
+
+  <Card title="Review Loaded Files" icon="eye">
+    Periodically check the Context Panel to understand what files are being considered.
+  </Card>
+
+  <Card title="Supplement When Needed" icon="plus">
+    Use @file to add specific files if you notice something important is missing.
+  </Card>
+</CardGroup>
+
+### Optimizing Performance
+
+**Do's:**
+- ✅ Let the droid discover files naturally through your task
+- ✅ Provide specific error messages or function names when debugging
+- ✅ Mention file paths or module names to guide retrieval
+- ✅ Use clear, descriptive language about your task
+
+**Don'ts:**
+- ❌ Manually add every file you think might be relevant
+- ❌ Worry if not all files are loaded immediately
+- ❌ Duplicate files already loaded by the droid
+- ❌ Fight against the automatic retrieval system
+
+## Advanced Features
+
+### Incremental Loading
+
+Context builds progressively:
+
+1. **Initial Load**: Core files directly mentioned or obviously relevant
+2. **Exploration Phase**: Additional files discovered through analysis
+3. **Implementation Phase**: Specific files needed for changes
+4. **Validation Phase**: Test files and configuration for verification
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The droid isn't finding the files I need">
+    - Provide more specific context about what you're looking for
+    - Mention specific file names or function names
+    - Use @file to manually add critical files
+    - Check if files are in ignored directories
+  </Accordion>
+
+  <Accordion title="Too many files are being loaded">
+    - Be more specific in your task description to help the droid focus
+    - You can work with a subset of your repository if needed
+    - Consider breaking large tasks into smaller, focused steps
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="External Integrations" icon="plug" href="/core-concepts/context/external-integrations">
+    Learn about manually adding tickets, PRs, and documentation
+  </Card>
+
+  <Card title="Memory System" icon="brain" href="/core-concepts/context/memory">
+    Explore how Factory remembers patterns and knowledge across sessions
+  </Card>
+</CardGroup>

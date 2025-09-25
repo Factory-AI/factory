@@ -1,0 +1,188 @@
+---
+title: Diagram Code with Factory
+description: Learn how to leverage Factory's AI capabilities to generate visual representations of your codebase, architecture, and workflows
+---
+
+Visualizing code and architecture through diagrams is crucial for understanding complex systems, communicating ideas, and planning development. Factory can significantly streamline this process by analyzing your code and generating various types of diagrams. This guide will walk you through how to use Factory to create different types of code diagrams.
+
+## Getting Started
+
+Before diving into code diagramming with Factory, ensure you have:
+
+1. Access to Factory
+
+2. Your codebase or architecture details ready
+
+3. Familiarity with basic diagram types (e.g., UML, flowcharts)
+
+<Note>
+  If you're new to Factory, check out our [Quickstart Guide](/user-guides/get-started/quickstart) to set up your environment.
+</Note>
+
+## Types of Code Diagrams
+
+Factory can help you create various types of diagrams:
+
+<CardGroup cols={2}>
+  <Card title="Class Diagrams" icon="diagram-project">
+    Visualize the structure of your classes and their relationships
+  </Card>
+
+  <Card title="Sequence Diagrams" icon="arrow-right-arrow-left">
+    Illustrate the flow of operations and interactions between objects
+  </Card>
+
+  <Card title="Entity-Relationship Diagrams" icon="database">
+    Represent the structure of databases and relationships between entities
+  </Card>
+
+  <Card title="Flowcharts" icon="sitemap">
+    Depict the steps in a process or algorithm
+  </Card>
+
+  <Card title="Architecture Diagrams" icon="building">
+    Visualize the high-level structure of your application or system
+  </Card>
+</CardGroup>
+
+## Diagramming Workflow with Factory
+
+### 1. Code Analysis
+
+Start by asking Factory to analyze your code or system description:
+
+<Steps>
+  <Step title="Import Code">
+    Use Factory's file upload feature to import your code.
+  </Step>
+
+  <Step title="Request Analysis">
+    Ask Factory to analyze the imported code:
+
+    "I've imported the 'src' directory of our project. Can you analyze the code and provide an overview of the main classes and their relationships?"
+  </Step>
+
+  <Step title="Clarify Requirements">
+    Specify the type of diagram you need:
+
+    "Based on your analysis, I'd like to create a class diagram. What key classes and relationships should we include?"
+  </Step>
+</Steps>
+
+### 2. Diagram Generation
+
+Use Factory to generate the diagram using Mermaid syntax:
+
+<AccordionGroup>
+  <Accordion title="Class Diagram">
+    Request a class diagram:
+
+    "Can you generate a Mermaid class diagram for the key classes you identified? Include inheritance, associations, and important methods."
+  </Accordion>
+
+  <Accordion title="Sequence Diagram">
+    Ask for a sequence diagram:
+
+    "Please create a Mermaid sequence diagram for the user authentication process in our application."
+  </Accordion>
+
+  <Accordion title="Entity-Relationship Diagram">
+    Request an ER diagram:
+
+    "Based on our database schema, can you generate a Mermaid entity-relationship diagram? Focus on the main entities and their relationships."
+  </Accordion>
+</AccordionGroup>
+
+Example of a generated Mermaid class diagram:
+
+<Frame>
+  ```mermaid
+  classDiagram
+      class User {
+          +String username
+          +String email
+          +authenticate()
+          +updateProfile()
+      }
+      class Order {
+          +int orderId
+          +Date orderDate
+          +float total
+          +processPayment()
+      }
+      class Product {
+          +int productId
+          +String name
+          +float price
+          +updateInventory()
+      }
+      User "1" -- "0..*" Order : places
+      Order "0..*" -- "1..*" Product : contains
+  ```
+</Frame>
+
+### 3. Diagram Refinement
+
+Iterate on the generated diagram to improve its clarity and accuracy:
+
+<Steps>
+  <Step title="Review and Feedback">
+    Analyze the generated diagram and provide feedback:
+
+    "The class diagram looks good, but can we add the 'Address' class and its relationship to 'User'?"
+  </Step>
+
+  <Step title="Request Changes">
+    Ask Factory to make specific changes:
+
+    "Please update the diagram to include the 'Address' class with a one-to-many relationship to 'User'."
+  </Step>
+
+  <Step title="Styling and Layout">
+    Refine the diagram's appearance:
+
+    "Can you adjust the layout to group related classes together and add colors to distinguish between different types of classes?"
+  </Step>
+</Steps>
+
+### 4. Documentation
+
+Use Factory to help document the diagram:
+
+<AccordionGroup>
+  <Accordion title="Diagram Explanation">
+    Request an explanation of the diagram:
+
+    "Can you provide a brief explanation of the class diagram, describing the main components and their relationships?"
+  </Accordion>
+
+  <Accordion title="Integration with Docs">
+    Ask how to integrate the diagram into your documentation:
+
+    "How can I include this Mermaid diagram in our Markdown documentation? Please provide the necessary syntax."
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices for Code Diagramming with Factory
+
+1. **Start with Clear Objectives**: Define what you want to visualize before asking Factory to generate a diagram.
+
+2. **Provide Context**: Give Factory as much context as possible about your system or the specific part you want to diagram.
+
+3. **Iterate and Refine**: Use an iterative approach, starting with a basic diagram and then refining it based on feedback and additional requirements.
+
+4. **Balance Detail and Clarity**: Ask Factory to focus on the most important elements to avoid cluttered diagrams.
+
+5. **Consistent Styling**: Maintain consistent styling across your diagrams. Ask Factory to use a uniform style for similar diagram types.
+
+6. **Version Control**: Consider versioning your diagrams alongside your code to keep them up-to-date.
+
+7. **Combine Diagram Types**: For complex systems, ask Factory to create multiple diagram types that complement each other.
+
+<Card title="Explore More Use Cases" icon="lightbulb" href="/user-guides/sessions-in-factory/use-cases">
+  Discover other ways Factory can enhance your development workflow
+</Card>
+
+<Card title="Learn About Fragments" icon="puzzle-piece" href="/user-guides/sessions-in-factory/how-to-use-fragments">
+  Dive deeper into using fragments in Factory, including Mermaid diagrams
+</Card>

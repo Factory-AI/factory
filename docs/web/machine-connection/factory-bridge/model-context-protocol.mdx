@@ -1,0 +1,192 @@
+---
+title: Model Context Protocol (MCP)
+description: Extend Factory's capabilities with custom tools and data sources using Model Context Protocol
+---
+
+## What is MCP?
+
+The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol that standardizes how applications provide context and tools to LLMs. With MCP, you can extend Factory's capabilities by connecting it to various data sources and tools through standardized interfaces.
+
+## Configuring MCP Servers
+
+Factory supports MCP through Factory Bridge, which runs MCP servers on your local machine and makes their tools available to Factory.
+
+### Configuration Process
+
+To set up MCP servers with Factory:
+
+1. Install [Factory Bridge](/user-guides/factory-bridge/installation-and-usage) if you haven't already
+2. Configure your MCP servers in the configuration file (details below)
+3. Factory Bridge will automatically detect and load your MCP servers
+4. The tools provided by your MCP servers will become available in Factory
+
+## Accessing the MCP Configuration File
+
+The easiest way to access and edit your MCP configuration is through the Factory Bridge system tray icon:
+
+1. Locate the Factory Bridge icon in the system tray (menu bar on macOS, notification area on Windows)
+2. Click on the icon to open the context menu
+3. Select **"Open MCP Config File"** from the menu options
+
+![Bridge Menu](/images/tutorial/bridge-menu-mcp.png)
+
+This will open the configuration file in your default text editor. If the file doesn't exist yet, Factory Bridge will automatically create it with an empty default configuration.
+
+For reference, the configuration file is stored at:
+
+- **macOS**: `~/Library/Application Support/Factory Bridge/mcp.json`
+- **Windows**: `%APPDATA%\Factory Bridge\mcp.json`
+
+## Configuration Format
+
+The MCP configuration file uses JSON format with the following structure:
+
+```json
+{
+  "mcpServers": {
+    "server-name": {
+      "command": "executable",
+      "args": ["arg1", "arg2"],
+      "env": {
+        "ENV_VAR1": "value1",
+        "ENV_VAR2": "value2"
+      },
+      "disabled": false
+    }
+  }
+}
+```
+
+### Configuration Fields
+
+- `mcpServers`: An object containing named server configurations
+- For each server:
+  - `command`: The executable to run (required)
+  - `args`: Array of command-line arguments (required)
+  - `env`: Optional environment variables to pass to the server
+  - `disabled`: Optional boolean to temporarily disable a server without removing it
+
+### Example Configuration
+
+Here's an example configuration with multiple MCP servers:
+
+```json
+{
+  "mcpServers": {
+    "google-maps": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-google-maps"],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "your-api-key-here"
+      }
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-****************************"
+      }
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-******************",
+        "SLACK_TEAM_ID": "T********"
+      },
+      "disabled": true
+    }
+  }
+}
+```
+
+In this example:
+- The `google-maps` server provides tools for interacting with Google Maps
+- The `firecrawl` server is enabled and configured with an API key
+- The `slack` server is disabled (it won't be loaded) but its configuration is preserved for future use
+
+## Automatic Configuration Updates
+
+Factory Bridge automatically detects changes to the MCP configuration file in real-time. When you modify the `mcp.json` file:
+
+1. Factory Bridge detects the changes immediately
+2. It identifies which servers need to be stopped, started, or restarted
+3. It applies the changes without requiring a restart of the application
+4. New servers and tools are automatically made available in Factory
+
+This allows you to add, modify, or remove MCP servers without restarting Factory Bridge. Simply edit the configuration file, save your changes, and the new tools will be available in Factory.
+
+## Disabling Servers
+
+The `disabled` field allows you to temporarily disable a server without removing its configuration. This is useful for:
+
+- Troubleshooting issues by selectively enabling/disabling servers
+- Maintaining configurations for servers you only use occasionally
+- Testing different server configurations
+
+When a server is disabled, Factory Bridge will skip loading it but keep its configuration in the file for future use.
+
+To disable a server, simply add `"disabled": true` to its configuration:
+
+```json
+"slack": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-slack"],
+  "env": {
+    "SLACK_BOT_TOKEN": "xoxb-******************",
+    "SLACK_TEAM_ID": "T********"
+  },
+  "disabled": true
+}
+```
+
+To re-enable it, either remove the `disabled` field or set it to `false`.
+
+## Using MCP Tools in Factory
+
+Once your MCP servers are configured and running, Factory will automatically detect the available tools and make them available for use.
+
+When using Factory, it will intelligently determine when to use MCP tools based on your requests. You can also explicitly ask Factory to use a specific tool by referring to it by name.
+
+## Windows Troubleshooting – `npx` Execution
+
+Running MCP servers via `npx` works out-of-the-box on macOS / Linux, but Windows users may encounter issues when trying to execute `npx` commands.
+
+**Why it happens:**  
+On Windows, `npx` is a script (`npx.cmd` / `npx.ps1`), not an executable. MCP stdio servers launch without shell access, so Windows cannot run the script directly.
+
+### Quick Fix – wrap the call with `cmd /c`
+
+```json
+{
+  "mcpServers": {
+    "slack": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "<your_mcp_command_here>"
+      ],
+    }
+  }
+}
+```
+
+## Coming Soon
+
+We're actively working on expanding MCP support with these upcoming features:
+
+1. **SSE Transport Support**: Support for **SSE transport** to connect to remote MCP servers over HTTP/HTTPS.
+
+2. **Image Tool Support**: Support for tools that return image outputs.
+
+3. **Configuration UI**: A dedicated UI for MCP configuration with error reporting and server status monitoring.
+
+## Resources
+
+For more information about MCP and available servers:
+
+- [Model Context Protocol Documentation](https://modelcontextprotocol.io)
+- [Awesome MCP servers repository](https://github.com/punkpeye/awesome-mcp-servers)
+- [Awesome MCP servers org page](https://mcpservers.org/)
+- [Building Custom MCP Servers](https://modelcontextprotocol.io/quickstart/server)
