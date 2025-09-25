@@ -1,0 +1,372 @@
+---
+title: Overview
+description: Non-interactive execution mode for CI/CD pipelines and automation scripts.
+---
+
+# Droid Exec (Headless CLI)
+
+Droid Exec is Factory's headless execution mode designed for automation workflows. Unlike the interactive CLI, `droid exec` runs as a one-shot command that completes a task and exits, making it ideal for CI/CD pipelines, shell scripts, and batch processing.
+
+## Summary and goals
+
+Droid Exec is a one-shot task runner designed to:
+
+- Produce readable logs, and structured artifacts when requested
+- Enforce opt-in for mutations/command execution (secure-by-default)
+- Fail fast on permission violations with clear errors
+- Support simple composition for batch and parallel work
+
+<CardGroup cols={2}>
+  <Card title="Non-Interactive" icon="terminal">
+    Single run execution that writes to stdout/stderr for CI/CD integration
+  </Card>
+  <Card title="Secure by Default" icon="lock">
+    Read-only by default with explicit opt-in for mutations via autonomy levels
+  </Card>
+  <Card title="Composable" icon="puzzle">
+    Designed for shell scripting, parallel execution, and pipeline integration
+  </Card>
+  <Card title="Clean Output" icon="file-export">
+    Structured output formats and artifacts for automated processing
+  </Card>
+</CardGroup>
+
+## Execution model
+
+- Non-interactive single run that writes to stdout/stderr.
+- Default is spec-mode: the agent is only allowed to execute read-only operations.
+- Add `--auto` to enable edits and commands; risk tiers gate what can run.
+
+CLI help (excerpt):
+
+```
+Usage: droid exec [options] [prompt]
+
+Execute a single command (non-interactive mode)
+
+Arguments:
+  prompt                          The prompt to execute
+
+Options:
+  -o, --output-format <format>    Output format (default: "text")
+  -f, --file <path>               Read prompt from file
+  --auto <level>                  Autonomy level: low|medium|high
+  --skip-permissions-unsafe       Skip ALL permission checks (unsafe)
+  -s, --session-id <id>           Existing session to continue (requires a prompt)
+  -m, --model <id>                Model ID to use
+  -r, --reasoning-effort <level>  Reasoning effort: off|low|medium|high
+  --cwd <path>                    Working directory path
+  -h, --help                      display help for command
+```
+
+Supported models (examples):
+
+- gpt-5-codex (default)
+- gpt-5-2025-08-07
+- claude-sonnet-4-20250514
+- claude-opus-4-1-20250805
+
+## Install and authenticate
+
+- Install the `droid` CLI for your environment:
+
+<CodeGroup>
+
+```bash macOS/Linux
+curl -fsSL https://app.factory.ai/cli | sh
+```
+
+```powershell Windows
+irm https://app.factory.ai/cli/windows | iex
+$env:PATH += ";$Env:USERPROFILE\bin"
+setx PATH "$Env:Path;$Env:USERPROFILE\bin"
+```
+
+</CodeGroup>
+
+- Generate your Factory API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys):
+  - macOS/Linux: `export FACTORY_API_KEY=fk-...`
+  - Windows (PowerShell): `$env:FACTORY_API_KEY="fk-..."`
+  - Windows (CMD): `set FACTORY_API_KEY=fk-...`
+
+## Quickstart
+
+- Direct prompt:
+  - `droid exec "analyze code quality"`
+  - `droid exec "fix the bug in src/main.js" --auto low`
+- From file:
+  - `droid exec -f prompt.md`
+- Pipe:
+  - `echo "summarize repo structure" | droid exec`
+- Session continuation:
+  - `droid exec --session-id <session-id> "continue with next steps"`
+
+## Autonomy Levels
+
+Droid exec uses a tiered autonomy system to control what operations the agent can perform. By default, it runs in read-only mode, requiring explicit flags to enable modifications.
+
+### DEFAULT (no flags) - Read-only Mode
+The safest mode for reviewing planned changes without execution:
+- ✅ Reading files or logs: cat, less, head, tail, systemctl status
+- ✅ Display commands: echo, pwd
+- ✅ Information gathering: whoami, date, uname, ps, top
+- ✅ Git read operations: git status, git log, git diff
+- ✅ Directory listing: ls, find (without -delete or -exec)
+- ❌ No modifications to files or system
+- **Use case:** Safe for reviewing what changes would be made
+
+```bash
+# Analyze and plan refactoring without making changes
+droid exec "Analyze the authentication system and create a detailed plan for migrating from session-based auth to OAuth2. List all files that would need changes and describe the modifications required."
+
+# Review code quality and generate report
+droid exec "Review the codebase for security vulnerabilities, performance issues, and code smells. Generate a prioritized list of improvements needed."
+
+# Understand project structure
+droid exec "Analyze the project architecture and create a dependency graph showing how modules interact with each other."
+```
+
+### `--auto low` - Low-risk Operations
+Enables basic file operations while blocking system changes:
+- ✅ File creation/editing in project directories
+- ❌ No system modifications or package installations
+- **Use case:** Documentation updates, code formatting, adding comments
+
+```bash
+# Safe file operations
+droid exec --auto low "add JSDoc comments to all functions"
+droid exec --auto low "fix typos in README.md"
+```
+
+### `--auto medium` - Development Operations
+Operations that may have significant side effects, but these side effects are typically harmless and straightforward to recover from.
+Adds common development tasks to low-risk operations:
+- Installing packages from trusted sources: npm install, pip install (without sudo)
+- Network requests to trusted endpoints: curl, wget to known APIs
+- Git operations that modify local repositories: git commit, git checkout, git pull (but not git push)
+- Building code with tools like make, npm run build, mvn compile
+- ❌ No git push, sudo commands, or production changes
+- **Use case:** Local development, testing, dependency management
+
+```bash
+# Development tasks
+droid exec --auto medium "install deps, run tests, fix issues"
+droid exec --auto medium "update packages and resolve conflicts"
+```
+
+### `--auto high` - Production Operations
+Commands that may have security implications such as data transfers between untrusted sources or execution of unknown code, or major side effects such as irreversible data loss or modifications of production systems/deployments.
+- Running arbitrary/untrusted code: curl | bash, eval, executing downloaded scripts
+- Exposing ports or modifying firewall rules that could allow external access
+- Git push operations that modify remote repositories: git push, git push --force
+- Irreversible actions to production deployments, database migrations, or other sensitive operations
+- Commands that access or modify sensitive information like passwords or keys
+- ❌ Still blocks: sudo rm -rf /, system-wide changes
+- **Use case:** CI/CD pipelines, automated deployments
+
+```bash
+# Full workflow automation
+droid exec --auto high "fix bug, test, commit, and push to main"
+droid exec --auto high "deploy to staging after running tests"
+```
+
+### `--skip-permissions-unsafe` - Bypass All Checks
+<Warning>
+  DANGEROUS: This mode allows ALL operations without confirmation. Only use in completely isolated environments like Docker containers or throwaway VMs.
+</Warning>
+
+- ⚠️ Allows ALL operations without confirmation
+- ⚠️ Can execute irreversible operations
+- Cannot be combined with --auto flags
+- **Use case:** Isolated environments
+
+```bash
+# In a disposable Docker container for CI testing
+docker run --rm -v $(pwd):/workspace alpine:latest sh -c "
+  apk add curl bash &&
+  curl -fsSL https://app.factory.ai/cli | sh &&
+  droid exec --skip-permissions-unsafe 'Install all system dependencies, modify system configs, run integration tests that require root access, and clean up test databases'
+"
+
+# In ephemeral GitHub Actions runner for rapid iteration
+# where the runner is destroyed after each job
+droid exec --skip-permissions-unsafe "Modify /etc/hosts for test domains, install custom kernel modules, run privileged container tests, and reset network interfaces"
+
+# In a temporary VM for security testing
+droid exec --skip-permissions-unsafe "Run penetration testing tools, modify firewall rules, test privilege escalation scenarios, and generate security audit reports"
+```
+
+### Fail-fast Behavior
+
+If a requested action exceeds the current autonomy level, droid exec will:
+1. Stop immediately with a clear error message
+2. Return a non-zero exit code
+3. Not perform any partial changes
+
+This ensures predictable behavior in automation scripts and CI/CD pipelines.
+
+## Output formats and artifacts
+
+Droid exec supports three output formats for different use cases:
+
+### text (default)
+Human-readable output for direct consumption or logs:
+
+```bash
+$ droid exec --auto low "create a python file that prints 'hello world'"
+Perfect! I've created a Python file named `hello_world.py` in your home directory that prints 'hello world' when executed.
+```
+
+### json
+Structured JSON output for parsing in scripts and automation:
+
+```bash
+$ droid exec "summarize this repository" --output-format json
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 5657,
+  "num_turns": 1,
+  "result": "This is a Factory documentation repository containing guides for CLI tools, web platform features, and onboarding procedures...",
+  "session_id": "8af22e0a-d222-42c6-8c7e-7a059e391b0b"
+}
+```
+
+Use JSON format when you need to:
+- Parse the result in a script
+- Check success/failure programmatically
+- Extract session IDs for continuation
+- Process results in a pipeline
+
+### debug
+Streaming messages showing the agent's execution in real-time:
+
+```bash
+$ droid exec "run ls command" --output-format debug
+{"type":"message","role":"user","text":"run ls command"}
+{"type":"message","role":"assistant","text":"I'll run the ls command to list the contents..."}
+{"type":"tool_call","toolName":"Execute","parameters":{"command":"ls -la"}}
+{"type":"tool_result","value":"total 16\ndrwxr-xr-x@ 8 user staff..."}
+{"type":"message","role":"assistant","text":"The ls command has been executed successfully..."}
+```
+
+Debug format is useful for:
+- Monitoring agent behavior
+- Troubleshooting execution issues
+- Understanding tool usage patterns
+- Real-time progress tracking
+
+For automated pipelines, you can also direct the agent to write specific artifacts:
+
+```bash
+droid exec --auto low "Analyze dependencies and write to deps.json"
+droid exec --auto low "Generate metrics report in CSV format to metrics.csv"
+```
+
+## Working directory
+
+- Use `--cwd` to scope execution:
+
+```
+droid exec --cwd /home/runner/work/repo "Map internal packages and dump graphviz DOT to deps.dot"
+```
+
+## Models and reasoning effort
+
+- Choose a model with `-m` and adjust reasoning with `-r`:
+
+```
+droid exec -m claude-sonnet-4-20250514 -r medium -f plan.md
+```
+
+## Batch and parallel patterns
+
+Shell loops (bounded concurrency):
+
+```bash
+# Process files in parallel (GNU xargs -P)
+find src -name "*.ts" -print0 | xargs -0 -P 4 -I {} \
+  droid exec --auto low "Refactor file: {} to use modern TS patterns"
+```
+
+Background job parallelization:
+
+```bash
+# Process multiple directories in parallel with job control
+for path in packages/ui packages/models apps/factory-app; do
+  (
+    cd "$path" &&
+    droid exec --auto low "Run targeted analysis and write report.md"
+  ) &
+done
+wait  # Wait for all background jobs to complete
+```
+
+Chunked inputs:
+
+```bash
+# Split large file lists into manageable chunks
+git diff --name-only origin/main...HEAD | split -l 50 - /tmp/files_
+for f in /tmp/files_*; do
+  list=$(tr '\n' ' ' < "$f")
+  droid exec --auto low "Review changed files: $list and write to review.json"
+done
+rm /tmp/files_*  # Clean up temporary files
+```
+
+Workflow Automation (CI/CD):
+
+```yaml
+# Dead code detection and cleanup suggestions
+name: Code Cleanup Analysis
+on:
+  schedule:
+    - cron: '0 1 * * 0' # Weekly on Sundays
+  workflow_dispatch:
+jobs:
+  cleanup-analysis:
+    strategy:
+      matrix:
+        module: ['src/components', 'src/services', 'src/utils', 'src/hooks']
+    steps:
+      - uses: actions/checkout@v4
+      - run: droid exec --cwd "${{ matrix.module }}" --auto low "Identify unused exports, dead code, and deprecated patterns. Generate cleanup recommendations in cleanup-report.md"
+```
+
+## Unique usage examples
+
+License header enforcer:
+
+```bash
+git ls-files "*.ts" | xargs -I {} \
+  droid exec --auto low "Ensure {} begins with the Apache-2.0 header; add it if missing"
+```
+
+API contract drift check (read-only):
+
+```bash
+droid exec "Compare openapi.yaml operations to our TypeScript client methods and write drift.md with any mismatches"
+```
+
+Security sweep:
+
+```bash
+droid exec --auto low "Run a quick audit for sync child_process usage and propose fixes; write findings to sec-audit.csv"
+```
+
+## Exit behavior
+
+- 0: success
+- Non-zero: failure (permission violation, tool error, unmet objective). Treat non-zero as failed in CI.
+
+## Best practices
+
+- Favor `--auto low`; keep mutations minimal and commit/push in scripted steps.
+- Avoid `--skip-permissions-unsafe` unless fully sandboxed.
+- Ask the agent to emit artifacts your pipeline can verify.
+- Use `--cwd` to constrain scope in monorepos.
+
+<Note>
+  For advanced automation patterns and real-world examples, see the [Automation Cookbook](/cli/droid-exec/automation-cookbook).
+</Note>
