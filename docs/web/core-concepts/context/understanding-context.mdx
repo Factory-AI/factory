@@ -1,0 +1,163 @@
+---
+title: Understanding Context
+description: Learn how Factory brings together all relevant information for your development tasks in one unified system
+---
+
+## What is Context?
+
+Context in Factory represents all the information relevant to your current development task. Unlike traditional development environments where context lives across multiple tools and tabs, Factory brings everything together in one place, allowing AI to understand and assist with your work more effectively.
+
+## The Context Panel
+
+<Note>
+  The Context Panel is your central hub for managing all context in Factory. Access it from the chat interface to view, add, and manage different types of context.
+</Note>
+
+<Card>
+  <img src="/images/features/context-panel-overview.png" alt="Factory Context Panel showing various context types" />
+  <Caption>The Context Panel provides a unified view of all context types in your session</Caption>
+</Card>
+
+## How Context Works
+
+Factory's context system operates on three key principles:
+
+<CardGroup cols={3}>
+  <Card title="Smart Aggregation" icon="layer-group">
+    Factory automatically collects and organizes context from your connected tools and repositories.
+  </Card>
+
+  <Card title="Intelligent Understanding" icon="brain">
+    Our AI analyzes relationships between different pieces of information to provide relevant insights.
+  </Card>
+
+  <Card title="Selective Focus" icon="bullseye">
+    Prioritize the most relevant information for your current task to maintain optimal performance.
+  </Card>
+</CardGroup>
+
+## Types of Context
+
+Factory distinguishes between different types of context based on how they're added and managed:
+
+### External Integration Context
+These are external resources you bring into your session:
+- **Project Management**: Jira tickets, Linear issues, GitHub/GitLab issues
+- **Code Reviews**: Pull requests, merge requests, code discussions
+- **Documentation**: Google Docs, Notion pages, Confluence wikis
+- **Incidents**: PagerDuty incidents, Sentry issues, monitoring alerts
+- **Communication**: Slack threads, team discussions
+
+[Learn more about external context →](/core-concepts/context/external-integrations)
+
+### Dynamic Repository Context
+Factory dynamically manages code context as you work:
+- **Code Files**: Source files, configurations, tests automatically pulled as needed
+- **Code Snippets**: Specific functions, classes, or code blocks identified by the droid
+- **Repository Structure**: Directory layouts, file relationships, project organization
+- **Search Results**: Code search, pattern matching, dependency analysis
+- **Build & Test Output**: Compilation results, test failures, logs from executed commands
+
+*Note: You can supplement with @file commands to add specific files when needed*
+
+[Learn more about dynamic context →](/core-concepts/context/dynamic-retrieval)
+
+### Managed Memory Context
+Persistent knowledge that Factory manages for you:
+- **User Memory**: Personal preferences, workflows, and patterns (private to you)
+- **Organization Memory**: Team conventions, standards, and shared knowledge
+- **Session History**: Recent conversations and task progress
+- **Learning Patterns**: Frequently used commands and solutions
+
+[Learn more about memory as context →](/core-concepts/context/memory)
+
+## Context Limits and Optimization
+
+### Understanding Token Limits
+
+Tokens are the fundamental units that Factory uses to process text. Each session has a context limit based on the underlying LLM being used.
+
+<Accordion title="What are Tokens?">
+  Tokens are discrete units of text that language models use to process and understand content. They represent the atomic elements of text processing, where words, subwords, or individual characters are converted into numerical values that the AI can analyze.
+
+  **Basic Concepts:**
+  - Tokens can be words, parts of words, or even single characters
+  - Common words are usually single tokens (e.g., "the", "is", "Factory")
+  - Longer or uncommon words might be split into multiple tokens
+  - Punctuation marks and spaces count as tokens
+
+  **Token Limits:**
+  - Maximum context window: ~200,000 tokens (Claude 3.5 Sonnet)
+  - Optimal working range: 40,000-80,000 tokens
+  - Includes all context sources: code, documentation, conversation history
+</Accordion>
+
+### Best Practices for Context Management
+
+<Steps>
+  <Step title="Start Focused">
+    Begin with core context essential to your task:
+    - Main files you're working on
+    - Directly related tickets or PRs
+    - Immediate documentation needs
+  </Step>
+
+  <Step title="Add Context Gradually">
+    Expand context as your task evolves:
+    - Add related PRs when reviewing code
+    - Include additional documentation when exploring features
+    - Bring in historical context for deeper understanding
+  </Step>
+
+  <Step title="Maintain Context Hygiene">
+    Regularly review and update your context:
+    - Remove outdated or irrelevant information
+    - Update stale documentation
+    - Clear context when switching between unrelated tasks
+  </Step>
+
+  <Step title="Monitor Context Size">
+    Keep an eye on your token usage:
+    - Use the context panel to track current usage
+    - Stay within the optimal range for best performance
+    - Remove unnecessary context when approaching limits
+  </Step>
+</Steps>
+
+## Quick Context Actions
+
+<CardGroup cols={2}>
+  <Card title="Add Context with @" icon="at">
+    Use @ commands in chat to quickly add:
+    - @file for code files
+    - @ticket for Jira/Linear issues  
+    - @pull request for PRs
+    - @google docs for documents
+    - @notion for wiki pages
+  </Card>
+
+  <Card title="Paste Links Directly" icon="link">
+    Simply paste URLs to automatically add:
+    - GitHub/GitLab PRs and issues
+    - Jira/Linear tickets
+    - Google Docs/Notion pages
+    - Sentry issues
+    - PagerDuty incidents
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="External Integrations" icon="plug" href="/core-concepts/context/external-integrations">
+    Learn about adding tickets, PRs, and other external resources
+  </Card>
+
+  <Card title="Dynamic Retrieval" icon="magnifying-glass" href="/core-concepts/context/dynamic-retrieval">
+    Understand how Factory pulls in code and files automatically
+  </Card>
+
+  <Card title="Memory System" icon="brain" href="/core-concepts/context/memory">
+    Explore how Factory remembers and applies knowledge
+  </Card>
+</CardGroup>

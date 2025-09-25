@@ -1,0 +1,136 @@
+---
+title: Data Science - Analyze Data with Factory
+description: Learn how to leverage Factory's AI capabilities for data preprocessing, analysis, and visualization in your data science projects
+---
+
+Factory is a powerful ally in your data science workflow, particularly when it comes to analyzing user data. This guide will walk you through how to use Factory for various stages of the data science process, from preprocessing to visualization and interpretation.
+
+## Getting Started
+
+Before diving into data analysis, ensure you have:
+
+1. Access to Factory
+
+2. Your dataset ready for analysis
+
+<Note>
+  If you're new to Factory, check out our [Quickstart Guide](/user-guides/get-started/quickstart) to set up your environment.
+</Note>
+
+## Importing Your Data
+
+To get the most out of Factory for data science tasks, you need to provide it with your dataset. Here's how you can do that:
+
+<Steps>
+  <Step title="Prepare Your Data">
+    Ensure your data is in a common format like CSV, JSON, or Excel.
+  </Step>
+
+  <Step title="Upload to Factory">
+    Use the file upload feature in Factory to import your dataset.
+  </Step>
+
+  <Step title="Verify Data Import">
+    Ask Factory to confirm the successful import and provide a summary of the dataset.
+  </Step>
+</Steps>
+
+Example prompt for data verification:
+
+```
+I've just uploaded a CSV file named 'user_data.csv'. Can you confirm it's been imported correctly and give me a brief summary of its contents?
+```
+
+## Data Science Workflow with Factory
+
+### 1. Data Preprocessing
+
+Factory can assist in cleaning and preparing your data for analysis. Here are some tasks you can accomplish:
+
+<AccordionGroup>
+  <Accordion title="Handling Missing Values">
+    Ask Factory to identify and suggest methods for dealing with missing data:
+
+    "Analyze the 'user\_data.csv' file for missing values. What percentage of data is missing in each column, and what strategies would you recommend for handling these missing values?"
+  </Accordion>
+
+  <Accordion title="Data Type Conversion">
+    Request Factory to suggest and implement necessary data type conversions:
+
+    "Review the data types in our dataset. Are there any columns that should be converted to a different data type for analysis? If so, can you provide the code to perform these conversions?"
+  </Accordion>
+
+  <Accordion title="Feature Engineering">
+    Leverage Factory to create new features or transform existing ones:
+
+    "Based on the 'purchase\_date' and 'last\_login' columns, can you create a new feature that represents the number of days between a user's last purchase and their last login? Provide the code to accomplish this."
+  </Accordion>
+</AccordionGroup>
+
+### 2. Exploratory Data Analysis (EDA)
+
+Factory can help you gain insights from your data through various EDA techniques:
+
+<Steps>
+  <Step title="Descriptive Statistics">
+    Ask Factory to calculate and interpret basic statistics:
+
+    "Calculate the mean, median, and standard deviation for all numerical columns in the dataset. What insights can we draw from these statistics?"
+  </Step>
+
+  <Step title="Data Visualization">
+    Request Factory to generate code for creating informative visualizations:
+
+    "Create a histogram of user ages and a box plot of purchase amounts by user category. Use matplotlib or seaborn for these visualizations and explain what the plots reveal about our user base."
+  </Step>
+
+  <Step title="Correlation Analysis">
+    Use Factory to identify relationships between variables:
+
+    "Perform a correlation analysis on the numerical features in our dataset. Generate a heatmap of the correlation matrix and highlight any strong correlations we should investigate further."
+  </Step>
+</Steps>
+
+### 3. Machine Learning Model Selection
+
+Factory can provide guidance on choosing appropriate machine learning models for your data:
+
+Example prompt:
+
+```
+Based on our preprocessed dataset and the goal of predicting user churn, what machine learning models would you recommend? Please explain the pros and cons of each suggested model in the context of our data and objective.
+```
+
+### 4. Model Evaluation and Interpretation
+
+After model selection and training, Factory can assist in evaluating and interpreting the results:
+
+<AccordionGroup>
+  <Accordion title="Performance Metrics">
+    Ask Factory to calculate and explain relevant performance metrics:
+
+    "For our churn prediction model, calculate the accuracy, precision, recall, and F1 score. Interpret these metrics in the context of our business goal."
+  </Accordion>
+
+  <Accordion title="Feature Importance">
+    Request insights on which features are most influential:
+
+    "Analyze the feature importance in our churn prediction model. Which factors seem to be the strongest predictors of user churn? Can you create a bar plot to visualize this?"
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices for Data Science with Factory
+
+1. **Start with Clear Objectives**: Clearly define your analysis goals before engaging with Factory.
+
+2. **Iterative Approach**: Use Factory's insights to refine your analysis iteratively. Don't hesitate to ask follow-up questions or request clarifications.
+
+3. **Code Review**: Always review and understand the code generated by Factory. It's a tool to augment your expertise, not replace it.
+
+4. **Document Your Process**: Use Factory to help document your data science workflow, making it easier for team collaboration and future reference.
+
+5. **Ethical Considerations**: When analyzing user data, always consider privacy and ethical implications. Ask Factory for guidance on data anonymization techniques if needed.
+
+<Card title="Explore More Use Cases" icon="lightbulb" href="/user-guides/sessions-in-factory/use-cases">
+  Discover other ways Factory can enhance your development and analysis workflows
+</Card>
