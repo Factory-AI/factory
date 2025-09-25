@@ -1,0 +1,35 @@
+---
+title: Remote Workspaces – Custom commands
+description: Add custom commands to run during workspace creation
+---
+
+Custom commands are shell commands Factory runs during workspace creation, after your repository is cloned and before the workspace is activated. Use this feature to set up your workspace and give droid tools to work with your codebase.
+
+## 1. How to define custom commands to run
+
+1. In the modal for workspace creation, in “Setup Commands (Optional)” section, add commands in the order you want them to run. Each entry is a single shell line; chain steps with `&&` if needed.
+2. Submit. Commands run in the repo root with bash strict mode (`set -euo pipefail`). The first failing command stops the build.
+3. Keep commands non‑interactive and idempotent. Each command can be up to 2048 characters.
+4. Review build logs for lines like `=== Running command X/N: ... ===` if anything fails.
+
+Examples:
+- Node.js (Next.js): `npm ci && npm run build`
+- PNPM monorepo: `pnpm -w i && pnpm -w build`
+- Python: `pip install -r requirements.txt && pytest -q`
+- Bash: `bash ./scripts/setup.sh`
+
+What happens under the hood:
+- Commands execute after repository cloning, inside the build container at the repo root.
+- Environment variables specified are also available for command runs.
+- Errors are surfaced clearly (e.g., `Setup command failed: ...`) for quick fixes.
+
+## 2. Troubleshooting Tips
+
+| Issue | Fix |
+|---|---|
+| Setup fails with “Setup command failed: …” | The first failing command stopped the build. Run it locally, fix errors, add non‑interactive flags (e.g., `-y`), then retry. |
+| Command not found | Install the tool earlier in your command list or ensure it’s in the base image before using it. |
+| Permission denied (scripts) | Make scripts executable (`chmod +x ./scripts/setup.sh`) or invoke via interpreter (`bash ./scripts/setup.sh`). |
+| Env var not applied | Add it in Environment Variables and reference as `$VAR`. Avoid echoing secrets in commands. |
+| Long builds | Keep commands minimal; prefer cached installs (`npm ci` over `npm install`); avoid heavy, non‑essential work. |
+| Path/file not found | Commands run at the repo root. Verify relative paths and that files exist after clone. |

@@ -1,0 +1,106 @@
+---
+title: Remote Workspaces – Installation & Usage
+description: Set up, connect to, and use Remote Workspaces inside Factory sessions
+---
+
+A **remote workspace** is a fully-configured, on-demand development environment that lives in the cloud. Remote workspaces give you the same tools and dependencies you'd expect locally—without any machine-setup friction—so you can build, test, and run code directly from Factory.
+
+## System Requirements
+
+- A repository enabled in Factory
+- Manager role or higher to create remote workspaces
+
+<Steps>
+
+  <Step title="Open Session Settings">
+    1. In Factory, click the **Settings** icon from the left sidebar.  
+    2. Select **Session**.
+    3. Scroll down to **Remote Workspaces**.
+  </Step>
+
+  <Step title="Create a New Remote Workspace">
+    1. Click **Create Workspace**.  
+    2. Enter the repository you want to use.  
+    3. Give your workspace a friendly name (e.g., “frontend-workspace”).  
+    4. (Optional) Enter custom commands to run.
+    5. Click **Create**.
+    <Note>
+      Factory clones your repo and prepares the environment—this can take a minute for large projects.
+    </Note>
+  </Step>
+
+  <Step title="Verify Workspace Ready">
+    The new workspace appears in the list with a status indicator. Once it shows **Ready**, you can use it from any session.
+  </Step>
+
+</Steps>
+
+---
+
+## Launching a Remote Workspace inside a Session
+
+<Steps>
+
+  <Step title="Open or Start a Session">
+    Join any Factory session as usual.
+  </Step>
+
+  <Step title="Connect to Cloud Machine">
+    1. On the session start page, click the Machine Connection button. 
+    2. Choose **Remote** tab.  
+    3. Select the workspace you created earlier.  
+    4. Factory attaches the remote workspace to your session.
+
+    <Frame>
+    ![machine-connection-start.gif](/images/web/machine-connection-start.gif)
+    </Frame> 
+  </Step>
+
+  <Step title="Confirm Connection">
+    A green indicator and remote working directory appear on the top-right next to your profile dropdown menu. You’re now interacting with the cloud workspace.
+  </Step>
+
+</Steps>
+
+---
+
+## Everyday Usage
+
+<CardGroup cols={2}>
+
+  <Card title="Run CLI Commands" icon="terminal">
+    Use the **Terminal** toolkit to execute commands like:
+    <pre>npm run dev
+pytest
+git status</pre>
+    Output streams live into chat and logs.
+  </Card>
+
+  <Card title="Edit & Save Files" icon="file-code">
+    Open files from the repo, make changes, and save.  
+    Files persist in the remote workspace and can be committed upstream when ready.
+  </Card>
+
+  <Card title="Auto-Save Controls" icon="save">
+    Auto-save is disabled by default—enable it from the **Session Settings** panel whenever you want live file syncing.
+  </Card>
+
+</CardGroup>
+
+---
+
+## Troubleshooting & Help
+
+<AccordionGroup>
+
+  <Accordion title="Can't connect from session">
+    Ensure you:  
+    1. Selected **Remote Machine** (not Local).  
+    2. Refresh the page, or try again in a different session
+  </Accordion>
+
+</AccordionGroup>
+
+<Card title="Need More Help?" icon="life-ring" href="/web/machine-connection/remote-workspaces/troubleshooting">
+  Visit the full Remote Workspace Troubleshooting Guide
+</Card>
