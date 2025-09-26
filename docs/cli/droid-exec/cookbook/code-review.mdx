@@ -124,9 +124,9 @@ Before running the review, we need to gather context about the PR. This step fet
               issue_number: prNumber,
               per_page: 100
             });
-            fs.writeFileSync(`${path}/existing_comments.json`, JSON.stringify(comments, null, 2));
+            fs.writeFileSync(\`\${path}/existing_comments.json\`, JSON.stringify(comments, null, 2));
 
-            // Fetch changed files with line position info
+            // Fetch changed files with patches
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -134,20 +134,20 @@ Before running the review, we need to gather context about the PR. This step fet
               per_page: 100
             });
             const reduced = files.map(f => ({ filename: f.filename, patch: f.patch }));
-            fs.writeFileSync(`${path}/files.json`, JSON.stringify(reduced, null, 2));
+            fs.writeFileSync(\`\${path}/files.json\`, JSON.stringify(reduced, null, 2));
 
-            // Generate diff locally
+            // Create diff via git locally
             const { execSync } = require('child_process');
             const base = context.payload.pull_request.base.sha;
             const head = context.payload.pull_request.head.sha;
             try {
-              const diff = execSync(`git diff ${base}...${head}`, { 
+              const diff = execSync(\`git diff \${base}...\${head}\`, { 
                 encoding: 'utf8', 
                 stdio: ['ignore', 'pipe', 'pipe'] 
               });
-              fs.writeFileSync(`${path}/diff.txt`, diff);
+              fs.writeFileSync(\`\${path}/diff.txt\`, diff);
             } catch (e) {
-              fs.writeFileSync(`${path}/diff.txt`, '');
+              fs.writeFileSync(\`\${path}/diff.txt\`, '');
             }
 ```
 
@@ -155,23 +155,19 @@ Before running the review, we need to gather context about the PR. This step fet
 
 Now let's create the review step. The prompt defines what issues to look for and how to format comments:
 
-#### Define review objectives
-
-The agent should focus on real bugs, not style issues:
-- **Find**: Logic errors, security vulnerabilities, performance problems
-- **Skip**: Code style, naming conventions, architectural decisions
-- **Format**: Clear, actionable feedback with suggested fixes
-
-#### Create the review prompt
-
 ```yaml
       - name: Generate inline review
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
         timeout-minutes: 10
         run: |
-          # Copy context files for droid to access
-          cp .git/pr_review/*.json .git/pr_review/diff.txt ./ 2>/dev/null || true
+          # Copy context files to current directory for droid to access
+          cp .git/pr_review/existing_comments.json ./existing_comments.json
+          cp .git/pr_review/files.json ./files.json
+          cp .git/pr_review/diff.txt ./diff.txt
+
+          echo "Files prepared:"
+          ls -la *.json diff.txt 2>/dev/null || true
 
           cat > prompt.txt << 'EOF'
           You are an automated code review system. Review the PR diff and identify clear issues that need to be fixed.
@@ -182,39 +178,63 @@ The agent should focus on real bugs, not style issues:
           - existing_comments.json: skip issues already mentioned here
 
           Task: Create comments.json with this exact format:
-          [{ "path": "path/to/file.js", "position": 42, "body": "Your comment here" }]
+          '[{"path": "path/to/file.js", "position": 42, "body": "Your comment here"}]'
 
           Focus on these types of issues:
-          - Dead/unreachable code (if (false), code after return)
-          - Broken control flow (missing break in switch)
-          - Async/await mistakes (missing await, unhandled rejections)
-          - React hooks violations (conditional hooks, missing dependencies)
-          - Incorrect operators (== vs ===, = in conditions)
+          - Dead/unreachable code (if (false), while (false), code after return/throw/break)
+          - Broken control flow (missing break in switch, fallthrough bugs)
+          - Async/await mistakes (missing await, .then without return, unhandled promise rejections)
+          - Array/object mutations in React components or reducers
+          - UseEffect dependency array problems (missing deps, incorrect deps)
+          - Incorrect operator usage (== vs ===, && vs ||, = in conditions)
           - Off-by-one errors in loops or array indexing
-          - Security vulnerabilities (SQL injection, XSS)
-          - Null/undefined dereferences
-          - Resource leaks (unclosed connections)
+          - Integer overflow/underflow in calculations
+          - Regex catastrophic backtracking vulnerabilities
+          - Missing base cases in recursive functions
+          - Incorrect type coercion that changes behavior
+          - Environment variable access without defaults or validation
 
-          Comment guidelines:
-          - Describe the issue clearly
-          - Provide a concrete fix
-          - Include code suggestions when possible
-          - Be specific about impact
-          - Max 10 comments per review
+          Comment format:
+          - Clearly describe the issue: "This code block is unreachable due to the if (false) condition"
+          - Provide a concrete fix: "Remove this entire if block as it will never execute"
+          - When possible, suggest the exact code change:
+            ```suggestion
+            // Remove the unreachable code
+            ```
+          - Be specific about why it's a problem: "This will cause a TypeError if input is null"
+          - No emojis, just clear technical language
 
-          Output: Array of comment objects or empty array if no issues
+          Skip commenting on:
+          - Code style, formatting, or naming conventions
+          - Minor performance optimizations
+          - Architectural decisions or design patterns
+          - Features or functionality (unless broken)
+          - Test coverage (unless tests are clearly broken)
+
+          Position calculation:
+          - Use the "position" field from files.json patches
+          - This is the line number in the diff, not the file
+          - Comments must align with exact changed lines only
+
+          Output: 
+          - Empty array [] if no issues found
+          - Otherwise array of comment objects with path, position, body
+          - Each comment should be actionable and clear about what needs to be fixed
           EOF
 
-          # Run droid exec with medium autonomy (can create files)
-          droid exec --output-format debug --auto medium --model gpt-5-codex -f prompt.txt
+          # Run droid exec with stderr captured
+          echo "Running droid exec..."
+          droid exec --output-format debug --auto medium --model gpt-5-codex -f prompt.txt 2>&1
 
-          # Verify output was created
+          # Check if comments.json was created
           if [ ! -f comments.json ]; then
             echo "❌ ERROR: droid exec did not create comments.json"
+            echo "This indicates a failure in the review generation"
             exit 1
           fi
 
-          echo "✅ Review complete. Comments:"
+          echo "✅ comments.json created successfully"
+          echo "=== Contents of comments.json ==="
           cat comments.json
 ```
 
@@ -223,7 +243,7 @@ The agent should focus on real bugs, not style issues:
 To avoid confusion, supersede old "no issues" comments when new issues are found:
 
 ```yaml
-      - name: Supersede outdated comments
+      - name: Supersede prior no-issues comments if new issues found
         if: always()
         uses: actions/github-script@v7
         with:
@@ -232,19 +252,20 @@ To avoid confusion, supersede old "no issues" comments when new issues are found
             if (!fs.existsSync('comments.json')) return;
 
             const comments = JSON.parse(fs.readFileSync('comments.json','utf8'));
+            // Only supersede if we have actual issues to report
             if (!Array.isArray(comments) || comments.length === 0) return;
 
-            // Find and update old "no issues" comments
             const prNumber = context.payload.pull_request.number;
             const existingComments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: prNumber
+              issue_number: prNumber,
+              per_page: 100
             });
 
             for (const c of existingComments) {
-              const body = (c.body || '').trim().toLowerCase();
-              if (body.includes('no issues') || body === 'lgtm') {
+              const body = (c.body || '').trim();
+              if (/^(✅\s*no issues|no issues found|lgtm)/i.test(body)) {
                 await github.rest.issues.updateComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -266,26 +287,20 @@ Post the generated comments as an inline review on the PR:
           script: |
             const fs = require('fs');
             const prNumber = context.payload.pull_request.number;
-            
             if (!fs.existsSync('comments.json')) {
-              core.info('No comments file found');
+              core.info('comments.json missing; skipping');
               return;
             }
-            
             const comments = JSON.parse(fs.readFileSync('comments.json','utf8'));
-            
             if (!Array.isArray(comments) || comments.length === 0) {
-              // Only post "no issues" if we haven't already
+              // Post a single minimal top-level comment only if none exists yet
               const existing = await github.paginate(github.rest.issues.listComments, {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: prNumber
+                issue_number: prNumber,
+                per_page: 100
               });
-              
-              const hasNoIssues = existing.some(c => 
-                /no issues/i.test(c.body || '')
-              );
-              
+              const hasNoIssues = existing.some(c => /no issues/i.test(c.body || ''));
               if (!hasNoIssues) {
                 await github.rest.pulls.createReview({
                   owner: context.repo.owner,
@@ -297,14 +312,13 @@ Post the generated comments as an inline review on the PR:
               }
               return;
             }
-            
-            // Submit review with inline comments
+            const summary = 'Automated review with inline comments.';
             await github.rest.pulls.createReview({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber,
               event: 'COMMENT',
-              body: 'Automated review completed with inline comments.',
+              body: summary,
               comments: comments
             });
 ```
@@ -339,11 +353,11 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
-  group: droid-review-only-${{ github.event.pull_request.number }}
+  group: droid-review-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
-  review-only:
+  review:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -357,7 +371,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup droid CLI
@@ -382,7 +395,7 @@ jobs:
               issue_number: prNumber,
               per_page: 100
             });
-            fs.writeFileSync(`${path}/existing_comments.json`, JSON.stringify(comments, null, 2));
+            fs.writeFileSync(\`\${path}/existing_comments.json\`, JSON.stringify(comments, null, 2));
 
             // Fetch changed files with patches
             const files = await github.paginate(github.rest.pulls.listFiles, {
@@ -392,17 +405,17 @@ jobs:
               per_page: 100
             });
             const reduced = files.map(f => ({ filename: f.filename, patch: f.patch }));
-            fs.writeFileSync(`${path}/files.json`, JSON.stringify(reduced, null, 2));
+            fs.writeFileSync(\`\${path}/files.json\`, JSON.stringify(reduced, null, 2));
 
             // Create diff via git locally
             const { execSync } = require('child_process');
             const base = context.payload.pull_request.base.sha;
             const head = context.payload.pull_request.head.sha;
             try {
-              const diff = execSync(`git diff ${base}...${head}`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-              fs.writeFileSync(`${path}/diff.txt`, diff);
+              const diff = execSync(\`git diff \${base}...\${head}\`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+              fs.writeFileSync(\`\${path}/diff.txt\`, diff);
             } catch (e) {
-              fs.writeFileSync(`${path}/diff.txt`, '');
+              fs.writeFileSync(\`\${path}/diff.txt\`, '');
             }
 
       - name: Generate inline review
@@ -427,7 +440,7 @@ jobs:
           - existing_comments.json: skip issues already mentioned here
 
           Task: Create comments.json with this exact format:
-          [{ "path": "path/to/file.js", "position": 42, "body": "Your comment here" }]
+          '[{"path": "path/to/file.js", "position": 42, "body": "Your comment here"}]'
 
           Focus on these types of issues:
           - Dead/unreachable code (if (false), while (false), code after return/throw/break)
@@ -595,47 +608,6 @@ function processData(data) {
 ```
 
 The reviewer should identify these issues and post inline comments.
-
-## Customization options
-
-### Adjust review focus
-
-Modify the prompt to focus on specific issue types relevant to your codebase:
-
-```yaml
-# For a React project
-Focus on:
-- React hooks rules violations
-- State mutation in components
-- Missing key props in lists
-- UseEffect dependency issues
-
-# For a Node.js API
-Focus on:
-- Unhandled promise rejections  
-- SQL injection vulnerabilities
-- Missing input validation
-- Resource leaks
-```
-
-### Change autonomy level
-
-The `--auto` flag controls what Droid can do:
-- `--auto low`: Read-only analysis (safest, but can't create output files)
-- `--auto medium`: Can create files (default for this workflow)
-- `--auto high`: Can execute commands (not needed for reviews)
-
-### Use different models
-
-Specify different models for cost/performance tradeoffs:
-
-```bash
-# Faster, cheaper model
-droid exec --model claude-haiku-20240307 -f prompt.txt
-
-# Most capable model  
-droid exec --model gpt-5-codex -f prompt.txt
-```
 
 ## Troubleshooting
 
