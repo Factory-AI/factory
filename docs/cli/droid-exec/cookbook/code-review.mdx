@@ -1,10 +1,10 @@
 ---
-title: PR Review (Comment-Only) Workflow
+title: PR Reviews
 description: GitHub Actions workflow to run droid exec for comment-only inline PR reviews.
 ---
 
 ```yaml
-name: Droid PR Review (Comment-Only)
+name: Droid PR Review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -37,7 +37,7 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           $HOME/.local/bin/droid --version
 
-      - name: Prepare context (without gh CLI)
+      - name: Prepare context
         uses: actions/github-script@v7
         with:
           script: |
@@ -79,43 +79,105 @@ jobs:
       - name: Generate inline review
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        timeout-minutes: 10
         run: |
+          # Copy context files to current directory for droid to access
+          cp .git/pr_review/existing_comments.json ./existing_comments.json
+          cp .git/pr_review/files.json ./files.json
+          cp .git/pr_review/diff.txt ./diff.txt
+
+          echo "Files prepared:"
+          ls -la *.json diff.txt 2>/dev/null || true
+
           cat > prompt.txt << 'EOF'
-          You are Review Droid running in CI on a pull request. Produce inline comments for high-priority findings in the current PR diff.
+          You are an automated code review system. Review the PR diff and identify clear issues that need to be fixed.
 
-          Input files:
-          - existing_comments.json: prior PR comments (to deduplicate "no issues" comments like "✅ no issues", "No issues found", "LGTM").
-          - files.json: changed files with unified patches to compute positions.
-          - diff.txt: full PR diff for additional context.
+          Input files (already in current directory):
+          - diff.txt: the code changes to review
+          - files.json: file patches with line numbers for positioning comments
+          - existing_comments.json: skip issues already mentioned here
 
-          Requirements:
-          - Output a single file comments.json in repo root with JSON array entries of the form: { "path": "<file>", "position": <diff_position>, "body": "..." }.
-          - Focus only on: null/undefined dereferences, resource leaks, injection (XSS/SQL), race conditions, missing critical error handling, obvious logic errors, clear perf anti-patterns, definitive security findings.
-          - Each body must be 1–2 sentences, actionable, with emojis: 🚨, 🔒, ⚡, ⚠️, ✅ as appropriate.
-          - Ensure positions point to the correct changed line in the PR diff. Use files.json patches to calculate diff positions.
-          - If prior "no issues" style comments exist and you produce any issues, include a field supersedeNoIssues: true in a companion file meta.json.
-          - If no issues found: write comments.json as [] and meta.json with {"noIssues": true}.
+          Task: Create comments.json with this exact format:
+          [{ "path": "path/to/file.js", "position": 42, "body": "Your comment here" }]
+
+          Focus on these types of issues:
+          - Dead/unreachable code (if (false), while (false), code after return/throw/break)
+          - Broken control flow (missing break in switch, fallthrough bugs)
+          - Async/await mistakes (missing await, .then without return, unhandled promise rejections)
+          - Array/object mutations in React components or reducers
+          - UseEffect dependency array problems (missing deps, incorrect deps)
+          - Incorrect operator usage (== vs ===, && vs ||, = in conditions)
+          - Off-by-one errors in loops or array indexing
+          - Integer overflow/underflow in calculations
+          - Regex catastrophic backtracking vulnerabilities
+          - Missing base cases in recursive functions
+          - Incorrect type coercion that changes behavior
+          - Environment variable access without defaults or validation
+
+          Comment format:
+          - Clearly describe the issue: "This code block is unreachable due to the if (false) condition"
+          - Provide a concrete fix: "Remove this entire if block as it will never execute"
+          - When possible, suggest the exact code change:
+            ```suggestion
+            // Remove the unreachable code
+            ```
+          - Be specific about why it's a problem: "This will cause a TypeError if input is null"
+          - No emojis, just clear technical language
+
+          Skip commenting on:
+          - Code style, formatting, or naming conventions
+          - Minor performance optimizations
+          - Architectural decisions or design patterns
+          - Features or functionality (unless broken)
+          - Test coverage (unless tests are clearly broken)
+
+          Position calculation:
+          - Use the "position" field from files.json patches
+          - This is the line number in the diff, not the file
+          - Comments must align with exact changed lines only
+
+          Output: 
+          - Empty array [] if no issues found
+          - Otherwise array of comment objects with path, position, body
+          - Each comment should be actionable and clear about what needs to be fixed
           EOF
 
-          droid exec --auto medium "Read .git/pr_review/existing_comments.json, .git/pr_review/files.json, and .git/pr_review/diff.txt. Then create comments.json and meta.json per the prompt above in the repository root."
+          # Run droid exec with stderr captured
+          echo "Running droid exec..."
+          droid exec --output-format debug --auto medium --model gpt-5-codex -f prompt.txt 2>&1
 
-      - name: Supersede prior no-issues comments if needed (no gh CLI)
+          # Check if comments.json was created
+          if [ ! -f comments.json ]; then
+            echo "❌ ERROR: droid exec did not create comments.json"
+            echo "This indicates a failure in the review generation"
+            exit 1
+          fi
+
+          echo "✅ comments.json created successfully"
+          echo "=== Contents of comments.json ==="
+          cat comments.json
+
+      - name: Supersede prior no-issues comments if new issues found
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            if (!fs.existsSync('meta.json')) return;
-            const meta = JSON.parse(fs.readFileSync('meta.json','utf8'));
-            if (!meta.supersedeNoIssues) return;
+            if (!fs.existsSync('comments.json')) return;
+
+            const comments = JSON.parse(fs.readFileSync('comments.json','utf8'));
+            // Only supersede if we have actual issues to report
+            if (!Array.isArray(comments) || comments.length === 0) return;
+
             const prNumber = context.payload.pull_request.number;
-            const comments = await github.paginate(github.rest.issues.listComments, {
+            const existingComments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
               per_page: 100
             });
-            for (const c of comments) {
+
+            for (const c of existingComments) {
               const body = (c.body || '').trim();
               if (/^(✅\s*no issues|no issues found|lgtm)/i.test(body)) {
                 await github.rest.issues.updateComment({
@@ -175,9 +237,9 @@ jobs:
           name: pr-review-only-${{ github.event.pull_request.number }}
           path: |
             comments.json
-            meta.json
             .git/pr_review/*.json
             .git/pr_review/diff.txt
+            droid-exec-debug.log
           if-no-files-found: ignore
           retention-days: 14
 ```
