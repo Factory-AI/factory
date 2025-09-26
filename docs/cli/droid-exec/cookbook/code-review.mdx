@@ -124,7 +124,7 @@ Before running the review, we need to gather context about the PR. This step fet
               issue_number: prNumber,
               per_page: 100
             });
-            fs.writeFileSync(\`\${path}/existing_comments.json\`, JSON.stringify(comments, null, 2));
+            fs.writeFileSync(`${path}/existing_comments.json`, JSON.stringify(comments, null, 2));
 
             // Fetch changed files with patches
             const files = await github.paginate(github.rest.pulls.listFiles, {
@@ -134,20 +134,20 @@ Before running the review, we need to gather context about the PR. This step fet
               per_page: 100
             });
             const reduced = files.map(f => ({ filename: f.filename, patch: f.patch }));
-            fs.writeFileSync(\`\${path}/files.json\`, JSON.stringify(reduced, null, 2));
+            fs.writeFileSync(`${path}/files.json`, JSON.stringify(reduced, null, 2));
 
             // Create diff via git locally
             const { execSync } = require('child_process');
             const base = context.payload.pull_request.base.sha;
             const head = context.payload.pull_request.head.sha;
             try {
-              const diff = execSync(\`git diff \${base}...\${head}\`, { 
+              const diff = execSync(`git diff ${base}...${head}`, { 
                 encoding: 'utf8', 
                 stdio: ['ignore', 'pipe', 'pipe'] 
               });
-              fs.writeFileSync(\`\${path}/diff.txt\`, diff);
+              fs.writeFileSync(`${path}/diff.txt`, diff);
             } catch (e) {
-              fs.writeFileSync(\`\${path}/diff.txt\`, '');
+              fs.writeFileSync(`${path}/diff.txt`, '');
             }
 ```
 
@@ -395,7 +395,7 @@ jobs:
               issue_number: prNumber,
               per_page: 100
             });
-            fs.writeFileSync(\`\${path}/existing_comments.json\`, JSON.stringify(comments, null, 2));
+            fs.writeFileSync(`${path}/existing_comments.json`, JSON.stringify(comments, null, 2));
 
             // Fetch changed files with patches
             const files = await github.paginate(github.rest.pulls.listFiles, {
@@ -405,17 +405,17 @@ jobs:
               per_page: 100
             });
             const reduced = files.map(f => ({ filename: f.filename, patch: f.patch }));
-            fs.writeFileSync(\`\${path}/files.json\`, JSON.stringify(reduced, null, 2));
+            fs.writeFileSync(`${path}/files.json`, JSON.stringify(reduced, null, 2));
 
             // Create diff via git locally
             const { execSync } = require('child_process');
             const base = context.payload.pull_request.base.sha;
             const head = context.payload.pull_request.head.sha;
             try {
-              const diff = execSync(\`git diff \${base}...\${head}\`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-              fs.writeFileSync(\`\${path}/diff.txt\`, diff);
+              const diff = execSync(`git diff ${base}...${head}`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+              fs.writeFileSync(`${path}/diff.txt`, diff);
             } catch (e) {
-              fs.writeFileSync(\`\${path}/diff.txt\`, '');
+              fs.writeFileSync(`${path}/diff.txt`, '');
             }
 
       - name: Generate inline review
