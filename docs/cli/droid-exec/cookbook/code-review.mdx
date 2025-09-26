@@ -1,7 +1,336 @@
 ---
-title: PR Reviews
-description: GitHub Actions workflow to run droid exec for comment-only inline PR reviews.
+title: Code Review with Droid Exec
+description: Automate pull request reviews using Droid Exec in GitHub Actions
 ---
+
+# Code Review with Droid Exec
+
+This tutorial shows you how to set up automated code review using Droid Exec in GitHub Actions. The workflow will analyze pull requests, identify issues, and post feedback as inline comments.
+
+<Info>
+  Unlike interactive CLI sessions, Droid Exec runs in headless mode, making it perfect for CI/CD automation. The agent analyzes code changes, identifies issues, and creates structured output that can be posted as PR comments.
+</Info>
+
+## How it works
+
+The workflow:
+1. Triggers on pull request events
+2. Fetches the PR diff and existing comments
+3. Uses Droid Exec to analyze the changes
+4. Posts inline comments on specific lines with issues
+5. Handles edge cases like duplicate comments and superseding outdated feedback
+
+## Prerequisites
+
+Before setting up the workflow, ensure you have:
+- A GitHub repository with Actions enabled
+- A Factory API key for authentication
+- Basic understanding of GitHub Actions
+
+## Configure authentication
+
+Generate your Factory API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys) and add it as a repository secret:
+
+1. Go to your repository's Settings → Secrets and variables → Actions
+2. Click "New repository secret"
+3. Name: `FACTORY_API_KEY`
+4. Value: Your Factory API key (starts with `fk-`)
+
+## Build the GitHub Actions workflow
+
+Let's build the workflow step by step to understand each component.
+
+### Set up the workflow trigger
+
+Create `.github/workflows/droid-code-review.yml` and configure when it should run:
+
+```yaml
+name: Droid PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: droid-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+```
+
+The `concurrency` group ensures only one review runs per PR at a time, canceling outdated runs when new commits are pushed.
+
+### Configure job permissions
+
+Set up the job with necessary permissions and conditions:
+
+```yaml
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    permissions:
+      contents: read       # Read repository contents
+      pull-requests: write # Post PR comments
+      issues: write        # Update issue comments
+    
+    # Skip draft PRs to avoid noise during development
+    if: github.event.pull_request.draft == false
+
+    steps:
+```
+
+### Checkout the repository
+
+Add the checkout step to access the PR code:
+
+```yaml
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for accurate diffs
+          ref: ${{ github.event.pull_request.head.sha }}
+```
+
+### Install Droid CLI
+
+Install the Factory Droid CLI in the runner:
+
+```yaml
+      - name: Setup droid CLI
+        run: |
+          curl -fsSL https://app.factory.ai/cli | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          $HOME/.local/bin/droid --version
+```
+
+### Prepare review context
+
+Before running the review, we need to gather context about the PR. This step fetches existing comments and changed files:
+
+```yaml
+      - name: Prepare context
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '.git/pr_review';
+            fs.mkdirSync(path, { recursive: true });
+
+            // Fetch existing PR comments to avoid duplicates
+            const prNumber = context.payload.pull_request.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100
+            });
+            fs.writeFileSync(`${path}/existing_comments.json`, JSON.stringify(comments, null, 2));
+
+            // Fetch changed files with line position info
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100
+            });
+            const reduced = files.map(f => ({ filename: f.filename, patch: f.patch }));
+            fs.writeFileSync(`${path}/files.json`, JSON.stringify(reduced, null, 2));
+
+            // Generate diff locally
+            const { execSync } = require('child_process');
+            const base = context.payload.pull_request.base.sha;
+            const head = context.payload.pull_request.head.sha;
+            try {
+              const diff = execSync(`git diff ${base}...${head}`, { 
+                encoding: 'utf8', 
+                stdio: ['ignore', 'pipe', 'pipe'] 
+              });
+              fs.writeFileSync(`${path}/diff.txt`, diff);
+            } catch (e) {
+              fs.writeFileSync(`${path}/diff.txt`, '');
+            }
+```
+
+### Configure the review agent
+
+Now let's create the review step. The prompt defines what issues to look for and how to format comments:
+
+#### Define review objectives
+
+The agent should focus on real bugs, not style issues:
+- **Find**: Logic errors, security vulnerabilities, performance problems
+- **Skip**: Code style, naming conventions, architectural decisions
+- **Format**: Clear, actionable feedback with suggested fixes
+
+#### Create the review prompt
+
+```yaml
+      - name: Generate inline review
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        timeout-minutes: 10
+        run: |
+          # Copy context files for droid to access
+          cp .git/pr_review/*.json .git/pr_review/diff.txt ./ 2>/dev/null || true
+
+          cat > prompt.txt << 'EOF'
+          You are an automated code review system. Review the PR diff and identify clear issues that need to be fixed.
+
+          Input files (already in current directory):
+          - diff.txt: the code changes to review
+          - files.json: file patches with line numbers for positioning comments
+          - existing_comments.json: skip issues already mentioned here
+
+          Task: Create comments.json with this exact format:
+          [{ "path": "path/to/file.js", "position": 42, "body": "Your comment here" }]
+
+          Focus on these types of issues:
+          - Dead/unreachable code (if (false), code after return)
+          - Broken control flow (missing break in switch)
+          - Async/await mistakes (missing await, unhandled rejections)
+          - React hooks violations (conditional hooks, missing dependencies)
+          - Incorrect operators (== vs ===, = in conditions)
+          - Off-by-one errors in loops or array indexing
+          - Security vulnerabilities (SQL injection, XSS)
+          - Null/undefined dereferences
+          - Resource leaks (unclosed connections)
+
+          Comment guidelines:
+          - Describe the issue clearly
+          - Provide a concrete fix
+          - Include code suggestions when possible
+          - Be specific about impact
+          - Max 10 comments per review
+
+          Output: Array of comment objects or empty array if no issues
+          EOF
+
+          # Run droid exec with medium autonomy (can create files)
+          droid exec --output-format debug --auto medium --model gpt-5-codex -f prompt.txt
+
+          # Verify output was created
+          if [ ! -f comments.json ]; then
+            echo "❌ ERROR: droid exec did not create comments.json"
+            exit 1
+          fi
+
+          echo "✅ Review complete. Comments:"
+          cat comments.json
+```
+
+### Handle existing comments
+
+To avoid confusion, supersede old "no issues" comments when new issues are found:
+
+```yaml
+      - name: Supersede outdated comments
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync('comments.json')) return;
+
+            const comments = JSON.parse(fs.readFileSync('comments.json','utf8'));
+            if (!Array.isArray(comments) || comments.length === 0) return;
+
+            // Find and update old "no issues" comments
+            const prNumber = context.payload.pull_request.number;
+            const existingComments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+
+            for (const c of existingComments) {
+              const body = (c.body || '').trim().toLowerCase();
+              if (body.includes('no issues') || body === 'lgtm') {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                  body: '[Superseded by new findings]'
+                });
+              }
+            }
+```
+
+### Submit the review
+
+Post the generated comments as an inline review on the PR:
+
+```yaml
+      - name: Submit inline review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const prNumber = context.payload.pull_request.number;
+            
+            if (!fs.existsSync('comments.json')) {
+              core.info('No comments file found');
+              return;
+            }
+            
+            const comments = JSON.parse(fs.readFileSync('comments.json','utf8'));
+            
+            if (!Array.isArray(comments) || comments.length === 0) {
+              // Only post "no issues" if we haven't already
+              const existing = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber
+              });
+              
+              const hasNoIssues = existing.some(c => 
+                /no issues/i.test(c.body || '')
+              );
+              
+              if (!hasNoIssues) {
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: prNumber,
+                  event: 'COMMENT',
+                  body: '✅ No issues found in the current changes.'
+                });
+              }
+              return;
+            }
+            
+            // Submit review with inline comments
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              event: 'COMMENT',
+              body: 'Automated review completed with inline comments.',
+              comments: comments
+            });
+```
+
+### Save artifacts for debugging
+
+Store review artifacts for troubleshooting:
+
+```yaml
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-review-${{ github.event.pull_request.number }}
+          path: |
+            comments.json
+            .git/pr_review/*.json
+            .git/pr_review/diff.txt
+            droid-exec-debug.log
+          if-no-files-found: ignore
+          retention-days: 14
+```
+
+## Complete workflow file
+
+Here's the full workflow combining all the components:
 
 ```yaml
 name: Droid PR Review
@@ -243,3 +572,88 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 ```
+
+## Test your reviewer
+
+Create a test PR with some intentional issues to verify the workflow:
+
+```javascript
+// Example code with issues
+function processData(data) {
+  if (false) {  // Dead code
+    console.log("This never runs");
+  }
+  
+  data.forEach(async item => {  // Missing await
+    processItem(item);
+  });
+  
+  if (data = null) {  // Assignment instead of comparison
+    return;
+  }
+}
+```
+
+The reviewer should identify these issues and post inline comments.
+
+## Customization options
+
+### Adjust review focus
+
+Modify the prompt to focus on specific issue types relevant to your codebase:
+
+```yaml
+# For a React project
+Focus on:
+- React hooks rules violations
+- State mutation in components
+- Missing key props in lists
+- UseEffect dependency issues
+
+# For a Node.js API
+Focus on:
+- Unhandled promise rejections  
+- SQL injection vulnerabilities
+- Missing input validation
+- Resource leaks
+```
+
+### Change autonomy level
+
+The `--auto` flag controls what Droid can do:
+- `--auto low`: Read-only analysis (safest, but can't create output files)
+- `--auto medium`: Can create files (default for this workflow)
+- `--auto high`: Can execute commands (not needed for reviews)
+
+### Use different models
+
+Specify different models for cost/performance tradeoffs:
+
+```bash
+# Faster, cheaper model
+droid exec --model claude-haiku-20240307 -f prompt.txt
+
+# Most capable model  
+droid exec --model gpt-5-codex -f prompt.txt
+```
+
+## Troubleshooting
+
+### Comments not appearing
+
+Check the artifacts for `comments.json` to see if issues were found. Verify the position values match the diff line numbers.
+
+### Duplicate comments
+
+The workflow checks `existing_comments.json` to avoid duplicates. Ensure this file is being created and passed to Droid.
+
+### Rate limits
+
+Add delays between PR events or use the concurrency group to prevent hitting API rate limits.
+
+## Next steps
+
+- Customize the review criteria for your team's standards
+- Add blocking reviews that prevent merging if critical issues are found
+- Integrate with other workflows like [CI failure fixing](/cli/droid-exec/cookbook/github-actions)
+- Create project-specific review profiles for different file types
