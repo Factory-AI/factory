@@ -1,9 +1,7 @@
 ---
-title: Code Review with Droid Exec
+title: Automated Code Review with Droid Exec
 description: Automate pull request reviews using Droid Exec in GitHub Actions
 ---
-
-# Code Review with Droid Exec
 
 This tutorial shows you how to set up automated code review using Droid Exec in GitHub Actions. The workflow will analyze pull requests, identify issues, and post feedback as inline comments.
 
@@ -346,6 +344,9 @@ Store review artifacts for troubleshooting:
 
 ## Complete workflow file
 
+<details>
+<summary>Click to view the complete workflow file</summary>
+
 Here's the full workflow combining all the components:
 
 ````yaml
@@ -588,6 +589,8 @@ jobs:
           retention-days: 14
 ````
 
+</details>
+
 ## Test your reviewer
 
 Create a test PR with some intentional issues to verify the workflow:
@@ -621,14 +624,10 @@ Check the artifacts for `comments.json` to see if issues were found. Verify the 
 
 The workflow checks `existing_comments.json` to avoid duplicates. Ensure this file is being created and passed to Droid.
 
-### Rate limits
-
-Add delays between PR events or use the concurrency group to prevent hitting API rate limits.
-
 ## Next steps
 
   - Customize the review criteria for your team's standards
   - Add blocking reviews that prevent merging if critical issues are found
-- Integrate with other workflows like [CI failure fixing](/cli/droid-exec/cookbook/github-actions)
+  - Integrate with other workflows like [CI failure fixing](/cli/droid-exec/cookbook/github-actions)
   - Create project-specific review profiles for different file types
   
