@@ -219,38 +219,34 @@ Once you're satisfied with the preview, run the actual refactoring:
 
 ```bash
 # Actually refactor the imports (default behavior)
-./droid-refactor-imports.sh src
+./droid-refactor-imports.sh packages/models
 
 # Or explicitly set DRY_RUN=false
-DRY_RUN=false ./droid-refactor-imports.sh src
+DRY_RUN=false ./droid-refactor-imports.sh packages/models
 
 # Adjust concurrency for faster processing
-CONCURRENCY=10 ./droid-refactor-imports.sh src
+CONCURRENCY=10 ./droid-refactor-imports.sh packages/models
 ```
 
 Actual execution example:
 ```
 === Droid Import Refactoring ===
-Directory: src
+Directory: packages/models
 Concurrency: 5
 
-Found 25 files to check
+Found 78 files to check
 
-Processing: src/components/Button.tsx
-  ✓ Refactored
-Processing: src/utils/api.ts
-  ✓ Refactored
-Processing: src/hooks/useAuth.ts
-  ✓ Refactored
+Processing: packages/models/src/organization/test-utils/fixtures.ts
+Processing: packages/models/src/organization/agentReadiness/types.ts
+Processing: packages/models/src/organization/utils.ts
+Processing: packages/models/src/organization/agentReadiness/handlers.ts
+Processing: packages/models/jest.config.ts
+Processing: packages/models/src/organization/user/defaultRepositories/handlers.ts
+Perfect! I've successfully refactored the imports in the file...
+## Summary
 
-=== Summary ===
-Files processed: 20
-Files modified: 18
-
-Next steps:
-  git diff           # Review changes
-  git add -A         # Stage changes
-  git commit -m 'refactor: organize imports'
+I've successfully refactored the imports in `packages/models/src/organization/test-utils/fixtures.ts`. 
+The imports are now properly organized with comments separating external packages from relative imports...
 ```
 
 ## Advanced usage
