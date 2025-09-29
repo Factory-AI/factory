@@ -311,15 +311,17 @@ fi
 
 ```bash
 # Preview changes without modifying files
-./droid-refactor-imports.sh --dry-run src
+./droid-refactor-imports.sh --dry-run --max-files 5 packages
 
 # Example output:
-# 🔍 Found 247 files to process
-# 🏃 DRY RUN mode - no files will be modified
-# [DRY RUN] Would refactor imports in: src/components/Button.tsx
-#   - Would group external packages first
-#   - Would remove unused import: debounce
-#   - Would convert require() to import
+# 📂 Scanning for files in: packages
+# 📊 Found 5 files to process
+# 🏃 Running in DRY RUN mode - no files will be modified
+# 🔧 Processing: packages/services/src/services/stripe/customers.ts
+# [DRY RUN] Would refactor imports in: customers.ts
+#   - Remove unused imports: dayjs, url
+#   - Convert require() to ES6 import
+#   - Group and sort imports
 ```
 
 ### Apply refactoring
@@ -327,14 +329,28 @@ fi
 Once you're satisfied with the preview, run the actual refactoring:
 
 ```bash
-# Refactor all files in src directory
-./droid-refactor-imports.sh src
+# Create a branch and refactor with style fixes
+./droid-refactor-imports.sh --branch test/import-refactor --fix-style packages/services
 
-# With custom concurrency for faster processing
-./droid-refactor-imports.sh --concurrency 20 src
+# Limit scope for testing
+./droid-refactor-imports.sh --max-files 10 --concurrency 5 packages
+```
 
-# Create a git branch before changes (recommended)
-./droid-refactor-imports.sh --branch refactor/organize-imports src
+Actual execution example:
+```
+📌 Creating git branch: test/import-refactor
+Switched to a new branch 'test/import-refactor'
+📂 Scanning for files in: packages/services
+📊 Found 10 files to process
+🔄 Concurrency: 5 parallel tasks
+───────────────────────────────────────
+🔧 Processing: packages/services/src/services/stripe/customers.ts
+🔧 Processing: packages/services/src/services/firebase/admin.ts
+✅ Completed: customers.ts
+✅ Completed: admin.ts
+
+💡 To review changes: git diff
+💡 To commit changes: git add -A && git commit -m 'refactor: organize imports'
 ```
 
 ## Advanced features
@@ -386,50 +402,82 @@ Run linting after each file to ensure changes are valid:
 ./droid-refactor-imports.sh --branch fix/imports --validate src
 ```
 
-## Understanding the transformation
+## Real-world transformations
+
+### Example 1: customers.ts
 
 <Tabs>
   <Tab title="Before">
-    ```javascript
-    // Messy imports in src/components/UserProfile.jsx
-    const React = require('react');
-    import { fetchUser } from '../../../api/users';
-    import axios from 'axios';
-    const { useState, useEffect } = require('react');
-    import { Button } from '@mui/material';
-    import lodash from 'lodash';  // unused
-    import '../styles/profile.css';
-    import { Avatar } from '@mui/material';
-    import { formatDate } from '../utils/date';
-    import { validateEmail } from '../utils/validation';  // unused
+    ```typescript
+    // customers.ts
+    const getStripeInstance = require("./instance").getStripeInstance;
+    import dayjs from 'dayjs';  // unused import
+    import url from 'url';  // unused import
     ```
   </Tab>
   
   <Tab title="After">
-    ```javascript
-    // Organized imports in src/components/UserProfile.jsx
-    // External packages
-    import React, { useState, useEffect } from 'react';
-    import axios from 'axios';
-    import { Avatar, Button } from '@mui/material';
+    ```typescript
+    // customers.ts
+    // Relative imports
+    import { getStripeInstance } from './instance';
+    ```
+  </Tab>
+</Tabs>
 
-    // Internal/absolute imports
-    import { fetchUser } from '@/api/users';
-    import { formatDate } from '@/utils/date';
+### Example 2: admin.ts
+
+<Tabs>
+  <Tab title="Before">
+    ```typescript
+    // admin.ts
+    const { auth } = require('firebase-admin');
+    import { App } from "firebase-admin/app"
+    import { Firestore } from 'firebase-admin/firestore';
+    import dotenv from 'dotenv';  // unused import
+    const { FirebaseProjectName } = require("./enums");
+    import {
+      getFirestoreInstanceForProject,
+      getFirebaseAuthInstanceForProject,
+    } from './multi-admin';
+    const { initializeFirebaseAdminApp } = require('./multi-admin');
+    import {
+      getFirestoreInstance as getDefaultFirestoreInstance,
+      getFirestoreInstanceForTest as getDefaultFirestoreInstanceForTest,
+      getFirebaseAuthInstance as getDefaultFirebaseAuthInstance,
+    } from "./multi-admin"
+    import express from 'express';  // unused import
+    ```
+  </Tab>
+  
+  <Tab title="After">
+    ```typescript
+    // admin.ts
+    // External packages
+    import { auth } from 'firebase-admin';
+    import { App } from 'firebase-admin/app';
+    import { Firestore } from 'firebase-admin/firestore';
 
     // Relative imports
-    import '../styles/profile.css';
+    import { FirebaseProjectName } from './enums';
+    import {
+      getFirestoreInstanceForProject,
+      getFirebaseAuthInstanceForProject,
+      initializeFirebaseAdminApp,
+      getFirestoreInstance as getDefaultFirestoreInstance,
+      getFirestoreInstanceForTest as getDefaultFirestoreInstanceForTest,
+      getFirebaseAuthInstance as getDefaultFirebaseAuthInstance,
+    } from './multi-admin';
     ```
   </Tab>
 </Tabs>
 
 <Check>
-  <li>CommonJS converted to ES6 modules</li>
-  <li>Imports grouped by type with blank lines</li>
-  <li>Alphabetically sorted within groups</li>
-  <li>Unused imports removed (lodash, validateEmail)</li>
-  <li>React imports consolidated</li>
-  <li>Material-UI imports combined</li>
+  <li>CommonJS `require()` converted to ES6 `import` statements</li>
+  <li>Unused imports removed (dayjs, url, dotenv, express)</li>
+  <li>Multiple imports from same module consolidated</li>
+  <li>Imports grouped by type (external, internal, relative)</li>
+  <li>Consistent quote style and formatting applied</li>
 </Check>
 
 ## Script options reference
@@ -669,34 +717,22 @@ git checkout backup/before-import-refactor
 
 ## Metrics and reporting
 
-The script generates a summary report:
+The script generates a summary report showing processed files:
 
 ```markdown
 # Import Refactoring Summary
 
-**Date:** 2024-01-15
-**Directory:** src
-**File Type:** all
-**Total Files:** 247
+**Date:** Mon Sep 29 13:09:20 PDT 2025
+**Directory:** packages
+**Total Files:** 15
 
 ## Files Processed
 
-### Successfully Processed (243 files)
-- src/components/Button.tsx
-- src/components/Modal.tsx
-- src/utils/validation.ts
+### Successfully Processed
+packages/services/src/services/stripe/customers.ts
+packages/services/src/services/firebase/admin.ts
+packages/ui/src/buttons/ButtonV2.tsx
 ...
-
-### Failed (4 files)
-- src/legacy/old-component.js (syntax error)
-- src/generated/types.ts (generated file)
-...
-
-## Statistics
-- Imports organized: 1,247
-- Unused imports removed: 89
-- CommonJS converted: 23
-- Time taken: 1m 47s
 ```
 
 ## Best practices
@@ -706,28 +742,47 @@ The script generates a summary report:
 </Note>
 
 <Steps>
-  <Step title="Always run a dry run first">
-    Preview changes before applying them to understand the scope
+  <Step title="Exclude non-source files">
+    Focus on actual source code directories:
+    ```bash
+    ./droid-refactor-imports.sh \
+      --exclude "node_modules|dist|build|.turbo" \
+      packages/*/src
+    ```
+  </Step>
+  
+  <Step title="Start with a small scope">
+    Test on a few files first before processing entire directories:
+    ```bash
+    ./droid-refactor-imports.sh --max-files 5 --dry-run packages
+    ```
   </Step>
   
   <Step title="Create a git branch">
-    Use `--branch` flag to create a dedicated branch for changes
+    Always use `--branch` flag to isolate changes:
+    ```bash
+    ./droid-refactor-imports.sh --branch refactor/imports packages
+    ```
   </Step>
   
-  <Step title="Process incrementally">
-    For large codebases, process directory by directory
+  <Step title="Process by file type">
+    Handle different file types separately for better control:
+    ```bash
+    ./droid-refactor-imports.sh --type tsx packages  # React components
+    ./droid-refactor-imports.sh --type ts packages   # TypeScript files
+    ```
   </Step>
   
-  <Step title="Run tests">
-    Verify nothing broke after refactoring
+  <Step title="Run tests after refactoring">
+    Verify nothing broke after changes:
+    ```bash
+    npm test
+    npm run typecheck
+    ```
   </Step>
   
-  <Step title="Review changes">
-    Use `git diff` to review all modifications
-  </Step>
-  
-  <Step title="Commit logical chunks">
-    Split commits by feature area rather than committing everything at once
+  <Step title="Review changes carefully">
+    Use `git diff` to review all modifications before committing
   </Step>
 </Steps>
 
