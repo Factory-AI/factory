@@ -74,6 +74,16 @@ jobs:
 
             core.setOutput('webhook', webhook);
             core.setOutput('label', matchedLabel);
+            const issueBody = (context.payload.issue.body || '').trim();
+            let summary = issueBody;
+            if (summary) {
+              summary = summary.replace(/\r\n/g, '\n');
+              summary = summary.replace(/\n{3,}/g, '\n\n');
+              if (summary.length > 400) {
+                summary = summary.slice(0, 400).trimEnd() + '…';
+              }
+            }
+            core.setOutput('summary', summary);
 
       - name: Add 👀 reaction
         if: github.event.action == 'labeled'
@@ -92,6 +102,7 @@ jobs:
           WEBHOOK_URL: ${{ steps.route.outputs.webhook }}
           ISSUE_URL: ${{ github.event.issue.html_url }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_SUMMARY: ${{ steps.route.outputs.summary }}
         run: |
           if [ -z "${WEBHOOK_URL}" ]; then
             echo "Slack webhook URL not provided." >&2
@@ -103,19 +114,40 @@ jobs:
             exit 1
           fi
 
-          payload=$(jq -n --arg url "$ISSUE_URL" --arg title "$ISSUE_TITLE" '{
+          payload=$(jq -n --arg url "$ISSUE_URL" --arg title "$ISSUE_TITLE" --arg summary "$ISSUE_SUMMARY" '{
             text: $url,
             unfurl_links: true,
-            unfurl_media: true,
-            blocks: [
-              {
-                type: "section",
-                text: {
-                  type: "mrkdwn",
-                  text: "<\($url)|\($title)>"
-                }
-              }
-            ]
+            unfurl_media: false,
+            blocks: (
+              if ($summary | length) > 0 then
+                [
+                  {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text: "<\($url)|\($title)>"
+                    }
+                  },
+                  {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text: $summary
+                    }
+                  }
+                ]
+              else
+                [
+                  {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text: "<\($url)|\($title)>"
+                    }
+                  }
+                ]
+              end
+            )
           }')
 
           curl -X POST -H 'Content-type: application/json' --data "$payload" "$WEBHOOK_URL"
