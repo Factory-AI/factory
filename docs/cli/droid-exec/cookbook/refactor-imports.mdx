@@ -407,14 +407,6 @@ The script includes built-in safety measures:
   </Tab>
 </Tabs>
 
-<Check>
-  <li>Import groups clearly labeled with comments</li>
-  <li>External packages separated from relative imports</li>
-  <li>Alphabetical sorting within each import group</li>
-  <li>Verification that all imports are actually used</li>
-  <li>Consistent formatting and code style maintained</li>
-</Check>
-
 ## Configuration reference
 
 <ParamField path="options" type="object">
@@ -507,158 +499,6 @@ done
 ./droid-refactor-imports.sh packages/shared/src
 ```
 
-## CI/CD integration
-
-### GitHub Actions workflow
-
-Automate import organization in CI:
-
-```yaml
-name: Auto-organize imports
-
-on:
-  pull_request:
-    paths:
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.ts'
-      - '**/*.tsx'
-
-jobs:
-  organize-imports:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Droid CLI
-        run: |
-          curl -fsSL https://app.factory.ai/cli | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-      
-      - name: Run import organization
-        env:
-          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
-        run: |
-          # Download script
-          curl -O https://raw.githubusercontent.com/factory-ai/cookbook/main/scripts/droid-refactor-imports.sh
-          chmod +x droid-refactor-imports.sh
-          
-          # Run on changed files only
-          git diff --name-only origin/main... | grep -E '\.(js|jsx|ts|tsx)$' > changed_files.txt
-          
-          # Process changed files
-          while IFS= read -r file; do
-            if [ -f "$file" ]; then
-              ./droid-refactor-imports.sh "$(dirname "$file")"
-            fi
-          done < changed_files.txt
-      
-      - name: Commit changes
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git add -A
-            git commit -m "refactor: organize imports [skip ci]"
-            git push
-          fi
-```
-
-## Performance optimization
-
-### Parallel processing
-
-The script uses parallel processing for speed. Adjust concurrency based on your system:
-
-```bash
-# Default: 10 parallel workers
-./droid-refactor-imports.sh src
-
-# High-end machine: increase concurrency
-./droid-refactor-imports.sh --concurrency 30 src
-
-# CI environment: conservative concurrency
-./droid-refactor-imports.sh --concurrency 5 src
-```
-
-### Processing large codebases
-
-For very large codebases, process in batches:
-
-```bash
-# Process in batches of 100 files
-find src -name "*.tsx" | split -l 100 - batch_
-
-for batch in batch_*; do
-  echo "Processing batch: $batch"
-  cat "$batch" | xargs -n 1 -P 10 ./process-single-file.sh
-  rm "$batch"
-done
-```
-
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="Script fails on certain files">
-    Some files might have syntax errors or unusual patterns. Use continue mode:
-    
-    ```bash
-    ./droid-refactor-imports.sh --continue-on-error src
-    ```
-  </Accordion>
-  
-  <Accordion title="Validation fails after refactoring">
-    If linting fails after refactoring, skip validation and fix manually:
-    
-    ```bash
-    ./droid-refactor-imports.sh src
-    npm run lint -- --fix
-    ```
-  </Accordion>
-  
-  <Accordion title="Too many changes at once">
-    Process incrementally by directory for easier review:
-    
-    ```bash
-    ./droid-refactor-imports.sh src/components
-    # Review and commit
-    ./droid-refactor-imports.sh src/utils
-    # Review and commit
-    ```
-  </Accordion>
-</AccordionGroup>
-
-### Rollback changes
-
-If something goes wrong:
-
-```bash
-# Discard all changes
-git checkout -- .
-
-# Or revert to backup branch
-git checkout backup/before-import-refactor
-```
-
-## Metrics and reporting
-
-The script generates a summary report showing processed files:
-
-```markdown
-# Import Refactoring Summary
-
-**Date:** Mon Sep 29 13:09:20 PDT 2025
-**Directory:** packages
-**Total Files:** 15
-
-## Files Processed
-
-### Successfully Processed
-packages/services/src/services/stripe/customers.ts
-packages/services/src/services/firebase/admin.ts
-packages/ui/src/buttons/ButtonV2.tsx
-...
-```
 
 ## Best practices
 
@@ -667,34 +507,42 @@ packages/ui/src/buttons/ButtonV2.tsx
 </Note>
 
 <Steps>
-  <Step title="Exclude non-source files">
-    Focus on actual source code directories:
+  <Step title="Start with a dry run">
+    Always preview changes before modifying files:
     ```bash
-    ./droid-refactor-imports.sh \
-      --exclude "node_modules|dist|build|.turbo" \
-      packages/*/src
+    # Preview what would happen without making changes
+    DRY_RUN=true ./droid-refactor-imports.sh packages/models
     ```
   </Step>
   
-  <Step title="Start with a small scope">
-    Test on a few files first before processing entire directories:
+  <Step title="Test on a small scope first">
+    Start with a specific subdirectory before processing entire codebase:
     ```bash
-    ./droid-refactor-imports.sh --max-files 5 --dry-run packages
+    # Test on a single module first
+    ./droid-refactor-imports.sh packages/models/src/utils
+    
+    # Then expand to larger directories
+    ./droid-refactor-imports.sh packages/models
     ```
   </Step>
   
   <Step title="Create a git branch">
-    Always use `--branch` flag to isolate changes:
+    Always work in a separate branch to isolate changes:
     ```bash
-    ./droid-refactor-imports.sh --branch refactor/imports packages
+    git checkout -b refactor/organize-imports
+    ./droid-refactor-imports.sh packages
     ```
   </Step>
   
-  <Step title="Process by file type">
-    Handle different file types separately for better control:
+  <Step title="Process incrementally">
+    For large codebases, process directories separately for easier review:
     ```bash
-    ./droid-refactor-imports.sh --type tsx packages  # React components
-    ./droid-refactor-imports.sh --type ts packages   # TypeScript files
+    # Process each package separately
+    ./droid-refactor-imports.sh packages/models
+    git add -A && git commit -m "refactor: organize imports in models"
+    
+    ./droid-refactor-imports.sh packages/services  
+    git add -A && git commit -m "refactor: organize imports in services"
     ```
   </Step>
   
@@ -703,11 +551,16 @@ packages/ui/src/buttons/ButtonV2.tsx
     ```bash
     npm test
     npm run typecheck
+    npm run lint
     ```
   </Step>
   
   <Step title="Review changes carefully">
-    Use `git diff` to review all modifications before committing
+    Use `git diff` to review all modifications before committing:
+    ```bash
+    git diff --staged  # Review what will be committed
+    git diff HEAD~1    # Review after committing
+    ```
   </Step>
 </Steps>
 
