@@ -250,49 +250,6 @@ The imports are now properly organized with comments separating external package
 ...
 ```
 
-## Advanced usage
-
-### Environment variables
-
-The simplified script uses environment variables for configuration:
-
-```bash
-# Control parallel processing (default: 5)
-CONCURRENCY=10 ./droid-refactor-imports.sh src
-
-# Enable dry run mode
-DRY_RUN=true ./droid-refactor-imports.sh src
-
-# Combine multiple settings
-DRY_RUN=true CONCURRENCY=3 ./droid-refactor-imports.sh packages
-```
-
-### Processing specific directories
-
-The script automatically finds all JavaScript and TypeScript files:
-
-```bash
-# Process current directory
-./droid-refactor-imports.sh
-
-# Process specific directory
-./droid-refactor-imports.sh src
-
-# Process multiple directories sequentially
-for dir in src packages apps; do
-  ./droid-refactor-imports.sh "$dir"
-done
-```
-
-### Safety features
-
-The script includes built-in safety measures:
-
-1. **Automatic exclusions**: Skips `node_modules`, `.git`, `dist`, and `build` directories
-2. **Import detection**: Only processes files that actually have imports
-3. **Hash comparison**: Tracks which files were actually modified
-4. **Parallel safety**: Uses proper file locking for concurrent processing
-
 ## Real-world transformations
 
 ### Example 1: Adding Import Groups
