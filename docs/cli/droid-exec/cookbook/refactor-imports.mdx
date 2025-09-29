@@ -9,12 +9,14 @@ This tutorial demonstrates how to use Droid Exec to refactor import statements a
 
 The script:
 
-1. Scans your codebase for JavaScript/TypeScript files
-2. Analyzes each file's import structure and usage
-3. Groups imports by type (external, internal, relative)
-4. Removes genuinely unused imports
-5. Converts CommonJS to ES6 modules where appropriate
-6. Applies consistent formatting and style
+1. **Finds files**: Searches for all `.js`, `.jsx`, `.ts`, and `.tsx` files
+2. **Filters smartly**: Excludes `node_modules`, `.git`, `dist`, and `build` directories
+3. **Checks for imports**: Only processes files that contain import statements
+4. **Groups imports**: Organizes into external, internal, and relative imports
+5. **Sorts alphabetically**: Within each group for consistency
+6. **Removes unused**: Eliminates imports that aren't referenced
+7. **Modernizes syntax**: Converts `require()` to ES6 `import`
+8. **Consolidates duplicates**: Merges multiple imports from the same module
 
 
 ## Real-world impact
@@ -321,38 +323,6 @@ The imports are now properly organized with comments separating external package
     <Note>Multiple imports from same module consolidated, unused removed, CommonJS converted</Note>
   </Tab>
 </Tabs>
-
-## Configuration reference
-
-<ParamField path="options" type="object">
-  <Expandable title="Environment Variables">
-    <ParamField path="CONCURRENCY" type="number" default="5">
-      Number of parallel workers for processing files. Increase for faster processing on powerful machines.
-    </ParamField>
-    
-    <ParamField path="DRY_RUN" type="boolean" default="false">
-      When set to `true`, preview changes without modifying files. Shows which files would be processed.
-    </ParamField>
-  </Expandable>
-  
-  <Expandable title="Command Line Arguments">
-    <ParamField path="directory" type="string" default=".">
-      The directory to process. Defaults to current directory if not specified.
-    </ParamField>
-  </Expandable>
-</ParamField>
-
-### What the script does
-
-The script automatically:
-1. **Finds files**: Searches for all `.js`, `.jsx`, `.ts`, and `.tsx` files
-2. **Filters smartly**: Excludes `node_modules`, `.git`, `dist`, and `build` directories
-3. **Checks for imports**: Only processes files that contain import statements
-4. **Groups imports**: Organizes into external, internal, and relative imports
-5. **Sorts alphabetically**: Within each group for consistency
-6. **Removes unused**: Eliminates imports that aren't referenced
-7. **Modernizes syntax**: Converts `require()` to ES6 `import`
-8. **Consolidates duplicates**: Merges multiple imports from the same module
 
 ## Best practices
 
