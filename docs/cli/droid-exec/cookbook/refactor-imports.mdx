@@ -247,6 +247,7 @@ Perfect! I've successfully refactored the imports in the file...
 
 I've successfully refactored the imports in `packages/models/src/organization/test-utils/fixtures.ts`. 
 The imports are now properly organized with comments separating external packages from relative imports...
+...
 ```
 
 ## Advanced usage
@@ -294,80 +295,124 @@ The script includes built-in safety measures:
 
 ## Real-world transformations
 
-### Example 1: customers.ts
+### Example 1: Adding Import Groups
 
 <Tabs>
   <Tab title="Before">
     ```typescript
-    // customers.ts
-    const getStripeInstance = require("./instance").getStripeInstance;
-    import dayjs from 'dayjs';  // unused import
-    import url from 'url';  // unused import
+    // organization/agentReadiness/types.ts
+    import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+
+    export interface AgentReadinessAssessment {
+      id: string;
+      createdAt: Timestamp | FieldValue;
+      updatedAt: Timestamp | FieldValue;
+      organizationId: string;
+      // ... rest of interface
+    }
     ```
   </Tab>
   
   <Tab title="After">
     ```typescript
-    // customers.ts
-    // Relative imports
-    import { getStripeInstance } from './instance';
+    // organization/agentReadiness/types.ts
+    // External packages
+    import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+
+    export interface AgentReadinessAssessment {
+      id: string;
+      createdAt: Timestamp | FieldValue;
+      updatedAt: Timestamp | FieldValue;
+      organizationId: string;
+      // ... rest of interface
+    }
     ```
+    <Note>AI adds comment headers to clearly identify import groups</Note>
   </Tab>
 </Tabs>
 
-### Example 2: admin.ts
+### Example 2: Organizing Relative Imports
 
 <Tabs>
   <Tab title="Before">
     ```typescript
-    // admin.ts
-    const { auth } = require('firebase-admin');
-    import { App } from "firebase-admin/app"
-    import { Firestore } from 'firebase-admin/firestore';
-    import dotenv from 'dotenv';  // unused import
-    const { FirebaseProjectName } = require("./enums");
-    import {
-      getFirestoreInstanceForProject,
-      getFirebaseAuthInstanceForProject,
-    } from './multi-admin';
-    const { initializeFirebaseAdminApp } = require('./multi-admin');
-    import {
-      getFirestoreInstance as getDefaultFirestoreInstance,
-      getFirestoreInstanceForTest as getDefaultFirestoreInstanceForTest,
-      getFirebaseAuthInstance as getDefaultFirebaseAuthInstance,
-    } from "./multi-admin"
-    import express from 'express';  // unused import
+    // organization/utils.ts
+    import { isEnterpriseOrg } from './subscription/utils';
+    import { FirestoreOrganization } from './types';
+
+    export function organizationHasOnboarded(
+      organization: FirestoreOrganization
+    ): boolean {
+      return isEnterpriseOrg(organization) || organization.onboarded;
+    }
     ```
   </Tab>
   
   <Tab title="After">
     ```typescript
-    // admin.ts
+    // organization/utils.ts
+    // Relative imports
+    import { isEnterpriseOrg } from './subscription/utils';
+    import { FirestoreOrganization } from './types';
+
+    export function organizationHasOnboarded(
+      organization: FirestoreOrganization
+    ): boolean {
+      return isEnterpriseOrg(organization) || organization.onboarded;
+    }
+    ```
+    <Note>Imports are verified to be in use and alphabetically sorted</Note>
+  </Tab>
+</Tabs>
+
+### Example 3: Complex Mixed Imports
+
+<Tabs>
+  <Tab title="Before">
+    ```typescript
+    // test-utils/fixtures.ts
+    import {
+      FirestoreOrganization,
+      OrganizationSettings,
+    } from '../types';
+    import { Timestamp } from 'firebase-admin/firestore';
+    import { DEFAULT_ORGANIZATION_SETTINGS } from '../settings/constants';
+    import { v4 as uuidv4 } from 'uuid';
+
+    export function createMockOrganization(): FirestoreOrganization {
+      // implementation
+    }
+    ```
+  </Tab>
+  
+  <Tab title="After">
+    ```typescript
+    // test-utils/fixtures.ts
     // External packages
-    import { auth } from 'firebase-admin';
-    import { App } from 'firebase-admin/app';
-    import { Firestore } from 'firebase-admin/firestore';
+    import { Timestamp } from 'firebase-admin/firestore';
+    import { v4 as uuidv4 } from 'uuid';
 
     // Relative imports
-    import { FirebaseProjectName } from './enums';
+    import { DEFAULT_ORGANIZATION_SETTINGS } from '../settings/constants';
     import {
-      getFirestoreInstanceForProject,
-      getFirebaseAuthInstanceForProject,
-      initializeFirebaseAdminApp,
-      getFirestoreInstance as getDefaultFirestoreInstance,
-      getFirestoreInstanceForTest as getDefaultFirestoreInstanceForTest,
-      getFirebaseAuthInstance as getDefaultFirebaseAuthInstance,
-    } from './multi-admin';
+      FirestoreOrganization,
+      OrganizationSettings,
+    } from '../types';
+
+    export function createMockOrganization(): FirestoreOrganization {
+      // implementation
+    }
     ```
+    <Note>External packages separated from relative imports, each group sorted alphabetically</Note>
   </Tab>
 </Tabs>
 
 <Check>
-  <li>CommonJS `require()` converted to ES6 `import` statements</li>
-  <li>Unused imports removed (dayjs, url, dotenv, express)</li>
-  <li>Multiple imports from same module consolidated</li>
-  <li>Imports grouped by type (external, internal, relative)</li>
-  <li>Consistent quote style and formatting applied</li>
+  <li>Import groups clearly labeled with comments</li>
+  <li>External packages separated from relative imports</li>
+  <li>Alphabetical sorting within each import group</li>
+  <li>Verification that all imports are actually used</li>
+  <li>Consistent formatting and code style maintained</li>
 </Check>
 
 ## Configuration reference
