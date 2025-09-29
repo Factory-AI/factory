@@ -354,67 +354,6 @@ The script automatically:
 7. **Modernizes syntax**: Converts `require()` to ES6 `import`
 8. **Consolidates duplicates**: Merges multiple imports from the same module
 
-## Complete example workflow
-
-Here's a typical workflow for refactoring imports in a large project:
-
-```bash
-#!/bin/bash
-# Complete import refactoring workflow
-
-# 1. Create a backup branch
-git checkout -b backup/before-import-refactor
-git checkout -
-
-# 2. Run dry run to preview
-echo "🔍 Previewing changes..."
-DRY_RUN=true ./droid-refactor-imports.sh src
-
-# 3. Ask for confirmation
-read -p "Proceed with refactoring? (y/n) " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
-fi
-
-# 4. Create working branch
-git checkout -b feature/organize-imports
-
-# 5. Run refactoring with higher concurrency
-echo "🚀 Starting import refactoring..."
-CONCURRENCY=15 ./droid-refactor-imports.sh src
-
-# 6. Run tests to ensure nothing broke
-echo "🧪 Running tests..."
-npm test
-
-# 7. Show summary
-echo "📊 Summary:"
-git diff --stat
-echo
-echo "✅ Refactoring complete! Review changes with: git diff"
-```
-
-## Handling monorepos
-
-For monorepos with multiple packages:
-
-```bash
-# Process each package separately
-for package in packages/*; do
-  if [ -d "$package/src" ]; then
-    echo "Processing $package..."
-    ./droid-refactor-imports.sh "$package/src"
-  fi
-done
-
-# Or process specific workspaces
-./droid-refactor-imports.sh apps/web/src
-./droid-refactor-imports.sh apps/api/src
-./droid-refactor-imports.sh packages/shared/src
-```
-
-
 ## Best practices
 
 <Note>
@@ -468,15 +407,7 @@ done
     npm run typecheck
     npm run lint
     ```
-  </Step>
-  
-  <Step title="Review changes carefully">
-    Use `git diff` to review all modifications before committing:
-    ```bash
-    git diff --staged  # Review what will be committed
-    git diff HEAD~1    # Review after committing
-    ```
-  </Step>
+  </Step>  
 </Steps>
 
 ## Next steps
