@@ -1,0 +1,572 @@
+---
+title: "Mass Import Refactoring"
+description: "Automatically organize and optimize imports across your entire codebase using parallel AI-powered refactoring"
+---
+
+# Mass Import Refactoring with Droid Exec
+
+This tutorial demonstrates how to use Droid Exec to refactor import statements across hundreds of files simultaneously. The script intelligently groups, sorts, and optimizes imports while removing unused dependencies and converting module formats.
+
+<Info>
+  Unlike manual refactoring or simple linters, Droid Exec understands your code's dependency graph and can make intelligent decisions about import organization, unused detection, and module format conversion—all while processing files in parallel for maximum speed.
+</Info>
+
+## How it works
+
+The script:
+
+1. Scans your codebase for JavaScript/TypeScript files
+2. Analyzes each file's import structure and usage
+3. Groups imports by type (external, internal, relative)
+4. Removes genuinely unused imports
+5. Converts CommonJS to ES6 modules where appropriate
+6. Applies consistent formatting and style
+
+<div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+  <div style={{ flex: '1', minWidth: '300px' }}>
+    <img src="https://placeholder.com/import-before.png" alt="Before: Messy imports with mixed styles and unused dependencies" />
+    <caption>Before: Mixed CommonJS/ES6, unsorted, with unused imports</caption>
+  </div>
+
+  <div style={{ flex: '1', minWidth: '300px' }}>
+    <img src="https://placeholder.com/import-after.png" alt="After: Clean, organized imports grouped by type" />
+    <caption>After: Organized ES6 imports, grouped and sorted</caption>
+  </div>
+</div>
+
+## Real-world impact
+
+<CardGroup cols={2}>
+  <Card title="Time Saved" icon="clock">
+    4+ hours of manual work completed in under 2 minutes
+  </Card>
+  <Card title="Files Processed" icon="files">
+    247 components and utilities in parallel
+  </Card>
+  <Card title="Imports Cleaned" icon="sparkles">
+    1,200+ import statements organized
+  </Card>
+  <Card title="Unused Removed" icon="trash">
+    89 unused imports eliminated
+  </Card>
+</CardGroup>
+
+## Prerequisites
+
+<Steps>
+  <Step title="Install Droid CLI">
+    ```bash
+    curl -fsSL https://app.factory.ai/cli | sh
+    ```
+  </Step>
+  
+  <Step title="Get Factory API Key">
+    Generate your API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys)
+  </Step>
+  
+  <Step title="Prepare Your Repository">
+    Ensure you have a Git repository for safe rollback and a Node.js project with JS/TS files
+  </Step>
+</Steps>
+
+## Get the script
+
+<CodeGroup>
+
+```bash download
+# Download the script
+curl -O https://raw.githubusercontent.com/factory-ai/cookbook/main/scripts/droid-refactor-imports.sh
+chmod +x droid-refactor-imports.sh
+```
+
+```bash help
+# View available options
+./droid-refactor-imports.sh --help
+```
+
+</CodeGroup>
+
+## Basic usage
+
+### Preview changes (dry run)
+
+<Warning>
+  Always start with a dry run to preview changes before modifying files. This helps you understand what transformations will be applied.
+</Warning>
+
+```bash
+# Preview changes without modifying files
+./droid-refactor-imports.sh --dry-run src
+
+# Example output:
+# 🔍 Found 247 files to process
+# 🏃 DRY RUN mode - no files will be modified
+# [DRY RUN] Would refactor imports in: src/components/Button.tsx
+#   - Would group external packages first
+#   - Would remove unused import: debounce
+#   - Would convert require() to import
+```
+
+### Apply refactoring
+
+Once you're satisfied with the preview, run the actual refactoring:
+
+```bash
+# Refactor all files in src directory
+./droid-refactor-imports.sh src
+
+# With custom concurrency for faster processing
+./droid-refactor-imports.sh --concurrency 20 src
+
+# Create a git branch before changes (recommended)
+./droid-refactor-imports.sh --branch refactor/organize-imports src
+```
+
+## Advanced features
+
+### Process specific file types
+
+Target specific file extensions to refactor incrementally:
+
+```bash
+# Only TypeScript files
+./droid-refactor-imports.sh --type ts src
+
+# Only React components
+./droid-refactor-imports.sh --type tsx src/components
+
+# Only JavaScript files
+./droid-refactor-imports.sh --type js src/utils
+```
+
+### Style enforcement
+
+Apply consistent import styling across the codebase:
+
+```bash
+# Enforce style: single quotes, semicolons, multi-line destructuring
+./droid-refactor-imports.sh --fix-style src
+
+# This will transform:
+import {Component1,Component2,Component3,Component4} from "react"
+
+# Into:
+import {
+  Component1,
+  Component2,
+  Component3,
+  Component4
+} from 'react';
+```
+
+### Validation and safety
+
+Run linting after each file to ensure changes are valid:
+
+```bash
+# Validate each file after refactoring
+./droid-refactor-imports.sh --validate src
+
+# Safe mode: create branch and validate
+./droid-refactor-imports.sh --branch fix/imports --validate src
+```
+
+## Understanding the transformation
+
+<Tabs>
+  <Tab title="Before">
+    ```javascript
+    // Messy imports in src/components/UserProfile.jsx
+    const React = require('react');
+    import { fetchUser } from '../../../api/users';
+    import axios from 'axios';
+    const { useState, useEffect } = require('react');
+    import { Button } from '@mui/material';
+    import lodash from 'lodash';  // unused
+    import '../styles/profile.css';
+    import { Avatar } from '@mui/material';
+    import { formatDate } from '../utils/date';
+    import { validateEmail } from '../utils/validation';  // unused
+    ```
+  </Tab>
+  
+  <Tab title="After">
+    ```javascript
+    // Organized imports in src/components/UserProfile.jsx
+    // External packages
+    import React, { useState, useEffect } from 'react';
+    import axios from 'axios';
+    import { Avatar, Button } from '@mui/material';
+
+    // Internal/absolute imports
+    import { fetchUser } from '@/api/users';
+    import { formatDate } from '@/utils/date';
+
+    // Relative imports
+    import '../styles/profile.css';
+    ```
+  </Tab>
+</Tabs>
+
+<Check>
+  <li>CommonJS converted to ES6 modules</li>
+  <li>Imports grouped by type with blank lines</li>
+  <li>Alphabetically sorted within groups</li>
+  <li>Unused imports removed (lodash, validateEmail)</li>
+  <li>React imports consolidated</li>
+  <li>Material-UI imports combined</li>
+</Check>
+
+## Script options reference
+
+<ParamField path="options" type="object">
+  <Expandable title="Command Line Options">
+    <ParamField path="-c, --concurrency" type="number" default="10">
+      Number of parallel workers for processing files
+    </ParamField>
+    
+    <ParamField path="-d, --dry-run" type="boolean">
+      Preview changes without modifying files
+    </ParamField>
+    
+    <ParamField path="-t, --type" type="string">
+      File type to process (js, ts, jsx, tsx, all)
+    </ParamField>
+    
+    <ParamField path="-e, --exclude" type="string">
+      Pattern to exclude files from processing
+    </ParamField>
+    
+    <ParamField path="-v, --validate" type="boolean">
+      Run linter after each file change
+    </ParamField>
+    
+    <ParamField path="-b, --branch" type="string">
+      Create git branch before making changes
+    </ParamField>
+    
+    <ParamField path="-m, --max-files" type="number">
+      Maximum number of files to process
+    </ParamField>
+    
+    <ParamField path="-f, --fix-style" type="boolean">
+      Apply consistent style formatting to imports
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Complete example workflow
+
+Here's a typical workflow for refactoring imports in a large project:
+
+```bash
+#!/bin/bash
+# Complete import refactoring workflow
+
+# 1. Create a backup branch
+git checkout -b backup/before-import-refactor
+git checkout -
+
+# 2. Run dry run to preview
+echo "🔍 Previewing changes..."
+./droid-refactor-imports.sh --dry-run src
+
+# 3. Ask for confirmation
+read -p "Proceed with refactoring? (y/n) " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 1
+fi
+
+# 4. Create working branch
+git checkout -b feature/organize-imports
+
+# 5. Run refactoring with validation
+echo "🚀 Starting import refactoring..."
+./droid-refactor-imports.sh \
+    --concurrency 15 \
+    --validate \
+    --fix-style \
+    src
+
+# 6. Run tests to ensure nothing broke
+echo "🧪 Running tests..."
+npm test
+
+# 7. Show summary
+echo "📊 Summary:"
+git diff --stat
+echo
+echo "✅ Refactoring complete! Review changes with: git diff"
+```
+
+## Handling monorepos
+
+For monorepos with multiple packages:
+
+```bash
+# Process each package separately
+for package in packages/*; do
+  if [ -d "$package/src" ]; then
+    echo "Processing $package..."
+    ./droid-refactor-imports.sh "$package/src"
+  fi
+done
+
+# Or process specific workspaces
+./droid-refactor-imports.sh apps/web/src
+./droid-refactor-imports.sh apps/api/src
+./droid-refactor-imports.sh packages/shared/src
+```
+
+## CI/CD integration
+
+### GitHub Actions workflow
+
+Automate import organization in CI:
+
+```yaml
+name: Auto-organize imports
+
+on:
+  pull_request:
+    paths:
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/*.ts'
+      - '**/*.tsx'
+
+jobs:
+  organize-imports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Droid CLI
+        run: |
+          curl -fsSL https://app.factory.ai/cli | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Run import organization
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        run: |
+          # Download script
+          curl -O https://raw.githubusercontent.com/factory-ai/cookbook/main/scripts/droid-refactor-imports.sh
+          chmod +x droid-refactor-imports.sh
+          
+          # Run on changed files only
+          git diff --name-only origin/main... | grep -E '\.(js|jsx|ts|tsx)$' > changed_files.txt
+          
+          # Process changed files
+          while IFS= read -r file; do
+            if [ -f "$file" ]; then
+              ./droid-refactor-imports.sh "$(dirname "$file")"
+            fi
+          done < changed_files.txt
+      
+      - name: Commit changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "refactor: organize imports [skip ci]"
+            git push
+          fi
+```
+
+## Performance optimization
+
+### Parallel processing
+
+The script uses parallel processing for speed. Adjust concurrency based on your system:
+
+```bash
+# Default: 10 parallel workers
+./droid-refactor-imports.sh src
+
+# High-end machine: increase concurrency
+./droid-refactor-imports.sh --concurrency 30 src
+
+# CI environment: conservative concurrency
+./droid-refactor-imports.sh --concurrency 5 src
+```
+
+### Processing large codebases
+
+For very large codebases, process in batches:
+
+```bash
+# Process in batches of 100 files
+find src -name "*.tsx" | split -l 100 - batch_
+
+for batch in batch_*; do
+  echo "Processing batch: $batch"
+  cat "$batch" | xargs -n 1 -P 10 ./process-single-file.sh
+  rm "$batch"
+done
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Script fails on certain files">
+    Some files might have syntax errors or unusual patterns. Use continue mode:
+    
+    ```bash
+    ./droid-refactor-imports.sh --continue-on-error src
+    ```
+  </Accordion>
+  
+  <Accordion title="Validation fails after refactoring">
+    If linting fails after refactoring, skip validation and fix manually:
+    
+    ```bash
+    ./droid-refactor-imports.sh src
+    npm run lint -- --fix
+    ```
+  </Accordion>
+  
+  <Accordion title="Too many changes at once">
+    Process incrementally by directory for easier review:
+    
+    ```bash
+    ./droid-refactor-imports.sh src/components
+    # Review and commit
+    ./droid-refactor-imports.sh src/utils
+    # Review and commit
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Rollback changes
+
+If something goes wrong:
+
+```bash
+# Discard all changes
+git checkout -- .
+
+# Or revert to backup branch
+git checkout backup/before-import-refactor
+```
+
+## Metrics and reporting
+
+The script generates a summary report:
+
+```markdown
+# Import Refactoring Summary
+
+**Date:** 2024-01-15
+**Directory:** src
+**File Type:** all
+**Total Files:** 247
+
+## Files Processed
+
+### Successfully Processed (243 files)
+- src/components/Button.tsx
+- src/components/Modal.tsx
+- src/utils/validation.ts
+...
+
+### Failed (4 files)
+- src/legacy/old-component.js (syntax error)
+- src/generated/types.ts (generated file)
+...
+
+## Statistics
+- Imports organized: 1,247
+- Unused imports removed: 89
+- CommonJS converted: 23
+- Time taken: 1m 47s
+```
+
+## Best practices
+
+<Note>
+  Follow these best practices for safe and effective import refactoring.
+</Note>
+
+<Steps>
+  <Step title="Always run a dry run first">
+    Preview changes before applying them to understand the scope
+  </Step>
+  
+  <Step title="Create a git branch">
+    Use `--branch` flag to create a dedicated branch for changes
+  </Step>
+  
+  <Step title="Process incrementally">
+    For large codebases, process directory by directory
+  </Step>
+  
+  <Step title="Run tests">
+    Verify nothing broke after refactoring
+  </Step>
+  
+  <Step title="Review changes">
+    Use `git diff` to review all modifications
+  </Step>
+  
+  <Step title="Commit logical chunks">
+    Split commits by feature area rather than committing everything at once
+  </Step>
+</Steps>
+
+## Comparison with alternatives
+
+<Table>
+  <thead>
+    <tr>
+      <th>Tool</th>
+      <th>Speed</th>
+      <th>Intelligence</th>
+      <th>Safety</th>
+      <th>Parallel</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Droid Import Refactor</strong></td>
+      <td>⚡ Fast</td>
+      <td>🧠 AI-powered</td>
+      <td>✅ Git-safe</td>
+      <td>✅ Yes</td>
+    </tr>
+    <tr>
+      <td>ESLint --fix</td>
+      <td>⚡ Fast</td>
+      <td>⚠️ Rule-based</td>
+      <td>✅ Safe</td>
+      <td>❌ No</td>
+    </tr>
+    <tr>
+      <td>Manual refactoring</td>
+      <td>🐌 Slow</td>
+      <td>🧠 Human</td>
+      <td>⚠️ Error-prone</td>
+      <td>❌ No</td>
+    </tr>
+    <tr>
+      <td>IDE refactoring</td>
+      <td>🐢 Medium</td>
+      <td>⚠️ Pattern-based</td>
+      <td>✅ Safe</td>
+      <td>❌ No</td>
+    </tr>
+  </tbody>
+</Table>
+
+## Next steps
+
+* Customize the import grouping rules for your team's conventions
+* Combine with [lint and type fixing](/cli/droid-exec/cookbook/lint-typefix) for complete code cleanup
+* Set up pre-commit hooks to maintain import organization
+* Create project-specific configurations for different import styles
+
+## Community examples
+
+Share your import refactoring results and custom configurations in our [Discord community](https://discord.gg/factory). See how other teams are using Droid Exec to maintain clean, organized codebases at scale.
