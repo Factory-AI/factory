@@ -1,0 +1,39 @@
+name: Twitter-Slack Bridge
+
+on:
+  schedule:
+    - cron: '* * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-bridge:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tweepy slack-sdk python-dotenv
+      
+      - name: Run bridge
+        env:
+          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+          TWITTER_USERNAME: ${{ secrets.TWITTER_USERNAME }}
+        run: python bridge.py
+      
+      - name: Commit updated last_seen_id
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add last_seen_id.txt
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update last_seen_id"
+          git push
