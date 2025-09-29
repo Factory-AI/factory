@@ -3,8 +3,6 @@ title: "Mass Import Refactoring"
 description: "Automatically organize and optimize imports across your entire codebase using parallel AI-powered refactoring"
 ---
 
-# Mass Import Refactoring with Droid Exec
-
 This tutorial demonstrates how to use Droid Exec to refactor import statements across hundreds of files simultaneously. The script intelligently groups, sorts, and optimizes imports while removing unused dependencies and converting module formats.
 
 <Info>
@@ -68,6 +66,259 @@ chmod +x droid-refactor-imports.sh
 ```
 
 </CodeGroup>
+
+<Accordion title="View full script source">
+```bash
+#!/bin/bash
+
+# droid-refactor-imports.sh
+# Automatically organize and optimize imports across your codebase using AI
+
+set -e
+
+# Configuration
+CONCURRENCY=10
+DRY_RUN=false
+FILE_TYPE="all"
+EXCLUDE_PATTERN=""
+VALIDATE=false
+BRANCH=""
+MAX_FILES=""
+FIX_STYLE=false
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+usage() {
+    cat << EOF
+Usage: $0 [OPTIONS] <directory>
+
+Refactor imports across JavaScript/TypeScript files using Droid Exec.
+
+OPTIONS:
+    -c, --concurrency <n>     Number of parallel workers (default: 10)
+    -d, --dry-run            Preview changes without modifying files
+    -t, --type <type>        File type: js, ts, jsx, tsx, all (default: all)
+    -e, --exclude <pattern>  Pattern to exclude files
+    -v, --validate           Run linter after each file change
+    -b, --branch <name>      Create git branch before changes
+    -m, --max-files <n>      Maximum number of files to process
+    -f, --fix-style          Apply consistent style formatting
+    -h, --help               Show this help message
+
+EXAMPLES:
+    # Preview changes
+    $0 --dry-run src
+
+    # Process TypeScript files only
+    $0 --type ts src
+
+    # High concurrency with validation
+    $0 --concurrency 20 --validate src
+
+EOF
+    exit 0
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -c|--concurrency)
+            CONCURRENCY="$2"
+            shift 2
+            ;;
+        -d|--dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        -t|--type)
+            FILE_TYPE="$2"
+            shift 2
+            ;;
+        -e|--exclude)
+            EXCLUDE_PATTERN="$2"
+            shift 2
+            ;;
+        -v|--validate)
+            VALIDATE=true
+            shift
+            ;;
+        -b|--branch)
+            BRANCH="$2"
+            shift 2
+            ;;
+        -m|--max-files)
+            MAX_FILES="$2"
+            shift 2
+            ;;
+        -f|--fix-style)
+            FIX_STYLE=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            ;;
+        *)
+            DIRECTORY="$1"
+            shift
+            ;;
+    esac
+done
+
+# Validate directory argument
+if [ -z "$DIRECTORY" ]; then
+    echo -e "${RED}Error: Directory argument is required${NC}"
+    usage
+fi
+
+if [ ! -d "$DIRECTORY" ]; then
+    echo -e "${RED}Error: Directory '$DIRECTORY' does not exist${NC}"
+    exit 1
+fi
+
+# Create branch if specified
+if [ -n "$BRANCH" ]; then
+    echo -e "${GREEN}Creating branch: $BRANCH${NC}"
+    git checkout -b "$BRANCH"
+fi
+
+# Function to find files based on type
+find_files() {
+    local pattern
+    case $FILE_TYPE in
+        js) pattern="*.js" ;;
+        jsx) pattern="*.jsx" ;;
+        ts) pattern="*.ts" ;;
+        tsx) pattern="*.tsx" ;;
+        all) pattern="*.[jt]s*" ;;
+        *) echo -e "${RED}Invalid file type: $FILE_TYPE${NC}"; exit 1 ;;
+    esac
+    
+    local find_cmd="find $DIRECTORY -name '$pattern' -type f"
+    
+    if [ -n "$EXCLUDE_PATTERN" ]; then
+        find_cmd="$find_cmd | grep -v '$EXCLUDE_PATTERN'"
+    fi
+    
+    if [ -n "$MAX_FILES" ]; then
+        find_cmd="$find_cmd | head -n $MAX_FILES"
+    fi
+    
+    eval $find_cmd
+}
+
+# Function to process a single file
+process_file() {
+    local file="$1"
+    
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${YELLOW}[DRY RUN] Would refactor: $file${NC}"
+        
+        # Create the prompt
+        local prompt="Analyze the imports in this file and describe what changes would be made:
+        1. Group imports (external packages, internal modules, relative imports)
+        2. Sort alphabetically within groups
+        3. Remove unused imports
+        4. Convert CommonJS to ES6 modules
+        5. Apply consistent formatting
+        
+        File content:
+        $(cat "$file")"
+        
+        echo "$prompt" | droid exec --auto low --model gpt-4o-mini 2>/dev/null || true
+        return
+    fi
+    
+    echo -e "${GREEN}Processing: $file${NC}"
+    
+    # Create the refactoring prompt
+    local prompt="Refactor the imports in the following file:
+    
+    Requirements:
+    1. Group imports in this order (with blank lines between groups):
+       - External packages (npm/node_modules)
+       - Internal/absolute imports (using aliases like @/ or src/)
+       - Relative imports (./.. or ../..)
+    2. Sort imports alphabetically within each group
+    3. Remove genuinely unused imports (be careful not to remove imports used in JSX, types, or side effects)
+    4. Convert CommonJS require() to ES6 import statements
+    5. Combine imports from the same module
+    6. Preserve side-effect imports (imports without bindings)"
+    
+    if [ "$FIX_STYLE" = true ]; then
+        prompt="$prompt
+    7. Apply consistent style:
+       - Use single quotes
+       - Add semicolons
+       - Use multi-line destructuring for 4+ items"
+    fi
+    
+    prompt="$prompt
+
+    Output only the complete refactored file content, nothing else.
+    
+    File content:
+    $(cat "$file")"
+    
+    # Run droid exec and capture output
+    local output
+    output=$(echo "$prompt" | droid exec --auto low --model gpt-4o 2>/dev/null)
+    
+    if [ -n "$output" ]; then
+        echo "$output" > "$file"
+        
+        # Validate if requested
+        if [ "$VALIDATE" = true ]; then
+            if command -v npm &> /dev/null && [ -f "package.json" ]; then
+                npm run lint -- "$file" --fix 2>/dev/null || true
+            fi
+        fi
+        
+        echo -e "${GREEN}✓ Refactored: $file${NC}"
+    else
+        echo -e "${RED}✗ Failed: $file${NC}"
+    fi
+}
+
+export -f process_file
+export DRY_RUN FIX_STYLE VALIDATE GREEN YELLOW RED NC
+
+# Main execution
+echo -e "${GREEN}🔍 Scanning for files...${NC}"
+FILES=$(find_files)
+FILE_COUNT=$(echo "$FILES" | wc -l)
+
+if [ -z "$FILES" ]; then
+    echo -e "${YELLOW}No files found matching criteria${NC}"
+    exit 0
+fi
+
+echo -e "${GREEN}Found $FILE_COUNT files to process${NC}"
+
+if [ "$DRY_RUN" = true ]; then
+    echo -e "${YELLOW}🏃 DRY RUN mode - no files will be modified${NC}"
+fi
+
+# Process files in parallel
+echo "$FILES" | xargs -n 1 -P "$CONCURRENCY" -I {} bash -c 'process_file "$@"' _ {}
+
+# Summary
+echo -e "${GREEN}✨ Import refactoring complete!${NC}"
+
+if [ "$DRY_RUN" = false ]; then
+    # Show git diff summary
+    if command -v git &> /dev/null; then
+        echo -e "${GREEN}Changes made:${NC}"
+        git diff --stat
+    fi
+    
+    echo -e "${YELLOW}Review changes with: git diff${NC}"
+fi
+```
+</Accordion>
 
 ## Basic usage
 
