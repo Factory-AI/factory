@@ -1,12 +1,12 @@
 ---
-title: 'Fix Lint Issues'
-description: 'Automatically add required middleware calls to NextJS API routes using Droid Exec'
+title: 'Automated Lint Fixes'
+description: 'Automatically fix ESLint violations across your codebase using Droid Exec'
 ---
 
-This tutorial demonstrates how to use Droid Exec to fix NextJS API route files that are missing required middleware calls. The script finds all route.ts files that violate the `require-route-middleware` ESLint rule and automatically adds the appropriate middleware handler as the first statement in each HTTP handler function.
+This tutorial demonstrates how to use Droid Exec to automatically fix ESLint violations across your codebase. The script identifies files with lint errors and intelligently fixes them while preserving functionality.
 
 <Info>
-The `require-route-middleware` rule enforces that all exported HTTP handlers (GET, POST, PUT, DELETE, etc.) in route.ts files must call a handle*Middleware function as their very first statement. This ensures consistent authentication, authorization, error handling, and logging across all API routes.
+This approach works with any ESLint rule - from simple formatting issues to complex architectural patterns.
 </Info>
 
 ## How it works
@@ -276,6 +276,18 @@ exit 0
 ```
 </Accordion>
 
+<Warning>
+  **Critical for Success**: When customizing this script for your own lint rules, always include concrete before/after examples in the prompt you give to Droid Exec. This dramatically improves accuracy.
+  
+  Good prompt structure:
+  1. Describe the violation to fix
+  2. Show a "before" code example with the violation
+  3. Show an "after" code example with the fix applied
+  4. List any edge cases or patterns to preserve
+  
+  The more specific your examples, the better Droid will understand and implement the fix pattern.
+</Warning>
+
 ## Prerequisites
 
 Before you begin, ensure you have:
@@ -473,102 +485,6 @@ Once ready, run the actual fix:
   </Tab>
 </Tabs>
 
-## Understanding middleware types
-
-The script automatically detects which middleware type to use based on the route path:
-
-<Note>
-  The middleware provides consistent authentication, authorization, error handling, and logging across all routes.
-</Note>
-
-<Tabs>
-  <Tab title="handleAuthenticatedMiddleware">
-    **For:** Routes requiring user authentication
-    
-    **Provides:**
-    - Session validation
-    - User object in callback
-    - Optional role-based access control
-    - CSRF protection (optional)
-    
-    **Usage:**
-    ```typescript
-    return handleAuthenticatedMiddleware(
-      req,
-      async ({ req, user }) => {
-        // Your route logic with access to authenticated user
-      },
-      {
-        requiredRole: AdminRole.ADMIN_1,  // optional
-        requireCsrf: true,                 // optional
-        context: 'Update settings'         // optional
-      }
-    );
-    ```
-  </Tab>
-  
-  <Tab title="handlePublicMiddleware">
-    **For:** Routes that don't require authentication
-    
-    **Provides:**
-    - Consistent error handling
-    - Request logging
-    - Optional CSRF protection
-    
-    **Usage:**
-    ```typescript
-    return handlePublicMiddleware(
-      req,
-      async (req) => {
-        // Your route logic
-      },
-      {
-        requireCsrf: true,         // optional
-        context: 'Public endpoint' // optional
-      }
-    );
-    ```
-  </Tab>
-  
-  <Tab title="handleCronMiddleware">
-    **For:** Scheduled cron job routes
-    
-    **Provides:**
-    - Bearer token validation (CRON_SECRET)
-    - Error handling and logging
-    - Protection against unauthorized triggers
-    
-    **Usage:**
-    ```typescript
-    return handleCronMiddleware(
-      req,
-      async (req) => {
-        // Your cron job logic
-      },
-      { context: 'Daily sync job' } // optional
-    );
-    ```
-  </Tab>
-  
-  <Tab title="handleExportMiddleware">
-    **For:** Data export endpoints
-    
-    **Provides:**
-    - Bearer token validation (EXPORT_API_SECRET)
-    - Error handling for large data operations
-    
-    **Usage:**
-    ```typescript
-    return handleExportMiddleware(
-      req,
-      async (req) => {
-        // Your export logic
-      },
-      { context: 'Export user data' } // optional
-    );
-    ```
-  </Tab>
-</Tabs>
 
 ## Best practices
 
@@ -577,14 +493,6 @@ The script automatically detects which middleware type to use based on the route
 </Note>
 
 <Steps>
-  <Step title="Run ESLint first">
-    Check current violations before fixing:
-    ```bash
-    # See all route middleware violations
-    npm run lint -- --rule "factory/require-route-middleware: error"
-    ```
-  </Step>
-  
   <Step title="Start with dry run">
     Preview changes before applying:
     ```bash
@@ -607,89 +515,4 @@ The script automatically detects which middleware type to use based on the route
     git add -A && git commit -m "fix(factory-admin): add required middleware to API routes"
     ```
   </Step>
-  
-  <Step title="Verify fixes">
-    After running, ensure all violations are resolved:
-    ```bash
-    # Run linting to verify fixes
-    npm run lint
-    
-    # Run type checking
-    npm run typecheck
-    
-    # Run relevant tests
-    npm run test -- --filter=factory-app
-    ```
-  </Step>
-  
-  <Step title="Review security implications">
-    Carefully review the changes to ensure:
-    - Correct middleware type is used (authenticated vs public)
-    - Appropriate role requirements for admin routes
-    - CSRF protection where needed
-    - No routes accidentally made public that should be protected
-  </Step>
 </Steps>
-
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="ESLint can't find violations">
-    If the script doesn't detect violations, try:
-    ```bash
-    # Run ESLint directly to see violations
-    npx eslint apps/factory-app --ext .ts --rule "factory/require-route-middleware: error"
-    
-    # Or find route.ts files manually and check each
-    find apps -name "route.ts" -type f | xargs -I {} npx eslint {}
-    ```
-  </Accordion>
-  
-  <Accordion title="Middleware import errors">
-    If TypeScript can't find the middleware imports:
-    - Verify the import path matches your project structure
-    - Check if middleware.ts exists in the expected location
-    - Ensure tsconfig paths are configured correctly
-  </Accordion>
-  
-  <Accordion title="Some routes still failing after fix">
-    For complex handlers that aren't fixed automatically:
-    - Check if they use non-standard patterns (e.g., factory handler wrappers)
-    - Manually review and fix these edge cases
-    - Consider if they need custom middleware logic
-  </Accordion>
-</AccordionGroup>
-
-## Security considerations
-
-<Warning>
-  Adding middleware is a security-critical operation. Always review changes carefully!
-</Warning>
-
-Key points to verify:
-- **Authentication boundaries**: Ensure routes that handle sensitive data use `handleAuthenticatedMiddleware`
-- **Public endpoints**: Only use `handlePublicMiddleware` for truly public routes (health checks, webhooks with own auth)
-- **Role requirements**: Admin operations should specify appropriate `requiredRole`
-- **CSRF protection**: Enable for state-changing operations from browsers
-- **Cron protection**: All scheduled jobs must use `handleCronMiddleware`
-
-## Integration with CI/CD
-
-Add this check to your CI pipeline:
-
-```yaml
-# .github/workflows/lint.yml
-- name: Check route middleware
-  run: |
-    npx eslint . --ext .ts --rule "factory/require-route-middleware: error"
-    
-- name: Auto-fix in PR
-  if: failure() && github.event_name == 'pull_request'
-  run: |
-    ./scripts/droid-fix-route-middleware.sh apps
-    git config user.name "factory-droid[bot]"
-    git config user.email "138933559+factory-droid[bot]@users.noreply.github.com"
-    git add -A
-    git commit -m "fix: add required middleware to API routes [auto-fix]"
-    git push
-```
