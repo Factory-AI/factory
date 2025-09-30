@@ -117,17 +117,25 @@ jobs:
             {
               "path": "file/path.js",
               "line": 42,
-              "side": "RIGHT",
-              "body": "Issue: [description]\nFix: [specific solution]"
+              "body": "Issue: [description]\\nFix: [specific solution]"
             }
           ]
 
-          If no critical issues found, output empty array: []
-
+          Use GitHub review “position” (not file line). Compute positions from pr.diff. If no critical issues, output []
           Files to review:
           - pr.diff: the full PR diff
           - existing_comments.json: skip exact duplicates
           EOF
+
+          # Append artifacts so Droid sees actual diff and prior comments
+          {
+            printf "\n--- BEGIN pr.diff ---\n";
+            cat pr.diff;
+            printf "\n--- END pr.diff ---\n";
+            printf "\n--- BEGIN existing_comments.json ---\n";
+            cat existing_comments.json || true;
+            printf "\n--- END existing_comments.json ---\n";
+          } >> prompt.txt
 
           if ! droid exec --auto medium --model gpt-5-codex --output-format json -f prompt.txt > comments.json 2>review_output.log; then
             echo "droid exec failed"
@@ -149,6 +157,7 @@ jobs:
 
             const { owner, repo } = context.repo;
             const pull_number = context.issue.number;
+            const headSha = context.payload.pull_request.head.sha;
             const commentsPath = 'comments.json';
 
             const readComments = () => {
@@ -166,15 +175,35 @@ jobs:
               }
             };
 
-            const postReview = async (body, comments = []) => {
+            const postBatchReview = async (body, comments = []) => {
               const payload = { owner, repo, pull_number, event: 'COMMENT', body };
-              if (comments.length) payload.comments = comments;
+              if (comments.length) payload.comments = comments; // needs path+position+body
               await github.rest.pulls.createReview(payload);
             };
 
-            const postFallback = async (comments) => {
+            const postPerComment = async (comments) => {
+              for (const c of comments) {
+                // expects: path, line (new file), side ("RIGHT"), body
+                await github.rest.pulls.createReviewComment({
+                  owner,
+                  repo,
+                  pull_number,
+                  commit_id: headSha,
+                  path: c.path,
+                  line: c.line,
+                  side: c.side || 'RIGHT',
+                  body: c.body,
+                });
+              }
+            };
+
+            const postIssueSummary = async (comments) => {
               const body = comments
-                .map(({ path, line, body: commentBody }) => `**${path}:${line}**\n${commentBody}`)
+                .map((c) => {
+                  const loc = c.position != null ? `${c.path}:${c.position}` :
+                             c.line != null ? `${c.path}:${c.line}` : c.path;
+                  return `**${loc}**\n${c.body}`;
+                })
                 .join('\n\n---\n\n');
 
               await github.rest.issues.createComment({
@@ -188,17 +217,30 @@ jobs:
             const comments = readComments();
 
             if (!comments.length) {
-              await postReview('✅ Automated review complete - no critical issues found.');
+              await postBatchReview('✅ Automated review complete - no critical issues found.');
               return;
             }
 
+            const hasOnlyPositions = comments.every(c => Number.isInteger(c.position));
+            const hasAnyLine = comments.some(c => Number.isInteger(c.line));
+
             try {
-              await postReview(`🔍 Automated review found ${comments.length} issue(s) requiring attention.`, comments);
-              core.info(`Posted ${comments.length} review comment(s).`);
+              if (hasOnlyPositions) {
+                await postBatchReview(`🔍 Automated review found ${comments.length} issue(s) requiring attention.`, comments);
+                core.info(`Posted ${comments.length} review comment(s) via batch (position).`);
+              } else if (hasAnyLine) {
+                await postPerComment(comments);
+                // Optional: add a summary review comment
+                await postBatchReview(`🔍 Automated review posted ${comments.length} inline comment(s).`);
+                core.info(`Posted ${comments.length} review comment(s) individually (line/side).`);
+              } else {
+                core.warning('Comments lack required fields (position or line). Falling back to issue comment.');
+                await postIssueSummary(comments);
+              }
             } catch (error) {
               core.warning(`Failed to post inline review: ${error.message}`);
               try {
-                await postFallback(comments);
+                await postIssueSummary(comments);
               } catch (fallbackError) {
                 core.setFailed(`Unable to post review: ${fallbackError.message}`);
               }
@@ -210,6 +252,8 @@ jobs:
         with:
           name: review-debug-${{ github.event.pull_request.number }}
           path: |
+            pr.diff
+            prompt.txt
             review_output.log
             comments.json
             existing_comments.json
@@ -414,6 +458,7 @@ Post the generated comments as a PR review with inline comments or fallback to i
 
             const { owner, repo } = context.repo;
             const pull_number = context.issue.number;
+            const headSha = context.payload.pull_request.head.sha;
             const commentsPath = 'comments.json';
 
             const readComments = () => {
@@ -431,15 +476,35 @@ Post the generated comments as a PR review with inline comments or fallback to i
               }
             };
 
-            const postReview = async (body, comments = []) => {
+            const postBatchReview = async (body, comments = []) => {
               const payload = { owner, repo, pull_number, event: 'COMMENT', body };
-              if (comments.length) payload.comments = comments;
+              if (comments.length) payload.comments = comments; // needs path+position+body
               await github.rest.pulls.createReview(payload);
             };
 
-            const postFallback = async (comments) => {
+            const postPerComment = async (comments) => {
+              for (const c of comments) {
+                // expects: path, line (new file), side ("RIGHT"), body
+                await github.rest.pulls.createReviewComment({
+                  owner,
+                  repo,
+                  pull_number,
+                  commit_id: headSha,
+                  path: c.path,
+                  line: c.line,
+                  side: c.side || 'RIGHT',
+                  body: c.body,
+                });
+              }
+            };
+
+            const postIssueSummary = async (comments) => {
               const body = comments
-                .map(({ path, line, body: commentBody }) => `**${path}:${line}**\n${commentBody}`)
+                .map((c) => {
+                  const loc = c.position != null ? `${c.path}:${c.position}` :
+                             c.line != null ? `${c.path}:${c.line}` : c.path;
+                  return `**${loc}**\n${c.body}`;
+                })
                 .join('\n\n---\n\n');
 
               await github.rest.issues.createComment({
@@ -453,17 +518,30 @@ Post the generated comments as a PR review with inline comments or fallback to i
             const comments = readComments();
 
             if (!comments.length) {
-              await postReview('✅ Automated review complete - no critical issues found.');
+              await postBatchReview('✅ Automated review complete - no critical issues found.');
               return;
             }
 
+            const hasOnlyPositions = comments.every(c => Number.isInteger(c.position));
+            const hasAnyLine = comments.some(c => Number.isInteger(c.line));
+
             try {
-              await postReview(`🔍 Automated review found ${comments.length} issue(s) requiring attention.`, comments);
-              core.info(`Posted ${comments.length} review comment(s).`);
+              if (hasOnlyPositions) {
+                await postBatchReview(`🔍 Automated review found ${comments.length} issue(s) requiring attention.`, comments);
+                core.info(`Posted ${comments.length} review comment(s) via batch (position).`);
+              } else if (hasAnyLine) {
+                await postPerComment(comments);
+                // Optional: add a summary review comment
+                await postBatchReview(`🔍 Automated review posted ${comments.length} inline comment(s).`);
+                core.info(`Posted ${comments.length} review comment(s) individually (line/side).`);
+              } else {
+                core.warning('Comments lack required fields (position or line). Falling back to issue comment.');
+                await postIssueSummary(comments);
+              }
             } catch (error) {
               core.warning(`Failed to post inline review: ${error.message}`);
               try {
-                await postFallback(comments);
+                await postIssueSummary(comments);
               } catch (fallbackError) {
                 core.setFailed(`Unable to post review: ${fallbackError.message}`);
               }
@@ -481,6 +559,8 @@ Store review artifacts for troubleshooting if the workflow fails:
         with:
           name: review-debug-${{ github.event.pull_request.number }}
           path: |
+            pr.diff
+            prompt.txt
             review_output.log
             comments.json
             existing_comments.json

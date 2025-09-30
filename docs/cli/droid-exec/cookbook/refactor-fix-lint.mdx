@@ -64,10 +64,8 @@ find_violations() {
     # Run ESLint with the specific rule and capture violations
     # Using --format json for easier parsing
     npx eslint "$TARGET_DIR" \
-        --ext .ts \
+        --ext .ts,.tsx \
         --rule "${ESLINT_RULE}: error" \
-        --no-eslintrc \
-        --plugin factory \
         --format json 2>/dev/null | \
         jq -r '.[] | select(.errorCount > 0) | .filePath' > "$VIOLATIONS_FILE" || true
     
@@ -82,8 +80,6 @@ find_violations() {
             # Check if file has middleware violations
             if npx eslint "$file" \
                 --rule "${ESLINT_RULE}: error" \
-                --no-eslintrc \
-                --plugin factory \
                 --format compact 2>&1 | grep -q "require-route-middleware"; then
                 echo "$file" >> "$VIOLATIONS_FILE"
             fi
@@ -290,11 +286,7 @@ exit 0
 
 ## Prerequisites
 
-Before you begin, ensure you have:
-
-1. Completed the [Droid Exec installation](/cli/droid-exec/overview#installation)
-2. The Factory ESLint plugin configured in your project
-3. Access to the codebase with route.ts files
+Before you begin, ensure you have completed the [Droid Exec installation](/cli/droid-exec/overview#installation)
 
 ## Basic usage
 

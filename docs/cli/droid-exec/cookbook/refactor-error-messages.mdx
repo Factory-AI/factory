@@ -168,7 +168,7 @@ echo -e "${BLUE}Found $FILE_COUNT files with ResponseError classes${NC}\n"
 
 # Process files in parallel
 
-cat "$FILES_LIST" | xargs -n 1 -P "$CONCURRENCY" -I {} bash -c 'process*file "$@"' * {}
+cat "$FILES_LIST" | xargs -n 1 -P "$CONCURRENCY" -I {} bash -c 'process_file "$@"' _ {}
 
 # Calculate total errors found in dry run
 
