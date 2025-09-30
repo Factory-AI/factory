@@ -1,6 +1,6 @@
 ---
-title: "Mass Import Refactoring"
-description: "Automatically organize and optimize imports across your entire codebase using parallel AI-powered refactoring"
+title: "Mass Refactors: Imports"
+description: "Automatically organize imports across your entire codebase using Droid Exec"
 ---
 
 This tutorial demonstrates how to use Droid Exec to refactor import statements across hundreds of files simultaneously. The script intelligently groups, sorts, and optimizes imports while removing unused dependencies and converting module formats.
@@ -18,7 +18,6 @@ The script:
 7. **Modernizes syntax**: Converts `require()` to ES6 `import`
 8. **Consolidates duplicates**: Merges multiple imports from the same module
 
-
 ## Real-world impact
 
 <CardGroup cols={2}>
@@ -29,24 +28,6 @@ The script:
     Automatically eliminate unused imports
   </Card>
 </CardGroup>
-
-## Prerequisites
-
-<Steps>
-  <Step title="Install Droid CLI">
-    ```bash
-    curl -fsSL https://app.factory.ai/cli | sh
-    ```
-  </Step>
-  
-  <Step title="Get Factory API Key">
-    Generate your API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys)
-  </Step>
-  
-  <Step title="Prepare Your Repository">
-    Ensure you have a Git repository for safe rollback and a Node.js project with JS/TS files
-  </Step>
-</Steps>
 
 ## Get the script
 
@@ -177,6 +158,24 @@ if [ "$DRY_RUN" = "false" ] && [ "$MODIFIED_COUNT" -gt 0 ]; then
 fi
 ```
 </Accordion>
+
+## Prerequisites
+
+<Steps>
+  <Step title="Install Droid CLI">
+    ```bash
+    curl -fsSL https://app.factory.ai/cli | sh
+    ```
+  </Step>
+  
+  <Step title="Get Factory API Key">
+    Generate your API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys)
+  </Step>
+  
+  <Step title="Prepare Your Repository">
+    Ensure you have a Git repository for safe rollback and a Node.js project with JS/TS files
+  </Step>
+</Steps>
 
 ## Basic usage
 
