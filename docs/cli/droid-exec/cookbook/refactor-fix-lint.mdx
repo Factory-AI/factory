@@ -375,6 +375,7 @@ Once ready, run the actual fix:
 
 <Tabs>
   <Tab title="Before">
+    <Note>Missing middleware - no authentication check!</Note>
     ```typescript
     // apps/factory-app/src/app/api/sessions/route.ts
     import { NextRequest, NextResponse } from 'next/server';
@@ -391,10 +392,10 @@ Once ready, run the actual fix:
       });
     }
     ```
-    <Note>Missing middleware - no authentication check!</Note>
   </Tab>
   
   <Tab title="After">
+    <Note>Now properly authenticated with access to user object</Note>
     ```typescript
     // apps/factory-app/src/app/api/sessions/route.ts
     import { NextRequest, NextResponse } from 'next/server';
@@ -414,7 +415,6 @@ Once ready, run the actual fix:
       });
     }
     ```
-    <Note>Now properly authenticated with access to user object</Note>
   </Tab>
 </Tabs>
 
@@ -422,6 +422,7 @@ Once ready, run the actual fix:
 
 <Tabs>
   <Tab title="Before">
+    <Note>Cron job without authorization - anyone could trigger it!</Note>
     ```typescript
     // apps/factory-admin/src/app/api/cron/batch-friction/poll-and-report/route.ts
     export async function GET(request: NextRequest) {
@@ -449,10 +450,10 @@ Once ready, run the actual fix:
       });
     }
     ```
-    <Note>Cron job without authorization - anyone could trigger it!</Note>
   </Tab>
   
   <Tab title="After">
+    <Note>Now protected by cron secret, entire handler wrapped in middleware</Note>
     ```typescript
     // apps/factory-admin/src/app/api/cron/batch-friction/poll-and-report/route.ts
     export async function GET(request: NextRequest) {
@@ -481,7 +482,6 @@ Once ready, run the actual fix:
       });
     }
     ```
-    <Note>Now protected by cron secret, entire handler wrapped in middleware</Note>
   </Tab>
 </Tabs>
 
