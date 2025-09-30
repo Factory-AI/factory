@@ -199,21 +199,7 @@ fi
 
 ## Prerequisites
 
-<Steps>
-  <Step title="Install Droid CLI">
-    ```bash
-    curl -fsSL https://app.factory.ai/cli | sh
-    ```
-  </Step>
-
-  <Step title="Get Factory API Key">
-    Generate your API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys)
-  </Step>
-
-  <Step title="Import ResponseError Classes">
-    Ensure your project uses the `@factory/logging` package with ResponseError classes
-  </Step>
-</Steps>
+Before you begin, complete the [Droid Exec installation](/cli/droid-exec/overview#installation).
 
 ## Basic usage
 
@@ -372,8 +358,6 @@ Error messages improved: ~35
   </Tab>
 </Tabs>
 
-
-
 ## Best practices
 
 <Note>
@@ -382,33 +366,30 @@ Error messages improved: ~35
 
 <Steps>
   <Step title="Start with a dry run">
-    Always preview the scope of changes first: ```bash # See how many errors
-    need improvement DRY_RUN=true ./droid-improve-errors.sh packages ```
+    Always preview the scope of changes first: 
+    ```bash
+    # See how many errors need improvement 
+    DRY_RUN=true ./droid-improve-errors.sh packages
+    ```
   </Step>
 
   <Step title="Test on critical paths first">
-    Start with user-facing API routes for maximum impact: ```bash # Improve
-    errors in API routes first ./droid-improve-errors.sh
-    apps/factory-app/src/app/api # Then expand to services
-    ./droid-improve-errors.sh packages/models/src ```
-  </Step>
-
-  <Step title="Create a git branch">
-    Isolate changes for easy review and rollback: ```bash git checkout -b
-    refactor/improve-error-messages ./droid-improve-errors.sh apps ```
-  </Step>
-
-  <Step title="Review and test thoroughly">
-    Error messages are user-facing, so test carefully: ```bash # After running
-    the script git diff # Review all changes npm run typecheck # Ensure types
-    are valid npm run test # Run test suite npm run dev # Manual testing ```
+    Start with user-facing API routes for maximum impact: 
+    ```bash # Improve errors in API routes first 
+    ./droid-improve-errors.sh apps/factory-app/src/app/api # Then expand to services
+    ./droid-improve-errors.sh packages/models/src
+    ```
   </Step>
 
   <Step title="Process incrementally">
-    For large codebases, tackle one module at a time: ```bash # Process each app
-    separately for easier review ./droid-improve-errors.sh apps/factory-admin
-    git add -A && git commit -m "refactor(factory-admin): improve error
-    messages" ./droid-improve-errors.sh apps/factory-app git add -A && git
-    commit -m "refactor(factory-app): improve error messages" ```
+    For large codebases, tackle one module at a time: 
+    ```bash 
+    # Process each app separately for easier review 
+    ./droid-improve-errors.sh apps/factory-admin
+    git add -A && git commit -m "refactor(factory-admin): improve error messages" 
+    
+    ./droid-improve-errors.sh apps/factory-app 
+    git add -A && git commit -m "refactor(factory-app): improve error messages"
+    ```
   </Step>
 </Steps>
