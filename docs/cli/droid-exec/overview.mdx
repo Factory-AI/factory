@@ -66,26 +66,32 @@ Supported models (examples):
 - claude-sonnet-4-20250514
 - claude-opus-4-1-20250805
 
-## Install and authenticate
+## Installation
 
-- Install the `droid` CLI for your environment:
+<Steps>
+  <Step title="Install Droid CLI">
+    <CodeGroup>
+    ```bash macOS/Linux
+    curl -fsSL https://app.factory.ai/cli | sh
+    ```
 
-<CodeGroup>
+    ```powershell Windows
+    irm https://app.factory.ai/cli/windows | iex
+    ```
+    </CodeGroup>
+  </Step>
 
-```bash macOS/Linux
-curl -fsSL https://app.factory.ai/cli | sh
-```
+  <Step title="Get Factory API Key">
+    Generate your API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys)
+  </Step>
 
-```powershell Windows
-irm https://app.factory.ai/cli/windows | iex
-```
-
-</CodeGroup>
-
-- Generate your Factory API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys):
-  - macOS/Linux: `export FACTORY_API_KEY=fk-...`
-  - Windows (PowerShell): `$env:FACTORY_API_KEY="fk-..."`
-  - Windows (CMD): `set FACTORY_API_KEY=fk-...`
+  <Step title="Set Environment Variable">
+    Export your API key as an environment variable:
+    ```bash
+    export FACTORY_API_KEY=fk-...
+    ```
+  </Step>
+</Steps>
 
 ## Quickstart
 
@@ -364,7 +370,3 @@ droid exec --auto low "Run a quick audit for sync child_process usage and propos
 - Avoid `--skip-permissions-unsafe` unless fully sandboxed.
 - Ask the agent to emit artifacts your pipeline can verify.
 - Use `--cwd` to constrain scope in monorepos.
-
-<Note>
-  For advanced automation patterns and real-world examples, see the [Automation Cookbook](/cli/droid-exec/automation-cookbook).
-</Note>
