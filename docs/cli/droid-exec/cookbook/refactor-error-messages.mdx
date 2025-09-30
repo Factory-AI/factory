@@ -3,7 +3,11 @@ title: 'Mass Refactors: Error Messages'
 description: 'Automatically improve Error messages across your entire codebase using Droid Exec'
 ---
 
-This tutorial demonstrates how to use Droid Exec to refactor error messages across hundreds of files simultaneously. The script intelligently finds all ResponseError instantiations and improves their messages to be more descriptive, actionable, and user-friendly.
+This tutorial demonstrates how to use Droid Exec to refactor error messages across hundreds of files simultaneously. The script intelligently finds all ResponseError instantiations and improves their messages to be more descriptive, actionable, and user-friendly. 
+
+<Info>
+ResponseError is Factory's internal error handling class used to throw HTTP-style errors with specific status codes (e.g., ResponseError400BadRequest, ResponseError401Unauthorized...). These error classes are used throughout the codebase to handle API errors. They used to contain generic messages like "Invalid request" or "Not found" that didn't provide enough context for users/developers to understand what went wrong or how to fix it.
+</Info>
 
 ## How it works
 
