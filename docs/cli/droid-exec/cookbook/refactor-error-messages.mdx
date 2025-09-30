@@ -17,17 +17,6 @@ The script:
 6. **User-friendly language**: Removes technical jargon
 7. **Preserves metadata**: Keeps error codes and metadata intact
 
-## Real-world impact
-
-<CardGroup cols={2}>
-  <Card title="Files Processed" icon="files">
-    Process hundreds of error messages in parallel
-  </Card>
-  <Card title="Better UX" icon="user-check">
-    Transform vague errors into helpful guidance
-  </Card>
-</CardGroup>
-
 ## Get the script
 
 <Accordion title="View full script source">
@@ -313,166 +302,77 @@ Error messages improved: ~35
 
 ## Real-world transformations
 
-### Example 1: API Key Validation
-
-<Tabs>
-  <Tab title="Before">
-    ```typescript
-    // handlers.ts
-    if (!isValidApiKeyFormat(apiKey)) {
-      throw new ResponseError400BadRequest('Invalid api key format', {
-        apiKey: apiKey.substring(0, 8) + '...',
-      });
-    }
-    ```
-  </Tab>
-  
-  <Tab title="After">
-    ```typescript
-    // handlers.ts
-    if (!isValidApiKeyFormat(apiKey)) {
-      throw new ResponseError400BadRequest(
-        'API key must be a 32-character alphanumeric string starting with "fac_". Please check your API key format.',
-        {
-          apiKey: apiKey.substring(0, 8) + '...',
-        }
-      );
-    }
-    ```
-    <Note>Specific format requirements and prefix hint added</Note>
-  </Tab>
-</Tabs>
-
-### Example 2: Authentication Errors
+### Example 1: Session Authentication
 
 <Tabs>
   <Tab title="Before">
     ```typescript
     // middleware.ts
-    if (!session) {
-      throw new ResponseError401Unauthorized('No session cookie found');
+    if (!sessionCookie?.value) {
+      throw new ResponseError401Unauthorized('No session');
     }
 
-    if (!isValidCsrfToken(token)) {
-      throw new ResponseError401Unauthorized('Invalid CSRF token');
+    if (!userRecord) {
+      throw new ResponseError401Unauthorized('Invalid session');
     }
     ```
-
   </Tab>
   
   <Tab title="After">
     ```typescript
     // middleware.ts
-    if (!session) {
+    if (!sessionCookie?.value) {
       throw new ResponseError401Unauthorized(
-        'Your session has expired. Please sign in again to continue.'
+        'Session cookie not found. Please sign in again to access the admin dashboard.'
       );
     }
 
-    if (!isValidCsrfToken(token)) {
+    if (!userRecord) {
       throw new ResponseError401Unauthorized(
-        'Security validation failed. Please refresh the page and try again.'
+        'Session is invalid or has expired. Please sign in again to continue.'
       );
     }
     ```
-    <Note>Technical terms replaced with user-friendly instructions</Note>
-
+    <Note>Clear instructions on what went wrong and how to fix it</Note>
   </Tab>
 </Tabs>
 
-### Example 3: Resource Not Found
+### Example 2: Bearer Token Authorization
 
 <Tabs>
   <Tab title="Before">
     ```typescript
-    // route.ts
-    const org = await getOrganizationById(orgId);
-    if (!org) {
-      throw new ResponseError404NotFound('Organization not found', {
-        orgId,
-      });
+    // middleware.ts
+    if (!authHeader) {
+      throw new ResponseError401Unauthorized('Missing auth header');
     }
 
-    const promotion = await getPromotionById(promotionId);
-    if (!promotion) {
-      throw new ResponseError404NotFound('Promotion not found', { promotionId });
+    if (authHeader !== `Bearer ${secret}`) {
+      throw new ResponseError401Unauthorized('Invalid token');
     }
     ```
-
   </Tab>
   
   <Tab title="After">
     ```typescript
-    // route.ts
-    const org = await getOrganizationById(orgId);
-    if (!org) {
-      throw new ResponseError404NotFound(
-        `Organization with ID "${orgId}" not found. Please verify the organization exists and you have access to it.`,
-        {
-          orgId,
-        }
+    // middleware.ts
+    if (!authHeader) {
+      throw new ResponseError401Unauthorized(
+        'Authorization header is missing. Please include a valid Bearer token in the Authorization header.'
       );
     }
 
-    const promotion = await getPromotionById(promotionId);
-    if (!promotion) {
-      throw new ResponseError404NotFound(
-        `Promotion code "${promotionId}" not found. It may have been deleted or expired.`,
-        { promotionId }
+    if (authHeader !== `Bearer ${secret}`) {
+      throw new ResponseError401Unauthorized(
+        'Invalid or expired authorization token. Please verify your API credentials and ensure the token is properly formatted as "Bearer <token>".'
       );
     }
     ```
-    <Note>Context about what was searched and possible reasons added</Note>
-
+    <Note>Specific format requirements and troubleshooting hints added</Note>
   </Tab>
 </Tabs>
 
-### Example 4: Validation Errors
 
-<Tabs>
-  <Tab title="Before">
-    ```typescript
-    // invite-member/route.ts
-    if (!email || !isValidEmail(email)) {
-      throw new ResponseError400BadRequest('Invalid email address');
-    }
-
-    if (existingUser) {
-      throw new ResponseError422InvalidData('User is already a member');
-    }
-
-    if (members.length >= limit) {
-      throw new ResponseError400BadRequest('Member limit reached');
-    }
-    ```
-
-  </Tab>
-  
-  <Tab title="After">
-    ```typescript
-    // invite-member/route.ts
-    if (!email || !isValidEmail(email)) {
-      throw new ResponseError400BadRequest(
-        'Please provide a valid email address in the format: user@example.com'
-      );
-    }
-
-    if (existingUser) {
-      throw new ResponseError422InvalidData(
-        `${email} is already a member of this organization and cannot be invited again.`
-      );
-    }
-
-    if (members.length >= limit) {
-      throw new ResponseError400BadRequest(
-        `Your organization has reached its member limit of ${limit}. Please upgrade your plan to add more members.`
-      );
-    }
-    ```
-    <Note>Actionable guidance and next steps provided</Note>
-
-  </Tab>
-</Tabs>
 
 ## Best practices
 
@@ -512,7 +412,3 @@ Error messages improved: ~35
     commit -m "refactor(factory-app): improve error messages" ```
   </Step>
 </Steps>
-
-## Community examples
-
-Share your error message improvements on Twitter/X and tag @FactoryAI.
