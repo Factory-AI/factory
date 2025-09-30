@@ -372,15 +372,7 @@ Once ready, run the actual fix:
       const searchParams = req.nextUrl.searchParams;
       const userId = searchParams.get('userId');
       
-      if (!userId) {
-        return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
-      }
-      
-      const db = await getFirestoreInstance();
-      const sessions = await db
-        .collection('sessions')
-        .where('userId', '==', userId)
-        .get();
+      ...
       
       return NextResponse.json({
         sessions: sessions.docs.map(doc => doc.data())
@@ -402,15 +394,7 @@ Once ready, run the actual fix:
         const searchParams = req.nextUrl.searchParams;
         const userId = searchParams.get('userId');
         
-        if (!userId) {
-          return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
-        }
-        
-        const db = await getFirestoreInstance();
-        const sessions = await db
-          .collection('sessions')
-          .where('userId', '==', userId)
-          .get();
+        ...
         
         return NextResponse.json({
           sessions: sessions.docs.map(doc => doc.data())
@@ -429,7 +413,6 @@ Once ready, run the actual fix:
     ```typescript
     // apps/factory-admin/src/app/api/cron/batch-friction/poll-and-report/route.ts
     export async function GET(request: NextRequest) {
-      // WARNING: Missing handleCronMiddleware - this violates the lint rule!
       
       logInfo('[poll-report] Starting poll and report workflow');
 
@@ -487,117 +470,6 @@ Once ready, run the actual fix:
     }
     ```
     <Note>Now protected by cron secret, entire handler wrapped in middleware</Note>
-  </Tab>
-</Tabs>
-
-### Example 3: Admin Route with Role Check
-
-<Tabs>
-  <Tab title="Before">
-    ```typescript
-    // apps/factory-admin/src/app/api/orgs/[orgId]/delete/route.ts
-    import { NextRequest, NextResponse } from 'next/server';
-    import { deleteOrganization } from '@factory/services/orgs';
-    
-    export async function DELETE(
-      req: NextRequest,
-      { params }: { params: { orgId: string } }
-    ) {
-      const { orgId } = params;
-      
-      // Dangerous - no auth or permission check!
-      await deleteOrganization(orgId);
-      
-      return NextResponse.json({ success: true });
-    }
-    ```
-    <Note>Critical admin operation without any authorization!</Note>
-  </Tab>
-  
-  <Tab title="After">
-    ```typescript
-    // apps/factory-admin/src/app/api/orgs/[orgId]/delete/route.ts
-    import { NextRequest, NextResponse } from 'next/server';
-    import { deleteOrganization } from '@factory/services/orgs';
-    import { handleAuthenticatedMiddleware, AdminRole } from '@/app/api/_utils/middleware';
-    
-    export async function DELETE(
-      req: NextRequest,
-      { params }: { params: { orgId: string } }
-    ) {
-      return handleAuthenticatedMiddleware(
-        req,
-        async ({ req, user }) => {
-          const { orgId } = params;
-          
-          await deleteOrganization(orgId);
-          
-          return NextResponse.json({ success: true });
-        },
-        { 
-          requiredRole: AdminRole.SUPERADMIN,
-          context: 'Delete organization'
-        }
-      );
-    }
-    ```
-    <Note>Now requires SUPERADMIN role with proper error handling</Note>
-  </Tab>
-</Tabs>
-
-### Example 4: Public Webhook Handler
-
-<Tabs>
-  <Tab title="Before">
-    ```typescript
-    // apps/factory-app/src/app/api/webhooks/stripe/route.ts
-    import { NextRequest, NextResponse } from 'next/server';
-    import { handleStripeWebhook } from '@factory/services/stripe';
-    
-    export async function POST(req: NextRequest) {
-      const body = await req.text();
-      const signature = req.headers.get('stripe-signature');
-      
-      if (!signature) {
-        return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
-      }
-      
-      try {
-        await handleStripeWebhook(body, signature);
-        return NextResponse.json({ received: true });
-      } catch (error) {
-        return NextResponse.json({ error: 'Webhook failed' }, { status: 400 });
-      }
-    }
-    ```
-  </Tab>
-  
-  <Tab title="After">
-    ```typescript
-    // apps/factory-app/src/app/api/webhooks/stripe/route.ts
-    import { NextRequest, NextResponse } from 'next/server';
-    import { handleStripeWebhook } from '@factory/services/stripe';
-    import { handlePublicMiddleware } from '@/app/api/_utils/middleware';
-    
-    export async function POST(req: NextRequest) {
-      return handlePublicMiddleware(
-        req,
-        async (req) => {
-          const body = await req.text();
-          const signature = req.headers.get('stripe-signature');
-          
-          if (!signature) {
-            return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
-          }
-          
-          await handleStripeWebhook(body, signature);
-          return NextResponse.json({ received: true });
-        },
-        { context: 'Stripe webhook' }
-      );
-    }
-    ```
-    <Note>Public endpoint with consistent error handling and logging</Note>
   </Tab>
 </Tabs>
 
