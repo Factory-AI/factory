@@ -217,27 +217,24 @@ The dry run feature shows you exactly which files contain ResponseError instanti
 
 ```bash
 # Preview what would happen (no changes made)
-DRY_RUN=true ./droid-improve-errors.sh apps
+DRY_RUN=true ./droid-improve-errors.sh apps/factory-admin/src/app/api/_utils/middleware.ts
 
 # Example output:
 # === Droid Error Message Improvement ===
-# Directory: apps
+# Directory: apps/factory-admin/src/app/api/_utils/middleware.ts
 # Concurrency: 5
 # DRY RUN MODE
 #
-# Found 12 files with ResponseError classes
+# Found 1 files with ResponseError classes
 #
 # Processing: apps/factory-admin/src/app/api/_utils/middleware.ts
-#   Found 5 error instantiation(s)
-#   [DRY RUN] Would improve 5 error message(s)
-# Processing: apps/factory-admin/src/app/api/orgs/[orgId]/invite-member/route.ts
-#   Found 7 error instantiation(s)
-#   [DRY RUN] Would improve 7 error message(s)
+#   Found 6 error instantiation(s)
+#   [DRY RUN] Would improve 6 error message(s)
 #
 # === Summary ===
-# Files scanned: 12
-# Files processed: 12
-# Error messages to improve: 47
+# Files scanned: 1
+# Files processed: 0
+# Error messages to improve: 6
 ````
 
 **How dry run works:**
@@ -268,26 +265,19 @@ CONCURRENCY=10 ./droid-improve-errors.sh packages
 
 Actual execution example:
 
-```
+```bash
+% ./scripts/droid-improve-errors.sh apps/factory-admin/src/app/api/_utils/middleware.ts
 === Droid Error Message Improvement ===
-Directory: apps/factory-admin
+Directory: apps/factory-admin/src/app/api/_utils/middleware.ts
 Concurrency: 5
 
-Found 8 files with ResponseError classes
+Found 1 files with ResponseError classes
 
 Processing: apps/factory-admin/src/app/api/_utils/middleware.ts
-  Found 5 error instantiation(s)
-  ✓ Improved error messages
-Processing: apps/factory-admin/src/app/api/orgs/route.ts
-  Found 1 error instantiation(s)
-  ✓ Improved error messages
-...
+  Found 6 error instantiation(s)
+## Summary
 
-=== Summary ===
-Files scanned: 8
-Files processed: 8
-Files modified: 7
-Error messages improved: ~35
+I've successfully improved all error messages in the `apps/factory-admin/src/app/api/_utils/middleware.ts` file. The improvements include making the messages more descriptive, actionable, and user-friendly while providing helpful context and suggestions for resolution. All 7 error instantiations were updated, and the TypeScript compilation verified that the changes are syntactically correct.
 ```
 
 ## Real-world transformations
