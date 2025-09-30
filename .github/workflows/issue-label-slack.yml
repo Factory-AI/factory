@@ -3,77 +3,17 @@ name: Issue label Slack notifier
 on:
   issues:
     types:
-      - opened
       - labeled
 
 jobs:
   notify:
     runs-on: ubuntu-latest
-    if: |
-      github.event.action == 'opened' || github.event.action == 'labeled'
     steps:
-      - name: Determine Slack channel
-        id: route
+      - name: Prepare summary
+        id: prepare
         uses: actions/github-script@v7
-        env:
-          LABEL_WEBHOOK_MAP: ${{ vars.ISSUE_LABEL_WEBHOOK_MAP }}
-          DEFAULT_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           script: |
-            const mapInput = (process.env.LABEL_WEBHOOK_MAP || '').trim();
-            const mappings = new Map();
-            if (mapInput) {
-              for (const line of mapInput.split(/\r?\n/)) {
-                if (!line.trim()) continue;
-                const [labelName, webhookUrl] = line.split('=');
-                if (labelName && webhookUrl) {
-                  mappings.set(labelName.trim(), webhookUrl.trim());
-                }
-              }
-            }
-
-            const defaultWebhook = (process.env.DEFAULT_WEBHOOK || '').trim();
-            const action = context.payload.action;
-            const issueLabels = (context.payload.issue.labels || []).map(label => label.name).filter(Boolean);
-            const candidates = [];
-
-            if (action === 'labeled' && context.payload.label?.name) {
-              candidates.push(context.payload.label.name);
-            }
-
-            for (const name of issueLabels) {
-              if (!candidates.includes(name)) {
-                candidates.push(name);
-              }
-            }
-
-            if (candidates.length === 0) {
-              core.setFailed('No labels available to determine Slack webhook.');
-              return;
-            }
-
-            let webhook;
-            let matchedLabel;
-            for (const candidate of candidates) {
-              if (mappings.has(candidate)) {
-                webhook = mappings.get(candidate);
-                matchedLabel = candidate;
-                break;
-              }
-            }
-
-            if (!webhook) {
-              webhook = defaultWebhook;
-              matchedLabel = candidates[0];
-            }
-
-            if (!webhook) {
-              core.setFailed('No Slack webhook matched and no default webhook provided.');
-              return;
-            }
-
-            core.setOutput('webhook', webhook);
-            core.setOutput('label', matchedLabel);
             const issueBody = (context.payload.issue.body || '').trim();
             let summary = issueBody;
             if (summary) {
@@ -99,10 +39,10 @@ jobs:
 
       - name: Send Slack notification
         env:
-          WEBHOOK_URL: ${{ steps.route.outputs.webhook }}
+          WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           ISSUE_URL: ${{ github.event.issue.html_url }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
-          ISSUE_SUMMARY: ${{ steps.route.outputs.summary }}
+          ISSUE_SUMMARY: ${{ steps.prepare.outputs.summary }}
         run: |
           if [ -z "${WEBHOOK_URL}" ]; then
             echo "Slack webhook URL not provided." >&2
