@@ -1,47 +1,234 @@
 ---
 title: Bring Your Own Key
-description: Bring your own model api keys
+description: Connect your own API keys, use open source models, or run local models
 ---
+
+Factory CLI supports custom model configurations through BYOK (Bring Your Own Key). Use your own OpenAI or Anthropic keys, connect to any open source model providers (like OpenRouter), or run models locally on your hardware. Once configured, switch between models using the `/model` command.
+
+<Note>
+  Your API keys remain local and are not uploaded to Factory servers. Custom models are only available in the CLI and won't appear in Factory's web or mobile platforms.
+</Note>
+
+<img src="/images/custom_models.png" alt="Model selector showing custom models" />
 
 [Install the CLI with the 5-minute quickstart →](/cli/getting-started/quickstart)
 
-## Where to configure
+---
+
+## Configuration Reference
+
 Add custom models in `~/.factory/config.json` under the `custom_models` array.
 
-## Supported fields
-- `model`: The name of the model
-- `base_url`: The API base url
-- `api_key`: The API key
-- `provider`: One of:
-  - `anthropic` (for endpoints compatible with Anthropic’s Messages API)
-  - `openai` (for endpoints compatible with OpenAI's Responses API)
+### Supported Fields
 
-## Example configuration
-Place this in `~/.factory/config.json`:
+| Field | Required | Description |
+|-------|----------|-------------|
+| `model_display_name` | ✓ | Human-friendly name shown in model selector |
+| `model` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
+| `base_url` | ✓ | API endpoint base URL |
+| `api_key` | ✓ | Your API key for the provider. Can't be empty. |
+| `provider` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
+| `max_tokens` | ✓ | Maximum output tokens for model responses |
+
+---
+
+## Understanding Providers
+
+Factory supports three provider types that determine API compatibility:
+
+| Provider | API Format | Use For | Documentation |
+|----------|------------|---------|---------------|
+| `anthropic` | Anthropic Messages API (v1/messages) | Anthropic models on their official API or compatible proxies | [Anthropic Messages API](https://docs.claude.com/en/api/messages) |
+| `openai` | OpenAI Responses API | OpenAI models on their official API or compatible proxies. Required for the newest models like GPT-5 and GPT-5-Codex. | [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) |
+| `generic-chat-completion-api` | OpenAI Chat Completions API | OpenRouter, Fireworks, Together AI, Ollama, vLLM, and most open-source providers | [OpenAI Chat Completions API](https://platform.openai.com/docs/api-reference/chat) |
+
+<Warning>
+  Factory is actively verifying Droid's performance on popular models, but we cannot guarantee that all custom models will work out of the box. Only Anthropic and OpenAI models accessed via their official APIs are fully tested and benchmarked.
+</Warning>
+
+---
+
+## Prompt Caching
+
+Factory CLI automatically uses prompt caching when available to reduce API costs:
+
+- **Official providers (`anthropic`, `openai`)**: Factory attempts to use prompt caching via the official APIs. Caching behavior follows each provider's implementation and requirements.
+- **Generic providers (`generic-chat-completion-api`)**: Prompt caching support varies by provider and cannot be guaranteed. Some providers may support caching, while others may not.
+
+### Verifying Prompt Caching
+
+To check if prompt caching is working correctly with your custom model:
+
+1. Run a conversation with your custom model
+2. Use the `/cost` command in Droid CLI to view cost breakdowns
+3. Look for cache hit rates and savings in the output
+
+If you're not seeing expected caching savings, consult your provider's documentation about their prompt caching support and requirements.
+
+---
+
+## Quick Start Examples
+
+### Bring Your Own OpenAI/Anthropic Keys
+
+Use your own API keys for cost control and billing transparency:
 
 ```json
 {
   "custom_models": [
     {
-      "model": "claude-sonnet-4-20250514",
+      "model_display_name": "Sonnet 4.5 [Custom]",
+      "model": "claude-sonnet-4-5-20250929",
       "base_url": "https://api.anthropic.com",
-      "api_key": "<api_key>",
+      "api_key": "YOUR_ANTHROPIC_KEY",
       "provider": "anthropic"
     },
     {
-      "model": "gpt-4.1",
+      "model_display_name": "GPT5-Codex [Custom]",
+      "model": "gpt-5-codex",
       "base_url": "https://api.openai.com/v1",
-      "api_key": "<api_key>",
+      "api_key": "YOUR_OPENAI_KEY",
       "provider": "openai"
     }
   ]
 }
 ```
 
-## Using custom models with droid
-- Use the `/model` command to open the Model Selector.
-- Custom models will appear below Factory provided models.
+### Access via OpenRouter
+
+Connect to OpenRouter for access to models from multiple providers:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GPT-OSS-20B",
+      "model": "openai/gpt-oss-20b",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32000
+    }
+  ]
+}
+```
+
+Browse available models at [openrouter.ai/models](https://openrouter.ai/models).
+
+### Connect to Fireworks, Hugging Face, or Other Providers
+
+Access specialized or optimized model deployments:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GLM 4.5",
+      "model": "accounts/fireworks/models/glm-4p5",
+      "base_url": "https://api.fireworks.ai/inference/v1/",
+      "api_key": "YOUR_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    },
+    {
+      "model_display_name": "Kimi K2",
+      "model": "accounts/fireworks/models/kimi-k2-instruct-0905",
+      "base_url": "https://api.fireworks.ai/inference/v1/",
+      "api_key": "YOUR_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32768
+    }
+  ]
+}
+```
+
+Check your provider's documentation for available model IDs and base URLs.
+
+### Connect to Google Gemini
+
+Access Google's Gemini models using your Gemini AI API key:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Gemini 2.5 Pro",
+      "model": "gemini-2.5-pro",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/",
+      "api_key": "YOUR_GEMINI_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32000
+    }
+  ]
+}
+```
+
+### Run Local Models (Ollama, vLLM, etc.)
+
+Run models on your own hardware:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Qwen:4b [Local]",
+      "model": "qwen3:4b",
+      "base_url": "http://localhost:11434/v1/",
+      "api_key": "not-needed",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 4000
+    }
+  ]
+}
+```
+
+<Tip>
+  Local servers often don't require API keys, but the `api_key` field is still required. Use any placeholder value.
+</Tip>
+
+---
+
+## Using Custom Models
+
+Once configured, access your custom models in the CLI:
+
+1. Use the `/model` command
+2. Your custom models appear in a separate "Custom models" section below Factory-provided models
+3. Select any model to start using it
+
+Custom models display with the name you set in `model_display_name`, making it easy to identify different providers and configurations.
+
+---
+
+## Troubleshooting
+
+### Model not appearing in selector
+- Check JSON syntax in `~/.factory/config.json`
+- Restart the CLI after making configuration changes
+- Verify all required fields are present
+
+### "Invalid provider" error
+- Provider must be exactly `anthropic`, `openai`, or `generic-chat-completion-api`
+- Check for typos and ensure proper capitalization
+
+### Authentication errors
+- Verify your API key is valid and has available credits
+- Check that the API key has proper permissions
+- Confirm the base URL matches your provider's documentation
+
+### Local model won't connect
+- Ensure your local server is running (e.g., `ollama serve`)
+- Verify the base URL is correct and includes `/v1/` suffix if required
+- Check that the model is pulled/available locally
+
+### Rate limiting or quota errors
+- Check your provider's rate limits and usage quotas
+- Consider adding multiple API keys for load balancing
+- Monitor your usage through your provider's dashboard
+
+---
 
 ## Billing
-- Custom models are free to use with Factory.
 
+- You pay your provider directly with no Factory markup or usage fees
+- Track costs and usage in your provider's dashboard
