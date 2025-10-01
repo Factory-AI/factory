@@ -14,10 +14,10 @@ Unlike interactive CLI sessions, Droid Exec runs in headless mode, making it per
 The workflow:
 
 1.  Triggers on pull request events
-2.  Fetches existing bot comments to avoid duplicates
-3.  Generates a diff and uses Droid Exec to analyze changes
-4.  Posts inline comments on specific lines with issues
-5.  Falls back to issue comments if inline review fails
+2.  Checks out the PR and installs the Droid CLI
+3.  Configures git identity and prepares review context files
+4.  Runs Droid Exec to analyze the diff and produce review comments
+5.  Submits inline comments or a summary, uploading debug artifacts on failure
 
 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
   <div style={{ flex: '1', minWidth: '300px' }}>
@@ -30,7 +30,8 @@ The workflow:
 
 <Accordion title="Full Workflow File">
 ````yaml
-name: Droid PR Review
+name: Droid Code Review
+
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -39,224 +40,199 @@ concurrency:
   group: droid-review-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
+permissions:
+  pull-requests: write
+  contents: read
+  issues: write
+
 jobs:
-  review:
+  code-review:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
+    # Skip automated code review for draft PRs
     if: github.event.pull_request.draft == false
 
     steps:
-      - name: Checkout PR
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Setup droid CLI
+      - name: Install Droid CLI
         run: |
           curl -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          $HOME/.local/bin/droid --version
+          "$HOME/.local/bin/droid" --version
 
-      - name: Fetch existing bot comments
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const { owner, repo } = context.repo;
-            const pull_number = context.issue.number;
+      - name: Configure git identity
+        run: |
+          git config user.name "Droid Agent"
+          git config user.email "droidagent@factory.ai"
 
-            const comments = await github.paginate(github.rest.pulls.listReviewComments, {
-              owner,
-              repo,
-              pull_number,
-            });
+      - name: Prepare review context
+        run: |
+          # Get the PR diff
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git diff origin/${{ github.event.pull_request.base.ref }}...${{ github.event.pull_request.head.sha }} > diff.txt
 
-            const botComments = comments.filter((comment) => {
-              const user = comment.user;
-              if (!user) return false;
-              return user.type === 'Bot' || (user.login && user.login.includes('github-actions'));
-            });
+          # Get existing comments using GitHub API
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+               > existing_comments.json
 
-            fs.writeFileSync('existing_comments.json', JSON.stringify(botComments, null, 2));
+          # Get changed files with patches for positioning
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+               | jq '[.[] | {filename: .filename, patch: .patch}]' > files.json
 
-      - name: Generate and analyze diff
+      - name: Perform automated code review
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -euo pipefail
+          cat > prompt.txt << 'EOF'
+          You are an automated code review system. Review the PR diff and identify clear issues that need to be fixed.
 
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          git diff origin/${{ github.event.pull_request.base.ref }}...HEAD > pr.diff
+          Input files (already in current directory):
+          - diff.txt: the code changes to review
+          - files.json: file patches with line numbers for positioning comments
+          - existing_comments.json: skip issues already mentioned here
 
-          cat > prompt.txt <<'EOF'
-          Review the PR diff and identify only critical issues that need fixing.
+          Task: Create a file called comments.json with this exact format:
+          [{ "path": "path/to/file.js", "position": 42, "body": "Your comment here" }]
 
-          FOCUS ON:
-          - Dead/unreachable code (if false, code after return)
-          - Broken control flow (missing break, infinite loops)
-          - Async/await mistakes (missing await, unhandled promises)
-          - React hook dependency issues
-          - Type safety issues (wrong operators, null derefs)
-          - Security vulnerabilities (SQL injection, XSS)
-          - Clear bugs that will cause runtime errors
+          Focus on these types of issues:
+          - Dead/unreachable code (if (false), while (false), code after return/throw/break)
+          - Broken control flow (missing break in switch, fallthrough bugs)
+          - Async/await mistakes (missing await, .then without return, unhandled promise rejections)
+          - Array/object mutations in React components or reducers
+          - UseEffect dependency array problems (missing deps, incorrect deps)
+          - Incorrect operator usage (== vs ===, && vs ||, = in conditions)
+          - Off-by-one errors in loops or array indexing
+          - Integer overflow/underflow in calculations
+          - Regex catastrophic backtracking vulnerabilities
+          - Missing base cases in recursive functions
+          - Incorrect type coercion that changes behavior
+          - Environment variable access without defaults or validation
+          - Null/undefined dereferences
+          - Resource leaks (unclosed files or connections)
+          - SQL/XSS injection vulnerabilities
+          - Concurrency/race conditions
+          - Missing error handling for critical operations
 
-          SKIP:
-          - Style, formatting, naming conventions
-          - Minor optimizations
-          - Architecture or design patterns
-          - Test coverage suggestions
-          - Already reported issues in existing_comments.json
+          Comment format:
+          - Clearly describe the issue: "This code block is unreachable due to the if (false) condition"
+          - Provide a concrete fix: "Remove this entire if block as it will never execute"
+          - When possible, suggest the exact code change:
+            ```suggestion
+            // Remove the unreachable code
+            ```
+          - Be specific about why it's a problem: "This will cause a TypeError if input is null"
+          - No emojis, just clear technical language
 
-          Output a JSON array of inline comments:
-          [
-            {
-              "path": "file/path.js",
-              "line": 42,
-              "body": "Issue: [description]\\nFix: [specific solution]"
-            }
-          ]
+          Skip commenting on:
+          - Code style, formatting, or naming conventions
+          - Minor performance optimizations
+          - Architectural decisions or design patterns
+          - Features or functionality (unless broken)
+          - Test coverage (unless tests are clearly broken)
 
-          Use GitHub review “position” (not file line). Compute positions from pr.diff. If no critical issues, output []
-          Files to review:
-          - pr.diff: the full PR diff
-          - existing_comments.json: skip exact duplicates
+          Position calculation:
+          - Use the "position" field from files.json patches
+          - This is the line number in the diff, not the file
+          - Comments must align with exact changed lines only
+
+          Output: 
+          - Empty array [] if no issues found
+          - Otherwise array of comment objects with path, position, body
+          - Each comment should be actionable and clear about what needs to be fixed
+          - Maximum 10 comments total; prioritize the most critical issues
           EOF
 
-          # Append artifacts so Droid sees actual diff and prior comments
-          {
-            printf "\n--- BEGIN pr.diff ---\n";
-            cat pr.diff;
-            printf "\n--- END pr.diff ---\n";
-            printf "\n--- BEGIN existing_comments.json ---\n";
-            cat existing_comments.json || true;
-            printf "\n--- END existing_comments.json ---\n";
-          } >> prompt.txt
+          # Run droid exec with the prompt
+          echo "Running code review analysis..."
+          droid exec --auto high -f prompt.txt
 
-          if ! droid exec --auto medium --model gpt-5-codex --output-format json -f prompt.txt > comments.json 2>review_output.log; then
-            echo "droid exec failed"
-            cat review_output.log
+          # Check if comments.json was created
+          if [ ! -f comments.json ]; then
+            echo "❌ ERROR: droid exec did not create comments.json"
+            echo "This usually indicates the review run failed (e.g. missing FACTORY_API_KEY or runtime error)."
             exit 1
           fi
 
-          if ! python3 -m json.tool < comments.json > /dev/null 2>&1; then
-            echo "Invalid JSON in comments.json, defaulting to empty array"
-            cp comments.json review_output.log || true
-            echo "[]" > comments.json
-          fi
+          echo "=== Review Results ==="
+          cat comments.json
 
-      - name: Post review
+      - name: Submit inline review comments
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
+            const prNumber = context.payload.pull_request.number;
 
-            const { owner, repo } = context.repo;
-            const pull_number = context.issue.number;
-            const headSha = context.payload.pull_request.head.sha;
-            const commentsPath = 'comments.json';
-
-            const readComments = () => {
-              if (!fs.existsSync(commentsPath)) {
-                core.info('No comments file found.');
-                return [];
-              }
-
-              try {
-                const data = JSON.parse(fs.readFileSync(commentsPath, 'utf8'));
-                return Array.isArray(data) ? data : [];
-              } catch (error) {
-                core.warning(`Failed to parse comments.json: ${error.message}`);
-                return [];
-              }
-            };
-
-            const postBatchReview = async (body, comments = []) => {
-              const payload = { owner, repo, pull_number, event: 'COMMENT', body };
-              if (comments.length) payload.comments = comments; // needs path+position+body
-              await github.rest.pulls.createReview(payload);
-            };
-
-            const postPerComment = async (comments) => {
-              for (const c of comments) {
-                // expects: path, line (new file), side ("RIGHT"), body
-                await github.rest.pulls.createReviewComment({
-                  owner,
-                  repo,
-                  pull_number,
-                  commit_id: headSha,
-                  path: c.path,
-                  line: c.line,
-                  side: c.side || 'RIGHT',
-                  body: c.body,
-                });
-              }
-            };
-
-            const postIssueSummary = async (comments) => {
-              const body = comments
-                .map((c) => {
-                  const loc = c.position != null ? `${c.path}:${c.position}` :
-                             c.line != null ? `${c.path}:${c.line}` : c.path;
-                  return `**${loc}**\n${c.body}`;
-                })
-                .join('\n\n---\n\n');
-
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pull_number,
-                body: `🔍 Automated review found issues:\n\n${body}`,
-              });
-            };
-
-            const comments = readComments();
-
-            if (!comments.length) {
-              await postBatchReview('✅ Automated review complete - no critical issues found.');
+            if (!fs.existsSync('comments.json')) {
+              core.info('comments.json missing; skipping review submission');
               return;
             }
 
-            const hasOnlyPositions = comments.every(c => Number.isInteger(c.position));
-            const hasAnyLine = comments.some(c => Number.isInteger(c.line));
+            const comments = JSON.parse(fs.readFileSync('comments.json', 'utf8'));
 
-            try {
-              if (hasOnlyPositions) {
-                await postBatchReview(`🔍 Automated review found ${comments.length} issue(s) requiring attention.`, comments);
-                core.info(`Posted ${comments.length} review comment(s) via batch (position).`);
-              } else if (hasAnyLine) {
-                await postPerComment(comments);
-                // Optional: add a summary review comment
-                await postBatchReview(`🔍 Automated review posted ${comments.length} inline comment(s).`);
-                core.info(`Posted ${comments.length} review comment(s) individually (line/side).`);
-              } else {
-                core.warning('Comments lack required fields (position or line). Falling back to issue comment.');
-                await postIssueSummary(comments);
+            if (!Array.isArray(comments) || comments.length === 0) {
+              // Check if we already have a "no issues" comment
+              const existing = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                per_page: 100
+              });
+              
+              const hasNoIssuesComment = existing.some(c => 
+                c.user.login.includes('[bot]') && 
+                /no issues found|lgtm|✅/i.test(c.body || '')
+              );
+              
+              if (!hasNoIssuesComment) {
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: prNumber,
+                  event: 'COMMENT',
+                  body: '✅ No issues found in the current changes.'
+                });
               }
-            } catch (error) {
-              core.warning(`Failed to post inline review: ${error.message}`);
-              try {
-                await postIssueSummary(comments);
-              } catch (fallbackError) {
-                core.setFailed(`Unable to post review: ${fallbackError.message}`);
-              }
+              return;
             }
 
-      - name: Upload artifacts on failure
-        if: failure()
+            // Submit review with inline comments
+            const summary = `Found ${comments.length} potential issue${comments.length === 1 ? '' : 's'} that should be addressed.`;
+
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              event: 'COMMENT',
+              body: summary,
+              comments: comments
+            });
+
+            core.info(`Submitted review with ${comments.length} inline comments`);
+
+      - name: Upload debug artifacts on failure
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: review-debug-${{ github.event.pull_request.number }}
+          name: droid-review-debug-${{ github.run_id }}
           path: |
-            pr.diff
-            prompt.txt
-            review_output.log
-            comments.json
+            diff.txt
+            files.json
             existing_comments.json
+            prompt.txt
+            comments.json
+            ${{ runner.home }}/.factory/logs/droid-log-single.log
+            ${{ runner.home }}/.factory/logs/console.log
           if-no-files-found: ignore
           retention-days: 7
 ````
@@ -296,7 +272,7 @@ Let's build the workflow step by step to understand each component.
 Create `.github/workflows/droid-code-review.yml` and configure when it should run:
 
 ```yaml
-name: Droid PR Review
+name: Droid Code Review
 
 on:
   pull_request:
@@ -309,21 +285,21 @@ concurrency:
 
 The `concurrency` group ensures only one review runs per PR at a time, canceling outdated runs when new commits are pushed.
 
-### Configure job permissions
+### Configure workflow permissions
 
-Set up the job with necessary permissions and conditions:
+Define the top-level permissions and job details used by the workflow:
 
 ```yaml
+permissions:
+  pull-requests: write
+  contents: read
+  issues: write
+
 jobs:
-  review:
+  code-review:
     runs-on: ubuntu-latest
-    timeout-minutes: 15  # Reduced timeout for faster feedback
-    
-    permissions:
-      contents: read       # Read repository contents
-      pull-requests: write # Post PR comments
-      issues: write        # Fallback comment posting
-    
+    timeout-minutes: 15
+
     # Skip draft PRs to avoid noise during development
     if: github.event.pull_request.draft == false
 
@@ -335,7 +311,7 @@ Add the checkout step to access the PR code:
 
 ```yaml
     steps:
-      - name: Checkout PR
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Full history for accurate diffs
@@ -347,205 +323,188 @@ Add the checkout step to access the PR code:
 Install the Factory Droid CLI in the runner:
 
 ```yaml
-      - name: Setup droid CLI
+      - name: Install Droid CLI
         run: |
           curl -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          $HOME/.local/bin/droid --version
+          "$HOME/.local/bin/droid" --version
 ```
 
-### Fetch existing bot comments
+### Configure git identity
 
-Before running the review, fetch existing bot comments to avoid duplicates:
+Set the git username and email so review comments originate from the expected bot account:
 
 ```yaml
-      - name: Fetch existing bot comments
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const { owner, repo } = context.repo;
-            const pull_number = context.issue.number;
-
-            const comments = await github.paginate(github.rest.pulls.listReviewComments, {
-              owner,
-              repo,
-              pull_number,
-            });
-
-            const botComments = comments.filter((comment) => {
-              const user = comment.user;
-              if (!user) return false;
-              return user.type === 'Bot' || (user.login && user.login.includes('github-actions'));
-            });
-
-            fs.writeFileSync('existing_comments.json', JSON.stringify(botComments, null, 2));
+      - name: Configure git identity
+        run: |
+          git config user.name "Droid Agent"
+          git config user.email "droidagent@factory.ai"
 ```
 
-### Generate and analyze diff
+### Prepare review context
 
-Now let's create the review step. The prompt defines what issues to look for and how to format comments:
+Gather the diff, existing comments, and file patches that Droid Exec will analyze:
+
+```yaml
+      - name: Prepare review context
+        run: |
+          # Get the PR diff
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git diff origin/${{ github.event.pull_request.base.ref }}...${{ github.event.pull_request.head.sha }} > diff.txt
+
+          # Get existing comments using GitHub API
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+               > existing_comments.json
+
+          # Get changed files with patches for positioning
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+               | jq '[.[] | {filename: .filename, patch: .patch}]' > files.json
+```
+
+### Run the automated review
+
+Craft a detailed prompt and execute Droid Exec to produce inline comments. The command relies on both `FACTORY_API_KEY` and `GITHUB_TOKEN` secrets:
 
 ````yaml
-      - name: Generate and analyze diff
+      - name: Perform automated code review
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -euo pipefail
+          cat > prompt.txt << 'EOF'
+          You are an automated code review system. Review the PR diff and identify clear issues that need to be fixed.
 
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          git diff origin/${{ github.event.pull_request.base.ref }}...HEAD > pr.diff
+          Input files (already in current directory):
+          - diff.txt: the code changes to review
+          - files.json: file patches with line numbers for positioning comments
+          - existing_comments.json: skip issues already mentioned here
 
-          cat > prompt.txt <<'EOF'
-          Review the PR diff and identify only critical issues that need fixing.
+          Task: Create a file called comments.json with this exact format:
+          [{ "path": "path/to/file.js", "position": 42, "body": "Your comment here" }]
 
-          FOCUS ON:
-          - Dead/unreachable code (if false, code after return)
-          - Broken control flow (missing break, infinite loops)
-          - Async/await mistakes (missing await, unhandled promises)
-          - React hook dependency issues
-          - Type safety issues (wrong operators, null derefs)
-          - Security vulnerabilities (SQL injection, XSS)
-          - Clear bugs that will cause runtime errors
+          Focus on these types of issues:
+          - Dead/unreachable code (if (false), while (false), code after return/throw/break)
+          - Broken control flow (missing break in switch, fallthrough bugs)
+          - Async/await mistakes (missing await, .then without return, unhandled promise rejections)
+          - Array/object mutations in React components or reducers
+          - UseEffect dependency array problems (missing deps, incorrect deps)
+          - Incorrect operator usage (== vs ===, && vs ||, = in conditions)
+          - Off-by-one errors in loops or array indexing
+          - Integer overflow/underflow in calculations
+          - Regex catastrophic backtracking vulnerabilities
+          - Missing base cases in recursive functions
+          - Incorrect type coercion that changes behavior
+          - Environment variable access without defaults or validation
+          - Null/undefined dereferences
+          - Resource leaks (unclosed files or connections)
+          - SQL/XSS injection vulnerabilities
+          - Concurrency/race conditions
+          - Missing error handling for critical operations
 
-          SKIP:
-          - Style, formatting, naming conventions
-          - Minor optimizations
-          - Architecture or design patterns
-          - Test coverage suggestions
-          - Already reported issues in existing_comments.json
+          Comment format:
+          - Clearly describe the issue: "This code block is unreachable due to the if (false) condition"
+          - Provide a concrete fix: "Remove this entire if block as it will never execute"
+          - When possible, suggest the exact code change:
+            ```suggestion
+            // Remove the unreachable code
+            ```
+          - Be specific about why it's a problem: "This will cause a TypeError if input is null"
+          - No emojis, just clear technical language
 
-          Output a JSON array of inline comments:
-          [
-            {
-              "path": "file/path.js",
-              "line": 42,
-              "side": "RIGHT",
-              "body": "Issue: [description]\nFix: [specific solution]"
-            }
-          ]
+          Skip commenting on:
+          - Code style, formatting, or naming conventions
+          - Minor performance optimizations
+          - Architectural decisions or design patterns
+          - Features or functionality (unless broken)
+          - Test coverage (unless tests are clearly broken)
 
-          If no critical issues found, output empty array: []
+          Position calculation:
+          - Use the "position" field from files.json patches
+          - This is the line number in the diff, not the file
+          - Comments must align with exact changed lines only
 
-          Files to review:
-          - pr.diff: the full PR diff
-          - existing_comments.json: skip exact duplicates
+          Output: 
+          - Empty array [] if no issues found
+          - Otherwise array of comment objects with path, position, body
+          - Each comment should be actionable and clear about what needs to be fixed
+          - Prioritize the most critical issues
           EOF
 
-          if ! droid exec --auto medium --model gpt-5-codex --output-format json -f prompt.txt > comments.json 2>review_output.log; then
-            echo "droid exec failed"
-            cat review_output.log
+          echo "Running code review analysis..."
+          droid exec --auto high -f prompt.txt
+
+          if [ ! -f comments.json ]; then
+            echo "❌ ERROR: droid exec did not create comments.json"
+            echo "This usually indicates the review run failed (e.g. missing FACTORY_API_KEY or runtime error)."
             exit 1
           fi
 
-          if ! python3 -m json.tool < comments.json > /dev/null 2>&1; then
-            echo "Invalid JSON in comments.json, defaulting to empty array"
-            cp comments.json review_output.log || true
-            echo "[]" > comments.json
-          fi
+          echo "=== Review Results ==="
+          cat comments.json
 ````
 
-### Post the review
+### Submit review comments
 
-Post the generated comments as a PR review with inline comments or fallback to issue comments:
+Use `actions/github-script` to post inline feedback or a fallback summary based on the generated `comments.json`:
 
 ```yaml
-      - name: Post review
+      - name: Submit inline review comments
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
+            const prNumber = context.payload.pull_request.number;
 
-            const { owner, repo } = context.repo;
-            const pull_number = context.issue.number;
-            const headSha = context.payload.pull_request.head.sha;
-            const commentsPath = 'comments.json';
-
-            const readComments = () => {
-              if (!fs.existsSync(commentsPath)) {
-                core.info('No comments file found.');
-                return [];
-              }
-
-              try {
-                const data = JSON.parse(fs.readFileSync(commentsPath, 'utf8'));
-                return Array.isArray(data) ? data : [];
-              } catch (error) {
-                core.warning(`Failed to parse comments.json: ${error.message}`);
-                return [];
-              }
-            };
-
-            const postBatchReview = async (body, comments = []) => {
-              const payload = { owner, repo, pull_number, event: 'COMMENT', body };
-              if (comments.length) payload.comments = comments; // needs path+position+body
-              await github.rest.pulls.createReview(payload);
-            };
-
-            const postPerComment = async (comments) => {
-              for (const c of comments) {
-                // expects: path, line (new file), side ("RIGHT"), body
-                await github.rest.pulls.createReviewComment({
-                  owner,
-                  repo,
-                  pull_number,
-                  commit_id: headSha,
-                  path: c.path,
-                  line: c.line,
-                  side: c.side || 'RIGHT',
-                  body: c.body,
-                });
-              }
-            };
-
-            const postIssueSummary = async (comments) => {
-              const body = comments
-                .map((c) => {
-                  const loc = c.position != null ? `${c.path}:${c.position}` :
-                             c.line != null ? `${c.path}:${c.line}` : c.path;
-                  return `**${loc}**\n${c.body}`;
-                })
-                .join('\n\n---\n\n');
-
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pull_number,
-                body: `🔍 Automated review found issues:\n\n${body}`,
-              });
-            };
-
-            const comments = readComments();
-
-            if (!comments.length) {
-              await postBatchReview('✅ Automated review complete - no critical issues found.');
+            if (!fs.existsSync('comments.json')) {
+              core.info('comments.json missing; skipping review submission');
               return;
             }
 
-            const hasOnlyPositions = comments.every(c => Number.isInteger(c.position));
-            const hasAnyLine = comments.some(c => Number.isInteger(c.line));
+            const comments = JSON.parse(fs.readFileSync('comments.json', 'utf8'));
 
-            try {
-              if (hasOnlyPositions) {
-                await postBatchReview(`🔍 Automated review found ${comments.length} issue(s) requiring attention.`, comments);
-                core.info(`Posted ${comments.length} review comment(s) via batch (position).`);
-              } else if (hasAnyLine) {
-                await postPerComment(comments);
-                // Optional: add a summary review comment
-                await postBatchReview(`🔍 Automated review posted ${comments.length} inline comment(s).`);
-                core.info(`Posted ${comments.length} review comment(s) individually (line/side).`);
-              } else {
-                core.warning('Comments lack required fields (position or line). Falling back to issue comment.');
-                await postIssueSummary(comments);
+            if (!Array.isArray(comments) || comments.length === 0) {
+              // Check if we already have a "no issues" comment
+              const existing = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                per_page: 100
+              });
+              
+              const hasNoIssuesComment = existing.some(c => 
+                c.user.login.includes('[bot]') && 
+                /no issues found|lgtm|✅/i.test(c.body || '')
+              );
+              
+              if (!hasNoIssuesComment) {
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: prNumber,
+                  event: 'COMMENT',
+                  body: '✅ No issues found in the current changes.'
+                });
               }
-            } catch (error) {
-              core.warning(`Failed to post inline review: ${error.message}`);
-              try {
-                await postIssueSummary(comments);
-              } catch (fallbackError) {
-                core.setFailed(`Unable to post review: ${fallbackError.message}`);
-              }
+              return;
             }
+
+            // Submit review with inline comments
+            const summary = `Found ${comments.length} potential issue${comments.length === 1 ? '' : 's'} that should be addressed.`;
+
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              event: 'COMMENT',
+              body: summary,
+              comments: comments
+            });
+
+            core.info(`Submitted review with ${comments.length} inline comments`);
 ```
 
 ### Save artifacts on failure
@@ -553,17 +512,19 @@ Post the generated comments as a PR review with inline comments or fallback to i
 Store review artifacts for troubleshooting if the workflow fails:
 
 ```yaml
-      - name: Upload artifacts on failure
-        if: failure()
+      - name: Upload debug artifacts on failure
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: review-debug-${{ github.event.pull_request.number }}
+          name: droid-review-debug-${{ github.run_id }}
           path: |
-            pr.diff
-            prompt.txt
-            review_output.log
-            comments.json
+            diff.txt
+            files.json
             existing_comments.json
+            prompt.txt
+            comments.json
+            ${{ runner.home }}/.factory/logs/droid-log-single.log
+            ${{ runner.home }}/.factory/logs/console.log
           if-no-files-found: ignore
           retention-days: 7
 ```
