@@ -42,6 +42,29 @@ Factory supports three provider types that determine API compatibility:
 | `openai` | OpenAI Responses API | OpenAI models on their official API or compatible proxies. Required for the newest models like GPT-5 and GPT-5-Codex. | [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) |
 | `generic-chat-completion-api` | OpenAI Chat Completions API | OpenRouter, Fireworks, Together AI, Ollama, vLLM, and most open-source providers | [OpenAI Chat Completions API](https://platform.openai.com/docs/api-reference/chat) |
 
+<Warning>
+  Factory is actively verifying Droid's performance on popular models, but we cannot guarantee that all custom models will work out of the box. Only Anthropic and OpenAI models accessed via their official APIs are fully tested and benchmarked.
+</Warning>
+
+---
+
+## Prompt Caching
+
+Factory CLI automatically uses prompt caching when available to reduce API costs:
+
+- **Official providers (`anthropic`, `openai`)**: Factory attempts to use prompt caching via the official APIs. Caching behavior follows each provider's implementation and requirements.
+- **Generic providers (`generic-chat-completion-api`)**: Prompt caching support varies by provider and cannot be guaranteed. Some providers may support caching, while others may not.
+
+### Verifying Prompt Caching
+
+To check if prompt caching is working correctly with your custom model:
+
+1. Run a conversation with your custom model
+2. Use the `/cost` command in Droid CLI to view cost breakdowns
+3. Look for cache hit rates and savings in the output
+
+If you're not seeing expected caching savings, consult your provider's documentation about their prompt caching support and requirements.
+
 ---
 
 ## Quick Start Examples
@@ -202,25 +225,6 @@ Custom models display with the name you set in `model_display_name`, making it e
 - Check your provider's rate limits and usage quotas
 - Consider adding multiple API keys for load balancing
 - Monitor your usage through your provider's dashboard
-
----
-
-## Prompt Caching
-
-Factory CLI automatically uses prompt caching when available to reduce API costs:
-
-- **Official providers (`anthropic`, `openai`)**: Factory attempts to use prompt caching via the official APIs. Caching behavior follows each provider's implementation and requirements.
-- **Generic providers (`generic-chat-completion-api`)**: Prompt caching support varies by provider and cannot be guaranteed. Some providers may support caching, while others may not.
-
-### Verifying Prompt Caching
-
-To check if prompt caching is working correctly with your custom model:
-
-1. Run a conversation with your custom model
-2. Use the `/cost` command in Droid CLI to view cost breakdowns
-3. Look for cache hit rates and savings in the output
-
-If you're not seeing expected caching savings, consult your provider's documentation about their prompt caching support and requirements.
 
 ---
 
