@@ -37,14 +37,37 @@ For reference, the configuration file is stored at:
 - **macOS**: `~/Library/Application Support/Factory Bridge/mcp.json`
 - **Windows**: `%APPDATA%\Factory Bridge\mcp.json`
 
+## Server Types
+
+Factory Bridge supports two types of MCP servers:
+
+### Stdio Servers
+
+Stdio servers run as local processes and communicate via standard input/output streams. These are ideal for:
+- Local tools and utilities
+- File system operations
+- Development and testing environments
+- Servers that need direct access to your machine
+
+### Streamable HTTP Servers
+
+Streamable HTTP servers are remote endpoints accessed via HTTP/HTTPS URLs. These are ideal for:
+- Cloud-hosted MCP services
+- Shared team resources (like documentation servers)
+- External APIs and services
+- Servers that don't require local installation
+
 ## Configuration Format
 
-The MCP configuration file uses JSON format with the following structure:
+The MCP configuration file uses JSON format. The structure varies based on the server type.
+
+### Stdio Server Configuration
 
 ```json
 {
   "mcpServers": {
     "server-name": {
+      "type": "stdio",
       "command": "executable",
       "args": ["arg1", "arg2"],
       "env": {
@@ -57,23 +80,53 @@ The MCP configuration file uses JSON format with the following structure:
 }
 ```
 
-### Configuration Fields
-
-- `mcpServers`: An object containing named server configurations
-- For each server:
-  - `command`: The executable to run (required)
-  - `args`: Array of command-line arguments (required)
-  - `env`: Optional environment variables to pass to the server
-  - `disabled`: Optional boolean to temporarily disable a server without removing it
-
-### Example Configuration
-
-Here's an example configuration with multiple MCP servers:
+### Streamable HTTP Server Configuration
 
 ```json
 {
   "mcpServers": {
+    "server-name": {
+      "type": "http",
+      "url": "https://api.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer token",
+        "X-API-Key": "secret"
+      },
+      "disabled": false
+    }
+  }
+}
+```
+
+### Configuration Fields
+
+**Common fields:**
+- `mcpServers`: An object containing named server configurations
+- `type`: Server type - either `"stdio"` or `"http"` (required)
+- `disabled`: Optional boolean to temporarily disable a server without removing it
+
+**Stdio server fields:**
+- `command`: The executable to run (required)
+- `args`: Array of command-line arguments (required)
+- `env`: Optional environment variables to pass to the server
+
+**Streamable HTTP server fields:**
+- `url`: The HTTP/HTTPS endpoint URL (required)
+- `headers`: Optional HTTP headers for authentication or other purposes
+
+### Example Configuration
+
+Here's an example configuration with multiple MCP servers, showing both stdio and Streamable HTTP servers:
+
+```json
+{
+  "mcpServers": {
+    "factory-docs": {
+      "type": "http",
+      "url": "https://docs.factory.ai/mcp"
+    },
     "google-maps": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-google-maps"],
       "env": {
@@ -81,6 +134,7 @@ Here's an example configuration with multiple MCP servers:
       }
     },
     "firecrawl": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "firecrawl-mcp"],
       "env": {
@@ -88,6 +142,7 @@ Here's an example configuration with multiple MCP servers:
       }
     },
     "slack": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-slack"],
       "env": {
@@ -101,9 +156,10 @@ Here's an example configuration with multiple MCP servers:
 ```
 
 In this example:
-- The `google-maps` server provides tools for interacting with Google Maps
-- The `firecrawl` server is enabled and configured with an API key
-- The `slack` server is disabled (it won't be loaded) but its configuration is preserved for future use
+- The `factory-docs` server is a Streamable HTTP server that provides access to Factory documentation
+- The `google-maps` server is a stdio server that provides tools for interacting with Google Maps
+- The `firecrawl` server is a stdio server enabled and configured with an API key
+- The `slack` server is a stdio server that is disabled (it won't be loaded) but its configuration is preserved for future use
 
 ## Automatic Configuration Updates
 
@@ -172,15 +228,17 @@ On Windows, `npx` is a script (`npx.cmd` / `npx.ps1`), not an executable. MCP st
 }
 ```
 
+## What's New
+
+✅ **Streamable HTTP Transport Support**: You can now connect to remote MCP servers over HTTP/HTTPS! Use Streamable HTTP servers to access cloud-hosted MCP services, documentation servers, and shared team resources without local installation.
+
 ## Coming Soon
 
 We're actively working on expanding MCP support with these upcoming features:
 
-1. **SSE Transport Support**: Support for **SSE transport** to connect to remote MCP servers over HTTP/HTTPS.
+1. **Image Tool Support**: Support for tools that return image outputs.
 
-2. **Image Tool Support**: Support for tools that return image outputs.
-
-3. **Configuration UI**: A dedicated UI for MCP configuration with error reporting and server status monitoring.
+2. **Configuration UI**: A dedicated UI for MCP configuration with error reporting and server status monitoring.
 
 ## Resources
 
