@@ -6,8 +6,8 @@ description: "Manage MCP servers and configurations in droid CLI"
 The `/mcp` command provides comprehensive management of MCP servers within Factory CLI, allowing you to configure, monitor, and maintain Model Context Protocol server connections.
 
 <Note>
-    Factory CLI currently only supports **stdio-based MCP servers**. Other transport types are not
-    supported at this time.
+    Factory CLI supports both **stdio-based** and **Streamable HTTP** MCP servers, allowing you to
+    connect to local processes or remote MCP endpoints.
 </Note>
 
 ## Overview
@@ -33,13 +33,13 @@ MCP (Model Context Protocol) servers extend Factory's capabilities by providing 
 
 ### Available Commands
 
-| Command                | Description                                  |
-| ---------------------- | -------------------------------------------- |
-| `list`                 | List configured MCP servers and their status |
-| `add <name> <command>` | Add a new MCP server to the configuration    |
-| `remove <name>`        | Remove an MCP server from the configuration  |
-| `get <name>`           | Show details about a specific MCP server     |
-| `help [command]`       | Display help for a specific command          |
+| Command                       | Description                                  |
+| ----------------------------- | -------------------------------------------- |
+| `list`                        | List configured MCP servers and their status |
+| `add <name> <command-or-url>` | Add a new MCP server to the configuration    |
+| `remove <name>`               | Remove an MCP server from the configuration  |
+| `get <name>`                  | Show details about a specific MCP server     |
+| `help [command]`              | Display help for a specific command          |
 
 <Note>If no command is specified, `/mcp` defaults to the `list` command.</Note>
 
@@ -65,10 +65,14 @@ Lists all configured MCP servers and displays their current status.
 
 ### add
 
-Adds a new MCP server to your configuration.
+Adds a new MCP server to your configuration. Factory CLI supports two types of MCP servers: stdio (local processes) and Streamable HTTP (remote endpoints).
+
+#### Adding stdio servers
+
+Stdio servers run as local processes and communicate via standard input/output streams.
 
 ```bash
-/mcp add [options] <name> <command>
+/mcp add <name> <command> [options]
 ```
 
 **Arguments:**
@@ -78,22 +82,59 @@ Adds a new MCP server to your configuration.
 
 **Options:**
 
--   `-e, --env <key=value...>` - Environment variables (can be used multiple times)
--   `--transport <type>` - Transport type (defaults to "stdio")
+-   `-e, --env <key=value...>` - Environment variables (stdio only, can be used multiple times)
 -   `-h, --help` - Display help for the add command
 
 **Examples:**
 
-Add a basic MCP server:
+Add a basic stdio server:
 
 ```bash
 /mcp add myserver "node /path/to/server.js"
 ```
 
-Add a server with environment variables:
+Add a stdio server with environment variables:
 
 ```bash
 /mcp add myserver "python server.py" -e API_KEY=secret123 -e DEBUG=true
+```
+
+#### Adding Streamable HTTP servers
+
+Streamable HTTP servers are remote MCP endpoints accessed via HTTP/HTTPS URLs.
+
+```bash
+/mcp add --type http <name> <url> [options]
+```
+
+**Arguments:**
+
+-   `name` - Server name (used as identifier)
+-   `url` - HTTP/HTTPS URL of the MCP server endpoint
+
+**Options:**
+
+-   `-H, --header <key: value...>` - HTTP headers (http only, can be used multiple times)
+-   `-h, --help` - Display help for the add command
+
+**Examples:**
+
+Add a basic HTTP server:
+
+```bash
+/mcp add myserver https://api.example.com/mcp --type http
+```
+
+Add an HTTP server with authentication header:
+
+```bash
+/mcp add myserver https://api.example.com/mcp --type http -H "Authorization: Bearer token123"
+```
+
+Add an HTTP server with multiple headers:
+
+```bash
+/mcp add myserver https://api.example.com/mcp --type http -H "Authorization: Bearer token" -H "X-API-Key: secret"
 ```
 
 ### remove
@@ -162,18 +203,33 @@ You can get help for the `/mcp` command and its subcommands in several ways:
 MCP server configurations are stored in a configuration file managed by Factory CLI. Each server configuration includes:
 
 -   **Name**: Unique identifier for the server
--   **Command**: Shell command to start the server
--   **Environment Variables**: Optional environment variables passed to the server
--   **Transport**: Communication protocol (stdio only)
+-   **Type**: Server type (stdio or http)
+-   **Type-specific settings**: Command/args/env for stdio, URL/headers for http
+-   **Disabled**: Optional flag to temporarily disable a server
 
-## Stdio Transport
+## Transport Types
 
-Factory CLI uses the stdio transport method for MCP servers, which means:
+Factory CLI supports two transport methods for MCP servers:
+
+### Stdio Transport
+
+The stdio transport method runs MCP servers as local processes:
 
 -   Communication happens over standard input/output streams
 -   Servers must implement the MCP protocol over stdin/stdout
--   This is the most common and widely supported transport method for MCP servers
+-   Most common transport method for MCP servers
 -   No network configuration or ports are required
+-   Best for: Local tools, file system operations, development servers
+
+### Streamable HTTP Transport
+
+The Streamable HTTP transport method connects to remote MCP servers over HTTP/HTTPS:
+
+-   Communication happens via HTTP requests with streaming responses
+-   Servers are accessed via URL endpoints
+-   Supports authentication via custom headers
+-   No local process management needed
+-   Best for: Cloud-hosted MCP servers, shared team resources, documentation servers
 
 ## Environment Variables
 
@@ -190,8 +246,11 @@ Environment variables must be in `KEY=VALUE` format. If a value contains an equa
 The `/mcp` command provides clear error messages for common issues:
 
 -   **Invalid environment variable format**: Check that variables use `KEY=VALUE` format
+-   **Invalid header format**: Check that headers use `KEY: VALUE` format (note the colon and space)
 -   **Server already exists**: Use a different name or remove the existing server first
--   **Unsupported transport type**: Only "stdio" transport is supported
+-   **Invalid server type**: Must be "stdio" or "http"
+-   **Wrong options for server type**: `--env` is only for stdio servers, `--header` is only for HTTP servers
+-   **Invalid URL format**: For HTTP servers, provide a valid HTTP/HTTPS URL
 -   **Unknown command**: Use `/mcp --help` to see available commands
 -   **Missing arguments**: Ensure all required arguments are provided
 
@@ -219,6 +278,18 @@ Here are some common usage patterns:
 /mcp add python-server "python /path/to/server.py" -e DEBUG=1 -e CONFIG_PATH=/etc/config
 ```
 
+**Add Factory documentation MCP server (Streamable HTTP):**
+
+```bash
+/mcp add --type http factory-docs https://docs.factory.ai/mcp
+```
+
+**Add GitHub MCP server with authentication (Streamable HTTP):**
+
+```bash
+/mcp add --type http github https://mcp.githubcopilot.com -H "Authorization: Bearer YOUR_GITHUB_TOKEN"
+```
+
 **View server details:**
 
 ```bash
@@ -238,7 +309,7 @@ Here are some common usage patterns:
 ```
 
 <Tip>
-    MCP servers extend Factory's capabilities by providing additional tools and context. Make sure
-    your MCP servers are compatible with the Model Context Protocol specification and support stdio
-    transport.
+    MCP servers extend Factory's capabilities by providing additional tools and context. Use stdio
+    servers for local tools and processes, or Streamable HTTP servers to connect to remote MCP
+    endpoints like documentation servers and shared team resources.
 </Tip>
