@@ -115,13 +115,21 @@ Connect to OpenRouter for access to models from multiple providers:
 
 Browse available models at [openrouter.ai/models](https://openrouter.ai/models).
 
-### Connect to Fireworks, Hugging Face, or Other Providers
+### Connect to Deep Infra, Fireworks, Hugging Face, or Other Providers
 
 Access specialized or optimized model deployments:
 
 ```json
 {
   "custom_models": [
+    {
+      "model_display_name": "GLM 4.6",
+      "model": "zai-org/GLM-4.6",
+      "base_url": "https://api.deepinfra.com/v1/openai",
+      "api_key": "YOUR_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    }
     {
       "model_display_name": "GLM 4.5",
       "model": "accounts/fireworks/models/glm-4p5",
