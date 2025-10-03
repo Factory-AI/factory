@@ -24,7 +24,7 @@ This directory contains a sample GitHub Actions workflow that uses Droid to auto
     *   Name the secret `FACTORY_API_KEY` and paste your API key into the **Value** field.
 
     **Note on `GH_TOKEN`**: This workflow uses the built-in `secrets.GITHUB_TOKEN` to interact with the GitHub API. GitHub prevents creating secrets with a `GITHUB_` prefix. For this reason, the workflow assigns `secrets.GITHUB_TOKEN` to an environment variable named `GH_TOKEN`, which the Droid agent then uses. You do not need to create this secret yourself.
-    *   Your GitHub Token will need `contents: read` and pull `requests: read and write` access
+    *   Your GitHub Token will need `contents: read`, `pull requests: read and write` and `issues: write` access
 
 4.  **Create a pull request**:
 
