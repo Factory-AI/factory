@@ -5,12 +5,12 @@ description: "Model pricing in Standard Tokens"
 
 ## Pricing Tiers
 
-Factory measures usage through Standard Tokens. We offer two subscription plans:
+Factory measures usage through Standard Tokens. Cached tokens are billed at one-tenth of a Standard Token (10 cached tokens = 1 Standard Token). We offer two subscription plans:
 
-| Plan | Standard Tokens / Month | Price / Month |
-|------|------------------------|---------------|
-| **Pro** | 20 million | $20 |
-| **Max** | 200 million | $200 |
+| Plan    | Standard Tokens / Month | Price / Month |
+| ------- | ----------------------- | ------------- |
+| **Pro** | 20 million              | $20           |
+| **Max** | 200 million             | $200          |
 
 Overage is billed at $2.70 per million tokens.
 
@@ -20,12 +20,15 @@ Different models have different multipliers applied to calculate Standard Token 
 
 ### Pricing Table
 
-| Model | Multiplier |
-|-------|-----------|
-| GPT-5 | 0.5× |
-| GPT-5-Codex | 0.5× |
-| Gemini 2.5 Pro | 0.5× |
-| Claude Sonnet 4 | 1.2× |
-| Claude Sonnet 4.5 | 1.2× |
-| Claude Opus 4.1 | 6× |
+| Model             | Multiplier |
+| ----------------- | ---------- |
+| GPT-5             | 0.5×       |
+| GPT-5-Codex       | 0.5×       |
+| Gemini 2.5 Pro    | 0.5×       |
+| Claude Sonnet 4   | 1.2×       |
+| Claude Sonnet 4.5 | 1.2×       |
+| Claude Opus 4.1   | 6×         |
 
+## Thinking About Tokens
+
+As a reference point, using GPT-5-Codex at its 0.5× multiplier alongside our typical cache ratio of 4–8× means your effective Standard Token usage goes dramatically further than raw on-demand calls. Switching to very expensive models frequently—or rotating models often enough to invalidate the cache—will lower that benefit, but most workloads see materially higher usage ceilings compared with buying capacity directly from individual model providers. Our aim is for you to run your workloads without worrying about token math; the plans are designed so common usage patterns outperform comparable direct offerings.
