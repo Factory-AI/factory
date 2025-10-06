@@ -55,6 +55,34 @@ When enabled, syncs your CLI sessions to your Factory web sessions so you can vi
 - **`true`** - CLI sessions appear in Factory web interface
 - **`false`** - CLI sessions remain local only
 
+## Command allowlist & denylist
+
+Use these settings to control which commands droid can execute automatically and which it must never run:
+
+- **`commandAllowlist`** – Commands in this array are treated as safe and run without additional confirmation, regardless of autonomy prompts. Include only low-risk utilities you rely on frequently (for example `ls`, `pwd`, `dir`).
+- **`commandDenylist`** – Commands in this array always require confirmation and are typically blocked because they are destructive or unsafe (for example recursive `rm`, `mkfs`, or privileged system operations).
+
+Commands that appear in both lists default to the denylist behavior. Any command that is in neither list falls back to the autonomy level you selected for the session.
+
+### Example allow/deny configuration
+
+```json
+{
+  "commandAllowlist": [
+    "ls",
+    "pwd",
+    "dir"
+  ],
+  "commandDenylist": [
+    "rm -rf /",
+    "mkfs",
+    "shutdown"
+  ]
+}
+```
+
+Review and update these arrays periodically to match your workflow and security posture, especially when sharing configurations across teams.
+
 ## Example configuration
 
 ```json
