@@ -1,0 +1,154 @@
+---
+title: Become a Power User
+description: Maximize Droid performance with IDE integration, smart planning, and project optimization.
+---
+
+Want Droid to work faster, smarter, and with fewer iterations? These four power features transform good results into exceptional ones. Each technique saves tokens, reduces tool calls, and ships better code.
+
+<CardGroup cols={2}>
+  <Card title="Fewer Tool Calls" icon="plug">
+    IDE plugin provides real-time context so Droid sees what you see
+  </Card>
+  <Card title="Better First Attempts" icon="bullseye">
+    Spec Mode explores before coding, preventing false starts
+  </Card>
+  <Card title="Consistent Quality" icon="sparkles">
+    AGENTS.md captures your standards once, applies them always
+  </Card>
+  <Card title="Self-Correcting Code" icon="circle-check">
+    Linters and tests let Droid fix issues before you even see them
+  </Card>
+</CardGroup>
+
+## Factory IDE Plugin — Real-time context awareness
+
+Make sure to install Factory IDE plugin for Droid. The Factory IDE plugin acts as an MCP server that gives Droid immediate awareness of your development environment. No more explaining what file you're looking at or copying error messages—Droid sees exactly what you see.
+
+**What Droid gets automatically:**
+- Open files and selected lines
+- VSCode error highlighting and diagnostics
+- Project structure and active terminal output
+- Your cursor position and recent edits
+
+**Without the plugin:**
+```
+"Fix 'Property user does not exist on type AuthContext' error in auth.ts"
+```
+
+**With the plugin:**
+```
+"Fix error"
+```
+
+The plugin eliminates entire categories of back-and-forth. Droid knows the context, sees the errors that you see, and understands your intent from minimal input.
+
+<Tip>
+  **Quick setup:** Install the Factory extension from VSCode marketplace.
+</Tip>
+
+## Spec Mode — Explore and plan first, code second
+
+Complex features need exploration before implementation. Spec Mode prevents costly false starts by letting Droid investigate your codebase thoroughly before writing a single line of code.
+
+<Steps>
+  <Step title="Activate Spec Mode">
+    Press **Shift+Tab** when starting complex work
+  </Step>
+  <Step title="Describe your goal">
+    Write 1-2 sentences about what you want or provide fully-featured existing technical specs.
+  </Step>
+  <Step title="Droid explores">
+    Searches relevant files, understands patterns, identifies dependencies
+  </Step>
+  <Step title="Review the plan">
+    Get a detailed specification with implementation steps before any changes
+  </Step>
+  <Step title="Approve and execute">
+    Only after you approve does Droid start making changes
+  </Step>
+</Steps>
+
+**Perfect for:**
+- Features touching 2+ files
+- Architectural changes
+- Unfamiliar codebases
+- Security-sensitive work
+
+Without Spec Mode, Droid might jump into implementation too early and not do the work in the exact way you would like. With it, you get a detailed specification and a chance to correct the path before too many tokens are wasted.
+
+<Note>
+  Spec Mode isn't just for features—use it for complex debugging, refactoring, or any task where understanding comes before doing.
+</Note>
+
+## AGENTS.md — Your preferences, remembered
+
+AGENTS.md captures your coding standards, project conventions, and personal preferences in one place. Droid reads it automatically for every task.
+
+**What to document:**
+
+| Category | Examples |
+| --- | --- |
+| **Code style** | "Use arrow functions, not function declarations" <br/> "Prefer early returns over nested conditionals" |
+| **Testing** | "Every new endpoint needs integration tests" <br/> "Use factories, not fixtures for test data" |
+| **Architecture** | "Services go in src/services with matching interfaces" <br/> "All database queries use the repository pattern" |
+| **Tooling** | "Run `npm run verify` before marking any task complete" <br/> "Deploy with `scripts/deploy.sh`, never manual commands" |
+| **Mistakes to avoid** | "Never commit .env files" <br/> "Don't use any! type annotations" |
+
+**Start simple, evolve over time:**
+
+Create `AGENTS.md` in your project root:
+```markdown
+# Project Guidelines
+
+## Testing
+- Run `npm test` before completing any feature
+- New features need unit tests
+- API changes need integration tests
+
+## Code Style  
+- Use TypeScript strict mode
+- Prefer composition over inheritance
+- Keep functions under 20 lines
+
+## Common Commands
+- Lint: `npm run lint:fix`
+- Test: `npm test`
+- Build: `npm run build`
+```
+
+Every time Droid repeats a mistake or you explain something twice, add it to AGENTS.md. Within weeks, you'll have a personalized assistant that knows exactly how you work.
+
+<Tip>
+  **Pro tip:** Include examples of good code from your project. "Follow the pattern in src/services/UserService.ts" gives Droid a concrete template.
+</Tip>
+
+## Agent Readiness — Let your tools do the teaching
+
+Make your project self-correcting. When Droid can run the same verification tools as your CI/CD pipeline, it fixes problems immediately instead of waiting for you to point them out.
+
+<CardGroup cols={2}>
+  <Card title="Linters" icon="magnifying-glass">
+    ESLint, Pylint catch style issues instantly
+  </Card>
+  <Card title="Type Checkers" icon="shield">
+    TypeScript, mypy prevent type errors before runtime
+  </Card>
+  <Card title="Fast Tests" icon="gauge">
+    Unit tests that run in seconds provide immediate feedback
+  </Card>
+  <Card title="Pre-commit Hooks" icon="hook">
+    Husky, pre-commit ensure consistency before commits
+  </Card>
+</CardGroup>
+
+<Warning>
+  **Critical:** Keep verification fast. Slow tests will make the end-to-end work slower.
+</Warning>
+
+## Combining all four for maximum impact
+
+These features compound. IDE plugin provides context → Spec Mode uses that context for better planning → AGENTS.md ensures consistent implementation → Agent readiness catches issues immediately.
+
+<Note>
+  **Getting started?** Install the IDE plugin first—it's the fastest path to better results. Then add AGENTS.md with just your test commands. Build from there.
+</Note>
