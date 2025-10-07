@@ -46,6 +46,10 @@ Factory supports three provider types that determine API compatibility:
   Factory is actively verifying Droid's performance on popular models, but we cannot guarantee that all custom models will work out of the box. Only Anthropic and OpenAI models accessed via their official APIs are fully tested and benchmarked.
 </Warning>
 
+<Note>
+  **Model Size Consideration**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While these smaller models can be useful for experimentation and learning, they are generally not recommended for production coding work or complex software engineering tasks.
+</Note>
+
 ---
 
 ## Prompt Caching
@@ -71,13 +75,13 @@ If you're not seeing expected caching savings, consult your provider's documenta
 
 Choose a provider from the left navigation to see specific configuration examples:
 
-- **[OpenAI & Anthropic](/cli/byok/openai-anthropic)** - Use your own API keys for official models
-- **[OpenRouter](/cli/byok/openrouter)** - Access multiple providers through a single interface
 - **[Fireworks AI](/cli/byok/fireworks)** - High-performance inference for open-source models
 - **[Baseten](/cli/byok/baseten)** - Deploy and serve custom models
 - **[DeepInfra](/cli/byok/deepinfra)** - Cost-effective inference for open-source models
 - **[Hugging Face](/cli/byok/huggingface)** - Connect to models on HF Inference API
 - **[Ollama](/cli/byok/ollama)** - Run models locally or in the cloud
+- **[OpenRouter](/cli/byok/openrouter)** - Access multiple providers through a single interface
+- **[OpenAI & Anthropic](/cli/byok/openai-anthropic)** - Use your own API keys for official models
 - **[Google Gemini](/cli/byok/google-gemini)** - Access Google's Gemini models
 
 ---
@@ -117,7 +121,6 @@ Custom models display with the name you set in `model_display_name`, making it e
 
 ### Rate limiting or quota errors
 - Check your provider's rate limits and usage quotas
-- Consider adding multiple API keys for load balancing
 - Monitor your usage through your provider's dashboard
 
 ---

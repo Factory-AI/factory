@@ -7,7 +7,7 @@ Access high-performance inference for open-source models with Fireworks AI's opt
 
 ## Configuration
 
-Add these configurations to `~/.factory/config.json`:
+Configuration examples for `~/.factory/config.json`:
 
 ```json
 {
@@ -21,28 +21,12 @@ Add these configurations to `~/.factory/config.json`:
       "max_tokens": 16384
     },
     {
-      "model_display_name": "Kimi K2 [Fireworks]",
-      "model": "accounts/fireworks/models/kimi-k2-instruct-0905",
+      "model_display_name": "Deepseek V3.1 Terminus [Fireworks]",
+      "model": "accounts/fireworks/models/deepseek-v3p1-terminus",
       "base_url": "https://api.fireworks.ai/inference/v1",
       "api_key": "YOUR_FIREWORKS_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 32768
-    },
-    {
-      "model_display_name": "Llama 3.1 405B [Fireworks]",
-      "model": "accounts/fireworks/models/llama-v3p1-405b-instruct",
-      "base_url": "https://api.fireworks.ai/inference/v1",
-      "api_key": "YOUR_FIREWORKS_API_KEY",
-      "provider": "generic-chat-completion-api",
-      "max_tokens": 131072
-    },
-    {
-      "model_display_name": "Qwen 2.5 Coder 32B [Fireworks]",
-      "model": "accounts/fireworks/models/qwen2p5-coder-32b-instruct",
-      "base_url": "https://api.fireworks.ai/inference/v1",
-      "api_key": "YOUR_FIREWORKS_API_KEY",
-      "provider": "generic-chat-completion-api",
-      "max_tokens": 32768
+      "max_tokens": 20480
     }
   ]
 }
@@ -54,27 +38,6 @@ Add these configurations to `~/.factory/config.json`:
 2. Get your API key from the dashboard
 3. Browse available models in their [model catalog](https://fireworks.ai/models)
 4. Add desired models to your configuration
-
-## Popular Models
-
-- **Llama 3.1 Series**: `llama-v3p1-8b-instruct`, `llama-v3p1-70b-instruct`, `llama-v3p1-405b-instruct`
-- **Mixtral**: `mixtral-8x7b-instruct`, `mixtral-8x22b-instruct`
-- **Code Models**: `qwen2p5-coder-32b-instruct`, `deepseek-coder-v2-instruct`
-- **Long Context**: `yi-large` (200K context)
-
-## Benefits
-
-- **Fast Inference**: Optimized serving with low latency
-- **High Throughput**: Designed for production workloads
-- **Reliability**: 99.9% uptime SLA
-- **Developer Friendly**: Simple API with OpenAI compatibility
-
-## Pricing
-
-- Pay per token with competitive rates
-- Volume discounts available
-- Free tier for testing
-- Check [fireworks.ai/pricing](https://fireworks.ai/pricing) for current rates
 
 ## Notes
 

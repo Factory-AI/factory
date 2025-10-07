@@ -5,13 +5,17 @@ description: Run models locally on your hardware or use Ollama Cloud
 
 Run models locally on your hardware with Ollama, or use Ollama Cloud for hosted inference.
 
+<Note>
+  **Performance Notice**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While smaller models (7B, 13B) can be useful for experimentation and learning, they are generally not recommended for production coding work or complex software engineering tasks.
+</Note>
+
 ## Local Ollama
 
 Run models entirely on your machine with no internet required.
 
 ### Configuration
 
-Add these configurations to `~/.factory/config.json`:
+Configuration examples for `~/.factory/config.json`:
 
 ```json
 {
@@ -20,7 +24,7 @@ Add these configurations to `~/.factory/config.json`:
       "model_display_name": "Qwen 2.5 Coder 7B [Local]",
       "model": "qwen2.5-coder:7b",
       "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",
+      "api_key": "not-needed",  # add any non-empty value
       "provider": "generic-chat-completion-api",
       "max_tokens": 8192
     },
@@ -28,25 +32,9 @@ Add these configurations to `~/.factory/config.json`:
       "model_display_name": "DeepSeek Coder V2 [Local]",
       "model": "deepseek-coder-v2:16b",
       "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",
+      "api_key": "not-needed",  # add any non-empty value
       "provider": "generic-chat-completion-api",
       "max_tokens": 16384
-    },
-    {
-      "model_display_name": "Llama 3.1 8B [Local]",
-      "model": "llama3.1:8b",
-      "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",
-      "provider": "generic-chat-completion-api",
-      "max_tokens": 131072
-    },
-    {
-      "model_display_name": "Mistral 7B [Local]",
-      "model": "mistral:7b",
-      "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",
-      "provider": "generic-chat-completion-api",
-      "max_tokens": 32768
     }
   ]
 }
@@ -67,14 +55,8 @@ Add these configurations to `~/.factory/config.json`:
    ```
 4. Add configurations to Factory config
 
-### Popular Local Models
 
-- **Code Models**: `qwen2.5-coder`, `deepseek-coder-v2`, `codellama`
-- **Chat Models**: `llama3.1`, `mistral`, `gemma2`
-- **Small Models**: `phi3`, `tinyllama` (good for testing)
-- **Specialized**: `sqlcoder`, `starcoder2`
-
-### Hardware Requirements
+### Approximate Hardware Requirements
 
 | Model Size | RAM Required | VRAM (GPU) |
 |-----------|--------------|------------|
@@ -115,53 +97,12 @@ Use Ollama's cloud service for hosted model inference without local hardware req
 3. Add the configuration with authorization header
 4. Start using cloud-hosted models
 
-## Benefits
-
-### Local Ollama
-- **Privacy**: Data never leaves your machine
-- **No Costs**: Free after initial hardware investment
-- **Offline**: Works without internet connection
-- **Customization**: Fine-tune and modify models locally
-
-### Ollama Cloud
-- **No Hardware**: No GPU or high RAM requirements
-- **Instant Access**: No model downloads needed
-- **Scalability**: Handle multiple requests
-- **Managed Updates**: Automatic model updates
-
-## Managing Models
-
-### List installed models
-```bash
-ollama list
-```
-
-### Remove a model
-```bash
-ollama rm model-name
-```
-
-### Update a model
-```bash
-ollama pull model-name
-```
-
-### Check running models
-```bash
-ollama ps
-```
-
 ## Troubleshooting
 
 ### Local server not connecting
 - Ensure Ollama is running: `ollama serve`
 - Check if port 11434 is available
 - Try `curl http://localhost:11434/api/tags` to test
-
-### Slow performance
-- Check available RAM/VRAM
-- Use smaller model variants (e.g., 7b instead of 13b)
-- Enable GPU acceleration if available
 
 ### Model not found
 - Pull the model first: `ollama pull model-name`
@@ -171,5 +112,3 @@ ollama ps
 
 - Local API doesn't require authentication (use any placeholder for `api_key`)
 - Models are stored in `~/.ollama/models/`
-- Ollama automatically manages model loading and unloading
-- Supports GGUF format models from Hugging Face
