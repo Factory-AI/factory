@@ -9,6 +9,7 @@ Run models locally on your hardware with Ollama, or use Ollama Cloud for hosted 
   **Performance Notice**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While smaller models (7B, 13B) can be useful for experimentation and learning, they are generally not recommended for production coding work or complex software engineering tasks.
 </Note>
 
+
 ## Local Ollama
 
 Run models entirely on your machine with no internet required.
@@ -21,20 +22,20 @@ Configuration examples for `~/.factory/config.json`:
 {
   "custom_models": [
     {
+      "model_display_name": "Qwen 2.5 Coder 32B [Local]",
+      "model": "qwen2.5-coder:32b",
+      "base_url": "http://localhost:11434/v1",
+      "api_key": "not-needed",  # add any non-empty value
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16000
+    },
+    {
       "model_display_name": "Qwen 2.5 Coder 7B [Local]",
       "model": "qwen2.5-coder:7b",
       "base_url": "http://localhost:11434/v1",
       "api_key": "not-needed",  # add any non-empty value
       "provider": "generic-chat-completion-api",
-      "max_tokens": 8192
-    },
-    {
-      "model_display_name": "DeepSeek Coder V2 [Local]",
-      "model": "deepseek-coder-v2:16b",
-      "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",  # add any non-empty value
-      "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
+      "max_tokens": 4000
     }
   ]
 }
@@ -42,16 +43,24 @@ Configuration examples for `~/.factory/config.json`:
 
 ### Setup
 
+<Warning>
+  **Context Window Configuration**: For optimal performance with Factory, ensure you set the context window to at least 32,000 tokens. You can either:
+  - Use the context window slider in the Ollama app (set to 32k minimum)
+  - Set environment variable before starting: `OLLAMA_CONTEXT_LENGTH=32000 ollama serve`
+  
+  Without adequate context, the experience will be significantly degraded.
+</Warning>
+
 1. Install Ollama from [ollama.com/download](https://ollama.com/download)
 2. Pull desired models:
    ```bash
+   # Recommended models
+   ollama pull qwen2.5-coder:32b
    ollama pull qwen2.5-coder:7b
-   ollama pull llama3.1:8b
-   ollama pull mistral:7b
    ```
-3. Start the Ollama server:
+3. Start the Ollama server with extra context:
    ```bash
-   ollama serve
+   OLLAMA_CONTEXT_LENGTH=32000 ollama serve
    ```
 4. Add configurations to Factory config
 
@@ -68,7 +77,13 @@ Configuration examples for `~/.factory/config.json`:
 
 ## Ollama Cloud
 
-Use Ollama's cloud service for hosted model inference without local hardware requirements.
+Use Ollama's cloud service for hosted model inference without local hardware requirements
+
+### Recommended Cloud Model
+
+The best performance for agentic coding has been observed with **qwen3-coder:480b**. 
+
+For a full list of available cloud models, visit: [ollama.com/search?c=cloud](https://ollama.com/search?c=cloud)
 
 ### Configuration
 
@@ -76,26 +91,23 @@ Use Ollama's cloud service for hosted model inference without local hardware req
 {
   "custom_models": [
     {
-      "model_display_name": "Llama 3.1 8B [Ollama Cloud]",
-      "model": "llama3.1:8b",
-      "base_url": "https://ollama.com",
-      "api_key": "YOUR_OLLAMA_API_KEY",
+      "model_display_name": "qwen3-coder [Online]",
+      "model": "qwen3-coder:480b-cloud",
+      "base_url": "http://localhost:11434/v1/",
+      "api_key": "not-needed",  # add any non-empty value
       "provider": "generic-chat-completion-api",
-      "max_tokens": 131072,
-      "headers": {
-        "Authorization": "Bearer YOUR_OLLAMA_API_KEY"
-      }
+      "max_tokens": 128000
     }
   ]
 }
 ```
 
-### Getting Started with Cloud
+### Getting Started with Cloud Models
 
-1. Sign up at [ollama.com](https://ollama.com)
-2. Get your API key from the dashboard
-3. Add the configuration with authorization header
-4. Start using cloud-hosted models
+1. Ensure Ollama is installed and running locally
+2. Cloud models are accessed through your local Ollama instance - no API key needed
+3. Add the configuration above to your Factory config
+4. The model will automatically use cloud compute when requested
 
 ## Troubleshooting
 
