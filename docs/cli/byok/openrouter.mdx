@@ -1,0 +1,69 @@
+---
+title: OpenRouter
+description: Access models from multiple providers through a unified interface
+---
+
+Connect to OpenRouter for access to models from multiple providers through a single API interface.
+
+## Configuration
+
+Add these configurations to `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GPT-OSS-20B [OpenRouter]",
+      "model": "openai/gpt-oss-20b",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32000
+    },
+    {
+      "model_display_name": "Claude 3.5 Sonnet [OpenRouter]",
+      "model": "anthropic/claude-3.5-sonnet",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 200000
+    },
+    {
+      "model_display_name": "Llama 3.1 405B [OpenRouter]",
+      "model": "meta-llama/llama-3.1-405b-instruct",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 131072
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [openrouter.ai](https://openrouter.ai)
+2. Get your API key from the dashboard
+3. Browse available models at [openrouter.ai/models](https://openrouter.ai/models)
+4. Add desired models to your configuration
+
+## Benefits
+
+- **Multiple Providers**: Access models from OpenAI, Anthropic, Meta, Google, and more
+- **Single API Key**: One key for all providers
+- **Automatic Routing**: OpenRouter selects the best available provider
+- **Fallback Support**: Automatic fallback to alternative providers if one is down
+
+## Popular Models
+
+- `openai/gpt-4-turbo-preview` - Latest GPT-4 Turbo
+- `anthropic/claude-3-opus` - Most capable Claude model
+- `google/gemini-pro-1.5` - Google's Gemini Pro
+- `meta-llama/llama-3.1-405b-instruct` - Largest Llama model
+- `mistralai/mixtral-8x22b` - Mistral's MoE model
+
+## Notes
+
+- OpenRouter uses the `generic-chat-completion-api` provider type
+- Pricing varies by model - check [openrouter.ai/models](https://openrouter.ai/models) for details
+- Some models may have usage restrictions or require additional permissions

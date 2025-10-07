@@ -1,0 +1,96 @@
+---
+title: DeepInfra
+description: Cost-effective inference for a wide variety of open-source models
+---
+
+Access cost-effective inference for a wide variety of open-source models with DeepInfra's optimized infrastructure.
+
+## Configuration
+
+Add these configurations to `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GLM 4.6 [DeepInfra]",
+      "model": "zai-org/GLM-4.6",
+      "base_url": "https://api.deepinfra.com/v1/openai",
+      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    },
+    {
+      "model_display_name": "Qwen 2.5 Coder 32B [DeepInfra]",
+      "model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+      "base_url": "https://api.deepinfra.com/v1/openai",
+      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32768
+    },
+    {
+      "model_display_name": "DeepSeek V3 [DeepInfra]",
+      "model": "deepseek-ai/DeepSeek-V3",
+      "base_url": "https://api.deepinfra.com/v1/openai",
+      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 65536
+    },
+    {
+      "model_display_name": "Llama 3.1 405B [DeepInfra]",
+      "model": "meta-llama/Meta-Llama-3.1-405B-Instruct",
+      "base_url": "https://api.deepinfra.com/v1/openai",
+      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 131072
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [deepinfra.com](https://deepinfra.com)
+2. Get your API token from the dashboard
+3. View available models at their [model list](https://deepinfra.com/models)
+4. Add desired models to your configuration
+
+## Popular Models
+
+### Code Models
+- `Qwen/Qwen2.5-Coder-32B-Instruct` - Excellent for code generation
+- `deepseek-ai/DeepSeek-V3` - Strong reasoning and coding
+- `codellama/CodeLlama-70b-Instruct` - Meta's code-focused model
+
+### General Purpose
+- `meta-llama/Meta-Llama-3.1-405B-Instruct` - Largest Llama model
+- `meta-llama/Meta-Llama-3.1-70B-Instruct` - Balanced performance
+- `mistralai/Mixtral-8x22B-Instruct-v0.1` - MoE architecture
+
+### Specialized
+- `nvidia/Nemotron-4-340B-Instruct` - NVIDIA's large model
+- `01-ai/Yi-34B-Chat` - Bilingual (English/Chinese)
+- `upstage/SOLAR-10.7B-Instruct-v1.0` - Efficient small model
+
+## Benefits
+
+- **Cost Effective**: Among the lowest prices per token
+- **Wide Selection**: 100+ models available
+- **Fast Inference**: Optimized for low latency
+- **No Cold Starts**: Models stay warm for instant responses
+- **Simple Pricing**: Pay per token with no hidden fees
+
+## Pricing
+
+- Transparent per-token pricing
+- No minimum commitments
+- Free credits for new users
+- Volume discounts available
+- Check [deepinfra.com/pricing](https://deepinfra.com/pricing) for current rates
+
+## Notes
+
+- Base URL format: `https://api.deepinfra.com/v1/openai`
+- Model names match Hugging Face repository format
+- Supports OpenAI-compatible API
+- Automatic model updates when new versions are released

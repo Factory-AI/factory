@@ -1,0 +1,114 @@
+---
+title: Hugging Face
+description: Connect to models hosted on Hugging Face's Inference API
+---
+
+Connect to thousands of models hosted on Hugging Face's Inference API and Inference Endpoints.
+
+## Configuration
+
+Add these configurations to `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Mistral 7B [HF]",
+      "model": "mistralai/Mistral-7B-Instruct-v0.3",
+      "base_url": "https://api-inference.huggingface.co/models",
+      "api_key": "YOUR_HF_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32768
+    },
+    {
+      "model_display_name": "CodeLlama 13B [HF]",
+      "model": "codellama/CodeLlama-13b-Instruct-hf",
+      "base_url": "https://api-inference.huggingface.co/models",
+      "api_key": "YOUR_HF_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    },
+    {
+      "model_display_name": "Zephyr 7B [HF]",
+      "model": "HuggingFaceH4/zephyr-7b-beta",
+      "base_url": "https://api-inference.huggingface.co/models",
+      "api_key": "YOUR_HF_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32768
+    },
+    {
+      "model_display_name": "StarCoder2 15B [HF]",
+      "model": "bigcode/starcoder2-15b-instruct-v0.1",
+      "base_url": "https://api-inference.huggingface.co/models",
+      "api_key": "YOUR_HF_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [huggingface.co](https://huggingface.co)
+2. Get your token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+3. Browse models at [huggingface.co/models](https://huggingface.co/models)
+4. Add desired models to your configuration
+
+## Inference Options
+
+### Inference API (Serverless)
+- **Free Tier**: Limited requests for testing
+- **Pro Subscription**: Higher rate limits and priority access
+- **Base URL**: `https://api-inference.huggingface.co/models`
+
+### Inference Endpoints (Dedicated)
+For production workloads, deploy dedicated endpoints:
+1. Create an endpoint in HF Spaces
+2. Get the endpoint URL
+3. Use the endpoint URL as `base_url` in your config
+
+## Popular Models
+
+### Code Generation
+- `bigcode/starcoder2-15b-instruct-v0.1` - StarCoder 2
+- `codellama/CodeLlama-13b-Instruct-hf` - Meta's code model
+- `Salesforce/codegen25-7b-instruct` - Salesforce CodeGen
+
+### Chat Models
+- `mistralai/Mistral-7B-Instruct-v0.3` - Latest Mistral
+- `HuggingFaceH4/zephyr-7b-beta` - Fine-tuned on preferences
+- `teknium/OpenHermes-2.5-Mistral-7B` - OpenHermes series
+
+### Specialized
+- `microsoft/phi-2` - Small but capable (2.7B)
+- `google/flan-t5-xxl` - Encoder-decoder model
+- `bigscience/bloom` - Multilingual model
+
+## Benefits
+
+- **Massive Selection**: Access to 500,000+ models
+- **Community Models**: Use community fine-tuned models
+- **Version Control**: Pin specific model revisions
+- **Easy Testing**: Free tier for experimentation
+
+## Limitations
+
+- **Rate Limits**: Free tier has strict limits
+- **Cold Starts**: Models may need to load initially
+- **Availability**: Popular models may be busy during peak times
+
+## Pro Subscription
+
+Hugging Face Pro ($9/month) provides:
+- Higher rate limits
+- Priority access to models
+- Faster inference
+- Access to more models
+
+## Notes
+
+- Model names must match the exact Hugging Face repository ID
+- Some models require accepting license agreements on HF website first
+- Large models may not be available on free tier
+- Consider Inference Endpoints for production use

@@ -115,42 +115,204 @@ Connect to OpenRouter for access to models from multiple providers:
 
 Browse available models at [openrouter.ai/models](https://openrouter.ai/models).
 
-### Connect to Deep Infra, Fireworks, Hugging Face, or Other Providers
+### Fireworks AI
 
-Access specialized or optimized model deployments:
+Access high-performance inference for open-source models with optimized serving:
 
 ```json
 {
   "custom_models": [
     {
-      "model_display_name": "GLM 4.6",
-      "model": "zai-org/GLM-4.6",
-      "base_url": "https://api.deepinfra.com/v1/openai",
-      "api_key": "YOUR_KEY",
-      "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
-    }
-    {
-      "model_display_name": "GLM 4.5",
+      "model_display_name": "GLM 4.5 [Fireworks]",
       "model": "accounts/fireworks/models/glm-4p5",
-      "base_url": "https://api.fireworks.ai/inference/v1/",
-      "api_key": "YOUR_KEY",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "api_key": "YOUR_FIREWORKS_API_KEY",
       "provider": "generic-chat-completion-api",
       "max_tokens": 16384
     },
     {
-      "model_display_name": "Kimi K2",
+      "model_display_name": "Kimi K2 [Fireworks]",
       "model": "accounts/fireworks/models/kimi-k2-instruct-0905",
-      "base_url": "https://api.fireworks.ai/inference/v1/",
-      "api_key": "YOUR_KEY",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "api_key": "YOUR_FIREWORKS_API_KEY",
       "provider": "generic-chat-completion-api",
       "max_tokens": 32768
+    },
+    {
+      "model_display_name": "Llama 3.1 405B [Fireworks]",
+      "model": "accounts/fireworks/models/llama-v3p1-405b-instruct",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "api_key": "YOUR_FIREWORKS_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 131072
     }
   ]
 }
 ```
 
-Check your provider's documentation for available model IDs and base URLs.
+Get your API key at [fireworks.ai](https://fireworks.ai). Browse available models in their [model catalog](https://fireworks.ai/models).
+
+### Baseten
+
+Deploy and serve custom models with enterprise-grade infrastructure:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Custom Model [Baseten]",
+      "model": "YOUR_MODEL_ID",
+      "base_url": "https://inference.baseten.co/v1",
+      "api_key": "YOUR_BASETEN_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 8192
+    },
+    {
+      "model_display_name": "Llama 3.1 70B [Baseten]",
+      "model": "llama-3.1-70b-instruct",
+      "base_url": "https://inference.baseten.co/v1",
+      "api_key": "YOUR_BASETEN_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 131072
+    }
+  ]
+}
+```
+
+<Note>
+  Baseten supports custom model deployments. Replace `YOUR_MODEL_ID` with your deployed model's ID from the Baseten dashboard.
+</Note>
+
+### DeepInfra
+
+Access cost-effective inference for a wide variety of open-source models:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GLM 4.6 [DeepInfra]",
+      "model": "zai-org/GLM-4.6",
+      "base_url": "https://api.deepinfra.com/v1/openai",
+      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    },
+    {
+      "model_display_name": "Qwen 2.5 Coder 32B [DeepInfra]",
+      "model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+      "base_url": "https://api.deepinfra.com/v1/openai",
+      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32768
+    },
+    {
+      "model_display_name": "DeepSeek V3 [DeepInfra]",
+      "model": "deepseek-ai/DeepSeek-V3",
+      "base_url": "https://api.deepinfra.com/v1/openai",
+      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 65536
+    }
+  ]
+}
+```
+
+Get your API token at [deepinfra.com](https://deepinfra.com). View available models at their [model list](https://deepinfra.com/models).
+
+### Hugging Face Inference API
+
+Connect to models hosted on Hugging Face's Inference API:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Mistral 7B [HF]",
+      "model": "mistralai/Mistral-7B-Instruct-v0.3",
+      "base_url": "https://api-inference.huggingface.co/models",
+      "api_key": "YOUR_HF_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32768
+    },
+    {
+      "model_display_name": "CodeLlama 13B [HF]",
+      "model": "codellama/CodeLlama-13b-Instruct-hf",
+      "base_url": "https://api-inference.huggingface.co/models",
+      "api_key": "YOUR_HF_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    }
+  ]
+}
+```
+
+<Note>
+  Get your Hugging Face token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens). Some models may require Pro subscription for faster inference.
+</Note>
+
+### Ollama (Local and Cloud)
+
+#### Local Ollama
+
+Run models locally on your hardware with Ollama:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Qwen 2.5 Coder [Local]",
+      "model": "qwen2.5-coder:7b",
+      "base_url": "http://localhost:11434/v1",
+      "api_key": "not-needed",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 8192
+    },
+    {
+      "model_display_name": "DeepSeek Coder V2 [Local]",
+      "model": "deepseek-coder-v2:16b",
+      "base_url": "http://localhost:11434/v1",
+      "api_key": "not-needed",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    }
+  ]
+}
+```
+
+<Tip>
+  First, install Ollama and pull your desired model:
+  ```bash
+  ollama pull qwen2.5-coder:7b
+  ollama serve  # Start the local server
+  ```
+</Tip>
+
+#### Ollama Cloud
+
+Use Ollama's cloud service for hosted model inference:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Llama 3.1 8B [Ollama Cloud]",
+      "model": "llama3.1:8b",
+      "base_url": "https://ollama.com",
+      "api_key": "YOUR_OLLAMA_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 131072,
+      "headers": {
+        "Authorization": "Bearer YOUR_OLLAMA_API_KEY"
+      }
+    }
+  ]
+}
+```
+
+<Note>
+  For Ollama Cloud, you'll need to include the Authorization header with your API key. Get your API key from [ollama.com](https://ollama.com).
+</Note>
 
 ### Connect to Google Gemini
 
@@ -171,28 +333,7 @@ Access Google's Gemini models using your Gemini AI API key:
 }
 ```
 
-### Run Local Models (Ollama, vLLM, etc.)
 
-Run models on your own hardware:
-
-```json
-{
-  "custom_models": [
-    {
-      "model_display_name": "Qwen:4b [Local]",
-      "model": "qwen3:4b",
-      "base_url": "http://localhost:11434/v1/",
-      "api_key": "not-needed",
-      "provider": "generic-chat-completion-api",
-      "max_tokens": 4000
-    }
-  ]
-}
-```
-
-<Tip>
-  Local servers often don't require API keys, but the `api_key` field is still required. Use any placeholder value.
-</Tip>
 
 ---
 

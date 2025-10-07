@@ -1,0 +1,83 @@
+---
+title: Baseten
+description: Deploy and serve custom models with enterprise-grade infrastructure
+---
+
+Deploy and serve custom models with Baseten's enterprise-grade infrastructure for ML model serving.
+
+## Configuration
+
+Add these configurations to `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Custom Model [Baseten]",
+      "model": "YOUR_MODEL_ID",
+      "base_url": "https://inference.baseten.co/v1",
+      "api_key": "YOUR_BASETEN_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 8192
+    },
+    {
+      "model_display_name": "Llama 3.1 70B [Baseten]",
+      "model": "llama-3.1-70b-instruct",
+      "base_url": "https://inference.baseten.co/v1",
+      "api_key": "YOUR_BASETEN_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 131072
+    },
+    {
+      "model_display_name": "Mixtral 8x7B [Baseten]",
+      "model": "mixtral-8x7b-instruct",
+      "base_url": "https://inference.baseten.co/v1",
+      "api_key": "YOUR_BASETEN_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32768
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [baseten.co](https://baseten.co)
+2. Deploy a model from their model library or upload your own
+3. Get your API key from the settings page
+4. Find your model ID in the deployment dashboard
+5. Add the configuration to your Factory config
+
+## Custom Model Deployment
+
+Baseten allows you to deploy your own models:
+
+1. **Upload Your Model**: Support for PyTorch, TensorFlow, ONNX, and more
+2. **Auto-scaling**: Automatic scaling based on traffic
+3. **GPU Support**: Deploy on various GPU types (A10G, A100, H100)
+4. **Version Control**: Deploy multiple versions with rollback support
+
+## Pre-deployed Models
+
+Baseten offers pre-deployed models you can use immediately:
+
+- Llama 3.1 (8B, 70B, 405B)
+- Mixtral (8x7B, 8x22B)
+- Mistral 7B
+- CodeLlama variants
+- Custom fine-tuned models
+
+## Benefits
+
+- **Enterprise Ready**: SOC2 compliant with enterprise SLAs
+- **Custom Models**: Deploy your own fine-tuned or custom models
+- **Auto-scaling**: Scale from 0 to handle any traffic
+- **Monitoring**: Built-in monitoring and observability
+- **Private Deployments**: VPC and private cloud options available
+
+## Notes
+
+- Base URL format: `https://inference.baseten.co/v1`
+- Replace `YOUR_MODEL_ID` with your deployed model's ID from Baseten dashboard
+- Supports OpenAI-compatible API format
+- Contact Baseten for enterprise features and custom deployments
