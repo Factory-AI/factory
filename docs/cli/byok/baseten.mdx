@@ -1,0 +1,49 @@
+---
+title: Baseten
+description: Deploy and serve custom models with enterprise-grade infrastructure
+---
+
+Deploy and serve custom models with Baseten's enterprise-grade infrastructure for ML model serving.
+
+## Configuration
+
+Add these configurations to `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GPT OSS 120B [Baseten]",
+      "model": "openai/gpt-oss-120b",
+      "base_url": "https://inference.baseten.co/v1",
+      "api_key": "YOUR_BASETEN_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 8192
+    },
+    {
+      "model_display_name": "Kimi K2 [Baseten]",
+      "model": "moonshotai/Kimi-K2-Instruct-0905",
+      "base_url": "https://inference.baseten.co/v1",
+      "api_key": "YOUR_BASETEN_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 8192
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [baseten.co](https://baseten.co)
+2. Deploy a model from their model library or upload your own
+3. Get your API key from the settings page
+4. Find your model ID in the deployment dashboard
+5. Add the configuration to your Factory config
+
+## Notes
+
+- Base URL format: `https://inference.baseten.co/v1`
+- Replace `YOUR_MODEL_ID` with your deployed model's ID from Baseten dashboard
+- Supports OpenAI-compatible API format
+- Contact Baseten for enterprise features and custom deployments
+

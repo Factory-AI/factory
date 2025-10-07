@@ -1,0 +1,39 @@
+---
+title: OpenRouter
+description: Access models from multiple providers through a unified interface
+---
+
+Connect to OpenRouter for access to models from multiple providers through a single API interface.
+
+## Configuration
+
+Configuration examples for `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GPT-OSS-20B [OpenRouter]",
+      "model": "openai/gpt-oss-20b",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32000
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [openrouter.ai](https://openrouter.ai)
+2. Get your API key from the dashboard
+3. Browse available models at [openrouter.ai/models](https://openrouter.ai/models)
+4. Add desired models to your configuration
+
+## Notes
+
+- OpenRouter uses the `generic-chat-completion-api` provider type
+- Some models may have usage restrictions or require additional permissions
+
+

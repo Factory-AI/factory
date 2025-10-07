@@ -1,0 +1,114 @@
+---
+title: Ollama
+description: Run models locally on your hardware or use Ollama Cloud
+---
+
+Run models locally on your hardware with Ollama, or use Ollama Cloud for hosted inference.
+
+<Note>
+  **Performance Notice**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While smaller models (7B, 13B) can be useful for experimentation and learning, they are generally not recommended for production coding work or complex software engineering tasks.
+</Note>
+
+## Local Ollama
+
+Run models entirely on your machine with no internet required.
+
+### Configuration
+
+Configuration examples for `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Qwen 2.5 Coder 7B [Local]",
+      "model": "qwen2.5-coder:7b",
+      "base_url": "http://localhost:11434/v1",
+      "api_key": "not-needed",  # add any non-empty value
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 8192
+    },
+    {
+      "model_display_name": "DeepSeek Coder V2 [Local]",
+      "model": "deepseek-coder-v2:16b",
+      "base_url": "http://localhost:11434/v1",
+      "api_key": "not-needed",  # add any non-empty value
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    }
+  ]
+}
+```
+
+### Setup
+
+1. Install Ollama from [ollama.com/download](https://ollama.com/download)
+2. Pull desired models:
+   ```bash
+   ollama pull qwen2.5-coder:7b
+   ollama pull llama3.1:8b
+   ollama pull mistral:7b
+   ```
+3. Start the Ollama server:
+   ```bash
+   ollama serve
+   ```
+4. Add configurations to Factory config
+
+
+### Approximate Hardware Requirements
+
+| Model Size | RAM Required | VRAM (GPU) |
+|-----------|--------------|------------|
+| 3B params | 4GB | 3GB |
+| 7B params | 8GB | 6GB |
+| 13B params | 16GB | 10GB |
+| 30B params | 32GB | 20GB |
+| 70B params | 64GB | 40GB |
+
+## Ollama Cloud
+
+Use Ollama's cloud service for hosted model inference without local hardware requirements.
+
+### Configuration
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Llama 3.1 8B [Ollama Cloud]",
+      "model": "llama3.1:8b",
+      "base_url": "https://ollama.com",
+      "api_key": "YOUR_OLLAMA_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 131072,
+      "headers": {
+        "Authorization": "Bearer YOUR_OLLAMA_API_KEY"
+      }
+    }
+  ]
+}
+```
+
+### Getting Started with Cloud
+
+1. Sign up at [ollama.com](https://ollama.com)
+2. Get your API key from the dashboard
+3. Add the configuration with authorization header
+4. Start using cloud-hosted models
+
+## Troubleshooting
+
+### Local server not connecting
+- Ensure Ollama is running: `ollama serve`
+- Check if port 11434 is available
+- Try `curl http://localhost:11434/api/tags` to test
+
+### Model not found
+- Pull the model first: `ollama pull model-name`
+- Check exact model name with `ollama list`
+
+## Notes
+
+- Local API doesn't require authentication (use any placeholder for `api_key`)
+- Models are stored in `~/.ollama/models/`

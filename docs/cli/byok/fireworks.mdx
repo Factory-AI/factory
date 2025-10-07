@@ -1,0 +1,46 @@
+---
+title: Fireworks AI
+description: High-performance inference for open-source models with optimized serving
+---
+
+Access high-performance inference for open-source models with Fireworks AI's optimized serving infrastructure.
+
+## Configuration
+
+Configuration examples for `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GLM 4.5 [Fireworks]",
+      "model": "accounts/fireworks/models/glm-4p5",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "api_key": "YOUR_FIREWORKS_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    },
+    {
+      "model_display_name": "Deepseek V3.1 Terminus [Fireworks]",
+      "model": "accounts/fireworks/models/deepseek-v3p1-terminus",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "api_key": "YOUR_FIREWORKS_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 20480
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [fireworks.ai](https://fireworks.ai)
+2. Get your API key from the dashboard
+3. Browse available models in their [model catalog](https://fireworks.ai/models)
+4. Add desired models to your configuration
+
+## Notes
+
+- Base URL format: `https://api.fireworks.ai/inference/v1`
+- Model IDs typically start with `accounts/fireworks/models/`
+- Supports streaming responses and function calling for compatible models

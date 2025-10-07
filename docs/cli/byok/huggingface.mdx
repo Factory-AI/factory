@@ -1,0 +1,50 @@
+---
+title: Hugging Face
+description: Connect to models hosted on Hugging Face's Inference API
+---
+
+Connect to thousands of models hosted on Hugging Face's Inference API and Inference Endpoints.
+
+<Note>
+  **Model Performance**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While HuggingFace hosts many smaller models that can be useful for experimentation, they are generally not recommended for production coding work. Consider using models with 30B+ parameters for complex software engineering tasks.
+</Note>
+
+## Configuration
+
+Configuration examples for `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "GPT OSS 120B [HF Router]",
+      "model": "openai/gpt-oss-120b:fireworks-ai",
+      "base_url": "https://router.huggingface.co/v1",
+      "api_key": "YOUR_HF_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32768
+    },
+    {
+      "model_display_name": "Llama 4 Scout 17B [HF Router]",
+      "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct:fireworks-ai",
+      "base_url": "https://router.huggingface.co/v1",
+      "api_key": "YOUR_HF_TOKEN",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 16384
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [huggingface.co](https://huggingface.co)
+2. Get your token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+3. Browse models at [huggingface.co/models](https://huggingface.co/models)
+4. Add desired models to your configuration
+
+## Notes
+
+- Model names must match the exact Hugging Face repository ID
+- Some models require accepting license agreements on HF website first
+- Large models may not be available on free tier

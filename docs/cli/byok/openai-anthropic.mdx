@@ -1,0 +1,55 @@
+---
+title: OpenAI & Anthropic
+description: Use your own API keys for official OpenAI and Anthropic models
+---
+
+Use your own API keys for cost control and billing transparency with official OpenAI and Anthropic models.
+
+## Configuration
+
+Configuration examples for `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Sonnet 4.5 [Custom]",
+      "model": "claude-sonnet-4-5-20250929",
+      "base_url": "https://api.anthropic.com",
+      "api_key": "YOUR_ANTHROPIC_KEY",
+      "provider": "anthropic",
+      "max_tokens": 8192
+    },
+    {
+      "model_display_name": "GPT5-Codex [Custom]",
+      "model": "gpt-5-codex",
+      "base_url": "https://api.openai.com/v1",
+      "api_key": "YOUR_OPENAI_KEY",
+      "provider": "openai",
+      "max_tokens": 16384
+    }
+  ]
+}
+```
+
+## Getting API Keys
+
+### Anthropic
+1. Sign up at [console.anthropic.com](https://console.anthropic.com)
+2. Navigate to API Keys section
+3. Create a new API key
+4. Copy and use in your configuration
+
+### OpenAI
+1. Sign up at [platform.openai.com](https://platform.openai.com)
+2. Go to API Keys section
+3. Create a new secret key
+4. Copy and use in your configuration
+
+## Notes
+
+- These configurations use the official APIs with full prompt caching support
+- Factory automatically handles prompt caching when available
+- Use `/cost` command in CLI to view cost breakdowns and cache hit rates
+
+

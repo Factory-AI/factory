@@ -1,0 +1,55 @@
+---
+title: Google Gemini
+description: Access Google's Gemini models using your Gemini AI API key
+---
+
+Connect to Google's Gemini models for advanced AI capabilities with multimodal support.
+
+## Configuration
+
+Configuration examples for `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Gemini 2.5 Pro [Google]",
+      "model": "gemini-2.5-pro",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/",
+      "api_key": "YOUR_GEMINI_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32000
+    },
+    {
+      "model_display_name": "Gemini 1.5 Pro [Google]",
+      "model": "gemini-1.5-pro",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/",
+      "api_key": "YOUR_GEMINI_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 1048576
+    },
+    {
+      "model_display_name": "Gemini 1.5 Flash [Google]",
+      "model": "gemini-1.5-flash",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/",
+      "api_key": "YOUR_GEMINI_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 1048576
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Go to [makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+2. Click "Create API Key"
+3. Copy your API key
+4. Add it to your Factory configuration
+
+## Notes
+
+- Base URL uses the `v1beta` API version
+- Gemini models use the `generic-chat-completion-api` provider type
+
+
