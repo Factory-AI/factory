@@ -77,25 +77,24 @@ Findings:
 
 Key metadata fields:
 
-| Field                   | Notes                                                                                                                                                                             |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                  | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                                                                     |
-| `description`           | Optional. Shown in the UI list. Keep ≤500 chars.                                                                                                                                  |
-| `model`                 | `inherit` (use parent session's model), or specify an available model name. Run `/models` in the CLI to see available options.                                                   |
-| `tools`                 | Tool selection: `undefined` (all tools) or array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive.                                                                |
-
+| Field         | Notes                                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `name`        | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                  |
+| `description` | Optional. Shown in the UI list. Keep ≤500 chars.                                                                               |
+| `model`       | `inherit` (use parent session's model), or specify an available model name. Run `/models` in the CLI to see available options. |
+| `tools`       | Tool selection: `undefined` (all tools) or array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive.               |
 
 Prompts must start with YAML frontmatter containing at least `name` and include a non-empty body. `DroidValidator` surfaces errors (invalid names, unknown models, unknown tools) and warnings (missing description, duplicated tools). Validation issues appear in the CLI logs when a file fails to load.
 
 ### Tool categories → concrete tools
 
-| Category    | Tool IDs                                 | Purpose                             |
-| ----------- | ---------------------------------------- | ----------------------------------- |
-| `read-only` | `Read`, `LS`, `Grep`, `Glob`             | Safe analysis and file exploration |
-| `edit`      | `Create`, `Edit`, `MultiEdit`            | Code generation and modifications  |
-| `execute`   | `Execute`                                | Shell command execution            |
-| `web`       | `WebSearch`, `FetchUrl`                  | Internet research and content      |
-| `mcp`       | Dynamically populated (if any)           | Model Context Protocol tools       |
+| Category    | Tool IDs                                    | Purpose                            |
+| ----------- | ------------------------------------------- | ---------------------------------- |
+| `read-only` | `Read`, `LS`, `Grep`, `Glob`                | Safe analysis and file exploration |
+| `edit`      | `Create`, `Edit`, `MultiEdit`, `ApplyPatch` | Code generation and modifications  |
+| `execute`   | `Execute`                                   | Shell command execution            |
+| `web`       | `WebSearch`, `FetchUrl`                     | Internet research and content      |
+| `mcp`       | Dynamically populated (if any)              | Model Context Protocol tools       |
 
 Explicit arrays must use the tool names above (case-sensitive). Unknown names cause validation errors.
 
@@ -122,18 +121,18 @@ Explicit arrays must use the tool names above (case-sensitive). Unknown names ca
 
 ## 5.5 · Importing Claude Code subagents
 
-You can import agents created in Claude Code (from `~/.claude/agents/`) as custom droids. This lets you reuse your existing Claude Code agents with the Factory Droid system.
+You can import agents created in Claude Code as custom droids. This lets you reuse your existing Claude Code agents with the Factory Droid system.
 
 ### How to import
 
 1. Run `/droids` to open the Droids menu
 2. Press **I** to start the import flow
-3. The CLI scans both project and personal Claude Code locations:
-   - **Project scope**: `~/.claude/agents/` (workspace-specific agents)
+3. The CLI scans Claude Code agent directories:
+   - **Project scope**: `<repo>/.claude/agents/` (workspace-specific agents)
    - **Personal scope**: `~/.claude/agents/` (personal agents)
 4. Review the list of available agents:
-   - Agents marked `(already exists)` are skipped
-   - Pre-select agents you want to import
+   * Agents marked `(already exists)` are pre-deselected by default
+   * Pre-selected agents are those not yet imported to Factory Droids
 5. Press **Space** to toggle individual selections, **A** to toggle all
 6. Press **Enter** to import the selected agents
 
@@ -177,14 +176,18 @@ The import process converts Claude Code agents into Factory Droids:
 ```
 Import Droids (.claude/agents)
 
-Personal (~/.claude/agents/):
+Project (<repo>/.claude/agents/):
 > [x] polite-greeter
   Use this agent when the user requests a greeting, says hello, or asks for a polite
   welcome message. Examples: <example>...
 
-  [x] code-summarizer
+  [ ] code-summarizer
   Use this agent when you need to understand what a code file does without diving into
   implementation details. Examples: <example>...
+
+Personal (~/.claude/agents/):
+  [x] security-checker
+  Security analysis agent...
 
 ↑/↓ navigate • Space select • A toggle all • Enter import • B back
 ```
@@ -200,7 +203,7 @@ Custom Droids
 
   polite-greeter (claude-opus-4-1-20250805)
   Use this agent when the user requests a greeting, says he...
-  Location: Personal  •  Tools: 1 selected  Invalid tools: Write, NotebookEdit
+  Location: Personal  •  Tools: 1 selected
 
   code-summarizer (claude-sonnet-4-5-20250929)
   Use this agent when you need to understand what a code fi...
@@ -218,9 +221,12 @@ After importing, if you see **"Invalid tools: [list]"**, it means some Claude Co
 3. **Check available tools** - the list shows which Factory tools are available
 
 Common unmapped tools:
-- Claude Code tools like `Write`, `NotebookEdit`, `BrowseURL` don't exist in Factory
-- These should be replaced with equivalent Factory tools (e.g., `Edit`, `Create`, `WebSearch`)
-- Or remove the `tools` section entirely to enable all Factory tools
+
+* Claude Code tools like `Write`, `NotebookEdit`, `BrowseURL` don't exist in Factory
+* Replace with equivalent Factory tools:
+  * `Write` → `Edit`, `Create`
+  * `BrowseURL` → `WebSearch`, `FetchUrl`
+* Or remove the `tools` section entirely to enable all Factory tools
 
 ---
 
@@ -248,7 +254,7 @@ Common unmapped tools:
 name: code-reviewer
 description: Reviews diffs for correctness, tests, and migration fallout
 model: inherit
-tools: Read, LS, Grep, Glob
+tools: ["Read", "LS", "Grep", "Glob"]
 ---
 
 You are the team's principal reviewer. Given the diff and context:
@@ -275,7 +281,7 @@ Use: "Run the subagent `code-reviewer` on the staged diff."
 name: security-sweeper
 description: Looks for insecure patterns in recently edited files
 model: inherit
-tools: Read, Grep, WebSearch
+tools: ["Read", "Grep", "WebSearch"]
 ---
 
 Investigate the files referenced in the prompt for security issues:
