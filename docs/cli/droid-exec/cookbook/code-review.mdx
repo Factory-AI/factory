@@ -6,7 +6,7 @@ description: Automate pull request reviews using Droid Exec in GitHub Actions
 This tutorial shows you how to set up automated code review using Droid Exec in GitHub Actions. The workflow will analyze pull requests, identify issues, and post feedback as inline comments.
 
 <Info>
-Unlike interactive CLI sessions, Droid Exec runs in headless mode, making it perfect for CI/CD automation. The agent analyzes code changes, identifies issues, and creates structured output that can be posted as PR comments.
+Unlike interactive CLI sessions, Droid Exec runs in headless mode, making it perfect for CI/CD automation. The agent analyzes code changes, identifies issues, and submits review feedback directly via GitHub CLI.
 </Info>
 
 ## How it works
@@ -15,9 +15,9 @@ The workflow:
 
 1.  Triggers on pull request events
 2.  Checks out the PR and installs the Droid CLI
-3.  Configures git identity and prepares review context files
-4.  Runs Droid Exec to analyze the diff and produce review comments
-5.  Submits inline comments or a summary, uploading debug artifacts on failure
+3.  Configures git identity
+4.  Runs Droid Exec to fetch PR data and submit review comments via GitHub CLI
+5.  Uploads debug artifacts on failure
 
 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
   <div style={{ flex: '1', minWidth: '300px' }}>
@@ -70,39 +70,24 @@ jobs:
           git config user.name "Droid Agent"
           git config user.email "droidagent@factory.ai"
 
-      - name: Prepare review context
-        run: |
-          # Get the PR diff
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          git diff origin/${{ github.event.pull_request.base.ref }}...${{ github.event.pull_request.head.sha }} > diff.txt
-
-          # Get existing comments using GitHub API
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-               > existing_comments.json
-
-          # Get changed files with patches for positioning
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
-               | jq '[.[] | {filename: .filename, patch: .patch}]' > files.json
-
       - name: Perform automated code review
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           cat > prompt.txt << 'EOF'
           You are an automated code review system. Review the PR diff and identify clear issues that need to be fixed.
 
-          Input files (already in current directory):
-          - diff.txt: the code changes to review
-          - files.json: file patches with line numbers for positioning comments
-          - existing_comments.json: skip issues already mentioned here
+          First, use the Web Fetch tool to get the full PR context from: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
 
-          Task: Create a file called comments.json with this exact format:
-          [{ "path": "path/to/file.js", "position": 42, "body": "Your comment here" }]
+          This will provide you with:
+          - PR title, description, and metadata
+          - Complete diff with line numbers for positioning comments
+          - Changed files with their status
+          - Existing comments and review threads (to avoid duplicates)
+
+          Task: After fetching the PR data, review the code changes and directly submit your findings using the GitHub CLI.
 
           Focus on these types of issues:
           - Dead/unreachable code (if (false), while (false), code after return/throw/break)
@@ -127,7 +112,7 @@ jobs:
           - Clearly describe the issue: "This code block is unreachable due to the if (false) condition"
           - Provide a concrete fix: "Remove this entire if block as it will never execute"
           - When possible, suggest the exact code change:
-            ```suggestion
+            ```
             // Remove the unreachable code
             ```
           - Be specific about why it's a problem: "This will cause a TypeError if input is null"
@@ -140,85 +125,37 @@ jobs:
           - Features or functionality (unless broken)
           - Test coverage (unless tests are clearly broken)
 
+          You may open and read other repository files beyond those listed above when it helps you understand the change, but keep all review comments anchored to the modified lines in this PR.
+
+          Use the fetched PR data to:
+          - Avoid repeating resolved issues unless the problem still exists.
+          - Reference ongoing discussions when adding a follow-up or clarification.
+          - Prefer replying to existing open threads instead of creating duplicates when addressing the same code.
+          - Ignore your own previous comments that have been resolved unless the underlying issue is still present.
+
           Position calculation:
-          - Use the "position" field from files.json patches
-          - This is the line number in the diff, not the file
+          - Use the line position from the diff data fetched from the PR
+          - This is the line number in the diff, not the absolute file line
           - Comments must align with exact changed lines only
 
-          Output: 
-          - Empty array [] if no issues found
-          - Otherwise array of comment objects with path, position, body
+          How to submit your review:
+          Use the GitHub CLI (gh) to submit your review. Run "gh --help" and explore the available commands to understand how to:
+          - Submit PR reviews with inline comments
+          - Reply to existing review comments
+          - Post general PR comments when no issues are found
+
+          The PR number is ${{ github.event.pull_request.number }} and repository is ${{ github.repository }}.
+
+          Guidelines:
+          - Submit at most 10 comments total, prioritizing the most critical issues
           - Each comment should be actionable and clear about what needs to be fixed
-          - Maximum 10 comments total; prioritize the most critical issues
+          - Check for existing "no issues" comments from bots before posting duplicate messages
+          - Include a summary in the review body when submitting multiple inline comments
           EOF
 
-          # Run droid exec with the prompt
-          echo "Running code review analysis..."
-          droid exec --auto high -f prompt.txt
-
-          # Check if comments.json was created
-          if [ ! -f comments.json ]; then
-            echo "❌ ERROR: droid exec did not create comments.json"
-            echo "This usually indicates the review run failed (e.g. missing FACTORY_API_KEY or runtime error)."
-            exit 1
-          fi
-
-          echo "=== Review Results ==="
-          cat comments.json
-
-      - name: Submit inline review comments
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const prNumber = context.payload.pull_request.number;
-
-            if (!fs.existsSync('comments.json')) {
-              core.info('comments.json missing; skipping review submission');
-              return;
-            }
-
-            const comments = JSON.parse(fs.readFileSync('comments.json', 'utf8'));
-
-            if (!Array.isArray(comments) || comments.length === 0) {
-              // Check if we already have a "no issues" comment
-              const existing = await github.paginate(github.rest.issues.listComments, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                per_page: 100
-              });
-              
-              const hasNoIssuesComment = existing.some(c => 
-                c.user.login.includes('[bot]') && 
-                /no issues found|lgtm|✅/i.test(c.body || '')
-              );
-              
-              if (!hasNoIssuesComment) {
-                await github.rest.pulls.createReview({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: prNumber,
-                  event: 'COMMENT',
-                  body: '✅ No issues found in the current changes.'
-                });
-              }
-              return;
-            }
-
-            // Submit review with inline comments
-            const summary = `Found ${comments.length} potential issue${comments.length === 1 ? '' : 's'} that should be addressed.`;
-
-            await github.rest.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              event: 'COMMENT',
-              body: summary,
-              comments: comments
-            });
-
-            core.info(`Submitted review with ${comments.length} inline comments`);
+          # Run droid exec with the prompt - it will handle PR review submission directly
+          echo "Running code review analysis and submitting results..."
+          droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
 
       - name: Upload debug artifacts on failure
         if: ${{ failure() }}
@@ -226,11 +163,7 @@ jobs:
         with:
           name: droid-review-debug-${{ github.run_id }}
           path: |
-            diff.txt
-            files.json
-            existing_comments.json
             prompt.txt
-            comments.json
             ${{ runner.home }}/.factory/logs/droid-log-single.log
             ${{ runner.home }}/.factory/logs/console.log
           if-no-files-found: ignore
@@ -341,33 +274,9 @@ Set the git username and email so review comments originate from the expected bo
           git config user.email "droidagent@factory.ai"
 ```
 
-### Prepare review context
-
-Gather the diff, existing comments, and file patches that Droid Exec will analyze:
-
-```yaml
-      - name: Prepare review context
-        run: |
-          # Get the PR diff
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          git diff origin/${{ github.event.pull_request.base.ref }}...${{ github.event.pull_request.head.sha }} > diff.txt
-
-          # Get existing comments using GitHub API
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-               > existing_comments.json
-
-          # Get changed files with patches for positioning
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
-               | jq '[.[] | {filename: .filename, patch: .patch}]' > files.json
-```
-
 ### Run the automated review
 
-Craft a detailed prompt and execute Droid Exec to produce inline comments. The command relies on both `FACTORY_API_KEY` and `GITHUB_TOKEN` secrets:
+Craft a detailed prompt and execute Droid Exec to fetch PR data and submit review comments directly. The command relies on both `FACTORY_API_KEY` and `GITHUB_TOKEN` secrets:
 
 ````yaml
       - name: Perform automated code review
@@ -375,16 +284,19 @@ Craft a detailed prompt and execute Droid Exec to produce inline comments. The c
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           cat > prompt.txt << 'EOF'
           You are an automated code review system. Review the PR diff and identify clear issues that need to be fixed.
 
-          Input files (already in current directory):
-          - diff.txt: the code changes to review
-          - files.json: file patches with line numbers for positioning comments
-          - existing_comments.json: skip issues already mentioned here
+          First, use the Web Fetch tool to get the full PR context from: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
 
-          Task: Create a file called comments.json with this exact format:
-          [{ "path": "path/to/file.js", "position": 42, "body": "Your comment here" }]
+          This will provide you with:
+          - PR title, description, and metadata
+          - Complete diff with line numbers for positioning comments
+          - Changed files with their status
+          - Existing comments and review threads (to avoid duplicates)
+
+          Task: After fetching the PR data, review the code changes and directly submit your findings using the GitHub CLI.
 
           Focus on these types of issues:
           - Dead/unreachable code (if (false), while (false), code after return/throw/break)
@@ -409,7 +321,7 @@ Craft a detailed prompt and execute Droid Exec to produce inline comments. The c
           - Clearly describe the issue: "This code block is unreachable due to the if (false) condition"
           - Provide a concrete fix: "Remove this entire if block as it will never execute"
           - When possible, suggest the exact code change:
-            ```suggestion
+            ```
             // Remove the unreachable code
             ```
           - Be specific about why it's a problem: "This will cause a TypeError if input is null"
@@ -422,90 +334,38 @@ Craft a detailed prompt and execute Droid Exec to produce inline comments. The c
           - Features or functionality (unless broken)
           - Test coverage (unless tests are clearly broken)
 
+          You may open and read other repository files beyond those listed above when it helps you understand the change, but keep all review comments anchored to the modified lines in this PR.
+
+          Use the fetched PR data to:
+          - Avoid repeating resolved issues unless the problem still exists.
+          - Reference ongoing discussions when adding a follow-up or clarification.
+          - Prefer replying to existing open threads instead of creating duplicates when addressing the same code.
+          - Ignore your own previous comments that have been resolved unless the underlying issue is still present.
+
           Position calculation:
-          - Use the "position" field from files.json patches
-          - This is the line number in the diff, not the file
+          - Use the line position from the diff data fetched from the PR
+          - This is the line number in the diff, not the absolute file line
           - Comments must align with exact changed lines only
 
-          Output: 
-          - Empty array [] if no issues found
-          - Otherwise array of comment objects with path, position, body
+          How to submit your review:
+          Use the GitHub CLI (gh) to submit your review. Run "gh --help" and explore the available commands to understand how to:
+          - Submit PR reviews with inline comments
+          - Reply to existing review comments
+          - Post general PR comments when no issues are found
+
+          The PR number is ${{ github.event.pull_request.number }} and repository is ${{ github.repository }}.
+
+          Guidelines:
+          - Submit at most 10 comments total, prioritizing the most critical issues
           - Each comment should be actionable and clear about what needs to be fixed
-          - Prioritize the most critical issues
+          - Check for existing "no issues" comments from bots before posting duplicate messages
+          - Include a summary in the review body when submitting multiple inline comments
           EOF
 
-          echo "Running code review analysis..."
-          droid exec --auto high -f prompt.txt
-
-          if [ ! -f comments.json ]; then
-            echo "❌ ERROR: droid exec did not create comments.json"
-            echo "This usually indicates the review run failed (e.g. missing FACTORY_API_KEY or runtime error)."
-            exit 1
-          fi
-
-          echo "=== Review Results ==="
-          cat comments.json
+          # Run droid exec with the prompt - it will handle PR review submission directly
+          echo "Running code review analysis and submitting results..."
+          droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
 ````
-
-### Submit review comments
-
-Use `actions/github-script` to post inline feedback or a fallback summary based on the generated `comments.json`:
-
-```yaml
-      - name: Submit inline review comments
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const prNumber = context.payload.pull_request.number;
-
-            if (!fs.existsSync('comments.json')) {
-              core.info('comments.json missing; skipping review submission');
-              return;
-            }
-
-            const comments = JSON.parse(fs.readFileSync('comments.json', 'utf8'));
-
-            if (!Array.isArray(comments) || comments.length === 0) {
-              // Check if we already have a "no issues" comment
-              const existing = await github.paginate(github.rest.issues.listComments, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                per_page: 100
-              });
-              
-              const hasNoIssuesComment = existing.some(c => 
-                c.user.login.includes('[bot]') && 
-                /no issues found|lgtm|✅/i.test(c.body || '')
-              );
-              
-              if (!hasNoIssuesComment) {
-                await github.rest.pulls.createReview({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: prNumber,
-                  event: 'COMMENT',
-                  body: '✅ No issues found in the current changes.'
-                });
-              }
-              return;
-            }
-
-            // Submit review with inline comments
-            const summary = `Found ${comments.length} potential issue${comments.length === 1 ? '' : 's'} that should be addressed.`;
-
-            await github.rest.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              event: 'COMMENT',
-              body: summary,
-              comments: comments
-            });
-
-            core.info(`Submitted review with ${comments.length} inline comments`);
-```
 
 ### Save artifacts on failure
 
@@ -518,11 +378,7 @@ Store review artifacts for troubleshooting if the workflow fails:
         with:
           name: droid-review-debug-${{ github.run_id }}
           path: |
-            diff.txt
-            files.json
-            existing_comments.json
             prompt.txt
-            comments.json
             ${{ runner.home }}/.factory/logs/droid-log-single.log
             ${{ runner.home }}/.factory/logs/console.log
           if-no-files-found: ignore

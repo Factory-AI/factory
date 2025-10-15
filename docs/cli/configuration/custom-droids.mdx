@@ -14,7 +14,7 @@ Custom droids are reusable subagents defined in Markdown. Each droid carries its
 
 ## 1 · What are custom droids?
 
-Custom droids live as `.md` files under either your project’s `.factory/droids/` or your personal `~/.factory/droids/` directory. When enabled, the CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the **Task** tool. This lets the primary assistant spin up purpose-built helpers mid-session.
+Custom droids live as `.md` files under either your project's `.factory/droids/` or your personal `~/.factory/droids/` directory. When enabled, the CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the **Task** tool. This lets the primary assistant spin up purpose-built helpers mid-session.
 
 - **Project droids** sit in `<repo>/.factory/droids/` and are shared with teammates.
 - **Personal droids** live in `~/.factory/droids/` and follow you across workspaces.
@@ -33,11 +33,17 @@ Custom droids live as `.md` files under either your project’s `.factory/droids
 
 ## 3 · Quick start
 
-1. Open **Settings** (`Shift+Tab` → **Settings**) and toggle **Custom Droids** under the _Experimental_ section. This persists `"enableCustomDroids"` in `~/.factory/settings.json` and registers the Task tool.
-2. Run `/droids` to launch the Droids menu.
-3. Choose **Create a new Droid**, pick a storage location (project or personal), then follow the wizard to set an identifier, system prompt, tools, and model.
-4. Save. The CLI writes `<name>.md` into the chosen `droids/` directory and normalizes the filename (lowercase, hyphenated).
-5. Ask droid to use it, e.g. “Run the Task tool with subagent `code-reviewer` to review this diff,” or trigger it from automation.
+1. Open **Settings** (`/settings`) and toggle **Custom Droids** under the _Experimental_ section. This persists `"enableCustomDroids"` in `~/.factory/settings.json` and registers the Task tool.
+2. Restart `droid`.
+3. Run `/droids` to launch the Droids menu.
+4. Choose **Create a new Droid**, pick a storage location (project or personal), then follow the wizard to set:
+   - Description of what the droid should do
+   - System prompt (auto-generated or manually edited)
+   - Identifier (name for the droid)
+   - Model (or inherit from parent session)
+   - Tools (explicit list of tool IDs)
+5. Save. The CLI writes `<name>.md` into the chosen `droids/` directory and normalizes the filename (lowercase, hyphenated).
+6. Ask droid to use it, e.g. "Run the Task tool with subagent `code-reviewer` to review this diff," or trigger it from automation.
 
 The loader caches scans for ~5 seconds. The current UI instantiates a fresh loader on every open, so changes usually show up on the next visit; a long-running watch is not yet enabled by default.
 
@@ -51,12 +57,11 @@ Each droid file is Markdown with YAML frontmatter.
 ---
 name: code-reviewer
 description: Focused reviewer that checks diffs for correctness risks
-model: claude-opus-4-1-20250805 # or claude-sonnet-4-20250514, gpt-5-2025-08-07, inherit
-tools: read-only # all | read-only | edit | execution | web | mcp | ["Read", "Edit", ...]
-version: v1
+model: inherit
+tools: ["Read", "LS", "Grep", "Glob"]
 ---
 
-You are the team’s senior reviewer. Examine the diff the parent agent shares and:
+You are the team's senior reviewer. Examine the diff the parent agent shares and:
 
 - flag correctness, security, and migration risks
 - list targeted follow-up tasks if changes are required
@@ -76,22 +81,21 @@ Key metadata fields:
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`                  | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                                                                     |
 | `description`           | Optional. Shown in the UI list. Keep ≤500 chars.                                                                                                                                  |
-| `model`                 | `claude-opus-4-1-20250805`, `claude-sonnet-4-20250514`, `gpt-5-2025-08-07`, or `inherit` (use the parent session’s model). The validator rejects other strings.                   |
-| `tools`                 | `all`, a category (`read-only`, `edit`, `execution`, `web`, `mcp`), or an explicit list of tool IDs (e.g. `"Read"`, `"Execute"`). Default is `all`, which enables every CLI tool. |
-| `createdAt`/`updatedAt` | Auto-filled when using the wizard; optional otherwise.                                                                                                                            |
-| `version`               | Optional string to track revisions.                                                                                                                                               |
+| `model`                 | `inherit` (use parent session's model), or specify an available model name. Run `/models` in the CLI to see available options.                                                   |
+| `tools`                 | Tool selection: `undefined` (all tools) or array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive.                                                                |
 
-Prompts must start with YAML frontmatter containing at least `name` and include a non-empty body. `DroidValidator` surfaces errors (invalid names, unknown models, unknown tools) and warnings (missing description, duplicated tools, unrestricted `all`). Validation issues appear in the CLI logs when a file fails to load.
+
+Prompts must start with YAML frontmatter containing at least `name` and include a non-empty body. `DroidValidator` surfaces errors (invalid names, unknown models, unknown tools) and warnings (missing description, duplicated tools). Validation issues appear in the CLI logs when a file fails to load.
 
 ### Tool categories → concrete tools
 
-| Category    | Tools granted (LLM IDs)                  |
-| ----------- | ---------------------------------------- |
-| `read-only` | `Read`, `Grep`, `Glob`, `LS`             |
-| `edit`      | `Edit`, `MultiEdit`, `Create`            |
-| `execution` | `Execute`                                |
-| `web`       | `WebSearch`, `FetchUrl`                  |
-| `mcp`       | Dynamically populated MCP tools (if any) |
+| Category    | Tool IDs                                 | Purpose                             |
+| ----------- | ---------------------------------------- | ----------------------------------- |
+| `read-only` | `Read`, `LS`, `Grep`, `Glob`             | Safe analysis and file exploration |
+| `edit`      | `Create`, `Edit`, `MultiEdit`            | Code generation and modifications  |
+| `execute`   | `Execute`                                | Shell command execution            |
+| `web`       | `WebSearch`, `FetchUrl`                  | Internet research and content      |
+| `mcp`       | Dynamically populated (if any)           | Model Context Protocol tools       |
 
 Explicit arrays must use the tool names above (case-sensitive). Unknown names cause validation errors.
 
@@ -99,24 +103,139 @@ Explicit arrays must use the tool names above (case-sensitive). Unknown names ca
 
 ## 5 · Managing droids in the UI
 
-`/droids` opens a modal with:
+`/droids` opens a modal displaying:
 
-- **Create a new Droid** – launches the guided flow above.
-- **List of droids** – shows name, summary, and location badge (Project / Personal).
-- Selecting a droid lets you **View**, **Edit**, **Delete**, or go **Back**.
+- **List of droids** – shows each droid with:
+  - Name and model in parentheses
+  - Description preview
+  - Location badge (Project / Personal)
+  - Tools summary (e.g., "All tools" or count of selected tools)
+- **Create a new Droid** – launches a guided wizard:
+  1. Choose location (Project or Personal)
+  2. Describe what the droid should do
+  3. Generate or manually edit the system prompt
+  4. Confirm identifier, model, and tools
+- **Import from Claude Code** – import existing agents from `~/.claude/agents/` as custom droids
+- **Actions** – View, Edit, Delete droids, or Reload to refresh the list
 
-The “Generate from description” flow in the creator is stubbed today—it seeds placeholder content while the generation pipeline is under construction.
+---
+
+## 5.5 · Importing Claude Code subagents
+
+You can import agents created in Claude Code (from `~/.claude/agents/`) as custom droids. This lets you reuse your existing Claude Code agents with the Factory Droid system.
+
+### How to import
+
+1. Run `/droids` to open the Droids menu
+2. Press **I** to start the import flow
+3. The CLI scans both project and personal Claude Code locations:
+   - **Project scope**: `~/.claude/agents/` (workspace-specific agents)
+   - **Personal scope**: `~/.claude/agents/` (personal agents)
+4. Review the list of available agents:
+   - Agents marked `(already exists)` are skipped
+   - Pre-select agents you want to import
+5. Press **Space** to toggle individual selections, **A** to toggle all
+6. Press **Enter** to import the selected agents
+
+### What happens during import
+
+The import process converts Claude Code agents into Factory Droids:
+
+1. **Metadata extraction**:
+   - Agent name → droid `name`
+   - Agent description (including examples and usage guidance) → droid `description`
+   - Agent instructions → droid system prompt (body)
+
+2. **Configuration mapping**:
+   - Model: Maps Claude Code model families to Factory models:
+     - `inherit` → `inherit`
+     - `sonnet` → first available Sonnet model
+     - `haiku` → first available Haiku model
+     - `opus` → first available Opus model
+   - Tools: Maps Claude Code tool names to Factory tools (may show validation warnings if tools don't map)
+   - Location: Imports to Personal `~/.factory/droids/` by default
+
+3. **Tool validation**:
+   - Some Claude Code tools may not have equivalents in Factory
+   - Invalid tools are listed with a warning: "Invalid tools: [list]"
+   - You can edit the droid to fix tool mappings or adjust tool access
+
+4. **File creation**:
+   - Creates a `.md` file in `~/.factory/droids/` (personal location)
+   - Filename is normalized (lowercase, hyphenated)
+   - File format: YAML frontmatter + system prompt body
+
+5. **Import report**:
+   - Shows success/failure for each agent
+   - Imported agents are immediately available in the droid list
+   - You can edit any imported droid to adjust model, tools, or prompt
+
+### Example import flow
+
+**Selection screen** (before import):
+
+```
+Import Droids (.claude/agents)
+
+Personal (~/.claude/agents/):
+> [x] polite-greeter
+  Use this agent when the user requests a greeting, says hello, or asks for a polite
+  welcome message. Examples: <example>...
+
+  [x] code-summarizer
+  Use this agent when you need to understand what a code file does without diving into
+  implementation details. Examples: <example>...
+
+↑/↓ navigate • Space select • A toggle all • Enter import • B back
+```
+
+**After import** (back in droid list):
+
+```
+Custom Droids
+
+> code-reviewer (gpt-5-codex)
+  This droid verifies the correct base branch and committed...
+  Location: Project  •  Tools: All tools
+
+  polite-greeter (claude-opus-4-1-20250805)
+  Use this agent when the user requests a greeting, says he...
+  Location: Personal  •  Tools: 1 selected  Invalid tools: Write, NotebookEdit
+
+  code-summarizer (claude-sonnet-4-5-20250929)
+  Use this agent when you need to understand what a code fi...
+  Location: Personal  •  Tools: All tools
+```
+
+### Handling tool validation errors
+
+After importing, if you see **"Invalid tools: [list]"**, it means some Claude Code tools don't have Factory equivalents:
+
+1. **View the droid** (press Enter) to see the full tool list
+2. **Edit the droid** (press E) to adjust:
+   - Remove invalid tools from the list
+   - Keep only valid Factory tools
+3. **Check available tools** - the list shows which Factory tools are available
+
+Common unmapped tools:
+- Claude Code tools like `Write`, `NotebookEdit`, `BrowseURL` don't exist in Factory
+- These should be replaced with equivalent Factory tools (e.g., `Edit`, `Create`, `WebSearch`)
+- Or remove the `tools` section entirely to enable all Factory tools
 
 ---
 
 ## 6 · Using custom droids effectively
 
-- **Invoke via the Task tool** – when custom droids are enabled, the droid may call it autonomously, or you can request it directly (“Use the subagent `security-auditor` on this change”).
-- **Switch models intentionally** – the subagent respects the `model` field. Use `inherit` when you want it to follow the parent session’s active provider and reasoning effort.
-- **Limit tool access** – prefer categories (e.g. `read-only`) or explicit lists so the subagent can’t execute unexpected shell commands.
-- **Version in git** – check `.factory/droids/*.md` into your repo to share prompts and review changes like code.
-
-Structuring the prompt to emit sections like `Summary:` and `Findings:` helps the Task tool UI summarize results.
+- **Invoke via the Task tool** – when custom droids are enabled, the droid may call it autonomously, or you can request it directly ("Use the subagent `security-auditor` on this change").
+- **Choose models strategically** – use `inherit` to match the parent session, or specify a different model for specialized tasks:
+  - Smaller/faster models for simple analysis and summary tasks (lower cost).
+  - Larger/more capable models for complex reasoning, code review, and multi-step analysis.
+  - Run `/models` in the CLI to see available options for your workspace.
+- **Limit tool access** – use explicit tool lists to restrict what a subagent can do, preventing unexpected shell commands or other dangerous operations.
+- **Leverage live updates** – the Task tool now streams live progress, showing tool calls, results, and TodoWrite updates in real time as the subagent executes.
+- **Structure output** – organize the prompt to emit sections like `Summary:` and `Findings:` so the Task tool UI can summarize results clearly.
+- **Share and collaborate** – check `.factory/droids/*.md` into your repo so teammates can use shared droids, and version-control prompt updates like code.
+- **Leverage Claude Code agents** – import your existing Claude Code agents (see section 5.5) to reuse them as custom droids in Factory.
 
 ---
 
@@ -128,11 +247,11 @@ Structuring the prompt to emit sections like `Summary:` and `Findings:` helps th
 ---
 name: code-reviewer
 description: Reviews diffs for correctness, tests, and migration fallout
-model: claude-opus-4-1-20250805
-tools: read-only
+model: inherit
+tools: Read, LS, Grep, Glob
 ---
 
-You are the team’s principal reviewer. Given the diff and context:
+You are the team's principal reviewer. Given the diff and context:
 
 - Summarize the intent of the change.
 - Flag correctness risks, missing tests, or rollback hazards.
@@ -147,7 +266,7 @@ Findings:
 - <action or leave blank>
 ```
 
-Use: “Run the subagent `code-reviewer` on the staged diff.”
+Use: "Run the subagent `code-reviewer` on the staged diff."
 
 ### Security sweeper (personal scope)
 
@@ -155,11 +274,8 @@ Use: “Run the subagent `code-reviewer` on the staged diff.”
 ---
 name: security-sweeper
 description: Looks for insecure patterns in recently edited files
-model: gpt-5-2025-08-07
-tools:
-  - Read
-  - Grep
-  - WebSearch
+model: inherit
+tools: Read, Grep, WebSearch
 ---
 
 Investigate the files referenced in the prompt for security issues:
@@ -177,6 +293,25 @@ Findings:
 - <recommendation>
 ```
 
+### Task coordinator (with live progress)
+
+```md
+---
+name: task-coordinator
+description: Coordinates multi-step tasks with live progress updates
+model: inherit
+tools: Read, Edit, Execute, TodoWrite
 ---
 
-With custom droids, you capture tribal knowledge as code. Compose specialized prompts once, assign the right tools, and let the primary assistant delegate heavy lifts to the subagents you design.
+You are a task coordinator. Break down the goal into actionable steps:
+
+1. Use TodoWrite to create and update a task list
+2. For each task, read relevant files and execute commands as needed
+3. Report progress in real-time using TodoWrite updates
+
+Keep the task list updated with completion status (pending, in_progress, completed).
+```
+
+---
+
+With custom droids, you capture tribal knowledge as code. Compose specialized prompts once, assign the right tools and models, and let the primary assistant delegate heavy lifts to the subagents you design.
