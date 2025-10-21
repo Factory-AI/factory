@@ -1,22 +1,22 @@
 ---
-title: Best Practices for Remote Workspaces
+title: Remote Workspaces - Best Practices
 description: Proven tips and workflows to get the most out of remote workspaces in Factory
 ---
 
 Remote workspaces let you spin up consistent, production-ready development environments in seconds. Below are field-tested practices that keep workspaces fast, predictable, and team-friendly.
 
-## 1. Smart Custom Commands Setup
+## 1. Smart Setup Script Practices
 
 | Practice                           | Why it matters                                        | How to do it                                                                                          |
 | ---------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | **Order commands by dependency**   | Later commands may depend on earlier installs.        | Run package installation first: `npm ci && npm run build` or `pip install -r requirements.txt && pytest -q` |
 | **Use exact package managers**     | Consistent lockfiles prevent version drift.           | Use `npm ci` (not `npm install`), `pnpm -w i`, or `pip install -r requirements.txt` for reproducible builds |
-| **Chain related steps with &&**    | Stops build on first failure, saves debugging time.   | `npm ci && npm run build && npm run test` fails fast if any step breaks |
+| **Add error handling**             | Stops build on first failure, saves debugging time.   | Start your script with `#!/usr/bin/env bash` and `set -euo pipefail` for proper error handling |
 | **Make scripts executable early**  | Avoid permission errors mid-build.                    | Add `chmod +x ./scripts/setup.sh && bash ./scripts/setup.sh` or use `bash ./scripts/setup.sh` directly |
-| **Keep commands idempotent**       | Re-running setup shouldn't break things.              | Use flags like `pip install --no-deps` or check for existing files before creating them |
+| **Keep scripts idempotent**        | Re-running setup shouldn't break things.              | Use flags like `pip install --no-deps` or check for existing files before creating them |
 | **Minimize heavy operations**      | Long builds slow down workspace creation.             | Focus on essential setup; defer optional tools to manual installation later |
 
-> **Tip:** Test your setup commands locally first. Each command runs with `bash` strict mode (`set -euo pipefail`) at the repo root.
+> **Tip:** Test your setup script locally first. The script runs with `bash` at the repo root, and you can add `set -euo pipefail` for strict error handling.
 
 
 ---
@@ -43,7 +43,7 @@ Remote workspaces let you spin up consistent, production-ready development envir
 | Tip                         | Details                                                                                                             |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | **Name workspaces clearly** | Name workspaces according to the tracked repository, e.g. `factory-mono` to work on the `factory-mono` GitHub repo. |
-| **Document entry commands** | Add a `README_REMOTE_WORKSPACE.md` with common tasks (`npm run dev`, `pytest`)—new hires onboard instantly.         |
+| **Document entry commands** | Add an `AGENTS.md` file with common tasks (`npm run dev`, `pytest`). Droid automatically reads this file.           |
 
 ## 5. Troubleshooting at a Glance
 
