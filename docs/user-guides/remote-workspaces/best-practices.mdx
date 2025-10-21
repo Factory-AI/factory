@@ -5,78 +5,45 @@ description: Proven tips and workflows to get the most out of remote workspaces 
 
 Remote workspaces let you spin up consistent, production-ready development environments in seconds. Below are field-tested practices that keep workspaces fast, predictable, and team-friendly.
 
-## 1. Smart Custom Commands Setup
+## 1. Smart Setup Script Practices
 
 | Practice                           | Why it matters                                        | How to do it                                                                                          |
 | ---------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Order commands by dependency**   | Later commands may depend on earlier installs.       | Run package installation first: `npm ci && npm run build` or `pip install -r requirements.txt && pytest -q` |
-| **Use exact package managers**     | Consistent lockfiles prevent version drift.          | Use `npm ci` (not `npm install`), `pnpm -w i`, or `pip install -r requirements.txt` for reproducible builds |
-| **Chain related steps with &&**    | Stops build on first failure, saves debugging time.  | `npm ci && npm run build && npm run test` fails fast if any step breaks |
-| **Make scripts executable early**  | Avoid permission errors mid-build.                   | Add `chmod +x ./scripts/setup.sh && bash ./scripts/setup.sh` or use `bash ./scripts/setup.sh` directly |
-| **Keep commands idempotent**       | Re-running setup shouldn't break things.             | Use flags like `pip install --no-deps` or check for existing files before creating them |
+| **Order commands by dependency**   | Later commands may depend on earlier installs.        | Run package installation first: `npm ci && npm run build` or `pip install -r requirements.txt && pytest -q` |
+| **Use exact package managers**     | Consistent lockfiles prevent version drift.           | Use `npm ci` (not `npm install`), `pnpm -w i`, or `pip install -r requirements.txt` for reproducible builds |
+| **Add error handling**             | Stops build on first failure, saves debugging time.   | Start your script with `#!/usr/bin/env bash` and `set -euo pipefail` for proper error handling |
+| **Make scripts executable early**  | Avoid permission errors mid-build.                    | Add `chmod +x ./scripts/setup.sh && bash ./scripts/setup.sh` or use `bash ./scripts/setup.sh` directly |
+| **Keep scripts idempotent**        | Re-running setup shouldn't break things.              | Use flags like `pip install --no-deps` or check for existing files before creating them |
 | **Minimize heavy operations**      | Long builds slow down workspace creation.             | Focus on essential setup; defer optional tools to manual installation later |
 
-> **Tip:** Test your setup commands locally first. Each command runs with `bash` strict mode (`set -euo pipefail`) at the repo root.
+> **Tip:** Test your setup script locally first. The script runs with `bash` at the repo root, and you can add `set -euo pipefail` for strict error handling.
+
 
 ---
 
-## 2. Git Workflows Inside a Remote Workspace
-
-<CardGroup cols={2}>
-
-  <Card title="Branch Fast" icon="git-branch">
-    Create feature branches as you would locally:
-    `git checkout -b feature/workspace-improvements`.
-  </Card>
-
-  <Card title="Commit Often" icon="git-commit">
-    Short commit cycles reduce merge pain and keep your workspace snapshot small.
-  </Card>
-
-  <Card title="Push via HTTPS" icon="cloud-upload">
-    Remote credentials are injected automatically—no need to copy SSH keys.
-  </Card>
-
-  <Card title="Use Rebase for Clean History" icon="layers">
-    `git pull --rebase origin main` keeps your branch up-to-date without noisy merge commits.
-  </Card>
-
-</CardGroup>
-
-<Note>
-  Remember: everything you do in a remote workspace happens **inside the cloud environment**. Your local machine stays untouched until you pull changes down.
-</Note>
-
----
-
-## 3. Workflow Patterns That Scale
+## 2. Workflow Patterns That Scale
 
 <AccordionGroup>
 
   <Accordion title="Spin-Up-Per-Task">
-    Treat remote workspaces as disposable: create one per ticket or PR, then archive when merged.  
+    Treat remote sessions as disposable: create one per ticket or PR, then archive when merged.  
     **Benefits:** perfect isolation, zero “works on my machine” drift.
   </Accordion>
 
-  <Accordion title="Shared Review Environments">
-    For larger features, keep a named workspace (e.g., “design-review”) that teammates can attach to for demos or QA.  
-    **How:** Grant workspace visibility to your team and share the session URL.
-  </Accordion>
-
   <Accordion title="Parallel Environments">
-    Need to test multiple branches? Launch two workspaces and attach them to separate sessions; switch context without killing processes.
+    Need to test multiple branches? Launch two separate sessions; switch context without killing processes.
   </Accordion>
 
 </AccordionGroup>
 
 ---
 
-## 4. Team Collaboration Tips
+## 3. Team Collaboration Tips
 
-| Tip                         | Details                                                                                                     |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Name workspaces clearly** | Use `service-purpose-branch` (e.g., `api-auth-refactor`) so teammates know what’s running.                  |
-| **Document entry commands** | Add a `README_REMOTE_WORKSPACE.md` with common tasks (`npm run dev`, `pytest`)—new hires onboard instantly. |
+| Tip                         | Details                                                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Name workspaces clearly** | Name workspaces according to the tracked repository, e.g. `factory-mono` to work on the `factory-mono` GitHub repo. |
+| **Document entry commands** | Add a `README_REMOTE_WORKSPACE.md` with common tasks (`npm run dev`, `pytest`)—new hires onboard instantly.         |
 
 ## 5. Troubleshooting at a Glance
 
@@ -85,13 +52,5 @@ Remote workspaces let you spin up consistent, production-ready development envir
 | **Rebuild is slow**          | Verify `.dockerignore`, cache heavy installs in image, use lighter base.     |
 | **Git asks for credentials** | Ensure repository integration is enabled in **Integrations → Repositories**. |
 | **Out-of-disk errors**       | Prune package caches (`npm cache clean --force`) or rebuild workspace.       |
-
----
-
-### Quick Checklist Before Merging Code
-
-- [ ] All tests pass inside remote workspace
-- [ ] Linter is green
-- [ ] Workspace hibernated or archived
 
 Following these practices keeps your remote workspaces fast, secure, and collaborative—so you can focus on shipping code, not configuring machines.
