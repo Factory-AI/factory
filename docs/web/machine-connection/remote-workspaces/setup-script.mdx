@@ -68,6 +68,6 @@ What happens under the hood:
 | Setup fails with "Setup script failed: …" | Check the build logs for specific error messages. Run the script locally to debug, add error handling, use non‑interactive flags (e.g., `-y`), then retry. |
 | Command not found | Install required tools earlier in your script or ensure they're available in the base Ubuntu image. |
 | Permission denied (scripts) | Make scripts executable (`chmod +x ./scripts/setup.sh`) or invoke via interpreter (`bash ./scripts/setup.sh`). |
-| Env var not applied | Add it in Environment Variables section and reference as `$VAR`. Avoid echoing secrets in your script. |
+| Env var not found | Add it in Environment Variables section and reference as `$VAR`. Avoid echoing secrets in your script. |
 | Long builds | Keep your script minimal; prefer cached installs (`npm ci` over `npm install`); avoid heavy, non‑essential work. |
 | Path/file not found | Scripts run at the repo root. Verify relative paths and that files exist after clone. |
