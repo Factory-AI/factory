@@ -1,0 +1,551 @@
+---
+title: "Complete Walkthrough (Video)"
+description: "Follow along with a comprehensive video tutorial covering installation, configuration, and all key features of the Droid CLI"
+---
+
+Watch this complete walkthrough to learn everything you need to know about using the Droid CLI, from basic installation to advanced configuration.
+
+<iframe
+  width="100%"
+  height="450"
+  src="/Users/bentossell/Desktop/factory-demos/getting started overview_final.mp4"
+  title="Getting Started with Droid CLI - Complete Walkthrough"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+  className="rounded-lg"
+/>
+
+<Note>
+  This 8-minute video covers the complete Droid CLI experience. Feel free to follow along or use the sections below as a reference guide.
+</Note>
+
+## Installation & Setup
+
+Get started by installing the Droid CLI in your terminal of choice.
+
+<CodeGroup>
+
+```bash macOS/Linux
+curl -fsSL https://app.factory.ai/cli | sh
+```
+
+```powershell Windows
+irm https://app.factory.ai/cli/windows | iex
+```
+
+</CodeGroup>
+
+Verify the installation:
+
+```bash
+which droid
+```
+
+Start the Droid CLI:
+
+```bash
+cd /path/to/your/project
+droid
+```
+
+### First-Time Authentication
+
+On your first run, you'll see an onboarding screen:
+
+1. Choose to create an account or log in
+2. Confirm the authentication code in your browser
+3. Return to the terminal to start using droid
+
+## Interface & Shortcuts
+
+### Help Menu
+
+Press `Shift + ?` to open the help menu, which shows:
+
+- How to send messages and create new lines
+- Available keyboard shortcuts
+- Basic navigation commands
+- Autonomy mode options
+
+<Note>
+  **Terminal-specific key bindings**: The default for new lines is `\` + `Enter`, but you can configure this to `Shift + Enter` or other combinations based on your terminal's key bindings. Check `/terminal-setup` in the CLI for configuration options.
+</Note>
+
+### Essential Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Enter` | Send message |
+| `\` + `Enter` (or `Shift + Enter`) | New line in message |
+| `Shift + ?` | Open help menu |
+| `Shift + Tab` | Cycle through autonomy modes |
+| `/` | Open command menu |
+| `Cmd + Shift + H` | Show root directory |
+| `Cmd + Shift + .` | Show hidden files/folders |
+| `Ctrl + C` or `exit` | Exit droid |
+
+### Paste Image
+
+The paste image shortcut works across all terminals, though the specific key binding may vary based on your terminal configuration.
+
+## Autonomy Modes
+
+Cycle through different autonomy levels by pressing `Shift + Tab`:
+
+[Learn more about Specification Mode →](/cli/user-guides/specification-mode)
+
+<AccordionGroup>
+  <Accordion title="Spec Mode (Research & Plan Only)">
+    Droid will research and create a plan without making any changes. Perfect for understanding what will happen before execution.
+    
+    - No file edits
+    - No command execution
+    - Creates detailed specifications
+    - Allows iteration on plans before proceeding
+  </Accordion>
+
+  <Accordion title="Low Mode (Read-Only + Safe Commands)">
+    Allows reading files and executing low-risk, read-only commands.
+    
+    - File reading
+    - Directory listing
+    - Safe diagnostic commands
+    - No modifications
+  </Accordion>
+
+  <Accordion title="Medium Mode (File Edits Allowed)">
+    Enables file modifications and medium-risk commands that are easily reversible.
+    
+    - Create/edit/delete files
+    - Run build commands
+    - Execute tests
+    - Reversible operations
+  </Accordion>
+
+  <Accordion title="High Mode (All Commands with Safeguards)">
+    Allows all commands but still maintains safety through allow/deny lists.
+    
+    - Full command execution
+    - File removal operations (with confirmation)
+    - Git operations
+    - Configurable via allow/deny lists
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  Even in High mode, certain dangerous operations (like removing files) will always require your approval unless you explicitly configure them in the allow list.
+</Warning>
+
+[Configure autonomy settings →](/cli/configuration/settings)
+
+## Slash Commands
+
+Press `/` to access the command menu with options for:
+
+- **Account & Billing** - Manage your Factory account
+- **Model** - Switch between AI models and set reasoning levels
+- **Sessions** - View and navigate previous sessions
+- **Settings** - Configure CLI preferences
+- **Terminal Setup** - Configure key bindings
+- **Custom Commands** - Access your [custom slash commands](/cli/configuration/custom-slash-commands)
+- **Droids** - Manage [custom sub-agents](/cli/configuration/custom-droids)
+- **MCP** - Configure [Model Context Protocol integrations](/cli/configuration/mcp)
+
+### Switching Models
+
+Access the model menu with `/model`:
+
+1. View available models (e.g., Codex, Claude Sonnet, GPT-4)
+2. Switch between models for different tasks
+3. Set reasoning level where applicable (e.g., for o1 models)
+
+<Tip>
+  Different models excel at different tasks. Use reasoning models for complex planning and faster models for routine edits.
+</Tip>
+
+[Learn about choosing your model →](/cli/user-guides/choosing-your-model)
+
+### Sessions Management
+
+Access with `/sessions`:
+
+- View all previous sessions
+- Navigate to any past session
+- Open sessions in the web interface
+- Continue work from where you left off
+
+Cloud sync must be enabled in settings for sessions to appear in the web interface.
+
+## Settings & Configuration
+
+Access settings via `/settings` to customize your experience:
+
+[Full settings documentation →](/cli/configuration/settings)
+
+### Core Settings
+
+<CardGroup cols={2}>
+  <Card title="Model & Reasoning">
+    Choose your default model and reasoning level for new sessions
+  </Card>
+  
+  <Card title="Diff Mode">
+    Configure how code changes are displayed
+  </Card>
+  
+  <Card title="GitHub Completion">
+    Enable/disable GitHub Copilot-style completions
+  </Card>
+  
+  <Card title="Cloud Sync">
+    Sync sessions to Factory web platform
+  </Card>
+</CardGroup>
+
+### Advanced Settings
+
+<AccordionGroup>
+  <Accordion title="Droid Co-Author on PRs">
+    When enabled, droid will be added as a co-author on pull requests it helps create. You can disable this if you prefer to be the sole author.
+  </Accordion>
+
+  <Accordion title="Droid Shield">
+    Protects environment variables and secrets in your code. Prevents accidental commits of sensitive information like API keys, passwords, and tokens.
+    
+    <Warning>
+      Keep this enabled to protect against security vulnerabilities.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Save Spec as Markdown">
+    Automatically saves specifications generated in Spec Mode as markdown files on your machine for reference and documentation.
+    
+    [Learn more about Specification Mode →](/cli/user-guides/specification-mode)
+  </Accordion>
+
+  <Accordion title="Allow List & Deny List">
+    Configure which commands require approval even in High autonomy mode. Even on High, file removal operations require confirmation by default.
+    
+    [Learn more about auto-run settings →](/cli/user-guides/auto-run)
+  </Accordion>
+</AccordionGroup>
+
+### IDE Integration
+
+Install the droid extension for VS Code, Cursor, and other IDEs directly from the settings menu.
+
+[Learn more about IDE integration →](/cli/configuration/ide-integrations)
+
+## Configuration Files
+
+Access your configuration directory by pressing `Cmd + Shift + H` to show your root directory, then `Cmd + Shift + .` to reveal hidden files. Navigate to the `~/.factory/` folder.
+
+### Directory Structure
+
+```
+~/.factory/
+├── config.json          # Model configuration and BYOK
+├── settings.json        # CLI settings and allow/deny lists
+├── mcp.json            # MCP integrations
+├── droids/             # Custom sub-agents
+├── commands/           # Custom slash commands
+├── logs/               # Session logs
+└── bug-reports/        # Crash reports
+```
+
+<Tip>
+  Learn more: [Settings](/cli/configuration/settings) | [Custom Slash Commands](/cli/configuration/custom-slash-commands) | [Custom Droids](/cli/configuration/custom-droids) | [MCP Configuration](/cli/configuration/mcp)
+</Tip>
+
+### config.json - Bring Your Own Key
+
+Configure custom models using your own API keys:
+
+```json
+{
+  "models": [
+    {
+      "provider": "openrouter",
+      "name": "anthropic/claude-3.5-sonnet",
+      "apiKey": "your-api-key-here",
+      "displayName": "Claude 3.5 Sonnet (OpenRouter)"
+    }
+  ]
+}
+```
+
+<Steps>
+  <Step title="Find Provider Documentation">
+    Visit [Bring Your Own Key documentation](/cli/byok/overview) and select your provider (OpenRouter, Fireworks, etc.)
+  </Step>
+  
+  <Step title="Copy Configuration Template">
+    Copy the JSON configuration for your chosen provider
+  </Step>
+  
+  <Step title="Add to config.json">
+    Paste the configuration into `~/.factory/config.json` and add your API key
+  </Step>
+  
+  <Step title="Select Model">
+    Use `/model` in the CLI to select your newly added model
+  </Step>
+</Steps>
+
+[See all BYOK providers →](/cli/byok/overview)
+
+### settings.json - Allow & Deny Lists
+
+Configure which commands require approval in High autonomy mode:
+
+```json
+{
+  "autoModeAllow": [],
+  "autoModeDeny": [
+    "git push",
+    "rm -rf",
+    "npm publish"
+  ]
+}
+```
+
+Even in High mode, commands in the `autoModeDeny` list will always require your explicit approval before execution.
+
+### mcp.json - MCP Integrations
+
+Enable or disable MCP tools individually:
+
+```json
+{
+  "mcpServers": {
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "your-api-key"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-playwright"],
+      "disabled": true
+    }
+  }
+}
+```
+
+Set `"disabled": true` to temporarily disable an MCP without removing its configuration.
+
+[Learn more about MCP configuration →](/cli/configuration/mcp)
+
+## Custom Droids (Sub-Agents)
+
+Custom droids are specialized AI agents that handle specific tasks. Access the droids menu with `/droids`:
+
+### Managing Droids
+
+- **Import** (`i`) - Import pre-built droids from explored agents
+- **Create** (`c`) - Create a new custom droid
+- **Edit** - Modify existing droid configurations
+- **Enable/Disable** - Toggle droids on or off
+
+### Creating a Custom Droid
+
+<Steps>
+  <Step title="Choose Scope">
+    Decide if the droid should be **project-level** (specific repository) or **personal** (available across all projects)
+  </Step>
+  
+  <Step title="Generation Method">
+    Choose to create manually or generate with droid's help:
+    
+    ```
+    I want a code review droid that checks for security issues and coding standards
+    ```
+    
+    Droid will generate an appropriate description and configuration
+  </Step>
+  
+  <Step title="Configure Model">
+    - **Inherit**: Use the same model as the parent session
+    - **Specific Model**: Choose a dedicated model for this droid (e.g., use a reasoning model for complex analysis)
+  </Step>
+  
+  <Step title="Enable Tools">
+    Select which tools and capabilities the droid should have access to
+  </Step>
+  
+  <Step title="Save & Edit">
+    Confirm the configuration and optionally edit the details
+  </Step>
+</Steps>
+
+### Example Use Cases
+
+- **Code Review Droid** - Automated code reviews for pull requests
+- **Documentation Droid** - Generates and maintains documentation
+- **Test Generation Droid** - Creates comprehensive test suites
+- **Security Audit Droid** - Scans for vulnerabilities and security issues
+
+[Learn more about custom droids →](/cli/configuration/custom-droids)
+
+## MCP Integrations
+
+Model Context Protocol (MCP) allows droid to integrate with external tools and data sources.
+
+### Adding MCPs via CLI
+
+Use the `/mcp add` command:
+
+```bash
+/mcp add
+```
+
+Then provide the MCP details:
+- **Name**: Identifier for the MCP
+- **Command**: Executable command (e.g., `npx`, `python`)
+- **Args**: Command arguments
+- **Environment Variables**: API keys and configuration
+
+### Listing Configured MCPs
+
+```bash
+/mcp list
+```
+
+This shows all configured MCPs and their enabled/disabled status.
+
+<Note>
+  After adding or modifying MCPs, you may need to restart the CLI for changes to take effect.
+</Note>
+
+### Adding MCPs via Configuration File
+
+You can also directly edit `~/.factory/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/directory"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
+### Popular MCP Integrations
+
+- **Brave Search** - Web search capabilities
+- **Playwright** - Browser automation
+- **GitHub** - Repository and issue management
+- **Filesystem** - Extended file system access
+- **Postgres** - Database queries
+- **Slack** - Team communication
+
+[Browse all MCP servers →](/cli/configuration/mcp)
+
+## Example Workflow: Spec Mode to Implementation
+
+Here's a complete workflow demonstrating droid's capabilities:
+
+<Steps>
+  <Step title="Start in Spec Mode">
+    Press `Shift + Tab` until you're in Spec mode
+    
+    ```
+    Create an authentication system with GitHub and Google OAuth
+    ```
+  </Step>
+  
+  <Step title="Review the Plan">
+    Droid generates a detailed specification:
+    - Architecture decisions
+    - Files to create/modify
+    - Dependencies needed
+    - Implementation steps
+  </Step>
+  
+  <Step title="Iterate on the Spec">
+    Refine the plan before implementation:
+    
+    ```
+    No Google, just GitHub
+    ```
+    
+    Droid updates the specification accordingly
+  </Step>
+  
+  <Step title="Approve and Proceed">
+    Once satisfied with the plan, proceed with High mode to implement
+  </Step>
+  
+  <Step title="Review Changes">
+    Droid shows exactly what will change and waits for your approval
+  </Step>
+</Steps>
+
+<Tip>
+  Spec mode is especially powerful for complex features. It allows you to validate the approach before any code is written.
+</Tip>
+
+[Read the full Specification Mode guide →](/cli/user-guides/specification-mode)
+
+[Learn about implementing large features →](/cli/user-guides/implementing-large-features)
+
+## Summary
+
+You've learned how to:
+
+- ✅ Install and authenticate with the Droid CLI
+- ✅ Navigate the interface and use keyboard shortcuts
+- ✅ Understand and switch between autonomy modes
+- ✅ Configure settings and preferences
+- ✅ Add custom models with BYOK
+- ✅ Create and manage custom droids (sub-agents)
+- ✅ Integrate external tools via MCP
+- ✅ Use spec mode for planning before implementation
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="How to Talk to a Droid"
+    icon="comments"
+    href="/cli/getting-started/how-to-talk-to-a-droid"
+  >
+    Learn best practices for communicating with droid
+  </Card>
+  
+  <Card
+    title="Common Use Cases"
+    icon="lightbulb"
+    href="/cli/getting-started/common-use-cases"
+  >
+    Explore real-world workflows and scenarios
+  </Card>
+  
+  <Card
+    title="Become a Power User"
+    icon="bolt"
+    href="/cli/user-guides/become-a-power-user"
+  >
+    Advanced techniques and productivity tips
+  </Card>
+  
+  <Card
+    title="AGENTS.md Guide"
+    icon="file-lines"
+    href="/cli/configuration/agents-md"
+  >
+    Document project-specific conventions
+  </Card>
+</CardGroup>
