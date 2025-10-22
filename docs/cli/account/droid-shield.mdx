@@ -47,8 +47,8 @@ Droid Shield scans for a wide range of credential patterns, including:
 
 Droid Shield uses smart pattern matching with randomness validation:
 
-- **Pattern matching** - Identifies credentials by format (e.g., `fk-...` for Factory keys, `ghp_...` for GitHub tokens)
-- **Randomness check** - Validates that captured values look like actual secrets (high entropy)
+- **Pattern matching** - Identifies credentials by format
+- **Randomness check** - Validates that captured values look like actual secrets
 - **Context awareness** - Considers variable names and assignment patterns to reduce false positives
 
 ---
@@ -104,7 +104,7 @@ If you would like to override, you can either:
   </Step>
   <Step title="Remove the secrets">
     - Use environment variables instead of hardcoded credentials
-    - Move secrets to secure credential stores (e.g., AWS Secrets Manager, 1Password)
+    - Move secrets to secure credential stores
     - Add sensitive files to `.gitignore`
     - Use git filter-branch or BFG Repo-Cleaner if secrets were already committed
   </Step>
