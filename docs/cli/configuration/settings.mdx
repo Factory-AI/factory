@@ -26,13 +26,12 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 
 | Setting | Options | Default | Description |
 | ------- | ------- | ------- | ----------- |
-| `model` | Provider IDs such as `claude-sonnet-4-5-20250929`, `claude-opus-4-1-20250805`, `claude-sonnet-4-20250514`, `gpt-5-2025-08-07`, `gpt-5-codex`, `glm-4.6`, `claude-haiku-4-5-20251001` | `claude-sonnet-4-5-20250929` | Default model for new sessions (friendly names shown inside `/settings`). |
+| `model` | `sonnet`, `opus`, `GPT-5`, `gpt-5-codex`, `haiku`, `droid-core`, `custom-model` | `sonnet` | The default AI model used by droid |
 | `reasoningEffort` | `off`, `none`, `low`, `medium`, `high` (availability depends on the model) | Model-dependent default | Controls how much structured thinking the model performs. |
 | `autonomyLevel` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
 | `cloudSessionSync` | `true`, `false` | `true` | Mirror CLI sessions to Factory web. |
 | `diffMode` | `github`, `unified` | `github` | Choose between split GitHub-style diffs and a single-column view. |
-| `completionSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`, or an absolute path to a `.wav` file | `off` | Audio cue when a response finishes. |
-| `completionSoundFocusMode` | `always`, `focused`, `unfocused` | `always` | Control when completion sounds play relative to terminal focus. |
+| `completionSound` | `off`, `bell` | `off` | Audio cue when a response finishes. |
 | `commandAllowlist` | Array of commands | Safe defaults provided | Commands that run without extra confirmation. |
 | `commandDenylist` | Array of commands | Restrictive defaults provided | Commands that always require confirmation. |
 | `includeCoAuthoredByDroid` | `true`, `false` | `true` | Automatically append the Droid co-author trailer to commits. |
@@ -43,15 +42,15 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 
 ### Model
 
-Use the settings menu to pick the default model for new sessions. The UI shows friendly names, while `settings.json` stores the provider IDs listed above:
+Choose the default AI model that powers your droid:
 
-- **Claude Sonnet 4.5** (`claude-sonnet-4-5-20250929`) – default balanced model.
-- **Claude Opus 4.1** (`claude-opus-4-1-20250805`) – highest capability Anthropic model.
-- **Claude Sonnet 4** (`claude-sonnet-4-20250514`) – previous-generation Sonnet.
-- **OpenAI GPT-5** (`gpt-5-2025-08-07`) – OpenAI flagship model.
-- **OpenAI GPT-5 Codex (Auto)** (`gpt-5-codex`) – optimized for IDE-style coding.
-- **Droid Core (GLM-4.6)** (`glm-4.6`) – factory-hosted open model.
-- **Claude Haiku 4.5** (`claude-haiku-4-5-20251001`) – fastest Anthropic tier.
+- **`sonnet`** - Claude Sonnet 4.5 (recommended, current default)
+- **`opus`** - Claude Opus 4.1 for complex tasks
+- **`GPT-5`** - Latest OpenAI model
+- **`gpt-5-codex`** - Advanced coding-focused model
+- **`haiku`** - Claude Haiku 4.5, fast and cost-effective
+- **`droid-core`** - GLM-4.6 open-source model
+- **`custom-model`** - Your own configured model via BYOK
 
 [You can also add custom models and BYOK.](/cli/configuration/byok)
 
@@ -84,24 +83,13 @@ When this switch is on, every CLI session is mirrored to Factory web so you can 
 
 ### Sound notifications
 
-Configure audio feedback when droid completes a response, helping you multitask without staring at the terminal:
+Configure audio feedback when droid completes a response:
 
-**Sound option (`completionSound`):**
-- **`fx-ok01`** – Friendly built-in chime.
-- **`fx-ack01`** – Tactile notification tone.
-- **`bell`** – System terminal bell.
-- **Absolute file path** – Point to your own `.wav` file.
-- **`off`** – Disable audio alerts.
-
-Place custom sounds somewhere readable by the CLI (for example `~/Sounds/droid-complete.wav`) and store the absolute path in `completionSound`. The TUI keeps existing custom paths in its menu so you can toggle them later.
-
-**Focus mode (`completionSoundFocusMode`):**
-- **`always`** – Play sounds regardless of terminal focus.
-- **`focused`** – Only play when the terminal window is focused.
-- **`unfocused`** – Only play when the terminal is in the background (useful for notifications).
+- **`bell`** – Use the system terminal bell
+- **`off`** – No sound notifications
 
 <Note>
-  Access sound settings quickly via `/settings` or `Shift+Tab` → **Settings** → **Sound** in the TUI.
+  Access sound settings via `/settings` or `Shift+Tab` → **Settings** in the TUI.
 </Note>
 
 ## Command allowlist & denylist
@@ -136,12 +124,11 @@ Review and update these arrays periodically to match your workflow and security 
 
 ```json
 {
-  "model": "claude-sonnet-4-5-20250929",
+  "model": "sonnet",
   "reasoningEffort": "low",
   "diffMode": "github",
   "cloudSessionSync": true,
-  "completionSound": "fx-ok01",
-  "completionSoundFocusMode": "focused"
+  "completionSound": "bell"
 }
 ```
 
@@ -149,6 +136,7 @@ Review and update these arrays periodically to match your workflow and security 
 
 ### Need more?
 
-- [Factory CLI overview](/cli/getting-started/overview) – see the main TUI workflow
+- [CLI Overview](/cli/getting-started/overview) – see the main TUI workflow
+- [CLI Reference](/cli/configuration/cli-reference) – command flags & options
 - [IDE Integrations](/cli/configuration/ide-integrations) – editor-specific setup
 - [Custom models & BYOK](/cli/configuration/byok) - add custom models and API keys

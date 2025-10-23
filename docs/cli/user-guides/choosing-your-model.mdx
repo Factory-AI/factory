@@ -3,20 +3,20 @@ title: Choosing Your Model
 description: Balance accuracy, speed, and cost by picking the right model and reasoning level for each CLI task.
 ---
 
-Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Wednesday, September 24th 2025.
+Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Wednesday, October 23rd 2025.
 
 ---
 
-## 1 · Current stack rank (September 2025)
+## 1 · Current stack rank (October 2025)
 
-| Rank | Model                               | Why we reach for it                                                                                                                                           |
-| ---- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1    | **Claude Sonnet 4.5**               | Recommended daily driver. Stellar for deep planning, architectural reviews, and product specs while keeping latency and cost practical.                   |
-| 2    | **Claude Opus 4.1**                 | Comparable depth to Sonnet 4.5 and a dependable fallback when you need every ounce of Anthropic capability for critical audits or extremely long edits.   |
-| 3    | **GPT‑5 Codex**                     | Nearly Opus-level output with noticeably lower latency and ~5× lower cost. Excellent for implementation-heavy coding loops.                              |
-| 4    | **GPT‑5**                           | Strong generalist. Choose it when you prefer OpenAI ergonomics or require parity with GPT features available elsewhere.                                  |
-| 5    | **Claude Haiku 4.5**                | Fast and cost-effective for routine tasks, quick iterations, and high-volume automation.                                                                   |
-| 6    | **Droid Core (GLM-4.6)**            | Native Factory model with a 0.25× token multiplier. Lightning-fast and budget-friendly for automation, bulk edits, and environments where you want guaranteed availability without external providers. |
+| Rank | Model                    | Why we reach for it                                                                                                                              |
+| ---- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | **Claude Sonnet 4.5**    | Recommended daily driver. Excellent balance of quality, speed, and cost for most development tasks. Current CLI default.                        |
+| 2    | **GPT-5 Codex**          | Fast iteration loops with strong coding performance. Great for implementation-heavy work at lower cost than Sonnet.                             |
+| 3    | **Claude Haiku 4.5**     | Fast and cost-effective for routine tasks, quick iterations, and high-volume automation. Best for speed-sensitive workflows.                    |
+| 4    | **Droid Core (GLM-4.6)** | Open-source model with 0.25× token multiplier. Lightning-fast and budget-friendly for automation, bulk edits, and air-gapped environments.     |
+| 5    | **GPT-5**                | Strong generalist from OpenAI. Choose when you prefer OpenAI ergonomics or need specific GPT features.                                          |
+| 6    | **Claude Opus 4.1**      | Highest capability for extremely complex work. Use when you need maximum reasoning power for critical architecture decisions or tough problems. |
 
 <Note>
   We ship model updates regularly. When a new release overtakes the list above,
@@ -27,13 +27,17 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 
 ## 2 · Match the model to the job
 
-| Scenario                                                         | Recommended model                                                                                                                                      |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Deep planning, architecture reviews, ambiguous product specs** | Default to **Sonnet 4.5** – it delivers Opus-grade reasoning with friendlier turnaround. Pull in **Opus 4.1** only when you need the absolute ceiling.  |
-| **Full-feature development, large refactors**                    | **Sonnet 4.5** is the recommended daily driver; switch to **Opus 4.1** for edge cases or **GPT‑5 Codex** when you want faster iteration loops.         |
-| **Repeatable edits, summarization, boilerplate generation**      | **GPT‑5** or **Sonnet 4.5** keep costs low while staying accurate.                                                                                     |
-| **CI/CD or automation loops**                                    | Favor **Sonnet 4.5** or **GPT‑5 Codex** for predictable throughput. Promote critical planning steps to **Opus 4.1** only when correctness demands it.   |
-| **High-volume automation, frequent quick turns**                 | **Claude Haiku 4.5** for speedy feedback loops at the lowest cost tier.                                                                               |
+| Scenario                                                         | Recommended model                                                                                                                          |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Sonnet 4.5** for strong reasoning at practical cost. Use **GPT-5 Codex** for faster iteration or **Haiku 4.5** for lighter tasks. |
+| **Full-feature development, large refactors**                    | **Sonnet 4.5** is the recommended daily driver. Try **GPT-5 Codex** when you want faster loops or **Droid Core** for high-volume work.   |
+| **Repeatable edits, summarization, boilerplate generation**      | **Haiku 4.5** or **Droid Core** for speed and cost savings. **GPT-5** or **Sonnet 4.5** when you need higher quality.                     |
+| **CI/CD or automation loops**                                    | Favor **Haiku 4.5** or **Droid Core** for predictable throughput at low cost. Use **Sonnet 4.5** or **Codex** for complex automation.    |
+| **High-volume automation, frequent quick turns**                 | **Haiku 4.5** for speedy feedback loops. **Droid Core** when cost is critical or you need air-gapped deployment.                          |
+
+<Tip>
+  **Claude Opus 4.1** remains available for extremely complex architecture decisions or critical work where you need maximum reasoning capability. Most tasks don't require Opus-level power—start with Sonnet 4.5 and escalate only if needed.
+</Tip>
 
 Tip: you can swap models mid-session with `/model` or by toggling in the settings panel (`Shift+Tab` → **Settings**).
 
@@ -50,8 +54,8 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 
 ## 4 · Reasoning effort settings
 
-- Anthropic models (Opus/Sonnet) show modest gains between Low and High.
-- GPT models respond much more to higher reasoning effort—bumping **GPT‑5** or **GPT‑5 Codex** to **High** can materially improve planning and debugging.
+- Anthropic models (Opus/Sonnet/Haiku) show modest gains between Low and High.
+- GPT models respond much more to higher reasoning effort—bumping **GPT-5** or **GPT-5 Codex** to **High** can materially improve planning and debugging.
 - Reasoning effort increases latency and cost, so start Low for simple work and escalate when you need more depth.
 
 <Tip>
