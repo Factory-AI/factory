@@ -9,11 +9,14 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 
 ## 1 · Current stack rank (September 2025)
 
-| Rank | Model                               | Why we reach for it                                                                                                                                    |
-| ---- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1    | **Claude Opus 4.1**                 | Highest reliability on complex planning, architecture decisions, and long edits. Slight lead in reasoning and code quality, but also the highest cost. |
-| 2    | **GPT‑5 Codex**                     | Nearly Opus-level output with noticeably lower latency and ~5× lower cost. Great daily driver for implementation work.                                 |
-| 3    | **GPT‑5** <br/> **Claude Sonnet 4** | Solid generalists. We see similar behavior between them; pick based on preference, latency, or cost.                                                   |
+| Rank | Model                               | Why we reach for it                                                                                                                                           |
+| ---- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | **Claude Sonnet 4.5**               | Recommended daily driver. Stellar for deep planning, architectural reviews, and product specs while keeping latency and cost practical.                   |
+| 2    | **Claude Opus 4.1**                 | Comparable depth to Sonnet 4.5 and a dependable fallback when you need every ounce of Anthropic capability for critical audits or extremely long edits.   |
+| 3    | **GPT‑5 Codex**                     | Nearly Opus-level output with noticeably lower latency and ~5× lower cost. Excellent for implementation-heavy coding loops.                              |
+| 4    | **GPT‑5**                           | Strong generalist. Choose it when you prefer OpenAI ergonomics or require parity with GPT features available elsewhere.                                  |
+| 5    | **Claude Haiku 4.5**                | Fast and cost-effective for routine tasks, quick iterations, and high-volume automation.                                                                   |
+| 6    | **Droid Core (GLM-4.6)**            | Native Factory model with a 0.25× token multiplier. Lightning-fast and budget-friendly for automation, bulk edits, and environments where you want guaranteed availability without external providers. |
 
 <Note>
   We ship model updates regularly. When a new release overtakes the list above,
@@ -24,12 +27,13 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 
 ## 2 · Match the model to the job
 
-| Scenario                                                         | Recommended model                                                                                                                                    |
-| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.1**. Switch down if you only need execution after the plan is locked.                                                            |
-| **Full-feature development, large refactors**                    | **GPT‑5 Codex** balances quality and speed; Opus is a good fallback if Codex struggles.                                                              |
-| **Repeatable edits, summarization, boilerplate generation**      | **GPT‑5** or **Sonnet 4** keep costs low while staying accurate.                                                                                     |
-| **CI/CD or automation loops**                                    | Favor **GPT‑5 Codex** or **Sonnet 4** for predictable throughput. Promote the critical planning steps to **Opus 4.1** when correctness matters most. |
+| Scenario                                                         | Recommended model                                                                                                                                      |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Deep planning, architecture reviews, ambiguous product specs** | Default to **Sonnet 4.5** – it delivers Opus-grade reasoning with friendlier turnaround. Pull in **Opus 4.1** only when you need the absolute ceiling.  |
+| **Full-feature development, large refactors**                    | **Sonnet 4.5** is the recommended daily driver; switch to **Opus 4.1** for edge cases or **GPT‑5 Codex** when you want faster iteration loops.         |
+| **Repeatable edits, summarization, boilerplate generation**      | **GPT‑5** or **Sonnet 4.5** keep costs low while staying accurate.                                                                                     |
+| **CI/CD or automation loops**                                    | Favor **Sonnet 4.5** or **GPT‑5 Codex** for predictable throughput. Promote critical planning steps to **Opus 4.1** only when correctness demands it.   |
+| **High-volume automation, frequent quick turns**                 | **Claude Haiku 4.5** for speedy feedback loops at the lowest cost tier.                                                                               |
 
 Tip: you can swap models mid-session with `/model` or by toggling in the settings panel (`Shift+Tab` → **Settings**).
 
@@ -60,6 +64,19 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 ## 5 · Bring Your Own Keys (BYOK)
 
 Factory ships with managed Anthropic and OpenAI access. If you prefer to run against your own accounts, BYOK is opt-in—see [Bring Your Own Keys](/cli/configuration/byok) for setup steps, supported providers, and billing notes.
+
+### Open-source models
+
+**Droid Core (GLM-4.6)** is an open-source alternative available in the CLI. It's useful for:
+
+- **Air-gapped environments** where external API calls aren't allowed
+- **Cost-sensitive projects** needing unlimited local inference
+- **Privacy requirements** where code cannot leave your infrastructure
+- **Experimentation** with open-source model capabilities
+
+**Note:** GLM-4.6 does not support image attachments. For image-based workflows, use Claude or GPT models.
+
+To use open-source models, you'll need to configure them via BYOK with a local inference server (like Ollama) or a hosted provider. See [BYOK documentation](/cli/configuration/byok) for setup instructions.
 
 ---
 
