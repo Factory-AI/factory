@@ -26,34 +26,71 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 
 | Setting | Options | Default | Description |
 | ------- | ------- | ------- | ----------- |
-| `model` | `sonnet`, `opus`, `GPT-5`, `gpt-5-codex` | `sonnet` | The default AI model used by droid |
-| `diffMode` | `github`, `diff` | `github` | How code changes are displayed |
-| `persistToCloud` | `true`, `false` | `false` | Sync CLI sessions to Factory web UI |
+| `model` | `sonnet`, `opus`, `GPT-5`, `gpt-5-codex`, `haiku`, `droid-core`, `custom-model` | `sonnet` | The default AI model used by droid |
+| `reasoningEffort` | `off`, `none`, `low`, `medium`, `high` (availability depends on the model) | Model-dependent default | Controls how much structured thinking the model performs. |
+| `autonomyLevel` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
+| `cloudSessionSync` | `true`, `false` | `true` | Mirror CLI sessions to Factory web. |
+| `diffMode` | `github`, `unified` | `github` | Choose between split GitHub-style diffs and a single-column view. |
+| `completionSound` | `off`, `bell` | `off` | Audio cue when a response finishes. |
+| `commandAllowlist` | Array of commands | Safe defaults provided | Commands that run without extra confirmation. |
+| `commandDenylist` | Array of commands | Restrictive defaults provided | Commands that always require confirmation. |
+| `includeCoAuthoredByDroid` | `true`, `false` | `true` | Automatically append the Droid co-author trailer to commits. |
+| `enableDroidShield` | `true`, `false` | `true` | Enable secret scanning and git guardrails. |
+| `specSaveEnabled` | `true`, `false` | `false` | Persist spec outputs to disk. |
+| `specSaveDir` | File path | `.factory/docs` | Directory used when `specSaveEnabled` is `true`. |
+| `enableCustomDroids` | `true`, `false` | `false` | Toggle the experimental Custom Droids feature. |
 
 ### Model
 
 Choose the default AI model that powers your droid:
 
-- **`sonnet`** - Balanced performance and speed (recommended)
-- **`opus`** - Most capable model for complex tasks  
+- **`sonnet`** - Claude Sonnet 4.5 (recommended, current default)
+- **`opus`** - Claude Opus 4.1 for complex tasks
 - **`GPT-5`** - Latest OpenAI model
 - **`gpt-5-codex`** - Advanced coding-focused model
+- **`haiku`** - Claude Haiku 4.5, fast and cost-effective
+- **`droid-core`** - GLM-4.6 open-source model
+- **`custom-model`** - Your own configured model via BYOK
 
 [You can also add custom models and BYOK.](/cli/configuration/byok)
+
+### Reasoning effort
+
+`reasoningEffort` adjusts how much structured thinking the model performs before replying. Available values depend on the model, but typically include:
+
+- **`off` / `none`** – disable structured reasoning (fastest).
+- **`low`**, **`medium`**, **`high`** – progressively increase deliberation time for more complex reasoning.
+
+Anthropic models default to `off`, while GPT-5 starts on `medium`.
+
+### Autonomy level
+
+`autonomyLevel` controls how proactively droid executes commands when sessions begin. Start at `normal`, or select an `auto-*` preset to pre-authorize additional actions.
 
 ### Diff mode
 
 Control how droid displays code changes:
 
-- **`github`** - Side-by-side, higher quality render (recommended)
-- **`diff`** - Traditional git diff format
+- **`github`** – Side-by-side, higher fidelity render (recommended).
+- **`unified`** – Traditional single-column diff format.
 
-### Persist to cloud
+### Cloud session sync
 
-When enabled, syncs your CLI sessions to your Factory web sessions so you can view them in the web UI:
+When this switch is on, every CLI session is mirrored to Factory web so you can revisit conversations in the browser:
 
-- **`true`** - CLI sessions appear in Factory web interface
-- **`false`** - CLI sessions remain local only
+- **`true`** – Sync sessions to the web app.
+- **`false`** – Keep sessions local only.
+
+### Sound notifications
+
+Configure audio feedback when droid completes a response:
+
+- **`bell`** – Use the system terminal bell
+- **`off`** – No sound notifications
+
+<Note>
+  Access sound settings via `/settings` or `Shift+Tab` → **Settings** in the TUI.
+</Note>
 
 ## Command allowlist & denylist
 
@@ -88,8 +125,10 @@ Review and update these arrays periodically to match your workflow and security 
 ```json
 {
   "model": "sonnet",
-  "diffMode": "github", 
-  "persistToCloud": true
+  "reasoningEffort": "low",
+  "diffMode": "github",
+  "cloudSessionSync": true,
+  "completionSound": "bell"
 }
 ```
 
@@ -97,6 +136,7 @@ Review and update these arrays periodically to match your workflow and security 
 
 ### Need more?
 
+- [CLI Overview](/cli/getting-started/overview) – see the main TUI workflow
 - [CLI Reference](/cli/configuration/cli-reference) – command flags & options
 - [IDE Integrations](/cli/configuration/ide-integrations) – editor-specific setup
 - [Custom models & BYOK](/cli/configuration/byok) - add custom models and API keys

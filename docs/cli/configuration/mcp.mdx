@@ -39,6 +39,8 @@ MCP (Model Context Protocol) servers extend Factory's capabilities by providing 
 | `add <name> <command-or-url>` | Add a new MCP server to the configuration    |
 | `remove <name>`               | Remove an MCP server from the configuration  |
 | `get <name>`                  | Show details about a specific MCP server     |
+| `enable <name> [name2...]`    | Enable one or more disabled servers          |
+| `disable <name> [name2...]`   | Disable one or more servers temporarily      |
 | `help [command]`              | Display help for a specific command          |
 
 <Note>If no command is specified, `/mcp` defaults to the `list` command.</Note>
@@ -180,6 +182,70 @@ Shows detailed information about a specific MCP server.
 ```bash
 /mcp get myserver
 ```
+
+### enable
+
+Enables one or more previously disabled MCP servers. Enabled servers will be available for use in your sessions.
+
+```bash
+/mcp enable <name> [name2 name3...]
+```
+
+**Arguments:**
+
+-   `name` - Server name(s) to enable (can specify multiple)
+
+**Options:**
+
+-   `-h, --help` - Display help for the enable command
+
+**Examples:**
+
+```bash
+# Enable a single server
+/mcp enable myserver
+
+# Enable multiple servers at once
+/mcp enable server1 server2 server3
+```
+
+**Notes:**
+
+-   Servers must already exist in your configuration
+-   If a server is already enabled, the command has no effect
+-   Use `/mcp list` to see which servers are currently disabled
+
+### disable
+
+Temporarily disables one or more MCP servers without removing them from your configuration. Disabled servers won't be available for use but can be re-enabled later.
+
+```bash
+/mcp disable <name> [name2 name3...]
+```
+
+**Arguments:**
+
+-   `name` - Server name(s) to disable (can specify multiple)
+
+**Options:**
+
+-   `-h, --help` - Display help for the disable command
+
+**Examples:**
+
+```bash
+# Disable a single server
+/mcp disable myserver
+
+# Disable multiple servers at once
+/mcp disable server1 server2 server3
+```
+
+**Notes:**
+
+-   Disabled servers remain in your configuration and can be re-enabled with `/mcp enable`
+-   Use this when you want to temporarily stop using a server without losing its configuration
+-   Disabled servers appear in `/mcp list` with a "disabled" indicator
 
 ## Getting Help
 
