@@ -1,0 +1,196 @@
+---
+title: Droid Shield
+description: Automatic secret detection to prevent accidental exposure of credentials in your git commits and pushes.
+---
+
+## What is Droid Shield?
+
+Droid Shield is a built-in security feature that automatically scans un-committed changes for potential secrets before committing and pushing them to remote. It acts as a safety net to prevent accidental exposure of sensitive credentials like API keys, tokens, and passwords in your version control history.
+
+---
+
+## How Droid Shield Works
+
+When you use Droid to perform `git commit` or `git push` operations, Droid Shield automatically:
+
+1. **Scans the diff** - Analyzes only the lines being added (not removed or unchanged)
+2. **Detects secrets** - Uses pattern matching to identify potential credentials
+3. **Blocks execution** - Stops the git operation if secrets are detected
+4. **Reports findings** - Shows exactly where potential secrets were found
+
+<Note>
+  Droid Shield only scans git operations performed through Droid. Manual git commands run outside of Droid are not affected.
+</Note>
+
+---
+
+## What Droid Shield Detects
+
+Droid Shield scans for a wide range of credential patterns, including:
+
+<CardGroup cols={2}>
+  <Card title="API Keys & Tokens" icon="key">
+    Factory API keys, GitHub tokens, GitLab tokens, npm tokens, and API keys from (e.g. AWS, Google Cloud, Stripe, SendGrid) and more.
+  </Card>
+  <Card title="Authentication Credentials" icon="user-lock">
+    (e.g. JWT, OAuth, session tokens), and URLs with embedded credentials.
+  </Card>
+  <Card title="Private Keys" icon="file-shield">
+    (e.g. SSH private keys, PGP keys, age secret keys, OpenSSH keys), and other cryptographic key formats.
+  </Card>
+  <Card title="Service-Specific Secrets" icon="cloud">
+    (e.g. Slack webhooks and tokens, Twilio credentials, Mailchimp keys, Square OAuth secrets, Azure storage keys).
+  </Card>
+</CardGroup>
+
+### Detection Algorithm
+
+Droid Shield uses smart pattern matching with randomness validation:
+
+- **Pattern matching** - Identifies credentials by format
+- **Randomness check** - Validates that captured values look like actual secrets
+- **Context awareness** - Considers variable names and assignment patterns to reduce false positives
+
+---
+
+## When Droid Shield Activates
+
+Droid Shield automatically activates during these git operations:
+
+- **`git commit`** - Scans staged changes before creating the commit
+- **`git push`** - Scans commits that would be pushed to the remote
+
+<Warning>
+  If secrets are detected, the git operation is blocked to prevent credential exposure. You'll need to remove the secrets before proceeding.
+</Warning>
+
+---
+
+## Managing Droid Shield Settings
+
+### In the CLI
+
+You can toggle Droid Shield on or off through the settings menu:
+
+1. Run `droid`
+2. Enter `/settings`
+3. Toggle **"Droid Shield"** setting
+4. Changes take effect immediately
+
+<Info>
+  Droid Shield is **enabled by default** for your protection. We strongly recommend keeping it enabled.
+</Info>
+
+---
+
+## What to Do if Secrets are Detected
+
+When Droid Shield detects potential secrets, you'll see an error message like:
+
+```
+Droid-Shield has detected potential secrets in 2 location(s) across files:
+src/config.ts, .env.example
+
+If you would like to override, you can either:
+1. Perform the commit/push yourself manually
+2. Disable Droid Shield by running /settings and toggling the "Droid Shield" option
+```
+
+### Recommended Actions
+
+<Steps>
+  <Step title="Review the findings">
+    Carefully examine the files and lines mentioned to identify what was detected.
+  </Step>
+  <Step title="Remove the secrets">
+    - Use environment variables instead of hardcoded credentials
+    - Move secrets to secure credential stores
+    - Add sensitive files to `.gitignore`
+    - Use git filter-branch or BFG Repo-Cleaner if secrets were already committed
+  </Step>
+  <Step title="Retry the operation">
+    Once secrets are removed, run the git command again through Droid.
+  </Step>
+</Steps>
+
+<Warning>
+  **Never disable Droid Shield just to bypass the check.** Exposed credentials can lead to security breaches, unauthorized access, and compliance violations.
+</Warning>
+
+### If You Get a False Positive
+
+Droid Shield uses conservative patterns to err on the side of caution. If you believe a detection is a false positive:
+
+1. **Verify it's not a real secret** - Double-check that the value isn't sensitive
+2. **Use a manual commit** - Perform the git operation yourself outside of Droid
+3. **Report the pattern** - Contact support@factory.ai if you encounter recurring false positives
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use environment variables">
+    Store all secrets in environment variables or secure credential managers, never hardcode them in source files.
+    
+    ```bash
+    # Good - Using environment variable
+    const apiKey = process.env.FACTORY_API_KEY;
+    
+    # Bad - Hardcoded secret
+    const apiKey = "fk-abc123xyz789...";
+    ```
+  </Accordion>
+  
+  <Accordion title="Keep Droid Shield enabled">
+    Droid Shield provides an essential safety layer. Keep it enabled at all times, especially in team environments.
+  </Accordion>
+  
+  <Accordion title="Review before committing">
+    Even with Droid Shield, manually review your changes before committing to ensure no sensitive data is included.
+  </Accordion>
+  
+  <Accordion title="Educate your team">
+    Make sure all team members understand how Droid Shield works and why it's important to keep it enabled.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Limitations
+
+<Note>
+  **Droid Shield is a detection tool, not a guarantee.** While it catches many common secret patterns, it cannot detect:
+  - Custom secret formats not in the pattern database
+  - Secrets that don't follow recognizable patterns
+  - Obfuscated or encoded credentials
+  - Business logic vulnerabilities or code security issues
+  
+  Always follow security best practices and never rely solely on automated tools for secret protection.
+</Note>
+
+---
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Security Overview" icon="shield" href="/cli/account/security">
+    Learn about Factory's comprehensive security features and best practices.
+  </Card>
+  <Card title="Settings" icon="gear" href="/cli/configuration/settings">
+    Configure Droid settings including Droid Shield preferences.
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+<CardGroup cols={2}>
+  <Card title="Security Questions" icon="envelope">
+    Email our security team: **security@factory.ai**
+  </Card>
+  <Card title="False Positives" icon="flag">
+    Contact **support@factory.ai** to report persistent false positive patterns.
+  </Card>
+</CardGroup>
