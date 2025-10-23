@@ -1,14 +1,9 @@
 ---
 title: CLI Reference
-description: Complete reference for droid commands, flags, and options
+description: Complete reference for droid command-line interface, including commands and flags
 ---
 
-## Overview
-
-The Factory CLI (`droid`) provides a powerful command-line interface for AI-powered software development. It operates in two modes:
-
-- **Interactive Mode** - Chat-like interface for multi-turn conversations (default)
-- **Non-Interactive Mode** - Single execution mode for automation (`droid exec`)
+> Comprehensive reference for Factory's `droid` CLI, covering interactive mode, automation, and all available flags.
 
 ## Installation
 
@@ -24,389 +19,141 @@ irm https://app.factory.ai/cli/windows | iex
 
 </CodeGroup>
 
-## Basic Usage
+The CLI operates in two modes:
 
-### Interactive Mode (Default)
+- **Interactive (`droid`)** - Chat-first REPL with slash commands
+- **Non-interactive (`droid exec`)** - Single-shot execution for automation and scripting
 
-Start a conversation with Droid in your terminal:
+## CLI commands
 
-```bash
-# Start interactive session
-droid
+| Command                          | Description                                 | Example                                         |
+| :------------------------------- | :------------------------------------------ | :---------------------------------------------- |
+| `droid`                          | Start interactive REPL                      | `droid`                                         |
+| `droid "query"`                  | Start REPL with initial prompt              | `droid "explain this project"`                  |
+| `droid exec "query"`             | Execute task without interactive mode       | `droid exec "summarize src/auth"`               |
+| `droid exec -f prompt.md`        | Load prompt from file                       | `droid exec -f .factory/prompts/review.md`      |
+| `cat file \| droid exec`         | Process piped content                       | `git diff \| droid exec "draft release notes"` |
+| `droid exec -s <id> "query"`     | Resume existing session in exec mode        | `droid exec -s session-123 "continue"`          |
+| `droid exec --list-tools`        | List available tools, then exit             | `droid exec --list-tools`                       |
 
-# Start with initial context
-droid "review the authentication system"
+## CLI flags
 
-# Start with a specific prompt
-droid "analyze app.tsx and suggest improvements"
-```
+Customize droid's behavior with command-line flags:
 
-In interactive mode, you can use slash commands to control the session. Type `/help` to see available commands.
+| Flag                             | Description                                                                                                  | Example                                                  |
+| :------------------------------- | :----------------------------------------------------------------------------------------------------------- | :------------------------------------------------------- |
+| `-f, --file <path>`              | Read prompt from a file                                                                                      | `droid exec -f plan.md`                                  |
+| `-m, --model <id>`               | Select a specific model (see [model IDs](#available-models))                                                 | `droid exec -m claude-opus-4-1-20250805`                 |
+| `-s, --session-id <id>`          | Continue an existing session                                                                                 | `droid exec -s session-abc123`                           |
+| `--auto <level>`                 | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)                                             | `droid exec --auto medium "run tests"`                   |
+| `--enabled-tools <ids>`          | Force-enable specific tools (comma or space separated)                                                       | `droid exec --enabled-tools ApplyPatch,Bash`             |
+| `--disabled-tools <ids>`         | Disable specific tools for this run                                                                          | `droid exec --disabled-tools execute-cli`                |
+| `--list-tools`                   | Print available tools and exit                                                                               | `droid exec --list-tools`                                |
+| `-o, --output-format <format>`   | Output format (`text`, `json`, `stream-json`)                                                                | `droid exec -o json "document API"`                      |
+| `--input-format <format>`        | Input format (`stream-json` for multi-turn)                                                                  | `droid exec --input-format stream-json -o stream-json`   |
+| `-r, --reasoning-effort <level>` | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`)                                           | `droid exec -r high "debug flaky test"`                  |
+| `--spec-model <id>`              | Use a different model for specification planning                                                             | `droid exec --spec-model claude-sonnet-4-5-20250929`     |
+| `--use-spec`                     | Start in specification mode (plan before executing)                                                          | `droid exec --use-spec "add user profiles"`              |
+| `--skip-permissions-unsafe`      | Skip all permission prompts (⚠️ use with extreme caution)                                                    | `droid exec --skip-permissions-unsafe`                   |
+| `--cwd <path>`                   | Execute from a specific working directory                                                                    | `droid exec --cwd ../service "run tests"`                |
+| `--delegation-url <url>`         | Override delegation service endpoint                                                                         | `droid exec --delegation-url https://custom.factory.ai`  |
+| `-v, --version`                  | Display CLI version                                                                                          | `droid -v`                                               |
+| `-h, --help`                     | Show help information                                                                                        | `droid --help`                                           |
 
-### Non-Interactive Mode
+<Tip>
+  Use `--output-format json` for scripting and automation, allowing you to parse droid's responses programmatically.
+</Tip>
 
-Execute single commands without entering interactive mode:
+## Autonomy levels
 
-```bash
-# Execute a prompt
-droid exec "add comments to all functions"
+`droid exec` uses tiered autonomy to control what operations the agent can perform. Only raise access when the environment is safe.
 
-# Read prompt from file
-droid exec -f prompt.txt
-
-# Read from stdin
-cat task.md | droid exec
-echo "analyze this code" | droid exec
-```
-
-## Main Commands
-
-### `droid`
-
-Start interactive mode with the AI assistant.
-
-**Usage:**
-```bash
-droid [options] [prompt...]
-```
-
-**Options:**
-- `-v, --version` - Output the version number
-- `-h, --help` - Display help for command
-
-**Examples:**
-```bash
-droid                              # Start interactive mode
-droid "review app.tsx"             # Start with initial prompt
-```
-
----
-
-### `droid exec`
-
-Execute a single command in non-interactive mode. Perfect for automation, scripts, and CI/CD pipelines.
-
-**Usage:**
-```bash
-droid exec [options] [prompt]
-```
-
-**Arguments:**
-- `prompt` - The task or prompt to execute
-
-**Core Options:**
-
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-f, --file <path>` | Read prompt from file | - |
-| `-m, --model <id>` | Model ID to use | `claude-sonnet-4-5-20250929` |
-| `-s, --session-id <id>` | Continue existing session | - |
-| `--auto <level>` | Autonomy level: `low\|medium\|high` | read-only |
-| `-o, --output-format <format>` | Output format | `text` |
-| `--input-format <format>` | Input format (`stream-json` for multi-turn) | - |
-| `--cwd <path>` | Working directory path | current directory |
-
-**Autonomy Levels:**
-
-Droid exec uses a tiered autonomy system to control what operations the agent can perform:
-
-#### Default (No Flags) - Read-Only Mode
-
-**The safest mode** for reviewing planned changes without execution.
-
-**Allowed:**
-- Reading files: `cat`, `less`, `head`, `tail`
-- Display commands: `echo`, `pwd`
-- Information gathering: `whoami`, `date`, `uname`, `ps`
-- Git read operations: `git status`, `git log`, `git diff`
-- Directory listing: `ls`, `find` (without `-delete`)
-
-**Blocked:**
-- All file modifications
-- Package installations
-- System changes
-
-**Use case:** Safe for reviewing what changes would be made
-
-```bash
-droid exec "Analyze the auth system and create a detailed plan"
-droid exec "Review codebase for security vulnerabilities"
-```
-
-#### `--auto low` - Low-Risk Operations
-
-Basic file operations while blocking system changes.
-
-**Allowed (in addition to read-only):**
-- File creation/modification: `touch`, `mkdir`, `mv`, `cp`
-- Basic edits in non-system directories
-
-**Blocked:**
-- System modifications
-- Package installations
-- Git commits/pushes
-
-**Use case:** Documentation updates, code formatting, adding comments
-
-```bash
-droid exec --auto low "add JSDoc comments to all functions"
-droid exec --auto low "fix typos in README.md"
-droid exec --auto low "format all Python files"
-```
-
-#### `--auto medium` - Development Operations
-
-Significant but recoverable side effects.
-
-**Allowed (in addition to low):**
-- Installing packages: `npm install`, `pip install` (without sudo)
-- Network requests: `curl`, `wget` to known APIs
-- Git operations (local): `git commit`, `git checkout`, `git pull`
-- Building code: `make`, `npm run build`, `mvn compile`
-
-**Blocked:**
-- `git push` commands
-- `sudo` commands
-- Production changes
-
-**Use case:** Local development, testing, dependency management
-
-```bash
-droid exec --auto medium "install deps, run tests, fix issues"
-droid exec --auto medium "update packages and resolve conflicts"
-droid exec --auto medium "set up dev environment and run tests"
-```
-
-#### `--auto high` - Production Operations
-
-Security implications or major side effects.
-
-**Allowed (in addition to medium):**
-- Running arbitrary code: `curl | bash`, `eval`
-- Git push operations: `git push`, `git push --force`
-- Production deployments
-- Database migrations
-- Operations accessing passwords/keys
-
-**Blocked:**
-- `sudo rm -rf /` (destructive system-wide changes)
-
-**Use case:** CI/CD pipelines, automated deployments
-
-```bash
-droid exec --auto high "fix bug, test, commit, and push"
-droid exec --auto high "deploy to staging after tests"
-droid exec --auto high "run database migration"
-```
-
-#### `--skip-permissions-unsafe` - Bypass All Checks
-
-**⚠️ DANGEROUS!** Allows ALL operations without confirmation.
-
-**Use case:** Isolated environments only (Docker, throwaway VMs)
-
-```bash
-# In a Docker container
-docker run --rm -v $(pwd):/workspace alpine:latest sh -c \
-  "droid exec --skip-permissions-unsafe 'Install system deps, modify configs'"
-```
-
-**Advanced Options:**
-
-| Flag | Description |
-|------|-------------|
-| `-r, --reasoning-effort <level>` | Reasoning effort (defaults per model) |
-| `--spec-model <id>` | Model for specification mode |
-| `--spec-reasoning-effort <level>` | Reasoning effort for spec mode |
-| `--use-spec` | Start in specification mode |
-| `--enabled-tools <ids>` | Enable specific tools (comma/space separated) |
-| `--disabled-tools <ids>` | Disable specific tools |
-| `--list-tools` | List available tools and exit |
-| `--delegation-url <url>` | Custom delegation URL |
-| `--log-group-id <id>` | Log group ID for filtering logs |
-| `--request-id <id>` | Request ID for tracking |
+| Level                         | Intended for             | Notable allowances                                                                 |
+| :---------------------------- | :----------------------- | :--------------------------------------------------------------------------------- |
+| *(default)*                   | Read-only reconnaissance | File reads, git diffs, environment inspection                                      |
+| `--auto low`                  | Safe edits               | Create/edit files, run formatters, non-destructive commands                        |
+| `--auto medium`               | Local development        | Install dependencies, build/test, local git commits                                |
+| `--auto high`                 | CI/CD & orchestration    | Git push, deploy scripts, long-running operations                                  |
+| `--skip-permissions-unsafe`   | Isolated sandboxes only  | Removes all guardrails (⚠️ use only in disposable containers)                      |
 
 **Examples:**
 
 ```bash
-# Tool management
-droid exec --list-tools
-droid exec --enabled-tools ApplyPatch "refactor without raising autonomy"
-droid exec --auto medium --disabled-tools execute-cli "edits only"
+# Default (read-only)
+droid exec "Analyze the auth system and create a plan"
 
-# Session continuation
-droid exec -s <session-id> "continue previous task"
+# Low autonomy - safe edits
+droid exec --auto low "Add JSDoc comments to all functions"
 
-# Streaming mode (for SDK integration)
-droid exec --input-format stream-json --output-format stream-json --auto low
+# Medium autonomy - development work
+droid exec --auto medium "Install deps, run tests, fix issues"
+
+# High autonomy - deployment
+droid exec --auto high "Run tests, commit, and push changes"
 ```
 
-## Available Models
+<Warning>
+  `--skip-permissions-unsafe` removes all safety checks. Use **only** in isolated environments like Docker containers.
+</Warning>
 
-Factory CLI supports multiple AI models:
+## Available models
 
-| Model ID | Name | Reasoning Support | Default Reasoning |
-|----------|------|-------------------|-------------------|
-| `claude-sonnet-4-5-20250929` | Claude Sonnet 4.5 (default) | Yes | off |
-| `gpt-5-codex` | OpenAI GPT-5-Codex (Auto) | No | none |
-| `gpt-5-2025-08-07` | OpenAI GPT-5 | Yes | medium |
-| `claude-opus-4-1-20250805` | Claude Opus 4.1 | Yes | off |
-| `claude-haiku-4-5-20251001` | Claude Haiku 4.5 | Yes | off |
-| `glm-4.6` | Droid Core (GLM-4.6) | No | none |
+| Model ID                      | Name                    | Reasoning support | Default reasoning |
+| :---------------------------- | :---------------------- | :---------------- | :---------------- |
+| `claude-sonnet-4-5-20250929`  | Claude Sonnet 4.5       | Yes               | off               |
+| `gpt-5-codex`                 | GPT-5 Codex (Auto)      | No                | none              |
+| `gpt-5-2025-08-07`            | GPT-5                   | Yes               | medium            |
+| `claude-opus-4-1-20250805`    | Claude Opus 4.1         | Yes               | off               |
+| `claude-haiku-4-5-20251001`   | Claude Haiku 4.5        | Yes               | off               |
+| `glm-4.6`                     | Droid Core (GLM-4.6)    | No                | none              |
 
-**Custom Models:**
+Custom models configured via [BYOK](/cli/configuration/byok) use the format: `custom:<alias>`
 
-You can also use custom models configured via BYOK:
+See [Choosing Your Model](/cli/user-guides/choosing-your-model) for detailed guidance on which model to use for different tasks.
+
+## Slash commands (interactive mode)
+
+Available when running `droid` in interactive mode. Type the command at the prompt:
+
+| Command                  | Description                                           |
+| :----------------------- | :---------------------------------------------------- |
+| `/account`               | Open Factory account settings in browser              |
+| `/billing`               | View and manage billing settings                      |
+| `/bug [title]`           | Create a bug report with session data and logs        |
+| `/clear`                 | Start a new session (alias for `/new`)                |
+| `/compress [prompt]`     | Compress session and move to new one with summary     |
+| `/cost`                  | Show token usage statistics                           |
+| `/help`                  | Show available slash commands                         |
+| `/mcp`                   | Manage Model Context Protocol servers                 |
+| `/model`                 | Switch AI model mid-session                           |
+| `/new`                   | Start a new session                                   |
+| `/sessions`              | List and select previous sessions                     |
+| `/settings`              | Configure application settings                        |
+| `/status`                | Show current droid status and configuration           |
+| `/terminal-setup`        | Configure terminal keybindings for Shift+Enter        |
+
+For detailed information on slash commands, see the [interactive mode documentation](/cli/getting-started/quickstart#useful-slash-commands).
+
+### MCP command reference
+
+The `/mcp` command manages Model Context Protocol servers:
 
 ```bash
-droid exec --model custom:deepseek-v3 "analyze this code"
-droid exec --model custom:google/gemini-2.5-flash "implement feature"
+/mcp list                    # List all configured servers
+/mcp add <name> <command>    # Add stdio-based server
+/mcp add --type http <url>   # Add HTTP-based server
+/mcp remove <name>           # Remove a server
+/mcp get <name>              # Show server details
+/mcp enable <name>           # Enable a disabled server
+/mcp disable <name>          # Temporarily disable a server
 ```
 
-See [Bring Your Own Key](/cli/configuration/byok) for custom model configuration.
-
-## Slash Commands (Interactive Mode)
-
-Available in interactive mode only. Type the command at the prompt:
-
-| Command | Description |
-|---------|-------------|
-| `/bug [title]` | Create a bug report with session data and logs |
-| `/clear` | Start a new session (alias for `/new`) |
-| `/compress [instructions]` | Compress session and move to new one with summary |
-| `/cost` | Show token usage statistics for current session |
-| `/help` | Show available slash commands |
-| `/mcp` | Manage MCP servers and configurations |
-| `/model` | Switch AI model mid-session |
-| `/new` | Start a new session |
-| `/sessions` | List and select previous sessions |
-| `/settings` | Configure application settings |
-| `/status` | Show current Droid status and configuration |
-| `/terminal-setup` | Configure terminal keybindings (Shift+Enter) |
-
-### `/bug` - Report a Bug
-
-Create a comprehensive bug report with session data and logs.
-
-```bash
-/bug Authentication issue with OAuth
-```
-
-### `/compress` - Compact Session
-
-Compress the current session and start a new one with a summary as context. Useful for long conversations that hit context limits.
-
-```bash
-/compress                                # Default compression
-/compress "Focus on authentication changes"  # Custom instructions
-```
-
-### `/cost` - Token Usage
-
-Display token usage statistics for the current session.
-
-```bash
-/cost
-```
-
-### `/mcp` - Manage MCP Servers
-
-Manage Model Context Protocol server configurations.
-
-**Subcommands:**
-- `list` - List configured MCP servers and their status
-- `add` - Add a new MCP server (stdio or http)
-- `remove <name>` - Remove an MCP server
-- `show <name>` - Show details about a specific server
-- `enable <name>` - Enable a disabled MCP server
-- `disable <name>` - Disable an MCP server without removing it
-
-```bash
-/mcp list
-/mcp add filesystem --type stdio
-/mcp enable github
-/mcp disable slack
-```
-
-See [MCP Configuration](/cli/configuration/mcp) for detailed setup.
-
-### `/model` - Switch Model
-
-Change the AI model mid-session.
-
-```bash
-/model                           # Show current model and options
-/model claude-opus-4-1-20250805  # Switch to Opus
-/model gpt-5-codex               # Switch to GPT-5-Codex
-```
-
-### `/new` - New Session
-
-Start a fresh session with no conversation history.
-
-```bash
-/new
-```
-
-### `/sessions` - Session Management
-
-List previous sessions and switch between them.
-
-```bash
-/sessions
-```
-
-### `/settings` - Configure Settings
-
-Open the settings interface to configure:
-- Autonomy levels
-- Model preferences
-- Custom slash commands
-- IDE integrations
-- And more
-
-```bash
-/settings
-```
-
-See [Settings Configuration](/cli/configuration/settings) for details.
-
-### `/status` - System Status
-
-Show current Droid status and configuration including:
-- Active model
-- Session ID
-- Autonomy level
-- Enabled tools
-- Authentication status
-
-```bash
-/status
-```
-
-### `/terminal-setup` - Terminal Configuration
-
-Configure terminal keybindings for Shift+Enter support in:
-- VS Code
-- Cursor
-- Windsurf
-- Windows Terminal
-
-```bash
-/terminal-setup
-```
+See [MCP Configuration](/cli/configuration/mcp) for complete documentation.
 
 ## Authentication
 
-Factory CLI requires an API key for authentication.
-
-### Getting an API Key
-
-1. Visit [https://app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)
-2. Create a new API key
-3. Set it as an environment variable
-
-### Setting Your API Key
+1. Generate an API key at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)
+2. Set the environment variable:
 
 <CodeGroup>
 
@@ -424,77 +171,56 @@ set FACTORY_API_KEY=fk-...
 
 </CodeGroup>
 
-**Persistent Setup:**
+**Persist the variable** in your shell profile (`~/.bashrc`, `~/.zshrc`, or PowerShell `$PROFILE`) for long-term use.
 
-<CodeGroup>
+<Warning>
+  Never commit API keys to source control. Use environment variables or secure secret management.
+</Warning>
 
-```bash macOS/Linux (~/.bashrc or ~/.zshrc)
-echo 'export FACTORY_API_KEY=fk-...' >> ~/.bashrc
-source ~/.bashrc
-```
+## Exit codes
 
-```powershell Windows (PowerShell Profile)
-echo '$env:FACTORY_API_KEY="fk-..."' >> $PROFILE
-```
+| Code | Meaning                        |
+| :--- | :----------------------------- |
+| `0`  | Success                        |
+| `1`  | General runtime error          |
+| `2`  | Invalid CLI arguments/options  |
 
-</CodeGroup>
+## Common workflows
 
-**⚠️ Security:** Never commit your API key to source control. Use environment variables or secure secret management.
-
-## Global Options
-
-These options work across all commands:
-
-| Flag | Description |
-|------|-------------|
-| `-v, --version` | Output CLI version number |
-| `-h, --help` | Display help information |
-
-## Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| `0` | Success |
-| `1` | General error |
-| `2` | Invalid arguments or options |
-
-## Common Workflows
-
-### Code Review
+### Code review
 
 ```bash
-# Read-only analysis
-droid exec "Review this PR for security issues and suggest improvements"
+# Analysis only
+droid exec "Review this PR for security issues"
 
 # With modifications
-droid exec --auto low "Review code and add missing type annotations"
+droid exec --auto low "Review code and add missing type hints"
 ```
 
-### Testing & Debugging
+### Testing and debugging
 
 ```bash
-# Read-only investigation
+# Investigation
 droid exec "Analyze failing tests and explain root cause"
 
-# Fix and run tests
+# Fix and verify
 droid exec --auto medium "Fix failing tests and run test suite"
 ```
 
 ### Refactoring
 
 ```bash
-# Plan refactoring
-droid exec "Analyze codebase and create refactoring plan for auth module"
+# Planning
+droid exec "Create refactoring plan for auth module"
 
-# Execute refactoring
-droid exec --auto low "Refactor auth module per the plan"
-droid exec --auto medium "Refactor, update tests, and verify"
+# Execution
+droid exec --auto low --use-spec "Refactor auth module"
 ```
 
-### CI/CD Integration
+### CI/CD integration
 
-```bash
-# In GitHub Actions
+```yaml
+# GitHub Actions example
 - name: Run Droid Analysis
   env:
     FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
@@ -502,53 +228,13 @@ droid exec --auto medium "Refactor, update tests, and verify"
     droid exec --auto medium -f .github/prompts/deploy.md
 ```
 
-### Documentation
+## See also
 
-```bash
-# Generate documentation
-droid exec --auto low "Generate API documentation from code comments"
-
-# Update existing docs
-droid exec --auto low "Update README with recent changes"
-```
-
-## Next Steps
-
-<CardGroup cols={2}>
-  <Card
-    title="Settings"
-    icon="gear"
-    href="/cli/configuration/settings"
-  >
-    Configure autonomy, models, and preferences
-  </Card>
-  <Card
-    title="Custom Commands"
-    icon="terminal"
-    href="/cli/configuration/custom-slash-commands"
-  >
-    Create your own slash commands
-  </Card>
-  <Card
-    title="Custom Droids"
-    icon="robot"
-    href="/cli/configuration/custom-droids"
-  >
-    Build specialized AI agents
-  </Card>
-  <Card
-    title="MCP Integration"
-    icon="plug"
-    href="/cli/configuration/mcp"
-  >
-    Connect external tools and services
-  </Card>
-</CardGroup>
-
-## Related Documentation
-
-- [Quickstart Guide](/cli/getting-started/quickstart) - Get up and running quickly
-- [Common Use Cases](/cli/getting-started/common-use-cases) - Practical examples
-- [Specification Mode](/cli/user-guides/specification-mode) - Plan before executing
-- [BYOK Configuration](/cli/configuration/byok) - Use your own API keys
-- [Droid Exec Reference](/cli/droid-exec/overview) - Headless automation
+- [Quickstart guide](/cli/getting-started/quickstart) - Getting started with Factory CLI
+- [Interactive mode](/cli/getting-started/quickstart) - Shortcuts, input modes, and features
+- [Choosing your model](/cli/user-guides/choosing-your-model) - Model selection guidance
+- [Settings](/cli/configuration/settings) - Configuration options
+- [Custom commands](/cli/configuration/custom-slash-commands) - Create your own shortcuts
+- [Custom droids](/cli/configuration/custom-droids) - Build specialized agents
+- [Droid Exec overview](/cli/droid-exec/overview) - Detailed automation guide
+- [MCP configuration](/cli/configuration/mcp) - External tool integration
