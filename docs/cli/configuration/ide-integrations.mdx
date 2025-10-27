@@ -5,10 +5,7 @@ description: Run droid directly inside your editor for richer context and a smoo
 
 Droid works great with any Integrated Development Environment (IDE) that has a terminal. Just run `droid`, and you're ready to go.
 
-In addition, Droid provides dedicated integrations for popular IDEs, which provide features like interactive diff viewing, selection context sharing, and more. These integrations currently exist for:
-
-- **Visual Studio Code** (including popular forks like Cursor, Windsurf, and VSCodium)
-- **JetBrains IDEs** (including IntelliJ, PyCharm, Android Studio, WebStorm, PhpStorm and GoLand)
+In addition, Droid provides a dedicated integration for Visual Studio Code (including popular forks like Cursor, Windsurf, and VSCodium). For JetBrains IDEs such as IntelliJ, PyCharm, Android Studio, WebStorm, PhpStorm, and GoLand, simply run `droid` inside the integrated terminal—no plugin is required.
 
 ## Features
 
@@ -35,9 +32,7 @@ To install Droid on VS Code and popular forks like Cursor, Windsurf, and VSCodiu
 
 ### JetBrains
 
-To install Droid on JetBrains IDEs like IntelliJ, PyCharm, Android Studio, WebStorm, PhpStorm and GoLand, find and install the Factory Droid plugin from the marketplace and restart your IDE.
-
-The plugin may also be auto-installed when you run `droid` in the integrated terminal. The IDE must be restarted completely to take effect.
+Open the integrated terminal in your JetBrains IDE (IntelliJ, PyCharm, Android Studio, WebStorm, PhpStorm, or GoLand) and run `droid`. No additional plugin installation is necessary.
 
 ## Usage
 
@@ -58,11 +53,11 @@ Run `droid` from your IDE's integrated terminal, and all features will be active
   - If not installed, use `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux) and search for "Shell Command: Install 'code' command in PATH" (or the equivalent for your IDE)
 - Check that VS Code has permission to install extensions
 
-### JetBrains plugin not working
+### JetBrains terminal issues
 
 - Ensure you're running Droid from the project root directory
-- Check that the JetBrains plugin is enabled in the IDE settings
-- Completely restart the IDE. You may need to do this multiple times
+- Use the integrated terminal inside the IDE rather than an external shell
+- Completely restart the IDE if terminal state issues persist
 
 ### ESC key configuration
 
@@ -80,7 +75,7 @@ This allows the ESC key to properly interrupt Droid operations.
 
 | Symptom                                   | Fix                                                                                        |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
-| **"Editor integration disabled" message** | Verify the extension/plug-in is installed and that `editorIntegration` matches your editor |
+| **"Editor integration disabled" message** | Verify the VS Code extension is installed or update `editorIntegration` to match your editor |
 | CLI cannot find Node/Bun                  | Ensure the `droid` binary is on the PATH VS Code/JetBrains uses (restart after install)    |
 | Missing file context                      | Save files; unsaved buffers older than 500 KB are skipped for performance                  |
 | Stale diagnostics                         | Run **↻ Refresh Diagnostics** command (VS Code Command Palette)                            |
