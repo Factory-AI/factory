@@ -1,381 +1,270 @@
 ---
-title: "Model Context Protocol"
-description: "Manage MCP servers and configurations in droid CLI"
+title: 'Model Context Protocol (MCP)'
+description: 'Connect your own tools with Model Context Protocol'
 ---
 
-The `/mcp` command provides comprehensive management of MCP servers within Factory CLI, allowing you to configure, monitor, and maintain Model Context Protocol server connections.
+Model Context Protocol (MCP) servers extend droid's capabilities by providing additional tools and context. Droid offers two ways to manage them: CLI commands for quick setup and scripting, or an interactive UI for browsing and management.
 
 <Note>
-    Factory CLI supports both **stdio-based** and **Streamable HTTP** MCP servers, allowing you to
-    connect to local processes or remote MCP endpoints.
+  Use CLI commands like `droid mcp add` for quick server setup and automation,
+  or use `/mcp` within droid for an interactive visual interface.
 </Note>
 
-## Overview
+## Adding Servers
 
-MCP (Model Context Protocol) servers extend Factory's capabilities by providing additional tools and context. The `/mcp` command lets you:
+The `droid mcp add` command adds MCP servers to your configuration. Droid supports two types of servers: **http** (remote endpoints) and **stdio** (local processes).
 
--   List all configured MCP servers and their status
--   Add new MCP servers to your configuration
--   Remove existing servers
--   View detailed information about specific servers
+### Adding HTTP Servers
 
-## Usage
+HTTP servers are remote MCP endpoints - the recommended way to connect to cloud services and APIs.
 
-```bash
-/mcp [options] [command]
-```
-
-### Global Options
-
-| Option       | Description              |
-| ------------ | ------------------------ |
-| `-h, --help` | Display help for command |
-
-### Available Commands
-
-| Command                       | Description                                  |
-| ----------------------------- | -------------------------------------------- |
-| `list`                        | List configured MCP servers and their status |
-| `add <name> <command-or-url>` | Add a new MCP server to the configuration    |
-| `remove <name>`               | Remove an MCP server from the configuration  |
-| `get <name>`                  | Show details about a specific MCP server     |
-| `enable <name> [name2...]`    | Enable one or more disabled servers          |
-| `disable <name> [name2...]`   | Disable one or more servers temporarily      |
-| `help [command]`              | Display help for a specific command          |
-
-<Note>If no command is specified, `/mcp` defaults to the `list` command.</Note>
-
-## Commands
-
-### list
-
-Lists all configured MCP servers and displays their current status.
+**Syntax:**
 
 ```bash
-/mcp list [options]
-```
-
-**Options:**
-
--   `-h, --help` - Display help for the list command
-
-**Example:**
-
-```bash
-/mcp list
-```
-
-### add
-
-Adds a new MCP server to your configuration. Factory CLI supports two types of MCP servers: stdio (local processes) and Streamable HTTP (remote endpoints).
-
-#### Adding stdio servers
-
-Stdio servers run as local processes and communicate via standard input/output streams.
-
-```bash
-/mcp add <name> <command> [options]
+droid mcp add <name> <url> --type http [--header "KEY: VALUE"...]
 ```
 
 **Arguments:**
 
--   `name` - Server name (used as identifier)
--   `command` - Command to start the server
+- `name` - Unique server identifier
+- `url` - HTTP/HTTPS URL of the MCP server
+- `--type http` - Required flag to specify HTTP transport
+- `--header "KEY: VALUE"` - HTTP headers for authentication (can be used multiple times)
 
-**Options:**
+**Popular HTTP Server Examples:**
 
--   `-e, --env <key=value...>` - Environment variables (stdio only, can be used multiple times)
--   `-h, --help` - Display help for the add command
+#### Development & Testing
 
-**Examples:**
-
-Add a basic stdio server:
+**Sentry** - Monitor errors, debug production issues
 
 ```bash
-/mcp add myserver "node /path/to/server.js"
+droid mcp add sentry https://mcp.sentry.dev/mcp --type http
 ```
 
-Add a stdio server with environment variables:
+**Hugging Face** - Access Hugging Face Hub and Gradio AI applications
 
 ```bash
-/mcp add myserver "python server.py" -e API_KEY=secret123 -e DEBUG=true
+droid mcp add hugging-face https://huggingface.co/mcp --type http
 ```
 
-#### Adding Streamable HTTP servers
-
-Streamable HTTP servers are remote MCP endpoints accessed via HTTP/HTTPS URLs.
+**Socket** - Security analysis for dependencies
 
 ```bash
-/mcp add --type http <name> <url> [options]
+droid mcp add socket https://mcp.socket.dev/ --type http
 ```
 
-**Arguments:**
+#### Project Management & Documentation
 
--   `name` - Server name (used as identifier)
--   `url` - HTTP/HTTPS URL of the MCP server endpoint
-
-**Options:**
-
--   `-H, --header <key: value...>` - HTTP headers (http only, can be used multiple times)
--   `-h, --help` - Display help for the add command
-
-**Examples:**
-
-Add a basic HTTP server:
+**Notion** - Read docs, update pages, manage tasks
 
 ```bash
-/mcp add myserver https://api.example.com/mcp --type http
+droid mcp add notion https://mcp.notion.com/mcp --type http
 ```
 
-Add an HTTP server with authentication header:
+**Linear** - Issue tracking and project management
 
 ```bash
-/mcp add myserver https://api.example.com/mcp --type http -H "Authorization: Bearer token123"
+droid mcp add linear https://mcp.linear.app/mcp --type http
 ```
 
-Add an HTTP server with multiple headers:
+**Atlassian** - Manage Jira tickets and Confluence docs
 
 ```bash
-/mcp add myserver https://api.example.com/mcp --type http -H "Authorization: Bearer token" -H "X-API-Key: secret"
+droid mcp add atlassian https://mcp.atlassian.com/v1/sse --type http
 ```
 
-### remove
-
-Removes an MCP server from the configuration.
+**Asana** - Interact with Asana workspace
 
 ```bash
-/mcp remove [options] <name>
+droid mcp add asana https://mcp.asana.com/sse --type http
 ```
 
-**Arguments:**
-
--   `name` - Server name to remove
-
-**Options:**
-
--   `-h, --help` - Display help for the remove command
-
-**Example:**
+**Intercom** - Access customer conversations and tickets
 
 ```bash
-/mcp remove myserver
+droid mcp add intercom https://mcp.intercom.com/mcp --type http
 ```
 
-### get
-
-Shows detailed information about a specific MCP server.
+**Monday** - Manage monday.com boards and items
 
 ```bash
-/mcp get [options] <name>
+droid mcp add monday https://mcp.monday.com/mcp --type http
 ```
 
-**Arguments:**
+#### Payments & Commerce
 
--   `name` - Server name to get details for
-
-**Options:**
-
--   `-h, --help` - Display help for the get command
-
-**Example:**
+**Stripe** - Payment processing and subscriptions
 
 ```bash
-/mcp get myserver
+droid mcp add stripe https://mcp.stripe.com --type http
 ```
 
-### enable
-
-Enables one or more previously disabled MCP servers. Enabled servers will be available for use in your sessions.
+**PayPal** - PayPal commerce and payment processing
 
 ```bash
-/mcp enable <name> [name2 name3...]
+droid mcp add paypal https://mcp.paypal.com/mcp --type http
 ```
 
-**Arguments:**
-
--   `name` - Server name(s) to enable (can specify multiple)
-
-**Options:**
-
--   `-h, --help` - Display help for the enable command
-
-**Examples:**
+**Square** - Build with Square APIs for payments and inventory
 
 ```bash
-# Enable a single server
-/mcp enable myserver
-
-# Enable multiple servers at once
-/mcp enable server1 server2 server3
+droid mcp add square https://mcp.squareup.com/sse --type http
 ```
 
-**Notes:**
-
--   Servers must already exist in your configuration
--   If a server is already enabled, the command has no effect
--   Use `/mcp list` to see which servers are currently disabled
-
-### disable
-
-Temporarily disables one or more MCP servers without removing them from your configuration. Disabled servers won't be available for use but can be re-enabled later.
+**Plaid** - Banking data and financial account linking
 
 ```bash
-/mcp disable <name> [name2 name3...]
+droid mcp add plaid https://api.dashboard.plaid.com/mcp/sse --type http
 ```
 
-**Arguments:**
+#### Design & Media
 
--   `name` - Server name(s) to disable (can specify multiple)
-
-**Options:**
-
--   `-h, --help` - Display help for the disable command
-
-**Examples:**
+**Figma** - Generate code with Figma context
 
 ```bash
-# Disable a single server
-/mcp disable myserver
-
-# Disable multiple servers at once
-/mcp disable server1 server2 server3
+droid mcp add figma https://mcp.figma.com/mcp --type http
 ```
 
-**Notes:**
-
--   Disabled servers remain in your configuration and can be re-enabled with `/mcp enable`
--   Use this when you want to temporarily stop using a server without losing its configuration
--   Disabled servers appear in `/mcp list` with a "disabled" indicator
-
-## Getting Help
-
-You can get help for the `/mcp` command and its subcommands in several ways:
-
--   `/mcp --help` or `/mcp -h` - Show general help
--   `/mcp help` - Show general help
--   `/mcp help <command>` - Show help for a specific command
--   `/mcp <command> --help` - Show help for a specific command
-
-**Examples:**
+**Canva** - Browse, summarize, and generate Canva designs
 
 ```bash
-/mcp --help
-/mcp help add
-/mcp add --help
+droid mcp add canva https://mcp.canva.com/mcp --type http
 ```
 
-## Configuration
-
-MCP server configurations are stored in a configuration file managed by Factory CLI. Each server configuration includes:
-
--   **Name**: Unique identifier for the server
--   **Type**: Server type (stdio or http)
--   **Type-specific settings**: Command/args/env for stdio, URL/headers for http
--   **Disabled**: Optional flag to temporarily disable a server
-
-## Transport Types
-
-Factory CLI supports two transport methods for MCP servers:
-
-### Stdio Transport
-
-The stdio transport method runs MCP servers as local processes:
-
--   Communication happens over standard input/output streams
--   Servers must implement the MCP protocol over stdin/stdout
--   Most common transport method for MCP servers
--   No network configuration or ports are required
--   Best for: Local tools, file system operations, development servers
-
-### Streamable HTTP Transport
-
-The Streamable HTTP transport method connects to remote MCP servers over HTTP/HTTPS:
-
--   Communication happens via HTTP requests with streaming responses
--   Servers are accessed via URL endpoints
--   Supports authentication via custom headers
--   No local process management needed
--   Best for: Cloud-hosted MCP servers, shared team resources, documentation servers
-
-## Environment Variables
-
-When adding servers, you can specify environment variables using the `-e` or `--env` flag:
+**invideo** - Video creation capabilities
 
 ```bash
-/mcp add myserver "node server.js" -e NODE_ENV=production -e PORT=3000 -e API_URL=https://api.example.com
+droid mcp add invideo https://mcp.invideo.io/sse --type http
 ```
 
-Environment variables must be in `KEY=VALUE` format. If a value contains an equals sign, everything after the first `=` is treated as the value.
+#### Infrastructure & DevOps
 
-## Error Handling
-
-The `/mcp` command provides clear error messages for common issues:
-
--   **Invalid environment variable format**: Check that variables use `KEY=VALUE` format
--   **Invalid header format**: Check that headers use `KEY: VALUE` format (note the colon and space)
--   **Server already exists**: Use a different name or remove the existing server first
--   **Invalid server type**: Must be "stdio" or "http"
--   **Wrong options for server type**: `--env` is only for stdio servers, `--header` is only for HTTP servers
--   **Invalid URL format**: For HTTP servers, provide a valid HTTP/HTTPS URL
--   **Unknown command**: Use `/mcp --help` to see available commands
--   **Missing arguments**: Ensure all required arguments are provided
-
-## Examples
-
-Here are some common usage patterns:
-
-**List all servers:**
+**Netlify** - Create, deploy, and manage websites
 
 ```bash
-/mcp
-# or
-/mcp list
+droid mcp add netlify https://netlify-mcp.netlify.app/mcp --type http
 ```
 
-**Add a Node.js MCP server:**
+**Vercel** - Manage projects, deployments, and logs
 
 ```bash
-/mcp add nodejs-server "node /path/to/mcp-server.js"
+droid mcp add vercel https://mcp.vercel.com/ --type http
 ```
 
-**Add a Python server with environment variables:**
+**Stytch** - Configure authentication services
 
 ```bash
-/mcp add python-server "python /path/to/server.py" -e DEBUG=1 -e CONFIG_PATH=/etc/config
-```
-
-**Add Factory documentation MCP server (Streamable HTTP):**
-
-```bash
-/mcp add --type http factory-docs https://docs.factory.ai/mcp
-```
-
-**Add GitHub MCP server with authentication (Streamable HTTP):**
-
-```bash
-/mcp add --type http github https://mcp.githubcopilot.com -H "Authorization: Bearer YOUR_GITHUB_TOKEN"
-```
-
-**View server details:**
-
-```bash
-/mcp get nodejs-server
-```
-
-**Remove a server:**
-
-```bash
-/mcp remove nodejs-server
-```
-
-**Get help for a specific command:**
-
-```bash
-/mcp help add
+droid mcp add stytch http://mcp.stytch.dev/mcp --type http
 ```
 
 <Tip>
-    MCP servers extend Factory's capabilities by providing additional tools and context. Use stdio
-    servers for local tools and processes, or Streamable HTTP servers to connect to remote MCP
-    endpoints like documentation servers and shared team resources.
+  Many HTTP servers require OAuth authentication. After adding, use the
+  interactive `/mcp` UI to complete the authentication flow.
 </Tip>
+
+### Adding Stdio Servers
+
+Stdio servers run as local processes on your machine - ideal for tools that need direct system access.
+
+**Syntax:**
+
+```bash
+droid mcp add <name> "<command>" [--env KEY=VALUE...]
+```
+
+**Arguments:**
+
+- `name` - Unique server identifier
+- `command` - Command to start the server (quote if it contains spaces)
+- `--env KEY=VALUE` - Environment variables (can be used multiple times)
+
+**Popular Stdio Server Examples:**
+
+**Airtable** - Read/write records, manage bases and tables
+
+```bash
+droid mcp add airtable "npx -y airtable-mcp-server" \
+  --env AIRTABLE_API_KEY=your_key
+```
+
+**ClickUp** - Task management and project tracking
+
+```bash
+droid mcp add clickup "npx -y @hauptsache.net/clickup-mcp" \
+  --env CLICKUP_API_KEY=your_key \
+  --env CLICKUP_TEAM_ID=your_team_id
+```
+
+**HubSpot** - Access and manage CRM data
+
+```bash
+droid mcp add hubspot "npx -y @hubspot/mcp-server" \
+  --env HUBSPOT_ACCESS_TOKEN=your_token
+```
+
+## Removing Servers
+
+Remove a server from your configuration:
+
+```bash
+droid mcp remove <name>
+```
+
+**Example:**
+
+```bash
+droid mcp remove notion
+```
+
+## Managing Servers
+
+Type `/mcp` within droid to open an interactive visual interface for managing MCP servers.
+
+### Navigation
+
+- **Arrow keys** - Navigate through options
+- **Enter** - Select an option
+- **Escape** - Go back or close
+
+### Features
+
+**Server List View:**
+
+- See all configured servers with real-time status
+- Status indicators: Connected, Connecting, Needs Auth, Disabled
+- Quick add new server option
+
+**Server Details:**
+
+- View server configuration and status
+- Available actions:
+  - View Tools - Browse available tools from this server
+  - Authenticate/Re-authenticate - Complete OAuth flows for HTTP servers
+  - Clear Authentication - Remove stored authentication
+  - Enable/Disable - Toggle server on/off
+  - Remove - Delete server from configuration
+
+**Tools Browser:**
+
+- View all tools provided by each server
+- See tool descriptions and schemas
+- Understand what each tool can do
+
+**Add Server Form:**
+
+- Interactive form to add new servers
+- Choose between stdio and HTTP types
+- Input validation and helpful error messages
+
+## Configuration
+
+MCP server configurations are stored in `~/.factory/mcp.json`. The configuration includes:
+
+- **Name**: Unique identifier for the server
+- **Type**: Server type (`stdio` or `http`)
+- **Stdio settings**: `command`, `args`, `env` (environment variables)
+- **HTTP settings**: `url`, `headers` (for authentication)
+- **Disabled**: Boolean flag to temporarily disable a server
+
+Droid automatically reloads when the configuration file changes, so servers are immediately available after adding them.
+
