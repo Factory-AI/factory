@@ -31,7 +31,7 @@ droid mcp add <name> <url> --type http [--header "KEY: VALUE"...]
 - `--type http` - Required flag to specify HTTP transport
 - `--header "KEY: VALUE"` - HTTP headers for authentication (can be used multiple times)
 
-**Popular HTTP Server Examples:**
+### Popular HTTP MCP Servers
 
 #### Development & Testing
 
@@ -67,18 +67,6 @@ droid mcp add notion https://mcp.notion.com/mcp --type http
 droid mcp add linear https://mcp.linear.app/mcp --type http
 ```
 
-**Atlassian** - Manage Jira tickets and Confluence docs
-
-```bash
-droid mcp add atlassian https://mcp.atlassian.com/v1/sse --type http
-```
-
-**Asana** - Interact with Asana workspace
-
-```bash
-droid mcp add asana https://mcp.asana.com/sse --type http
-```
-
 **Intercom** - Access customer conversations and tickets
 
 ```bash
@@ -105,18 +93,6 @@ droid mcp add stripe https://mcp.stripe.com --type http
 droid mcp add paypal https://mcp.paypal.com/mcp --type http
 ```
 
-**Square** - Build with Square APIs for payments and inventory
-
-```bash
-droid mcp add square https://mcp.squareup.com/sse --type http
-```
-
-**Plaid** - Banking data and financial account linking
-
-```bash
-droid mcp add plaid https://api.dashboard.plaid.com/mcp/sse --type http
-```
-
 #### Design & Media
 
 **Figma** - Generate code with Figma context
@@ -129,12 +105,6 @@ droid mcp add figma https://mcp.figma.com/mcp --type http
 
 ```bash
 droid mcp add canva https://mcp.canva.com/mcp --type http
-```
-
-**invideo** - Video creation capabilities
-
-```bash
-droid mcp add invideo https://mcp.invideo.io/sse --type http
 ```
 
 #### Infrastructure & DevOps
@@ -178,7 +148,7 @@ droid mcp add <name> "<command>" [--env KEY=VALUE...]
 - `command` - Command to start the server (quote if it contains spaces)
 - `--env KEY=VALUE` - Environment variables (can be used multiple times)
 
-**Popular Stdio Server Examples:**
+### Popular Stdio MCP Servers
 
 **Airtable** - Read/write records, manage bases and tables
 
@@ -218,43 +188,11 @@ droid mcp remove notion
 
 ## Managing Servers
 
-Type `/mcp` within droid to open an interactive visual interface for managing MCP servers.
-
-### Navigation
-
-- **Arrow keys** - Navigate through options
-- **Enter** - Select an option
-- **Escape** - Go back or close
-
-### Features
-
-**Server List View:**
-
-- See all configured servers with real-time status
-- Status indicators: Connected, Connecting, Needs Auth, Disabled
-- Quick add new server option
-
-**Server Details:**
-
-- View server configuration and status
-- Available actions:
-  - View Tools - Browse available tools from this server
-  - Authenticate/Re-authenticate - Complete OAuth flows for HTTP servers
-  - Clear Authentication - Remove stored authentication
-  - Enable/Disable - Toggle server on/off
-  - Remove - Delete server from configuration
-
-**Tools Browser:**
-
+Type `/mcp` within droid to open an interactive UI for managing MCP servers.
+- See all configured servers with status
 - View all tools provided by each server
-- See tool descriptions and schemas
-- Understand what each tool can do
-
-**Add Server Form:**
-
-- Interactive form to add new servers
-- Choose between stdio and HTTP types
-- Input validation and helpful error messages
+- Authenticate remote servers that require OAuth authentication
+- Add/remove and enable/disable servers
 
 ## Configuration
 
