@@ -9,16 +9,17 @@ rss: true
 
   ## New features
 
-  * **Reasoning field support in streaming responses** - Added support for displaying reasoning fields in chat completion streaming chunks for models that provide extended reasoning (e.g., o1)
+  * **Reasoning field support in streaming responses** - Added support for displaying reasoning fields in chat completion streaming chunks for models that provide extended reasoning
   * **Import from Claude restored** - Re-enabled the "Import from Claude" option in the droids menu for easier conversation migration
 
   ## Bug fixes
 
-  * Fixed stale S3 feature flag reference in LLM streaming hook
   * Fixed MCP status indicator to only show when MCP servers are actually configured
-  * Fixed Gemini tool call ID mapping to ensure proper tool execution tracking
-  * Fixed message list flickering by treating text messages as stable checkpoints in the static/dynamic split logic
-  * Updated FetchUrl tool prompt for better clarity
+  * Fixed message list flickering
+  * Added support for custom headers when adding MCP servers
+  * Fixed sound files not being included in SEA binary releases
+  * Fixed Ctrl+C interruption messages to only display to users and not appear in logs for cleaner output
+  * Resolved issue where tool use would incorrectly appear in user messages after tool cancellation
 </Update>
 
 <Update label="October 30" rss={{ title: "CLI Updates", description: "MCP Revamp and OpenAI organization field fix" }}>
