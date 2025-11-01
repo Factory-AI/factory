@@ -4,6 +4,30 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="November 1" rss={{ title: "CLI Updates", description: "MCP Registry, tool permissions, session resume, and multiple bug fixes" }}>
+  `v0.22.9`
+
+  ## New features
+
+  * **MCP Registry** - Added a curated selection of MCP servers for easy discovery and setup
+  
+    ![MCP Registry interface showing curated MCP servers](/images/mcp-registry-2.gif)
+  
+  * **Tool Permissions Support** - Implemented request tool permissions flow in stream-jsonrpc mode with support for multiple concurrent tool confirmations
+  * **Session Resume** - Show resume command on exit (Ctrl+C or /quit) with new `-r, --resume` flag to continue sessions
+  * **Thinking Traces Display** - Added UI component to show thinking blocks in expanded session view
+
+  ## Bug fixes
+
+  * Fixed CLI completion sounds by extracting embedded sound files to host filesystem, making them accessible to external shell commands
+  * Fixed tool use in user message after tool cancellation
+  * Added baseline builds for x64 CPUs (pre-2013) that don't support AVX2 SIMD instructions
+  * Updated static split logic to use text messages as stable checkpoints, reducing flickering during rendering
+  * Fixed storage and sending of Gemini thinking content from delta.extra_content.google
+  * Removed MultiEdit tool due to low success rate (~80%)
+  * Added recovery from malformed optional arguments using optimistic JSON parsing
+</Update>
+
 <Update label="October 31" rss={{ title: "CLI Updates", description: "Reasoning field support, Import from Claude, and bug fixes" }}>
   `v0.22.7`
 
