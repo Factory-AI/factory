@@ -18,6 +18,8 @@ description: "Learn how to set up droid on a VPS for remote access and headless 
 - Configure SSH authentication with key pairs for secure, passwordless server connections
 - Use `droid exec` for headless automation tasks and system administration on your server
 
+---
+
 ## 1. Prerequisites and installation
 
 Before starting, you'll need:
@@ -29,23 +31,15 @@ Before starting, you'll need:
 
 **Cost estimate**: A basic VPS suitable for running droid costs around $5-10/month.
 
+---
+
 ## 2. Why use droid on a VPS?
 
-**Problem statement**: Running AI agents locally limits you to when you're at your computer. Many automation tasks need to run continuously, respond to triggers, or be accessible from anywhere - whether you're on a mobile device, traveling, or working from a different machine.
+Running AI agents locally limits you to when you're at your computer. Production debugging, scheduled automation, and mobile access all require a server that's always available. Without a VPS, you can't monitor servers from your phone, run headless automation 24/7, or access droid while traveling.
 
-**Concrete pain examples**:
-- You want to monitor and manage production servers but can't SSH in from your phone effectively
-- You need to run scheduled automation tasks that require AI assistance 24/7
-- You want to debug issues on live environments but don't have access to your development machine
-- Manual server administration tasks consume hours of your time that could be automated
+By deploying droid on a VPS, you get an always-available AI assistant accessible from any device. Perfect for system administration, production debugging, and building custom automation workflows with `droid exec`.
 
-**How droid on a VPS solves this**: By deploying Factory's droid agent on a cloud server, you get:
-- **Always-available AI assistant** - Access droid from any device, anywhere with internet
-- **Headless automation** - Run `droid exec` commands programmatically for building custom agents and workflows
-- **Production debugging** - Use AI to explore and troubleshoot your live environment directly
-- **System administration** - Let droid handle configuration, setup, and maintenance tasks
-
-**Technical foundation**: Factory's droid runs on any Linux environment with Python support. When deployed on a VPS, it becomes a persistent service you can interact with through SSH from any client.
+---
 
 ## 3. Setup and basic usage
 
@@ -145,6 +139,8 @@ On first run, droid will prompt you to log in:
 
 **Success check**: You should now see the droid prompt on your VPS, ready to accept commands.
 
+---
+
 ## 4. Advanced example: System administration with droid
 
 Now that droid is running on your VPS, let's use it for practical server administration. This example shows how droid can handle complex setup tasks like configuring a web server.
@@ -166,6 +162,8 @@ Droid will:
 **Verification**: Open a browser and navigate to your VPS IP address (e.g., `http://123.45.67.89`). You should see "Hello World" displayed.
 
 **What makes this powerful**: Tasks that normally require multiple commands, configuration files, and troubleshooting are handled by droid with a single natural language instruction. Droid understands best practices and handles edge cases automatically.
+
+---
 
 ## 5. Droid exec: Headless automation and custom agents
 
@@ -208,6 +206,8 @@ Content file: /var/www/html/index.html
 Docker setup: /home/user/docker-compose.yml
 Server running on: port 80
 ```
+
+---
 
 ## 6. Remote access from anywhere
 
