@@ -1,6 +1,6 @@
 ---
-title: "Deploy Factory Droid on a VPS Server"
-description: "Learn how to set up Factory CLI's droid agent on a VPS for remote access and headless automation"
+title: "Deploy Droid on a VPS Server"
+description: "Learn how to set up droid on a VPS for remote access and headless automation"
 ---
 
 <iframe
@@ -14,9 +14,9 @@ description: "Learn how to set up Factory CLI's droid agent on a VPS for remote 
 
 ## What this doc covers
 
-- Set up Factory CLI's droid agent on a Virtual Private Server (VPS) for remote access from anywhere
+- Set up Factory's CLI, Droid, on a Virtual Private Server (VPS) for remote access from anywhere
 - Configure SSH authentication with key pairs for secure, passwordless server connections
-- Use droid exec for headless automation tasks and system administration on your server
+- Use `droid exec` for headless automation tasks and system administration on your server
 
 ## 1. Prerequisites and installation
 
@@ -113,7 +113,7 @@ Host example
 
 **What this enables**: Instead of typing `ssh root@123.45.67.89 -i ~/.ssh/example` every time, you can simply run `ssh example`.
 
-### Step 5: Connect and install Factory CLI on the VPS
+### Step 5: Connect and install Droid on the VPS
 
 ```bash
 # In a new terminal window, connect to your VPS
@@ -129,7 +129,7 @@ source ~/.bashrc  # or source ~/.zshrc if using zsh
 droid --version
 ```
 
-### Step 6: Authenticate Factory CLI on the VPS
+### Step 6: Authenticate Droid on the VPS
 
 ```bash
 # Run droid for the first time
@@ -188,8 +188,6 @@ The real power of running droid on a VPS is `droid exec` - a headless mode that 
 droid exec --model glm-4.6 "Tell me a joke"
 ```
 
-**Why GLM 4.6?** It's an extremely fast model, ideal for quick queries and automation tasks where speed matters more than deep reasoning.
-
 ### Advanced: System exploration
 
 ```bash
@@ -210,29 +208,6 @@ Content file: /var/www/html/index.html
 Docker setup: /home/user/docker-compose.yml
 Server running on: port 80
 ```
-
-### Building custom agent workflows
-
-Because `droid exec` is scriptable, you can build sophisticated automation:
-
-```bash
-#!/bin/bash
-# Example: Automated deployment checker
-
-# Check deployment status
-STATUS=$(droid exec --model glm-4.6 "Check if my Docker containers are running and report their health")
-
-# If issues found, investigate
-if echo "$STATUS" | grep -q "error\|stopped"; then
-    droid exec --model glm-4.6 "Diagnose the Docker container issue and suggest fixes"
-fi
-```
-
-**Use cases for custom agents**:
-- Automated monitoring and alerting
-- Self-healing infrastructure (detect and fix common issues)
-- Intelligent log analysis and error triage
-- Dynamic configuration management based on system state
 
 ## 6. Remote access from anywhere
 
