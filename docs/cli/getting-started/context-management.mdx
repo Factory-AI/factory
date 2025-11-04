@@ -7,7 +7,7 @@ Factory's approach to context management enables you to work through multi-milli
 
 <CardGroup cols={2}>
   <Card title="Incremental Compression" icon="compress">
-    Context grows naturally until ~140k tokens, then intelligently compresses while preserving critical information
+    Context grows naturally, then intelligently compresses while preserving critical information
   </Card>
   <Card title="Smart Persistence" icon="bookmark">
     Key artifacts like to-do lists, specs, and recent changes always persist across compression points
@@ -24,13 +24,13 @@ Factory's approach to context management enables you to work through multi-milli
 
 ### The optimal context window
 
-Factory targets an optimal context window of approximately **140,000 tokens** per session. This sweet spot balances:
+Factory maintains an optimal context window per session that balances:
 
-- **Model performance** - LLMs maintain attention and coherence best within this range
+- **Model performance** - LLMs maintain attention and coherence effectively
 - **Response quality** - The agent can effectively reference all context without degradation
 - **Speed** - Prompt caching remains effective and responses stay fast
 
-When your session reaches this threshold, Factory automatically compresses the context down to a manageable size while preserving everything critical to your work.
+When your session reaches the threshold, Factory automatically compresses the context down to a manageable size while preserving everything critical to your work.
 
 <Note>
   **Key insight:** You can't rely on LLMs to correctly compress their own context. It's the agent system's responsibility to manage what information remains accessible and in what form.
@@ -216,15 +216,15 @@ This writes your specification to a dedicated directory as a markdown file. Bene
 - **Reference** - The agent reads the file at the start of new sessions
 - **Shareability** - Team members can read the spec to understand the work
 
-### Monitor progress, not tokens
+### Monitor progress
 
-Unlike other tools where you nervously watch token counts, with Factory you focus on progress:
+With Factory you focus on progress:
 
 - Is the to-do list moving forward? ✅
 - Are features working as expected? ✅
 - Is the code quality good? ✅
 
-If those are true, context management is working correctly - even across millions of tokens.
+If those are true, context management is working correctly throughout your entire session.
 
 ## How iterative compression evolved
 
@@ -241,7 +241,7 @@ Factory's compression approach went through several iterations:
   </Accordion>
 
   <Accordion title="V2: Naive compression (better, but not enough)">
-    Simplified to: "When you hit 140k tokens, compress everything into 1-2 messages."
+    Simplified to: "When context grows large, compress everything into 1-2 messages."
 
     This worked better but had issues:
     - Lost critical details like specific errors encountered
@@ -314,9 +314,9 @@ The agent will maintain it across compressions.
 
 Factory's context management enables extended sessions through:
 
-1. **Incremental compression** at ~140k tokens
+1. **Incremental compression** when context grows large
 2. **Selective persistence** of critical artifacts
 3. **Human-like handoff** of compressed context
 4. **Zero manual intervention** required
 
-This approach allows multi-million token sessions while maintaining agent performance, code quality, and project continuity. You focus on building - Factory handles the context.
+This approach allows extended sessions while maintaining agent performance, code quality, and project continuity. You focus on building - Factory handles the context.
