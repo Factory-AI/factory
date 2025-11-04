@@ -1,0 +1,291 @@
+---
+title: "Deploy Factory Droid on a VPS Server"
+description: "Learn how to set up Factory CLI's droid agent on a VPS for remote access and headless automation"
+---
+
+<iframe
+  className="w-full aspect-video rounded-xl"
+  src="https://youtube.com/embed/a3tqhTdSugg"
+  title="Deploy Factory Droid on a VPS Server"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+## What this doc covers
+
+- Set up Factory CLI's droid agent on a Virtual Private Server (VPS) for remote access from anywhere
+- Configure SSH authentication with key pairs for secure, passwordless server connections
+- Use droid exec for headless automation tasks and system administration on your server
+
+## 1. Prerequisites and installation
+
+Before starting, you'll need:
+
+- **Factory CLI installed locally** - Follow the [installation guide](/cli/getting-started/quickstart)
+- **Factory account** - Sign up at [factory.ai](https://factory.ai)
+- **VPS provider account** - This tutorial uses [Hetzner](https://www.hetzner.com/), but works with any VPS provider (DigitalOcean, Linode, AWS EC2, etc.)
+- **Basic terminal familiarity** - You'll be running commands in your local terminal and on the server
+
+**Cost estimate**: A basic VPS suitable for running droid costs around $5-10/month.
+
+## 2. Why use droid on a VPS?
+
+**Problem statement**: Running AI agents locally limits you to when you're at your computer. Many automation tasks need to run continuously, respond to triggers, or be accessible from anywhere - whether you're on a mobile device, traveling, or working from a different machine.
+
+**Concrete pain examples**:
+- You want to monitor and manage production servers but can't SSH in from your phone effectively
+- You need to run scheduled automation tasks that require AI assistance 24/7
+- You want to debug issues on live environments but don't have access to your development machine
+- Manual server administration tasks consume hours of your time that could be automated
+
+**How droid on a VPS solves this**: By deploying Factory's droid agent on a cloud server, you get:
+- **Always-available AI assistant** - Access droid from any device, anywhere with internet
+- **Headless automation** - Run `droid exec` commands programmatically for building custom agents and workflows
+- **Production debugging** - Use AI to explore and troubleshoot your live environment directly
+- **System administration** - Let droid handle configuration, setup, and maintenance tasks
+
+**Technical foundation**: Factory's droid runs on any Linux environment with Python support. When deployed on a VPS, it becomes a persistent service you can interact with through SSH from any client.
+
+## 3. Setup and basic usage
+
+Let's walk through the complete setup process, from creating SSH keys to connecting to your VPS.
+
+### Step 1: Generate SSH keys with droid
+
+We'll use droid locally to create an SSH key pair. This is more secure than password authentication and enables seamless connections.
+
+```bash
+# Start droid in your local terminal
+droid
+
+# Ask droid to create the key pair
+> Create a new SSH key pair called example
+```
+
+Droid will generate two files:
+- `~/.ssh/example` - Private key (keep this secret, never share)
+- `~/.ssh/example.pub` - Public key (safe to share, will be added to your VPS)
+
+### Step 2: Copy the public key
+
+```bash
+# Ask droid to copy the public key to your clipboard
+> Copy the public key to the clipboard
+```
+
+### Step 3: Create your VPS and add the SSH key
+
+In your VPS provider dashboard (Hetzner example):
+
+1. **Create a new server**:
+   - Choose your server type (e.g., CPX22 - $4.99/month)
+   - Select a location (e.g., Ashburn, Virginia)
+   - Keep default options
+
+2. **Add your SSH key**:
+   - In the "SSH Keys" section, click "Add SSH Key"
+   - Paste the public key you copied
+   - Name it "example" (or any descriptive name)
+   - Add the key to the server
+
+3. **Name and create**:
+   - Optionally name your server (e.g., "example-vps")
+   - Click "Create" and wait for the server to spin up
+
+### Step 4: Configure SSH for easy access
+
+Once your server is ready, copy its IP address (e.g., `123.45.67.89`) and ask droid to configure your SSH settings:
+
+```bash
+# In droid
+> Add 123.45.67.89 to my SSH config file with an alias called example so I can connect easily
+```
+
+Droid will update your `~/.ssh/config` file to include something like:
+
+```ssh-config
+Host example
+    HostName 123.45.67.89
+    User root
+    IdentityFile ~/.ssh/example
+```
+
+**What this enables**: Instead of typing `ssh root@123.45.67.89 -i ~/.ssh/example` every time, you can simply run `ssh example`.
+
+### Step 5: Connect and install Factory CLI on the VPS
+
+```bash
+# In a new terminal window, connect to your VPS
+ssh example
+
+# Install Factory CLI on the VPS
+curl -fsSL https://cli.factory.ai/install.sh | sh
+
+# Activate the installation
+source ~/.bashrc  # or source ~/.zshrc if using zsh
+
+# Verify installation
+droid --version
+```
+
+### Step 6: Authenticate Factory CLI on the VPS
+
+```bash
+# Run droid for the first time
+droid
+```
+
+On first run, droid will prompt you to log in:
+1. It displays a URL and an authentication code
+2. Copy the code
+3. Click the URL (or paste it in your browser)
+4. Paste the code to authenticate
+5. You're now logged in and can use droid on your VPS
+
+**Success check**: You should now see the droid prompt on your VPS, ready to accept commands.
+
+## 4. Advanced example: System administration with droid
+
+Now that droid is running on your VPS, let's use it for practical server administration. This example shows how droid can handle complex setup tasks like configuring a web server.
+
+### Setting up Nginx with Docker
+
+```bash
+# In your VPS, with droid running
+> Set up Nginx with Docker and serve a hello world page
+```
+
+Droid will:
+1. Install Docker if not already present
+2. Create a basic Nginx configuration
+3. Create an HTML file with "Hello World"
+4. Set up and run the Docker container
+5. Configure networking and ports
+
+**Verification**: Open a browser and navigate to your VPS IP address (e.g., `http://123.45.67.89`). You should see "Hello World" displayed.
+
+**What makes this powerful**: Tasks that normally require multiple commands, configuration files, and troubleshooting are handled by droid with a single natural language instruction. Droid understands best practices and handles edge cases automatically.
+
+## 5. Droid exec: Headless automation and custom agents
+
+The real power of running droid on a VPS is `droid exec` - a headless mode that enables programmatic access for building automation workflows and custom agents.
+
+### What is droid exec?
+
+`droid exec` runs droid commands without an interactive session, making it perfect for:
+- Scheduled automation tasks
+- Building custom agent frameworks
+- Integrating droid into scripts and applications
+- Running quick queries from CI/CD pipelines
+
+<Note>See the full droid exec docs [here](/cli/droid-exec/overview).</Note>
+
+### Basic droid exec usage
+
+```bash
+# Simple query with a fast model (GLM 4.6)
+droid exec --model glm-4.6 "Tell me a joke"
+```
+
+**Why GLM 4.6?** It's an extremely fast model, ideal for quick queries and automation tasks where speed matters more than deep reasoning.
+
+### Advanced: System exploration
+
+```bash
+# Ask droid to explore your system and find specific information
+droid exec --model glm-4.6 "Explore my system and tell me where the file is that I'm serving with Nginx"
+```
+
+Droid will:
+1. Search for Nginx configuration files
+2. Identify the document root
+3. Locate the HTML/content files being served
+4. Report back with file paths and relevant configuration
+
+**Output example**:
+```
+Configuration file: /etc/nginx/nginx.conf
+Content file: /var/www/html/index.html
+Docker setup: /home/user/docker-compose.yml
+Server running on: port 80
+```
+
+### Building custom agent workflows
+
+Because `droid exec` is scriptable, you can build sophisticated automation:
+
+```bash
+#!/bin/bash
+# Example: Automated deployment checker
+
+# Check deployment status
+STATUS=$(droid exec --model glm-4.6 "Check if my Docker containers are running and report their health")
+
+# If issues found, investigate
+if echo "$STATUS" | grep -q "error\|stopped"; then
+    droid exec --model glm-4.6 "Diagnose the Docker container issue and suggest fixes"
+fi
+```
+
+**Use cases for custom agents**:
+- Automated monitoring and alerting
+- Self-healing infrastructure (detect and fix common issues)
+- Intelligent log analysis and error triage
+- Dynamic configuration management based on system state
+
+## 6. Remote access from anywhere
+
+One of the biggest advantages of having droid on a VPS is accessing it from any device, including mobile.
+
+### Using Termius for mobile SSH access
+
+[Termius](https://termius.com/) is a modern SSH client available for:
+- macOS, Windows, Linux (desktop)
+- iOS and Android (mobile)
+
+**Setup steps**:
+
+1. **Install Termius** on your device
+2. **Add your SSH key**:
+   - In Termius, go to Keychain
+   - Add a new key
+   - Import your private key (`~/.ssh/example`)
+3. **Add your VPS host**:
+   - Create a new host
+   - Hostname: Your VPS IP address
+   - Username: `root` (or your configured user)
+   - Key: Select the key you imported
+4. **Connect**: Tap the host to connect
+
+**Mobile workflow**:
+```bash
+# On your phone via Termius
+ssh example
+
+# Run droid
+droid
+
+# Or use droid exec for quick queries
+droid exec --model glm-4-flash "Check system resources and uptime"
+```
+
+### Real-world scenarios
+
+- **Travel troubleshooting**: Server goes down while you're away? SSH in from your phone and let droid help diagnose and fix the issue
+- **On-call debugging**: Respond to alerts from anywhere with AI-assisted investigation
+- **Quick queries**: Check system status, review logs, or make configuration changes without needing your laptop
+
+## Next steps
+
+Now that you have droid running on your VPS:
+
+1. **Explore automation**: Start with simple `droid exec` commands and build up to custom scripts
+2. **Set up monitoring**: Use droid to help configure system monitoring and alerting
+3. **Create scheduled tasks**: Combine droid exec with cron jobs for recurring automation
+4. **Join the community**: Share your use cases and learn from others in the [Factory Discord](https://discord.gg/zuudFXxg69)
+
+For more information:
+- [Factory CLI Documentation](/cli/getting-started/overview)
+- [Droid Exec Reference](/cli/droid-exec/overview)
+- [Custom Droids Guide](/cli/configuration/custom-droids)
