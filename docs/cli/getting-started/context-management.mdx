@@ -20,17 +20,6 @@ Factory compresses context incrementally as you work. Extended coding sessions s
   </Card>
 </CardGroup>
 
-## Naive compression approaches fail in practice
-
-Re-summarizing the entire conversation whenever context grows too long seems straightforward but creates problems:
-
-- **Redundant work** - Every request re-summarizes content already summarized in previous turns
-- **Linear cost growth** - Summarization cost and latency increase linearly with conversation length
-- **Degraded quality** - Sessions run permanently near maximum context, degrading response quality
-- **Forced multi-stage processing** - Very long sessions require multi-stage chunking, compounding latency and cost
-
-Factory uses incremental compression instead.
-
 ## Factory compresses incrementally with anchor points
 
 Factory maintains a persistent summary and updates it incrementally. Anchor points mark specific messages where summaries persist. Only newly dropped content gets summarized.
@@ -53,13 +42,7 @@ Factory maintains a persistent summary and updates it incrementally. Anchor poin
 LLMs cannot reliably compress their own context. The agent system must manage what information stays accessible.
 </Note>
 
-## Aggressive compression increases total cost
-
-Cutting context too aggressively forces the agent to re-fetch information. Extra inference calls add latency and cost.
-
-Workflows that revisit information (iterative code review, complex system implementations) suffer most. Round-trips to re-fetch information outweigh savings from compression.
-
-**Factory minimizes total work per task, not context per request.** Factory keeps enough context to avoid repeated work while respecting model limits.
+**Why not just re-summarize everything?** Re-summarizing the entire conversation creates redundant work, linear cost growth, and quality degradation. Factory uses incremental compression instead - only new content summarizes, not the entire history repeatedly.
 
 ## Critical artifacts never compress
 
@@ -105,60 +88,7 @@ Five types of artifacts never compress:
   </Accordion>
 </AccordionGroup>
 
-## Compressed context mirrors engineering handoffs
-
-Factory's compression mirrors how engineers hand off work to teammates. Compressed context resembles a status update, not raw conversation history.
-
-### OAuth authentication example
-
-Working on OAuth authentication, the agent retains:
-
-**Building:**
-- OAuth 2.0 flow with Google and GitHub providers
-- JWT session management  
-- Protected route middleware
-
-**Progress:**
-- ✅ OAuth credentials configured
-- ✅ Google OAuth callback working
-- ✅ User model created with OAuth fields
-- 🔄 GitHub OAuth in progress
-- ⏳ Session middleware pending
-- ⏳ Protected route examples pending
-
-**Technical stack:**
-- Express.js with Passport.js authentication
-- PostgreSQL with Sequelize ORM
-- REST API patterns in `/api/v1/`
-- httpOnly cookies (not localStorage) for tokens
-
-**Blockers and learnings:**
-- Google OAuth needs verified domain (configured)
-- Added `scope: ['profile', 'email']` for user details
-- passport-github2 works better than passport-github
-- Must handle new registration and existing login separately
-
-**Files modified:**
-- `/routes/auth.js` - OAuth routes and callbacks
-- `/models/User.js` - User model with OAuth fields
-- `/middleware/auth.js` - Authentication middleware
-- `/config/passport.js` - Passport strategy configuration
-
-Engineers provide this information when handing off work. Factory preserves the same.
-
-### Exploration compresses, decisions persist
-
-Conversational back-and-forth, exploratory questions, and resolved issues compress:
-
-- ❌ Explanatory questions and answers
-- ❌ Failed attempts and alternative approaches tried
-- ❌ Debugging sessions that reached resolution
-- ❌ Multiple prompt iterations
-- ❌ Tangential implementation discussions
-
-**Decisions and outcomes persist. Exploration compresses.**
-
-## Extend sessions with these practices
+## Recommendations for extended sessions
 
 ### Create specifications first
 
@@ -253,6 +183,43 @@ Focus on progress:
 
 Progress indicates context management works correctly.
 
+## Example: OAuth authentication handoff
+
+Factory's compression mirrors how engineers hand off work to teammates. Working on OAuth authentication, the agent retains:
+
+**Building:**
+- OAuth 2.0 flow with Google and GitHub providers
+- JWT session management
+- Protected route middleware
+
+**Progress:**
+- ✅ OAuth credentials configured
+- ✅ Google OAuth callback working
+- ✅ User model created with OAuth fields
+- 🔄 GitHub OAuth in progress
+- ⏳ Session middleware pending
+- ⏳ Protected route examples pending
+
+**Technical stack:**
+- Express.js with Passport.js authentication
+- PostgreSQL with Sequelize ORM
+- REST API patterns in `/api/v1/`
+- httpOnly cookies (not localStorage) for tokens
+
+**Blockers and learnings:**
+- Google OAuth needs verified domain (configured)
+- Added `scope: ['profile', 'email']` for user details
+- passport-github2 works better than passport-github
+- Must handle new registration and existing login separately
+
+**Files modified:**
+- `/routes/auth.js` - OAuth routes and callbacks
+- `/models/User.js` - User model with OAuth fields
+- `/middleware/auth.js` - Authentication middleware
+- `/config/passport.js` - Passport strategy configuration
+
+Compressed context preserves decisions and outcomes like an engineering handoff. Exploratory questions, failed attempts, and resolved debugging compress away.
+
 ## How iterative compression evolved
 
 Factory's compression approach went through several iterations:
@@ -295,6 +262,20 @@ Factory's compression approach went through several iterations:
 
     This hybrid approach delivers the best of both worlds: **comprehensive context retention with optimal performance**.
   </Accordion>
+
+  <Accordion title="V4: Proactive compression (planned)">
+    Current compression is reactive - triggered by context thresholds. Future compression will be proactive.
+
+    Debugging sessions generate trial-and-error noise. When errors resolve, agents should compress immediately, not wait for thresholds.
+
+    **Planned capabilities:**
+    - **Natural breakpoint detection** - Agents recognize when to compress completed work phases
+    - **Structured memory** - Persistent artifacts like task lists and decision logs (currently implemented)
+    - **Sub-agent architectures** - Retrieval agents gather inputs, parent agents keep only results
+    - **Intelligent curation** - Agents compress based on relevance, not age
+
+    Compression will shift from "when forced" to "when optimal."
+  </Accordion>
 </AccordionGroup>
 
 ## Troubleshoot context issues
@@ -336,42 +317,6 @@ Create a to-do list for this feature implementation and keep it updated as we pr
 ```
 
 The agent maintains to-do lists across compressions.
-
-## Information preserved during compression
-
-Factory preserves specific information types during compression:
-
-<CardGroup cols={2}>
-  <Card title="Session Intent" icon="bullseye">
-    What did you create the session for? What requirements have been stated? What is the ideal outcome?
-  </Card>
-  <Card title="High-Level Play-By-Play" icon="timeline">
-    Major actions and decisions: "User requests refactor → Assistant modifies files A, B, C → User requests clarification..."
-  </Card>
-  <Card title="Artifact Trail" icon="code-branch">
-    Which files were created, modified, or deleted? What were the key changes? Test results and their outcomes
-  </Card>
-  <Card title="Breadcrumbs" icon="map-signs">
-    File paths, function names, and key identifiers that allow the agent to re-access truncated artifacts if needed
-  </Card>
-</CardGroup>
-
-## Proactive compression is the future
-
-Current compression is reactive - triggered by context thresholds. Future compression will be proactive.
-
-### Agents will compress at natural breakpoints
-
-Debugging sessions generate trial-and-error noise. When errors resolve, agents should compress immediately, not wait for thresholds.
-
-**Future capabilities:**
-
-1. **Natural breakpoint detection** - Agents recognize when to compress completed work phases
-2. **Structured memory** - Persistent artifacts like task lists and decision logs (currently implemented)
-3. **Sub-agent architectures** - Retrieval agents gather inputs, parent agents keep only results
-4. **Intelligent curation** - Agents compress based on relevance, not age
-
-AI models will improve at self-reflection and planning. Compression will shift from "when forced" to "when optimal."
 
 ## Summary: Context management enables extended sessions
 
