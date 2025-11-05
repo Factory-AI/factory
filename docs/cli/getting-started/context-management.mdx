@@ -22,19 +22,46 @@ Factory's approach to context management enables you to work through multi-milli
 
 ## How context compression works
 
-### The optimal context window
+### Why the naive approach doesn't work
 
-Factory maintains an optimal context window per session that balances:
+The simplest approach to context management would be to re-summarize the entire conversation whenever it gets too long. This seems straightforward but fails in practice:
+
+- **Redundant re-summarization** - Each request triggers a full re-summarization of content that was already summarized in previous turns
+- **Growing cost** - The span requiring summarization grows with each turn, causing costs and latency to increase linearly with conversation length
+- **Perpetual edge-of-limit** - Once compression starts, you run permanently near max context, which degrades response quality
+- **Forces hierarchical summarization** - For very long conversations, you need multi-stage chunking, compounding latency and cost
+
+Factory solves this with **incremental compression** - a fundamentally different approach.
+
+### Factory's incremental compression approach
+
+Rather than regenerating the entire summary per request, Factory maintains a **persistent summary** and updates it incrementally. The system uses **anchor points** - specific messages where summaries are persisted - and only summarizes newly dropped content.
+
+**How it works:**
+
+1. **Context grows naturally** - Your conversation and work artifacts accumulate in context
+2. **Compression trigger** - When context reaches an optimal threshold, Factory compresses older messages
+3. **Incremental update** - Only the newly dropped span gets summarized and merged into the existing persistent summary
+4. **Anchor tracking** - Each summary is anchored to a specific message, creating a clear history of compressions
+
+This approach delivers:
 
 - **Model performance** - LLMs maintain attention and coherence effectively
-- **Response quality** - The agent can effectively reference all context without degradation
+- **Response quality** - The agent can effectively reference all context without degradation  
 - **Speed** - Prompt caching remains effective and responses stay fast
-
-When your session reaches the threshold, Factory automatically compresses the context down to a manageable size while preserving everything critical to your work.
+- **Cost efficiency** - Only new content gets summarized, not the entire history repeatedly
 
 <Note>
   **Key insight:** You can't rely on LLMs to correctly compress their own context. It's the agent system's responsibility to manage what information remains accessible and in what form.
 </Note>
+
+### The false economy of over-compression
+
+Cutting context too aggressively can backfire. Once key artifacts are summarized away, the agent must re-fetch them, adding extra inference calls and latency.
+
+In workflows that revisit the same information (like iterative code review or implementations within complex systems), these round-trips can outweigh any savings from aggressive compression.
+
+**Factory's goal:** Minimize total work per task, not context per request. Keep just enough context to avoid repeated work while respecting the model's effective limits.
 
 ### What always persists
 
@@ -310,13 +337,50 @@ Create a to-do list for this feature implementation and keep it updated as we pr
 
 The agent will maintain it across compressions.
 
+## What information must survive compression
+
+For Factory's synchronous chat-based coding sessions, certain information is always preserved during compression:
+
+<CardGroup cols={2}>
+  <Card title="Session Intent" icon="bullseye">
+    What did you create the session for? What requirements have been stated? What is the ideal outcome?
+  </Card>
+  <Card title="High-Level Play-By-Play" icon="timeline">
+    Major actions and decisions: "User requests refactor → Assistant modifies files A, B, C → User requests clarification..."
+  </Card>
+  <Card title="Artifact Trail" icon="code-branch">
+    Which files were created, modified, or deleted? What were the key changes? Test results and their outcomes
+  </Card>
+  <Card title="Breadcrumbs" icon="map-signs">
+    File paths, function names, and key identifiers that allow the agent to re-access truncated artifacts if needed
+  </Card>
+</CardGroup>
+
+## The future: Proactive memory curation
+
+Factory's current compression strategy is **reactive** - it compresses based on reaching context thresholds. But the future of context management is **proactive**.
+
+### Self-directed compression
+
+Consider an agent that just completed a complex debugging session. As soon as the error is resolved, much of the intermediate trial-and-error becomes noise for future work. Rather than waiting to hit a threshold, the agent should proactively compress completed work.
+
+The future of Factory's context management involves:
+
+1. **Natural breakpoints** - Agents recognize when to compress completed phases of work
+2. **Structured working memory** - Maintaining persistent, structured artifacts like task lists and decision logs (already implemented)
+3. **Sub-agent architectures** - Retrieval agents gather inputs, parent agents retain only final results
+4. **Intelligent curation** - Agents choose what to compress based on relevance, not just age
+
+As AI models improve at self-reflection and planning, we expect to shift from "compress when forced" to "compress when optimal."
+
 ## Summary
 
 Factory's context management enables extended sessions through:
 
-1. **Incremental compression** when context grows large
-2. **Selective persistence** of critical artifacts
-3. **Human-like handoff** of compressed context
-4. **Zero manual intervention** required
+1. **Incremental compression** using anchor points and persistent summaries
+2. **Selective persistence** of critical artifacts that never get compressed
+3. **Human-like handoff** of compressed context with decisions and outcomes
+4. **Smart tradeoffs** that minimize total work per task, not just context per request
+5. **Zero manual intervention** required
 
 This approach allows extended sessions while maintaining agent performance, code quality, and project continuity. You focus on building - Factory handles the context.
