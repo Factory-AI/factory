@@ -1,0 +1,68 @@
+name: Post Changelog to Discord
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/changelog/*.mdx'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get changed changelog files
+        id: changes
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | grep 'docs/changelog/' || echo "")
+          echo "Changed files: $CHANGED_FILES"
+          if [ -n "$CHANGED_FILES" ]; then
+            # Get the first changed file
+            FIRST_FILE=$(echo "$CHANGED_FILES" | head -n 1)
+            echo "file=$FIRST_FILE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node.js
+        if: steps.changes.outputs.file != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Parse changelog and post to Discord
+        if: steps.changes.outputs.file != ''
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          CHANGELOG_FILE: ${{ steps.changes.outputs.file }}
+        run: |
+          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
+            echo "Discord webhook URL not provided. Skipping notification."
+            exit 0
+          fi
+
+          # Parse the changelog
+          MESSAGE=$(node .github/scripts/parse-changelog.js "$CHANGELOG_FILE")
+          
+          if [ -z "$MESSAGE" ]; then
+            echo "Failed to parse changelog"
+            exit 1
+          fi
+          
+          echo "Posting to Discord:"
+          echo "$MESSAGE"
+          
+          # Create JSON payload
+          PAYLOAD=$(jq -n --arg content "$MESSAGE" '{
+            content: $content
+          }')
+          
+          # Post to Discord
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"
+          
+          echo "Successfully posted to Discord!"
