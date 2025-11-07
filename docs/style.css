@@ -62,29 +62,29 @@
 
 /* Unfocused sidebar navigation link color - soft gray */
 a.text-gray-700:not(.text-primary),
-button.text-gray-700:not(.text-primary) {
+button.text-gray-700.border-l:not(.text-primary) {
     color: #999999 !important;
 }
 
 a.text-gray-700:not(.text-primary):hover,
-button.text-gray-700:not(.text-primary):hover,
+button.text-gray-700.border-l:not(.text-primary):hover,
 a.text-gray-700.hover\:text-gray-900:not(.text-primary):hover,
-button.text-gray-700.hover\:text-gray-900:not(.text-primary):hover {
+button.text-gray-700.hover\:text-gray-900.border-l:not(.text-primary):hover {
     color: #333333 !important;
     border-left-color: #333333 !important;
 }
 
 .dark a.dark\:text-gray-400:not(.text-primary),
-.dark button.dark\:text-gray-400:not(.text-primary),
+.dark button.dark\:text-gray-400.border-l:not(.text-primary),
 a.text-gray-700.dark\:text-gray-400:not(.text-primary),
-button.text-gray-700.dark\:text-gray-400:not(.text-primary) {
+button.text-gray-700.dark\:text-gray-400.border-l:not(.text-primary) {
     color: #888888 !important;
 }
 
 .dark a.dark\:text-gray-400:not(.text-primary):hover,
-.dark button.dark\:text-gray-400:not(.text-primary):hover,
+.dark button.dark\:text-gray-400.border-l:not(.text-primary):hover,
 .dark a.dark\:hover\:text-gray-300:not(.text-primary):hover,
-.dark button.dark\:hover\:text-gray-300:not(.text-primary):hover {
+.dark button.dark\:hover\:text-gray-300.border-l:not(.text-primary):hover {
     color: #CCCCCC !important;
     border-left-color: #CCCCCC !important;
 }
@@ -93,6 +93,11 @@ button.text-gray-700.dark\:text-gray-400:not(.text-primary) {
 .prose {
     font-size: 15px !important;
     color: #5c5855 !important;
+}
+
+/* Headers use Geist Mono */
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Geist Mono", monospace !important;
 }
 
 /* Eyebrow section label in orange */
@@ -130,17 +135,20 @@ a.text-primary.border-primary {
     color: #f5f5f5 !important;
 }
 
+/* Maintain font-weight for TOC items across light/dark modes */
+.toc-item a.font-medium {
+    font-weight: 500 !important;
+}
+
 /* Active/focused table of contents link color */
 #table-of-contents-content a.text-primary,
 #table-of-contents-content a.border-primary {
     color: #F27B2F !important;
     border-color: #F27B2F !important;
-    font-weight: 400 !important;
 }
 
 .dark #table-of-contents-content a.text-primary,
 .dark #table-of-contents-content a.border-primary {
     color: #F27B2F !important;
     border-color: #F27B2F !important;
-    font-weight: 400 !important;
 }
