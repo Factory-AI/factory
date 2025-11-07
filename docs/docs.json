@@ -1,11 +1,24 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "willow",
   "name": "Factory Documentation",
   "colors": {
-    "primary": "#292929",
+    "primary": "#020202",
     "light": "#f8f8f8",
-    "dark": "#292929"
+    "dark": "#020202"
+  },
+  "styling": {
+    "fonts": {
+      "body": {
+        "family": "Inter"
+      },
+      "heading": {
+        "family": "Inter"
+      },
+      "mono": {
+        "family": "Geist Mono"
+      }
+    }
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -25,177 +38,160 @@
     },
     "tabs": [
       {
-        "tab": "Welcome",
+        "tab": "Docs",
         "groups": [
           {
             "group": "Welcome",
-            "pages": [
-              "welcome/index"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "CLI",
-        "groups": [
-          {
-            "group": "Getting Started",
-            "pages": [
-              "cli/getting-started/overview",
-              "cli/getting-started/quickstart"
-            ]
+            "pages": ["welcome/index", "pricing"]
           },
           {
-            "group": "Overview",
+            "group": "CLI",
             "pages": [
-              "cli/getting-started/video-walkthrough",
-              "cli/getting-started/how-to-talk-to-a-droid",
-              "cli/getting-started/common-use-cases"
-            ]
-          },
-          {
-            "group": "User Guides",
-            "pages": [
-              "cli/user-guides/become-a-power-user",
-              "cli/user-guides/specification-mode",
-              "cli/user-guides/auto-run",
-              "cli/user-guides/choosing-your-model",
-              "cli/user-guides/implementing-large-features"
-            ]
-          },
-          {
-            "group": "Configuration",
-            "pages": [
-              "cli/configuration/cli-reference",
-              "cli/configuration/custom-slash-commands",
-              "cli/configuration/ide-integrations",
-              "cli/configuration/custom-droids",
-              "cli/configuration/agents-md",
-              "cli/configuration/settings",
-              "cli/configuration/mixed-models",
-              "cli/configuration/mcp",
-              {
-                "group": "Bring Your Own Key",
-                "pages": [
-                  "cli/byok/overview",
-                  "cli/byok/fireworks",
-                  "cli/byok/baseten",
-                  "cli/byok/deepinfra",
-                  "cli/byok/huggingface",
-                  "cli/byok/ollama",
-                  "cli/byok/openrouter",
-                  "cli/byok/openai-anthropic",
-                  "cli/byok/google-gemini"
+                  "cli/getting-started/overview",
+                  "cli/getting-started/quickstart",
+                  {
+                    "group": "Resources",
+                    "pages": [
+                      "cli/getting-started/video-walkthrough",
+                      "cli/getting-started/how-to-talk-to-a-droid",
+                      "cli/getting-started/common-use-cases"
+                    ]
+                  },
+                  {
+                    "group": "User Guides",
+                    "pages": [
+                      "cli/user-guides/become-a-power-user",
+                      "cli/user-guides/specification-mode",
+                      "cli/user-guides/auto-run",
+                      "cli/user-guides/choosing-your-model",
+                      "cli/user-guides/implementing-large-features"
+                    ]
+                  },
+                  {
+                    "group": "Configuration",
+                    "pages": [
+                      "cli/configuration/cli-reference",
+                      "cli/configuration/custom-slash-commands",
+                      "cli/configuration/ide-integrations",
+                      "cli/configuration/custom-droids",
+                      "cli/configuration/agents-md",
+                      "cli/configuration/settings",
+                      "cli/configuration/mixed-models",
+                      "cli/configuration/mcp",
+                      {
+                        "group": "Bring Your Own Key",
+                        "pages": [
+                          "cli/byok/overview",
+                          "cli/byok/fireworks",
+                          "cli/byok/baseten",
+                          "cli/byok/deepinfra",
+                          "cli/byok/huggingface",
+                          "cli/byok/ollama",
+                          "cli/byok/openrouter",
+                          "cli/byok/openai-anthropic",
+                          "cli/byok/google-gemini"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Droid Exec (Headless)",
+                    "pages": [
+                      "cli/droid-exec/overview",
+                      {
+                        "group": "Cookbook",
+                        "pages": [
+                          "cli/droid-exec/cookbook/code-review",
+                          "cli/droid-exec/cookbook/refactor-imports",
+                          "cli/droid-exec/cookbook/refactor-error-messages",
+                          "cli/droid-exec/cookbook/refactor-fix-lint"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Account",
+                    "pages": [
+                      "cli/account/security",
+                      "cli/account/droid-shield"
+                    ]
+                  }
                 ]
-              }
-            ]
           },
           {
-            "group": "Droid Exec (Headless)",
-            "pages": [
-              "cli/droid-exec/overview",
-              {
-                "group": "Cookbook",
-                "pages": [
-                  "cli/droid-exec/cookbook/code-review",
-                  "cli/droid-exec/cookbook/refactor-imports",
-                  "cli/droid-exec/cookbook/refactor-error-messages",
-                  "cli/droid-exec/cookbook/refactor-fix-lint"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Account",
-            "pages": [
-              "cli/account/security",
-              "cli/account/droid-shield"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Web Platform",
-        "groups": [
-          {
-            "group": "Getting Started",
+            "group": "Web Platform",
             "pages": [
               "web/getting-started/overview",
-              "web/getting-started/quickstart"
-            ]
-          },
-          {
-            "group": "Core Concepts",
-            "pages": [
+              "web/getting-started/quickstart",
               {
-                "group": "Context",
+                "group": "Core Concepts",
                 "pages": [
-                  "web/core-concepts/context/understanding-context",
-                  "web/core-concepts/context/external-integrations",
-                  "web/core-concepts/context/dynamic-retrieval",
-                  "web/core-concepts/context/memory-as-context"
+                  {
+                    "group": "Context",
+                    "pages": [
+                      "web/core-concepts/context/understanding-context",
+                      "web/core-concepts/context/external-integrations",
+                      "web/core-concepts/context/dynamic-retrieval",
+                      "web/core-concepts/context/memory-as-context"
+                    ]
+                  },
+                  {
+                    "group": "Droids",
+                    "pages": [
+                      "web/core-concepts/droids/understanding-droids",
+                      "web/core-concepts/droids/using-specialized-droids"
+                    ]
+                  }
                 ]
               },
               {
-                "group": "Droids",
+                "group": "Machine Connection",
                 "pages": [
-                  "web/core-concepts/droids/understanding-droids",
-                  "web/core-concepts/droids/using-specialized-droids"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Machine Connection",
-            "pages": [
-              {
-                "group": "Factory Bridge",
-                "pages": [
-                  "web/machine-connection/factory-bridge/installation-and-usage",
-                  "web/machine-connection/factory-bridge/cli-tools-reference",
-                  "web/machine-connection/factory-bridge/model-context-protocol",
-                  "web/machine-connection/factory-bridge/best-practices",
-                  "web/machine-connection/factory-bridge/troubleshooting"
+                  {
+                    "group": "Factory Bridge",
+                    "pages": [
+                      "web/machine-connection/factory-bridge/installation-and-usage",
+                      "web/machine-connection/factory-bridge/cli-tools-reference",
+                      "web/machine-connection/factory-bridge/model-context-protocol",
+                      "web/machine-connection/factory-bridge/best-practices",
+                      "web/machine-connection/factory-bridge/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "Remote Workspaces",
+                    "pages": [
+                      "web/machine-connection/remote-workspaces/index",
+                      "web/machine-connection/remote-workspaces/installation-and-usage",
+                      "web/machine-connection/remote-workspaces/setup-script",
+                      "web/machine-connection/remote-workspaces/best-practices",
+                      "web/machine-connection/remote-workspaces/troubleshooting"
+                    ]
+                  }
                 ]
               },
               {
-                "group": "Remote Workspaces",
+                "group": "User Guides",
                 "pages": [
-                  "web/machine-connection/remote-workspaces/index",
-                  "web/machine-connection/remote-workspaces/installation-and-usage",
-                  "web/machine-connection/remote-workspaces/setup-script",
-                  "web/machine-connection/remote-workspaces/best-practices",
-                  "web/machine-connection/remote-workspaces/troubleshooting"
+                  {
+                    "group": "Use Cases",
+                    "pages": [
+                      "web/use-cases/overview",
+                      "web/use-cases/unit-testing",
+                      "web/use-cases/building-internal-tools",
+                      "web/use-cases/core-development",
+                      "web/use-cases/code-diagrams",
+                      "web/use-cases/data-science",
+                      "web/use-cases/design-to-component",
+                      "web/use-cases/documentation",
+                      "web/use-cases/migrations"
+                    ]
+                  }
                 ]
               }
             ]
           },
           {
-            "group": "User Guides",
-            "pages": [
-              {
-                "group": "Use Cases",
-                "pages": [
-                  "web/use-cases/overview",
-                  "web/use-cases/unit-testing",
-                  "web/use-cases/building-internal-tools",
-                  "web/use-cases/core-development",
-                  "web/use-cases/code-diagrams",
-                  "web/use-cases/data-science",
-                  "web/use-cases/design-to-component",
-                  "web/use-cases/documentation",
-                  "web/use-cases/migrations"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Onboarding",
-        "groups": [
-          {
-            "group": "Onboarding",
+            "group": "Enterprise",
             "pages": [
               "onboarding/index",
               {
@@ -246,26 +242,11 @@
         ]
       },
       {
-        "tab": "Pricing",
-        "groups": [
-          {
-            "group": "Pricing",
-            "pages": [
-              "pricing"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Changelog",
         "groups": [
           {
             "group": "Changelog",
-            "pages": [
-              "changelog/1-9",
-              "changelog/1-8",
-              "changelog/cli-updates"
-            ]
+            "pages": ["changelog/1-9", "changelog/1-8", "changelog/cli-updates"]
           }
         ]
       }
@@ -273,7 +254,7 @@
   },
   "_hiddenTabs": {},
   "logo": {
-    "light": "/logo/light.svg",
+    "light": "/logo/light.png",
     "dark": "/logo/dark.svg"
   },
   "topbarLinks": [
@@ -298,12 +279,7 @@
     }
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude"]
   },
   "integrations": {
     "mixpanel": {
