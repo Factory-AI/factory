@@ -1,0 +1,331 @@
+---
+title: Context Management
+description: Factory compresses context incrementally to enable extended coding sessions without manual resets
+---
+
+Factory compresses context incrementally as you work. Extended coding sessions stay performant without manual resets or context degradation.
+
+<CardGroup cols={2}>
+  <Card title="Compression happens incrementally" icon="compress">
+    Context compresses automatically when sessions grow large, preserving critical information
+  </Card>
+  <Card title="Critical artifacts never compress" icon="bookmark">
+    To-do lists, specs, and recent changes persist across all compression points
+  </Card>
+  <Card title="Compressed context mirrors engineering handoffs" icon="handshake">
+    Compression preserves decisions, blockers, and context like an engineer handing off work
+  </Card>
+  <Card title="No manual intervention required" icon="wand-magic-sparkles">
+    Compression happens automatically without creating new chats or manual summarization
+  </Card>
+</CardGroup>
+
+## Factory compresses incrementally with anchor points
+
+Factory maintains a persistent summary and updates it incrementally. Anchor points mark specific messages where summaries persist. Only newly dropped content gets summarized.
+
+**Incremental compression process:**
+
+1. **Context grows** - Conversation and work artifacts accumulate
+2. **Threshold triggers compression** - Factory compresses older messages when context reaches optimal size
+3. **Only new content summarizes** - Newly dropped content summarizes and merges into existing persistent summary
+4. **Anchors track compression history** - Each summary anchors to a specific message
+
+**Benefits:**
+
+- **Better model performance** - LLMs maintain attention and coherence
+- **Consistent quality** - Agent references all context without degradation
+- **Fast responses** - Prompt caching stays effective
+- **Lower costs** - New content summarizes once, not repeatedly
+
+<Note>
+LLMs cannot reliably compress their own context. The agent system must manage what information stays accessible.
+</Note>
+
+**Why not just re-summarize everything?** Re-summarizing the entire conversation creates redundant work, linear cost growth, and quality degradation. Factory uses incremental compression instead - only new content summarizes, not the entire history repeatedly.
+
+## Critical artifacts never compress
+
+Five types of artifacts never compress:
+
+<AccordionGroup>
+  <Accordion title="Specifications" icon="file-lines">
+    Specifications created in spec mode (Shift+Tab) persist in full. Specifications describe what you're building, who it's for, success metrics, and potential pitfalls. The agent references specifications constantly.
+  </Accordion>
+
+  <Accordion title="To-do lists" icon="list-check">
+    Task lists with status tracking persist across compression points. The agent tracks:
+    - Completed tasks
+    - In-progress work
+    - Pending tasks and their order
+    - Overall completion percentage
+
+    Without persisted to-do lists, the agent loses track in multi-step implementations.
+  </Accordion>
+
+  <Accordion title="Recent code changes" icon="code-compare">
+    Git diffs and recent file modifications stay accessible. The agent needs to know what changed to avoid:
+    - Re-implementing features already built
+    - Breaking existing functionality
+    - Losing awareness of current state
+  </Accordion>
+
+  <Accordion title="agents.md files" icon="file-code">
+    Repository agents.md files (loaded recursively) always stay loaded. Files contain:
+    - Repository-specific conventions
+    - Framework-specific guidance
+    - Team coding standards
+    - Codebase context
+
+    Persisted agents.md files prevent the agent from forgetting coding conventions.
+  </Accordion>
+
+  <Accordion title="Error states" icon="triangle-exclamation">
+    Errors, failed attempts, and blocked progress remain in context. Preserved errors help the agent:
+    - Avoid retrying failed approaches
+    - Remember why solutions didn't work
+    - Continue debugging from the last point
+  </Accordion>
+</AccordionGroup>
+
+## Recommendations for extended sessions
+
+### Create specifications first
+
+Press Shift+Tab to create a comprehensive spec before implementation. Specifications become persistent anchors:
+
+```
+Create a detailed specification for building a multi-tenant SaaS dashboard with:
+- Organization and user management
+- Role-based access control
+- Billing integration with Stripe
+- Real-time data updates
+- Mobile responsive design
+
+Include technical approach, success metrics, and potential challenges.
+```
+
+Specifications stay in context throughout sessions, keeping the agent aligned after compression.
+
+### Trust the to-do list
+
+To-do lists are the source of truth. The agent maintains them automatically:
+
+```
+You: "Add user authentication to the dashboard"
+
+Agent creates:
+1. Set up auth provider configuration
+2. Create login/signup UI components
+3. Implement session management
+4. Add protected route middleware
+5. Create user profile page
+```
+
+The agent updates the list as work completes. After compression, the agent knows where it left off.
+
+### Add agents.md files for consistency
+
+Create agents.md files in your repository (especially subdirectories) with critical context:
+
+**Example `/backend/agents.md`:**
+```markdown
+# Backend Architecture
+
+This backend uses:
+- **Framework**: Express.js with TypeScript
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT tokens via Passport.js
+- **API Style**: RESTful with `/api/v1/` prefix
+
+## Important Conventions
+
+- All routes go through `/routes` with separate files per resource
+- Use `/middleware` for reusable Express middleware
+- Database queries use Prisma Client, never raw SQL
+- All endpoints return JSON with `{ success, data, error }` structure
+- Input validation via Zod schemas in `/schemas`
+
+## Gotchas
+
+- Prisma generates types - run `npx prisma generate` after schema changes
+- JWT secret is in `.env` as JWT_SECRET
+- Use `asyncHandler` wrapper for route error handling
+```
+
+agents.md files always stay loaded and survive compression, ensuring consistency across sessions.
+
+### Configure spec persistence
+
+Type `/settings` to configure spec persistence:
+
+```
+/settings
+> Save spec mode: yes
+```
+
+Factory writes specifications to a dedicated directory as markdown files.
+
+**Benefits:**
+
+- **Version control** - Commit specs alongside code
+- **Manual editing** - Update spec files directly when requirements change
+- **Session reference** - Agent reads files at session start
+- **Team sharing** - Team members read specs to understand work
+
+### Monitor progress, not context
+
+Focus on progress:
+
+- To-do list moves forward ✅
+- Features work as expected ✅
+- Code quality stays high ✅
+
+Progress indicates context management works correctly.
+
+## Example: OAuth authentication handoff
+
+Factory's compression mirrors how engineers hand off work to teammates. Working on OAuth authentication, the agent retains:
+
+**Building:**
+- OAuth 2.0 flow with Google and GitHub providers
+- JWT session management
+- Protected route middleware
+
+**Progress:**
+- ✅ OAuth credentials configured
+- ✅ Google OAuth callback working
+- ✅ User model created with OAuth fields
+- 🔄 GitHub OAuth in progress
+- ⏳ Session middleware pending
+- ⏳ Protected route examples pending
+
+**Technical stack:**
+- Express.js with Passport.js authentication
+- PostgreSQL with Sequelize ORM
+- REST API patterns in `/api/v1/`
+- httpOnly cookies (not localStorage) for tokens
+
+**Blockers and learnings:**
+- Google OAuth needs verified domain (configured)
+- Added `scope: ['profile', 'email']` for user details
+- passport-github2 works better than passport-github
+- Must handle new registration and existing login separately
+
+**Files modified:**
+- `/routes/auth.js` - OAuth routes and callbacks
+- `/models/User.js` - User model with OAuth fields
+- `/middleware/auth.js` - Authentication middleware
+- `/config/passport.js` - Passport strategy configuration
+
+Compressed context preserves decisions and outcomes like an engineering handoff. Exploratory questions, failed attempts, and resolved debugging compress away.
+
+## How iterative compression evolved
+
+Factory's compression approach went through several iterations:
+
+<AccordionGroup>
+  <Accordion title="V1: Over-engineered (didn't work well)">
+    Early versions tracked multiple separate documents:
+    - Accomplishments document (what's been done)
+    - User intent document (what the user wants)
+    - Context document (relevant information)
+
+    This was complex to manage and led to fragmentation. The agent would get confused about which document contained what information.
+  </Accordion>
+
+  <Accordion title="V2: Naive compression (better, but not enough)">
+    Simplified to: "When context grows large, compress everything into 1-2 messages."
+
+    This worked better but had issues:
+    - Lost critical details like specific errors encountered
+    - To-do list would get summarized too much
+    - Agent would re-explore files it had already analyzed
+    - Code changes weren't always preserved accurately
+  </Accordion>
+
+  <Accordion title="V3: Selective persistence (current approach)">
+    The breakthrough was realizing: **not all context is created equal**.
+
+    Some things should **never** be compressed:
+    - To-do list (always needed in full)
+    - Current spec (the north star)
+    - Recent code changes (what did we just do?)
+    - Agent.md files (conventions and standards)
+    - Active error state (what's currently broken?)
+
+    Everything else can be compressed intelligently:
+    - Conversation history → summarized decisions
+    - Exploratory work → outcomes only
+    - Resolved issues → lessons learned
+    - Multiple iterations → final approach
+
+    This hybrid approach delivers the best of both worlds: **comprehensive context retention with optimal performance**.
+  </Accordion>
+
+  <Accordion title="V4: Proactive compression (planned)">
+    Current compression is reactive - triggered by context thresholds. Future compression will be proactive.
+
+    Debugging sessions generate trial-and-error noise. When errors resolve, agents should compress immediately, not wait for thresholds.
+
+    **Planned capabilities:**
+    - **Natural breakpoint detection** - Agents recognize when to compress completed work phases
+    - **Structured memory** - Persistent artifacts like task lists and decision logs (currently implemented)
+    - **Sub-agent architectures** - Retrieval agents gather inputs, parent agents keep only results
+    - **Intelligent curation** - Agents compress based on relevance, not age
+
+    Compression will shift from "when forced" to "when optimal."
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshoot context issues
+
+### Agent forgets important information
+
+**Cause:** Information was not marked as persistent
+
+**Solution:** Add information to agents.md or spec files:
+
+```
+/spec
+[Add the forgotten context to your specification]
+```
+
+Update agents.md in the relevant directory with conventions.
+
+### Agent re-explores analyzed files
+
+**Cause:** File exploration history compressed
+
+**Solution:** List repeatedly accessed files in the spec:
+
+```
+Key files being modified:
+- /components/Dashboard.tsx - Main dashboard component
+- /hooks/useAuth.tsx - Authentication hook
+- /api/routes/user.ts - User API endpoints
+```
+
+### Agent loses track of progress
+
+**Cause:** To-do list not maintained
+
+**Solution:** Request a to-do list:
+
+```
+Create a to-do list for this feature implementation and keep it updated as we progress.
+```
+
+The agent maintains to-do lists across compressions.
+
+## Summary: Context management enables extended sessions
+
+Factory enables extended sessions through:
+
+1. **Incremental compression** - Anchor points and persistent summaries
+2. **Selective persistence** - Critical artifacts never compress
+3. **Engineering handoffs** - Compressed context preserves decisions and outcomes
+4. **Smart tradeoffs** - Minimize total work per task, not context per request
+5. **No manual work** - Automatic compression without intervention
+
+Extended sessions maintain performance, code quality, and continuity. Focus on building. Factory handles context.
