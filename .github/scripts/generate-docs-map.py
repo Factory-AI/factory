@@ -94,14 +94,36 @@ def format_heading_as_bullet(level: int, title: str) -> str:
     indent = "  " * (level - 2)  # Start from h2 (level 2)
     return f"{indent}- {title}"
 
+def should_exclude_file(file_path: Path) -> bool:
+    """Determine if a file should be excluded from the docs map."""
+    rel_path = str(file_path.relative_to(DOCS_ROOT))
+    
+    # Exclude patterns
+    exclude_patterns = [
+        "changelog/",
+    ]
+    
+    # Check if file matches any exclude pattern
+    for pattern in exclude_patterns:
+        if rel_path.startswith(pattern):
+            return True
+    
+    # Exclude specific files
+    if file_path.name.lower() == "readme.md":
+        return True
+    if "factory_docs_map" in file_path.name:
+        return True
+    
+    return False
+
 def generate_docs_map() -> str:
     """Generate the complete documentation map."""
     # Find all MDX files
     mdx_files = sorted(DOCS_ROOT.glob("**/*.mdx"))
     md_files = sorted(DOCS_ROOT.glob("**/*.md"))
     
-    # Exclude README.md
-    doc_files = [f for f in mdx_files + md_files if f.name.lower() != "readme.md" and "factory_docs_map" not in f.name]
+    # Filter out excluded files
+    doc_files = [f for f in mdx_files + md_files if not should_exclude_file(f)]
     
     # Group documentation files
     doc_groups = get_doc_groups(doc_files)
