@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+"""
+Generate a comprehensive documentation map for Factory docs.
+This script creates an unlisted page that outlines all documentation with heading structure.
+Inspired by Claude Code's documentation map approach.
+"""
+
+import os
+import re
+from pathlib import Path
+from datetime import datetime
+from typing import List, Dict, Tuple
+from collections import defaultdict
+
+DOCS_ROOT = Path("docs")
+OUTPUT_FILE = DOCS_ROOT / "factory_docs_map.mdx"
+BASE_URL = "https://docs.factory.ai"
+
+def extract_frontmatter(content: str) -> Dict[str, str]:
+    """Extract frontmatter from MDX file."""
+    frontmatter = {}
+    if content.startswith("---"):
+        end = content.find("---", 3)
+        if end != -1:
+            fm_content = content[3:end].strip()
+            for line in fm_content.split("\n"):
+                if ":" in line:
+                    key, value = line.split(":", 1)
+                    frontmatter[key.strip()] = value.strip().strip('"').strip("'")
+    return frontmatter
+
+def extract_headings(content: str) -> List[Tuple[int, str]]:
+    """Extract markdown headings from content."""
+    # Remove frontmatter
+    if content.startswith("---"):
+        end = content.find("---", 3)
+        if end != -1:
+            content = content[end + 3:]
+    
+    headings = []
+    for line in content.split("\n"):
+        match = re.match(r"^(#{1,6})\s+(.+)$", line.strip())
+        if match:
+            level = len(match.group(1))
+            title = match.group(2).strip()
+            # Remove markdown links but keep the text
+            title = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', title)
+            # Remove HTML tags
+            title = re.sub(r'<[^>]+>', '', title)
+            headings.append((level, title))
+    
+    return headings
+
+def get_doc_groups(docs_files: List[Path]) -> Dict[str, List[Path]]:
+    """Organize documentation files by their top-level directory."""
+    groups = defaultdict(list)
+    
+    for doc_file in docs_files:
+        rel_path = doc_file.relative_to(DOCS_ROOT)
+        parts = rel_path.parts
+        
+        if len(parts) == 1:
+            # Root level docs
+            groups["Root"].append(doc_file)
+        else:
+            # Group by top-level directory
+            group_name = parts[0].replace("-", " ").replace("_", " ").title()
+            groups[group_name].append(doc_file)
+    
+    return dict(sorted(groups.items()))
+
+def get_page_url(doc_file: Path) -> str:
+    """Generate the documentation URL for a file."""
+    rel_path = doc_file.relative_to(DOCS_ROOT)
+    # Remove .mdx extension and convert to URL path
+    url_path = str(rel_path.with_suffix("")).replace("\\", "/")
+    # Remove /index from the end if present
+    if url_path.endswith("/index"):
+        url_path = url_path[:-6]
+    return f"{BASE_URL}/{url_path}"
+
+def get_page_title(doc_file: Path, frontmatter: Dict[str, str]) -> str:
+    """Get the page title from frontmatter or filename."""
+    if "title" in frontmatter:
+        return frontmatter["title"]
+    elif "sidebarTitle" in frontmatter:
+        return frontmatter["sidebarTitle"]
+    else:
+        # Use filename without extension
+        return doc_file.stem.replace("-", " ").replace("_", " ").title()
+
+def format_heading_as_bullet(level: int, title: str) -> str:
+    """Format a heading as a nested bullet point."""
+    indent = "  " * (level - 2)  # Start from h2 (level 2)
+    return f"{indent}- {title}"
+
+def should_exclude_file(file_path: Path) -> bool:
+    """Determine if a file should be excluded from the docs map."""
+    rel_path = str(file_path.relative_to(DOCS_ROOT))
+    
+    # Exclude patterns
+    exclude_patterns = [
+        "changelog/",
+    ]
+    
+    # Check if file matches any exclude pattern
+    for pattern in exclude_patterns:
+        if rel_path.startswith(pattern):
+            return True
+    
+    # Exclude specific files
+    if file_path.name.lower() == "readme.md":
+        return True
+    if "factory_docs_map" in file_path.name:
+        return True
+    
+    return False
+
+def generate_docs_map() -> str:
+    """Generate the complete documentation map."""
+    # Find all MDX files
+    mdx_files = sorted(DOCS_ROOT.glob("**/*.mdx"))
+    md_files = sorted(DOCS_ROOT.glob("**/*.md"))
+    
+    # Filter out excluded files
+    doc_files = [f for f in mdx_files + md_files if not should_exclude_file(f)]
+    
+    # Group documentation files
+    doc_groups = get_doc_groups(doc_files)
+    
+    # Start building the markdown
+    lines = [
+        "---",
+        'title: "Factory Documentation Map"',
+        'description: "A comprehensive map of all Factory documentation pages with their headings for easy LLM navigation"',
+        "---",
+        "",
+        "# Factory Documentation Map",
+        "",
+        "This is a comprehensive map of all Factory documentation pages with their headings, designed for easy navigation by LLMs and developers.",
+        "",
+        "> **Note:** This file is auto-generated by GitHub Actions. Do not edit manually.",
+        f"> Last updated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC",
+        "",
+        "## Document Structure",
+        "",
+        "This map uses a hierarchical structure:",
+        "",
+        "- **##** marks documentation groups (e.g., 'CLI', 'Web', 'User Guides')",
+        "- **###** marks individual documentation pages",
+        "- **Nested bullets** show the heading structure within each page",
+        "- Each page title links to the full documentation",
+        "",
+    ]
+    
+    # Generate documentation for each group
+    for group_name, files in doc_groups.items():
+        lines.append(f"## {group_name}")
+        lines.append("")
+        
+        # Sort files by path for consistent ordering
+        sorted_files = sorted(files, key=lambda f: f.relative_to(DOCS_ROOT))
+        
+        for doc_file in sorted_files:
+            try:
+                content = doc_file.read_text(encoding="utf-8")
+                frontmatter = extract_frontmatter(content)
+                page_title = get_page_title(doc_file, frontmatter)
+                page_url = get_page_url(doc_file)
+                
+                # Add page title with link
+                rel_path = doc_file.relative_to(DOCS_ROOT)
+                lines.append(f"### [{page_title}]({page_url})")
+                lines.append("")
+                
+                # Extract and add headings
+                headings = extract_headings(content)
+                if headings:
+                    for level, title in headings:
+                        if level >= 2:  # Skip h1 as it's usually the page title
+                            lines.append(format_heading_as_bullet(level, title))
+                    lines.append("")
+                
+            except Exception as e:
+                print(f"Warning: Could not process {doc_file}: {e}")
+                continue
+    
+    return "\n".join(lines)
+
+def main():
+    """Main execution function."""
+    print("Generating Factory documentation map...")
+    
+    # Generate the documentation map
+    docs_map = generate_docs_map()
+    
+    # Write to output file
+    OUTPUT_FILE.write_text(docs_map, encoding="utf-8")
+    
+    print(f"Documentation map generated successfully: {OUTPUT_FILE}")
+    print(f"Total lines: {len(docs_map.splitlines())}")
+
+if __name__ == "__main__":
+    main()
