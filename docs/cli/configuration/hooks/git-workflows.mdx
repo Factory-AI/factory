@@ -1,0 +1,745 @@
+---
+title: "Git Workflow Hooks"
+description: "Integrate hooks with Git for commit validation, branch protection, and automated workflows"
+---
+
+This cookbook shows how to use hooks to enforce Git workflows, validate commits, protect branches, and automate changelog generation.
+
+## How it works
+
+Git workflow hooks can:
+
+1. **Validate commits**: Check commit messages follow conventions
+2. **Protect branches**: Prevent accidental commits to main/production
+3. **Generate changelogs**: Auto-create changelog entries from commits
+4. **Run pre-push checks**: Validate code before pushing
+5. **Enforce PR requirements**: Check branch names, linear issues, etc.
+
+## Prerequisites
+
+Basic Git tools:
+
+<CodeGroup>
+
+```bash Git
+git --version
+```
+
+```bash GitHub CLI (optional)
+brew install gh  # macOS
+# or download from https://cli.github.com
+```
+
+```bash Conventional Commits (optional)
+npm install -g commitlint @commitlint/cli @commitlint/config-conventional
+```
+
+</CodeGroup>
+
+## Basic Git hooks
+
+### Commit message validation
+
+Enforce conventional commit format:
+
+<Accordion title="Commit message validator">
+
+Create `.factory/hooks/validate-commit-msg.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+
+# Only validate Bash commands that look like git commit
+if [ "$tool_name" != "Bash" ]; then
+  exit 0
+fi
+
+command=$(echo "$input" | jq -r '.tool_input.command')
+
+# Check if this is a git commit command
+if ! echo "$command" | grep -qE "^git commit"; then
+  exit 0
+fi
+
+# Extract commit message from command
+if echo "$command" | grep -qE "git commit -m"; then
+  # Extract message from -m flag
+  commit_msg=$(echo "$command" | sed -E 's/.*git commit.*-m[= ]*["\x27]([^"\x27]+)["\x27].*/\1/')
+else
+  # Allow commits without -m (will open editor)
+  exit 0
+fi
+
+# Validate conventional commit format
+# Format: type(scope): description
+# Example: feat(auth): add login functionality
+
+if ! echo "$commit_msg" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?:.+"; then
+  echo "❌ Invalid commit message format" >&2
+  echo "" >&2
+  echo "Commit message must follow Conventional Commits format:" >&2
+  echo "  type(scope): description" >&2
+  echo "" >&2
+  echo "Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert" >&2
+  echo "" >&2
+  echo "Examples:" >&2
+  echo "  feat(auth): add user login" >&2
+  echo "  fix(api): handle null values" >&2
+  echo "  docs: update README" >&2
+  exit 2
+fi
+
+# Check for Linear issue reference
+if ! echo "$commit_msg" | grep -qE "FAC-[0-9]+"; then
+  echo "⚠️ No Linear issue reference found" >&2
+  echo "Consider adding issue reference like: feat(auth): add login FAC-123" >&2
+  # Warning only, don't block
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/validate-commit-msg.sh
+```
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/validate-commit-msg.sh",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+### Branch protection
+
+Prevent commits directly to protected branches:
+
+<Accordion title="Branch protection hook">
+
+Create `.factory/hooks/protect-branches.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+command=$(echo "$input" | jq -r '.tool_input.command // ""')
+
+# Only check git commit commands
+if [ "$tool_name" != "Bash" ] || ! echo "$command" | grep -qE "^git (commit|push)"; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Check if we're in a git repo
+if [ ! -d ".git" ]; then
+  exit 0
+fi
+
+current_branch=$(git branch --show-current)
+
+# Protected branches that cannot be committed to directly
+protected_branches=("main" "master" "production" "prod")
+
+for branch in "${protected_branches[@]}"; do
+  if [ "$current_branch" = "$branch" ]; then
+    echo "❌ Cannot commit directly to protected branch: $branch" >&2
+    echo "" >&2
+    echo "Please create a feature branch instead:" >&2
+    echo "  git checkout -b feature/your-feature-name" >&2
+    echo "" >&2
+    echo "Then create a pull request to merge your changes." >&2
+    exit 2
+  fi
+done
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/protect-branches.sh
+```
+</Accordion>
+
+### Enforce branch naming
+
+Require feature branches to follow naming conventions:
+
+<Accordion title="Branch naming validator">
+
+Create `.factory/hooks/validate-branch-name.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+command=$(echo "$input" | jq -r '.tool_input.command // ""')
+
+# Only check git checkout -b commands
+if [ "$tool_name" != "Bash" ] || ! echo "$command" | grep -qE "^git checkout -b"; then
+  exit 0
+fi
+
+# Extract branch name
+branch_name=$(echo "$command" | sed -E 's/.*git checkout -b[= ]*([^ ]+).*/\1/')
+
+# Valid patterns:
+# - feature/FAC-123-description
+# - fix/FAC-123-description
+# - hotfix/FAC-123-description
+
+if ! echo "$branch_name" | grep -qE "^(feature|fix|hotfix|docs|refactor)/[A-Z]+-[0-9]+-[a-z0-9-]+$"; then
+  echo "❌ Invalid branch name format" >&2
+  echo "" >&2
+  echo "Branch names must follow the pattern:" >&2
+  echo "  type/ISSUE-123-description" >&2
+  echo "" >&2
+  echo "Examples:" >&2
+  echo "  feature/FAC-123-add-user-auth" >&2
+  echo "  fix/FAC-456-fix-login-bug" >&2
+  echo "  hotfix/FAC-789-critical-security-fix" >&2
+  exit 2
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/validate-branch-name.sh
+```
+</Accordion>
+
+## Advanced Git automation
+
+### Auto-generate changelog entries
+
+Automatically create changelog entries from commits:
+
+<Accordion title="Changelog generator">
+
+Create `.factory/hooks/update-changelog.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+command=$(echo "$input" | jq -r '.tool_input.command // ""')
+
+# Only run after git commit
+if [ "$tool_name" != "Bash" ] || ! echo "$command" | grep -qE "^git commit"; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Get the last commit message
+last_commit=$(git log -1 --pretty=format:"%s")
+
+# Parse conventional commit
+if echo "$last_commit" | grep -qE "^(feat|fix)(\(.+\))?:"; then
+  commit_type=$(echo "$last_commit" | sed -E 's/^([^:(]+).*/\1/')
+  commit_msg=$(echo "$last_commit" | sed -E 's/^[^:]+: (.+)/\1/')
+  
+  # Determine changelog section
+  if [ "$commit_type" = "feat" ]; then
+    section="### Features"
+  elif [ "$commit_type" = "fix" ]; then
+    section="### Bug Fixes"
+  else
+    exit 0
+  fi
+  
+  # Create/update CHANGELOG.md
+  if [ ! -f "CHANGELOG.md" ]; then
+    cat > CHANGELOG.md << EOF
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [Unreleased]
+
+$section
+
+- $commit_msg
+
+EOF
+  else
+    # Insert into Unreleased section
+    if grep -q "## \[Unreleased\]" CHANGELOG.md; then
+      # Check if section exists
+      if grep -q "^$section" CHANGELOG.md; then
+        # Add to existing section
+        sed -i.bak "/^$section/a\\
+- $commit_msg
+" CHANGELOG.md
+      else
+        # Create new section
+        sed -i.bak "/## \[Unreleased\]/a\\
+\\
+$section\\
+\\
+- $commit_msg
+" CHANGELOG.md
+      fi
+      rm CHANGELOG.md.bak 2>/dev/null || true
+    fi
+  fi
+  
+  echo "✓ Updated CHANGELOG.md"
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/update-changelog.sh
+```
+
+Add to PostToolUse:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/update-changelog.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+### Pre-push validation
+
+Run tests and checks before allowing git push:
+
+<Accordion title="Pre-push validator">
+
+Create `.factory/hooks/pre-push-check.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+command=$(echo "$input" | jq -r '.tool_input.command // ""')
+
+# Only check git push commands
+if [ "$tool_name" != "Bash" ] || ! echo "$command" | grep -qE "^git push"; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+echo "🔍 Running pre-push checks..."
+
+# Check for uncommitted changes
+if [ -n "$(git status --porcelain)" ]; then
+  echo "⚠️ You have uncommitted changes" >&2
+  echo "Commit or stash them before pushing" >&2
+  git status --short >&2
+  exit 2
+fi
+
+# Run linter
+if [ -f "package.json" ] && grep -q '"lint"' package.json; then
+  echo "Running linter..."
+  if ! npm run lint 2>&1; then
+    echo "❌ Linting failed" >&2
+    echo "Fix lint errors before pushing" >&2
+    exit 2
+  fi
+  echo "✓ Linting passed"
+fi
+
+# Run tests
+if [ -f "package.json" ] && grep -q '"test"' package.json; then
+  echo "Running tests..."
+  if ! npm test 2>&1; then
+    echo "❌ Tests failed" >&2
+    echo "Fix failing tests before pushing" >&2
+    exit 2
+  fi
+  echo "✓ Tests passed"
+fi
+
+# Check for merge conflicts markers
+if git grep -qE "^(<<<<<<<|=======|>>>>>>>)" 2>/dev/null; then
+  echo "❌ Merge conflict markers found in files" >&2
+  git grep -l "^(<<<<<<<|=======|>>>>>>>)" >&2
+  exit 2
+fi
+
+echo "✓ All pre-push checks passed"
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/pre-push-check.sh
+```
+</Accordion>
+
+### Auto-create PR when pushing new branch
+
+Automatically open a PR when pushing a feature branch:
+
+<Accordion title="Auto PR creation">
+
+Create `.factory/hooks/auto-create-pr.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+command=$(echo "$input" | jq -r '.tool_input.command // ""')
+
+# Only run after successful git push of a new branch
+if [ "$tool_name" != "Bash" ] || ! echo "$command" | grep -qE "^git push.*-u origin"; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Check if gh CLI is available
+if ! command -v gh &> /dev/null; then
+  exit 0
+fi
+
+current_branch=$(git branch --show-current)
+
+# Don't create PR for main/master branches
+if [[ "$current_branch" =~ ^(main|master|dev|develop)$ ]]; then
+  exit 0
+fi
+
+# Check if PR already exists
+if gh pr view &>/dev/null; then
+  echo "ℹ️ PR already exists for this branch"
+  exit 0
+fi
+
+# Extract issue number from branch name
+issue_number=""
+if [[ $current_branch =~ ([A-Z]+-[0-9]+) ]]; then
+  issue_number="${BASH_REMATCH[1]}"
+fi
+
+# Generate PR title from branch name or commits
+pr_title="$current_branch"
+if [ -n "$issue_number" ]; then
+  pr_title="$issue_number: $(echo "$current_branch" | sed -E 's/^[^/]+\/[A-Z]+-[0-9]+-//; s/-/ /g')"
+fi
+
+# Create PR
+echo "🔄 Creating pull request..."
+if gh pr create --title "$pr_title" --body "Closes $issue_number" --web; then
+  echo "✓ Pull request created and opened in browser"
+else
+  echo "⚠️ Could not create PR automatically"
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/auto-create-pr.sh
+```
+</Accordion>
+
+### Enforce co-authorship in commits
+
+Add co-author trailers to commits:
+
+<Accordion title="Co-author enforcement">
+
+Create `.factory/hooks/add-coauthor.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+command=$(echo "$input" | jq -r '.tool_input.command // ""')
+
+# Only modify git commit commands
+if [ "$tool_name" != "Bash" ] || ! echo "$command" | grep -qE "^git commit.*-m"; then
+  exit 0
+fi
+
+# Extract commit message
+commit_msg=$(echo "$command" | sed -E 's/.*git commit.*-m[= ]*["\x27]([^"\x27]+)["\x27].*/\1/')
+
+# Check if co-author is already present
+if echo "$commit_msg" | grep -qE "Co-authored-by:"; then
+  exit 0
+fi
+
+# Add factory droid co-author
+coauthor="Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
+
+# Modify command to include co-author
+modified_msg="$commit_msg
+
+$coauthor"
+
+# Return modified command via JSON output
+cat << EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "allow",
+    "permissionDecisionReason": "Adding co-author to commit",
+    "updatedInput": {
+      "command": "$(echo "$command" | sed -E "s/(git commit.*-m[= ]*)[\"']([^\"']+)[\"']/\1\"$modified_msg\"/")"
+    }
+  }
+}
+EOF
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/add-coauthor.sh
+```
+</Accordion>
+
+## Real-world examples
+
+### Example 1: Monorepo commit validation
+
+Ensure commits only touch one package:
+
+<Accordion title="Monorepo commit scope validator">
+
+Create `.factory/hooks/validate-monorepo-scope.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+command=$(echo "$input" | jq -r '.tool_input.command // ""')
+
+if [ "$tool_name" != "Bash" ] || ! echo "$command" | grep -qE "^git commit"; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Get staged files
+staged_files=$(git diff --cached --name-only)
+
+if [ -z "$staged_files" ]; then
+  exit 0
+fi
+
+# Check if changes span multiple packages
+packages=$(echo "$staged_files" | grep -E "^(packages|apps)/" | cut -d/ -f1-2 | sort -u)
+package_count=$(echo "$packages" | wc -l | tr -d ' ')
+
+if [ "$package_count" -gt 1 ]; then
+  echo "❌ Commit spans multiple packages" >&2
+  echo "" >&2
+  echo "Changed packages:" >&2
+  echo "$packages" | sed 's/^/  - /' >&2
+  echo "" >&2
+  echo "Please commit changes to each package separately for clearer history." >&2
+  exit 2
+fi
+
+exit 0
+```
+</Accordion>
+
+### Example 2: Release automation
+
+Auto-tag releases when version changes:
+
+<Accordion title="Auto-tagging on version bump">
+
+Create `.factory/hooks/auto-tag-release.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+
+# Only run after commits
+if [ "$tool_name" != "Bash" ]; then
+  exit 0
+fi
+
+command=$(echo "$input" | jq -r '.tool_input.command // ""')
+if ! echo "$command" | grep -qE "^git commit"; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Check if package.json version changed in last commit
+if ! git diff HEAD~1 HEAD --name-only | grep -q "package.json"; then
+  exit 0
+fi
+
+# Check if version field changed
+if git diff HEAD~1 HEAD -- package.json | grep -q "^+.*\"version\""; then
+  # Get new version
+  new_version=$(jq -r '.version' package.json)
+  
+  echo "📦 Version bump detected: v$new_version"
+  echo "Creating git tag..."
+  
+  # Create and push tag
+  if git tag "v$new_version" && git push origin "v$new_version"; then
+    echo "✓ Created and pushed tag v$new_version"
+  fi
+fi
+
+exit 0
+```
+</Accordion>
+
+## Best practices
+
+<Steps>
+  <Step title="Use PreToolUse for prevention">
+    Block bad commits before they happen:
+    ```bash
+    # In PreToolUse hook
+    if invalid_commit; then
+      echo "❌ Cannot proceed" >&2
+      exit 2  # Blocks the git commit
+    fi
+    ```
+  </Step>
+  
+  <Step title="Use PostToolUse for automation">
+    Automate followup actions after successful commits:
+    ```bash
+    # In PostToolUse hook
+    if git_commit_successful; then
+      update_changelog
+      create_pr
+    fi
+    ```
+  </Step>
+  
+  <Step title="Provide clear error messages">
+    Tell users exactly what's wrong and how to fix it:
+    ```bash
+    echo "❌ Commit message must include issue reference" >&2
+    echo "Example: feat(auth): add login FAC-123" >&2
+    ```
+  </Step>
+  
+  <Step title="Make hooks configurable">
+    Allow teams to customize behavior:
+    ```bash
+    PROTECTED_BRANCHES="${DROID_PROTECTED_BRANCHES:-main,master,production}"
+    REQUIRE_ISSUE_REF="${DROID_REQUIRE_ISSUE:-true}"
+    ```
+  </Step>
+  
+  <Step title="Test hooks with dry-run">
+    Test without making actual commits:
+    ```bash
+    # Simulate a commit
+    echo '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"test\""}}' | \
+      .factory/hooks/validate-commit-msg.sh
+    ```
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Hook blocks legitimate commits">
+    **Problem**: Validation too strict
+    
+    **Solution**: Add escape hatches:
+    ```bash
+    # Allow bypass with special prefix
+    if echo "$commit_msg" | grep -q "^WIP:"; then
+      echo "⚠️ WIP commit allowed"
+      exit 0
+    fi
+    ```
+  </Accordion>
+  
+  <Accordion title="Conflicts with Git hooks">
+    **Problem**: Both Droid hooks and .git/hooks running
+    
+    **Solution**: Coordinate or choose one:
+    ```bash
+    # In .git/hooks/pre-commit
+    if [ -n "$DROID_SESSION" ]; then
+      exit 0  # Let Droid hooks handle it
+    fi
+    ```
+  </Accordion>
+  
+  <Accordion title="Pre-push checks too slow">
+    **Problem**: Tests take too long
+    
+    **Solution**: Run quick checks only:
+    ```bash
+    # Run fast subset of tests
+    npm run test:unit  # Skip slow integration tests
+    
+    # Or run in parallel with push
+    npm test &
+    git push
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## See also
+
+- [Hooks reference](/cli/configuration/hooks-reference) - Complete hooks API documentation
+- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
+- [Code validation](/cli/configuration/hooks/code-validation) - Validate code quality
+- [Testing automation](/cli/configuration/hooks/testing-automation) - Automate tests

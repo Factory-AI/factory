@@ -1,0 +1,505 @@
+---
+title: "Auto-formatting Code"
+description: "Automatically format code after every file edit using hooks"
+---
+
+This cookbook shows how to automatically format code after Droid edits files, ensuring consistent code style across your project without manual intervention.
+
+## How it works
+
+The hook:
+
+1. **Triggers on file edits**: Runs after Write or Edit tool calls
+2. **Detects file type**: Checks file extension to determine formatter
+3. **Runs appropriate formatter**: Executes prettier, black, gofmt, rustfmt, etc.
+4. **Provides feedback**: Reports formatting results to the user
+5. **Handles errors gracefully**: Continues even if formatting fails
+
+## Prerequisites
+
+Install formatters for your language stack:
+
+<CodeGroup>
+
+```bash JavaScript/TypeScript
+npm install -D prettier
+```
+
+```bash Python
+pip install black isort
+```
+
+```bash Go
+# gofmt is included with Go installation
+go version
+```
+
+```bash Rust
+rustup component add rustfmt
+```
+
+</CodeGroup>
+
+## Basic setup
+
+### Single language project
+
+For a JavaScript/TypeScript project, add this to your `.factory/settings.json`:
+
+<Accordion title="TypeScript/JavaScript formatter hook">
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.(ts|tsx|js|jsx)$'; then npx prettier --write \"$file_path\" 2>&1 && echo \"✓ Formatted $file_path\"; fi; }",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+### Multi-language project
+
+For projects with multiple languages, use a script to handle different file types:
+
+<Accordion title="Multi-language formatter script">
+
+Create `.factory/hooks/format.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+# Read the hook input
+input=$(cat)
+file_path=$(echo "$input" | jq -r '.tool_input.file_path')
+
+# Skip if file doesn't exist
+if [ ! -f "$file_path" ]; then
+  exit 0
+fi
+
+# Determine formatter based on file extension
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx|*.json|*.css|*.scss|*.md|*.mdx)
+    if command -v prettier &> /dev/null; then
+      prettier --write "$file_path" 2>&1
+      echo "✓ Formatted with Prettier: $file_path"
+    fi
+    ;;
+  *.py)
+    if command -v black &> /dev/null; then
+      black "$file_path" 2>&1
+      echo "✓ Formatted with Black: $file_path"
+    fi
+    if command -v isort &> /dev/null; then
+      isort "$file_path" 2>&1
+      echo "✓ Sorted imports with isort: $file_path"
+    fi
+    ;;
+  *.go)
+    if command -v gofmt &> /dev/null; then
+      gofmt -w "$file_path" 2>&1
+      echo "✓ Formatted with gofmt: $file_path"
+    fi
+    ;;
+  *.rs)
+    if command -v rustfmt &> /dev/null; then
+      rustfmt "$file_path" 2>&1
+      echo "✓ Formatted with rustfmt: $file_path"
+    fi
+    ;;
+  *.java)
+    if command -v google-java-format &> /dev/null; then
+      google-java-format -i "$file_path" 2>&1
+      echo "✓ Formatted with google-java-format: $file_path"
+    fi
+    ;;
+  *)
+    # No formatter for this file type
+    exit 0
+    ;;
+esac
+
+exit 0
+```
+
+Make the script executable:
+
+```bash
+chmod +x .factory/hooks/format.sh
+```
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+## Advanced configurations
+
+### Format with custom config
+
+Use project-specific prettier config:
+
+<Accordion title="Custom prettier config hook">
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.(ts|tsx|js|jsx)$'; then npx prettier --config \"$DROID_PROJECT_DIR\"/.prettierrc --write \"$file_path\" 2>&1; fi; }",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+### Format with linting
+
+Combine formatting with linting fixes:
+
+<Accordion title="Format and lint hook">
+
+Create `.factory/hooks/format-and-lint.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+file_path=$(echo "$input" | jq -r '.tool_input.file_path')
+
+if [ ! -f "$file_path" ]; then
+  exit 0
+fi
+
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    # Format with prettier
+    if command -v prettier &> /dev/null; then
+      prettier --write "$file_path" 2>&1
+      echo "✓ Formatted: $file_path"
+    fi
+    
+    # Fix lint issues
+    if command -v eslint &> /dev/null; then
+      eslint --fix "$file_path" 2>&1 || true
+      echo "✓ Linted: $file_path"
+    fi
+    ;;
+  *.py)
+    # Format with black
+    if command -v black &> /dev/null; then
+      black "$file_path" 2>&1
+      echo "✓ Formatted with Black: $file_path"
+    fi
+    
+    # Sort imports
+    if command -v isort &> /dev/null; then
+      isort "$file_path" 2>&1
+      echo "✓ Sorted imports: $file_path"
+    fi
+    
+    # Run flake8 for style issues
+    if command -v flake8 &> /dev/null; then
+      flake8 "$file_path" 2>&1 || true
+      echo "✓ Checked with flake8: $file_path"
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+Make executable and configure:
+
+```bash
+chmod +x .factory/hooks/format-and-lint.sh
+```
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format-and-lint.sh",
+            "timeout": 45
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+### Conditional formatting
+
+Only format files in specific directories:
+
+<Accordion title="Conditional formatting by directory">
+
+Create `.factory/hooks/format-src-only.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+file_path=$(echo "$input" | jq -r '.tool_input.file_path')
+
+# Only format files in src/ or packages/ directories
+if ! echo "$file_path" | grep -qE '^(src/|packages/)'; then
+  exit 0
+fi
+
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    if command -v prettier &> /dev/null; then
+      prettier --write "$file_path" 2>&1
+      echo "✓ Formatted: $file_path"
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/format-src-only.sh
+```
+</Accordion>
+
+## Real-world examples
+
+### Example 1: React component formatting
+
+<Tabs>
+  <Tab title="Before Hook">
+    ```typescript
+    // Droid creates this file
+    import React from 'react';
+    import {useState} from 'react';
+
+    export const Button = ({onClick,label}:{onClick:()=>void;label:string})=>{
+    const [loading,setLoading]=useState(false);
+    return <button onClick={onClick} disabled={loading}>{label}</button>
+    }
+    ```
+  </Tab>
+  
+  <Tab title="After Hook">
+    ```typescript
+    // Automatically formatted by prettier
+    import React, { useState } from 'react';
+
+    export const Button = ({
+      onClick,
+      label,
+    }: {
+      onClick: () => void;
+      label: string;
+    }) => {
+      const [loading, setLoading] = useState(false);
+      return (
+        <button onClick={onClick} disabled={loading}>
+          {label}
+        </button>
+      );
+    };
+    ```
+    <Note>Imports consolidated, spacing fixed, formatting applied</Note>
+  </Tab>
+</Tabs>
+
+### Example 2: Python import sorting
+
+<Tabs>
+  <Tab title="Before Hook">
+    ```python
+    # Droid creates this file
+    from typing import Optional
+    import sys
+    from django.db import models
+    import os
+    from myapp.utils import helper
+
+    def process_data(data: Optional[str]) -> None:
+        if data:
+            helper(data)
+    ```
+  </Tab>
+  
+  <Tab title="After Hook">
+    ```python
+    # Automatically formatted by black and isort
+    import os
+    import sys
+    from typing import Optional
+
+    from django.db import models
+
+    from myapp.utils import helper
+
+
+    def process_data(data: Optional[str]) -> None:
+        if data:
+            helper(data)
+    ```
+    <Note>Imports sorted into stdlib, third-party, and local groups</Note>
+  </Tab>
+</Tabs>
+
+## Best practices
+
+<Warning>
+  Formatters can sometimes introduce subtle bugs (e.g., changing string formats, line continuations). Always review changes before committing.
+</Warning>
+
+<Steps>
+  <Step title="Start with read-only mode">
+    Test your formatter configuration manually first:
+    ```bash
+    # Dry run to see what would change
+    prettier --check src/
+    black --check src/
+    ```
+  </Step>
+  
+  <Step title="Use consistent config files">
+    Ensure formatter configs are committed:
+    ```bash
+    # Add to version control
+    git add .prettierrc .prettierignore
+    git add pyproject.toml  # for black config
+    ```
+  </Step>
+  
+  <Step title="Set appropriate timeouts">
+    Large files may need more time:
+    ```json
+    {
+      "timeout": 60  // Increase for large files
+    }
+    ```
+  </Step>
+  
+  <Step title="Handle formatter errors gracefully">
+    Don't block Droid if formatting fails:
+    ```bash
+    # Use || true to continue on errors
+    prettier --write "$file_path" 2>&1 || true
+    ```
+  </Step>
+  
+  <Step title="Consider Git hooks integration">
+    Combine with pre-commit hooks for consistency:
+    ```yaml
+    # .pre-commit-config.yaml
+    repos:
+      - repo: https://github.com/pre-commit/mirrors-prettier
+        rev: v3.0.0
+        hooks:
+          - id: prettier
+    ```
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Formatter not found">
+    **Problem**: `command not found` error
+    
+    **Solution**: Install the formatter globally or use npx/project binaries:
+    ```bash
+    # Install globally
+    npm install -g prettier
+    
+    # Or use project version
+    npx prettier --write "$file_path"
+    ```
+  </Accordion>
+  
+  <Accordion title="Formatting breaks code">
+    **Problem**: Formatter introduces syntax errors
+    
+    **Solution**: Add file validation after formatting:
+    ```bash
+    # For TypeScript
+    prettier --write "$file_path"
+    tsc --noEmit "$file_path" || echo "⚠️ Type errors after formatting"
+    ```
+  </Accordion>
+  
+  <Accordion title="Hook runs too slowly">
+    **Problem**: Formatting takes too long
+    
+    **Solution**: Only format changed files, use faster formatters:
+    ```bash
+    # Skip files that haven't changed
+    if git diff --quiet "$file_path"; then
+      exit 0
+    fi
+    ```
+  </Accordion>
+  
+  <Accordion title="Conflicts with editor formatting">
+    **Problem**: Editor and hook format differently
+    
+    **Solution**: Use the same config for both:
+    ```json
+    // .vscode/settings.json
+    {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true,
+      "prettier.configPath": ".prettierrc"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## See also
+
+- [Hooks reference](/cli/configuration/hooks-reference) - Complete hooks API documentation
+- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
+- [Code validation hooks](/cli/configuration/hooks/code-validation) - Enforce code standards
+- [Git workflow hooks](/cli/configuration/hooks/git-workflows) - Integrate with Git

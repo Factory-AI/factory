@@ -1,0 +1,647 @@
+---
+title: "Custom Notifications"
+description: "Get notified when Droid needs attention using desktop alerts, sounds, Slack, and more"
+---
+
+This cookbook shows how to set up custom notifications so you know when Droid needs your input or when important events occur during a session.
+
+## How it works
+
+Notification hooks can:
+
+1. **Trigger on multiple events**: Notification, Stop, SubagentStop, SessionEnd
+2. **Support multiple channels**: Desktop notifications, system sounds, Slack, email, webhooks
+3. **Provide context**: Include session details, task completion status, error messages
+4. **Filter intelligently**: Only notify on important events
+5. **Work cross-platform**: macOS, Linux, Windows
+
+## Prerequisites
+
+Install notification tools for your platform:
+
+<CodeGroup>
+
+```bash macOS
+# Built-in commands (no installation needed)
+which osascript  # For display notifications
+which afplay     # For sounds
+```
+
+```bash Linux
+# Install notify-send
+sudo apt-get install libnotify-bin  # Ubuntu/Debian
+sudo dnf install libnotify           # Fedora
+sudo pacman -S libnotify             # Arch
+```
+
+```bash Windows (PowerShell)
+# BurntToast for Windows notifications
+Install-Module -Name BurntToast -Scope CurrentUser
+```
+
+</CodeGroup>
+
+For Slack notifications, create a webhook at [api.slack.com/messaging/webhooks](https://api.slack.com/messaging/webhooks).
+
+## Basic notifications
+
+### Desktop notification when Droid waits
+
+Get notified when Droid is waiting for your input:
+
+<Accordion title="Cross-platform desktop notification">
+
+Create `.factory/hooks/notify-wait.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+message=$(echo "$input" | jq -r '.message // "Droid needs your attention"')
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+
+# Only notify on actual wait events
+if [ "$hook_event" != "Notification" ]; then
+  exit 0
+fi
+
+# Platform-specific notification
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  osascript -e "display notification \"$message\" with title \"Droid\" sound name \"Ping\""
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # Linux
+  notify-send "Droid" "$message" -i dialog-information -u normal
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+  # Windows
+  powershell -Command "New-BurntToastNotification -Text 'Droid', '$message'"
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/notify-wait.sh
+```
+
+Add to `~/.factory/settings.json` (user-wide):
+
+```json
+{
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/notify-wait.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+### Sound alert when task completes
+
+Play a sound when Droid finishes:
+
+<Accordion title="Task completion sound">
+
+Create `.factory/hooks/completion-sound.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+
+# Only alert on completion events
+if [ "$hook_event" != "Stop" ]; then
+  exit 0
+fi
+
+# Platform-specific sound
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS - use system sounds
+  afplay /System/Library/Sounds/Glass.aiff
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # Linux - use system bell or speaker-test
+  paplay /usr/share/sounds/freedesktop/stereo/complete.oga 2>/dev/null || \
+    echo -e '\a'  # Fallback to terminal bell
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/completion-sound.sh
+```
+
+Add to `~/.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/completion-sound.sh",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+## Advanced notifications
+
+### Slack integration
+
+Send Slack messages when Droid completes tasks:
+
+<Accordion title="Slack notification on completion">
+
+Create `.factory/hooks/slack-notify.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+# Configure your Slack webhook URL
+SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
+
+if [ -z "$SLACK_WEBHOOK_URL" ]; then
+  echo "SLACK_WEBHOOK_URL not set, skipping Slack notification"
+  exit 0
+fi
+
+input=$(cat)
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+session_id=$(echo "$input" | jq -r '.session_id')
+cwd=$(echo "$input" | jq -r '.cwd')
+
+# Build message based on event type
+case "$hook_event" in
+  "Stop")
+    title="✅ Droid Task Completed"
+    color="good"
+    ;;
+  "SessionEnd")
+    title="🏁 Droid Session Ended"
+    color="#808080"
+    reason=$(echo "$input" | jq -r '.reason')
+    ;;
+  "SubagentStop")
+    title="🤖 Subagent Task Completed"
+    color="good"
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+
+# Send to Slack
+curl -X POST "$SLACK_WEBHOOK_URL" \
+  -H 'Content-Type: application/json' \
+  -d @- << EOF
+{
+  "attachments": [
+    {
+      "color": "$color",
+      "title": "$title",
+      "fields": [
+        {
+          "title": "Project",
+          "value": "$(basename "$cwd")",
+          "short": true
+        },
+        {
+          "title": "Session",
+          "value": "${session_id:0:8}...",
+          "short": true
+        }
+      ],
+      "footer": "Factory Droid",
+      "ts": $(date +%s)
+    }
+  ]
+}
+EOF
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/slack-notify.sh
+```
+
+Set your webhook URL:
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+```
+
+Add to `~/.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/slack-notify.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/slack-notify.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+### Email notifications
+
+Send email alerts for important events:
+
+<Accordion title="Email notification on errors">
+
+Create `.factory/hooks/email-notify.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+# Configure email settings
+EMAIL_TO="${DROID_NOTIFY_EMAIL:-your-email@example.com}"
+EMAIL_FROM="${DROID_FROM_EMAIL:-droid@factory.ai}"
+
+input=$(cat)
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+
+# Only notify on session end with errors
+if [ "$hook_event" != "SessionEnd" ]; then
+  exit 0
+fi
+
+reason=$(echo "$input" | jq -r '.reason')
+session_id=$(echo "$input" | jq -r '.session_id')
+cwd=$(echo "$input" | jq -r '.cwd')
+
+# Check if session ended due to error
+if [ "$reason" != "error" ] && [ "$reason" != "other" ]; then
+  exit 0
+fi
+
+# Send email using sendmail or mail command
+subject="Droid Session Ended: $(basename "$cwd")"
+body="Session $session_id ended with reason: $reason
+
+Project: $cwd
+Time: $(date)
+
+Check the logs for more details."
+
+# Try sendmail first, fallback to mail command
+if command -v sendmail &> /dev/null; then
+  echo -e "Subject: $subject\nFrom: $EMAIL_FROM\nTo: $EMAIL_TO\n\n$body" | sendmail -t
+elif command -v mail &> /dev/null; then
+  echo "$body" | mail -s "$subject" "$EMAIL_TO"
+else
+  echo "No email command available (sendmail or mail)"
+  exit 1
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/email-notify.sh
+```
+
+Configure environment:
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export DROID_NOTIFY_EMAIL="your-email@example.com"
+```
+</Accordion>
+
+### Rich desktop notifications with actions
+
+macOS notifications with action buttons:
+
+<Accordion title="macOS rich notifications">
+
+Create `.factory/hooks/rich-notify-macos.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+message=$(echo "$input" | jq -r '.message // "Droid needs your attention"')
+session_id=$(echo "$input" | jq -r '.session_id')
+
+# Only for macOS
+if [[ "$OSTYPE" != "darwin"* ]]; then
+  exit 0
+fi
+
+case "$hook_event" in
+  "Notification")
+    # Notification with action buttons
+    osascript << EOF
+tell application "System Events"
+  display notification "$message" with title "Droid Waiting" subtitle "Session: ${session_id:0:8}" sound name "Ping"
+end tell
+EOF
+    ;;
+    
+  "Stop")
+    # Success notification
+    osascript << EOF
+tell application "System Events"
+  display notification "Task completed successfully" with title "Droid Complete" subtitle "$(basename "$PWD")" sound name "Glass"
+end tell
+EOF
+    ;;
+    
+  "SessionEnd")
+    reason=$(echo "$input" | jq -r '.reason')
+    # Different sound based on reason
+    sound="Purr"
+    if [ "$reason" == "error" ]; then
+      sound="Basso"
+    fi
+    
+    osascript << EOF
+tell application "System Events"
+  display notification "Session ended: $reason" with title "Droid Session" subtitle "$(basename "$PWD")" sound name "$sound"
+end tell
+EOF
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/rich-notify-macos.sh
+```
+</Accordion>
+
+### Webhook integration
+
+Send notifications to custom webhooks:
+
+<Accordion title="Generic webhook notification">
+
+Create `.factory/hooks/webhook-notify.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+WEBHOOK_URL="${DROID_WEBHOOK_URL:-}"
+
+if [ -z "$WEBHOOK_URL" ]; then
+  exit 0
+fi
+
+input=$(cat)
+
+# Forward the entire hook input to webhook
+curl -X POST "$WEBHOOK_URL" \
+  -H 'Content-Type: application/json' \
+  -d "$input" \
+  --max-time 5 \
+  --silent \
+  --show-error
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/webhook-notify.sh
+export DROID_WEBHOOK_URL="https://your-webhook-url.com/droid-events"
+```
+</Accordion>
+
+## Real-world examples
+
+### Example 1: Focus mode notifications
+
+Only notify when you're away from your desk:
+
+<Accordion title="Smart notification based on idle time">
+
+Create `.factory/hooks/smart-notify.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+
+# Check if user is idle (macOS)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  idle_time=$(ioreg -c IOHIDSystem | awk '/HIDIdleTime/ {print int($NF/1000000000)}')
+  
+  # Only notify if idle for more than 60 seconds
+  if [ "$idle_time" -lt 60 ]; then
+    exit 0
+  fi
+fi
+
+# Send notification
+message=$(echo "$input" | jq -r '.message // "Droid needs your attention"')
+osascript -e "display notification \"$message\" with title \"Droid\" sound name \"Ping\""
+
+exit 0
+```
+</Accordion>
+
+### Example 2: Team notification dashboard
+
+Log all events to a shared dashboard:
+
+<Accordion title="Team event logger">
+
+Create `.factory/hooks/team-logger.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+# Central logging endpoint
+LOG_ENDPOINT="${TEAM_LOG_ENDPOINT:-}"
+
+if [ -z "$LOG_ENDPOINT" ]; then
+  exit 0
+fi
+
+input=$(cat)
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+session_id=$(echo "$input" | jq -r '.session_id')
+cwd=$(echo "$input" | jq -r '.cwd')
+
+# Add metadata
+payload=$(echo "$input" | jq -c ". + {
+  user: \"$USER\",
+  hostname: \"$HOSTNAME\",
+  timestamp: \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+  project: \"$(basename "$cwd")\"
+}")
+
+# Send to logging service
+curl -X POST "$LOG_ENDPOINT" \
+  -H 'Content-Type: application/json' \
+  -d "$payload" \
+  --max-time 3 \
+  --silent
+
+exit 0
+```
+</Accordion>
+
+## Best practices
+
+<Steps>
+  <Step title="Keep notification scripts fast">
+    Use short timeouts to avoid blocking Droid:
+    ```json
+    {
+      "timeout": 5  // 5 seconds max for notifications
+    }
+    ```
+  </Step>
+  
+  <Step title="Handle failures gracefully">
+    Don't block execution if notifications fail:
+    ```bash
+    # Continue even if curl fails
+    curl -X POST "$URL" ... || true
+    exit 0
+    ```
+  </Step>
+  
+  <Step title="Respect user preferences">
+    Check environment variables for opt-out:
+    ```bash
+    if [ "$DROID_DISABLE_NOTIFICATIONS" = "true" ]; then
+      exit 0
+    fi
+    ```
+  </Step>
+  
+  <Step title="Test notifications">
+    Manually trigger hooks for testing:
+    ```bash
+    # Test notification script
+    echo '{"hook_event_name":"Notification","message":"Test"}' | .factory/hooks/notify-wait.sh
+    ```
+  </Step>
+  
+  <Step title="Use appropriate notification levels">
+    Different events warrant different urgency:
+    - Notification: High urgency (Droid waiting)
+    - Stop: Medium urgency (task complete)
+    - SessionEnd: Low urgency (FYI only)
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Notifications not appearing">
+    **Problem**: No notifications show up
+    
+    **Solution**: Check notification permissions:
+    ```bash
+    # macOS - check System Settings > Notifications
+    # Linux - verify notify-send works
+    notify-send "Test" "This is a test"
+    
+    # Check if hooks are executing
+    droid --debug
+    ```
+  </Accordion>
+  
+  <Accordion title="Slack webhook fails">
+    **Problem**: Slack messages not sending
+    
+    **Solution**: Test webhook directly:
+    ```bash
+    curl -X POST "$SLACK_WEBHOOK_URL" \
+      -H 'Content-Type: application/json' \
+      -d '{"text":"Test from curl"}'
+    ```
+  </Accordion>
+  
+  <Accordion title="Too many notifications">
+    **Problem**: Getting spammed with alerts
+    
+    **Solution**: Add rate limiting:
+    ```bash
+    # Only notify once every 5 minutes
+    LAST_NOTIFY_FILE="/tmp/droid-last-notify"
+    
+    if [ -f "$LAST_NOTIFY_FILE" ]; then
+      last_time=$(cat "$LAST_NOTIFY_FILE")
+      current_time=$(date +%s)
+      if [ $((current_time - last_time)) -lt 300 ]; then
+        exit 0
+      fi
+    fi
+    
+    date +%s > "$LAST_NOTIFY_FILE"
+    # ... send notification
+    ```
+  </Accordion>
+  
+  <Accordion title="Sound doesn't play">
+    **Problem**: No audio alert
+    
+    **Solution**: Check audio system:
+    ```bash
+    # macOS - list available sounds
+    ls /System/Library/Sounds/
+    
+    # Test sound
+    afplay /System/Library/Sounds/Glass.aiff
+    
+    # Linux - check audio
+    paplay /usr/share/sounds/freedesktop/stereo/complete.oga
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## See also
+
+- [Hooks reference](/cli/configuration/hooks-reference) - Complete hooks API documentation  
+- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
+- [Session automation](/cli/configuration/hooks/session-automation) - Automate session setup
+- [Logging and analytics](/cli/configuration/hooks/logging-analytics) - Track Droid usage

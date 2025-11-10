@@ -1,0 +1,733 @@
+---
+title: "Testing Automation"
+description: "Automate test execution, coverage tracking, and test result validation with hooks"
+---
+
+This cookbook shows how to automatically run tests when Droid modifies code, maintain test coverage, and enforce testing requirements.
+
+## How it works
+
+Testing hooks can:
+
+1. **Auto-run tests**: Execute tests after code changes
+2. **Track coverage**: Monitor and enforce coverage thresholds
+3. **Validate test files**: Ensure tests exist for new code
+4. **Run specific tests**: Execute only relevant test suites
+5. **Generate reports**: Create test and coverage reports
+
+## Prerequisites
+
+Install testing frameworks for your stack:
+
+<CodeGroup>
+
+```bash JavaScript/TypeScript
+npm install -D jest @testing-library/react vitest
+npm install -D @vitest/coverage-v8  # For coverage
+```
+
+```bash Python
+pip install pytest pytest-cov
+pip install coverage  # For coverage tracking
+```
+
+```bash Go
+# go test is built-in
+go install github.com/gotestyourself/gotestsum@latest  # Better test output
+```
+
+</CodeGroup>
+
+## Basic testing automation
+
+### Run tests after code changes
+
+Automatically run tests when Droid edits files:
+
+<Accordion title="Auto-test runner">
+
+Create `.factory/hooks/run-tests.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only run tests after file write/edit
+if [ "$tool_name" != "Write" ] && [ "$tool_name" != "Edit" ]; then
+  exit 0
+fi
+
+# Skip non-code files
+if ! echo "$file_path" | grep -qE '\.(ts|tsx|js|jsx|py|go)$'; then
+  exit 0
+fi
+
+# Skip test files themselves
+if echo "$file_path" | grep -qE '\.(test|spec)\.(ts|tsx|js|jsx)$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+echo "🧪 Running tests for changed file..."
+
+# Determine test command based on file type
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    # Find corresponding test file
+    test_file=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.test.\1/')
+    
+    if [ ! -f "$test_file" ]; then
+      # Try alternate naming
+      test_file=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.spec.\1/')
+    fi
+    
+    if [ -f "$test_file" ]; then
+      # Run specific test file
+      if command -v npm &> /dev/null && grep -q '"test"' package.json; then
+        npm test -- "$test_file" 2>&1 || {
+          echo "❌ Tests failed for $test_file" >&2
+          echo "Please fix the failing tests." >&2
+          exit 2
+        }
+        echo "✓ Tests passed for $test_file"
+      fi
+    else
+      echo "⚠️ No test file found for $file_path"
+      echo "Consider creating: $test_file"
+    fi
+    ;;
+    
+  *.py)
+    # Run pytest for Python files
+    if command -v pytest &> /dev/null; then
+      # Find test file
+      test_file=$(echo "$file_path" | sed 's/\.py$//' | sed 's|^src/|tests/test_|')_test.py
+      
+      if [ -f "$test_file" ]; then
+        pytest "$test_file" -v 2>&1 || {
+          echo "❌ Tests failed" >&2
+          exit 2
+        }
+        echo "✓ Tests passed"
+      else
+        echo "⚠️ No test file found at $test_file"
+      fi
+    fi
+    ;;
+    
+  *.go)
+    # Run go test
+    if command -v go &> /dev/null; then
+      package=$(dirname "$file_path")
+      go test "./$package" -v 2>&1 || {
+        echo "❌ Tests failed" >&2
+        exit 2
+      }
+      echo "✓ Tests passed"
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/run-tests.sh
+```
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/run-tests.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+### Enforce test coverage
+
+Block changes that decrease test coverage:
+
+<Accordion title="Coverage checker">
+
+Create `.factory/hooks/check-coverage.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only check code files
+if ! echo "$file_path" | grep -qE '\.(ts|tsx|js|jsx|py)$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Minimum coverage threshold
+MIN_COVERAGE="${DROID_MIN_COVERAGE:-80}"
+
+echo "📊 Checking test coverage..."
+
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    # Jest coverage
+    if command -v npm &> /dev/null && grep -q '"test"' package.json; then
+      # Run coverage for specific file
+      coverage_output=$(npm test -- --coverage --collectCoverageFrom="$file_path" --silent 2>&1 || true)
+      
+      # Extract coverage percentage
+      if echo "$coverage_output" | grep -qE "All files.*[0-9]+(\.[0-9]+)?%"; then
+        coverage=$(echo "$coverage_output" | grep "All files" | grep -oE "[0-9]+(\.[0-9]+)?%" | head -1 | tr -d '%')
+        
+        if (( $(echo "$coverage < $MIN_COVERAGE" | bc -l) )); then
+          echo "❌ Coverage too low: ${coverage}% (minimum: ${MIN_COVERAGE}%)" >&2
+          echo "Please add tests to improve coverage." >&2
+          exit 2
+        fi
+        
+        echo "✓ Coverage: ${coverage}%"
+      fi
+    fi
+    ;;
+    
+  *.py)
+    # Python coverage
+    if command -v pytest &> /dev/null; then
+      coverage_output=$(pytest --cov="$file_path" --cov-report=term 2>&1 || true)
+      
+      if echo "$coverage_output" | grep -qE "TOTAL.*[0-9]+%"; then
+        coverage=$(echo "$coverage_output" | grep "TOTAL" | grep -oE "[0-9]+%" | tr -d '%')
+        
+        if [ "$coverage" -lt "$MIN_COVERAGE" ]; then
+          echo "❌ Coverage too low: ${coverage}% (minimum: ${MIN_COVERAGE}%)" >&2
+          exit 2
+        fi
+        
+        echo "✓ Coverage: ${coverage}%"
+      fi
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/check-coverage.sh
+```
+
+Configure coverage threshold:
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export DROID_MIN_COVERAGE=75
+```
+</Accordion>
+
+### Require tests for new files
+
+Ensure new code files have corresponding tests:
+
+<Accordion title="Test existence validator">
+
+Create `.factory/hooks/require-tests.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only check Write operations (new files)
+if [ "$tool_name" != "Write" ]; then
+  exit 0
+fi
+
+# Only check code files in src/
+if ! echo "$file_path" | grep -qE '^src/.*\.(ts|tsx|js|jsx|py)$'; then
+  exit 0
+fi
+
+# Skip if it's already a test file
+if echo "$file_path" | grep -qE '\.(test|spec)\.(ts|tsx|js|jsx)$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+
+# Determine expected test file location
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    test_file1=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.test.\1/')
+    test_file2=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.spec.\1/')
+    test_file3=$(echo "$file_path" | sed 's|^src/|tests/|; s/\.(ts|tsx|js|jsx)$/.test.\1/')
+    ;;
+    
+  *.py)
+    test_file1=$(echo "$file_path" | sed 's|^src/|tests/|; s/\.py$/_test.py/')
+    test_file2=$(echo "$file_path" | sed 's|^src/|tests/test_|')
+    test_file3=""
+    ;;
+esac
+
+# Check if any test file exists
+found_test=false
+for test_file in "$test_file1" "$test_file2" "$test_file3"; do
+  if [ -n "$test_file" ] && [ -f "$cwd/$test_file" ]; then
+    found_test=true
+    break
+  fi
+done
+
+if [ "$found_test" = false ]; then
+  echo "⚠️ No test file found for $file_path" >&2
+  echo "" >&2
+  echo "Please create a test file at one of:" >&2
+  echo "  - $test_file1" >&2
+  [ -n "$test_file2" ] && echo "  - $test_file2" >&2
+  [ -n "$test_file3" ] && echo "  - $test_file3" >&2
+  echo "" >&2
+  echo "Or ask me: 'Create tests for $file_path'" >&2
+  
+  # Warning only, don't block
+  # Change to exit 2 to enforce test creation
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/require-tests.sh
+```
+</Accordion>
+
+## Advanced testing automation
+
+### Smart test selection
+
+Only run tests affected by changes:
+
+<Accordion title="Smart test runner">
+
+Create `.factory/hooks/run-affected-tests.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+if [ "$tool_name" != "Write" ] && [ "$tool_name" != "Edit" ]; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Find tests that import this file
+echo "🔍 Finding affected tests..."
+
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    # Find test files that import this file
+    filename=$(basename "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$//')
+    module_name=$(echo "$file_path" | sed 's|^src/||; s/\.(ts|tsx|js|jsx)$//')
+    
+    # Search for imports
+    affected_tests=$(grep -rl "from.*['\"].*$module_name['\"]" . \
+      --include="*.test.ts" \
+      --include="*.test.tsx" \
+      --include="*.test.js" \
+      --include="*.test.jsx" \
+      --include="*.spec.ts" \
+      --include="*.spec.tsx" \
+      2>/dev/null || true)
+    
+    if [ -n "$affected_tests" ]; then
+      echo "Running affected tests:"
+      echo "$affected_tests" | sed 's/^/  - /'
+      echo ""
+      
+      # Run tests
+      echo "$affected_tests" | while read -r test_file; do
+        npm test -- "$test_file" 2>&1 || {
+          echo "❌ Test failed: $test_file" >&2
+          exit 2
+        }
+      done
+      
+      echo "✓ All affected tests passed"
+    else
+      echo "No affected tests found"
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/run-affected-tests.sh
+```
+</Accordion>
+
+### Snapshot testing validation
+
+Detect and validate snapshot updates:
+
+<Accordion title="Snapshot validator">
+
+Create `.factory/hooks/validate-snapshots.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Check if snapshot files changed
+if ! echo "$file_path" | grep -qE '__snapshots__/.*\.snap$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+echo "📸 Snapshot file modified: $file_path"
+echo ""
+
+# Run tests in update mode to verify
+test_file=$(echo "$file_path" | sed 's|/__snapshots__/.*\.snap$|.test.ts|')
+
+if [ ! -f "$test_file" ]; then
+  test_file=$(echo "$file_path" | sed 's|/__snapshots__/.*\.snap$|.spec.ts|')
+fi
+
+if [ -f "$test_file" ]; then
+  echo "Verifying snapshot update..."
+  
+  if npm test -- "$test_file" -u 2>&1; then
+    echo "✓ Snapshot update verified"
+    echo ""
+    echo "⚠️ Remember to review snapshot changes before committing:"
+    echo "  git diff $file_path"
+  else
+    echo "❌ Snapshot verification failed" >&2
+    exit 2
+  fi
+else
+  echo "⚠️ Could not find test file for snapshot"
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/validate-snapshots.sh
+```
+</Accordion>
+
+### Test performance monitoring
+
+Track test execution time and warn on slow tests:
+
+<Accordion title="Test performance monitor">
+
+Create `.factory/hooks/monitor-test-perf.py`:
+
+```python
+#!/usr/bin/env python3
+"""
+Monitor test execution time and report slow tests.
+"""
+import json
+import sys
+import subprocess
+import time
+import re
+
+# Slow test threshold in seconds
+SLOW_TEST_THRESHOLD = 5.0
+
+def run_tests_with_timing(test_file):
+    """Run tests and capture timing information."""
+    start_time = time.time()
+    
+    try:
+        result = subprocess.run(
+            ['npm', 'test', '--', test_file, '--verbose'],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        elapsed = time.time() - start_time
+        
+        # Parse test output for individual test times
+        slow_tests = []
+        for line in result.stdout.split('\n'):
+            # Look for test timing info
+            match = re.search(r'(.*?)\s+\((\d+)ms\)', line)
+            if match:
+                test_name = match.group(1).strip()
+                test_time_ms = int(match.group(2))
+                test_time_s = test_time_ms / 1000.0
+                
+                if test_time_s > SLOW_TEST_THRESHOLD:
+                    slow_tests.append((test_name, test_time_s))
+        
+        return elapsed, slow_tests, result.returncode
+        
+    except subprocess.TimeoutExpired:
+        return None, [], 1
+
+try:
+    input_data = json.load(sys.stdin)
+    file_path = input_data.get('tool_input', {}).get('file_path', '')
+    
+    if not file_path or not file_path.endswith(('.test.ts', '.test.tsx', '.spec.ts', '.spec.tsx')):
+        sys.exit(0)
+    
+    print(f"⏱️  Monitoring test performance for {file_path}...")
+    
+    elapsed, slow_tests, returncode = run_tests_with_timing(file_path)
+    
+    if elapsed is not None:
+        print(f"\nTotal test time: {elapsed:.2f}s")
+        
+        if slow_tests:
+            print(f"\n⚠️  Found {len(slow_tests)} slow test(s):")
+            for test_name, test_time in slow_tests:
+                print(f"  - {test_name}: {test_time:.2f}s")
+            print("\nConsider optimizing these tests or mocking expensive operations.")
+        else:
+            print("✓ All tests running within acceptable time")
+        
+        # Don't block on slow tests, just warn
+        sys.exit(returncode)
+    else:
+        print("❌ Tests timed out", file=sys.stderr)
+        sys.exit(2)
+        
+except Exception as e:
+    print(f"Error monitoring tests: {e}", file=sys.stderr)
+    sys.exit(0)
+```
+
+```bash
+chmod +x .factory/hooks/monitor-test-perf.py
+```
+</Accordion>
+
+### Test flakiness detector
+
+Detect and report flaky tests:
+
+<Accordion title="Flaky test detector">
+
+Create `.factory/hooks/detect-flaky-tests.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only check test files
+if ! echo "$file_path" | grep -qE '\.(test|spec)\.(ts|tsx|js|jsx)$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+echo "🎲 Checking for test flakiness..."
+
+# Run tests multiple times
+RUNS=3
+failures=0
+
+for i in $(seq 1 $RUNS); do
+  echo "Run $i/$RUNS..."
+  
+  if ! npm test -- "$file_path" --silent 2>&1; then
+    ((failures++))
+  fi
+done
+
+if [ $failures -gt 0 ] && [ $failures -lt $RUNS ]; then
+  echo "" >&2
+  echo "⚠️ FLAKY TEST DETECTED" >&2
+  echo "Test passed $((RUNS - failures))/$RUNS times" >&2
+  echo "" >&2
+  echo "This test is unreliable and should be fixed." >&2
+  echo "Common causes:" >&2
+  echo "  - Race conditions" >&2
+  echo "  - Timing dependencies" >&2
+  echo "  - Non-deterministic data" >&2
+  echo "  - External dependencies" >&2
+  
+  # Warning only, don't block
+  exit 0
+elif [ $failures -eq $RUNS ]; then
+  echo "❌ Test consistently fails" >&2
+  exit 2
+else
+  echo "✓ Test is stable ($RUNS/$RUNS passed)"
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/detect-flaky-tests.sh
+```
+</Accordion>
+
+## Best practices
+
+<Steps>
+  <Step title="Run tests asynchronously when possible">
+    Don't block Droid unnecessarily:
+    ```bash
+    # Run tests in background, report later
+    (npm test "$file" > /tmp/test-results.txt 2>&1 &)
+    echo "Tests running in background..."
+    ```
+  </Step>
+  
+  <Step title="Set appropriate timeouts">
+    Allow enough time for test suites:
+    ```json
+    {
+      "timeout": 120  // 2 minutes for test suites
+    }
+    ```
+  </Step>
+  
+  <Step title="Use test file conventions">
+    Follow standard naming patterns:
+    ```
+    src/components/Button.tsx
+    src/components/Button.test.tsx  // Co-located
+    
+    Or:
+    
+    src/components/Button.tsx
+    tests/components/Button.test.tsx  // Separate directory
+    ```
+  </Step>
+  
+  <Step title="Make coverage configurable">
+    Different files may need different thresholds:
+    ```bash
+    # .factory/.coverage-config
+    src/critical/*.ts:90
+    src/utils/*.ts:75
+    src/experimental/*.ts:50
+    ```
+  </Step>
+  
+  <Step title="Cache test results">
+    Skip tests if code hasn't changed:
+    ```bash
+    hash=$(md5sum "$file_path")
+    cache_file="/tmp/test-cache-$hash"
+    
+    if [ -f "$cache_file" ]; then
+      echo "✓ Tests passed (cached)"
+      exit 0
+    fi
+    ```
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Tests too slow">
+    **Problem**: Test execution blocks workflow
+    
+    **Solution**: Run only unit tests, skip integration:
+    ```bash
+    # Fast unit tests only
+    npm test -- --testPathPattern="unit" "$file"
+    
+    # Or configure in package.json
+    {
+      "scripts": {
+        "test:fast": "jest --testPathIgnorePatterns=integration"
+      }
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="False test failures">
+    **Problem**: Tests fail in hooks but pass manually
+    
+    **Solution**: Check environment differences:
+    ```bash
+    # Ensure same environment
+    export NODE_ENV=test
+    export CI=true
+    
+    # Use project test script
+    npm test  # Not direct jest call
+    ```
+  </Accordion>
+  
+  <Accordion title="Coverage calculation wrong">
+    **Problem**: Coverage includes generated files
+    
+    **Solution**: Configure coverage exclusions:
+    ```json
+    // jest.config.js
+    {
+      "coveragePathIgnorePatterns": [
+        "/node_modules/",
+        "/.gen/",
+        "/dist/",
+        "\\.d\\.ts$"
+      ]
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## See also
+
+- [Hooks reference](/cli/configuration/hooks-reference) - Complete hooks API documentation
+- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
+- [Code validation](/cli/configuration/hooks/code-validation) - Validate code quality
+- [Git workflows](/cli/configuration/hooks/git-workflows) - Git integration
