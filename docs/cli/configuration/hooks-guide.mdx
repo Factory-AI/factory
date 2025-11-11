@@ -5,7 +5,7 @@ description: "Learn how to customize and extend Droid's behavior by registering 
 
 Droid hooks are user-defined shell commands that execute at various points
 in Droid's lifecycle. Hooks provide deterministic control over Droid's behavior, ensuring certain actions always happen rather than relying on
-the LLM to choose to run them.
+Droid to choose to run them.
 
 <Tip>
   For reference documentation on hooks, see [Hooks reference](/cli/configuration/hooks-reference).
@@ -28,7 +28,7 @@ By encoding these rules as hooks rather than prompting instructions, you turn
 suggestions into app-level code that executes every time it is expected to run.
 
 <Warning>
-  You must consider the security implication of hooks as you add them, because hooks run automatically during the agent loop with your current environment's credentials.
+  You must consider the security implication of hooks as you add them, because hooks run automatically during Droid's execution with your current environment's credentials.
   For example, malicious hooks code can exfiltrate your data. Always review your hooks implementation before registering them.
 
   For full security best practices, see [Security Considerations](/cli/configuration/hooks-reference#security-considerations) in the hooks reference documentation.
@@ -37,7 +37,7 @@ suggestions into app-level code that executes every time it is expected to run.
 <Note>
   **Important**: Always use **absolute paths** when referencing scripts in your hook commands, not relative paths. 
   Hooks execute from Droid's current working directory, which may not be your project root. 
-  Use `$DROID_PROJECT_DIR` for project-relative scripts (e.g., `"$DROID_PROJECT_DIR"/.factory/hooks/script.sh`) 
+  Use `$FACTORY_PROJECT_DIR` for project-relative scripts (e.g., `"$FACTORY_PROJECT_DIR"/.factory/hooks/script.sh`) 
   or full paths for global scripts (e.g., `/usr/local/bin/my-hook.sh` or `~/.factory/hooks/script.sh`).
 </Note>
 
@@ -51,7 +51,7 @@ workflow:
 * **UserPromptSubmit**: Runs when the user submits a prompt, before Droid processes it
 * **Notification**: Runs when Droid sends notifications
 * **Stop**: Runs when Droid finishes responding
-* **SubagentStop**: Runs when subagent tasks complete
+* **SubagentStop**: Runs when sub-droid tasks complete
 * **PreCompact**: Runs before Droid is about to run a compact operation
 * **SessionStart**: Runs when Droid starts a new session or resumes an existing session
 * **SessionEnd**: Runs when Droid session ends
@@ -88,7 +88,7 @@ Type `Bash` for the matcher.
 Select `+ Add new hook…` and enter this command:
 
 ```bash
-jq -r '"\(.tool_input.command) - \(.tool_input.description // "No description")"' >> ~/.factory/bash-command-log.txt
+jq -r '.tool_input.command' >> ~/.factory/bash-command-log.txt
 ```
 
 ### Step 4: Save your configuration
@@ -112,7 +112,7 @@ Run `/hooks` again or check `~/.factory/settings.json` to see your configuration
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '\"\\(.tool_input.command) - \\(.tool_input.description // \"No description\")\"' >> ~/.factory/bash-command-log.txt"
+            "command": "jq -r '.tool_input.command' >> ~/.factory/bash-command-log.txt"
           }
         ]
       }
@@ -132,7 +132,7 @@ cat ~/.factory/bash-command-log.txt
 You should see entries like:
 
 ```
-ls - Lists files and directories
+ls
 ```
 
 ## More Examples
@@ -176,7 +176,7 @@ Automatically fix missing language tags and formatting issues in markdown files:
         "hooks": [
           {
             "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/markdown_formatter.py"
+            "command": "\"$FACTORY_PROJECT_DIR\"/.factory/hooks/markdown_formatter.py"
           }
         ]
       }

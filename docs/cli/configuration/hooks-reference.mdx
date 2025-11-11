@@ -46,7 +46,7 @@ Hooks are organized by matchers, where each matcher can have multiple hooks:
     `matcher` blank.
 * **hooks**: Array of commands to execute when the pattern matches
   * `type`: Currently only `"command"` is supported
-  * `command`: The bash command to execute (can use `$DROID_PROJECT_DIR`
+  * `command`: The bash command to execute (can use `$FACTORY_PROJECT_DIR`
     environment variable)
   * `timeout`: (Optional) How long a command should run, in seconds, before
     canceling that specific command.
@@ -54,7 +54,7 @@ Hooks are organized by matchers, where each matcher can have multiple hooks:
 <Warning>
   **Always use absolute paths** for hook commands and scripts, not relative paths. 
   Hooks execute from Droid's current working directory, which may change during execution. 
-  Use `"$DROID_PROJECT_DIR"/path/to/script.sh` for project-relative scripts or full paths like 
+  Use `"$FACTORY_PROJECT_DIR"/path/to/script.sh` for project-relative scripts or full paths like 
   `/usr/local/bin/script.sh` or `~/.factory/hooks/script.sh` for global scripts.
 </Warning>
 
@@ -80,7 +80,7 @@ that don't use matchers, you can omit the matcher field:
 
 ### Project-Specific Hook Scripts
 
-You can use the environment variable `DROID_PROJECT_DIR` (only available when
+You can use the environment variable `FACTORY_PROJECT_DIR` (only available when
 Droid spawns the hook command) to reference scripts stored in your project,
 ensuring they work regardless of Droid's current directory:
 
@@ -93,7 +93,7 @@ ensuring they work regardless of Droid's current directory:
         "hooks": [
           {
             "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-style.sh"
+            "command": "\"$FACTORY_PROJECT_DIR\"/.factory/hooks/check-style.sh"
           }
         ]
       }
@@ -146,7 +146,7 @@ ensuring they work regardless of Droid's current directory:
 **Environment variables for plugins**:
 
 * `${DROID_PLUGIN_ROOT}`: Absolute path to the plugin directory
-* `${DROID_PROJECT_DIR}`: Project root directory (same as for project hooks)
+* `${FACTORY_PROJECT_DIR}`: Project root directory (same as for project hooks)
 * All standard environment variables are available
 
 See the plugin components reference for details on creating plugin hooks.
@@ -159,7 +159,7 @@ Runs after Droid creates tool parameters and before processing the tool call.
 
 **Common matchers:**
 
-* `Task` - Subagent tasks (see [subagents documentation](/cli/user-guides/specification-mode))
+* `Task` - Sub-droid tasks (see [subagents documentation](/cli/user-guides/specification-mode))
 * `Bash` - Shell commands
 * `Glob` - File pattern matching
 * `Grep` - Content search
@@ -191,12 +191,12 @@ block certain types of prompts.
 
 ### Stop
 
-Runs when the main Droid agent has finished responding. Does not run if
+Runs when Droid has finished responding. Does not run if
 the stoppage occurred due to a user interrupt.
 
 ### SubagentStop
 
-Runs when a Droid subagent (Task tool call) has finished responding.
+Runs when a sub-droid (Task tool call) has finished responding.
 
 ### PreCompact
 
@@ -220,50 +220,7 @@ development context like existing issues or recent changes to your codebase, ins
 * `clear` - Invoked from `/clear`
 * `compact` - Invoked from auto or manual compact.
 
-#### Persisting environment variables
 
-SessionStart hooks have access to the `DROID_ENV_FILE` environment variable, which provides a file path where you can persist environment variables for subsequent bash commands.
-
-**Example: Setting individual environment variables**
-
-```bash
-#!/bin/bash
-
-if [ -n "$DROID_ENV_FILE" ]; then
-  echo 'export NODE_ENV=production' >> "$DROID_ENV_FILE"
-  echo 'export API_KEY=your-api-key' >> "$DROID_ENV_FILE"
-  echo 'export PATH="$PATH:./node_modules/.bin"' >> "$DROID_ENV_FILE"
-fi
-
-exit 0
-```
-
-**Example: Persisting all environment changes from the hook**
-
-When your setup modifies the environment (e.g., `nvm use`), capture and persist all changes by diffing the environment:
-
-```bash
-#!/bin/bash
-
-ENV_BEFORE=$(export -p | sort)
-
-# Run your setup commands that modify the environment
-source ~/.nvm/nvm.sh
-nvm use 20
-
-if [ -n "$DROID_ENV_FILE" ]; then
-  ENV_AFTER=$(export -p | sort)
-  comm -13 <(echo "$ENV_BEFORE") <(echo "$ENV_AFTER") >> "$DROID_ENV_FILE"
-fi
-
-exit 0
-```
-
-Any variables written to this file will be available in all subsequent bash commands that Droid executes during the session.
-
-<Note>
-  `DROID_ENV_FILE` is only available for SessionStart hooks. Other hook types do not have access to this variable.
-</Note>
 
 ### SessionEnd
 
@@ -456,7 +413,7 @@ Hooks communicate status through exit codes, stdout, and stderr:
 | `Notification`     | N/A, shows stderr to user only                                     |
 | `UserPromptSubmit` | Blocks prompt processing, erases prompt, shows stderr to user only |
 | `Stop`             | Blocks stoppage, shows stderr to Droid                            |
-| `SubagentStop`     | Blocks stoppage, shows stderr to Droid subagent                   |
+| `SubagentStop`     | Blocks stoppage, shows stderr to sub-droid                   |
 | `PreCompact`       | N/A, shows stderr to user only                                     |
 | `SessionStart`     | N/A, shows stderr to user only                                     |
 | `SessionEnd`       | N/A, shows stderr to user only                                     |
@@ -826,7 +783,7 @@ Here are some key practices for writing more secure hooks:
 1. **Validate and sanitize inputs** - Never trust input data blindly
 2. **Always quote shell variables** - Use `"$VAR"` not `$VAR`
 3. **Block path traversal** - Check for `..` in file paths
-4. **Use absolute paths** - Always specify full paths for scripts. Never use relative paths like `./script.sh` or `hooks/script.sh` as they may resolve incorrectly depending on Droid's current directory. Use `"$DROID_PROJECT_DIR"/path/to/script.sh` for project scripts or full paths like `/usr/local/bin/script.sh` or `~/.factory/hooks/script.sh` for global scripts.
+4. **Use absolute paths** - Always specify full paths for scripts. Never use relative paths like `./script.sh` or `hooks/script.sh` as they may resolve incorrectly depending on Droid's current directory. Use `"$FACTORY_PROJECT_DIR"/path/to/script.sh` for project scripts or full paths like `/usr/local/bin/script.sh` or `~/.factory/hooks/script.sh` for global scripts.
 5. **Skip sensitive files** - Avoid `.env`, `.git/`, keys, etc.
 
 ### Configuration Safety
@@ -847,9 +804,8 @@ This prevents malicious hook modifications from affecting your current session.
 * **Parallelization**: All matching hooks run in parallel
 * **Deduplication**: Multiple identical hook commands are deduplicated automatically
 * **Environment**: Runs in current directory with Droid's environment
-  * The `DROID_PROJECT_DIR` environment variable is available and contains the
+  * The `FACTORY_PROJECT_DIR` environment variable is available and contains the
     absolute path to the project root directory (where Droid was started)
-  * The `DROID_REMOTE` environment variable indicates whether the hook is running in a remote (web) environment (`"true"`) or local CLI environment (not set or empty). Use this to run different logic based on execution context.
 * **Input**: JSON via stdin
 * **Output**:
   * PreToolUse/PostToolUse/Stop/SubagentStop: Progress shown in transcript (Ctrl-R)
