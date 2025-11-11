@@ -4,6 +4,134 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="November 10" rss={{ title: "CLI Updates", description: "Markdown tables, pinned todos, and MCP improvements" }}>
+  `v0.23.0`
+
+  ## New features
+
+  * **Markdown table rendering** - CLI now properly renders markdown tables for better display of structured data and documentation
+  * **Pinned todo plans** - Pin important todo items to keep them visible and track tasks during long-running sessions
+  * **MCP tool result formatting** - Improved formatting for MCP tool results with cleaner, more readable output
+
+  ## Bug fixes
+
+  * Fixed thinking block support for chat completion APIs to enable extended reasoning in compatible models
+  * Fixed issue with baseline versions reverting back to non-baseline builds on update
+  * Fixed autonomy mode handling in `droid exec` command for more reliable execution
+  * Restored Ctrl+T keyboard shortcut functionality on Windows
+
+</Update>
+
+<Update label="November 7-8" rss={{ title: "CLI Updates", description: "Reasoning controls, bash output expansion, and MCP improvements" }}>
+  `v0.22.14`
+
+  ## New features
+
+  * **Tab to cycle reasoning levels** - Navigate through different reasoning levels using the Tab key for better control
+  * **Expanded bash mode outputs** - Transcript view now expands and displays bash command outputs for better visibility
+
+  ## Bug fixes
+
+  * Fixed MCP tool discovery for droid exec so tools appear correctly in --list-tools and pass validation
+  * Fixed diff view to line wrap for better readability of long lines
+  * Fixed OAuth refresh for MCP servers
+  * Fixed markdown rendering bug in transcript view
+  * Fixed message cancellation handling in TUI
+  * Fixed prompt cache key handling in completions
+  * Brought back Ctrl+T keyboard shortcut on Windows
+
+</Update>
+
+<Update label="November 6" rss={{ title: "CLI Updates", description: "Console improvements and enhanced reliability" }}>
+  `v0.22.12`
+
+  ## New features
+
+  * **Quit/exit aliases** - type 'quit' or 'exit' commands for exiting sessions
+
+  ## Bug fixes
+
+  * Collect all AGENTS.md and CLAUDE.md files for system reminders
+  * Fixed MCP server argument parsing when adding servers through the UI
+  * Improved system diagnostics utilities for better troubleshooting
+  * Cleaning and dynamic rendering of the pending tools to make it clear Droid is not stuck
+
+</Update>
+
+<Update label="November 5" rss={{ title: "CLI Updates", description: "Model support, tool permissions, and MCP improvements" }}>
+  `v0.22.11`
+
+  ## New features
+
+  * **Context7 MCP server** - Added Context7 MCP server to the MCP registry
+
+  ## Bug fixes
+
+  * Improved droid exec run type tracking
+  * Improved MCP client info handling
+
+</Update>
+
+<Update label="November 4" rss={{ title: "CLI Updates", description: "OAuth discovery, interrupt support, and stability improvements" }}>
+  `v0.22.10`
+
+  ## New features
+
+  * **OAuth Discovery** - Automatically discover OAuth providers to streamline authentication setup for MCP
+  * **OpenAI Reasoning Summaries** - Display OpenAI's extended reasoning summaries in expanded session view
+
+  ## Bug fixes
+
+  * Fixed copy-pasting behavior in terminal sessions
+  * Improved timeout handling for more reliable operations
+  * Enhanced Windows compatibility
+  * Enable custom droids by default
+  * Improved error logging and diagnostics
+
+</Update>
+
+<Update label="November 1" rss={{ title: "CLI Updates", description: "MCP Registry, tool permissions, session resume, and multiple bug fixes" }}>
+  `v0.22.9`
+
+  ## New features
+
+  * **MCP Registry** - Added a curated selection of MCP servers for easy discovery and setup
+
+    ![MCP Registry interface showing curated MCP servers](/images/mcp-registry-2.gif)
+
+  * **Tool Permissions Support** - Implemented request tool permissions flow in stream-jsonrpc mode with support for multiple concurrent tool confirmations
+  * **Session Resume** - Show resume command on exit (Ctrl+C or /quit) with new `-r, --resume` flag to continue sessions
+  * **Thinking Traces Display** - Added UI component to show thinking blocks in expanded session view
+
+  ## Bug fixes
+
+  * Fixed CLI completion sounds by extracting embedded sound files to host filesystem, making them accessible to external shell commands
+  * Fixed tool use in user message after tool cancellation
+  * Added baseline builds for x64 CPUs (pre-2013) that don't support AVX2 SIMD instructions
+  * Updated static split logic to use text messages as stable checkpoints, reducing flickering during rendering
+  * Fixed storage and sending of Gemini thinking content from delta.extra_content.google
+  * Removed MultiEdit tool due to low success rate (~80%)
+  * Added recovery from malformed optional arguments using optimistic JSON parsing
+</Update>
+
+<Update label="October 31" rss={{ title: "CLI Updates", description: "Reasoning field support, Import from Claude, and bug fixes" }}>
+  `v0.22.7`
+
+  ## New features
+
+  * **Reasoning field support in streaming responses** - Added support for displaying reasoning fields in chat completion streaming chunks for models that provide extended reasoning
+  * **Import from Claude restored** - Re-enabled the "Import from Claude" option in the droids menu for easier conversation migration
+
+  ## Bug fixes
+
+  * Fixed MCP status indicator to only show when MCP servers are actually configured
+  * Fixed message list flickering
+  * Added support for custom headers when adding MCP servers
+  * Fixed sound files not being included in SEA binary releases
+  * Fixed Ctrl+C interruption messages to only display to users and not appear in logs for cleaner output
+  * Resolved issue where tool use would incorrectly appear in user messages after tool cancellation
+</Update>
+
 <Update label="October 30" rss={{ title: "CLI Updates", description: "MCP Revamp and OpenAI organization field fix" }}>
   `v0.22.6`
 

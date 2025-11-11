@@ -1,0 +1,63 @@
+name: Generate Documentation Map
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**/*.md'
+      - 'docs/**/*.mdx'
+      - '.github/scripts/generate-docs-map.py'
+      - '.github/workflows/generate-docs-map.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-docs-map:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Generate documentation map
+        run: |
+          python .github/scripts/generate-docs-map.py
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet docs/factory_docs_map.mdx; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/factory_docs_map.mdx
+          git commit -m "docs: auto-update documentation map [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Summary
+        run: |
+          if [ "${{ steps.check_changes.outputs.changed }}" == "true" ]; then
+            echo "✅ Documentation map updated and committed"
+          else
+            echo "ℹ️ Documentation map is already up to date"
+          fi
