@@ -159,13 +159,10 @@ Add to `.factory/settings.json`:
   }
 }
 ```
-</Accordion>
 
 ### Enforce test coverage
 
-Block changes that decrease test coverage:
-
-<Accordion title="Coverage checker">
+Block changes that decrease test coverage.
 
 Create `.factory/hooks/check-coverage.sh`:
 
@@ -244,13 +241,10 @@ Configure coverage threshold:
 # Add to ~/.bashrc or ~/.zshrc
 export DROID_MIN_COVERAGE=75
 ```
-</Accordion>
 
 ### Require tests for new files
 
-Ensure new code files have corresponding tests:
-
-<Accordion title="Test existence validator">
+Ensure new code files have corresponding tests.
 
 Create `.factory/hooks/require-tests.sh`:
 
@@ -328,9 +322,7 @@ chmod +x .factory/hooks/require-tests.sh
 
 ### Smart test selection
 
-Only run tests affected by changes:
-
-<Accordion title="Smart test runner">
+Only run tests affected by changes.
 
 Create `.factory/hooks/run-affected-tests.sh`:
 
@@ -398,9 +390,7 @@ chmod +x .factory/hooks/run-affected-tests.sh
 
 ### Snapshot testing validation
 
-Detect and validate snapshot updates:
-
-<Accordion title="Snapshot validator">
+Detect and validate snapshot updates.
 
 Create `.factory/hooks/validate-snapshots.sh`:
 
@@ -456,9 +446,7 @@ chmod +x .factory/hooks/validate-snapshots.sh
 
 ### Test performance monitoring
 
-Track test execution time and warn on slow tests:
-
-<Accordion title="Test performance monitor">
+Track test execution time and warn on slow tests.
 
 Create `.factory/hooks/monitor-test-perf.py`:
 

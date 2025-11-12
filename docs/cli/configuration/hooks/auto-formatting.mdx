@@ -457,57 +457,55 @@ Add to `.factory/settings.json`:
 
 ## Troubleshooting
 
-<AccordionGroup>
-  <Accordion title="Formatter not found">
-    **Problem**: `command not found` error
-    
-    **Solution**: Install the formatter globally or use npx/project binaries:
-    ```bash
-    # Install globally
-    npm install -g prettier
-    
-    # Or use project version
-    npx prettier --write "$file_path"
-    ```
-  </Accordion>
-  
-  <Accordion title="Formatting breaks code">
-    **Problem**: Formatter introduces syntax errors
-    
-    **Solution**: Add file validation after formatting:
-    ```bash
-    # For TypeScript
-    prettier --write "$file_path"
-    tsc --noEmit "$file_path" || echo "⚠️ Type errors after formatting"
-    ```
-  </Accordion>
-  
-  <Accordion title="Hook runs too slowly">
-    **Problem**: Formatting takes too long
-    
-    **Solution**: Only format changed files, use faster formatters:
-    ```bash
-    # Skip files that haven't changed
-    if git diff --quiet "$file_path"; then
-      exit 0
-    fi
-    ```
-  </Accordion>
-  
-  <Accordion title="Conflicts with editor formatting">
-    **Problem**: Editor and hook format differently
-    
-    **Solution**: Use the same config for both:
-    ```json
-    // .vscode/settings.json
-    {
-      "editor.defaultFormatter": "esbenp.prettier-vscode",
-      "editor.formatOnSave": true,
-      "prettier.configPath": ".prettierrc"
-    }
-    ```
-  </Accordion>
-</AccordionGroup>
+### Formatter not found
+
+**Problem**: `command not found` error
+
+**Solution**: Install the formatter globally or use npx/project binaries:
+```bash
+# Install globally
+npm install -g prettier
+
+# Or use project version
+npx prettier --write "$file_path"
+```
+
+### Formatting breaks code
+
+**Problem**: Formatter introduces syntax errors
+
+**Solution**: Add file validation after formatting:
+```bash
+# For TypeScript
+prettier --write "$file_path"
+tsc --noEmit "$file_path" || echo "⚠️ Type errors after formatting"
+```
+
+### Hook runs too slowly
+
+**Problem**: Formatting takes too long
+
+**Solution**: Only format changed files, use faster formatters:
+```bash
+# Skip files that haven't changed
+if git diff --quiet "$file_path"; then
+  exit 0
+fi
+```
+
+### Conflicts with editor formatting
+
+**Problem**: Editor and hook format differently
+
+**Solution**: Use the same config for both:
+```json
+// .vscode/settings.json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "prettier.configPath": ".prettierrc"
+}
+```
 
 ## See also
 
