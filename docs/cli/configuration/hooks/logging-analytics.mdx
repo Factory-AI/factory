@@ -1,0 +1,832 @@
+---
+title: "Logging and Analytics"
+description: "Track Droid usage, collect metrics, and analyze development patterns with hooks"
+---
+
+This cookbook shows how to use hooks to track Droid usage, collect development metrics, analyze patterns, and generate insights about your development workflow.
+
+## How it works
+
+Logging and analytics hooks can:
+
+1. **Track tool usage**: Log which tools Droid uses most frequently
+2. **Measure performance**: Track session duration, command execution time
+3. **Analyze patterns**: Identify common workflows and bottlenecks
+4. **Generate reports**: Create usage summaries and insights
+5. **Monitor costs**: Track token usage and API costs
+
+## Prerequisites
+
+Tools for logging and data collection:
+
+<CodeGroup>
+
+```bash Basic tools
+# jq for JSON processing
+brew install jq  # macOS
+sudo apt-get install jq  # Ubuntu/Debian
+
+# SQLite for local database
+brew install sqlite3  # macOS (usually pre-installed)
+```
+
+```bash Optional analytics
+# ClickHouse for advanced analytics
+brew install clickhouse  # macOS
+docker run -d -p 8123:8123 clickhouse/clickhouse-server
+
+# Or use cloud services
+# - Google Analytics
+# - Mixpanel
+# - PostHog
+```
+
+</CodeGroup>
+
+## Basic logging
+
+### Log all commands
+
+Track every command Droid executes.
+
+Create `.factory/hooks/log-commands.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+
+# Only log Bash commands
+if [ "$tool_name" != "Bash" ]; then
+  exit 0
+fi
+
+command=$(echo "$input" | jq -r '.tool_input.command')
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+session_id=$(echo "$input" | jq -r '.session_id')
+
+# Log to file
+log_file="$HOME/.factory/command-log.jsonl"
+
+# Create log entry
+log_entry=$(jq -n \
+  --arg ts "$timestamp" \
+  --arg sid "$session_id" \
+  --arg cmd "$command" \
+  '{timestamp: $ts, session_id: $sid, command: $cmd}')
+
+echo "$log_entry" >> "$log_file"
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/log-commands.sh
+```
+
+Add to `~/.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/log-commands.sh",
+            "timeout": 2
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Analyze logs:
+
+```bash
+# Most common commands
+jq -r '.command' ~/.factory/command-log.jsonl | sort | uniq -c | sort -rn | head -10
+
+# Commands by session
+jq -r '"\(.session_id): \(.command)"' ~/.factory/command-log.jsonl
+```
+
+### Track file modifications
+
+Log all file edits and writes.
+
+Create `.factory/hooks/track-file-changes.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only track file operations
+if [ "$tool_name" != "Write" ] && [ "$tool_name" != "Edit" ]; then
+  exit 0
+fi
+
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+session_id=$(echo "$input" | jq -r '.session_id')
+cwd=$(echo "$input" | jq -r '.cwd')
+
+# Determine file type
+file_ext="${file_path##*.}"
+
+# Calculate file size (for Write operations)
+if [ "$tool_name" = "Write" ]; then
+  content=$(echo "$input" | jq -r '.tool_input.content // ""')
+  size=$(echo "$content" | wc -c | tr -d ' ')
+else
+  size="unknown"
+fi
+
+# Log to SQLite database
+db_file="$HOME/.factory/file-changes.db"
+
+# Create table if not exists
+sqlite3 "$db_file" "CREATE TABLE IF NOT EXISTS file_changes (
+  timestamp TEXT,
+  session_id TEXT,
+  project TEXT,
+  operation TEXT,
+  file_path TEXT,
+  file_type TEXT,
+  size INTEGER
+);" 2>/dev/null
+
+# Insert record
+sqlite3 "$db_file" "INSERT INTO file_changes VALUES (
+  '$timestamp',
+  '$session_id',
+  '$(basename "$cwd")',
+  '$tool_name',
+  '$file_path',
+  '$file_ext',
+  '$size'
+);" 2>/dev/null
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/track-file-changes.sh
+```
+
+Query the database:
+
+```bash
+# Most edited files
+sqlite3 ~/.factory/file-changes.db \
+  "SELECT file_path, COUNT(*) as edits FROM file_changes 
+   GROUP BY file_path ORDER BY edits DESC LIMIT 10;"
+
+# Files edited by type
+sqlite3 ~/.factory/file-changes.db \
+  "SELECT file_type, COUNT(*) as count FROM file_changes 
+   GROUP BY file_type ORDER BY count DESC;"
+
+# Activity by project
+sqlite3 ~/.factory/file-changes.db \
+  "SELECT project, COUNT(*) as changes FROM file_changes 
+   GROUP BY project ORDER BY changes DESC;"
+```
+
+
+### Session duration tracking
+
+Measure how long sessions last:
+
+
+
+Create `.factory/hooks/track-session.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+session_id=$(echo "$input" | jq -r '.session_id')
+
+db_file="$HOME/.factory/sessions.db"
+
+# Create table
+sqlite3 "$db_file" "CREATE TABLE IF NOT EXISTS sessions (
+  session_id TEXT PRIMARY KEY,
+  start_time TEXT,
+  end_time TEXT,
+  reason TEXT,
+  duration_seconds INTEGER
+);" 2>/dev/null
+
+case "$hook_event" in
+  "SessionStart")
+    # Record session start
+    start_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    sqlite3 "$db_file" "INSERT OR REPLACE INTO sessions (session_id, start_time) 
+      VALUES ('$session_id', '$start_time');" 2>/dev/null
+    ;;
+    
+  "SessionEnd")
+    # Record session end and calculate duration
+    end_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    reason=$(echo "$input" | jq -r '.reason')
+    
+    # Get start time
+    start_time=$(sqlite3 "$db_file" \
+      "SELECT start_time FROM sessions WHERE session_id='$session_id';" 2>/dev/null)
+    
+    if [ -n "$start_time" ]; then
+      # Calculate duration in seconds
+      start_epoch=$(date -jf "%Y-%m-%dT%H:%M:%SZ" "$start_time" +%s 2>/dev/null || date -d "$start_time" +%s)
+      end_epoch=$(date -jf "%Y-%m-%dT%H:%M:%SZ" "$end_time" +%s 2>/dev/null || date -d "$end_time" +%s)
+      duration=$((end_epoch - start_epoch))
+      
+      # Update record
+      sqlite3 "$db_file" "UPDATE sessions 
+        SET end_time='$end_time', reason='$reason', duration_seconds=$duration 
+        WHERE session_id='$session_id';" 2>/dev/null
+      
+      # Print summary
+      echo "📊 Session duration: $((duration / 60)) minutes $((duration % 60)) seconds"
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/track-session.sh
+```
+
+Add to hooks:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/track-session.sh",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/track-session.sh",
+            "timeout": 2
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Query session stats:
+
+```bash
+# Average session duration
+sqlite3 ~/.factory/sessions.db \
+  "SELECT AVG(duration_seconds) / 60.0 as avg_minutes FROM sessions 
+   WHERE duration_seconds IS NOT NULL;"
+
+# Sessions by exit reason
+sqlite3 ~/.factory/sessions.db \
+  "SELECT reason, COUNT(*) as count FROM sessions 
+   GROUP BY reason ORDER BY count DESC;"
+
+# Longest sessions
+sqlite3 ~/.factory/sessions.db \
+  "SELECT session_id, duration_seconds / 60.0 as minutes FROM sessions 
+   ORDER BY duration_seconds DESC LIMIT 10;"
+```
+
+
+## Advanced analytics
+
+### Usage heatmap
+
+Track when Droid is used most:
+
+
+
+Create `.factory/hooks/usage-heatmap.py`:
+
+```python
+#!/usr/bin/env python3
+"""
+Generate usage heatmap showing when Droid is used most.
+"""
+import json
+import sys
+import sqlite3
+from datetime import datetime
+from collections import defaultdict
+
+def generate_heatmap():
+    """Create a heatmap of Droid usage by hour and day."""
+    db_path = os.path.expanduser('~/.factory/sessions.db')
+    
+    if not os.path.exists(db_path):
+        return
+    
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Get all session starts
+    cursor.execute("SELECT start_time FROM sessions WHERE start_time IS NOT NULL")
+    
+    # Count by day of week and hour
+    heatmap = defaultdict(lambda: defaultdict(int))
+    
+    for (start_time,) in cursor.fetchall():
+        try:
+            dt = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+            day = dt.strftime('%A')
+            hour = dt.hour
+            heatmap[day][hour] += 1
+        except:
+            continue
+    
+    conn.close()
+    
+    # Print heatmap
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    hours = range(24)
+    
+    print("\n📊 Droid Usage Heatmap")
+    print("=" * 80)
+    print(f"{'Day':<12} {'Morning (6-12)':<15} {'Afternoon (12-18)':<15} {'Evening (18-24)':<15}")
+    print("-" * 80)
+    
+    for day in days:
+        morning = sum(heatmap[day][h] for h in range(6, 12))
+        afternoon = sum(heatmap[day][h] for h in range(12, 18))
+        evening = sum(heatmap[day][h] for h in range(18, 24))
+        
+        print(f"{day:<12} {morning:<15} {afternoon:<15} {evening:<15}")
+    
+    print("=" * 80)
+
+if __name__ == '__main__':
+    import os
+    generate_heatmap()
+```
+
+```bash
+chmod +x .factory/hooks/usage-heatmap.py
+```
+
+Run periodically:
+
+```bash
+# Add to weekly report
+~/.factory/hooks/usage-heatmap.py
+```
+
+
+### Tool usage statistics
+
+Track which tools are used most:
+
+
+
+Create `.factory/hooks/tool-stats.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+
+# Log tool usage
+log_file="$HOME/.factory/tool-usage.log"
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+echo "$timestamp $tool_name" >> "$log_file"
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/tool-stats.sh
+```
+
+Add to PreToolUse for all tools:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/tool-stats.sh",
+            "timeout": 1
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Generate report:
+
+```bash
+# Most used tools
+awk '{print $2}' ~/.factory/tool-usage.log | sort | uniq -c | sort -rn
+
+# Tool usage over time
+awk '{print $1}' ~/.factory/tool-usage.log | cut -d'T' -f1 | uniq -c
+
+# Usage by hour
+awk '{print $1}' ~/.factory/tool-usage.log | cut -d'T' -f2 | cut -d':' -f1 | sort | uniq -c
+```
+
+
+### Performance metrics
+
+Track hook execution performance:
+
+
+
+Create `.factory/hooks/perf-monitor.sh`:
+
+```bash
+#!/bin/bash
+
+# This hook measures its own performance and logs it
+start_time=$(date +%s.%N)
+
+input=$(cat)
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+tool_name=$(echo "$input" | jq -r '.tool_name // "none"')
+
+# Simulate your actual hook work here
+# ...
+
+end_time=$(date +%s.%N)
+duration=$(echo "$end_time - $start_time" | bc)
+
+# Log performance
+perf_log="$HOME/.factory/hook-performance.log"
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+echo "$timestamp $hook_event $tool_name ${duration}s" >> "$perf_log"
+
+# Warn if hook is slow
+if (( $(echo "$duration > 1.0" | bc -l) )); then
+  echo "⚠️ Hook took ${duration}s to execute (>1s threshold)" >&2
+fi
+
+exit 0
+```
+
+Analyze performance:
+
+```bash
+# Slowest hooks
+sort -k4 -rn ~/.factory/hook-performance.log | head -10
+
+# Average execution time by event
+awk '{sum[$2]+=$4; count[$2]++} END {for (event in sum) print event, sum[event]/count[event] "s"}' \
+  ~/.factory/hook-performance.log
+```
+
+
+### Cost tracking
+
+Monitor token usage and API costs:
+
+
+
+Create `.factory/hooks/track-costs.sh`:
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+hook_event=$(echo "$input" | jq -r '.hook_event_name')
+
+# Only track on session end
+if [ "$hook_event" != "SessionEnd" ]; then
+  exit 0
+fi
+
+session_id=$(echo "$input" | jq -r '.session_id')
+transcript_path=$(echo "$input" | jq -r '.transcript_path')
+
+# Parse transcript for token usage
+if [ ! -f "$transcript_path" ]; then
+  exit 0
+fi
+
+# Extract token counts from transcript (simplified)
+# In reality, you'd parse the actual transcript format
+input_tokens=$(grep -o '"input_tokens":[0-9]*' "$transcript_path" | \
+  cut -d':' -f2 | paste -sd+ - | bc)
+output_tokens=$(grep -o '"output_tokens":[0-9]*' "$transcript_path" | \
+  cut -d':' -f2 | paste -sd+ - | bc)
+
+# Calculate approximate cost (rates vary by model)
+# Claude Sonnet 4.5: $3 per 1M input, $15 per 1M output
+input_cost=$(echo "scale=4; $input_tokens * 3 / 1000000" | bc)
+output_cost=$(echo "scale=4; $output_tokens * 15 / 1000000" | bc)
+total_cost=$(echo "scale=4; $input_cost + $output_cost" | bc)
+
+# Log costs
+cost_db="$HOME/.factory/costs.db"
+
+sqlite3 "$cost_db" "CREATE TABLE IF NOT EXISTS costs (
+  session_id TEXT PRIMARY KEY,
+  timestamp TEXT,
+  input_tokens INTEGER,
+  output_tokens INTEGER,
+  total_cost REAL
+);" 2>/dev/null
+
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+sqlite3 "$cost_db" "INSERT OR REPLACE INTO costs VALUES (
+  '$session_id',
+  '$timestamp',
+  $input_tokens,
+  $output_tokens,
+  $total_cost
+);" 2>/dev/null
+
+# Print summary
+echo "💰 Session cost: \$${total_cost} (${input_tokens} input + ${output_tokens} output tokens)"
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/track-costs.sh
+```
+
+Query costs:
+
+```bash
+# Total costs
+sqlite3 ~/.factory/costs.db \
+  "SELECT SUM(total_cost) as total FROM costs;"
+
+# Cost by date
+sqlite3 ~/.factory/costs.db \
+  "SELECT DATE(timestamp) as date, SUM(total_cost) as cost 
+   FROM costs GROUP BY DATE(timestamp) ORDER BY date DESC;"
+
+# Most expensive sessions
+sqlite3 ~/.factory/costs.db \
+  "SELECT session_id, total_cost FROM costs 
+   ORDER BY total_cost DESC LIMIT 10;"
+```
+
+
+### Generate weekly reports
+
+Compile usage reports:
+
+
+
+Create `.factory/hooks/weekly-report.py`:
+
+```python
+#!/usr/bin/env python3
+"""
+Generate weekly usage report.
+"""
+import os
+import sqlite3
+from datetime import datetime, timedelta
+
+def generate_report():
+    """Generate comprehensive weekly report."""
+    home = os.path.expanduser('~')
+    sessions_db = f"{home}/.factory/sessions.db"
+    files_db = f"{home}/.factory/file-changes.db"
+    costs_db = f"{home}/.factory/costs.db"
+    
+    # Get date range
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=7)
+    
+    print(f"\n{'='*60}")
+    print(f"Droid Weekly Report")
+    print(f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
+    print(f"{'='*60}\n")
+    
+    # Session statistics
+    if os.path.exists(sessions_db):
+        conn = sqlite3.connect(sessions_db)
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT COUNT(*), AVG(duration_seconds), SUM(duration_seconds)
+            FROM sessions 
+            WHERE start_time >= ?
+        """, (start_date.isoformat(),))
+        
+        count, avg_duration, total_duration = cursor.fetchone()
+        
+        if count:
+            print("📊 Session Statistics")
+            print(f"  Total sessions: {count}")
+            print(f"  Average duration: {int(avg_duration / 60)} minutes")
+            print(f"  Total time: {int(total_duration / 3600)} hours")
+            print()
+        
+        conn.close()
+    
+    # File changes
+    if os.path.exists(files_db):
+        conn = sqlite3.connect(files_db)
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT file_type, COUNT(*) as changes
+            FROM file_changes
+            WHERE timestamp >= ?
+            GROUP BY file_type
+            ORDER BY changes DESC
+            LIMIT 5
+        """, (start_date.isoformat(),))
+        
+        print("📝 Most Edited File Types")
+        for file_type, changes in cursor.fetchall():
+            print(f"  .{file_type}: {changes} changes")
+        print()
+        
+        conn.close()
+    
+    # Costs
+    if os.path.exists(costs_db):
+        conn = sqlite3.connect(costs_db)
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT SUM(total_cost), SUM(input_tokens), SUM(output_tokens)
+            FROM costs
+            WHERE timestamp >= ?
+        """, (start_date.isoformat(),))
+        
+        total_cost, input_tokens, output_tokens = cursor.fetchone()
+        
+        if total_cost:
+            print("💰 Cost Summary")
+            print(f"  Total cost: ${total_cost:.2f}")
+            print(f"  Input tokens: {input_tokens:,}")
+            print(f"  Output tokens: {output_tokens:,}")
+            print()
+        
+        conn.close()
+    
+    print(f"{'='*60}\n")
+
+if __name__ == '__main__':
+    generate_report()
+```
+
+```bash
+chmod +x .factory/hooks/weekly-report.py
+```
+
+Schedule weekly:
+
+```bash
+# Add to crontab
+# Run every Monday at 9am
+# 0 9 * * 1 ~/.factory/hooks/weekly-report.py
+```
+
+
+## Best practices
+
+<Steps>
+  <Step title="Use structured logging">
+    Log in JSON or to database for easy querying:
+    ```bash
+    # JSON logs
+    jq -n --arg cmd "$command" '{timestamp: now, command: $cmd}' >> log.jsonl
+    
+    # SQLite for analytics
+    sqlite3 db.db "INSERT INTO logs VALUES (...)"
+    ```
+  </Step>
+  
+  <Step title="Minimize performance impact">
+    Keep logging hooks fast:
+    ```bash
+    # Async logging
+    (echo "$log_entry" >> log.json) &
+    
+    # Batch writes
+    echo "$entry" >> /tmp/buffer
+    if [ $(wc -l < /tmp/buffer) -gt 100 ]; then
+      cat /tmp/buffer >> permanent.log
+      > /tmp/buffer
+    fi
+    ```
+  </Step>
+  
+  <Step title="Protect sensitive data">
+    Don't log secrets or credentials:
+    ```bash
+    # Redact sensitive info
+    command=$(echo "$command" | sed 's/password=[^ ]*/password=***/g')
+    ```
+  </Step>
+  
+  <Step title="Rotate logs">
+    Prevent log files from growing too large:
+    ```bash
+    # Log rotation
+    if [ $(du -k log.json | cut -f1) -gt 10240 ]; then  # 10MB
+      mv log.json log.json.$(date +%Y%m%d)
+      gzip log.json.*
+    fi
+    ```
+  </Step>
+  
+  <Step title="Make analytics opt-in">
+    Respect user privacy:
+    ```bash
+    if [ "$DROID_ANALYTICS_ENABLED" != "true" ]; then
+      exit 0
+    fi
+    ```
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+
+  
+    **Problem**: Log files consuming too much disk space
+    
+    **Solution**: Implement log rotation:
+    ```bash
+    # Compress old logs
+    find ~/.factory -name "*.log" -mtime +7 -exec gzip {} \;
+    
+    # Delete very old logs
+    find ~/.factory -name "*.log.gz" -mtime +30 -delete
+    ```
+  
+  
+  
+    **Problem**: SQLite database locked during concurrent access
+    
+    **Solution**: Use WAL mode and retry logic:
+    ```bash
+    # Enable WAL mode
+    sqlite3 db.db "PRAGMA journal_mode=WAL;"
+    
+    # Retry on busy
+    sqlite3 db.db -cmd ".timeout 5000" "INSERT ..."
+    ```
+  
+  
+  
+    **Problem**: Hooks take too long
+    
+    **Solution**: Use async logging:
+    ```bash
+    # Background logging
+    (
+      # Expensive logging operation
+      process_and_log_data
+    ) &  # Run in background
+    
+    exit 0  # Return immediately
+    ```
+  
+
+
+## See also
+
+- [Hooks reference](/cli/configuration/hooks-reference) - Complete hooks API documentation
+- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
+- [Session automation](/cli/configuration/hooks/session-automation) - Automate session setup
+- [Custom notifications](/cli/configuration/hooks/notifications) - Get notified about events
