@@ -47,9 +47,7 @@ docker run -d -p 8123:8123 clickhouse/clickhouse-server
 
 ### Log all commands
 
-Track every command Droid executes:
-
-<Accordion title="Command logger">
+Track every command Droid executes.
 
 Create `.factory/hooks/log-commands.sh`:
 
@@ -117,13 +115,10 @@ jq -r '.command' ~/.factory/command-log.jsonl | sort | uniq -c | sort -rn | head
 # Commands by session
 jq -r '"\(.session_id): \(.command)"' ~/.factory/command-log.jsonl
 ```
-</Accordion>
 
 ### Track file modifications
 
-Log all file edits and writes:
-
-<Accordion title="File modification tracker">
+Log all file edits and writes.
 
 Create `.factory/hooks/track-file-changes.sh`:
 
