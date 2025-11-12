@@ -197,13 +197,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/update-readme.sh
 ```
-</Accordion>
+
 
 ### Sync code examples in documentation
 
 Ensure code examples in docs match actual code:
 
-<Accordion title="Example synchronizer">
+
 
 Create `.factory/hooks/sync-doc-examples.py`:
 
@@ -305,7 +305,7 @@ if __name__ == '__main__':
 ```bash
 chmod +x .factory/hooks/sync-doc-examples.py
 ```
-</Accordion>
+
 
 ## Advanced documentation automation
 
@@ -313,7 +313,7 @@ chmod +x .factory/hooks/sync-doc-examples.py
 
 Ensure API documentation matches implementation:
 
-<Accordion title="OpenAPI validator">
+
 
 Create `.factory/hooks/validate-openapi.sh`:
 
@@ -379,13 +379,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/validate-openapi.sh
 ```
-</Accordion>
+
 
 ### JSDoc/TSDoc enforcement
 
 Require documentation comments for public APIs:
 
-<Accordion title="Documentation comment enforcer">
+
 
 Create `.factory/hooks/enforce-jsdoc.sh`:
 
@@ -446,13 +446,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/enforce-jsdoc.sh
 ```
-</Accordion>
+
 
 ### Generate changelog from commits
 
 Automatically build changelog from git history:
 
-<Accordion title="Changelog generator">
+
 
 Create `.factory/hooks/generate-changelog.sh`:
 
@@ -510,13 +510,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/generate-changelog.sh
 ```
-</Accordion>
+
 
 ### Docs coverage report
 
 Track which code has documentation:
 
-<Accordion title="Documentation coverage reporter">
+
 
 Create `.factory/hooks/docs-coverage.py`:
 
@@ -630,7 +630,7 @@ Run on session end:
   }
 }
 ```
-</Accordion>
+
 
 ## Best practices
 
@@ -691,8 +691,8 @@ Run on session end:
 
 ## Troubleshooting
 
-<AccordionGroup>
-  <Accordion title="Doc generation fails">
+
+  
     **Problem**: Can't generate documentation
     
     **Solution**: Check tool configuration:
@@ -707,9 +707,9 @@ Run on session end:
     typedoc --version
     typedoc --help
     ```
-  </Accordion>
   
-  <Accordion title="Examples out of sync">
+  
+  
     **Problem**: Doc examples don't match code
     
     **Solution**: Extract examples from tests:
@@ -725,9 +725,9 @@ Run on session end:
     ```bash
     sed -n '/DOC_EXAMPLE_START/,/DOC_EXAMPLE_END/p' test.ts
     ```
-  </Accordion>
   
-  <Accordion title="Docs build too slow">
+  
+  
     **Problem**: Doc generation takes too long
     
     **Solution**: Build incrementally:
@@ -740,8 +740,8 @@ Run on session end:
       exit 0
     fi
     ```
-  </Accordion>
-</AccordionGroup>
+  
+
 
 ## See also
 

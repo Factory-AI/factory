@@ -207,7 +207,7 @@ exit 0
 ```bash
 chmod +x .factory/hooks/setup-env.sh
 ```
-</Accordion>
+
 
 ## Advanced automation
 
@@ -422,13 +422,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/load-guidelines.sh
 ```
-</Accordion>
+
 
 ### Smart context based on Git branch
 
 Load different context based on the current branch:
 
-<Accordion title="Branch-aware context">
+
 
 Create `.factory/hooks/branch-context.sh`:
 
@@ -508,7 +508,7 @@ exit 0
 ```bash
 chmod +x .factory/hooks/branch-context.sh
 ```
-</Accordion>
+
 
 ## Real-world examples
 
@@ -516,7 +516,7 @@ chmod +x .factory/hooks/branch-context.sh
 
 Automatically switch to the right package:
 
-<Accordion title="Monorepo context">
+
 
 Create `.factory/hooks/monorepo-setup.sh`:
 
@@ -556,13 +556,13 @@ fi
 
 exit 0
 ```
-</Accordion>
+
 
 ### Example 2: Docker environment check
 
 Ensure Docker services are running:
 
-<Accordion title="Docker service checker">
+
 
 Create `.factory/hooks/check-docker.sh`:
 
@@ -601,7 +601,7 @@ fi
 
 exit 0
 ```
-</Accordion>
+
 
 ## Best practices
 
@@ -662,8 +662,8 @@ exit 0
 
 ## Troubleshooting
 
-<AccordionGroup>
-  <Accordion title="Context too verbose">
+
+  
     **Problem**: Too much information loaded
     
     **Solution**: Summarize and link to details:
@@ -671,9 +671,9 @@ exit 0
     echo "README.md exists ($(wc -l < README.md) lines)"
     echo "Run 'cat README.md' to view full content"
     ```
-  </Accordion>
   
-  <Accordion title="Environment variables not persisting">
+  
+  
     **Problem**: Variables not available in Bash commands
     
     **Solution**: Verify DROID_ENV_FILE usage:
@@ -686,9 +686,9 @@ exit 0
     # Append, don't overwrite
     echo 'export VAR=value' >> "$DROID_ENV_FILE"
     ```
-  </Accordion>
   
-  <Accordion title="Hook runs too slowly">
+  
+  
     **Problem**: Session start takes too long
     
     **Solution**: Run expensive operations asynchronously:
@@ -702,8 +702,8 @@ exit 0
     # Return immediately with basic context
     echo "Loading detailed context in background..."
     ```
-  </Accordion>
-</AccordionGroup>
+  
+
 
 ## See also
 

@@ -316,7 +316,7 @@ exit 0
 ```bash
 chmod +x .factory/hooks/require-tests.sh
 ```
-</Accordion>
+
 
 ## Advanced testing automation
 
@@ -386,7 +386,7 @@ exit 0
 ```bash
 chmod +x .factory/hooks/run-affected-tests.sh
 ```
-</Accordion>
+
 
 ### Snapshot testing validation
 
@@ -442,7 +442,7 @@ exit 0
 ```bash
 chmod +x .factory/hooks/validate-snapshots.sh
 ```
-</Accordion>
+
 
 ### Test performance monitoring
 
@@ -532,13 +532,13 @@ except Exception as e:
 ```bash
 chmod +x .factory/hooks/monitor-test-perf.py
 ```
-</Accordion>
+
 
 ### Test flakiness detector
 
 Detect and report flaky tests:
 
-<Accordion title="Flaky test detector">
+
 
 Create `.factory/hooks/detect-flaky-tests.sh`:
 
@@ -599,7 +599,7 @@ exit 0
 ```bash
 chmod +x .factory/hooks/detect-flaky-tests.sh
 ```
-</Accordion>
+
 
 ## Best practices
 
@@ -661,8 +661,8 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
 
 ## Troubleshooting
 
-<AccordionGroup>
-  <Accordion title="Tests too slow">
+
+  
     **Problem**: Test execution blocks workflow
     
     **Solution**: Run only unit tests, skip integration:
@@ -677,9 +677,9 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
       }
     }
     ```
-  </Accordion>
   
-  <Accordion title="False test failures">
+  
+  
     **Problem**: Tests fail in hooks but pass manually
     
     **Solution**: Check environment differences:
@@ -691,9 +691,9 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
     # Use project test script
     npm test  # Not direct jest call
     ```
-  </Accordion>
   
-  <Accordion title="Coverage calculation wrong">
+  
+  
     **Problem**: Coverage includes generated files
     
     **Solution**: Configure coverage exclusions:
@@ -708,8 +708,8 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
       ]
     }
     ```
-  </Accordion>
-</AccordionGroup>
+  
+
 
 ## See also
 

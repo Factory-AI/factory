@@ -174,13 +174,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/protect-branches.sh
 ```
-</Accordion>
+
 
 ### Enforce branch naming
 
 Require feature branches to follow naming conventions:
 
-<Accordion title="Branch naming validator">
+
 
 Create `.factory/hooks/validate-branch-name.sh`:
 
@@ -223,7 +223,7 @@ exit 0
 ```bash
 chmod +x .factory/hooks/validate-branch-name.sh
 ```
-</Accordion>
+
 
 ## Advanced Git automation
 
@@ -231,7 +231,7 @@ chmod +x .factory/hooks/validate-branch-name.sh
 
 Automatically create changelog entries from commits:
 
-<Accordion title="Changelog generator">
+
 
 Create `.factory/hooks/update-changelog.sh`:
 
@@ -334,13 +334,13 @@ Add to PostToolUse:
   }
 }
 ```
-</Accordion>
+
 
 ### Pre-push validation
 
 Run tests and checks before allowing git push:
 
-<Accordion title="Pre-push validator">
+
 
 Create `.factory/hooks/pre-push-check.sh`:
 
@@ -407,13 +407,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/pre-push-check.sh
 ```
-</Accordion>
+
 
 ### Auto-create PR when pushing new branch
 
 Automatically open a PR when pushing a feature branch:
 
-<Accordion title="Auto PR creation">
+
 
 Create `.factory/hooks/auto-create-pr.sh`:
 
@@ -477,13 +477,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/auto-create-pr.sh
 ```
-</Accordion>
+
 
 ### Enforce co-authorship in commits
 
 Add co-author trailers to commits:
 
-<Accordion title="Co-author enforcement">
+
 
 Create `.factory/hooks/add-coauthor.sh`:
 
@@ -536,7 +536,7 @@ exit 0
 ```bash
 chmod +x .factory/hooks/add-coauthor.sh
 ```
-</Accordion>
+
 
 ## Real-world examples
 
@@ -544,7 +544,7 @@ chmod +x .factory/hooks/add-coauthor.sh
 
 Ensure commits only touch one package:
 
-<Accordion title="Monorepo commit scope validator">
+
 
 Create `.factory/hooks/validate-monorepo-scope.sh`:
 
@@ -585,13 +585,13 @@ fi
 
 exit 0
 ```
-</Accordion>
+
 
 ### Example 2: Release automation
 
 Auto-tag releases when version changes:
 
-<Accordion title="Auto-tagging on version bump">
+
 
 Create `.factory/hooks/auto-tag-release.sh`:
 
@@ -636,7 +636,7 @@ fi
 
 exit 0
 ```
-</Accordion>
+
 
 ## Best practices
 
@@ -691,8 +691,8 @@ exit 0
 
 ## Troubleshooting
 
-<AccordionGroup>
-  <Accordion title="Hook blocks legitimate commits">
+
+  
     **Problem**: Validation too strict
     
     **Solution**: Add escape hatches:
@@ -703,9 +703,9 @@ exit 0
       exit 0
     fi
     ```
-  </Accordion>
   
-  <Accordion title="Conflicts with Git hooks">
+  
+  
     **Problem**: Both Droid hooks and .git/hooks running
     
     **Solution**: Coordinate or choose one:
@@ -715,9 +715,9 @@ exit 0
       exit 0  # Let Droid hooks handle it
     fi
     ```
-  </Accordion>
   
-  <Accordion title="Pre-push checks too slow">
+  
+  
     **Problem**: Tests take too long
     
     **Solution**: Run quick checks only:
@@ -729,8 +729,8 @@ exit 0
     npm test &
     git push
     ```
-  </Accordion>
-</AccordionGroup>
+  
+
 
 ## See also
 

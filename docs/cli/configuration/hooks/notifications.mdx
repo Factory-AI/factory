@@ -337,7 +337,7 @@ Configure environment:
 # Add to ~/.bashrc or ~/.zshrc
 export DROID_NOTIFY_EMAIL="your-email@example.com"
 ```
-</Accordion>
+
 
 ### Rich desktop notifications with actions
 
@@ -399,13 +399,13 @@ exit 0
 ```bash
 chmod +x .factory/hooks/rich-notify-macos.sh
 ```
-</Accordion>
+
 
 ### Webhook integration
 
 Send notifications to custom webhooks:
 
-<Accordion title="Generic webhook notification">
+
 
 Create `.factory/hooks/webhook-notify.sh`:
 
@@ -436,7 +436,7 @@ exit 0
 chmod +x .factory/hooks/webhook-notify.sh
 export DROID_WEBHOOK_URL="https://your-webhook-url.com/droid-events"
 ```
-</Accordion>
+
 
 ## Real-world examples
 
@@ -444,7 +444,7 @@ export DROID_WEBHOOK_URL="https://your-webhook-url.com/droid-events"
 
 Only notify when you're away from your desk:
 
-<Accordion title="Smart notification based on idle time">
+
 
 Create `.factory/hooks/smart-notify.sh`:
 
@@ -469,13 +469,13 @@ osascript -e "display notification \"$message\" with title \"Droid\" sound name 
 
 exit 0
 ```
-</Accordion>
+
 
 ### Example 2: Team notification dashboard
 
 Log all events to a shared dashboard:
 
-<Accordion title="Team event logger">
+
 
 Create `.factory/hooks/team-logger.sh`:
 
@@ -512,7 +512,7 @@ curl -X POST "$LOG_ENDPOINT" \
 
 exit 0
 ```
-</Accordion>
+
 
 ## Best practices
 
@@ -562,8 +562,8 @@ exit 0
 
 ## Troubleshooting
 
-<AccordionGroup>
-  <Accordion title="Notifications not appearing">
+
+  
     **Problem**: No notifications show up
     
     **Solution**: Check notification permissions:
@@ -575,9 +575,9 @@ exit 0
     # Check if hooks are executing
     droid --debug
     ```
-  </Accordion>
   
-  <Accordion title="Slack webhook fails">
+  
+  
     **Problem**: Slack messages not sending
     
     **Solution**: Test webhook directly:
@@ -586,9 +586,9 @@ exit 0
       -H 'Content-Type: application/json' \
       -d '{"text":"Test from curl"}'
     ```
-  </Accordion>
   
-  <Accordion title="Too many notifications">
+  
+  
     **Problem**: Getting spammed with alerts
     
     **Solution**: Add rate limiting:
@@ -607,9 +607,9 @@ exit 0
     date +%s > "$LAST_NOTIFY_FILE"
     # ... send notification
     ```
-  </Accordion>
   
-  <Accordion title="Sound doesn't play">
+  
+  
     **Problem**: No audio alert
     
     **Solution**: Check audio system:
@@ -623,8 +623,8 @@ exit 0
     # Linux - check audio
     paplay /usr/share/sounds/freedesktop/stereo/complete.oga
     ```
-  </Accordion>
-</AccordionGroup>
+  
+
 
 ## See also
 

@@ -199,13 +199,13 @@ sqlite3 ~/.factory/file-changes.db \
   "SELECT project, COUNT(*) as changes FROM file_changes 
    GROUP BY project ORDER BY changes DESC;"
 ```
-</Accordion>
+
 
 ### Session duration tracking
 
 Measure how long sessions last:
 
-<Accordion title="Session duration tracker">
+
 
 Create `.factory/hooks/track-session.sh`:
 
@@ -317,7 +317,7 @@ sqlite3 ~/.factory/sessions.db \
   "SELECT session_id, duration_seconds / 60.0 as minutes FROM sessions 
    ORDER BY duration_seconds DESC LIMIT 10;"
 ```
-</Accordion>
+
 
 ## Advanced analytics
 
@@ -325,7 +325,7 @@ sqlite3 ~/.factory/sessions.db \
 
 Track when Droid is used most:
 
-<Accordion title="Usage heatmap generator">
+
 
 Create `.factory/hooks/usage-heatmap.py`:
 
@@ -400,13 +400,13 @@ Run periodically:
 # Add to weekly report
 ~/.factory/hooks/usage-heatmap.py
 ```
-</Accordion>
+
 
 ### Tool usage statistics
 
 Track which tools are used most:
 
-<Accordion title="Tool usage reporter">
+
 
 Create `.factory/hooks/tool-stats.sh`:
 
@@ -462,13 +462,13 @@ awk '{print $1}' ~/.factory/tool-usage.log | cut -d'T' -f1 | uniq -c
 # Usage by hour
 awk '{print $1}' ~/.factory/tool-usage.log | cut -d'T' -f2 | cut -d':' -f1 | sort | uniq -c
 ```
-</Accordion>
+
 
 ### Performance metrics
 
 Track hook execution performance:
 
-<Accordion title="Hook performance monitor">
+
 
 Create `.factory/hooks/perf-monitor.sh`:
 
@@ -512,13 +512,13 @@ sort -k4 -rn ~/.factory/hook-performance.log | head -10
 awk '{sum[$2]+=$4; count[$2]++} END {for (event in sum) print event, sum[event]/count[event] "s"}' \
   ~/.factory/hook-performance.log
 ```
-</Accordion>
+
 
 ### Cost tracking
 
 Monitor token usage and API costs:
 
-<Accordion title="Cost tracker">
+
 
 Create `.factory/hooks/track-costs.sh`:
 
@@ -602,13 +602,13 @@ sqlite3 ~/.factory/costs.db \
   "SELECT session_id, total_cost FROM costs 
    ORDER BY total_cost DESC LIMIT 10;"
 ```
-</Accordion>
+
 
 ### Generate weekly reports
 
 Compile usage reports:
 
-<Accordion title="Weekly report generator">
+
 
 Create `.factory/hooks/weekly-report.py`:
 
@@ -719,7 +719,7 @@ Schedule weekly:
 # Run every Monday at 9am
 # 0 9 * * 1 ~/.factory/hooks/weekly-report.py
 ```
-</Accordion>
+
 
 ## Best practices
 
@@ -781,8 +781,8 @@ Schedule weekly:
 
 ## Troubleshooting
 
-<AccordionGroup>
-  <Accordion title="Logs growing too large">
+
+  
     **Problem**: Log files consuming too much disk space
     
     **Solution**: Implement log rotation:
@@ -793,9 +793,9 @@ Schedule weekly:
     # Delete very old logs
     find ~/.factory -name "*.log.gz" -mtime +30 -delete
     ```
-  </Accordion>
   
-  <Accordion title="Database locked errors">
+  
+  
     **Problem**: SQLite database locked during concurrent access
     
     **Solution**: Use WAL mode and retry logic:
@@ -806,9 +806,9 @@ Schedule weekly:
     # Retry on busy
     sqlite3 db.db -cmd ".timeout 5000" "INSERT ..."
     ```
-  </Accordion>
   
-  <Accordion title="Logging slows down Droid">
+  
+  
     **Problem**: Hooks take too long
     
     **Solution**: Use async logging:
@@ -821,8 +821,8 @@ Schedule weekly:
     
     exit 0  # Return immediately
     ```
-  </Accordion>
-</AccordionGroup>
+  
+
 
 ## See also
 
