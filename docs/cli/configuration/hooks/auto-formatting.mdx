@@ -46,7 +46,6 @@ rustup component add rustfmt
 
 For a JavaScript/TypeScript project, add this to your `.factory/settings.json`:
 
-<Accordion title="TypeScript/JavaScript formatter hook">
 ```json
 {
   "hooks": {
@@ -65,13 +64,10 @@ For a JavaScript/TypeScript project, add this to your `.factory/settings.json`:
   }
 }
 ```
-</Accordion>
 
 ### Multi-language project
 
-For projects with multiple languages, use a script to handle different file types:
-
-<Accordion title="Multi-language formatter script">
+For projects with multiple languages, use a script to handle different file types.
 
 Create `.factory/hooks/format.sh`:
 
@@ -159,7 +155,6 @@ Add to `.factory/settings.json`:
   }
 }
 ```
-</Accordion>
 
 ## Advanced configurations
 
@@ -167,7 +162,6 @@ Add to `.factory/settings.json`:
 
 Use project-specific prettier config:
 
-<Accordion title="Custom prettier config hook">
 ```json
 {
   "hooks": {
@@ -186,13 +180,10 @@ Use project-specific prettier config:
   }
 }
 ```
-</Accordion>
 
 ### Format with linting
 
-Combine formatting with linting fixes:
-
-<Accordion title="Format and lint hook">
+Combine formatting with linting fixes.
 
 Create `.factory/hooks/format-and-lint.sh`:
 
@@ -245,11 +236,13 @@ esac
 exit 0
 ```
 
-Make executable and configure:
+Make the script executable:
 
 ```bash
 chmod +x .factory/hooks/format-and-lint.sh
 ```
+
+Add to `.factory/settings.json`:
 
 ```json
 {
@@ -269,13 +262,10 @@ chmod +x .factory/hooks/format-and-lint.sh
   }
 }
 ```
-</Accordion>
 
 ### Conditional formatting
 
-Only format files in specific directories:
-
-<Accordion title="Conditional formatting by directory">
+Only format files in specific directories.
 
 Create `.factory/hooks/format-src-only.sh`:
 
@@ -303,10 +293,32 @@ esac
 exit 0
 ```
 
+Make the script executable:
+
 ```bash
 chmod +x .factory/hooks/format-src-only.sh
 ```
-</Accordion>
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format-src-only.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ## Real-world examples
 

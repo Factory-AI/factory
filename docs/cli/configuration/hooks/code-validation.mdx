@@ -48,9 +48,7 @@ brew install gitleaks  # macOS
 
 ### Block sensitive file edits
 
-Prevent Droid from modifying critical files:
-
-<Accordion title="File protection hook">
+Prevent Droid from modifying critical files.
 
 Create `.factory/hooks/protect-files.sh`:
 
@@ -119,13 +117,10 @@ Add to `.factory/settings.json`:
   }
 }
 ```
-</Accordion>
 
 ### Validate TypeScript syntax
 
-Check TypeScript files for type errors before accepting edits:
-
-<Accordion title="TypeScript validation hook">
+Check TypeScript files for type errors before accepting edits.
 
 Create `.factory/hooks/validate-typescript.sh`:
 
@@ -192,15 +187,12 @@ For PostToolUse validation:
   }
 }
 ```
-</Accordion>
 
 ## Security validation
 
 ### Secret detection
 
-Prevent committing secrets and credentials:
-
-<Accordion title="Secret scanning hook">
+Prevent committing secrets and credentials.
 
 Create `.factory/hooks/scan-secrets.sh`:
 
@@ -273,13 +265,31 @@ exit 0
 ```bash
 chmod +x .factory/hooks/scan-secrets.sh
 ```
-</Accordion>
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/scan-secrets.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ### Dependency security scanning
 
-Check for vulnerable dependencies:
-
-<Accordion title="Dependency vulnerability check">
+Check for vulnerable dependencies.
 
 Create `.factory/hooks/check-deps.sh`:
 
@@ -334,15 +344,33 @@ exit 0
 ```bash
 chmod +x .factory/hooks/check-deps.sh
 ```
-</Accordion>
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-deps.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ## Code quality validation
 
 ### Enforce linting rules
 
-Validate code against linting rules before accepting changes:
-
-<Accordion title="Comprehensive linter hook">
+Validate code against linting rules before accepting changes.
 
 Create `.factory/hooks/lint-check.sh`:
 
@@ -408,13 +436,31 @@ exit 0
 ```bash
 chmod +x .factory/hooks/lint-check.sh
 ```
-</Accordion>
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/lint-check.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ### Complexity checks
 
-Reject overly complex code:
-
-<Accordion title="Code complexity validator">
+Reject overly complex code.
 
 Create `.factory/hooks/check-complexity.py`:
 
@@ -499,15 +545,33 @@ except Exception as e:
 chmod +x .factory/hooks/check-complexity.py
 pip install radon  # For Python complexity checking
 ```
-</Accordion>
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-complexity.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ## Advanced validation
 
 ### Custom business logic validation
 
-Enforce domain-specific rules:
-
-<Accordion title="Business logic validator">
+Enforce domain-specific rules.
 
 Create `.factory/hooks/validate-business-logic.sh`:
 
@@ -553,13 +617,31 @@ exit 0
 ```bash
 chmod +x .factory/hooks/validate-business-logic.sh
 ```
-</Accordion>
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/validate-business-logic.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ### Architecture compliance
 
-Ensure code follows architecture patterns:
-
-<Accordion title="Architecture validator">
+Ensure code follows architecture patterns.
 
 Create `.factory/hooks/check-architecture.py`:
 
@@ -633,7 +715,27 @@ except Exception as e:
 ```bash
 chmod +x .factory/hooks/check-architecture.py
 ```
-</Accordion>
+
+Add to `.factory/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-architecture.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ## Best practices
 
@@ -693,56 +795,54 @@ chmod +x .factory/hooks/check-architecture.py
 
 ## Troubleshooting
 
-<AccordionGroup>
-  <Accordion title="False positives">
-    **Problem**: Validation blocks legitimate code
-    
-    **Solution**: Add exclusion patterns:
-    ```bash
-    # Skip test files
-    if echo "$file_path" | grep -qE '\.(test|spec)\.(ts|js)$'; then
-      exit 0
-    fi
-    
-    # Skip generated files
-    if echo "$file_path" | grep -qE '(generated|\.gen\.)'; then
-      exit 0
-    fi
-    ```
-  </Accordion>
-  
-  <Accordion title="Validation too slow">
-    **Problem**: Hooks take too long to run
-    
-    **Solution**: Optimize validation:
-    ```bash
-    # Cache validation results
-    CACHE_FILE="/tmp/droid-validation-$(md5sum "$file_path" | cut -d' ' -f1)"
-    
-    if [ -f "$CACHE_FILE" ]; then
-      # File hasn't changed, use cached result
-      exit 0
-    fi
-    
-    # Run validation...
-    touch "$CACHE_FILE"
-    ```
-  </Accordion>
-  
-  <Accordion title="Inconsistent with CI">
-    **Problem**: Hook passes but CI fails
-    
-    **Solution**: Use same tools and configs:
-    ```bash
-    # Use exact same commands as CI
-    # .github/workflows/ci.yml:
-    #   npm run lint
-    
-    # Hook should run:
-    npm run lint "$file_path"
-    ```
-  </Accordion>
-</AccordionGroup>
+### False positives
+
+**Problem**: Validation blocks legitimate code
+
+**Solution**: Add exclusion patterns:
+```bash
+# Skip test files
+if echo "$file_path" | grep -qE '\.(test|spec)\.(ts|js)$'; then
+  exit 0
+fi
+
+# Skip generated files
+if echo "$file_path" | grep -qE '(generated|\.gen\.)'; then
+  exit 0
+fi
+```
+
+### Validation too slow
+
+**Problem**: Hooks take too long to run
+
+**Solution**: Optimize validation:
+```bash
+# Cache validation results
+CACHE_FILE="/tmp/droid-validation-$(md5sum "$file_path" | cut -d' ' -f1)"
+
+if [ -f "$CACHE_FILE" ]; then
+  # File hasn't changed, use cached result
+  exit 0
+fi
+
+# Run validation...
+touch "$CACHE_FILE"
+```
+
+### Inconsistent with CI
+
+**Problem**: Hook passes but CI fails
+
+**Solution**: Use same tools and configs:
+```bash
+# Use exact same commands as CI
+# .github/workflows/ci.yml:
+#   npm run lint
+
+# Hook should run:
+npm run lint "$file_path"
+```
 
 ## See also
 
