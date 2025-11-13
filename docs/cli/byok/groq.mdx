@@ -1,0 +1,39 @@
+---
+title: Groq
+description: Ultra-fast inference with Groq's LPU™ Inference Engine
+---
+
+Access ultra-fast inference powered by Groq's LPU™ (Language Processing Unit) Inference Engine for various open-source models.
+
+## Configuration
+
+Configuration examples for `~/.factory/config.json`:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Kimi K2 [Groq]",
+      "model": "moonshotai/kimi-k2-instruct-0905",
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_KEY",
+      "provider": "generic-chat-completion-api",
+      "max_tokens": 32000
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [groq.com](https://groq.com)
+2. Get your API key from [console.groq.com](https://console.groq.com)
+3. Browse available models in the [Groq documentation](https://console.groq.com/docs/overview.md)
+4. Add desired models to your configuration
+
+## Notes
+
+- Base URL format: `https://api.groq.com/openai/v1`
+- Groq uses the `generic-chat-completion-api` provider type
+- Known for extremely fast inference speeds thanks to LPU architecture
+- Supports streaming responses for compatible models
