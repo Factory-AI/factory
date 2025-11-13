@@ -4,6 +4,33 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="November 13" rss={{ title: "CLI Updates", description: "Execute tool streaming, enhanced hooks system, and MCP autonomy controls" }}>
+  `v0.25.0`
+
+  ## New features
+
+  * **Enhanced Hooks System** - Added 7 new hook types for complete lifecycle control:
+    * UserPromptSubmit - Modify or validate prompts before they're sent to the agent
+    * Stop - Execute custom logic when the agent completes (e.g., metrics collection)
+    * SubagentStop - Track and log subagent task completion
+    * PreCompact - Run custom logic before conversation compaction (can block compaction if needed)
+    * SessionStart - Initialize sessions and inject environment variables
+    * SessionEnd - Cleanup tasks when sessions end (triggered on logout, quit, Ctrl+C)
+  * **MCP Tool Autonomy Levels** - Granular control over MCP tool confirmations: low autonomy requires confirmation for read-only MCP tools, high autonomy requires confirmation for all MCP tool calls
+  * **Execute Tool Streaming** - Long-running commands now display the last two non-empty lines of output in real-time. No more wondering if Droid is stuck or slow.
+
+  ## Bug fixes
+
+  * Fixed paste handling in hooks UI - no more escape sequence artifacts when pasting commands
+  * Fixed message ID alignment after conversation compaction
+  * Fixed unfinished tool uses being cleared when switching providers to retry
+  * Fixed markdown prompt usage for GPT models
+  * Fixed /mcp rendering for narrow terminal windows
+  * Fixed bracketed paste handling when suspending TUI
+  * Authentication errors now appear directly in the CLI with clear error messages
+
+</Update>
+
 <Update label="November 12" rss={{ title: "CLI Updates", description: "Hooks system, interactive spec editing, and major performance improvements" }}>
   `v0.24.0`
 
