@@ -81,7 +81,7 @@ Key metadata fields:
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `name`        | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                  |
 | `description` | Optional. Shown in the UI list. Keep ≤500 chars.                                                                               |
-| `model`       | `inherit` (use parent session's model), or specify an available model name. Run `/models` in the CLI to see available options. |
+| `model`       | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`. Run `/models` in the CLI to see available options. |
 | `tools`       | Tool selection: `undefined` (all tools) or array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive.               |
 
 Prompts must start with YAML frontmatter containing at least `name` and include a non-empty body. `DroidValidator` surfaces errors (invalid names, unknown models, unknown tools) and warnings (missing description, duplicated tools). Validation issues appear in the CLI logs when a file fails to load.
