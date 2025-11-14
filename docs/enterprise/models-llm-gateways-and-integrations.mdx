@@ -39,12 +39,15 @@ Factory works with gateways in two ways:
 1. **Directly configured gateway endpoints**
    - `.factory/settings.json` can specify gateway base URLs for specific providers.
    - Environment variables can route calls (for example, `ANTHROPIC_BASE_URL`, `OPENAI_BASE_URL`).
+   - Custom models configured via [BYOK](/cli/configuration/byok) can point to gateway endpoints using `base_url` and provider‑specific settings, so the same gateway policy applies whether models are built‑in or custom.
 
 2. **Org‑level gateway policy**
    - Org admins can require that all model traffic go through specific gateways.
    - BYOK can be restricted so that only centrally managed keys and identities are used.
 
 When you use a gateway, **data handling and retention policies are those of the gateway and underlying providers**; Droid simply uses the endpoints and credentials you configure.
+
+For concrete examples of configuring custom models (including gateway‑backed models), see [Custom models & BYOK](/cli/configuration/byok), which covers the `custom_models` array in `~/.factory/config.json` and how those models appear in the `/model` selector.
 
 ---
 
