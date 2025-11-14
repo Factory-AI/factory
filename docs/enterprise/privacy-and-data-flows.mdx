@@ -23,16 +23,17 @@ How far each flow travels depends on whether you are in a **cloud‑managed**, *
 
 <CardGroup cols={3}>
   <Card title="Cloud‑managed" icon="cloud">
-    Droid runs on laptops and CI, talking to Factory’s cloud for orchestration and (optionally) analytics.
-    LLM requests go to your chosen model providers or LLM gateways.
+    Droid runs on laptops and CI, talking to Factory’s cloud for orchestration
+    and (optionally) analytics. LLM requests go to your chosen model providers
+    or LLM gateways.
   </Card>
   <Card title="Hybrid" icon="cloud-off">
-    Droid runs entirely inside your infra.
-    LLM and OTEL traffic terminate in your network; Factory cloud may only see minimal metadata if you enable it.
+    Droid runs entirely inside your infra. LLM and OTEL traffic terminate in
+    your network; Factory cloud may only see minimal metadata if you enable it.
   </Card>
   <Card title="Fully airgapped" icon="shield">
-    Droid, models, and collectors all live inside an isolated network.
-    No runtime dependency on Factory cloud; **no traffic leaves the environment**.
+    Droid, models, and collectors all live inside an isolated network. No
+    runtime dependency on Factory cloud; **no traffic leaves the environment**.
   </Card>
 </CardGroup>
 
@@ -74,7 +75,6 @@ If you instead configure your own endpoints—LLM gateways, self‑hosted models
 
 ### How Droid interacts with models
 
-- Droid uses **your keys and endpoints** for all model calls.
 - Org and project policies decide **which models and gateways are allowed**, and whether users can bring their own keys.
 - In high‑security settings, orgs commonly:
   - Prefer direct enterprise endpoints (for example, Azure OpenAI, AWS Bedrock, Google Vertex AI, OpenAI Enterprise, Anthropic/Claude Enterprise, Gemini Enterprise) to get first‑party zero‑retention guarantees.
@@ -87,7 +87,7 @@ See [Models, LLM Gateways & Integrations](/enterprise/models-llm-gateways-and-in
 
 ## Telemetry and analytics
 
-Telemetry is how you understand *what* Droid is doing and *where*. Factory treats OpenTelemetry as the primary interface for this.
+Telemetry is how you understand _what_ Droid is doing and _where_. Factory treats OpenTelemetry as the primary interface for this.
 
 ### OTEL as the source of truth
 
