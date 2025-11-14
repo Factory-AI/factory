@@ -42,14 +42,16 @@ How far each flow travels depends on whether you are in a **cloud‑managed**, *
 
 Droid is a filesystem‑native agent:
 
-- It reads your code, configuration, and test files **directly from the local filesystem**.
-- It generates patches and applies edits on disk, using git as the source of truth where available.
-- It never needs to upload entire repositories to Factory for basic operation.
+- It reads your code, configuration, and test files **directly from the local filesystem** at the moment they’re needed.
+- It uses LLMs to analyze existing code and generate new code, then applies patches on disk, with git as the source of truth where available.
+- It does **not** upload or index your codebase into a remote datastore; there is no static or “cold” copy of your repository stored in Factory cloud.
 
 In all deployment patterns:
 
-- **File reads and writes remain local** to the environment where Droid runs (developer machine, CI runner, VM, or container).
-- If you use hooks or Droid Shield to integrate with DLP systems, only the data those systems require will be forwarded.
+- The **agent loop and runtime execute entirely on the machine** where Droid runs (developer workstation, CI runner, VM, or container).
+- File contents can be included in LLM requests as context, so the data path for code always follows the same LLM request pipeline described below.
+- **File reads and writes remain local** to that environment; only the portions you choose to include in prompts leave the machine, and only to the model endpoints you configure.
+- Hooks and Droid Shield run locally inside that agent loop. By default they behave like local SAST / policy checks; they only send data off the machine if you explicitly configure a hook to call an external service.
 
 You control which files and directories Droid can see through standard OS permissions and your repository layout. See [LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls) for additional file‑level protections.
 
@@ -57,7 +59,11 @@ You control which files and directories Droid can see through standard OS permis
 
 ## LLM requests and model‑specific guarantees
 
-When Droid needs model output, it sends prompts and context to **your configured models and LLM gateways**. The privacy guarantees of those calls are determined by the providers and contracts you select.
+When Droid needs model output, it sends prompts and context to **your configured models and LLM gateways**.
+
+By default, Droid can target **enterprise‑grade endpoints** for providers like Azure OpenAI, AWS Bedrock, Google Vertex AI, OpenAI, Anthropic, and Gemini, using contracts that support zero data retention and enterprise privacy controls. In these configurations, Factory routes traffic **directly** to the provider’s official APIs; we do not proxy this traffic through third‑party services or store prompts and responses in Factory cloud.
+
+If you instead configure your own endpoints—LLM gateways, self‑hosted models, or generic HTTP APIs—the privacy guarantees are entirely determined by those systems and your agreements with them; Factory does not add additional protections on top.
 
 ### Model and gateway options
 
@@ -70,10 +76,10 @@ When Droid needs model output, it sends prompts and context to **your configured
 
 - Droid uses **your keys and endpoints** for all model calls.
 - Org and project policies decide **which models and gateways are allowed**, and whether users can bring their own keys.
-- In high‑security settings, orgs typically:
-  - Allow only enterprise ZDR‑style models or internal gateways.
-  - Disable user‑supplied keys entirely.
-  - Route all LLM traffic through a central audited gateway.
+- In high‑security settings, orgs commonly:
+  - Prefer direct enterprise endpoints (for example, Azure OpenAI, AWS Bedrock, Google Vertex AI, OpenAI Enterprise, Anthropic/Claude Enterprise, Gemini Enterprise) to get first‑party zero‑retention guarantees.
+  - Disable ad‑hoc user‑supplied keys and generic internet endpoints.
+  - Treat any LLM gateways or self‑hosted models as in‑scope security systems, subject to the same reviews and monitoring as other critical services.
 
 See [Models, LLM Gateways & Integrations](/enterprise/models-llm-gateways-and-integrations) for configuration details.
 
@@ -96,7 +102,7 @@ In cloud‑managed deployments, you can opt into Factory’s own analytics dashb
 - Aggregate anonymized usage metrics to show adoption, model usage, and cost trends.
 - Surface per‑org and per‑team insights for platform and leadership teams.
 
-These analytics are optional; org administrators decide whether to enable them. In hybrid and fully airgapped deployments, **OTEL to your own stack is the primary—and often only—telemetry path**.
+These analytics are optional; org administrators decide whether to enable them.
 
 For more on signals and schema, see [Usage, Cost & Productivity Analytics](/enterprise/usage-cost-and-analytics) and [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
 
