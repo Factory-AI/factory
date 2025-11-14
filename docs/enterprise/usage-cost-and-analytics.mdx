@@ -1,0 +1,114 @@
+---
+title: Usage, Cost & Productivity Analytics
+description: How to measure Droid adoption, control LLM spend, and understand impact using OpenTelemetry and optional Factory dashboards.
+---
+
+# Usage, Cost & Productivity Analytics
+
+Enterprise adoption requires more than a good developer experience—you need to understand **who is using Droid, on what, and at what cost**.
+
+Factory is built around **OpenTelemetry (OTEL)** so you can plug Droid directly into your existing observability stack, with optional cloud analytics for organizations that want a hosted view.
+
+---
+
+## OTEL‑native metrics and traces
+
+Droid emits OTEL signals that capture how it is used across your org.
+
+### Key metric families
+
+Examples of metric categories include:
+
+- **Session metrics**
+  - Counts of interactive and headless sessions.
+  - Session duration and active engagement time.
+
+- **LLM usage metrics**
+  - Tokens in/out per model and provider.
+  - Request counts and latencies.
+  - Error rates and retry behavior.
+
+- **Tool usage metrics**
+  - Tool invocations and execution time.
+  - Success/failure rates.
+  - Command risk levels proposed and executed.
+
+- **Code modification metrics**
+  - Files and lines modified, created, or deleted.
+  - Distribution across repositories and teams.
+
+### Traces and spans
+
+Traces can show the lifecycle of a session or automation run:
+
+- Session start → prompt construction → LLM call → tool execution → code edits → validation.
+- Spans capture timing and metadata for each step, including model choice, tools invoked, and error conditions.
+
+These signals allow you to build dashboards in systems like **Prometheus, Grafana, Datadog, New Relic, or Splunk** without depending on a proprietary analytics service.
+
+For a deeper look at the telemetry schema and how it supports compliance and audits, see [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
+
+---
+
+## Factory cloud analytics (optional)
+
+In cloud‑managed deployments, Factory can provide a **hosted analytics view** for platform and leadership teams.
+
+Typical views include:
+
+- Adoption metrics by org, team, and repository.
+- Model usage and performance trends.
+- High‑level cost estimates for LLM usage.
+- Top workflows and droids by frequency.
+
+These dashboards are built on top of the same signals Droid emits via OTEL; enabling them does not change the underlying telemetry model.
+
+Hybrid and fully airgapped deployments commonly rely solely on **customer‑owned OTEL pipelines** and disable hosted analytics entirely.
+
+---
+
+## Cost management strategies
+
+LLM cost control is a combination of **model policy**, **usage patterns**, and **observability**.
+
+Recommended practices:
+
+<AccordionGroup>
+  <Accordion title="Constrain the model catalog">
+    Use org‑level policies to limit which models are available.
+
+    - Prefer smaller models for everyday tasks; reserve large models for complicated refactors or design work.
+    - Disable experimental or high‑cost models by default.
+    - Enforce model choices per environment (for example, cheaper models in CI).
+  </Accordion>
+
+  <Accordion title="Tune autonomy and context usage">
+    Higher autonomy and larger context windows consume more tokens.
+
+    - Set reasonable defaults for autonomy level and reasoning effort.
+    - Use hooks to cap context size or block unnecessary large prompts.
+    - Encourage teams to iterate with tighter scopes (for example, specific directories instead of entire monorepos).
+  </Accordion>
+
+  <Accordion title="Use OTEL for cost monitoring">
+    Feed token and request metrics into your observability stack.
+
+    - Build per‑team and per‑model dashboards.
+    - Alert on unusual spikes in usage.
+    - Compare cost curves before and after policy changes.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Measuring productivity impact
+
+Cost only matters in the context of outcomes. With OTEL, you can correlate Droid usage with **software delivery and quality metrics** you already track.
+
+Common approaches:
+
+- Link OTEL traces for Droid sessions with CI builds, test runs, and deployment pipelines.
+- Measure how often Droid is involved in changes that reduce incidents, resolve alerts, or improve test coverage.
+- Use code modification metrics to estimate automation impact (for example, lines of code refactored or migrated).
+
+These analyses are done entirely in your existing observability and analytics stack; Factory’s role is to provide clean, structured signals from Droid.

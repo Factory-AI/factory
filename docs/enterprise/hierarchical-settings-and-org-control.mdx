@@ -1,0 +1,190 @@
+---
+title: Hierarchical Settings & Org Control
+description: How org, project, folder, and user settings combine to control models, tools, safety policies, and telemetry for Droid.
+---
+
+# Hierarchical Settings & Org Control
+
+Factory’s enterprise story is built on a **single, predictable settings hierarchy**. Instead of ad‑hoc per‑machine configuration, orgs express policy once and have it apply consistently across laptops, CI, VMs, and airgapped environments.
+
+This page explains how the hierarchy works and how to use it to govern models, tools, safety policies, and telemetry.
+
+---
+
+## The four levels
+
+Settings are defined in `.factory/` folders with a consistent structure at four levels:
+
+```text
+Org         → Central `.factory/` bundle (or config endpoint)
+Project     → <git-root>/.factory/
+Folder      → <git-root>/.../subfolder/.factory/
+User        → ~/.factory/
+```
+
+Each `.factory/` folder can contain:
+
+- `settings.json` – general settings (models, safety, preferences, telemetry).
+- `mcp.json` – MCP server configurations.
+- `droids/` – droid definitions.
+- `commands/` – custom commands.
+- `hooks/` – hook definitions.
+
+The **same schema** applies at every level. What changes is **precedence**.
+
+---
+
+## Extension‑only semantics
+
+Factory uses **extension‑only** semantics instead of traditional “override” behavior.
+
+- Higher levels (org, project) **cannot be overridden** by lower levels.
+- Lower levels (folder, user) can only **add** to what higher levels define when those fields are unset.
+- This ensures org policies remain intact even as projects and users customize their experience.
+
+There are three merge modes depending on the data type.
+
+### 1. Simple values – first wins
+
+For simple scalar values (strings, numbers, booleans):
+
+- The first level that sets a value “wins.”
+- Lower levels cannot change or remove that value.
+
+Examples:
+
+- `sessionDefaults.model`
+- `sessionDefaults.autonomyLevel`
+- `maxAutonomyLevel`
+
+This guarantees that org decisions (such as which models or autonomy levels are allowed) remain authoritative.
+
+### 2. Arrays – union, cannot remove
+
+Array fields accumulate across levels:
+
+- Org entries are always present and **cannot be removed**.
+- Project and folder levels can add more entries.
+- User level can add more entries but cannot remove or weaken higher‑level entries.
+
+Examples:
+
+- Command **allow lists** and **deny lists**.
+- Lists of enabled hooks or features.
+
+This pattern is ideal for policies like “these commands are always denied” or “these hooks are always enabled,” while still allowing teams to extend the list.
+
+### 3. Objects – keys are locked per level
+
+For object fields:
+
+- Keys defined at a higher level are **locked**; their contents cannot be changed by lower levels.
+- Lower levels can add new keys but not modify or delete existing ones.
+
+Examples:
+
+- `customModels` – org defines `claude-enterprise`; projects can add `payments-gpt`, users can add `personal-experimental`, but none can change or remove `claude-enterprise`.
+- MCP server definitions – org defines which servers exist and how they connect; projects decide which to use.
+
+This keeps critical configuration (like model endpoints and MCP servers) under centralized control.
+
+---
+
+## Org configuration
+
+Large organizations typically manage an **org‑level `.factory` bundle** or config endpoint that:
+
+- Specifies allowed models, gateways, and BYOK policies.
+- Defines global command allow/deny lists.
+- Sets defaults for autonomy, reasoning effort, and safety features like Droid Shield.
+- Configures OTEL defaults (endpoints, sampling, and attributes).
+- Publishes org‑standard droids, commands, and hooks.
+
+This bundle is distributed to all environments where Droid runs—developer machines, CI, VMs, and airgapped clusters.
+
+Org policy is the foundation; projects and users build on top of it.
+
+---
+
+## Project and folder configuration
+
+Projects and folders use `.factory/` directories checked into version control to specialize org policy for particular codebases and teams.
+
+Common responsibilities include:
+
+- Adding project‑specific models and gateways within the allowed set.
+- Defining project‑specific droids (for example, `/migrate-service`, `/refactor-module`).
+- Configuring hooks that know about the project’s tests, linters, and deployment processes.
+- Tightening safety controls for high‑risk repositories.
+
+Folder‑level `.factory/` directories are useful in monorepos where different subsystems have different policies.
+
+---
+
+## User configuration
+
+Developers can configure `~/.factory/` for **personal preferences only** where higher levels are silent.
+
+Examples:
+
+- Choosing a preferred model from the allowed set.
+- Setting default behavior for display options and minor UX preferences.
+- Enabling additional hooks or tools that do not conflict with org policy.
+
+Because of extension‑only semantics, users cannot:
+
+- Re‑enable models or tools that org or project settings have disallowed.
+- Loosen command allow/deny lists.
+- Reduce autonomy or safety requirements set by org or project.
+
+---
+
+## Example: enforcing a model policy
+
+Suppose your org wants to:
+
+- Allow only approved enterprise models.
+- Disallow user‑supplied API keys.
+- Force all prompts through a particular LLM gateway.
+
+You would:
+
+1. Define the allowed models and gateway endpoints in the org `.factory/settings.json`.
+2. Set a policy flag to disable user BYOK entirely.
+3. Configure hooks to verify that any model selection or endpoint use matches the org‑approved set.
+
+Projects and users can still choose **which of the approved models** to use for different tasks, but cannot break these guarantees.
+
+---
+
+## Example: environment‑specific autonomy
+
+Consider an org that wants to:
+
+- Allow high autonomy in CI and sandboxed containers.
+- Limit autonomy on developer laptops.
+
+You could:
+
+1. At org level, set `maxAutonomyLevel` to `high`.
+2. In project settings, define environment‑aware hooks that:
+   - Inspect environment tags (for example, `environment.type=local|ci|sandbox`).
+   - Downgrade or block autonomy levels above `medium` when running on laptops.
+3. Optionally, define stricter folder‑level policies for particularly sensitive repos.
+
+Again, users cannot override these rules; they can only choose safer personal defaults within the allowed space.
+
+---
+
+## Putting it all together
+
+The hierarchical settings system underpins everything described in the other enterprise pages:
+
+- [Identity & Access Management](/enterprise/identity-and-access) – who can change which level of settings.
+- [Privacy, Data Flows & Governance](/enterprise/privacy-and-data-flows) – where data and telemetry are allowed to go.
+- [Network & Deployment Configuration](/enterprise/network-and-deployment) – which environments Droid can run in and how it connects.
+- [LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls) – policies for commands, tools, and Droid Shield.
+- [Models, LLM Gateways & Integrations](/enterprise/models-llm-gateways-and-integrations) – control over models, gateways, MCP servers, droids, and commands.
+- [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring) – guarantees and telemetry used to prove compliance.
+
+By expressing policy once at the right level, you can run Droid across cloud, hybrid, and airgapped environments **without per‑machine drift or one‑off configuration**.

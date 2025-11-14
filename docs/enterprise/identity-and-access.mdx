@@ -1,0 +1,125 @@
+---
+title: Identity & Access Management
+description: How Droids use org, project, and user identity to control who can run agents, where, and with which permissions.
+---
+
+# Identity & Access Management
+
+Identity and access management controls **who can run Droid**, in which environments, and under what policies.
+
+This page provides an overview of the identity model, roles, and environments; detailed SSO and SCIM setup instructions live in [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
+
+---
+
+## Identity model
+
+Every Droid run is associated with three dimensions of identity:
+
+<CardGroup cols={2}>
+  <Card title="User or machine identity" icon="user">
+    Human developers authenticate via SSO (SAML/OIDC), inheriting their directory groups and roles.
+    Automation (CI/CD, scheduled jobs) runs under **machine identities** with long‑lived tokens or workload identities.
+  </Card>
+  <Card title="Org / project / folder" icon="folders">
+    The active repo and `.factory/` folders determine the **org, project, and folder context**.
+    Policies at these levels decide which models, tools, and integrations Droid may use.
+  </Card>
+  <Card title="Runtime environment" icon="server">
+    Whether Droid is running on a laptop, in a CI runner, or in a sandboxed VM/devcontainer is captured as environment attributes.
+    Policies can treat these differently (for example, higher autonomy only in CI or sandboxes).
+  </Card>
+  <Card title="Session metadata" icon="activity">
+    Each Droid session records metadata such as session ID, CLI version, and git branch, which is available for audit and OTEL telemetry.
+  </Card>
+</CardGroup>
+
+---
+
+## Org identity and SSO (overview)
+
+Most enterprises integrate Factory with an identity provider (IdP) such as **Okta, Azure AD, or Google Workspace**.
+
+At a high level:
+
+- **Org membership** is derived from IdP groups mapped to Factory organizations and teams.
+- **SSO sign‑in** gives developers access to both the web platform and Droid using corporate credentials.
+- **Role information** (for example, `Owner`, `Admin`, `Member`) flows from IdP groups into Factory roles.
+
+For step‑by‑step SSO and SCIM configuration—including setting up the IdP application, mapping attributes, and enabling provisioning—see [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
+
+---
+
+## Role‑based access control (RBAC)
+
+Factory distinguishes between three broad classes of actors:
+
+- **Org administrators**
+  - Define org‑level `.factory` configuration, including model policies, global command allow/deny lists, and default telemetry targets.
+  - Decide which deployment patterns (cloud, hybrid, airgapped) are supported and where Droid binaries may run.
+  - Configure security features such as maximum autonomy level and whether user‑supplied BYOK keys are allowed.
+
+- **Project owners / maintainers**
+  - Own project‑level `.factory/` folders that live in version control.
+  - Provide team‑specific models, droids, commands, and hooks that extend org policy without weakening it.
+  - Configure project‑specific policies, for example limiting Droid to certain repositories or directories.
+
+- **Developers**
+  - Customize personal preferences in `~/.factory/` (for example, default model choice within the allowed set).
+  - Run Droid locally, in IDEs, or via team‑provided scripts and CI jobs.
+  - Cannot override any setting defined at org or project level.
+
+Role assignment flows from your IdP into Factory; the **hierarchical settings engine** enforces what each role can effectively change. See [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) for the exact precedence rules.
+
+---
+
+## Devices, environments, and workspace trust
+
+Because Droid is a CLI, it can run in many environments:
+
+- Developer laptops (macOS, Linux, Windows)
+- Remote dev servers or workspaces
+- CI runners and build agents
+- Hardened VMs and devcontainers
+
+Enterprise customers typically combine Droid with **endpoint management** and **workspace trust** controls:
+
+<AccordionGroup>
+  <Accordion title="Endpoint & MDM controls">
+    Use tools like **Jamf, Intune, or other MDM solutions** to control where Droid binaries can be installed, which users can run them, and which configuration files they can read.
+
+    Common patterns include:
+
+    - Only allowing Droid to run under managed user accounts.
+    - Restricting configuration directories to corporate‑managed volumes.
+    - Enforcing OS‑level disk encryption and screen lock policies.
+  </Accordion>
+
+  <Accordion title="Workspace trust">
+    Treat Droid as trusted only in **known repositories and environments**:
+
+    - Pin Droid to specific paths or repos on developer machines.
+    - Require elevated approval or sandboxed environments for untrusted code.
+    - Use project‑level `.factory/` folders to mark which repos are "Droid‑ready" and what policies should apply.
+  </Accordion>
+
+  <Accordion title="Environment‑aware policies">
+    The same developer may run Droid in multiple contexts: on their laptop, in CI, or in an isolated container.
+
+    Policies can take these differences into account:
+
+    - Allow higher autonomy or more powerful tools **only** inside devcontainers or CI runners.
+    - Restrict network access or command execution when running on laptops.
+    - Tag OTEL telemetry with environment attributes to support environment‑specific alerting.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## How identity flows into policy and telemetry
+
+Identity and environment information are used in two main ways:
+
+1. **Policy evaluation** – hierarchical settings (org → project → folder → user) use identity to determine which configuration bundle applies to a given run.
+2. **Telemetry and audit** – Droid emits OTEL metrics, traces, and logs with attributes like `user.id`, `team.id`, `session.id`, and environment tags so you can build per‑org and per‑team dashboards.
+
+For details on how these identities are encoded in telemetry, see [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
