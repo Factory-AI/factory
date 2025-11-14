@@ -5,7 +5,9 @@ description: How Droids use org, project, and user identity to control who can r
 
 # Identity & Access Management
 
-Identity and access management controls **who can run Droid**, in which environments, and under what policies. This page explains how SSO, roles, and hierarchical settings work together to keep usage predictable in large organizations.
+Identity and access management controls **who can run Droid**, in which environments, and under what policies.
+
+This page provides an overview of the identity model, roles, and environments; detailed SSO and SCIM setup instructions live in [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
 
 ---
 
@@ -33,15 +35,17 @@ Every Droid run is associated with three dimensions of identity:
 
 ---
 
-## Org identity and SSO
+## Org identity and SSO (overview)
 
-Most enterprises integrate Factory with an identity provider (IdP) such as **Okta, Azure AD, or Google Workspace**. At a high level:
+Most enterprises integrate Factory with an identity provider (IdP) such as **Okta, Azure AD, or Google Workspace**.
+
+At a high level:
 
 - **Org membership** is derived from IdP groups mapped to Factory organizations and teams.
-- **SSO sign‑in** gives developers access to both the web platform and Droid, using the same corporate credentials.
-- **Role information** (for example, `Owner`, `Admin`, `Member`) is derived from IdP groups and controls who may manage policies.
+- **SSO sign‑in** gives developers access to both the web platform and Droid using corporate credentials.
+- **Role information** (for example, `Owner`, `Admin`, `Member`) flows from IdP groups into Factory roles.
 
-For detailed SSO setup and onboarding steps, see your onboarding documentation; this page focuses on how those identities are enforced when running Droid.
+For step‑by‑step SSO and SCIM configuration—including setting up the IdP application, mapping attributes, and enabling provisioning—see [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
 
 ---
 

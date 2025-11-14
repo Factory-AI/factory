@@ -1,0 +1,194 @@
+---
+title: SSO, IdP & SCIM Provisioning
+description: How to integrate Factory with your Identity Provider using SAML/OIDC SSO and SCIM to manage access to Droids at scale.
+---
+
+# SSO, IdP & SCIM Provisioning
+
+This page describes how to connect Factory to your **Identity Provider (IdP)** and keep access to Droids synchronized using **SSO and SCIM**.
+
+It is IdP‑agnostic and applies to Okta, Azure AD, Google Workspace, and other enterprise identity platforms.
+
+---
+
+## Overview
+
+Factory supports two main identity integrations:
+
+- **SAML 2.0 / OIDC SSO** – developers sign in with corporate credentials; no separate Factory password.
+- **SCIM 2.0 provisioning** – users and groups are created, updated, and removed automatically from your IdP.
+
+Together, these give you:
+
+- Centralized control over who can access Factory and Droids.
+- Automatic deprovisioning when people leave or change roles.
+- Consistent role and group mappings across web, CLI, and automation.
+
+The high‑level flow is:
+
+1. Configure an SSO application for Factory in your IdP.
+2. Map IdP attributes (email, name, groups) into Factory.
+3. Enable SCIM for automatic user and group provisioning (optional but recommended).
+4. Map directory groups to Factory orgs, teams, and roles.
+
+---
+
+## Prerequisites
+
+Before setting up SSO and SCIM:
+
+- You are on a plan that includes **enterprise SSO support**.
+- You have **admin access** to your IdP (or a partner in IT who does).
+- You have a **Factory admin** who can coordinate configuration on the Factory side.
+
+We generally recommend treating SSO + SCIM as a joint effort between your **security/IT** and **platform/dev‑prod** teams.
+
+---
+
+## SSO configuration (IdP‑agnostic)
+
+Factory supports both **SAML 2.0** and **OIDC**. The exact UI varies by IdP, but the concepts are the same.
+
+### 1. Create a Factory application in your IdP
+
+In your IdP admin console:
+
+1. Create a new application for **Factory**.
+2. Choose **SAML** or **OIDC** as the protocol (Factory supports both; your account team can recommend one based on your environment).
+3. Assign the application to a small test group of users first (for example, `factory-pilot-users`).
+
+Your Factory contact will provide or confirm:
+
+- The **redirect / callback URL** for SSO.
+- The **entity ID / client ID** and any other required metadata.
+
+### 2. Configure SAML/OIDC metadata
+
+In the IdP application you just created:
+
+- For **SAML**:
+  - Set the **Assertion Consumer Service (ACS) URL** / Single Sign‑On URL to the value provided by Factory.
+  - Set the **Entity ID** / Audience URI as provided by Factory.
+  - Configure the NameID format and attributes as recommended (typically email address as the primary identifier).
+
+- For **OIDC**:
+  - Use the Factory‑provided **client ID** and **redirect URI**.
+  - Configure the **scopes** to include at least `openid`, `profile`, and `email`.
+
+Factory will consume the IdP metadata (SAML XML or OIDC discovery configuration) and establish the trust relationship.
+
+### 3. Map attributes and groups
+
+Next, configure which attributes your IdP sends to Factory in the SAML assertion or OIDC ID token.
+
+We recommend at least:
+
+- **Email** – primary unique identifier (for example, `user.userprincipalname`, `user.mail`).
+- **Display name** – used in UI (for example, `user.displayname`).
+- **Groups or roles** – used to map users into Factory orgs and roles.
+
+Common patterns include groups such as:
+
+- `factory-org-owners`
+- `factory-org-admins`
+- `factory-users`
+- `factory-ci-bots`
+
+These groups can be mapped on the Factory side to **Owner**, **Admin**, and **Member** roles, and to specific orgs or teams.
+
+### 4. Test the connection
+
+Once metadata and attributes are configured:
+
+1. Use a test user in your IdP who is assigned to the Factory application.
+2. Initiate login from the Factory sign‑in page using “Sign in with SSO” / your IdP button.
+3. Verify that:
+   - The user is redirected to the IdP, authenticates, and returns to Factory.
+   - The user lands in the correct org/team with the expected role.
+
+If anything fails, check the IdP’s logs and Factory’s error message; most issues are due to mismatched URLs, certificates, or attribute mappings.
+
+---
+
+## SCIM provisioning
+
+SSO controls **how users authenticate**; SCIM controls **which users and groups exist** in Factory.
+
+With SCIM enabled:
+
+- New employees in relevant IdP groups get access to Factory automatically.
+- Users removed from those groups lose access automatically.
+- Group membership changes propagate into Factory without manual updates.
+
+### 1. Enable SCIM in Factory
+
+Your Factory admin (or account team) will:
+
+- Enable SCIM for your organization.
+- Provide a **SCIM base URL** and **SCIM bearer token** for your IdP.
+
+Treat the SCIM token as a secret; store it only in your IdP’s application configuration.
+
+### 2. Configure SCIM in your IdP
+
+In your IdP’s SCIM settings for the Factory application:
+
+1. Enable **automatic provisioning**.
+2. Paste the **SCIM base URL** and **SCIM token** from Factory.
+3. Choose which users and groups to sync (for example, only `factory-*` groups).
+4. Configure attribute mappings if required (for example, `userName` → email, `displayName` → name).
+
+Once enabled, your IdP will start pushing users and groups to Factory and keep them synchronized.
+
+### 3. Map directory groups to Factory roles
+
+With SCIM in place, group management should happen **only in your IdP**.
+
+Use group naming and mapping rules such as:
+
+- `factory-org-owners` → Factory org Owners.
+- `factory-org-admins` → Factory org Admins.
+- `factory-users` → Factory Members.
+- `factory-ci-bots` → machine/service accounts with restricted permissions.
+
+This keeps RBAC definitions in one place (your IdP) and lets you audit them alongside other enterprise apps.
+
+---
+
+## Service accounts and CI access
+
+Most organizations also need **non‑human identities** for CI/CD and automation.
+
+Recommended pattern:
+
+- Create **dedicated CI groups** (for example, `factory-ci-bots`).
+- Provision CI accounts via SCIM into Factory using those groups.
+- Issue tokens for CI workflows scoped to the relevant orgs/teams.
+
+This keeps human and machine access clearly separated while still benefiting from centralized provisioning and deprovisioning.
+
+---
+
+## Troubleshooting & best practices
+
+Common issues and recommendations:
+
+- **Login loops or failures**
+  - Verify ACS / redirect URLs exactly match what Factory provided.
+  - Confirm certificates or signing keys have not expired or been rotated without updating Factory.
+
+- **User lands in wrong org or role**
+  - Check group memberships and mapping rules.
+  - Ensure the intended groups are included in SAML assertions or ID tokens.
+
+- **Provisioning not working**
+  - Confirm SCIM is enabled in both Factory and your IdP.
+  - Check SCIM logs in your IdP for errors (invalid token, URL, or schema).
+
+Best practices:
+
+- Keep a **small pilot group** for initial rollout and future changes.
+- Use **clear, prefix‑based group names** (for example, `factory-*`) to keep IdP configuration maintainable.
+- Manage all role changes and access reviews in your IdP to leverage existing governance processes.
+
+Once SSO and SCIM are in place, the **Identity & Access Management** overview explains how these identities are enforced at runtime for Droids.
