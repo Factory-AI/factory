@@ -17,6 +17,28 @@ Use skills when you want the agent to:
 - **Be consistent across sessions** – run the same playbook every time you ask for "frontend change" or "new service integration".
 - **Scale safely** – let more people use automation without needing to be experts in the codebase or infrastructure.
 
+<Steps>
+  <Step title="Create a skill folder">
+    Under your repo, create a directory in `.factory/skills/`, for example
+    `.factory/skills/frontend-ui-integration/`.
+  </Step>
+  <Step title="Add SKILL.md or skill.mdx">
+    Inside the folder, create `SKILL.md` or `skill.mdx` with YAML frontmatter
+    (`name`, `description`) and markdown instructions that define the
+    capability, inputs, and success criteria.
+  </Step>
+  <Step title="Add supporting files (optional)">
+    Co-locate any types, schemas, or checklists the Droid should use when the
+    skill is active (for example `types.ts`, `schemas/`, or
+    `rollout-checklist.md`).
+  </Step>
+  <Step title="Restart and use">
+    Restart `droid` or your integration so it rescans skills, then describe
+    your task normally. The Droid will automatically invoke matching skills
+    when they apply.
+  </Step>
+</Steps>
+
 ## What is a skill?
 
 At the file-system level, a skill is a **directory** (e.g. `.factory/skills/frontend-ui-integration/`) that contains:
@@ -126,6 +148,41 @@ See the following examples:
 - `cli/configuration/skills/service-integration` – Skill for extending an existing service and wiring it into a complex monorepo
 - `cli/configuration/skills/data-querying` – Skill for safely querying internal data services and producing shareable artifacts
 - `cli/configuration/skills/internal-tools` – Skill for building or extending internal tools (admin panels, support consoles, engineering utilities)
+
+<CardGroup cols={2}>
+  <Card
+    title="Frontend UI integration"
+    href="/cli/configuration/skills/frontend-ui-integration"
+    icon="layout"
+  >
+    Implement typed, tested frontend flows against existing backend APIs using
+    your design system, routing, and testing conventions.
+  </Card>
+  <Card
+    title="Service integration in complex codebases"
+    href="/cli/configuration/skills/service-integration"
+    icon="layers"
+  >
+    Extend or wire backend services in a shared monorepo while respecting
+    ownership boundaries, observability, and rollout requirements.
+  </Card>
+  <Card
+    title="Internal data querying"
+    href="/cli/configuration/skills/data-querying"
+    icon="database"
+  >
+    Safely query internal analytics and data services, producing reproducible
+    queries and shareable analysis artifacts.
+  </Card>
+  <Card
+    title="Internal tools"
+    href="/cli/configuration/skills/internal-tools"
+    icon="settings"
+  >
+    Build or extend internal-facing tools (admin panels, consoles, utilities)
+    with strong RBAC, audit logging, and operational safeguards.
+  </Card>
+</CardGroup>
 
 In practice, each skill folder can also contain **supporting utilities** the agent may use alongside the core prompt template – for example:
 
