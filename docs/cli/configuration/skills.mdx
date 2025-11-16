@@ -63,17 +63,30 @@ Each **skill** lives in its own directory under one of these roots:
 - Workspace: `<repo>/.factory/skills/<skill-name>/SKILL.md`
 - Personal: `~/.factory/skills/<skill-name>/SKILL.md`
 
-In large monorepos, keep all skills under the root `.factory/skills/` directory and organize them by folder name, for example:
+In large monorepos, you can either:
 
-```text
-.factory/skills/
-  frontend/
-    SKILL.md
-  payments-service/
-    SKILL.md
-  data-warehouse-querying/
-    SKILL.md
-```
+- Keep a **single, shared** skills folder at the root:
+
+  ```text
+  .factory/skills/
+    frontend/
+      SKILL.md
+    payments-service/
+      SKILL.md
+    data-warehouse-querying/
+      SKILL.md
+  ```
+
+- Or add **per-project** `.factory` folders so skills live alongside each subproject:
+
+  ```text
+  services/payments/.factory/skills/
+    payments-service/
+      SKILL.md
+  apps/frontend/.factory/skills/
+    dashboard-ui/
+      SKILL.md
+  ```
 
 Project skills are the primary way to share and standardize capabilities inside an engineering org; personal skills are ideal for individual workflows or experiments.
 
