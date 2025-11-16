@@ -30,40 +30,7 @@ Skills are **model-invoked**: the Droid decides when to use them based on the sk
 
 ## Skill file format
 
-Skills are defined in Markdown with YAML frontmatter.
-
-```md
----
-name: frontend-ui-integration
-description: Implement typed, tested frontend flows against existing backend APIs.
----
-
-# Frontend UI integration
-
-## Instructions
-
-Implement or extend a user-facing workflow in our primary web application.
-
-- Use existing design system components
-- Wire API calls through the existing data layer
-- Handle loading, empty, error, and success states
-
-## Inputs
-
-- Feature description (user story)
-- Target route/component path
-- Backend APIs and types
-
-## Verification
-
-- `pnpm lint`
-- `pnpm test -- --runInBand --watch=false`
-- `pnpm typecheck`
-```
-
-You can also include additional frontmatter fields such as `allowed-tools` in future iterations; for now, `name` and `description` are the key fields that help Droids discover and use your skill.
-
-For very small, focused capabilities, a **micro skill** can be just a short SKILL.md:
+Skills are defined in Markdown with YAML frontmatter. A small, focused skill can be just a short `SKILL.md`:
 
 ```md
 ---
@@ -79,6 +46,8 @@ description: Summarize the staged git diff in 3–5 bullets. Use when the user a
 2. Summarize the changes in 3–5 bullets, focusing on user-visible behavior.
 3. Call out any migrations, risky areas, or tests that should be run.
 ```
+
+You can also include additional frontmatter fields such as `allowed-tools` in future iterations; for now, `name` and `description` are the key fields that help Droids discover and use your skill.
 
 ## Where skills live
 
