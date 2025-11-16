@@ -255,10 +255,10 @@ See the following examples:
 In practice, each skill folder can also contain **supporting utilities** the agent may use alongside the core prompt template – for example:
 
 - `SKILL.md` or `skill.mdx` – the main skill specification
-- `types.ts` or `types.py` – shared types for APIs and events the skill cares about
-- `schemas/` – JSON/YAML schemas or OpenAPI snippets referenced by the skill
+- `references.md` – links and pointers to types, APIs, and modules that already exist in your codebase
+- `schemas/` – JSON/YAML schemas or OpenAPI snippets referenced by the skill (not the source-of-truth service code)
 - `checklists.md` – reusable validation or rollout checklists
 
-These co-located files give the agent a predictable, structured bundle of context to work from when the skill is invoked.
+These co-located files give the agent a predictable, structured bundle of context to work from when the skill is invoked, without duplicating or relocating production code.
 
 Use these as starting points and adapt the inputs, constraints, and verification steps to match your stack and governance requirements.
