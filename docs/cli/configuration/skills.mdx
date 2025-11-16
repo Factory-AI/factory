@@ -5,17 +5,27 @@ description: Define reusable, composable capabilities for Droids to reliably exe
 
 # 1 · Skills overview
 
-Skills let you package up **capabilities + context + guardrails** into reusable units that Droids can invoke as part of a larger plan.
+Skills are how you turn "a very smart, very fast engineer" into **a reliable member of your team**.
 
-- A skill describes **what problem it solves**, **what inputs it expects**, and **what success looks like**.
-- Each skill includes **clear instructions, constraints, and examples** tuned to a narrow domain.
-- Skills are **tool- and model-agnostic** – they work across CLI Droids, custom droids, and headless Droid Exec.
+Instead of re-explaining the same workflows in every prompt, you capture them once as a skill: a small, reusable bundle of **capability + context + guardrails** that Droids can invoke as part of a larger plan.
 
-In an enterprise software org, skills are the building blocks you use to:
+Use skills when you want the agent to:
 
-- Standardize how Droids do **frontend implementation, API integrations, data querying, and internal tooling**
-- Encode **team conventions, safety rules, and SLAs** once, then reuse everywhere
-- Make complex workflows **discoverable, composable, and auditable**
+- **Behave like your team** – follow your architecture, testing, security, and rollout norms by default.
+- **Be consistent across sessions** – run the same playbook every time you ask for "frontend change" or "new service integration".
+- **Scale safely** – let more people use automation without needing to be experts in the codebase or infrastructure.
+
+Concretely, a skill defines:
+
+- **What problem it solves** – e.g., "add a typed React surface for an existing API" or "wire a service into our event bus".
+- **What inputs it expects** – feature description, services, APIs, time ranges, risk level, etc.
+- **What success looks like** – required artifacts, tests, verification commands, and safety checks.
+
+Skills are **tool- and model-agnostic** – they work across CLI Droids, custom droids, and headless Droid Exec – and are especially valuable in enterprise environments where:
+
+- You need to standardize how Droids do **frontend implementation, service integrations, data querying, and internal tools**.
+- You want to encode **team conventions, safety rules, and SLAs** once, then reuse them across projects.
+- You care that workflows are **discoverable, composable, and auditable**, not just "it worked once in a chat".
 
 You can create skills from scratch for Factory, or reuse existing skills you already invested in for other agents by importing them and wiring them into your droid configuration.
 
