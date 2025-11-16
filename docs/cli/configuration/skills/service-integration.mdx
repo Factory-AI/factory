@@ -1,0 +1,92 @@
+---
+title: Service integration skill
+description: A reusable skill for extending existing services and wiring integrations in complex enterprise codebases.
+---
+
+# Service integration skill
+
+Use this skill when a feature requires changes to one or more backend services in a **shared, multi-team codebase** – for example, adding a new endpoint, publishing an event, or calling out to a dependency owned by another team.
+
+The surrounding skill folder is a good place to keep **integration utilities** the agent can reuse, such as:
+
+- `SKILL.md` – this service-integration skill specification
+- `schemas/` – common event and API schemas (e.g., JSON, Protobuf, or OpenAPI)
+- `patterns.md` – examples of approved integration patterns
+- `observability-checklist.md` – standard logging/metrics/tracing helpers or checklists
+
+```md
+# Skill: Service integration in a complex codebase
+
+## Purpose
+
+Extend or integrate with existing services in our main backend codebase while preserving ownership boundaries, reliability standards, and observability requirements.
+
+## When to use this skill
+
+- The change requires adding or modifying a backend API, job, or event.
+- The service lives in a **shared monorepo** with clear ownership and domain boundaries.
+- The work may require coordination with other teams, but the main implementation happens in our services.
+
+## Inputs
+
+- **Business requirement**: short description of the user or system behavior change.
+- **Primary service(s)**: names/paths of the services and domains involved.
+- **Existing contracts**: relevant API schemas, events, or message formats.
+- **Non-functional requirements**: latency, error budget, data retention, and throughput expectations.
+- **Change management**: rollout strategy, feature flags, or migration plan.
+
+## Out of scope
+
+- Greenfield systems that require new infrastructure or data stores.
+- Cross-region or cross-cloud replication design.
+- Changes that conflict with established ownership boundaries without prior approval.
+
+## Conventions
+
+- Follow the **domain boundaries** and module layout described in `AGENTS.md` and internal architecture docs.
+- Use existing **configuration, logging, metrics, and tracing** patterns.
+- Reuse established **error handling** and **retry/backoff** utilities.
+
+## Required behavior
+
+1. Introduce new APIs, jobs, or events using existing framework patterns.
+2. Maintain backwards compatibility wherever possible; if breaking changes are required, document migration steps.
+3. Ensure all new behavior is observable via logs, metrics, and/or traces.
+4. Respect existing security and privacy requirements (authN/Z, PII handling, data residency).
+
+## Required artifacts
+
+- Code changes in the relevant service(s) and domain modules.
+- **Unit tests** for core logic and boundary conditions.
+- **Integration or contract tests** for new or modified interfaces, where harnesses exist.
+- Updated **runbooks or design docs** only if required by your team's process (link from the PR description instead of duplicating here).
+
+## Implementation checklist
+
+1. Identify ownership and confirm which service(s) should change.
+2. Map the data and control flow across services and dependencies.
+3. Design the integration surface (API, event, or job) and validate it against existing conventions.
+4. Implement the change, keeping related files and modules co-located.
+5. Add or update tests at the appropriate layers (unit, integration, contract).
+6. Ensure logs/metrics/traces make the new behavior debuggable in production.
+7. Wire in feature flags or configuration for safe rollout if necessary.
+
+## Verification
+
+Run the service-level validation commands, for example:
+
+- `pnpm test --filter <service>` or `pytest` in the service directory
+- `pnpm lint` or equivalent linter for the language in use
+- Any existing **contract or integration test suites** referenced from `AGENTS.md` or service docs
+
+The skill is complete when:
+
+- All relevant tests and linters pass.
+- The new integration behaves correctly in local or staging environments.
+- Observability signals (logs, metrics, traces) show the expected behavior without noisy regressions.
+
+## Safety and escalation
+
+- If the change touches **shared schemas, core auth logic, billing, or compliance-critical data**, stop and request explicit human approval and design review.
+- If dependencies owned by other teams need changes, create or update their tickets and clearly document assumptions and contract expectations in the PR.
+```

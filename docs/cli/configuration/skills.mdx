@@ -1,0 +1,89 @@
+---
+title: Skills
+description: Define reusable, composable capabilities for Droids to reliably execute complex software engineering workflows.
+---
+
+# 1 · Skills overview
+
+Skills let you package up **capabilities + context + guardrails** into reusable units that Droids can invoke as part of a larger plan.
+
+- A skill describes **what problem it solves**, **what inputs it expects**, and **what success looks like**.
+- Each skill includes **clear instructions, constraints, and examples** tuned to a narrow domain.
+- Skills are **tool- and model-agnostic** – they work across CLI Droids, custom droids, and headless Droid Exec.
+
+In an enterprise software org, skills are the building blocks you use to:
+
+- Standardize how Droids do **frontend implementation, API integrations, data querying, and internal tooling**
+- Encode **team conventions, safety rules, and SLAs** once, then reuse everywhere
+- Make complex workflows **discoverable, composable, and auditable**
+
+You can create skills from scratch for Factory, or reuse existing skills you already invested in for other agents by importing them and wiring them into your droid configuration.
+
+
+# 2 · Best practices
+
+## 2.1 Keep each skill narrow and outcome-focused
+
+- Design skills around a **single responsibility** (e.g., "implement a typed React UI for an existing endpoint"), not "build the whole feature".
+- Define a **crisp success criterion**: what artifacts should exist when the skill finishes (files changed, tests added, docs updated, approvals gathered).
+- Prefer several small skills composed by a Droid over one giant "do everything" skill.
+
+## 2.2 Make inputs explicit and structured
+
+- Document required inputs: repo path, services involved, APIs, schemas, feature flag names, etc.
+- Use **structured fields** (e.g., JSON snippets, bullet lists, tables) instead of long prose when describing APIs or data models.
+- For security-sensitive workflows, include explicit **"never do"** constraints and escalation conditions.
+
+## 2.3 Encode team conventions and guardrails
+
+- Bake in your **testing, observability, and rollout requirements** so the skill always follows them.
+- Reference your existing **AGENTS.md**, runbooks, and design docs instead of inlining everything.
+- Require **proof artifacts**: tests, screenshots, log queries, or links to dashboards depending on the domain.
+
+## 2.4 Design for enterprise constraints
+
+- Assume **large monorepos, multiple services, and layered approvals**.
+- Be explicit about **which directories** Droids may touch, which languages/frameworks are in-bounds, and which are not.
+- Include guidance for **cross-team dependencies** – when to stub, when to coordinate with another team, and when to stop and ask.
+
+## 2.5 Make skills composable
+
+- Prefer **idempotent** skills: safe to rerun on the same branch/PR.
+- Design skills to produce **machine-parseable output** where possible (e.g., a short summary block that other skills can consume).
+- Keep skills **stateless** beyond the current branch: no hidden assumptions about prior runs.
+
+## 2.6 Operate with verification and safety
+
+- Always include a **"Verification"** section that lists commands Droids must run before completing the skill.
+- Call out **fallbacks** when verification fails (rollback steps, feature flags, or canary paths).
+- For production-adjacent skills, require that Droids **open PRs but never merge** without human review.
+
+
+# 3 · Skills cookbook
+
+The cookbook provides opinionated skill templates aimed at common enterprise software workflows.
+
+We focus on four families of skills:
+
+1. **Frontend implementation skills** – building UI surfaces that integrate with existing APIs
+2. **Integration skills for complex codebases** – extending or wiring together services in large monorepos
+3. **Internal data querying skills** – safe, auditable access to internal analytics or data services
+4. **Internal tools skills** – building small but robust internal apps that improve developer and operator workflows
+
+See the following examples:
+
+- `cli/configuration/skills/frontend-ui-integration` – Frontend skill for implementing a typed UI workflow against an existing backend API
+- `cli/configuration/skills/service-integration` – Skill for extending an existing service and wiring it into a complex monorepo
+- `cli/configuration/skills/data-querying` – Skill for safely querying internal data services and producing shareable artifacts
+- `cli/configuration/skills/internal-tools` – Skill for building or extending internal tools (admin panels, support consoles, engineering utilities)
+
+In practice, each skill folder can also contain **supporting utilities** the agent may use alongside the core prompt template – for example:
+
+- `SKILL.md` or `skill.mdx` – the main skill specification
+- `types.ts` or `types.py` – shared types for APIs and events the skill cares about
+- `schemas/` – JSON/YAML schemas or OpenAPI snippets referenced by the skill
+- `checklists.md` – reusable validation or rollout checklists
+
+These co-located files give the agent a predictable, structured bundle of context to work from when the skill is invoked.
+
+Use these as starting points and adapt the inputs, constraints, and verification steps to match your stack and governance requirements.
