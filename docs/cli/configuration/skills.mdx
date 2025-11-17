@@ -1,0 +1,264 @@
+---
+title: Skills
+description: Capture the way your engineering org wants work done and package it as reusable capabilities Droids can invoke on demand.
+---
+
+Skills are how you turn a general-purpose Droid into **a specialist teammate that follows your engineering playbook every time**.
+
+Instead of re-explaining the same workflows in every prompt, you capture them once as a skill: a reusable bundle of **capability + context + guardrails** that Droids can invoke as part of a larger plan.
+
+Use skills when you want the agent to:
+
+- **Behave like your team** – follow your architecture, testing, security, and rollout norms by default.
+- **Be consistent across sessions** – run the same playbook every time you ask for "frontend change" or "new service integration".
+- **Scale safely** – let more people use automation without needing to be experts in the codebase or infrastructure.
+
+## What is a skill?
+
+At the file-system level, a skill is a **directory** (e.g. `.factory/skills/frontend-ui-integration/`) that contains:
+
+- A primary spec like `SKILL.md` or `skill.mdx` with frontmatter + markdown instructions
+- Optional supporting files (types, schemas, checklists) that the Droid can read when the skill is active
+
+Conceptually, each skill defines:
+
+- **What problem it solves** – e.g., "add a typed React surface for an existing API" or "wire a service into our event bus".
+- **What inputs it expects** – feature description, services, APIs, time ranges, risk level, etc.
+- **What success looks like** – required artifacts, tests, verification commands, and safety checks.
+
+Skills are **model-invoked**: the Droid decides when to use them based on the skill description and the current task, rather than you typing a specific command.
+
+## Skill file format
+
+Skills are defined in Markdown with YAML frontmatter. A small, focused skill can be just a short `SKILL.md`:
+
+```md
+---
+name: summarize-diff
+description: Summarize the staged git diff in 3–5 bullets. Use when the user asks for a summary of pending changes.
+---
+
+# Summarize Diff
+
+## Instructions
+
+1. Run `git diff --staged`.
+2. Summarize the changes in 3–5 bullets, focusing on user-visible behavior.
+3. Call out any migrations, risky areas, or tests that should be run.
+```
+
+You can also include additional frontmatter fields such as `allowed-tools` in future iterations; for now, `name` and `description` are the key fields that help Droids discover and use your skill.
+
+## Where skills live
+
+Skills are discovered from a small set of well-known locations:
+
+| Scope         | Location                            | Purpose                                                                 |
+| ------------- | ----------------------------------- | ----------------------------------------------------------------------- |
+| **Workspace** | `<repo>/.factory/skills/`           | Project skills shared with teammates; checked into git.                 |
+| **Personal**  | `~/.factory/skills/`                | Private skills that follow you across projects on your machine.         |
+
+Each **skill** lives in its own directory under one of these roots:
+
+- Workspace: `<repo>/.factory/skills/<skill-name>/SKILL.md`
+- Personal: `~/.factory/skills/<skill-name>/SKILL.md`
+
+In large monorepos, you can either:
+
+- Keep a **single, shared** skills folder at the root:
+
+  ```text
+  .factory/skills/
+    frontend/
+      SKILL.md
+    payments-service/
+      SKILL.md
+    data-warehouse-querying/
+      SKILL.md
+  ```
+
+- Or add **per-project** `.factory` folders so skills live alongside each subproject:
+
+  ```text
+  services/payments/.factory/skills/
+    payments-service/
+      SKILL.md
+  apps/frontend/.factory/skills/
+    dashboard-ui/
+      SKILL.md
+  ```
+
+Project skills are the primary way to share and standardize capabilities inside an engineering org; personal skills are ideal for individual workflows or experiments.
+
+## Quickstart
+
+<Steps>
+  <Step title="Create a skill folder">
+    Under your repo, create a directory in `.factory/skills/`, for example
+    `.factory/skills/frontend-ui-integration/`.
+  </Step>
+  <Step title="Add SKILL.md or skill.mdx">
+    Inside the folder, create `SKILL.md` or `skill.mdx` with YAML frontmatter
+    (`name`, `description`) and markdown instructions that define the
+    capability, inputs, and success criteria.
+  </Step>
+  <Step title="Add supporting files (optional)">
+    Co-locate any types, schemas, or checklists the Droid should use when the
+    skill is active (for example `types.ts`, `schemas/`, or
+    `rollout-checklist.md`).
+  </Step>
+  <Step title="Restart and use">
+    Restart `droid` or your integration so it rescans skills, then describe
+    your task normally. The Droid will automatically invoke matching skills
+    when they apply.
+  </Step>
+</Steps>
+
+## How skills differ from other configuration
+
+Skills sit alongside other ways of shaping Droid behavior:
+
+- **Custom droids** – define *which* model and tools to use and at what autonomy level; they are full agent configurations.
+- **Custom slash commands** – are **user-invoked** macros you call explicitly (e.g., `/review-pr`); they don’t automatically trigger based on the task.
+- **MCP servers** – expose external systems (APIs, databases, SaaS tools) as tools; they are about *connecting* resources, not encoding your workflow.
+
+Skills are different because they:
+
+- Package **how work should be done** (your engineering playbook) as reusable capabilities.
+- Are **discoverable and composable** – the Droid can chain multiple skills inside a plan.
+- Can sit on top of tools, custom droids, and MCP servers to orchestrate them safely.
+
+In practice you might:
+
+- Use MCP to expose your internal deployment API.
+- Use a custom droid to define which tools/models are allowed in CI.
+- Use a skill to encode "how to safely roll out a canary deployment" using that API and droid configuration.
+
+## Why skills matter in enterprise codebases
+
+Skills are especially valuable in enterprise environments where you need to:
+
+- Standardize how Droids do **frontend implementation, service integrations, data querying, and internal tools**.
+- Encode **team conventions, safety rules, and SLAs** once, then reuse them across projects.
+- Make automation **discoverable, auditable, and shareable** via git, not just "whatever happened in one chat".
+
+You can create skills from scratch for Factory, or reuse existing skills you already invested in for other agents by importing them and wiring them into your droid configuration.
+
+
+# Best practices
+
+<AccordionGroup>
+  <Accordion title="Keep each skill narrow and outcome-focused">
+    Design skills around a **single responsibility** (e.g., "implement a typed
+    React UI for an existing endpoint"), not "build the whole feature".
+    Define a **crisp success criterion**: what artifacts should exist when the
+    skill finishes (files changed, tests added, docs updated, approvals
+    gathered). Prefer several small skills composed by a Droid over one giant
+    "do everything" skill.
+  </Accordion>
+
+  <Accordion title="Make inputs explicit and structured">
+    Document required inputs: repo path, services involved, APIs, schemas,
+    feature flag names, etc. Use **structured fields** (JSON snippets, bullet
+    lists, tables) instead of long prose when describing APIs or data models.
+    For security-sensitive workflows, include explicit **"never do"**
+    constraints and escalation conditions.
+  </Accordion>
+
+  <Accordion title="Encode team conventions and guardrails">
+    Bake in your **testing, observability, and rollout requirements** so the
+    skill always follows them. Reference your existing **AGENTS.md**, runbooks,
+    and design docs instead of inlining everything. Require **proof
+    artifacts**: tests, screenshots, log queries, or links to dashboards
+    depending on the domain.
+  </Accordion>
+
+  <Accordion title="Design for enterprise constraints">
+    Assume **large monorepos, multiple services, and layered approvals**. Be
+    explicit about **which directories** Droids may touch, which
+    languages/frameworks are in-bounds, and which are not. Include guidance for
+    **cross-team dependencies** – when to stub, when to coordinate with
+    another team, and when to stop and ask.
+  </Accordion>
+
+  <Accordion title="Make skills composable">
+    Prefer **idempotent** skills: safe to rerun on the same branch/PR. Design
+    skills to produce **machine-parseable output** where possible (for example,
+    a short summary block that other skills can consume). Keep skills
+    **stateless** beyond the current branch: no hidden assumptions about prior
+    runs.
+  </Accordion>
+
+  <Accordion title="Operate with verification and safety">
+    Always include a **"Verification"** section that lists commands Droids
+    must run before completing the skill. Call out **fallbacks** when
+    verification fails (rollback steps, feature flags, or canary paths). For
+    production-adjacent skills, require that Droids **open PRs but never
+    merge** without human review.
+  </Accordion>
+</AccordionGroup>
+
+
+## Cookbook
+
+The cookbook provides opinionated skill templates aimed at common enterprise software workflows.
+
+We focus on four families of skills:
+
+1. **Frontend implementation skills** – building UI surfaces that integrate with existing APIs
+2. **Integration skills for complex codebases** – extending or wiring together services in large monorepos
+3. **Internal data querying skills** – safe, auditable access to internal analytics or data services
+4. **Internal tools skills** – building small but robust internal apps that improve developer and operator workflows
+
+See the following examples:
+
+- `cli/configuration/skills/frontend-ui-integration` – Frontend skill for implementing a typed UI workflow against an existing backend API
+- `cli/configuration/skills/service-integration` – Skill for extending an existing service and wiring it into a complex monorepo
+- `cli/configuration/skills/data-querying` – Skill for safely querying internal data services and producing shareable artifacts
+- `cli/configuration/skills/internal-tools` – Skill for building or extending internal tools (admin panels, support consoles, engineering utilities)
+
+<CardGroup cols={2}>
+  <Card
+    title="Frontend UI integration"
+    href="/cli/configuration/skills/frontend-ui-integration"
+    icon="layout"
+  >
+    Implement typed, tested frontend flows against existing backend APIs using
+    your design system, routing, and testing conventions.
+  </Card>
+  <Card
+    title="Service integration in complex codebases"
+    href="/cli/configuration/skills/service-integration"
+    icon="layers"
+  >
+    Extend or wire backend services in a shared monorepo while respecting
+    ownership boundaries, observability, and rollout requirements.
+  </Card>
+  <Card
+    title="Internal data querying"
+    href="/cli/configuration/skills/data-querying"
+    icon="database"
+  >
+    Safely query internal analytics and data services, producing reproducible
+    queries and shareable analysis artifacts.
+  </Card>
+  <Card
+    title="Internal tools"
+    href="/cli/configuration/skills/internal-tools"
+    icon="settings"
+  >
+    Build or extend internal-facing tools (admin panels, consoles, utilities)
+    with strong RBAC, audit logging, and operational safeguards.
+  </Card>
+</CardGroup>
+
+In practice, each skill folder can also contain **supporting utilities** the agent may use alongside the core prompt template – for example:
+
+- `SKILL.md` or `skill.mdx` – the main skill specification
+- `references.md` – links and pointers to types, APIs, and modules that already exist in your codebase
+- `schemas/` – JSON/YAML schemas or OpenAPI snippets referenced by the skill (not the source-of-truth service code)
+- `checklists.md` – reusable validation or rollout checklists
+
+These co-located files give the agent a predictable, structured bundle of context to work from when the skill is invoked, without duplicating or relocating production code.
+
+Use these as starting points and adapt the inputs, constraints, and verification steps to match your stack and governance requirements.
