@@ -15,19 +15,23 @@ Every Droid run is associated with three dimensions of identity:
 
 <CardGroup cols={2}>
   <Card title="User or machine identity" icon="user">
-    Human developers authenticate via SSO (SAML/OIDC), inheriting their directory groups and roles.
-    Automation (CI/CD, scheduled jobs) runs under **machine identities** with long‑lived tokens or workload identities.
+    Human developers authenticate via SSO (SAML/OIDC), inheriting their
+    directory groups and roles. Automation (CI/CD, scheduled jobs) runs under
+    **machine identities** with long‑lived tokens or workload identities.
   </Card>
   <Card title="Org / project / folder" icon="folders">
-    The active repo and `.factory/` folders determine the **org, project, and folder context**.
-    Policies at these levels decide which models, tools, and integrations Droid may use.
+    The active repo and `.factory/` folders determine the **org, project, and
+    folder context**. Policies at these levels decide which models, tools, and
+    integrations Droid may use.
   </Card>
   <Card title="Runtime environment" icon="server">
-    Whether Droid is running on a laptop, in a CI runner, or in a sandboxed VM/devcontainer is captured as environment attributes.
-    Policies can treat these differently (for example, higher autonomy only in CI or sandboxes).
+    Whether Droid is running on a laptop, in a CI runner, or in a sandboxed
+    VM/devcontainer is captured as environment attributes. Policies can treat
+    these differently (for example, higher autonomy only in CI or sandboxes).
   </Card>
   <Card title="Session metadata" icon="activity">
-    Each Droid session records metadata such as session ID, CLI version, and git branch, which is available for audit and OTEL telemetry.
+    Each Droid session records metadata such as session ID, CLI version, and git
+    branch, which is available for audit and OTEL telemetry.
   </Card>
 </CardGroup>
 
@@ -41,7 +45,7 @@ At a high level:
 
 - **Org membership** is derived from IdP groups mapped to Factory organizations and teams.
 - **SSO sign‑in** gives developers access to both the web platform and Droid using corporate credentials.
-- **Role information** (for example, `Owner`, `Admin`, `Member`) flows from IdP groups into Factory roles.
+- **Role information** (for example, `Owner`, `Admin`, `User`) flows from IdP groups into Factory roles.
 
 For step‑by‑step SSO and SCIM configuration—including setting up the IdP application, mapping attributes, and enabling provisioning—see [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
 
@@ -52,11 +56,13 @@ For step‑by‑step SSO and SCIM configuration—including setting up the IdP a
 Factory distinguishes between three broad classes of actors:
 
 - **Org administrators**
+
   - Define org‑level `.factory` configuration, including model policies, global command allow/deny lists, and default telemetry targets.
   - Decide which deployment patterns (cloud, hybrid, airgapped) are supported and where Droid binaries may run.
   - Configure security features such as maximum autonomy level and whether user‑supplied BYOK keys are allowed.
 
 - **Project owners / maintainers**
+
   - Own project‑level `.factory/` folders that live in version control.
   - Provide team‑specific models, droids, commands, and hooks that extend org policy without weakening it.
   - Configure project‑specific policies, for example limiting Droid to certain repositories or directories.
@@ -90,6 +96,7 @@ Enterprise customers typically combine Droid with **endpoint management** and **
     - Only allowing Droid to run under managed user accounts.
     - Restricting configuration directories to corporate‑managed volumes.
     - Enforcing OS‑level disk encryption and screen lock policies.
+
   </Accordion>
 
   <Accordion title="Workspace trust">
@@ -98,6 +105,7 @@ Enterprise customers typically combine Droid with **endpoint management** and **
     - Pin Droid to specific paths or repos on developer machines.
     - Require elevated approval or sandboxed environments for untrusted code.
     - Use project‑level `.factory/` folders to mark which repos are "Droid‑ready" and what policies should apply.
+
   </Accordion>
 
   <Accordion title="Environment‑aware policies">
@@ -108,6 +116,7 @@ Enterprise customers typically combine Droid with **endpoint management** and **
     - Allow higher autonomy or more powerful tools **only** inside devcontainers or CI runners.
     - Restrict network access or command execution when running on laptops.
     - Tag OTEL telemetry with environment attributes to support environment‑specific alerting.
+
   </Accordion>
 </AccordionGroup>
 
