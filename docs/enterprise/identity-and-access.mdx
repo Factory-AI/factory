@@ -41,13 +41,25 @@ Every Droid run is associated with three dimensions of identity:
 
 Most enterprises integrate Factory with an identity provider (IdP) such as **Okta, Azure AD, or Google Workspace**.
 
-At a high level:
+### Domain verification (prerequisite)
+
+Before enabling SSO, organizations must **verify ownership of their email domains**. This mandatory step:
+
+- **Establishes identity governance** — proves your organization controls the email domains.
+- **Claims existing users** — automatically associates Factory users with your verified domains to your organization.
+- **Enables policy enforcement** — allows domain‑specific security policies like mandatory SSO, MFA requirements, and session controls.
+
+Domain verification is handled through WorkOS with DNS validation (typically completes within 1–24 hours).
+
+### How SSO integration works
+
+Once domains are verified:
 
 - **Org membership** is derived from IdP groups mapped to Factory organizations and teams.
 - **SSO sign‑in** gives developers access to both the web platform and Droid using corporate credentials.
 - **Role information** (for example, `Owner`, `Admin`, `User`) flows from IdP groups into Factory roles.
 
-For step‑by‑step SSO and SCIM configuration—including setting up the IdP application, mapping attributes, and enabling provisioning—see [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
+For step‑by‑step domain verification, SSO, and SCIM configuration—including setting up the IdP application, mapping attributes, and enabling provisioning—see [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
 
 ---
 
