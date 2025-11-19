@@ -5,14 +5,42 @@ description: A reusable skill for rapidly prototyping and building modern web ap
 
 This skill enables Droids to act as a vibe coding partner, creating complete web applications from scratch on your local machine with speed and creativity. Unlike hosted builders like Lovable, Bolt, or v0, this skill works entirely in your local environment, giving you full control over the stack, deployment, and evolution of your application while maintaining the rapid, creative flow of vibe-based development.
 
-The folder that contains this skill definition can also include **supporting utilities** the Droid may call, for example:
+## Setup Instructions
 
-- `SKILL.md` / `vibe-coding.mdx` – this skill spec
-- `framework-references.md` – links to current documentation for React, Next.js, Vue, Svelte, etc.
-- `deployment-patterns.md` – common deployment options and checklists
-- `accessibility-checklist.md` – reusable accessibility and performance checklists
+To use this skill with Factory, create the following directory structure in your repository:
+
+```
+.factory/skills/vibe-coding/
+├── SKILL.md
+├── framework-references.md (optional)
+├── deployment-patterns.md (optional)
+└── accessibility-checklist.md (optional)
+```
+
+### Quick Start
+
+1. **Create the skill directory:**
+   ```bash
+   mkdir -p .factory/skills/vibe-coding
+   ```
+
+2. **Copy the skill content below into `.factory/skills/vibe-coding/SKILL.md` (or `skill.mdx`)**
+
+3. **Restart your Factory droid** to discover the new skill
+
+<Tip>
+When you ask Factory to rapidly prototype or build a web application from scratch, it will automatically invoke this skill based on the task description.
+</Tip>
+
+## Skill Definition
+
+Copy the following content into `.factory/skills/vibe-coding/SKILL.md`:
 
 ```md
+---
+name: vibe-coding
+description: Rapidly prototype and build modern, responsive web applications from scratch using current frameworks and libraries. Use when you want to quickly create a new web app with full local control, creative flow, and modern best practices. Local alternative to Lovable, Bolt, and v0.
+---
 # Skill: Vibe coding
 
 ## Purpose

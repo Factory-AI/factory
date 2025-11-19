@@ -5,13 +5,42 @@ description: A reusable skill for building and extending internal tools that sup
 
 Use this skill when Droids are building or extending **internal-facing applications** – admin panels, support consoles, operational dashboards, or engineering utilities – where reliability and safety matter more than surface polish.
 
-The internal-tools skill folder can also include **helper artifacts** the agent should use, for example:
+## Setup Instructions
 
-- `rbac.md` – summaries of standard RBAC roles and permission matrices, plus links to the authoritative policy definitions
-- `audit-patterns.md` – patterns for confirmations, approvals, and audit logging
-- `operations-checklist.md` – checklists for operational readiness and incident handling
+To use this skill with Factory, create the following directory structure in your repository:
+
+```
+.factory/skills/internal-tools/
+├── SKILL.md
+├── rbac.md (optional)
+├── audit-patterns.md (optional)
+└── operations-checklist.md (optional)
+```
+
+### Quick Start
+
+1. **Create the skill directory:**
+   ```bash
+   mkdir -p .factory/skills/internal-tools
+   ```
+
+2. **Copy the skill content below into `.factory/skills/internal-tools/SKILL.md` (or `skill.mdx`)**
+
+3. **Restart your Factory droid** to discover the new skill
+
+<Tip>
+When you ask Factory to build or extend internal tools like admin panels or operational dashboards, it will automatically invoke this skill based on the task description.
+</Tip>
+
+## Skill Definition
+
+Copy the following content into `.factory/skills/internal-tools/SKILL.md`:
 
 ```md
+---
+name: internal-tools
+description: Design, implement, or extend internal tools that help employees operate the system safely and efficiently, while respecting access controls and audit requirements. Use when building for internal staff interacting with production-adjacent systems.
+---
 # Skill: Internal tools development
 
 ## Purpose

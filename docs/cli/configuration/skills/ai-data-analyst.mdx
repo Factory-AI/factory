@@ -5,14 +5,42 @@ description: A reusable skill for performing comprehensive data analysis, visual
 
 This skill enables Droids to act as an AI-powered data analyst, performing exploratory data analysis, statistical modeling, data visualization, and generating insights from structured and unstructured data. Unlike point-solution data analysis tools, this skill runs entirely in your local environment with full Python ecosystem access and customization capabilities.
 
-The folder that contains this skill definition can also include **supporting utilities** the Droid may call, for example:
+## Setup Instructions
 
-- `SKILL.md` / `ai-data-analyst.mdx` – this skill spec
-- `visualization-templates.md` – common chart types and when to use them
-- `statistical-methods.md` – reference for statistical tests and their assumptions
-- `example-analyses.md` – example workflows for common analysis patterns
+To use this skill with Factory, create the following directory structure in your repository:
+
+```
+.factory/skills/ai-data-analyst/
+├── SKILL.md
+├── visualization-templates.md (optional)
+├── statistical-methods.md (optional)
+└── example-analyses.md (optional)
+```
+
+### Quick Start
+
+1. **Create the skill directory:**
+   ```bash
+   mkdir -p .factory/skills/ai-data-analyst
+   ```
+
+2. **Copy the skill content below into `.factory/skills/ai-data-analyst/SKILL.md` (or `skill.mdx`)**
+
+3. **Restart your Factory droid** to discover the new skill
+
+<Tip>
+When you ask Factory to perform data analysis, create visualizations, or build statistical models, it will automatically invoke this skill based on the task description.
+</Tip>
+
+## Skill Definition
+
+Copy the following content into `.factory/skills/ai-data-analyst/SKILL.md`:
 
 ```md
+---
+name: ai-data-analyst
+description: Perform comprehensive data analysis, statistical modeling, and data visualization by writing and executing self-contained Python scripts. Use when you need to analyze datasets, perform statistical tests, create visualizations, or build predictive models with reproducible, code-based workflows.
+---
 # Skill: AI data analyst
 
 ## Purpose

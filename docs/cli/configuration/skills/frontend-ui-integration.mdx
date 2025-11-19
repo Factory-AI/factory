@@ -5,16 +5,42 @@ description: A reusable skill for implementing typed, tested frontend workflows 
 
 This skill is designed for large enterprise frontends (React/TypeScript, Next.js, or similar) where Droids implement or extend user-facing flows against existing backend APIs.
 
-The folder that contains this skill definition can also include **supporting utilities** the Droid may call, for example:
+## Setup Instructions
 
-- `SKILL.md` / `frontend-ui-integration.mdx` – this skill spec
-- `references.md` – pointers to existing TypeScript types, API modules, and routes in your codebase
-- `design-system.md` – design-system usage guidelines or component maps
-- `accessibility-checklist.md` – reusable accessibility and performance checklists
-- `design-system.md` – design-system usage guidelines or component maps
-- `accessibility-checklist.md` – reusable accessibility and performance checklists
+To use this skill with Factory, create the following directory structure in your repository:
+
+```
+.factory/skills/frontend-ui-integration/
+├── SKILL.md
+├── references.md (optional)
+├── design-system.md (optional)
+└── accessibility-checklist.md (optional)
+```
+
+### Quick Start
+
+1. **Create the skill directory:**
+   ```bash
+   mkdir -p .factory/skills/frontend-ui-integration
+   ```
+
+2. **Copy the skill content below into `.factory/skills/frontend-ui-integration/SKILL.md` (or `skill.mdx`)**
+
+3. **Restart your Factory droid** to discover the new skill
+
+<Tip>
+When you ask Factory to implement a UI feature, it will automatically invoke this skill based on the task description.
+</Tip>
+
+## Skill Definition
+
+Copy the following content into `.factory/skills/frontend-ui-integration/SKILL.md`:
 
 ```md
+---
+name: frontend-ui-integration
+description: Implement or extend a user-facing workflow in a web application, integrating with existing backend APIs. Use when the feature is primarily a UI/UX change backed by existing APIs, affects only the web frontend, and requires following design system, routing, and testing conventions.
+---
 # Skill: Frontend UI integration
 
 ## Purpose
