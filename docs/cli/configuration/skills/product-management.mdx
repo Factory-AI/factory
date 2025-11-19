@@ -5,14 +5,40 @@ description: A reusable skill for assisting with product management workflows in
 
 This skill enables Droids to act as a product management assistant, helping with the documentation, analysis, and planning activities that are core to the PM role. Unlike point-solution PM tools, this skill integrates directly with your development workflow, codebase, and documentation.
 
-The folder that contains this skill definition can also include **supporting utilities** the Droid may call, for example:
+## Setup Instructions
 
-- `SKILL.md` / `product-management.mdx` – this skill spec
-- `prd-template.md` – standard PRD template for your organization
-- `feature-analysis-framework.md` – frameworks for evaluating features (RICE, ICE, etc.)
-- `user-research-templates.md` – templates for research synthesis and insights
+To use this skill with Factory, create the following directory structure in your repository:
+
+```
+.factory/skills/product-management/
+├── SKILL.md
+├── prd-template.md (optional)
+├── feature-analysis-framework.md (optional)
+└── user-research-templates.md (optional)
+```
+
+### Quick Start
+
+1. **Create the skill directory:**
+   ```bash
+   mkdir -p .factory/skills/product-management
+   ```
+
+2. **Copy the skill content below into `.factory/skills/product-management/SKILL.md` (or `skill.mdx`)**
+
+<Tip>
+When you ask Factory to help with PRDs, feature analysis, roadmap planning, or research synthesis, it will automatically invoke this skill based on the task description.
+</Tip>
+
+## Skill Definition
+
+Copy the following content into `.factory/skills/product-management/SKILL.md`:
 
 ```md
+---
+name: product-management
+description: Assist with core product management activities including writing PRDs, analyzing features, synthesizing user research, planning roadmaps, and communicating product decisions. Use when you need help with PM documentation, analysis, or planning workflows that integrate with your codebase.
+---
 # Skill: Product management AI
 
 ## Purpose

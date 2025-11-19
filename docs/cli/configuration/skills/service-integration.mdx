@@ -5,14 +5,40 @@ description: A reusable skill for extending existing services and wiring integra
 
 Use this skill when a feature requires changes to one or more backend services in a **shared, multi-team codebase** – for example, adding a new endpoint, publishing an event, or calling out to a dependency owned by another team.
 
-The surrounding skill folder is a good place to keep **integration utilities** the agent can reuse, such as:
+## Setup Instructions
 
-- `SKILL.md` – this service-integration skill specification
-- `schemas/` – representative event and API schemas (e.g., JSON, Protobuf, or OpenAPI) or trimmed examples, not the canonical service definitions
-- `patterns.md` – examples of approved integration patterns and links to the real implementations
-- `observability-checklist.md` – standard logging/metrics/tracing checklists
+To use this skill with Factory, create the following directory structure in your repository:
+
+```
+.factory/skills/service-integration/
+├── SKILL.md
+├── schemas/ (optional)
+├── patterns.md (optional)
+└── observability-checklist.md (optional)
+```
+
+### Quick Start
+
+1. **Create the skill directory:**
+   ```bash
+   mkdir -p .factory/skills/service-integration
+   ```
+
+2. **Copy the skill content below into `.factory/skills/service-integration/SKILL.md` (or `skill.mdx`)**
+
+<Tip>
+When you ask Factory to extend a backend service or wire an integration, it will automatically invoke this skill based on the task description.
+</Tip>
+
+## Skill Definition
+
+Copy the following content into `.factory/skills/service-integration/SKILL.md`:
 
 ```md
+---
+name: service-integration
+description: Extend or integrate with existing services in a shared monorepo while preserving ownership boundaries, reliability standards, and observability requirements. Use when changes require adding or modifying backend APIs, jobs, or events in services with clear domain boundaries.
+---
 # Skill: Service integration in a complex codebase
 
 ## Purpose

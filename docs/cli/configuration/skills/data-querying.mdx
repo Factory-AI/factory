@@ -5,13 +5,40 @@ description: A reusable skill for safely querying internal analytics and data se
 
 Use this skill when Droids need to answer questions using **internal data sources** – analytics warehouses, reporting databases, or internal data APIs – in a way that is safe, auditable, and reproducible.
 
-The skill directory can also host **data utilities** that the agent can leverage, such as:
+## Setup Instructions
 
-- `metrics.md` – definitions and references for key metrics/dimensions (with links to the canonical dbt models or warehouse docs)
-- `examples.sql` – small, illustrative queries against trusted models or marts
-- `data-governance.md` – data-classification guidance and safe-sharing checklists
+To use this skill with Factory, create the following directory structure in your repository:
+
+```
+.factory/skills/data-querying/
+├── SKILL.md
+├── metrics.md (optional)
+├── examples.sql (optional)
+└── data-governance.md (optional)
+```
+
+### Quick Start
+
+1. **Create the skill directory:**
+   ```bash
+   mkdir -p .factory/skills/data-querying
+   ```
+
+2. **Copy the skill content below into `.factory/skills/data-querying/SKILL.md` (or `skill.mdx`)**
+
+<Tip>
+When you ask Factory to query internal data or analyze metrics, it will automatically invoke this skill based on the task description.
+</Tip>
+
+## Skill Definition
+
+Copy the following content into `.factory/skills/data-querying/SKILL.md`:
 
 ```md
+---
+name: data-querying
+description: Query internal data services to answer well-scoped questions, producing results and artifacts that are safe to share and easy to re-run. Use when stakeholders need metrics, trends, or data slices from internal warehouses, marts, or reporting APIs.
+---
 # Skill: Internal data querying
 
 ## Purpose
