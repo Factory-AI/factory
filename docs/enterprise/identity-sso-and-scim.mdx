@@ -1,6 +1,6 @@
 ---
-title: Identity, SSO, and SCIM
-description: Enterprise identity management with SSO/SAML authentication and Directory Sync/SCIM provisioning
+title: Identity, Domains, SSO, and SCIM
+description: Enterprise identity management with Domain Managment, SSO/SAML authentication, and Directory Sync/SCIM provisioning
 ---
 
 Factory provides comprehensive enterprise identity management through Single Sign-On (SSO) using SAML/OIDC protocols and automated user provisioning via Directory Sync (SCIM). This guide covers how these systems work together to manage user identities, authentication, and access control.
@@ -9,12 +9,33 @@ Factory provides comprehensive enterprise identity management through Single Sig
 
 Factory uses **WorkOS** to handle enterprise identity management, supporting:
 
+- **Domain Verification**: Establish ownership of your email domains for identity governance
 - **SSO/SAML**: Authenticate users through your Identity Provider (IdP)
 - **Directory Sync/SCIM**: Automatically provision and manage users from your directory
 - **Just-In-Time (JIT) Provisioning**: Create users on first login via SSO
 - **Group-based Access Control**: Manage permissions through directory groups
 
 ## How It Works
+
+### Domain Verification (Required First)
+
+```mermaid
+graph LR
+    A[Add your<br/>email domains] --> B[DNS validation<br/>via TXT record]
+    B --> C[Domain verified<br/>by WorkOS]
+    C --> D[Configure security<br/>policies]
+    
+    style A fill:#fff3e0
+    style C fill:#c8e6c9
+    style D fill:#e1f5fe
+```
+
+Before enabling SSO or Directory Sync:
+
+1. **Verify ownership** of your email domains through DNS validation
+2. **Claim existing users** - All users with your domain automatically join your organization
+3. **Set policies** - Configure MFA, session management, and access controls
+4. **Enable SSO/SCIM** - Now ready for enterprise identity management
 
 ### Authentication with SSO
 
@@ -66,9 +87,10 @@ When users exist from multiple sources (SSO, Directory Sync, manual invite), Fac
 
 ## Prerequisites
 
-Before setting up SSO and SCIM:
+Before setting up Domains, SSO, and SCIM:
 
 - You are on a plan that includes **enterprise SSO support**
+- Your organization's **email domains must be verified** (see Domain Verification below)
 - You have **admin access** to your IdP (or a partner in IT who does)
 - You have a **Factory admin** who can coordinate configuration on the Factory side
 - Contact your Factory representative to initiate the setup process
@@ -83,23 +105,27 @@ Before setting up SSO and SCIM:
     support@factory.ai
   </Step>
 
-  <Step title="Receive Setup Link">
-    You'll receive a secure setup link (valid for 7 days) to configure your
-    identity provider
-  </Step>
+<Step title="Receive Setup Link">
+  You'll receive a secure setup link (valid for 7 days) to configure your
+  identity provider
+</Step>
 
-  <Step title="Select Provider">
-    Choose your identity provider from the supported list or select "Generic
-    SAML/OIDC"
-  </Step>
+<Step title="Select Provider">
+  Choose your identity provider from the supported list or select "Generic
+  SAML/OIDC"
+</Step>
 
-  <Step title="Configure SSO">
-    Follow provider-specific instructions to set up SAML or OIDC authentication
-  </Step>
+<Step title="Verify Your Domains (Required)">
+  Complete domain verification via DNS to establish ownership - SSO cannot be enabled without this step
+</Step>
 
-  <Step title="Enable Directory Sync (Optional)">
-    Configure SCIM provisioning for automated user management
-  </Step>
+<Step title="Configure SSO">
+  Follow provider-specific instructions to set up SAML or OIDC authentication
+</Step>
+
+<Step title="Enable Directory Sync (Optional)">
+  Configure SCIM provisioning for automated user management
+</Step>
 
   <Step title="Test & Verify">
     Test with pilot users before rolling out to entire organization
@@ -117,17 +143,17 @@ During setup, you'll configure:
     protocols
   </Accordion>
 
-  <Accordion title="User Provisioning">
-    - **Just-In-Time (JIT)** - Users created on first login - **Directory Sync
-    (SCIM)** - Automated provisioning from directory - **Manual** - Admin
-    invites users individually - **Hybrid** - Combination of methods
-  </Accordion>
+<Accordion title="User Provisioning">
+  - **Just-In-Time (JIT)** - Users created on first login - **Directory Sync
+  (SCIM)** - Automated provisioning from directory - **Manual** - Admin invites
+  users individually - **Hybrid** - Combination of methods
+</Accordion>
 
-  <Accordion title="Role Mapping">
-    - **Attribute-based** - Roles from SAML/OIDC claims - **Group-based** -
-    Roles from directory groups - **Default role** - All users get same initial
-    role - **Custom mapping** - Advanced rules engine
-  </Accordion>
+<Accordion title="Role Mapping">
+  - **Attribute-based** - Roles from SAML/OIDC claims - **Group-based** - Roles
+  from directory groups - **Default role** - All users get same initial role -
+  **Custom mapping** - Advanced rules engine
+</Accordion>
 
   <Accordion title="MFA Requirements">
     - **IdP-enforced** - MFA handled by your IdP - **Factory-enforced** -
@@ -135,6 +161,119 @@ During setup, you'll configure:
     **Optional** - User choice
   </Accordion>
 </AccordionGroup>
+
+## Domain Verification
+
+### Why Domain Verification Matters
+
+Domain verification is a **mandatory prerequisite** for enabling SSO and establishing your organization's identity governance in Factory. It proves your organization owns and controls specific email domains, creating a secure foundation for enterprise identity management.
+
+<Warning>
+  SSO cannot be enabled without verified domains. All users authenticating via
+  SSO must have email addresses from verified domains.
+</Warning>
+
+### What Domain Verification Enables
+
+Once your domain is verified, your organization gains powerful administrative controls:
+
+#### Identity Governance
+
+- **Mandatory SSO enforcement** - Require all users with your domain to authenticate via SSO
+- **Automatic user claiming** - Existing Factory users with your domain automatically join your organization
+- **Email domain restrictions** - Prevent unauthorized accounts from using your domain
+- **Guest user policies** - Define how external collaborators can access your organization
+
+#### Security Policies
+
+- **MFA requirements** - Enforce multi-factor authentication for all domain users
+- **Password policies** - Set complexity requirements for non-SSO authentication methods
+- **Session management** - Control session duration and idle timeout settings
+- **IP restrictions** - Limit access to specific IP ranges or VPN endpoints
+
+#### Compliance Controls
+
+- **Audit logging** - Track all authentication events for domain users
+- **Data residency** - Ensure user data stays within specified geographic regions
+- **Access reviews** - Periodic certification of user access rights
+- **Deprovisioning workflows** - Automated removal of access when users leave
+
+### Configuring Domain Verification
+
+<Info>
+**Domain verification is handled automatically through WorkOS.** You have two options:
+
+1. **Automatic Setup** - Your Factory admin handles the entire process for you
+2. **Self-Service Setup** - Use the WorkOS dashboard to verify domains yourself
+
+Both options follow the same verification flow:
+
+- Add domains to verify (e.g., `yourcompany.com`)
+- Receive a unique TXT record for DNS validation
+- Add the record to your domain's DNS settings
+- WorkOS automatically detects and validates the record
+- Configure domain policies once verified
+
+The process typically completes within 1-24 hours depending on DNS propagation. WorkOS provides real-time status updates and handles all the technical complexity.
+
+</Info>
+
+#### What Happens After Verification
+
+Once your domain is verified:
+
+- **Immediate effect** - All existing users with your domain email are associated with your organization
+- **Automatic claiming** - New users with your domain join your organization by default
+- **Policy enforcement** - Your configured security policies apply instantly
+- **SSO readiness** - You can proceed with SSO configuration for verified domains
+
+### Multiple Domain Support
+
+Organizations often need to verify multiple domains:
+
+- **Primary domain** - Your main corporate email domain
+- **Subsidiary domains** - Acquired companies or regional offices
+- **Legacy domains** - Historical domains still in use
+- **Alias domains** - Alternative spellings or shortened versions
+
+Each domain requires separate verification but shares the same organizational policies once verified.
+
+### Domain Verification Best Practices
+
+<AccordionGroup>
+  <Accordion title="Planning">
+    - Inventory all email domains used by employees - Identify domains that
+    should NOT be claimed (e.g., personal email domains) - Coordinate with DNS
+    administrators before starting - Plan for subsidiary and acquisition
+    scenarios
+  </Accordion>
+
+<Accordion title="Implementation">
+  - Verify your primary domain first - Test with a small pilot group before
+  organization-wide rollout - Document which team manages each domain's DNS -
+  Keep verification records even after validation completes
+</Accordion>
+
+  <Accordion title="Maintenance">
+    - Review verified domains quarterly - Remove domains no longer in use -
+    Update verification during domain migrations - Monitor for unauthorized
+    domain usage attempts
+  </Accordion>
+</AccordionGroup>
+
+### Common Issues and Solutions
+
+| Issue                                 | Cause                           | Solution                                           |
+| ------------------------------------- | ------------------------------- | -------------------------------------------------- |
+| Verification fails after 24 hours     | DNS record not properly added   | Check exact formatting and placement of TXT record |
+| Users can't access after verification | Domain policies too restrictive | Review and adjust enforcement settings             |
+| Subsidiary users not included         | Domain not verified             | Add and verify all subsidiary domains              |
+| External collaborators blocked        | Strict domain enforcement       | Configure guest user exceptions                    |
+
+<Info>
+  Domain verification is a one-time setup per domain, but the benefits apply to
+  all current and future users with email addresses from those domains.
+</Info>
 
 ## Single Sign-On (SSO)
 
@@ -206,9 +345,9 @@ When SSO is enabled with JIT provisioning:
   Resolution](#conflict-resolution) for best practices.
 </Warning>
 
-## SSO Configuration
+### Configuring SSO
 
-### What You Need to Prepare
+#### What You Need to Prepare
 
 Before starting SSO setup:
 
@@ -219,7 +358,7 @@ Before starting SSO setup:
    - Member groups (e.g., `factory-developers`)
    - Read-only groups (e.g., `factory-viewers`)
 
-### How Setup Works
+#### How Setup Works
 
 <Info>
 **WorkOS handles the technical configuration automatically.** When you receive your setup link from Factory:
@@ -234,7 +373,7 @@ You don't need to manually configure URLs, certificates, or technical parameters
 
 </Info>
 
-### Group-to-Role Mapping
+#### Group-to-Role Mapping
 
 During setup, you'll configure how your IdP groups map to Factory roles:
 
@@ -251,7 +390,7 @@ During setup, you'll configure how your IdP groups map to Factory roles:
   permissions by team.
 </Tip>
 
-### Testing Your Integration
+#### Testing Your Integration
 
 After configuration, test with your pilot group:
 
