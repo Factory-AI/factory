@@ -1,4 +1,4 @@
-name: Post Changelog to Discord
+name: Post Changelog to Discord and Reddit
 
 on:
   push:
@@ -39,30 +39,46 @@ jobs:
           CHANGELOG_FILE: ${{ steps.changes.outputs.file }}
         run: |
           if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
-            echo "Discord webhook URL not provided. Skipping notification."
-            exit 0
+            echo "Discord webhook URL not provided. Skipping Discord notification."
+          else
+            # Parse the changelog
+            MESSAGE=$(node .github/scripts/parse-changelog.js "$CHANGELOG_FILE")
+            
+            if [ -z "$MESSAGE" ]; then
+              echo "Failed to parse changelog for Discord"
+              exit 1
+            fi
+            
+            echo "Posting to Discord:"
+            echo "$MESSAGE"
+            
+            # Create JSON payload
+            PAYLOAD=$(jq -n --arg content "$MESSAGE" '{
+              content: $content
+            }')
+            
+            # Post to Discord
+            curl -X POST \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD" \
+              "$DISCORD_WEBHOOK_URL"
+            
+            echo "Successfully posted to Discord!"
           fi
 
-          # Parse the changelog
-          MESSAGE=$(node .github/scripts/parse-changelog.js "$CHANGELOG_FILE")
-          
-          if [ -z "$MESSAGE" ]; then
-            echo "Failed to parse changelog"
-            exit 1
+      - name: Post to Reddit
+        if: steps.changes.outputs.file != ''
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+          REDDIT_SUBREDDIT: 'FactoryAi'
+          CHANGELOG_FILE: ${{ steps.changes.outputs.file }}
+        run: |
+          if [ -z "${REDDIT_CLIENT_ID}" ]; then
+            echo "Reddit credentials not provided. Skipping Reddit notification."
+          else
+            echo "Posting to Reddit..."
+            node .github/scripts/post-to-reddit.js "$CHANGELOG_FILE"
           fi
-          
-          echo "Posting to Discord:"
-          echo "$MESSAGE"
-          
-          # Create JSON payload
-          PAYLOAD=$(jq -n --arg content "$MESSAGE" '{
-            content: $content
-          }')
-          
-          # Post to Discord
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD" \
-            "$DISCORD_WEBHOOK_URL"
-          
-          echo "Successfully posted to Discord!"
