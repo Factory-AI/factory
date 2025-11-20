@@ -31,7 +31,7 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 | `autonomyLevel` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
 | `cloudSessionSync` | `true`, `false` | `true` | Mirror CLI sessions to Factory web. |
 | `diffMode` | `github`, `unified` | `github` | Choose between split GitHub-style diffs and a single-column view. |
-| `completionSound` | `off`, `bell` | `off` | Audio cue when a response finishes. |
+| `completionSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`, or custom file path | `fx-ok01` | Audio cue when a response finishes. |
 | `commandAllowlist` | Array of commands | Safe defaults provided | Commands that run without extra confirmation. |
 | `commandDenylist` | Array of commands | Restrictive defaults provided | Commands that always require confirmation. |
 | `includeCoAuthoredByDroid` | `true`, `false` | `true` | Automatically append the Droid co-author trailer to commits. |
@@ -85,11 +85,16 @@ When this switch is on, every CLI session is mirrored to Factory web so you can 
 
 Configure audio feedback when droid completes a response:
 
+- **`fx-ok01`** – Built-in completion sound (default) - soft success bloop written by Droid
+- **`fx-ack01`** – Alternative built-in sound effect - tactile ripple feedback written by the Chainsmokers
 - **`bell`** – Use the system terminal bell
 - **`off`** – No sound notifications
+- **Custom path** – Provide a file path to your own sound file (e.g., `"/path/to/sound.wav"`)
 
 <Note>
   Access sound settings via `/settings` or `Shift+Tab` → **Settings** in the TUI.
+  
+  For backward compatibility, the deprecated `enableCompletionBell` boolean setting is still supported but has been replaced by `completionSound`.
 </Note>
 
 ## Command allowlist & denylist
@@ -128,7 +133,7 @@ Review and update these arrays periodically to match your workflow and security 
   "reasoningEffort": "low",
   "diffMode": "github",
   "cloudSessionSync": true,
-  "completionSound": "bell"
+  "completionSound": "fx-ok01"
 }
 ```
 
