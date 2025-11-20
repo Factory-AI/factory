@@ -138,14 +138,16 @@ function formatRedditPost(changelog, changelogUrl) {
 }
 
 async function postToReddit(subreddit, title, body, accessToken) {
-  const postData = JSON.stringify({
+  // Reddit API expects form-encoded data, not JSON
+  const params = new URLSearchParams({
     sr: subreddit,
     kind: 'self',
     title: title,
     text: body,
-    sendreplies: false,
+    sendreplies: 'false',
     api_type: 'json'
   });
+  const postData = params.toString();
   
   const options = {
     hostname: 'oauth.reddit.com',
@@ -153,7 +155,7 @@ async function postToReddit(subreddit, title, body, accessToken) {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
       'User-Agent': 'FactoryChangelogBot/1.0'
     }
   };
