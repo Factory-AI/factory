@@ -1,0 +1,88 @@
+---
+title: Droid Actions for GitHub
+description: Automate PR descriptions and code reviews using Factory Droid in GitHub Actions.
+---
+
+Droid Actions is a GitHub App that brings Factory's AI agent capabilities directly into your pull request workflow. It automates common PR tasks like filling descriptions and performing code reviews, helping teams ship faster with higher quality.
+
+## What it does
+
+- **`@droid fill`** - Automatically populate PR descriptions using your template or generate structured summaries
+- **`@droid review`** - Perform intelligent code reviews with inline comments on potential issues
+- **Automatic reviews** - Enable automatic reviews when PRs are opened or marked ready
+
+## How it works
+
+When you tag `@droid` in a PR comment or description:
+
+1. **Trigger detection** – The action scans for `@droid fill` or `@droid review` commands
+2. **Context gathering** – Droid collects PR metadata, comments, changed files, and your PR template
+3. **Execution** – The action runs `droid exec` with full repository context
+4. **Results** – For fill, Droid updates the PR body; for review, it posts inline feedback
+
+## Quick start
+
+<Steps>
+  <Step title="Install the Factory Droid GitHub App">
+    Go to [github.com/apps/factory-droid](https://github.com/apps/factory-droid) and click "Install". Grant it access to the repositories where you want Droid to operate.
+  </Step>
+
+  <Step title="Create a Factory API Key">
+    Generate a token at [Factory Settings](https://app.factory.ai/settings/api-keys) and save it as `FACTORY_API_KEY` in your repository or organization secrets.
+  </Step>
+
+  <Step title="Add the workflow">
+    Create `.github/workflows/droid.yml`:
+    
+```yaml
+name: Droid Tag
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  droid:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@droid')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@droid')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@droid')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@droid') || contains(github.event.issue.title, '@droid')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: Factory-AI/droid-action@v1
+        with:
+          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+```
+  </Step>
+</Steps>
+
+## Learn more
+
+<CardGroup cols={2}>
+  <Card title="Fill PR Descriptions" icon="file-pen" href="/cli/droid-actions/cookbook/fill-pr-description">
+    Automatically populate PR descriptions with @droid fill
+  </Card>
+  <Card title="Manual Reviews" icon="magnifying-glass" href="/cli/droid-actions/cookbook/manual-review">
+    Trigger on-demand reviews with @droid review
+  </Card>
+  <Card title="Automatic Reviews" icon="bolt" href="/cli/droid-actions/cookbook/automatic-review">
+    Enable automatic reviews on PR creation
+  </Card>
+  <Card title="GitHub Repository" icon="github" href="https://github.com/Factory-AI/droid-action">
+    View the source code and examples
+  </Card>
+</CardGroup>

@@ -1,0 +1,54 @@
+---
+title: Fill PR Descriptions
+description: Automatically populate pull request descriptions using @droid fill
+---
+
+`@droid fill` automatically populates PR descriptions based on your repository's template or generates a structured summary.
+
+## Prerequisites
+
+Before using `@droid fill`, make sure you have:
+
+1. Installed the Factory Droid GitHub App at [github.com/apps/factory-droid](https://github.com/apps/factory-droid)
+2. Added `FACTORY_API_KEY` to your repository secrets
+3. Created the workflow file (see [Quick Start](/cli/droid-actions/overview#quick-start))
+
+## Usage
+
+Simply include `@droid fill` in your PR description when creating a PR:
+
+```markdown
+@droid fill
+```
+
+Droid will analyze your commits and changed files, then replace this with a complete description.
+
+## With a PR template
+
+If you have a template at `.github/pull_request_template.md`, Droid will fill each section:
+
+```markdown
+## Overview
+<!-- Droid fills this automatically -->
+
+## Changes Made
+<!-- Droid lists all changes -->
+
+## Testing
+<!-- Droid suggests testing steps -->
+```
+
+## Without a template
+
+Droid generates a structured summary:
+
+- **Overview** - High-level summary of changes
+- **Changes** - Detailed list of modifications  
+- **Testing** - How to test the changes
+- **Deployment** - Any special considerations
+
+## Tips
+
+- Write clear commit messages for better descriptions
+- Add context when tagging `@droid fill` to guide generation
+- Review and refine the generated content before merging
