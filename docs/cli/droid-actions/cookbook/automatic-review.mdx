@@ -1,0 +1,84 @@
+---
+title: Automatic Reviews
+description: Enable automatic code reviews when pull requests are created
+---
+
+Automatic code reviews trigger whenever a PR is opened or marked ready for review, providing instant feedback without manual intervention.
+
+## Prerequisites
+
+Before setting up automatic reviews:
+
+1. Install the Factory Droid GitHub App at [github.com/apps/factory-droid](https://github.com/apps/factory-droid)
+2. Add `FACTORY_API_KEY` to your repository or organization secrets ([get your key](https://app.factory.ai/settings/api-keys))
+
+## Installation
+
+Create `.github/workflows/droid-review.yml`:
+
+```yaml
+name: Droid Auto Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+
+concurrency:
+  group: droid-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  droid-review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    
+    steps:
+      - uses: actions/checkout@v5
+      - uses: Factory-AI/droid-action@v1
+        with:
+          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+          automatic_review: true
+```
+
+## How it works
+
+1. PR is opened or marked ready for review
+2. Workflow triggers automatically (no `@droid` tag needed)
+3. Droid analyzes all changed files
+4. Posts inline comments on issues found
+5. Leaves a summary comment
+
+## Configuration
+
+**Skip draft PRs:**
+```yaml
+if: github.event.pull_request.draft == false
+```
+
+**Concurrency control:**
+```yaml
+concurrency:
+  group: droid-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+```
+Cancels outdated runs when new commits are pushed.
+
+**Timeout:**
+```yaml
+timeout-minutes: 15
+```
+Adjust based on typical PR size.
+
+## Best practices
+
+- Use draft PRs during development to avoid review noise
+- Include concurrency control to cancel outdated runs
+- Set reasonable timeouts based on repo size
+- Combine with manual reviews for comprehensive coverage

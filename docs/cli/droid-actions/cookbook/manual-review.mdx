@@ -1,0 +1,61 @@
+---
+title: Manual Reviews
+description: Trigger on-demand code reviews using @droid review
+---
+
+`@droid review` performs on-demand automated code reviews on pull requests.
+
+## Prerequisites
+
+Before using `@droid review`, make sure you have:
+
+1. Installed the Factory Droid GitHub App at [github.com/apps/factory-droid](https://github.com/apps/factory-droid)
+2. Added `FACTORY_API_KEY` to your repository secrets
+3. Created the workflow file (see [Quick Start](/cli/droid-actions/overview#quick-start))
+
+## Usage
+
+Comment `@droid review` anywhere on a PR to trigger a review:
+
+```
+@droid review
+```
+
+Droid will analyze the changes and post inline comments on potential issues within 1-2 minutes.
+
+## What Droid reviews
+
+Droid focuses on:
+
+- **Dead/unreachable code** - Code that will never execute
+- **Broken control flow** - Missing breaks, incorrect fallthrough
+- **Async/await mistakes** - Missing await, unhandled promises
+- **Type errors** - Null/undefined issues, incorrect coercion
+- **Security issues** - SQL injection, XSS, resource leaks
+- **Logic errors** - Off-by-one errors, race conditions
+
+## What Droid skips
+
+- Code style or formatting
+- Naming conventions
+- Architectural decisions
+- Minor performance optimizations
+
+## Example output
+
+**Inline comment:**
+```
+This function returns early without awaiting the database transaction, 
+which may cause the connection to close before the operation completes.
+
+Fix: Add await before the transaction call
+```
+
+**Summary comment:**
+```
+Found 2 potential issues:
+- 1 high priority: Missing await in async function
+- 1 medium priority: Possible null reference
+
+Please review the inline comments.
+```
