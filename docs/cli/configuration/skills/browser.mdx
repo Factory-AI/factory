@@ -1,0 +1,148 @@
+---
+title: Browser automation skill
+description: Minimal Chrome DevTools Protocol helpers that let Droids start Chrome, navigate tabs, evaluate JavaScript, take screenshots, and capture DOM metadata without building a full MCP server.
+---
+
+<Note>
+  This cookbook is inspired by [Mario Zechner's “What if you don't need
+  MCP?”](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/),
+  adapted into a reusable Factory skill so teams can share lightweight browser
+  helpers without standing up new services.
+</Note>
+
+The browser skill bundles a handful of executable scripts (`start.js`, `nav.js`, `eval.js`, `screenshot.js`, `pick.js`) plus a concise `SKILL.md`. Together they give Factory Droids a reliable way to spin up Chrome on port `9222`, drive an existing tab, scrape structured data, and capture visual evidence while staying entirely on the developer machine.
+
+## When to use this skill
+
+- You need **real-browser context** (authenticated sessions, production-only behavior, visual regressions) to complete a task.
+- You want to **inspect or extract DOM state** without building a dedicated MCP server.
+- You must **capture screenshots or DOM element metadata** as part of QA notes, bug triage, or documentation.
+- You prefer a **portable, git-tracked bundle** that any teammate can run locally with zero additional infrastructure.
+
+## What the scripts provide
+
+| Script          | Purpose                                                                                       | Typical usage                                                 |
+| --------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `start.js`      | Launches Chrome with remote debugging on `:9222`, with optional profile sync via `--profile`. | `~/.factory/skills/browser/start.js --profile`                |
+| `nav.js`        | Navigates the active tab or opens a new tab when `--new` is passed.                           | `~/.factory/skills/browser/nav.js https://example.com --new`  |
+| `eval.js`       | Runs arbitrary JavaScript (async supported) in the focused tab and prints structured results. | `~/.factory/skills/browser/eval.js "document.title"`          |
+| `screenshot.js` | Captures the current viewport to a timestamped PNG stored under `$TMPDIR`.                    | `~/.factory/skills/browser/screenshot.js`                     |
+| `pick.js`       | Injects a visual picker so you can click DOM nodes and return tag/id/class/text metadata.     | `~/.factory/skills/browser/pick.js "Click the submit button"` |
+
+All scripts rely on `puppeteer-core` and connect to a Chrome instance that you control. Because everything runs locally, existing cookies and auth tokens never leave your machine.
+
+## Setup
+
+<Steps>
+  <Step title="Create the skill folder">
+    Run `mkdir -p .factory/skills/browser`.
+  </Step>
+  <Step title="Copy scripts and package metadata">
+    Copy `start.js`, `nav.js`, `eval.js`, `screenshot.js`, `pick.js`, and
+    `package.json` into `.factory/skills/browser/` (or symlink to a shared
+    dotfiles repo).
+  </Step>
+  <Step title="Install dependencies">
+    Run `npm install --prefix .factory/skills/browser puppeteer-core`, then
+    `chmod +x .factory/skills/browser/*.js`.
+  </Step>
+  <Step title="Restart Droid">
+    Restart `droid` (or your IDE integration) so it rescans workspace skills and
+    discovers `browser`.
+  </Step>
+</Steps>
+
+## Skill definition
+
+Copy the following into `.factory/skills/browser/SKILL.md`:
+
+````md
+---
+name: browser
+description: Minimal Chrome DevTools Protocol tools for browser automation and scraping. Use when you need to start Chrome, navigate pages, execute JavaScript, take screenshots, or interactively pick DOM elements.
+---
+
+# Browser Tools
+
+Minimal CDP tools for collaborative site exploration and scraping.
+
+**IMPORTANT**: All scripts are located in `~/.factory/skills/browser/` and must be called with full paths.
+
+## Start Chrome
+
+```bash
+~/.factory/skills/browser/start.js              # Fresh profile
+~/.factory/skills/browser/start.js --profile    # Copy your profile (cookies, logins)
+```
+
+Start Chrome on `:9222` with remote debugging.
+
+## Navigate
+
+```bash
+~/.factory/skills/browser/nav.js https://example.com
+~/.factory/skills/browser/nav.js https://example.com --new
+```
+
+Navigate current tab or open new tab.
+
+## Evaluate JavaScript
+
+```bash
+~/.factory/skills/browser/eval.js 'document.title'
+~/.factory/skills/browser/eval.js 'document.querySelectorAll("a").length'
+```
+
+Execute JavaScript in active tab (async context).
+
+**IMPORTANT**: The code must be a single expression or use IIFE for multiple statements:
+
+- Single expression: `'document.title'`
+- Multiple statements: `'(() => { const x = 1; return x + 1; })()'`
+- Avoid newlines in the code string - keep it on one line
+
+## Screenshot
+
+```bash
+~/.factory/skills/browser/screenshot.js
+```
+
+Screenshot current viewport, returns temp file path.
+
+## Pick Elements
+
+```bash
+~/.factory/skills/browser/pick.js "Click the submit button"
+```
+
+Interactive element picker. Click to select, Cmd/Ctrl+Click for multi-select, Enter to finish.
+
+## Usage Notes
+
+- Start Chrome first before using other tools
+- The `--profile` flag syncs your actual Chrome profile so you're logged in everywhere
+- JavaScript evaluation runs in an async context in the page
+- Pick tool allows you to visually select DOM elements by clicking on them
+
+```
+
+## Workflow recipe
+
+1. **Start Chrome** with `start.js --profile` to mirror your authenticated state.
+2. **Drive navigation** via `nav.js https://target.app` or open secondary tabs with `--new`.
+3. **Inspect the DOM** using `eval.js` for quick counts, attribute checks, or extracting JSON payloads.
+4. **Capture artifacts** with `screenshot.js` for visual proof or `pick.js` when you need precise selectors or text snapshots.
+5. **Return the gathered evidence** (file paths, DOM metadata, query outputs) in your session summary or PR description.
+
+This workflow keeps the agent focused on the current browsing context and avoids shipping raw credentials or cookies outside your machine.
+
+## Verification
+
+- `~/.factory/skills/browser/start.js --profile` should print `✓ Chrome started on :9222 with your profile`.
+- `~/.factory/skills/browser/nav.js https://example.com` should confirm navigation.
+- `~/.factory/skills/browser/eval.js 'document.title'` should echo the current page title.
+- `~/.factory/skills/browser/screenshot.js` should output a valid PNG path under your system temp directory.
+
+If any step fails, rerun `start.js`, confirm Chrome is listening on `localhost:9222/json/version`, and ensure `puppeteer-core` is installed.
+```
+````
