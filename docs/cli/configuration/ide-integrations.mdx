@@ -5,7 +5,7 @@ description: Run droid directly inside your editor for richer context and a smoo
 
 Droid works great with any Integrated Development Environment (IDE) that has a terminal. Just run `droid`, and you're ready to go.
 
-In addition, Droid provides a dedicated integration for Visual Studio Code (including popular forks like Cursor, Windsurf, and VSCodium). For JetBrains IDEs such as IntelliJ, PyCharm, Android Studio, WebStorm, PhpStorm, and GoLand, simply run `droid` inside the integrated terminal—no plugin is required.
+In addition, Droid provides dedicated plugins for both Visual Studio Code (including popular forks like Cursor, Windsurf, and VSCodium) and JetBrains IDEs. For JetBrains IDEs such as IntelliJ IDEA, PyCharm, Android Studio, WebStorm, PhpStorm, and GoLand, you can either install the official Factory Droid plugin for enhanced integration or simply run `droid` in the integrated terminal.
 
 ## Features
 
@@ -30,9 +30,65 @@ To install Droid on VS Code and popular forks like Cursor, Windsurf, and VSCodiu
   here](https://marketplace.visualstudio.com/items?itemName=Factory.factory-vscode-extension).
 </Note>
 
-### JetBrains
+### JetBrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, etc.)
 
-Open the integrated terminal in your JetBrains IDE (IntelliJ, PyCharm, Android Studio, WebStorm, PhpStorm, or GoLand) and run `droid`. No additional plugin installation is necessary.
+Factory provides two ways to work with JetBrains IDEs:
+
+1. **Dedicated Plugin**: [Install the official Factory Droid plugin](https://plugins.jetbrains.com/plugin/28649-factory-droid) from the JetBrains Marketplace for enhanced IDE integration
+2. **Terminal Integration**: Run `droid` in the integrated terminal (no plugin required)
+
+**Supported JetBrains IDEs:**
+- IntelliJ IDEA (Ultimate and Community)
+- PyCharm (Professional and Community)
+- WebStorm
+- PhpStorm  
+- Android Studio
+- GoLand
+- CLion
+- RubyMine
+- DataGrip
+- Rider
+
+#### Option 1: Install the Factory Droid Plugin (Recommended)
+
+1. Open your JetBrains IDE
+2. Go to **Settings/Preferences** → **Plugins**
+3. Click the **Marketplace** tab
+4. Search for "Factory Droid"
+5. Click **Install** on the Factory Droid plugin
+6. Restart your IDE when prompted
+7. The Factory Droid toolbar will appear - click it to launch
+
+<Note>
+  You can download the plugin directly [here](https://plugins.jetbrains.com/plugin/28649-factory-droid)
+</Note>
+
+<img
+  src="/images/intellij.png"
+  alt="Factory Droid plugin in IntelliJ IDEA"
+  style={{ width: '100%', height: 'auto' }}
+  className="rounded-lg"
+/>
+
+#### Option 2: Terminal Integration  
+
+1. Open your JetBrains IDE
+2. Open the integrated terminal (`Alt+F12` on Windows/Linux, `Option+F12` on macOS)
+3. Navigate to your project root directory
+4. Run `droid` - all Factory features will be automatically available
+
+**Plugin Features (Option 1):**
+- **Toolbar Integration**: Launch Factory Droid directly from the IDE toolbar
+- **MCP-powered Context**: Secure context sharing with awareness of files you're editing
+- **Real-time Diagnostics**: View compiler errors and warnings shared with Droid
+- **Diff Visualization**: Review proposed changes before applying them
+- **Seamless CLI Integration**: Run tasks locally or in cloud sandboxes
+- **Enhanced Security**: Enterprise-grade guardrails for team collaboration
+
+**Terminal Integration Features (Option 2):**
+- **Project Context**: Droid automatically understands your project structure and build configuration
+- **File Navigation**: Quick file references and code exploration work seamlessly
+- **Multi-language Support**: Full support for all languages supported by your JetBrains IDE
 
 ## Usage
 
@@ -53,11 +109,14 @@ Run `droid` from your IDE's integrated terminal, and all features will be active
   - If not installed, use `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux) and search for "Shell Command: Install 'code' command in PATH" (or the equivalent for your IDE)
 - Check that VS Code has permission to install extensions
 
-### JetBrains terminal issues
+### JetBrains/IntelliJ terminal issues
 
 - Ensure you're running Droid from the project root directory
 - Use the integrated terminal inside the IDE rather than an external shell
 - Completely restart the IDE if terminal state issues persist
+- **For IntelliJ IDEA**: Make sure the terminal is using your system shell (not the embedded terminal)
+- **Project SDK**: Ensure your project SDK is properly configured if using language-specific features
+- **Terminal Settings**: Go to Settings → Tools → Terminal and verify shell path is correct
 
 ### ESC key configuration
 
