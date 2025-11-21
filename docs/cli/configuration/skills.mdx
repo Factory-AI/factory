@@ -1,32 +1,33 @@
 ---
 title: Skills
-description: Capture the way your engineering org wants work done and package it as reusable capabilities Droids can invoke on demand.
+description: Reusable capabilities that your AI agent invokes on demand.
 ---
 
-Skills are how you turn a general-purpose Droid into **a specialist teammate that follows your engineering playbook every time**.
+Skills are **reusable capabilities** that your AI agent invokes on demand. They pack instructions, expertise, and tools into a lightweight package.
 
-Instead of re-explaining the same workflows in every prompt, you capture them once as a skill: a reusable bundle of **capability + context + guardrails** that Droids can invoke as part of a larger plan.
+**Key properties:**
+- **Model-invoked** – Droids decide when to use them based on the task, not typed commands
+- **Composable** – can be chained together as part of larger workflows
+- **Token-efficient** – lightweight and focused, not bloated with unused tools or repeated instructions
 
-Use skills when you want the agent to:
+**A skill can be:**
+- **A workflow** – step-by-step instructions (e.g., "navigate to URL, take screenshot, extract data")
+- **Expertise** – domain knowledge and conventions (e.g., "how we implement frontend features with our design system")
+- **Both** – instructions + tools + best practices bundled together
 
-- **Behave like your team** – follow your architecture, testing, security, and rollout norms by default.
-- **Be consistent across sessions** – run the same playbook every time you ask for "frontend change" or "new service integration".
-- **Scale safely** – let more people use automation without needing to be experts in the codebase or infrastructure.
+**Example skills:**
+- `browser` – automate Chrome with CDP tools (navigate, screenshot, evaluate JS)
+- `linear` – manage Linear issues with CLI tools (list, update status, move teams)
+- `frontend-ui-integration` – implement typed React flows following team conventions
 
 ## What is a skill?
 
-At the file-system level, a skill is a **directory** (e.g. `.factory/skills/frontend-ui-integration/`) that contains:
+A skill is a **directory** (e.g. `.factory/skills/frontend-ui-integration/`) containing:
 
-- A primary spec like `SKILL.md` or `skill.mdx` with frontmatter + markdown instructions
-- Optional supporting files (types, schemas, checklists) that the Droid can read when the skill is active
+- `SKILL.md` or `skill.mdx` with YAML frontmatter and markdown instructions
+- Optional supporting files (scripts, schemas, checklists)
 
-Conceptually, each skill defines:
-
-- **What problem it solves** – e.g., "add a typed React surface for an existing API" or "wire a service into our event bus".
-- **What inputs it expects** – feature description, services, APIs, time ranges, risk level, etc.
-- **What success looks like** – required artifacts, tests, verification commands, and safety checks.
-
-Skills are **model-invoked**: the Droid decides when to use them based on the skill description and the current task, rather than you typing a specific command.
+Each skill defines what problem it solves, what inputs it expects, and what success looks like. The Droid automatically invokes matching skills when they apply to the current task.
 
 ## Skill file format
 
