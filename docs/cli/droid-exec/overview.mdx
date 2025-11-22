@@ -243,23 +243,53 @@ Use JSON format when you need to:
 - Extract session IDs for continuation
 - Process results in a pipeline
 
-### debug
-Streaming messages showing the agent's execution in real-time:
+### stream-json / debug
+Streaming JSONL messages showing the agent's execution in real-time. Each line is a separate JSON event that can be parsed independently:
 
 ```bash
-$ droid exec "run ls command" --output-format debug
-{"type":"message","role":"user","text":"run ls command"}
-{"type":"message","role":"assistant","text":"I'll run the ls command to list the contents..."}
-{"type":"tool_call","toolName":"Execute","parameters":{"command":"ls -la"}}
-{"type":"tool_result","value":"total 16\ndrwxr-xr-x@ 8 user staff..."}
-{"type":"message","role":"assistant","text":"The ls command has been executed successfully..."}
+$ droid exec "run ls command" --output-format stream-json
+{"type":"system","subtype":"init","cwd":"/path/to/dir","session_id":"abc-123","tools":["Read","Execute",...],"model":"claude-sonnet-4-5-20250929"}
+{"type":"message","role":"user","id":"msg-1","text":"run ls command","timestamp":1762517060816,"session_id":"abc-123"}
+{"type":"message","role":"assistant","id":"msg-2","text":"I'll run the ls command to list the contents...","timestamp":1762517062000,"session_id":"abc-123"}
+{"type":"tool_call","id":"call-1","messageId":"msg-2","toolId":"Execute","toolName":"Execute","parameters":{"command":"ls -la"},"timestamp":1762517062500,"session_id":"abc-123"}
+{"type":"tool_result","id":"call-1","messageId":"msg-3","toolId":"Execute","isError":false,"value":"total 16\ndrwxr-xr-x@ 8 user staff...","timestamp":1762517063000,"session_id":"abc-123"}
+{"type":"completion","finalText":"The ls command has been executed successfully. Here are the directory contents...","numTurns":1,"durationMs":3000,"session_id":"abc-123","timestamp":1762517064000}
 ```
 
-Debug format is useful for:
-- Monitoring agent behavior
+<Note>
+The `debug` format is a deprecated alias for `stream-json` and works identically.
+</Note>
+
+Key event types:
+- **system** - Session initialization with available tools and model
+- **message** - User or assistant text messages
+- **tool_call** - Agent calling a tool (Read, Execute, etc.)
+- **tool_result** - Result from tool execution
+- **completion** - Final event with the complete response in `finalText`
+
+The **completion event** is always emitted last and contains:
+- `finalText` - The agent's final response text
+- `numTurns` - Number of assistant turns taken
+- `durationMs` - Total execution time in milliseconds
+- `session_id` - Session identifier for continuation
+
+Stream-JSON format is useful for:
+- Monitoring agent behavior in real-time
+- Streaming progress updates to users
 - Troubleshooting execution issues
 - Understanding tool usage patterns
-- Real-time progress tracking
+- Extracting the final result from `completion.finalText`
+
+Example parsing in shell script:
+```bash
+# Extract just the final result
+droid exec "analyze code" --output-format stream-json | \
+  jq -r 'select(.type == "completion") | .finalText'
+
+# Monitor tool calls in real-time
+droid exec "complex task" --output-format stream-json | \
+  jq -r 'select(.type == "tool_call") | "\(.toolName): \(.parameters.command // .parameters.file_path // "")"'
+```
 
 For automated pipelines, you can also direct the agent to write specific artifacts:
 
