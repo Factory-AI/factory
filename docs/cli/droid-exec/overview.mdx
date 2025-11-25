@@ -308,11 +308,68 @@ droid exec --cwd /home/runner/work/repo "Map internal packages and dump graphviz
 
 ## Models and reasoning effort
 
-- Choose a model with `-m` and adjust reasoning with `-r`:
+Choose a model with `-m` and adjust reasoning with `-r`:
 
-```
+```bash
 droid exec -m claude-sonnet-4-20250514 -r medium -f plan.md
 ```
+
+### Custom models
+
+You can configure custom models to use with droid exec by adding them to your `~/.factory/config.json` file:
+
+```json
+{
+  "custom_models": [
+    {
+      "model": "gpt-5.1-codex-custom",
+      "base_url": "https://api.openai.com/v1",
+      "api_key": "your-api-key-here",
+      "provider": "openai",
+      "model_display_name": "My Custom Model"
+    }
+  ]
+}
+```
+
+To use a custom model, use the `custom:` prefix followed by the display name (with spaces replaced by dashes) and the index:
+
+```bash
+droid exec --model "custom:My-Custom-Model-0" "analyze this codebase"
+```
+
+If you have multiple custom models configured:
+
+```json
+{
+  "custom_models": [
+    {
+      "model_display_name": "Kimi K2 [Groq]"
+      "model": "kimi-k2",
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "your-groq-key",
+      "provider": "groq",
+    },
+    {
+      "model_display_name": "Gemini 3.0 Pro [Google]"
+      "model": "gemini-3.0-pro",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "api_key": "your-google-key",
+      "provider": "google",
+    }
+  ]
+}
+```
+
+You would reference them as:
+- `--model "custom:Kimi-K2-[Groq]-0"`
+- `--model "custom:Gemini-3.0-Pro-[Google]-1"`
+
+The index corresponds to the position in the `custom_models` array (0-based).
+
+<Note>
+Reasoning effort (`-r` / `--reasoning-effort`) is not yet supported for custom models, but coming soon.
+</Note>
 
 ## Batch and parallel patterns
 
