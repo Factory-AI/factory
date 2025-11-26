@@ -35,6 +35,42 @@ Add custom models in `~/.factory/config.json` under the `custom_models` array.
 | `extra_args` | `object` | | Additional provider-specific arguments to include in API requests |
 | `extra_headers` | `object` | | Additional HTTP headers to send with requests |
 
+### Using extra_args
+
+Pass provider-specific parameters like temperature or top_p:
+
+```json
+{
+  "model_display_name": "Custom Model",
+  "model": "your-model",
+  "base_url": "https://your-provider.com/v1",
+  "api_key": "YOUR_API_KEY",
+  "provider": "generic-chat-completion-api",
+  "extra_args": {
+    "temperature": 0.7,
+    "top_p": 0.9
+  }
+}
+```
+
+### Using extra_headers
+
+Add custom HTTP headers to API requests:
+
+```json
+{
+  "model_display_name": "Custom Model",
+  "model": "your-model",
+  "base_url": "https://your-provider.com/v1",
+  "api_key": "YOUR_API_KEY",
+  "provider": "generic-chat-completion-api",
+  "extra_headers": {
+    "X-Custom-Header": "value",
+    "Authorization": "Bearer YOUR_TOKEN"
+  }
+}
+```
+
 ---
 
 ## Understanding Providers
