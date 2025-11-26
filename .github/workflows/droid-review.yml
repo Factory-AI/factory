@@ -4,25 +4,24 @@ on:
   pull_request:
     types: [opened, ready_for_review, reopened]
 
-concurrency:
-  group: droid-review-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
   droid-review:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     permissions:
       contents: write
       pull-requests: write
       issues: write
       id-token: write
       actions: read
-    
     steps:
-      - uses: actions/checkout@v5
-      - uses: Factory-AI/droid-action@v1
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Run Droid Auto Review
+        uses: Factory-AI/droid-action@v1
         with:
           factory_api_key: ${{ secrets.FACTORY_API_KEY }}
           automatic_review: true
