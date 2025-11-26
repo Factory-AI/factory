@@ -23,14 +23,17 @@ Add custom models in `~/.factory/config.json` under the `custom_models` array.
 
 ### Supported Fields
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `model_display_name` | ✓ | Human-friendly name shown in model selector |
-| `model` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
-| `base_url` | ✓ | API endpoint base URL |
-| `api_key` | ✓ | Your API key for the provider. Can't be empty. |
-| `provider` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
-| `max_tokens` | ✓ | Maximum output tokens for model responses |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `model_display_name` | `string` | | Human-friendly name shown in model selector |
+| `model` | `string` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
+| `base_url` | `string` | ✓ | API endpoint base URL |
+| `api_key` | `string` | ✓ | Your API key for the provider. Can't be empty. |
+| `provider` | `string` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
+| `max_tokens` | `number` | | Maximum output tokens for model responses |
+| `supports_images` | `boolean` | | Whether the model supports image inputs |
+| `extra_args` | `object` | | Additional provider-specific arguments to include in API requests |
+| `extra_headers` | `object` | | Additional HTTP headers to send with requests |
 
 ---
 
