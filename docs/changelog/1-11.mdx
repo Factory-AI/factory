@@ -1,0 +1,65 @@
+---
+title: "Factory Release 1.11"
+description: "Skills, interactive code review, background processes, and custom models for subagents"
+draft: false
+---
+
+Factory 1.11 introduces Skills for modular, reusable capabilities, an interactive `/review` command for code reviews, and the ability to configure custom models for subagents.
+
+<iframe
+  className="w-full aspect-video rounded-xl"
+  src="https://youtube.com/embed/T17paVi8bh4"
+  title="Factory 1.11 Release"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+## Skills
+
+Extend Droid with modular, reusable capabilities. Skills are knowledge packs combined with custom tools that Droid can invoke when needed.
+
+**How it works**
+
+Type `/skills` to browse, enable, or create new skills. Skills live in `.factory/skills` directories—save them globally in your home directory (`~/.factory/skills`) for personal use, or keep them project-specific in your repo to share with your team.
+
+Droid automatically picks up your skills and uses them when relevant. If you're coming from Claude Code, Droid detects and imports skills from `.claude/skills` directories automatically.
+
+**What you can do**
+
+- Create custom skills for your team's workflows
+- Share skills across projects
+- Store skills globally or per-project
+
+<Note>Learn more about [Skills](/cli/configuration/skills).</Note>
+
+## Interactive code review
+
+Review code changes without leaving the CLI. The `/review` command provides a flexible workflow for examining diffs, commits, and branches.
+
+**How it works**
+
+Type `/review` to start an interactive code review. Choose from multiple review modes:
+
+- **Compare against base branch** - Review all changes relative to main or another branch
+- **Review specific commits** - Examine individual commits in detail
+- **Uncommitted changes** - Review your working directory changes before committing
+- **Custom instructions** - Provide specific review criteria or focus areas
+
+Droid analyzes the code changes and provides detailed feedback, catching issues before they reach pull requests.
+
+## Custom models for subagents
+
+Subagents can now use their own models. Instead of inheriting from your main session, configure each subagent to use a specific model.
+
+**How it works**
+
+Open `/droids` and select a subagent. Change the model field to use any available model—faster models for simple tasks, more capable ones for complex analysis.
+
+**Use cases**
+
+- Use a fast model for quick file searches
+- Use a reasoning model for security reviews
+- Optimize cost by matching model capability to task complexity
+
+<Note>Learn more about [custom droids](/cli/configuration/custom-droids).</Note>
