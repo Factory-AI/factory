@@ -1,0 +1,473 @@
+---
+title: "Context7 Hooks: Token Caps + Auto Archive"
+description: "Cap the number of tokens retrieved by Context7"
+---
+
+<Note>
+  Context7 already ships in Factory’s MCP registry. Once you authenticate it, you can plug in custom hooks to keep documentation pulls lightweight, logged, and repeatable.
+</Note>
+
+<Tip>
+  New to hooks? Start with [Get started with hooks](/cli/configuration/hooks-guide) for a walkthrough of the hooks UI and configuration model, then come back here to plug in the Context7-specific scripts.
+</Tip>
+
+## Prerequisites
+
+- Factory CLI installed
+- Context7 account + API token for MCP auth
+- `jq` installed (`brew install jq` on macOS)
+- A text editor—everything below builds the scripts from scratch
+- Hooks feature enabled (run `/settings`, toggle **Hooks** to **Enabled** so the `/hooks` command is available)
+
+## Step 1 · Authenticate the Context7 MCP connector
+
+<Steps>
+  <Step title="Start the auth flow">
+    Run the `/mcp` slash command to open the MCP manager. From the **Registry** list, select the `context7` entry to add it, then in the server detail view choose **Authenticate**. Follow the browser prompt; credentials are saved to `~/.factory/mcp-oauth.json`.
+  </Step>
+  <Step title="Verify connectivity">
+    Open `/mcp` again, select the `context7` server, and confirm it shows as enabled and authenticated (you should be able to view its tools, including `get-library-docs`). If not, run **Authenticate** again.
+  </Step>
+</Steps>
+
+## Step 2 · Create the hook scripts
+
+You can either have droid generate the scripts for you, or use a copy‑paste template.
+
+### Option A · Ask droid to generate the scripts
+
+If you want hooks in a project, in your project root, start a droid session and give it a prompt like:
+
+```text
+In this repo, create ~/.factory/hooks/context7_token_limiter.sh and ~/.factory/hooks/context7_archive.sh.
+The first should be a PreToolUse hook that enforces a MAX_TOKENS limit (3000) on the tool context7___get-library-docs.
+The second should archive every successful response as Markdown with YAML frontmatter into ${FACTORY_PROJECT_DIR:-$PWD}/context7-archive.
+Use jq and follow the hooks JSON input/output contracts from the hooks reference docs.
+```
+
+Review droid’s proposal, tweak as needed, then save the scripts under `~/.factory/hooks/` and make them executable:
+
+```bash
+chmod +x ~/.factory/hooks/context7_token_limiter.sh ~/.factory/hooks/context7_archive.sh
+```
+
+### Option B · Use the reference template
+
+Ensure the `~/.factory/hooks` directory exists, then create these two files.
+
+**`~/.factory/hooks/context7_token_limiter.sh`**
+
+```bash
+#!/usr/bin/env bash
+#
+# Context7 MCP Token Limiter Hook v2
+# Blocks context7___get-library-docs calls with tokens > MAX_TOKENS
+#
+# Exit Codes:
+#   0 - Allow (tokens <= MAX_TOKENS or not specified)
+#   1 - Allow with warning (invalid tokens parameter)
+#   2 - Block and provide feedback to Claude
+#
+# Notes:
+# - Environment variables MAX_TOKENS and LOG_FILE can override defaults
+# - Robust jq parsing handles strings, floats, missing values
+# - Logging never fails the hook
+# - Gracefully allows if jq is missing
+
+set -euo pipefail
+umask 077
+
+# Configuration with env overrides
+MAX_TOKENS="${MAX_TOKENS:-3000}"
+LOG_FILE="${LOG_FILE:-$HOME/.factory/hooks.log}"
+
+ts() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
+
+log() {
+  # Best effort logging; never fail the hook because of logging
+  local msg="$1"
+  mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || true
+  printf "[%s] %s\n" "$(ts)" "$msg" >> "$LOG_FILE" 2>/dev/null || true
+}
+
+# Ensure jq exists; if not, allow rather than blocking tooling
+if ! command -v jq >/dev/null 2>&1; then
+  printf "Warning: jq not found. Allowing tool call.\n" >&2
+  exit 0
+fi
+
+# Read JSON from stdin
+input="$(cat)"
+
+# Parse tool name (empty on parse errors)
+tool_name="$(printf "%s" "$input" | jq -r '.tool_name // empty' 2>/dev/null || printf "")"
+
+# Only validate Context7 get-library-docs tool
+if [[ "$tool_name" != "context7___get-library-docs" ]]; then
+  exit 0
+fi
+
+# Extract tokens as an integer using jq; empty if missing or null
+# floor ensures integer comparison even if caller passes a float
+tokens="$(printf "%s" "$input" \
+  | jq -r 'if (.tool_input.tokens? // null) == null then "" else (.tool_input.tokens | tonumber | floor) end' \
+  2>/dev/null || printf "")"
+
+log "Context7 validation: tool=$tool_name tokens=${tokens:-<missing>} limit=$MAX_TOKENS"
+
+# If tokens missing or empty, allow and let Context7 defaults apply
+if [[ -z "${tokens}" ]]; then
+  exit 0
+fi
+
+# Validate tokens is an integer string
+if ! [[ "$tokens" =~ ^[0-9]+$ ]]; then
+  printf "Warning: invalid tokens parameter: %s\n" "$tokens" >&2
+  # Non-fatal warning; preserve original intent
+  exit 1
+fi
+
+# Enforce limit
+if (( tokens > MAX_TOKENS )); then
+  log "BLOCKED: Context7 call with $tokens tokens (limit: $MAX_TOKENS)"
+
+  # Feedback to Claude. Exit code 2 signals a block in PreToolUse hooks.
+  cat >&2 <<EOF
+Context7 token limit exceeded: $tokens > $MAX_TOKENS
+
+We prefer an iterative approach to Context7 queries for better context management:
+
+1. Start with your first query (max $MAX_TOKENS tokens) on the most important topic
+2. Review the results and identify what additional information you need
+3. Refine your next query based on what you learned
+4. Repeat with focused follow-up queries
+
+This iterative pattern gives you:
+- Better control over context window usage
+- More focused, relevant results per query
+- Ability to adapt your research based on findings
+- Less risk of overwhelming the context with broad searches
+
+Example workflow:
+  Query 1: tokens=3000, topic="React 19 new hooks and features"
+  (review results, identify gaps)
+  Query 2: tokens=3000, topic="use() hook detailed patterns and examples"
+  (review results, go deeper)
+  Query 3: tokens=3000, topic="Server Actions with React 19 integration"
+
+Start with your most important question at 3000 tokens, then iterate.
+EOF
+
+  exit 2
+fi
+
+# Allow - tokens within acceptable range
+exit 0
+```
+
+**`~/.factory/hooks/context7_archive.sh`**
+
+```bash
+#!/bin/bash
+#
+# Context7 MCP Archive Hook v2
+# Saves Context7 query results to disk for future reference
+# PostToolUse hook for context7___get-library-docs
+#
+# Filename format: {YYYYMMDD}_{project-name}_{library-slug}_{topic-slug}.md
+# Uses underscore for field separators, hyphen for word separators
+#
+# Environment variables:
+#   DEBUG=1           - Enable debug logging
+#   RAW_JSON=1        - Save raw JSON tool_response instead of parsed text
+#
+
+set -euo pipefail
+
+# Security: restrictive file permissions
+umask 077
+
+# Configuration
+ARCHIVE_DIR="${FACTORY_PROJECT_DIR}/context7-archive"
+MAX_TOPIC_LENGTH=50
+DEBUG_LOG="${ARCHIVE_DIR}/hook-debug.log"
+
+# Debug function
+debug() {
+    if [[ "${DEBUG:-0}" == "1" ]]; then
+        echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] $*" >> "$DEBUG_LOG"
+    fi
+}
+
+# Check for jq dependency
+if ! command -v jq &> /dev/null; then
+    echo "Warning: jq not found. Context7 archive hook disabled." >&2
+    exit 0
+fi
+
+# Read JSON from stdin
+input=$(cat)
+
+# Create archive directory
+mkdir -p "$ARCHIVE_DIR"
+
+debug "Hook invoked"
+
+# Only process Context7 get-library-docs tool
+tool_name=$(echo "$input" | jq -r '.tool_name // empty' 2>/dev/null || echo "")
+debug "Tool: $tool_name"
+if [[ "$tool_name" != "context7___get-library-docs" ]]; then
+    debug "Skipping non-Context7 tool"
+    exit 0
+fi
+
+# Extract data from hook input
+library_id=$(echo "$input" | jq -r '.tool_input.context7CompatibleLibraryID // "unknown-library"' 2>/dev/null || echo "unknown-library")
+topic=$(echo "$input" | jq -r '.tool_input.topic // "untitled"' 2>/dev/null || echo "untitled")
+tokens=$(echo "$input" | jq -r '.tool_input.tokens // "unknown"' 2>/dev/null || echo "unknown")
+
+# Debug: log the tool_response type
+response_type=$(echo "$input" | jq -r '.tool_response | type' 2>/dev/null || echo "unknown")
+debug "tool_response type: $response_type"
+
+# Extract results - handle string, array, or object with text field
+# This is the robust parsing logic
+if [[ "$response_type" == "string" ]]; then
+    results=$(echo "$input" | jq -r '.tool_response' 2>/dev/null || echo "")
+elif [[ "$response_type" == "array" ]]; then
+    # Array of content parts - join them
+    results=$(echo "$input" | jq -r '.tool_response | if type == "array" then map(if type == "object" and has("text") then .text else . end) | join("\n\n") else . end' 2>/dev/null || echo "")
+elif [[ "$response_type" == "object" ]]; then
+    # Object with text field
+    results=$(echo "$input" | jq -r '.tool_response.text // .tool_response | if type == "string" then . else tojson end' 2>/dev/null || echo "")
+else
+    # Fallback: stringify whatever it is
+    results=$(echo "$input" | jq -r '.tool_response | if type == "string" then . else tojson end' 2>/dev/null || echo "")
+fi
+
+# RAW_JSON mode: save the full JSON tool_response
+if [[ "${RAW_JSON:-0}" == "1" ]]; then
+    results=$(echo "$input" | jq '.tool_response' 2>/dev/null || echo '{}')
+fi
+
+# Skip if no results
+if [[ -z "$results" || "$results" == "null" ]]; then
+    debug "No results to archive"
+    exit 0
+fi
+
+debug "Archiving: lib=$library_id topic=$topic tokens=$tokens"
+
+# Extract project name from FACTORY_PROJECT_DIR
+project_name=$(basename "$FACTORY_PROJECT_DIR" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+
+# Extract library slug from library ID with improved logic
+# /vercel/next.js/v15.1.8 -> nextjs
+# /ericbuess/claude-code-docs -> claude-code
+# /cloudflare/workers-sdk -> cloudflare-workers
+#
+# Strategy:
+# 1. Remove leading slash
+# 2. Split on slash: org / project / version
+# 3. Use project part (index 1)
+# 4. Remove common prefixes (workers-, etc.)
+# 5. Clean up: lowercase, replace non-alnum with hyphen, collapse multiple hyphens
+
+library_path="${library_id#/}"  # Remove leading slash
+IFS='/' read -ra parts <<< "$library_path"
+
+if [[ ${#parts[@]} -ge 2 ]]; then
+    org="${parts[0]}"
+    project="${parts[1]}"
+
+    # Derive slug from project name
+    library_slug=$(echo "$project" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//')
+
+    # Special handling for known patterns
+    # next.js -> nextjs
+    library_slug=$(echo "$library_slug" | sed 's/next-js/nextjs/')
+    # workers-sdk -> cloudflare-workers (prepend org for clarity)
+    if [[ "$project" =~ workers && "$org" == "cloudflare" ]]; then
+        library_slug="cloudflare-workers"
+    fi
+    # Remove common prefixes that add no value
+    library_slug=$(echo "$library_slug" | sed 's/^docs-//' | sed 's/-docs$//')
+else
+    # Fallback: use entire library_id as slug
+    library_slug=$(echo "$library_id" | tr '[:upper:]' '[:lower:]' | sed 's|/|-|g' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//')
+fi
+
+# Ensure we have a valid slug
+if [[ -z "$library_slug" ]]; then
+    library_slug="unknown"
+fi
+
+debug "Library slug: $library_slug"
+
+# Create topic slug (kebab-case, max 50 chars at word boundary)
+topic_slug=$(echo "$topic" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9 -]//g' | sed 's/  */-/g' | sed 's/^-//' | sed 's/-$//')
+
+# Handle empty topic
+if [[ -z "$topic_slug" ]]; then
+    topic_slug="untitled"
+fi
+
+# Truncate at word boundary if too long
+if [[ ${#topic_slug} -gt $MAX_TOPIC_LENGTH ]]; then
+    topic_slug="${topic_slug:0:$MAX_TOPIC_LENGTH}"
+    # Trim to last complete word (hyphen-separated)
+    if [[ "$topic_slug" =~ -.*$ ]]; then
+        topic_slug="${topic_slug%-*}"
+    fi
+fi
+
+debug "Topic slug: $topic_slug"
+
+# Generate timestamp and filename
+date_only=$(date +"%Y%m%d")
+base_filename="${date_only}_${project_name}_${library_slug}_${topic_slug}"
+filename="${base_filename}.md"
+filepath="${ARCHIVE_DIR}/${filename}"
+
+# Collision handling: add -N suffix if file exists
+counter=1
+while [[ -f "$filepath" ]]; do
+    filename="${base_filename}-${counter}.md"
+    filepath="${ARCHIVE_DIR}/${filename}"
+    ((counter++))
+    if [[ $counter -gt 100 ]]; then
+        echo "Error: Too many collisions for filename: $base_filename" >&2
+        exit 1
+    fi
+done
+
+debug "Final filename: $filename"
+
+# Create markdown file with YAML frontmatter
+cat > "$filepath" <<EOF
+---
+query_date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+library: $library_id
+topic: $topic
+tokens: $tokens
+project: $project_name
+tool: $tool_name
+---
+
+# Context7 Query: $topic
+
+$results
+EOF
+
+# Success
+debug "Archived to: $filename"
+exit 0
+```
+
+Then make both scripts executable:
+
+```bash
+chmod +x ~/.factory/hooks/context7_token_limiter.sh ~/.factory/hooks/context7_archive.sh
+```
+
+<Note>
+  The matcher should target the LLM tool name `context7___get-library-docs`. If you’re unsure, inspect `~/.factory/hooks.log` (written by the limiter) or open the latest transcript file (see the `transcript_path` field, typically under `~/.factory/projects/...`) to inspect the `tool_name` value.
+</Note>
+
+## Step 3 · Token limiter (PreToolUse)
+
+- **Hook file:** `~/.factory/hooks/context7_token_limiter.sh`
+- **Purpose:** Block any `context7___get-library-docs` call that requests more than 3,000 tokens.
+- **Useful env vars:**
+
+```bash
+export MAX_TOKENS=3000
+export LOG_FILE="$HOME/.factory/hooks.log"  # Optional auditing
+```
+
+When the script exits with code 2, Factory halts the tool call and surfaces the warning text to the assistant.
+
+## Step 4 · Archive writer (PostToolUse)
+
+- **Hook file:** `~/.factory/hooks/context7_archive.sh`
+- **Purpose:** Save every successful Context7 response as Markdown in `${FACTORY_PROJECT_DIR}/context7-archive` (falls back to your current repo if the env var is unset).
+- **Useful env vars:**
+
+```bash
+export DEBUG=1                           # Verbose logging to hook-debug.log
+export ARCHIVE_DIR="$HOME/context7-history"  # Optional custom location
+export RAW_JSON=1                        # Store raw JSON payloads instead of rendered text
+```
+
+Each file includes YAML frontmatter so you can grep or index entries later (e.g., `20251114_myapp_nextjs_server-actions.md`).
+
+## Step 5 · Register the hooks
+
+You can register these hooks either through the `/hooks` UI (recommended) or by editing `~/.factory/settings.json` directly.
+
+### Option A - Use the Hooks UI
+
+1. Run `/settings` and make sure **Hooks** is set to **Enabled**.
+2. Run `/hooks`, select the **PreToolUse** event, and add a matcher `context7___get-library-docs`. Hit enter to save.
+3. Add a `command`: `~/.factory/hooks/context7_token_limiter.sh`, and store it in **User settings**.
+4. Repeat for **PostToolUse**, matcher `context7___get-library-docs`, command `~/.factory/hooks/context7_archive.sh`.
+
+### Option B - Edit settings JSON
+
+Open `~/.factory/settings.json` and add a `hooks` block like this (merging with any existing hooks):
+
+```jsonc
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "context7___get-library-docs",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/context7_token_limiter.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "context7___get-library-docs",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.factory/hooks/context7_archive.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Using the exact LLM tool name `context7___get-library-docs` ensures you only target the Context7 docs fetch tool. You can also use regex matchers (see [Hooks reference](/reference/hooks-reference)) if you need to match multiple Context7 tools.
+
+Restart Factory (or reopen your session) after editing your hooks configuration.
+
+## Step 6 · Test the workflow
+
+<Steps>
+  <Step title="Limiter">
+    Ask Context7 for something intentionally huge, e.g. “Pull the entire Factory documentation with context7 mcp". The hook should block it at 3,000 tokens. (Factory already has a local codemap for its docs; this request is purely for testing.)
+  </Step>
+  <Step title="Archive">
+    Run a normal Context7 request. Confirm `context7-archive/` now contains a timestamped Markdown file with the query results.
+  </Step>
+</Steps>
+
+## Troubleshooting & customization
+
+- **Matcher typos:** If the hooks never run, double-check the matcher value against `context7___get-library-docs`. One missing underscore is enough to break it.
+- **Missing `jq`:** Install it with `brew install jq` (macOS) or your distro’s package manager.
+- **Permissions:** Ensure every script in `~/.factory/hooks` is executable (`chmod +x ~/.factory/hooks/*`).
+- **Archive clutter:** Add `context7-archive/` to `.gitignore` if you don’t plan to commit the saved docs.
+- **Timeouts:** Increase the `timeout` field in `hooks.json` if you routinely archive very large responses.
+
+With these two hooks in place, every Context7 pull stays within a predictable token budget and automatically lands in a searchable knowledge base.
