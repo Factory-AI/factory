@@ -4,6 +4,27 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="November 25" rss={{ title: "CLI Updates", description: "Project-level MCP configs, IDE command, and custom model improvements" }}>
+  `v0.27.2`
+
+  ## New features
+
+  * **Project-level MCP configs** - Configure MCP servers at the project level using `.factory/mcp.json`
+  * **`/ide` command** - New command to manage VS Code, Cursor, and Windsurf IDE integrations. Shows current extension version or prompts to install
+  * **Extra args in custom models** - Pass additional arguments to custom model configurations e.g. service_tier, temperature, top_p, etc
+
+  ## Bug fixes
+
+  * Fixed task tool infinite wait when running subagents
+  * Fixed expanding tilde (~) paths when loading sessions
+  * Improved `@` search rankings - exact filename matches now appear at the top with VSCode-style two-column display
+  * Removed automatic creation of `.factory/skills` folders
+  * Show compacting state when triggered 
+  * Consolidate markdown rendering (fixes missing character in spec mode)
+  * Parallelize loading certificates on Windows
+
+</Update>
+
 <Update label="November 24" rss={{ title: "CLI Updates", description: "New model support, persistent session settings, and auto-update improvements" }}>
   `v0.27.1`
 
