@@ -204,7 +204,14 @@ Type `/mcp` within droid to open an interactive UI for managing MCP servers.
 
 ## Configuration
 
-MCP server configurations are stored in `~/.factory/mcp.json`. The configuration includes:
+MCP server configurations can be stored at two levels:
+
+- **User-level**: `~/.factory/mcp.json` - applies to all projects
+- **Project-level**: `.factory/mcp.json` - applies only to the current project
+
+Project-level configurations are merged with user-level configurations, allowing you to define project-specific MCP servers that are automatically available when working in that project.
+
+The configuration includes:
 
 - **Name**: Unique identifier for the server
 - **Type**: Server type (`stdio` or `http`)
