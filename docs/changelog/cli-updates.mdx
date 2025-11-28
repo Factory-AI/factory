@@ -4,6 +4,27 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="November 28" rss={{ title: "CLI Updates", description: "Interleaved thinking support, show thinking setting, and hooks permanently enabled" }}>
+  `v0.27.4`
+
+  ## New features
+
+  * **Interleaved thinking support** - Display multiple thinking blocks during streaming, including redacted thinking blocks with safety messages
+  * **Show thinking setting** - Show AI thinking/reasoning on the main view, turn on/off in `/settings`
+  * **Hooks always enabled** - The hooks feature is now permanently enabled and available via the `/hooks` command
+
+  ## Bug fixes
+
+  * Fixed ESC/Q navigation in `/model` menus - pressing ESC or Q now properly navigates back to previous menu level instead of closing all menus
+  * Fixed garbage characters appearing in prompt input caused by terminal response bytes leaking into stdin
+  * Fixed reasoning effort display in spec mode to correctly reflect the actual reasoning effort being used
+  * Fixed OpenAI chat completions streaming for tool calls
+  * Improved Gemini's usage of the todo tool with better prompting
+  * Fixed model warmup for GLM-4.6
+  * Fixed `/install-github-app` command issues
+
+</Update>
+
 <Update label="November 25" rss={{ title: "CLI Updates", description: "Project-level MCP configs, IDE command, and custom model improvements" }}>
   `v0.27.2`
 
