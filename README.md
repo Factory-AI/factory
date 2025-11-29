@@ -2,7 +2,7 @@
 
 The agent-native development platform. Works across CLI, Web, Slack/Teams, Linear/Jira and Mobile.
 
-Our agent, Droid, is top performing in terminal benchmarks.
+Our agent, Droid, is a top performer in terminal benchmarks.
 
 <p align="left">
   <img src="docs/images/droid_ascii.gif" alt="Droid logo" height="220" />
