@@ -25,12 +25,13 @@ jobs:
       - name: Sync documentation
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+          PAYLOAD_CHANGES: ${{ github.event.client_payload.changes }}
         run: |
           droid exec --auto low "
           You are syncing public documentation from our private codebase.
           
           Payload from factory-mono:
-          ${{ github.event.client_payload.changes }}
+          $PAYLOAD_CHANGES
           
           STRICT RULES - VIOLATIONS MUST BLOCK ALL CHANGES:
           1. NEVER document anything behind a feature flag
@@ -54,7 +55,7 @@ jobs:
 
       - name: Check for feature flag violations
         run: |
-          if grep -rq "feature.flag\|featureFlag\|FF_\|FEATURE_FLAG" --include="*.md" --include="*.mdx" docs/ 2>/dev/null; then
+          if grep -rqE "featureFlag|feature_flag|FF_|FEATURE_FLAG|isEnabled|flagEnabled" --include="*.md" --include="*.mdx" docs/ 2>/dev/null; then
             echo "::error::Feature flag references detected in docs!"
             exit 1
           fi
