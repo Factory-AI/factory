@@ -1,0 +1,91 @@
+name: Sync Docs from Factory Mono
+
+on:
+  repository_dispatch:
+    types: [docs-sync]
+  workflow_dispatch:
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup droid CLI
+        run: |
+          curl -fsSL https://app.factory.ai/cli | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Sync documentation
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        run: |
+          droid exec --auto low "
+          You are syncing public documentation from our private codebase.
+          
+          Payload from factory-mono:
+          ${{ github.event.client_payload.changes }}
+          
+          STRICT RULES - VIOLATIONS MUST BLOCK ALL CHANGES:
+          1. NEVER document anything behind a feature flag
+          2. Search for: featureFlag, feature_flag, FF_, isEnabled, flagEnabled
+          3. If you find ANY feature-flagged content, STOP and write ONLY to doc-audit-summary.md explaining what was blocked
+          4. Models in docs must match exactly what's in production
+          5. Settings must reflect current shipped behavior only
+          
+          Tasks:
+          1. Review the payload for what changed
+          2. Search docs/ for files referencing changed APIs/settings/models
+          3. Update documentation to match current production state
+          4. Verify all code examples are accurate
+          5. Write doc-audit-summary.md with:
+             - Files updated and why
+             - Any feature-flagged content you REJECTED
+             - Anything needing human review
+          
+          DO NOT commit or push changes.
+          "
+
+      - name: Check for feature flag violations
+        run: |
+          if grep -rq "feature.flag\|featureFlag\|FF_\|FEATURE_FLAG" --include="*.md" --include="*.mdx" docs/ 2>/dev/null; then
+            echo "::error::Feature flag references detected in docs!"
+            exit 1
+          fi
+
+      - name: Create PR if changes exist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$(git status --porcelain docs/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            BRANCH="docs/sync-from-mono-$(date +%Y%m%d-%H%M%S)"
+            git checkout -b $BRANCH
+            git add docs/
+            git commit -m "docs: sync documentation from factory-mono"
+            git push origin $BRANCH
+            
+            SUMMARY=$(cat doc-audit-summary.md 2>/dev/null || echo "Documentation synced from factory-mono release.")
+            
+            gh pr create \
+              --title "Sync docs from factory-mono" \
+              --body "## Documentation Sync
+
+          $SUMMARY
+
+          ### Review Checklist
+          - [ ] No feature-flagged content included
+          - [ ] Models match production
+          - [ ] Examples are accurate
+          - [ ] No internal/sensitive information exposed"
+          else
+            echo "No documentation changes needed"
+          fi
