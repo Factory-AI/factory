@@ -1,0 +1,154 @@
+name: Changelog Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_pr_number:
+        description: 'Release PR number from factory-mono'
+        required: true
+        type: string
+      release_pr_title:
+        description: 'Release PR title'
+        required: true
+        type: string
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get release PR details
+        id: release-info
+        env:
+          GH_TOKEN: ${{ secrets.FACTORY_MONO_PAT }}
+        run: |
+          echo "Fetching PR #${{ inputs.release_pr_number }} from factory-mono..."
+          
+          PR_BODY=$(gh pr view ${{ inputs.release_pr_number }} \
+            --repo Factory-AI/factory-mono \
+            --json body \
+            --jq '.body')
+          
+          echo "$PR_BODY" > release_pr_body.txt
+          echo "pr_title=${{ inputs.release_pr_title }}" >> $GITHUB_OUTPUT
+
+      - name: Setup droid CLI
+        run: |
+          curl -fsSL https://app.factory.ai/cli | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Generate changelog entry
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        run: |
+          PR_BODY=$(cat release_pr_body.txt)
+          
+          droid exec --auto low "
+          You are creating a changelog entry for the Factory CLI.
+          
+          Release PR #${{ inputs.release_pr_number }}: ${{ inputs.release_pr_title }}
+          
+          PR Body:
+          $PR_BODY
+          
+          STRICT RULES - VIOLATIONS MUST BLOCK ALL CHANGES:
+          1. Only include CLI/TUI changes - ignore web app, desktop, infrastructure
+          2. NEVER include anything behind a feature flag
+          3. Search for these patterns to identify feature-flagged items:
+             - featureFlag, feature_flag, FF_, FEATURE_FLAG
+             - isEnabled, flagEnabled, isFeatureEnabled
+             - 'behind flag', 'feature gated', 'gated behind'
+          4. If a PR item mentions ANY of these patterns, EXCLUDE it completely
+          5. Check that features are merged to main (not just dev branch)
+          6. If uncertain whether something is feature-flagged, EXCLUDE it
+          
+          Tasks:
+          1. First, write changelog-audit.md (gitignored) with:
+             - ALL items from the release PR
+             - Mark each as INCLUDED or EXCLUDED
+             - For excluded items, explain WHY (feature flag, non-CLI, etc.)
+             - This file is for internal review only and won't be committed
+          
+          2. Extract version number from the release title (e.g., 'Release 1.3.XXX' -> v1.3.XXX)
+          
+          3. Identify ONLY non-flagged CLI/TUI Improvements and CLI Fixes
+          
+          4. Open docs/changelog/cli-updates.mdx and add a new <Update> block at the TOP (after frontmatter):
+          
+          <Update label=\"<Month Day>\" rss={{ title: \"CLI Updates\", description: \"<brief summary>\" }}>
+            \`vX.X.X\`
+            
+            ## New features
+            
+            * **Feature name** - Description of the feature
+            
+            ## Bug fixes
+            
+            * Fixed issue description
+          </Update>
+          
+          5. Write changelog-summary.md with:
+             - Version number
+             - Count of items included vs excluded
+             - List of features added (public safe)
+             - List of fixes added (public safe)
+          
+          DO NOT commit or push changes.
+          DO NOT include changelog-audit.md in any commits.
+          "
+
+      - name: Check for feature flag violations
+        run: |
+          # Check the changelog file for any feature flag patterns
+          if grep -rqE "featureFlag|feature_flag|FF_|FEATURE_FLAG|isEnabled|flagEnabled|isFeatureEnabled|behind.flag|feature.gated" docs/changelog/cli-updates.mdx 2>/dev/null; then
+            echo "::error::Feature flag references detected in changelog!"
+            exit 1
+          fi
+          
+          # Also check for any internal codenames or sensitive patterns
+          if grep -rqE "internal|beta.only|experimental.flag" docs/changelog/cli-updates.mdx 2>/dev/null; then
+            echo "::warning::Potentially sensitive content detected - please review"
+          fi
+
+      - name: Create PR if changes exist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$(git status --porcelain docs/changelog/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            BRANCH="changelog-$(date +%Y%m%d-%H%M%S)"
+            git checkout -b $BRANCH
+            
+            # Only add the changelog file, NOT audit files
+            git add docs/changelog/cli-updates.mdx
+            git commit -m "docs: add CLI changelog for ${{ inputs.release_pr_title }}"
+            git push origin $BRANCH
+            
+            # Use summary for PR body (audit file stays local)
+            SUMMARY=$(cat changelog-summary.md 2>/dev/null || echo "Changelog entry created from factory-mono release.")
+            
+            gh pr create \
+              --title "Changelog: ${{ inputs.release_pr_title }}" \
+              --body "## Changelog Entry
+
+          Generated from factory-mono PR #${{ inputs.release_pr_number }}
+
+          $SUMMARY
+
+          ### Review Checklist
+          - [ ] Version number is correct
+          - [ ] Only CLI/TUI changes included
+          - [ ] No feature-flagged items
+          - [ ] Formatting matches existing entries"
+          else
+            echo "No changelog changes generated"
+          fi

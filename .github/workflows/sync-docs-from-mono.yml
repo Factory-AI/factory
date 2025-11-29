@@ -1,0 +1,139 @@
+name: Sync Docs from Factory Mono
+
+on:
+  workflow_run:
+    workflows: ["Changelog Automation"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      release_pr_number:
+        description: 'Release PR number from factory-mono (optional for manual trigger)'
+        required: false
+        type: string
+
+jobs:
+  sync-docs:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get release info
+        id: release-info
+        env:
+          GH_TOKEN: ${{ secrets.FACTORY_MONO_PAT }}
+        run: |
+          # For workflow_run, get the most recent merged release PR
+          # For workflow_dispatch, use input or most recent
+          PR_NUM="${{ inputs.release_pr_number }}"
+          
+          if [ -z "$PR_NUM" ]; then
+            echo "Finding most recent release PR..."
+            RELEASE_PR=$(gh pr list \
+              --repo Factory-AI/factory-mono \
+              --state merged \
+              --search "Release in:title" \
+              --json number,title,body \
+              --limit 1)
+            
+            PR_NUM=$(echo "$RELEASE_PR" | jq -r '.[0].number')
+            PR_TITLE=$(echo "$RELEASE_PR" | jq -r '.[0].title')
+          else
+            PR_TITLE=$(gh pr view $PR_NUM --repo Factory-AI/factory-mono --json title --jq '.title')
+          fi
+          
+          echo "Processing release PR #$PR_NUM: $PR_TITLE"
+          
+          gh pr view $PR_NUM \
+            --repo Factory-AI/factory-mono \
+            --json body \
+            --jq '.body' > release_info.txt
+          
+          echo "pr_number=$PR_NUM" >> $GITHUB_OUTPUT
+          echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
+
+      - name: Setup droid CLI
+        run: |
+          curl -fsSL https://app.factory.ai/cli | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Sync documentation
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        run: |
+          RELEASE_INFO=$(cat release_info.txt)
+          
+          droid exec --auto low "
+          You are syncing public documentation based on release PRs merged in factory-mono.
+          
+          Release PRs merged:
+          $RELEASE_INFO
+          
+          STRICT RULES - VIOLATIONS MUST BLOCK ALL CHANGES:
+          1. NEVER document anything behind a feature flag
+          2. Search for: featureFlag, feature_flag, FF_, isEnabled, flagEnabled
+          3. If you find ANY feature-flagged content, STOP and write ONLY to doc-audit-summary.md explaining what was blocked
+          4. Models in docs must match exactly what's in production
+          5. Settings must reflect current shipped behavior only
+          
+          Tasks:
+          1. Review the release PR descriptions for what changed
+          2. Search docs/ for files referencing changed APIs/settings/models
+          3. Update documentation to match current production state
+          4. Verify all code examples are accurate
+          5. Write doc-audit-summary.md with:
+             - Files updated and why
+             - Any feature-flagged content you REJECTED
+             - Anything needing human review
+          
+          DO NOT commit or push changes.
+          "
+
+      - name: Check for feature flag violations
+        if: steps.check-releases.outputs.has_releases == 'true' && steps.check-processed.outputs.should_process == 'true'
+        run: |
+          if grep -rqE "featureFlag|feature_flag|FF_|FEATURE_FLAG|isEnabled|flagEnabled" --include="*.md" --include="*.mdx" docs/ 2>/dev/null; then
+            echo "::error::Feature flag references detected in docs!"
+            exit 1
+          fi
+
+      - name: Create PR if changes exist
+        if: steps.check-releases.outputs.has_releases == 'true' && steps.check-processed.outputs.should_process == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$(git status --porcelain docs/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            PR_NUMS="${{ steps.check-releases.outputs.pr_numbers }}"
+            BRANCH="docs/sync-from-mono-$(date +%Y%m%d-%H%M%S)"
+            git checkout -b $BRANCH
+            git add docs/
+            git commit -m "docs: sync from factory-mono PR #${PR_NUMS}"
+            git push origin $BRANCH
+            
+            SUMMARY=$(cat doc-audit-summary.md 2>/dev/null || echo "Documentation synced from factory-mono release.")
+            
+            gh pr create \
+              --title "Sync docs from factory-mono PR #${PR_NUMS}" \
+              --body "## Documentation Sync
+
+          Triggered by merged release PR(s) in factory-mono: #${PR_NUMS}
+
+          $SUMMARY
+
+          ### Review Checklist
+          - [ ] No feature-flagged content included
+          - [ ] Models match production
+          - [ ] Examples are accurate
+          - [ ] No internal/sensitive information exposed"
+          else
+            echo "No documentation changes needed"
+          fi
