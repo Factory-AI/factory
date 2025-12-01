@@ -41,7 +41,7 @@ Customize droid's behavior with command-line flags:
 | Flag                                 | Description                                                                                                  | Example                                                    |
 | :----------------------------------- | :----------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------- |
 | `-f, --file <path>`                  | Read prompt from a file                                                                                      | `droid exec -f plan.md`                                    |
-| `-m, --model <id>`                   | Select a specific model (see [model IDs](#available-models))                                                 | `droid exec -m claude-opus-4-1-20250805`                   |
+| `-m, --model <id>`                   | Select a specific model (see [model IDs](#available-models))                                                 | `droid exec -m claude-opus-4-5-20251101`                   |
 | `-s, --session-id <id>`              | Continue an existing session                                                                                 | `droid exec -s session-abc123`                             |
 | `--auto <level>`                     | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)                                             | `droid exec --auto medium "run tests"`                     |
 | `--enabled-tools <ids>`              | Force-enable specific tools (comma or space separated)                                                       | `droid exec --enabled-tools ApplyPatch,Bash`               |
@@ -99,11 +99,13 @@ droid exec --auto high "Run tests, commit, and push changes"
 
 | Model ID                      | Name                    | Reasoning support | Default reasoning |
 | :---------------------------- | :---------------------- | :---------------- | :---------------- |
+| `claude-opus-4-5-20251101`    | Claude Opus 4.5 (default) | Yes             | off               |
+| `gpt-5.1-codex`               | GPT-5.1 Codex           | Yes               | medium            |
+| `gpt-5.1`                     | GPT-5.1                 | Yes               | none              |
 | `claude-sonnet-4-5-20250929`  | Claude Sonnet 4.5       | Yes               | off               |
-| `gpt-5-codex`                 | GPT-5 Codex (Auto)      | No                | none              |
-| `gpt-5-2025-08-07`            | GPT-5                   | Yes               | medium            |
 | `claude-opus-4-1-20250805`    | Claude Opus 4.1         | Yes               | off               |
 | `claude-haiku-4-5-20251001`   | Claude Haiku 4.5        | Yes               | off               |
+| `gemini-3-pro-preview`        | Gemini 3 Pro            | Yes               | high              |
 | `glm-4.6`                     | Droid Core (GLM-4.6)    | No                | none              |
 
 Custom models configured via [BYOK](/cli/configuration/byok) use the format: `custom:<alias>`
@@ -132,14 +134,24 @@ Available when running `droid` in interactive mode. Type the command at the prom
 | `/billing`               | View and manage billing settings                      |
 | `/bug [title]`           | Create a bug report with session data and logs        |
 | `/clear`                 | Start a new session (alias for `/new`)                |
+| `/commands`              | Manage custom slash commands                          |
 | `/compress [prompt]`     | Compress session and move to new one with summary     |
 | `/cost`                  | Show token usage statistics                           |
+| `/favorite`              | Mark current session as a favorite                    |
 | `/help`                  | Show available slash commands                         |
+| `/hooks`                 | Manage lifecycle hooks                                |
+| `/ide`                   | Configure IDE integrations                            |
+| `/login`                 | Sign in to Factory                                    |
+| `/logout`                | Sign out of Factory                                   |
 | `/mcp`                   | Manage Model Context Protocol servers                 |
 | `/model`                 | Switch AI model mid-session                           |
 | `/new`                   | Start a new session                                   |
+| `/quit`                  | Exit droid (alias: `exit`, or press Ctrl+C)           |
+| `/review`                | Start a code review workflow                          |
+| `/rewind`                | Undo recent changes in the session                    |
 | `/sessions`              | List and select previous sessions                     |
 | `/settings`              | Configure application settings                        |
+| `/skills`                | Manage and invoke skills                              |
 | `/status`                | Show current droid status and configuration           |
 | `/terminal-setup`        | Configure terminal keybindings for Shift+Enter        |
 
