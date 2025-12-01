@@ -147,16 +147,14 @@ For detailed information on slash commands, see the [interactive mode documentat
 
 ### MCP command reference
 
-The `/mcp` command manages Model Context Protocol servers:
+The `/mcp` slash command opens an interactive manager UI for browsing and managing MCP servers.
+
+For CLI-based management (useful for scripting and automation), use:
 
 ```bash
-/mcp list                    # List all configured servers
-/mcp add <name> <command>    # Add stdio-based server
-/mcp add --type http <url>   # Add HTTP-based server
-/mcp remove <name>           # Remove a server
-/mcp get <name>              # Show server details
-/mcp enable <name>           # Enable a disabled server
-/mcp disable <name>          # Temporarily disable a server
+droid mcp add <name> <url> --type http    # Add HTTP-based server
+droid mcp add <name> "<command>"          # Add stdio-based server
+droid mcp remove <name>                   # Remove a server
 ```
 
 See [MCP Configuration](/cli/configuration/mcp) for complete documentation.
