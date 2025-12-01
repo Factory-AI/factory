@@ -57,7 +57,7 @@ Create `.factory/hooks/notify-wait.sh`:
 
 input=$(cat)
 message=$(echo "$input" | jq -r '.message // "Droid needs your attention"')
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
 
 # Only notify on actual wait events
 if [ "$hook_event" != "Notification" ]; then
@@ -113,7 +113,7 @@ Create `.factory/hooks/completion-sound.sh`:
 #!/bin/bash
 
 input=$(cat)
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
 
 # Only alert on completion events
 if [ "$hook_event" != "Stop" ]; then
@@ -178,8 +178,8 @@ if [ -z "$SLACK_WEBHOOK_URL" ]; then
 fi
 
 input=$(cat)
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
-session_id=$(echo "$input" | jq -r '.session_id')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
+session_id=$(echo "$input" | jq -r '.sessionId')
 cwd=$(echo "$input" | jq -r '.cwd')
 
 # Build message based on event type
@@ -290,7 +290,7 @@ EMAIL_TO="${DROID_NOTIFY_EMAIL:-your-email@example.com}"
 EMAIL_FROM="${DROID_FROM_EMAIL:-droid@factory.ai}"
 
 input=$(cat)
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
 
 # Only notify on session end with errors
 if [ "$hook_event" != "SessionEnd" ]; then
@@ -298,7 +298,7 @@ if [ "$hook_event" != "SessionEnd" ]; then
 fi
 
 reason=$(echo "$input" | jq -r '.reason')
-session_id=$(echo "$input" | jq -r '.session_id')
+session_id=$(echo "$input" | jq -r '.sessionId')
 cwd=$(echo "$input" | jq -r '.cwd')
 
 # Check if session ended due to error
@@ -350,9 +350,9 @@ Create `.factory/hooks/rich-notify-macos.sh`:
 #!/bin/bash
 
 input=$(cat)
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
 message=$(echo "$input" | jq -r '.message // "Droid needs your attention"')
-session_id=$(echo "$input" | jq -r '.session_id')
+session_id=$(echo "$input" | jq -r '.sessionId')
 
 # Only for macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
@@ -492,8 +492,8 @@ if [ -z "$LOG_ENDPOINT" ]; then
 fi
 
 input=$(cat)
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
-session_id=$(echo "$input" | jq -r '.session_id')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
+session_id=$(echo "$input" | jq -r '.sessionId')
 cwd=$(echo "$input" | jq -r '.cwd')
 
 # Add metadata
