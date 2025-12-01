@@ -65,7 +65,7 @@ fi
 
 command=$(echo "$input" | jq -r '.tool_input.command')
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-session_id=$(echo "$input" | jq -r '.session_id')
+session_id=$(echo "$input" | jq -r '.sessionId')
 
 # Log to file
 log_file="$HOME/.factory/command-log.jsonl"
@@ -136,7 +136,7 @@ if [ "$tool_name" != "Write" ] && [ "$tool_name" != "Edit" ]; then
 fi
 
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-session_id=$(echo "$input" | jq -r '.session_id')
+session_id=$(echo "$input" | jq -r '.sessionId')
 cwd=$(echo "$input" | jq -r '.cwd')
 
 # Determine file type
@@ -214,8 +214,8 @@ Create `.factory/hooks/track-session.sh`:
 #!/bin/bash
 
 input=$(cat)
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
-session_id=$(echo "$input" | jq -r '.session_id')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
+session_id=$(echo "$input" | jq -r '.sessionId')
 
 db_file="$HOME/.factory/sessions.db"
 
@@ -480,7 +480,7 @@ Create `.factory/hooks/perf-monitor.sh`:
 start_time=$(date +%s.%N)
 
 input=$(cat)
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
 tool_name=$(echo "$input" | jq -r '.tool_name // "none"')
 
 # Simulate your actual hook work here
@@ -527,15 +527,15 @@ Create `.factory/hooks/track-costs.sh`:
 #!/bin/bash
 
 input=$(cat)
-hook_event=$(echo "$input" | jq -r '.hook_event_name')
+hook_event=$(echo "$input" | jq -r '.hookEventName')
 
 # Only track on session end
 if [ "$hook_event" != "SessionEnd" ]; then
   exit 0
 fi
 
-session_id=$(echo "$input" | jq -r '.session_id')
-transcript_path=$(echo "$input" | jq -r '.transcript_path')
+session_id=$(echo "$input" | jq -r '.sessionId')
+transcript_path=$(echo "$input" | jq -r '.transcriptPath')
 
 # Parse transcript for token usage
 if [ ! -f "$transcript_path" ]; then

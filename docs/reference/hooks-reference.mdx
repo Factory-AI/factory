@@ -242,13 +242,13 @@ event-specific data:
 ```typescript
 {
   // Common fields
-  session_id: string
-  transcript_path: string  // Path to conversation JSON
-  cwd: string              // The current working directory when the hook is invoked
-  permission_mode: string  // Current permission mode: "default", "plan", "acceptEdits", or "bypassPermissions"
+  sessionId: string
+  transcriptPath: string  // Path to conversation JSON
+  cwd: string             // The current working directory when the hook is invoked
+  permissionMode: string  // Current permission mode: "off", "spec", "auto-low", "auto-medium", or "auto-high"
 
   // Event-specific fields
-  hook_event_name: string
+  hookEventName: string
   ...
 }
 ```
@@ -259,11 +259,11 @@ The exact schema for `tool_input` depends on the tool.
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "/Users/.../.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "sessionId": "abc123",
+  "transcriptPath": "/Users/.../.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
-  "permission_mode": "default",
-  "hook_event_name": "PreToolUse",
+  "permissionMode": "off",
+  "hookEventName": "PreToolUse",
   "tool_name": "Write",
   "tool_input": {
     "file_path": "/path/to/file.txt",
@@ -278,11 +278,11 @@ The exact schema for `tool_input` and `tool_response` depends on the tool.
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "/Users/.../.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "sessionId": "abc123",
+  "transcriptPath": "/Users/.../.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
-  "permission_mode": "default",
-  "hook_event_name": "PostToolUse",
+  "permissionMode": "off",
+  "hookEventName": "PostToolUse",
   "tool_name": "Write",
   "tool_input": {
     "file_path": "/path/to/file.txt",
@@ -299,11 +299,11 @@ The exact schema for `tool_input` and `tool_response` depends on the tool.
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "/Users/.../.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "sessionId": "abc123",
+  "transcriptPath": "/Users/.../.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
-  "permission_mode": "default",
-  "hook_event_name": "Notification",
+  "permissionMode": "off",
+  "hookEventName": "Notification",
   "message": "Task completed successfully"
 }
 ```
@@ -312,46 +312,46 @@ The exact schema for `tool_input` and `tool_response` depends on the tool.
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "/Users/.../.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "sessionId": "abc123",
+  "transcriptPath": "/Users/.../.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
-  "permission_mode": "default",
-  "hook_event_name": "UserPromptSubmit",
+  "permissionMode": "off",
+  "hookEventName": "UserPromptSubmit",
   "prompt": "Write a function to calculate the factorial of a number"
 }
 ```
 
 ### Stop and SubagentStop Input
 
-`stop_hook_active` is true when Droid is already continuing as a result of
+`stopHookActive` is true when Droid is already continuing as a result of
 a stop hook. Check this value or process the transcript to prevent Droid
 from running indefinitely.
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "~/.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "sessionId": "abc123",
+  "transcriptPath": "~/.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
-  "permission_mode": "default",
-  "hook_event_name": "Stop",
-  "stop_hook_active": true
+  "permissionMode": "off",
+  "hookEventName": "Stop",
+  "stopHookActive": true
 }
 ```
 
 ### PreCompact Input
 
-For `manual`, `custom_instructions` comes from what the user passes into
-`/compact`. For `auto`, `custom_instructions` is empty.
+For `manual`, `customInstructions` comes from what the user passes into
+`/compact`. For `auto`, `customInstructions` is empty.
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "~/.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "sessionId": "abc123",
+  "transcriptPath": "~/.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
-  "permission_mode": "default",
-  "hook_event_name": "PreCompact",
+  "permissionMode": "off",
+  "hookEventName": "PreCompact",
   "trigger": "manual",
-  "custom_instructions": ""
+  "customInstructions": ""
 }
 ```
 
@@ -359,11 +359,11 @@ For `manual`, `custom_instructions` comes from what the user passes into
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "~/.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "sessionId": "abc123",
+  "transcriptPath": "~/.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
-  "permission_mode": "default",
-  "hook_event_name": "SessionStart",
+  "permissionMode": "off",
+  "hookEventName": "SessionStart",
   "source": "startup"
 }
 ```
@@ -372,12 +372,12 @@ For `manual`, `custom_instructions` comes from what the user passes into
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "~/.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "sessionId": "abc123",
+  "transcriptPath": "~/.factory/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
-  "permission_mode": "default",
-  "hook_event_name": "SessionEnd",
-  "reason": "exit"
+  "permissionMode": "off",
+  "hookEventName": "SessionEnd",
+  "reason": "other"
 }
 ```
 
