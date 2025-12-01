@@ -93,7 +93,7 @@ Key metadata fields:
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `name`            | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                  |
 | `description`     | Optional. Shown in the UI list. Keep ≤500 chars.                                                                               |
-| `model`           | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`. Run `/models` in the CLI to see available options. |
+| `model`           | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`. See the [pricing page](/pricing#pricing-table) for model IDs. |
 | `reasoningEffort` | Optional. Set reasoning effort for models that support it (e.g., `low`, `medium`, `high`). Ignored when `model` is `inherit`. Must be compatible with the selected model. |
 | `tools`           | Tool selection: omit for all tools, use a category string (e.g., `read-only`), or specify an array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive. |
 
@@ -259,7 +259,7 @@ Common unmapped tools:
 - **Choose models strategically** – use `inherit` to match the parent session, or specify a different model for specialized tasks:
   - Smaller/faster models for simple analysis and summary tasks (lower cost).
   - Larger/more capable models for complex reasoning, code review, and multi-step analysis.
-  - Run `/models` in the CLI to see available options for your workspace.
+  - See the [pricing page](/pricing#pricing-table) for available model IDs.
 - **Limit tool access** – use explicit tool lists to restrict what a subagent can do, preventing unexpected shell commands or other dangerous operations.
 - **Leverage live updates** – the Task tool now streams live progress, showing tool calls, results, and TodoWrite updates in real time as the subagent executes.
 - **Structure output** – organize the prompt to emit sections like `Summary:` and `Findings:` so the Task tool UI can summarize results clearly.
