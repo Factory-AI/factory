@@ -46,24 +46,24 @@ Usage: droid exec [options] [prompt]
 Execute a single command (non-interactive mode)
 
 Arguments:
-  prompt                            The prompt to execute
+  prompt                          The prompt to execute
 
 Options:
-  -o, --output-format <format>      Output format: text|json|stream-json (default: "text")
-  --input-format <format>           Input format: stream-json|stream-jsonrpc for multi-turn
-  -f, --file <path>                 Read prompt from file
-  --auto <level>                    Autonomy level: low|medium|high
-  --skip-permissions-unsafe         Skip ALL permission checks (unsafe)
-  -s, --session-id <id>             Existing session to continue (requires a prompt)
-  -m, --model <id>                  Model ID to use
-  -r, --reasoning-effort <level>    Reasoning effort: none|off|low|medium|high
-  --spec-model <id>                 Model ID to use for spec mode
-  --use-spec                        Start in specification mode
-  --enabled-tools <ids>             Enable specific tools (comma or space separated)
-  --disabled-tools <ids>            Disable specific tools (comma or space separated)
-  --list-tools                      List available tools and exit
-  --cwd <path>                      Working directory path
-  -h, --help                        display help for command
+  -o, --output-format <format>    Output format (default: "text")
+  --input-format <format>         Input format: stream-json for multi-turn sessions
+  -f, --file <path>               Read prompt from file
+  --auto <level>                  Autonomy level: low|medium|high
+  --skip-permissions-unsafe       Skip ALL permission checks - allows all permissions (unsafe)
+  -s, --session-id <id>           Existing session to continue (requires a prompt)
+  -m, --model <id>                Model ID to use
+  -r, --reasoning-effort <level>  Reasoning effort (defaults per model)
+  --spec-model <id>               Model ID to use for spec mode
+  --use-spec                      Start in spec mode
+  --enabled-tools <ids>           Enable specific tools (comma or space separated list)
+  --disabled-tools <ids>          Disable specific tools (comma or space separated list)
+  --list-tools                    List available tools for the selected model and exit
+  --cwd <path>                    Working directory path
+  -h, --help                      display help for command
 ```
 
 Supported models (examples):
