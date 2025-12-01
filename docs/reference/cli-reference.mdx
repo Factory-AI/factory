@@ -149,13 +149,45 @@ For detailed information on slash commands, see the [interactive mode documentat
 
 The `/mcp` slash command opens an interactive manager UI for browsing and managing MCP servers.
 
+**Interactive manager features:**
+- Browse and search configured MCP servers
+- View tools provided by each connected server
+- Enable/disable servers temporarily
+- Authenticate with OAuth-enabled MCP servers
+- Clear authentication credentials
+- Add servers from a curated registry
+- Remove user-configured servers
+
 For CLI-based management (useful for scripting and automation), use:
 
 ```bash
-droid mcp add <name> <url> --type http    # Add HTTP-based server
-droid mcp add <name> "<command>"          # Add stdio-based server
-droid mcp remove <name>                   # Remove a server
+# Add HTTP-based server
+droid mcp add <name> <url> --type http
+
+# Add HTTP server with custom headers
+droid mcp add <name> <url> --type http --header "Authorization: Bearer xxx"
+
+# Add stdio-based server (default type)
+droid mcp add <name> "<command>"
+
+# Add stdio server with environment variables
+droid mcp add <name> "<command>" --env API_KEY=xxx --env DEBUG=true
+
+# Remove a server
+droid mcp remove <name>
 ```
+
+| Option | Description | Applies to |
+| :----- | :---------- | :--------- |
+| `--type <type>` | Server type: `http` or `stdio` (default: `stdio`) | Both |
+| `--env <KEY=VALUE>` | Environment variable (can be repeated) | stdio only |
+| `--header <KEY: VALUE>` | HTTP header (can be repeated) | http only |
+
+**Configuration files:**
+- **User config:** `~/.droid/mcp.json` - Your personal MCP servers
+- **Project config:** `.factory/mcp.json` - Shared team servers (committed to repo)
+
+Project-configured servers cannot be removed via CLI—edit `.factory/mcp.json` directly.
 
 See [MCP Configuration](/cli/configuration/mcp) for complete documentation.
 
