@@ -46,26 +46,34 @@ Usage: droid exec [options] [prompt]
 Execute a single command (non-interactive mode)
 
 Arguments:
-  prompt                          The prompt to execute
+  prompt                            The prompt to execute
 
 Options:
-  -o, --output-format <format>    Output format (default: "text")
-  -f, --file <path>               Read prompt from file
-  --auto <level>                  Autonomy level: low|medium|high
-  --skip-permissions-unsafe       Skip ALL permission checks (unsafe)
-  -s, --session-id <id>           Existing session to continue (requires a prompt)
-  -m, --model <id>                Model ID to use
-  -r, --reasoning-effort <level>  Reasoning effort: off|low|medium|high
-  --cwd <path>                    Working directory path
-  -h, --help                      display help for command
+  -o, --output-format <format>      Output format: text|json|stream-json (default: "text")
+  --input-format <format>           Input format: stream-json|stream-jsonrpc for multi-turn
+  -f, --file <path>                 Read prompt from file
+  --auto <level>                    Autonomy level: low|medium|high
+  --skip-permissions-unsafe         Skip ALL permission checks (unsafe)
+  -s, --session-id <id>             Existing session to continue (requires a prompt)
+  -m, --model <id>                  Model ID to use
+  -r, --reasoning-effort <level>    Reasoning effort: none|off|low|medium|high
+  --spec-model <id>                 Model ID to use for spec mode
+  --use-spec                        Start in specification mode
+  --enabled-tools <ids>             Enable specific tools (comma or space separated)
+  --disabled-tools <ids>            Disable specific tools (comma or space separated)
+  --list-tools                      List available tools and exit
+  --cwd <path>                      Working directory path
+  -h, --help                        display help for command
 ```
 
 Supported models (examples):
 
 - gpt-5-codex (default)
 - gpt-5-2025-08-07
-- claude-sonnet-4-20250514
+- claude-sonnet-4-5-20250929
 - claude-opus-4-1-20250805
+- claude-haiku-4-5-20251001
+- glm-4.6
 
 ## Installation
 
@@ -261,6 +269,20 @@ $ droid exec "run ls command" --output-format stream-json
 The `debug` format is a deprecated alias for `stream-json` and works identically.
 </Note>
 
+### stream-jsonrpc (multi-turn)
+For SDK integration and multi-turn conversations, use the JSON-RPC streaming protocol:
+
+```bash
+droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc --auto low
+```
+
+This mode reads JSONL messages from stdin and outputs JSON-RPC formatted responses, enabling:
+- Multi-turn conversations within a single exec invocation
+- Dynamic mode switching during execution
+- Full tool access like the interactive TUI
+
+Send messages via stdin in JSONL format and receive structured JSON-RPC responses.
+
 Key event types:
 - **system** - Session initialization with available tools and model
 - **message** - User or assistant text messages
@@ -312,7 +334,38 @@ droid exec --cwd /home/runner/work/repo "Map internal packages and dump graphviz
 Choose a model with `-m` and adjust reasoning with `-r`:
 
 ```bash
-droid exec -m claude-sonnet-4-20250514 -r medium -f plan.md
+droid exec -m claude-sonnet-4-5-20250929 -r medium -f plan.md
+```
+
+Use `--use-spec` to start in specification mode, where the agent plans before executing:
+
+```bash
+droid exec --use-spec --auto low "refactor the auth module"
+```
+
+You can also use a different model for the spec phase:
+
+```bash
+droid exec --use-spec --spec-model claude-haiku-4-5-20251001 --auto medium "implement feature X"
+```
+
+### Tool controls
+
+List available tools for a model:
+
+```bash
+droid exec --list-tools
+droid exec --model gpt-5-codex --list-tools --output-format json
+```
+
+Enable or disable specific tools:
+
+```bash
+# Enable additional tools
+droid exec --enabled-tools ApplyPatch "refactor files"
+
+# Disable specific tools
+droid exec --auto medium --disabled-tools execute-cli "run edits only"
 ```
 
 ### Custom models
