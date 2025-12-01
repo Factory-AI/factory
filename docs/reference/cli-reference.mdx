@@ -38,25 +38,26 @@ The CLI operates in two modes:
 
 Customize droid's behavior with command-line flags:
 
-| Flag                             | Description                                                                                                  | Example                                                  |
-| :------------------------------- | :----------------------------------------------------------------------------------------------------------- | :------------------------------------------------------- |
-| `-f, --file <path>`              | Read prompt from a file                                                                                      | `droid exec -f plan.md`                                  |
-| `-m, --model <id>`               | Select a specific model (see [model IDs](#available-models))                                                 | `droid exec -m claude-opus-4-1-20250805`                 |
-| `-s, --session-id <id>`          | Continue an existing session                                                                                 | `droid exec -s session-abc123`                           |
-| `--auto <level>`                 | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)                                             | `droid exec --auto medium "run tests"`                   |
-| `--enabled-tools <ids>`          | Force-enable specific tools (comma or space separated)                                                       | `droid exec --enabled-tools ApplyPatch,Bash`             |
-| `--disabled-tools <ids>`         | Disable specific tools for this run                                                                          | `droid exec --disabled-tools execute-cli`                |
-| `--list-tools`                   | Print available tools and exit                                                                               | `droid exec --list-tools`                                |
-| `-o, --output-format <format>`   | Output format (`text`, `json`, `stream-json`)                                                                | `droid exec -o json "document API"`                      |
-| `--input-format <format>`        | Input format (`stream-json` for multi-turn)                                                                  | `droid exec --input-format stream-json -o stream-json`   |
-| `-r, --reasoning-effort <level>` | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`)                                           | `droid exec -r high "debug flaky test"`                  |
-| `--spec-model <id>`              | Use a different model for specification planning                                                             | `droid exec --spec-model claude-sonnet-4-5-20250929`     |
-| `--use-spec`                     | Start in specification mode (plan before executing)                                                          | `droid exec --use-spec "add user profiles"`              |
-| `--skip-permissions-unsafe`      | Skip all permission prompts (⚠️ use with extreme caution)                                                    | `droid exec --skip-permissions-unsafe`                   |
-| `--cwd <path>`                   | Execute from a specific working directory                                                                    | `droid exec --cwd ../service "run tests"`                |
-| `--delegation-url <url>`         | Override delegation service endpoint                                                                         | `droid exec --delegation-url https://custom.factory.ai`  |
-| `-v, --version`                  | Display CLI version                                                                                          | `droid -v`                                               |
-| `-h, --help`                     | Show help information                                                                                        | `droid --help`                                           |
+| Flag                                 | Description                                                                                                  | Example                                                    |
+| :----------------------------------- | :----------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------- |
+| `-f, --file <path>`                  | Read prompt from a file                                                                                      | `droid exec -f plan.md`                                    |
+| `-m, --model <id>`                   | Select a specific model (see [model IDs](#available-models))                                                 | `droid exec -m claude-opus-4-1-20250805`                   |
+| `-s, --session-id <id>`              | Continue an existing session                                                                                 | `droid exec -s session-abc123`                             |
+| `--auto <level>`                     | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)                                             | `droid exec --auto medium "run tests"`                     |
+| `--enabled-tools <ids>`              | Force-enable specific tools (comma or space separated)                                                       | `droid exec --enabled-tools ApplyPatch,Bash`               |
+| `--disabled-tools <ids>`             | Disable specific tools for this run                                                                          | `droid exec --disabled-tools execute-cli`                  |
+| `--list-tools`                       | Print available tools and exit                                                                               | `droid exec --list-tools`                                  |
+| `-o, --output-format <format>`       | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)                                              | `droid exec -o json "document API"`                        |
+| `--input-format <format>`            | Input format (`stream-json`, `stream-jsonrpc` for multi-turn)                                                | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
+| `-r, --reasoning-effort <level>`     | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`)                                           | `droid exec -r high "debug flaky test"`                    |
+| `--spec-model <id>`                  | Use a different model for specification planning                                                             | `droid exec --spec-model claude-sonnet-4-5-20250929`       |
+| `--spec-reasoning-effort <level>`    | Override reasoning effort for spec mode                                                                      | `droid exec --use-spec --spec-reasoning-effort high`       |
+| `--use-spec`                         | Start in specification mode (plan before executing)                                                          | `droid exec --use-spec "add user profiles"`                |
+| `--skip-permissions-unsafe`          | Skip all permission prompts (⚠️ use with extreme caution)                                                    | `droid exec --skip-permissions-unsafe`                     |
+| `--cwd <path>`                       | Execute from a specific working directory                                                                    | `droid exec --cwd ../service "run tests"`                  |
+| `--delegation-url <url>`             | URL for delegated sessions (Slack thread or Linear issue)                                                    | `droid exec --delegation-url <slack-or-linear-url>`        |
+| `-v, --version`                      | Display CLI version                                                                                          | `droid -v`                                                 |
+| `-h, --help`                         | Show help information                                                                                        | `droid --help`                                             |
 
 <Tip>
   Use `--output-format json` for scripting and automation, allowing you to parse droid's responses programmatically.
