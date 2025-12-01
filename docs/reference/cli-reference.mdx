@@ -147,19 +147,19 @@ For detailed information on slash commands, see the [interactive mode documentat
 
 ### MCP command reference
 
-The `/mcp` command manages Model Context Protocol servers:
+The `/mcp` slash command opens an interactive manager UI for browsing and managing MCP servers.
+
+**Quick start:** Type `/mcp` and select **"Add from Registry"** to browse 40+ pre-configured servers (Linear, Sentry, Notion, Stripe, Vercel, and more). Select a server, authenticate if required, and you're ready to go.
+
+**CLI commands** for scripting and automation:
 
 ```bash
-/mcp list                    # List all configured servers
-/mcp add <name> <command>    # Add stdio-based server
-/mcp add --type http <url>   # Add HTTP-based server
-/mcp remove <name>           # Remove a server
-/mcp get <name>              # Show server details
-/mcp enable <name>           # Enable a disabled server
-/mcp disable <name>          # Temporarily disable a server
+droid mcp add <name> <url> --type http    # Add HTTP server
+droid mcp add <name> "<command>"          # Add stdio server
+droid mcp remove <name>                   # Remove a server
 ```
 
-See [MCP Configuration](/cli/configuration/mcp) for complete documentation.
+See [MCP Configuration](/cli/configuration/mcp) for the full registry list, CLI options (`--env`, `--header`), configuration files, and how user vs project config layering works.
 
 ## Authentication
 
