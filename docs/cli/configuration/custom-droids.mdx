@@ -6,16 +6,15 @@ keywords: ['custom droids', 'subagents', 'agents', 'specialized agents', 'delega
 
 Custom droids are reusable subagents defined in Markdown. Each droid carries its own system prompt, model preference, and tooling policy so you can hand off focused tasks—like code review, security checks, or research—without re-typing instructions.
 
-<Warning>
-  Custom Droids are experimental. You must enable them in settings before they
-  will be picked up.
-</Warning>
-
 ---
 
 ## 1 · What are custom droids?
 
-Custom droids live as `.md` files under either your project's `.factory/droids/` or your personal `~/.factory/droids/` directory. When enabled, the CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the **Task** tool. This lets the primary assistant spin up purpose-built helpers mid-session.
+Custom droids live as `.md` files under either your project's `.factory/droids/` or your personal `~/.factory/droids/` directory. The CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the **Task** tool. This lets the primary assistant spin up purpose-built helpers mid-session.
+
+<Note>
+  Custom Droids are enabled by default. You can toggle them off in Settings (`/settings`) under the Experimental section if needed.
+</Note>
 
 - **Project droids** sit in `<repo>/.factory/droids/` and are shared with teammates.
 - **Personal droids** live in `~/.factory/droids/` and follow you across workspaces.
@@ -34,19 +33,17 @@ Custom droids live as `.md` files under either your project's `.factory/droids/`
 
 ## 3 · Quick start
 
-1. Open **Settings** (`/settings`) and toggle **Custom Droids** under the _Experimental_ section. This persists `"enableCustomDroids"` in `~/.factory/settings.json` and registers the Task tool.
-2. Restart `droid`.
-3. Run `/droids` to launch the Droids menu.
-4. Choose **Create a new Droid**, pick a storage location (project or personal), then follow the wizard to set:
+1. Run `/droids` to launch the Droids menu.
+2. Choose **Create a new Droid**, pick a storage location (project or personal), then follow the wizard to set:
    - Description of what the droid should do
    - System prompt (auto-generated or manually edited)
    - Identifier (name for the droid)
    - Model (or inherit from parent session)
-   - Tools (explicit list of tool IDs)
-5. Save. The CLI writes `<name>.md` into the chosen `droids/` directory and normalizes the filename (lowercase, hyphenated).
-6. Ask droid to use it, e.g. "Run the Task tool with subagent `code-reviewer` to review this diff," or trigger it from automation.
+   - Tools (explicit list of tool IDs or a category)
+3. Save. The CLI writes `<name>.md` into the chosen `droids/` directory and normalizes the filename (lowercase, hyphenated).
+4. Ask droid to use it, e.g. "Run the Task tool with subagent `code-reviewer` to review this diff," or trigger it from automation.
 
-The loader caches scans for ~5 seconds. The current UI instantiates a fresh loader on every open, so changes usually show up on the next visit; a long-running watch is not yet enabled by default.
+Changes to droid files are picked up on the next menu open or Task tool invocation.
 
 ---
 
@@ -59,7 +56,7 @@ Each droid file is Markdown with YAML frontmatter.
 name: code-reviewer
 description: Focused reviewer that checks diffs for correctness risks
 model: inherit
-tools: ["Read", "LS", "Grep", "Glob"]
+tools: read-only
 ---
 
 You are the team's senior reviewer. Examine the diff the parent agent shares and:
@@ -76,28 +73,53 @@ Findings:
 - <bullet>
 ```
 
+You can also specify tools as an array for more control:
+
+```md
+---
+name: deep-analyzer
+description: Thorough analysis with extended thinking
+model: claude-sonnet-4-5-20250929
+reasoningEffort: high
+tools: ["Read", "Grep", "Glob", "WebSearch"]
+---
+
+Perform deep analysis of the code or problem presented...
+```
+
 Key metadata fields:
 
-| Field         | Notes                                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `name`        | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                  |
-| `description` | Optional. Shown in the UI list. Keep ≤500 chars.                                                                               |
-| `model`       | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`. Run `/models` in the CLI to see available options. |
-| `tools`       | Tool selection: `undefined` (all tools) or array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive.               |
+| Field             | Notes                                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `name`            | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                  |
+| `description`     | Optional. Shown in the UI list. Keep ≤500 chars.                                                                               |
+| `model`           | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`. See the [pricing page](/pricing#pricing-table) for model IDs. |
+| `reasoningEffort` | Optional. Set reasoning effort for models that support it (e.g., `low`, `medium`, `high`). Ignored when `model` is `inherit`. Must be compatible with the selected model. |
+| `tools`           | Tool selection: omit for all tools, use a category string (e.g., `read-only`), or specify an array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive. |
 
 Prompts must start with YAML frontmatter containing at least `name` and include a non-empty body. `DroidValidator` surfaces errors (invalid names, unknown models, unknown tools) and warnings (missing description, duplicated tools). Validation issues appear in the CLI logs when a file fails to load.
 
 ### Tool categories → concrete tools
 
-| Category    | Tool IDs                                    | Purpose                            |
-| ----------- | ------------------------------------------- | ---------------------------------- |
-| `read-only` | `Read`, `LS`, `Grep`, `Glob`                | Safe analysis and file exploration |
-| `edit`      | `Create`, `Edit`, `MultiEdit`, `ApplyPatch` | Code generation and modifications  |
-| `execute`   | `Execute`                                   | Shell command execution            |
-| `web`       | `WebSearch`, `FetchUrl`                     | Internet research and content      |
-| `mcp`       | Dynamically populated (if any)              | Model Context Protocol tools       |
+You can use a category name directly as the `tools` value (e.g., `tools: read-only`) or specify individual tool IDs in an array.
+
+| Category    | Tool IDs                         | Purpose                            |
+| ----------- | -------------------------------- | ---------------------------------- |
+| `read-only` | `Read`, `LS`, `Grep`, `Glob`     | Safe analysis and file exploration |
+| `edit`      | `Create`, `Edit`, `ApplyPatch`   | Code generation and modifications  |
+| `execute`   | `Execute`                        | Shell command execution            |
+| `web`       | `WebSearch`, `FetchUrl`          | Internet research and content      |
+| `mcp`       | Dynamically populated (if any)   | Model Context Protocol tools       |
 
 Explicit arrays must use the tool names above (case-sensitive). Unknown names cause validation errors.
+
+<Note>
+  `TodoWrite` is automatically included for all droids to enable task tracking. You don't need to add it to your tools list.
+</Note>
+
+<Note>
+  When using `Edit` with OpenAI models, `ApplyPatch` is automatically included for compatibility. When `model` is `inherit`, both tools are enabled to ensure coverage across model providers.
+</Note>
 
 ---
 
@@ -233,11 +255,11 @@ Common unmapped tools:
 
 ## 6 · Using custom droids effectively
 
-- **Invoke via the Task tool** – when custom droids are enabled, the droid may call it autonomously, or you can request it directly ("Use the subagent `security-auditor` on this change").
+- **Invoke via the Task tool** – droid may call custom droids autonomously, or you can request it directly ("Use the subagent `security-auditor` on this change").
 - **Choose models strategically** – use `inherit` to match the parent session, or specify a different model for specialized tasks:
   - Smaller/faster models for simple analysis and summary tasks (lower cost).
   - Larger/more capable models for complex reasoning, code review, and multi-step analysis.
-  - Run `/models` in the CLI to see available options for your workspace.
+  - See the [pricing page](/pricing#pricing-table) for available model IDs.
 - **Limit tool access** – use explicit tool lists to restrict what a subagent can do, preventing unexpected shell commands or other dangerous operations.
 - **Leverage live updates** – the Task tool now streams live progress, showing tool calls, results, and TodoWrite updates in real time as the subagent executes.
 - **Structure output** – organize the prompt to emit sections like `Summary:` and `Findings:` so the Task tool UI can summarize results clearly.
@@ -307,7 +329,7 @@ Findings:
 name: task-coordinator
 description: Coordinates multi-step tasks with live progress updates
 model: inherit
-tools: Read, Edit, Execute, TodoWrite
+tools: ["Read", "Edit", "Execute"]
 ---
 
 You are a task coordinator. Break down the goal into actionable steps:
