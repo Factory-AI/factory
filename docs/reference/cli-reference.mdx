@@ -149,16 +149,37 @@ For detailed information on slash commands, see the [interactive mode documentat
 
 The `/mcp` slash command opens an interactive manager UI for browsing and managing MCP servers.
 
-**Interactive manager features:**
-- Browse and search configured MCP servers
-- View tools provided by each connected server
-- Enable/disable servers temporarily
-- Authenticate with OAuth-enabled MCP servers
-- Clear authentication credentials
-- Add servers from a curated registry
-- Remove user-configured servers
+#### Quick start: Adding servers from the registry
 
-For CLI-based management (useful for scripting and automation), use:
+The easiest way to get started with MCP is using the built-in registry. Type `/mcp` and select **"Add from Registry"** to browse pre-configured servers:
+
+| Server | Description |
+| :----- | :---------- |
+| linear | Issue tracking and project management |
+| sentry | Error tracking and performance monitoring |
+| notion | Notes, docs, and project management |
+| supabase | Create and manage Supabase projects |
+| stripe | Payment processing APIs |
+| vercel | Manage projects and deployments |
+| playwright | End-to-end browser testing |
+| ... | 40+ servers available |
+
+Select a server, authenticate if required, and you're ready to go. Most HTTP servers support OAuth—just follow the browser prompt.
+
+#### Interactive manager features
+
+The `/mcp` UI lets you:
+- **Browse servers** - See all configured servers and their connection status
+- **View tools** - Inspect what tools each connected server provides
+- **Enable/disable** - Temporarily disable servers without removing them
+- **Authenticate** - Connect to OAuth-enabled servers via browser
+- **Clear auth** - Remove stored credentials for a server
+- **Add from registry** - One-click setup for popular MCP servers
+- **Remove servers** - Delete user-configured servers
+
+#### CLI commands for automation
+
+For scripting and automation, use CLI commands instead of the interactive UI:
 
 ```bash
 # Add HTTP-based server
@@ -183,11 +204,22 @@ droid mcp remove <name>
 | `--env <KEY=VALUE>` | Environment variable (can be repeated) | stdio only |
 | `--header <KEY: VALUE>` | HTTP header (can be repeated) | http only |
 
-**Configuration files:**
-- **User config:** `~/.droid/mcp.json` - Your personal MCP servers
-- **Project config:** `.factory/mcp.json` - Shared team servers (committed to repo)
+#### Configuration: User vs Project
 
-Project-configured servers cannot be removed via CLI—edit `.factory/mcp.json` directly.
+MCP servers can be configured at two levels:
+
+| Level | Location | Purpose |
+| :---- | :------- | :------ |
+| **User** | `~/.droid/mcp.json` | Your personal servers, available in all projects |
+| **Project** | `.factory/mcp.json` | Shared team servers, committed to the repo |
+
+**How layering works:**
+- User config takes priority over project config
+- When you enable/disable a project-defined server, a copy is saved to your user config with the new state
+- The original project config remains unchanged (so teammates aren't affected)
+- Project servers cannot be removed via CLI or UI—edit `.factory/mcp.json` directly
+
+**OAuth tokens** are stored globally in your system keyring, not per-project. If you authenticate with a server in one project, you're authenticated everywhere.
 
 See [MCP Configuration](/cli/configuration/mcp) for complete documentation.
 
