@@ -4,16 +4,46 @@ description: 'Connect your own tools with Model Context Protocol'
 keywords: ['mcp', 'model context protocol', 'tools', 'droid mcp', 'mcp servers', 'mcp tools', 'integrations', 'connect tools', 'extend droid', 'cli mcp', 'add mcp', 'mcp add']
 ---
 
-Model Context Protocol (MCP) servers extend droid's capabilities by providing additional tools and context. Droid offers two ways to manage them: CLI commands for quick setup and scripting, or an interactive UI for browsing and management.
+Model Context Protocol (MCP) servers extend droid's capabilities by providing additional tools and context. Droid offers two ways to manage them: an interactive UI for easy browsing and setup, or CLI commands for scripting and automation.
 
-<Note>
-  Use CLI commands like `droid mcp add` for quick server setup and automation,
-  or use `/mcp` within droid for an interactive visual interface.
-</Note>
+## Quick Start: Add from Registry
 
-## Adding Servers
+The easiest way to get started is using the built-in registry. Type `/mcp` in droid and select **"Add from Registry"** to browse 40+ pre-configured servers:
 
-The `droid mcp add` command adds MCP servers to your configuration. Droid supports two types of servers: **http** (remote endpoints) and **stdio** (local processes).
+| Server | Description |
+| :----- | :---------- |
+| linear | Issue tracking and project management |
+| sentry | Error tracking and performance monitoring |
+| notion | Notes, docs, and project management |
+| supabase | Create and manage Supabase projects |
+| stripe | Payment processing APIs |
+| vercel | Manage projects and deployments |
+| playwright | End-to-end browser testing |
+| hubspot | CRM data management |
+| mongodb | Database management |
+| ... | and many more |
+
+Select a server from the list, authenticate if required (most HTTP servers support OAuth—just follow the browser prompt), and the server is ready to use.
+
+<Tip>
+  The registry is the fastest way to get started. For custom servers or automation, use the CLI commands below.
+</Tip>
+
+## Interactive Manager (`/mcp`)
+
+Type `/mcp` within droid to open the interactive MCP manager. From here you can:
+
+- **Browse servers** - See all configured servers and their connection status
+- **View tools** - Inspect what tools each connected server provides
+- **Enable/disable** - Temporarily disable servers without removing them
+- **Authenticate** - Connect to OAuth-enabled servers via browser
+- **Clear auth** - Remove stored credentials for a server
+- **Add from registry** - One-click setup for popular MCP servers
+- **Remove servers** - Delete user-configured servers
+
+## Adding Servers via CLI
+
+For scripting and automation, use `droid mcp add`. Droid supports two types of servers: **http** (remote endpoints) and **stdio** (local processes).
 
 ### Adding HTTP Servers
 
@@ -206,18 +236,61 @@ Type `/mcp` within droid to open an interactive UI for managing MCP servers.
 
 MCP server configurations can be stored at two levels:
 
-- **User-level**: `~/.factory/mcp.json` - applies to all projects
-- **Project-level**: `.factory/mcp.json` - applies only to the current project
+| Level | Location | Purpose |
+| :---- | :------- | :------ |
+| **User** | `~/.droid/mcp.json` | Your personal servers, available in all projects |
+| **Project** | `.factory/mcp.json` | Shared team servers, committed to the repo |
 
-Project-level configurations are merged with user-level configurations, allowing you to define project-specific MCP servers that are automatically available when working in that project.
+### How Layering Works
 
-The configuration includes:
+User config takes priority over project config. When both levels define the same server, the user-level settings win.
 
-- **Name**: Unique identifier for the server
-- **Type**: Server type (`stdio` or `http`)
-- **Stdio settings**: `command`, `args`, `env` (environment variables)
-- **HTTP settings**: `url`, `headers` (for authentication)
-- **Disabled**: Boolean flag to temporarily disable a server
+**Key behaviors:**
+- When you **enable/disable** a project-defined server, a copy is saved to your user config with the new state. The original project config remains unchanged, so your teammates aren't affected.
+- **Project servers cannot be removed** via CLI or the `/mcp` UI. To remove them, edit `.factory/mcp.json` directly.
+- Servers you add via `droid mcp add` or the registry always go to your **user config**.
+
+### OAuth Tokens
+
+OAuth tokens are stored globally in your system keyring (or fallback file), **not per-project**. If you authenticate with a server in one project, you're authenticated everywhere that server is configured.
+
+To clear authentication for a server, use the `/mcp` interactive manager and select "Clear Auth".
+
+### Configuration Schema
+
+Each server entry includes:
+
+- **type**: Server type (`stdio` or `http`)
+- **disabled**: Boolean flag to temporarily disable the server (default: `false`)
+
+For **stdio** servers:
+- **command**: Executable to run
+- **args**: Command-line arguments (array)
+- **env**: Environment variables (object)
+
+For **http** servers:
+- **url**: HTTP/HTTPS endpoint URL
+- **headers**: HTTP headers for authentication (object)
+
+**Example `mcp.json`:**
+
+```json
+{
+  "mcpServers": {
+    "linear": {
+      "type": "http",
+      "url": "https://mcp.linear.app/mcp",
+      "disabled": false
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "disabled": false
+    }
+  }
+}
+```
 
 Droid automatically reloads when the configuration file changes, so servers are immediately available after adding them.
 
