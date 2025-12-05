@@ -27,29 +27,37 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 
 | Setting | Options | Default | Description |
 | ------- | ------- | ------- | ----------- |
-| `model` | `sonnet`, `opus`, `GPT-5`, `gpt-5-codex`, `haiku`, `droid-core`, `custom-model` | `sonnet` | The default AI model used by droid |
+| `model` | `sonnet`, `opus`, `GPT-5`, `gpt-5-codex`, `gpt-5-codex-max`, `haiku`, `droid-core`, `custom-model` | `opus` | The default AI model used by droid |
 | `reasoningEffort` | `off`, `none`, `low`, `medium`, `high` (availability depends on the model) | Model-dependent default | Controls how much structured thinking the model performs. |
 | `autonomyLevel` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
 | `cloudSessionSync` | `true`, `false` | `true` | Mirror CLI sessions to Factory web. |
 | `diffMode` | `github`, `unified` | `github` | Choose between split GitHub-style diffs and a single-column view. |
 | `completionSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`, or custom file path | `fx-ok01` | Audio cue when a response finishes. |
+| `awaitingInputSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`, or custom file path | `fx-ack01` | Audio cue when droid is waiting for user input. |
+| `soundFocusMode` | `always`, `focused`, `unfocused` | `always` | When to play sound notifications. |
 | `commandAllowlist` | Array of commands | Safe defaults provided | Commands that run without extra confirmation. |
 | `commandDenylist` | Array of commands | Restrictive defaults provided | Commands that always require confirmation. |
 | `includeCoAuthoredByDroid` | `true`, `false` | `true` | Automatically append the Droid co-author trailer to commits. |
 | `enableDroidShield` | `true`, `false` | `true` | Enable secret scanning and git guardrails. |
+| `hooksDisabled` | `true`, `false` | `false` | Globally disable all hooks execution. |
+| `ideAutoConnect` | `true`, `false` | `false` | Auto-connect to IDE from external terminals. |
+| `todoDisplayMode` | `inline`, `pinned` | `pinned` | How the todo list is displayed in the UI. |
 | `specSaveEnabled` | `true`, `false` | `false` | Persist spec outputs to disk. |
 | `specSaveDir` | File path | `.factory/docs` | Directory used when `specSaveEnabled` is `true`. |
-| `enableCustomDroids` | `true`, `false` | `false` | Toggle the experimental Custom Droids feature. |
+| `enableCustomDroids` | `true`, `false` | `true` | Toggle the Custom Droids feature. |
 | `showThinkingInMainView` | `true`, `false` | `false` | Display AI thinking/reasoning blocks in the main chat view. |
+| `allowBackgroundProcesses` | `true`, `false` | `false` | Allow droid to spawn background processes (experimental). |
+| `enableReadinessReport` | `true`, `false` | `false` | Enable the `/readiness-report` slash command (experimental). |
 
 ### Model
 
 Choose the default AI model that powers your droid:
 
-- **`sonnet`** - Claude Sonnet 4.5 (recommended, current default)
-- **`opus`** - Claude Opus 4.1 for complex tasks
+- **`opus`** - Claude Opus 4.5 (current default)
+- **`sonnet`** - Claude Sonnet 4.5, balanced cost and quality
 - **`GPT-5`** - Latest OpenAI model
 - **`gpt-5-codex`** - Advanced coding-focused model
+- **`gpt-5-codex-max`** - GPT-5.1-Codex-Max, supports Extra High reasoning
 - **`haiku`** - Claude Haiku 4.5, fast and cost-effective
 - **`droid-core`** - GLM-4.6 open-source model
 - **`custom-model`** - Your own configured model via BYOK
@@ -85,19 +93,48 @@ When this switch is on, every CLI session is mirrored to Factory web so you can 
 
 ### Sound notifications
 
-Configure audio feedback when droid completes a response:
+Configure audio feedback for droid events:
 
-- **`fx-ok01`** – Built-in completion sound (default) - soft success bloop written by Droid
-- **`fx-ack01`** – Alternative built-in sound effect - tactile ripple feedback written by the Chainsmokers
+**Completion sound** (`completionSound`) - plays when a response finishes:
+- **`fx-ok01`** – Built-in completion sound (default) - soft success bloop
+- **`fx-ack01`** – Alternative built-in sound effect - tactile ripple feedback
 - **`bell`** – Use the system terminal bell
 - **`off`** – No sound notifications
 - **Custom path** – Provide a file path to your own sound file (e.g., `"/path/to/sound.wav"`)
 
+**Awaiting input sound** (`awaitingInputSound`) - plays when droid is waiting for user input. Same options as completion sound, defaults to `fx-ack01`.
+
+**Sound focus mode** (`soundFocusMode`) - controls when sounds play:
+- **`always`** – Play sounds regardless of window focus (default)
+- **`focused`** – Only play sounds when the terminal is focused
+- **`unfocused`** – Only play sounds when the terminal is not focused
+
 <Note>
   Access sound settings via `/settings` or `Shift+Tab` → **Settings** in the TUI.
-  
-  For backward compatibility, the deprecated `enableCompletionBell` boolean setting is still supported but has been replaced by `completionSound`.
 </Note>
+
+### Hooks
+
+The `hooksDisabled` setting provides a global toggle to disable all hooks execution without removing your hook configurations:
+
+- **`false`** – Hooks are enabled and will execute normally (default)
+- **`true`** – All hooks are disabled globally
+
+You can also toggle this from the `/hooks` menu or `/settings`.
+
+### IDE auto-connect
+
+The `ideAutoConnect` setting controls whether droid automatically connects to your IDE when running from external terminals (outside the IDE's built-in terminal):
+
+- **`false`** – Only auto-connect when running inside IDE terminal (default)
+- **`true`** – Auto-connect to IDE from any terminal
+
+### Todo display mode
+
+The `todoDisplayMode` setting controls how the todo list is displayed in the UI:
+
+- **`pinned`** – Todo list is pinned above the input area (default)
+- **`inline`** – Todo list appears inline within the message flow
 
 ## Command allowlist & denylist
 
@@ -131,11 +168,14 @@ Review and update these arrays periodically to match your workflow and security 
 
 ```json
 {
-  "model": "sonnet",
+  "model": "opus",
   "reasoningEffort": "low",
   "diffMode": "github",
   "cloudSessionSync": true,
-  "completionSound": "fx-ok01"
+  "completionSound": "fx-ok01",
+  "awaitingInputSound": "fx-ack01",
+  "soundFocusMode": "always",
+  "todoDisplayMode": "pinned"
 }
 ```
 
