@@ -1,0 +1,155 @@
+---
+title: Maturity Dashboard
+description: Track and analyze your organization's Autonomy Maturity scores in the Factory app.
+keywords:
+  [
+    "autonomy maturity",
+    "dashboard",
+    "maturity tracking",
+    "repository scores",
+    "analytics",
+  ]
+---
+
+The Autonomy Maturity dashboard provides a centralized view of your organization's maturity scores across all repositories, with historical trends and detailed breakdowns.
+
+![Autonomy Maturity Dashboard](/images/web/maturity-dashboard.png)
+
+---
+
+## Accessing the Dashboard
+
+Navigate to **Settings → Analytics → Autonomy Maturity** in the Factory app.
+
+---
+
+## Main Dashboard View
+
+The dashboard shows an organization-level overview with three main sections:
+
+### Summary Cards
+
+At the top, you'll see key metrics:
+
+| Metric                   | Description                                                                 |
+| :----------------------- | :-------------------------------------------------------------------------- |
+| **Organization Score**   | Average maturity level across all measured repositories (rounded down)      |
+| **Repositories Tracked** | Number of repositories with maturity reports vs. total enabled repositories |
+| **Last Updated**         | Time since the most recent maturity evaluation                              |
+
+### Progress Graph
+
+A time-series chart showing your organization's maturity level over time. Use the period filters to view different time ranges:
+
+- **7d** — Last 7 days
+- **1m** — Last month
+- **6m** — Last 6 months
+- **1y** — Last year
+- **all** — All time
+
+### Repositories Table
+
+A searchable, paginated table of all repositories showing:
+
+- **Repository name** — Click to view details
+- **Level** — Current maturity level (1-5)
+- **Progress** — Percentage complete toward next level
+- **Last Update** — When the repository was last evaluated
+
+Use the search bar to filter repositories by name or URL.
+
+---
+
+## Repository Detail Page
+
+Click any repository row to view its detailed maturity breakdown.
+
+![Repository Detail Page](/images/web/maturity-criteria.png)
+
+### Header
+
+Shows the repository name, current level achieved, last evaluation time, and a **Refresh** button to trigger a new evaluation.
+
+### Level Accordions
+
+Each maturity level (Functional through Autonomous) has an expandable accordion section showing:
+
+- **Percentage complete** — How much of that level's criteria are passing
+- **Lock status** — Levels are locked until the previous level reaches 80%
+
+### Criterion Rows
+
+Within each level, individual criteria display:
+
+| Element       | Description                                        |
+| :------------ | :------------------------------------------------- |
+| **Name**      | The criterion being evaluated                      |
+| **Score**     | Format `[X/Y]` — numerator/denominator             |
+| **Status**    | Pass (green) or fail (red) indicator               |
+| **Rationale** | Click to expand and see the evaluation explanation |
+
+### Remediation (Coming Soon)
+
+Soon, failing criteria will display a **Fix** button that triggers automated remediation. Select the criteria you want to fix, and the system will implement the necessary changes to your repository.
+
+---
+
+## Triggering a Refresh
+
+There are two ways to refresh a maturity evaluation:
+
+### From the Web Dashboard
+
+1. Navigate to the repository detail page
+2. Click the **Refresh** button in the header
+3. A new session starts on a remote workspace for the repo
+4. Once done, the dashboard will update with results from the latest report
+
+### From the CLI
+
+Run the `/readiness-report` [slash command](/cli/features/readiness-report) in the Factory CLI while in the repository directory:
+
+```bash
+droid
+> /readiness-report
+```
+
+<Note>
+  Re-evaluations run the full maturity assessment against the current state of
+  your repository. This is useful after making infrastructure improvements or
+  merging changes that can affect a maturity criterion.
+</Note>
+
+---
+
+## Understanding the Metrics
+
+### Organization Level Calculation
+
+The organization-level score is calculated as the **average of all repository levels, rounded down**. For example:
+
+- Repo A: Level 3
+- Repo B: Level 2
+- Repo C: Level 3
+
+Organization Level = floor((3 + 2 + 3) / 3) = floor(2.67) = **Level 2**
+
+### Repository Level Calculation
+
+A repository's level is determined by the **80% threshold system**:
+
+1. Start at Level 1
+2. If 80% of Level 1 criteria pass → achieve Level 2
+3. If 80% of Level 2 criteria pass → achieve Level 3
+4. Continue through Level 5
+
+The percentage shown for each level indicates progress toward completing that level's criteria.
+
+---
+
+## Best Practices
+
+- **Regular evaluations:** Run maturity reports after significant infrastructure changes
+- **Focus on current level:** Address failing criteria in your current level before jumping ahead to focus on foundational improvements first
+- **Track trends:** Use the progress graph to monitor improvement over time
+- **Prioritize high-impact fixes:** The action items in CLI reports highlight the most impactful improvements
