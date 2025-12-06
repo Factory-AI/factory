@@ -509,27 +509,27 @@ if echo "$commit_msg" | grep -qE "Co-authored-by:"; then
   exit 0
 fi
 
-# Add factory droid co-author
+# Add factory droid co-author with proper newline handling
 coauthor="Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
+modified_msg="${commit_msg}\n\n${coauthor}"
 
-# Modify command to include co-author
-modified_msg="$commit_msg
+# Build new command with properly escaped message
+new_command=$(echo "$command" | sed -E "s|(git commit.*-m[= ]*)[\"']([^\"']+)[\"']|\1|")
+new_command="${new_command} -m \"${modified_msg}\""
 
-$coauthor"
-
-# Return modified command via JSON output
-cat << EOF
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "allow",
-    "permissionDecisionReason": "Adding co-author to commit",
-    "updatedInput": {
-      "command": "$(echo "$command" | sed -E "s/(git commit.*-m[= ]*)[\"']([^\"']+)[\"']/\1\"$modified_msg\"/")"
+# Use jq to properly construct JSON with escaped strings
+jq -n \
+  --arg cmd "$new_command" \
+  '{
+    "hookSpecificOutput": {
+      "hookEventName": "PreToolUse",
+      "permissionDecision": "allow",
+      "permissionDecisionReason": "Adding co-author to commit",
+      "updatedInput": {
+        "command": $cmd
+      }
     }
-  }
-}
-EOF
+  }'
 
 exit 0
 ```
