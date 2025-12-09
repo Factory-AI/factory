@@ -150,7 +150,7 @@ Available when running `droid` in interactive mode. Type the command at the prom
 | `/new`                   | Start a new session                                   |
 | `/quit`                  | Exit droid (alias: `exit`, or press Ctrl+C)           |
 | `/readiness-report`      | Generate readiness report                             |
-| `/review`                | Start a code review workflow                          |
+| `/review`                | Start AI-powered code review workflow (see [Code Review](/cli/features/code-review)) |
 | `/rewind-conversation`   | Undo recent changes in the session                    |
 | `/sessions`              | List and select previous sessions                     |
 | `/settings`              | Configure application settings                        |
@@ -216,12 +216,17 @@ set FACTORY_API_KEY=fk-...
 ### Code review
 
 ```bash
-# Analysis only
+# Interactive review workflow
+> /review
+
+# Analysis via exec (non-interactive)
 droid exec "Review this PR for security issues"
 
 # With modifications
 droid exec --auto low "Review code and add missing type hints"
 ```
+
+See the [Code Review documentation](/cli/features/code-review) for detailed guidance on review types, workflows, and best practices.
 
 ### Testing and debugging
 
