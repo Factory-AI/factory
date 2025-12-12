@@ -1,0 +1,238 @@
+---
+title: GitHub App
+description: Use the /install-gh-app command to set up Droid integration with your GitHub repositories
+keywords: ['github', 'github app', 'install', '/install-gh-app', 'slash command', 'github actions', 'workflow', 'droid action', '@droid', 'automated review', 'CI/CD', 'pull request']
+---
+
+## Overview
+
+The `/install-gh-app` command provides a guided workflow for installing the Factory GitHub App and configuring GitHub Actions workflows. This enables Droid to respond to @droid mentions in issues and PR comments, and optionally provide automated code reviews on new pull requests.
+
+When you run `/install-gh-app`, droid guides you through verifying prerequisites, selecting a repository, installing the GitHub App, and creating workflow files via a pull request.
+
+## Quick start
+
+<Steps>
+  <Step title="Start the installation flow">
+    In an interactive droid session, type:
+    ```bash
+    /install-gh-app
+    ```
+  </Step>
+
+  <Step title="Pass preflight checks">
+    Droid verifies that you have:
+    - GitHub CLI (`gh`) installed
+    - Authenticated with GitHub (`gh auth login`)
+    - Required OAuth scopes (`repo`, `read:org`)
+  </Step>
+
+  <Step title="Select a repository">
+    Choose from two options:
+    - **Use current repository** - Auto-detected from your git remote
+    - **Enter a different repository** - Type `owner/repo` or a GitHub URL
+  </Step>
+
+  <Step title="Install the GitHub App">
+    Your browser opens to install the Factory Droid GitHub App. Grant access to the selected repository.
+  </Step>
+
+  <Step title="Select workflows">
+    Choose which workflows to enable:
+    - **@Droid** - Respond to @droid mentions in issues and PR comments
+    - **Droid Review** - Automated code review on new PRs
+  </Step>
+
+  <Step title="Create the PR">
+    Droid creates a branch with workflow files and opens a pull request for you to review and merge.
+  </Step>
+</Steps>
+
+## Prerequisites
+
+Before running `/install-gh-app`, ensure you have the GitHub CLI installed and authenticated.
+
+### Install GitHub CLI
+
+<Tabs>
+  <Tab title="macOS (Homebrew)">
+    ```bash
+    brew install gh
+    ```
+  </Tab>
+
+  <Tab title="macOS (MacPorts)">
+    ```bash
+    sudo port install gh
+    ```
+  </Tab>
+
+  <Tab title="Linux/WSL">
+    ```bash
+    type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+    sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo apt update
+    sudo apt install gh -y
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```bash
+    winget install --id GitHub.cli
+    ```
+  </Tab>
+</Tabs>
+
+### Authenticate with GitHub
+
+```bash
+gh auth login
+```
+
+### Verify required scopes
+
+The CLI needs `repo` and `read:org` scopes. If missing, refresh your authentication:
+
+```bash
+gh auth refresh -s repo,read:org
+```
+
+## Available workflows
+
+### @Droid workflow
+
+Enables Droid to respond when you tag `@droid` in:
+
+- Issue comments
+- Pull request comments
+- Pull request reviews
+- Issue descriptions and titles
+
+**Triggers:**
+- `issue_comment` - When a comment contains @droid
+- `pull_request_review_comment` - When a PR review comment contains @droid
+- `pull_request_review` - When a PR review body contains @droid
+- `issues` - When an issue body or title contains @droid
+
+**Use cases:**
+- Ask Droid to implement features described in issues
+- Request code changes in PR comments
+- Get help understanding code in reviews
+
+### Droid Review workflow
+
+Provides automated code review on new pull requests.
+
+**Triggers:**
+- `pull_request` - When a PR is opened, reopened, or marked ready for review
+
+**Use cases:**
+- Automatic first-pass review on all PRs
+- Catch common issues before human review
+- Consistent review coverage across the team
+
+## Setup steps after installation
+
+After the `/install-gh-app` workflow completes, you need to:
+
+<Steps>
+  <Step title="Review the pull request">
+    A PR has been created in your repository with the workflow files. Review the changes.
+  </Step>
+
+  <Step title="Generate a Factory API key">
+    Go to [https://app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys) and create a new API key.
+  </Step>
+
+  <Step title="Add the secret to GitHub">
+    In your repository settings, go to **Settings > Secrets and variables > Actions** and add a new repository secret:
+    - **Name:** `FACTORY_API_KEY`
+    - **Value:** Your generated API key
+  </Step>
+
+  <Step title="Merge the PR">
+    Once the secret is configured, merge the workflow PR to enable Droid.
+  </Step>
+</Steps>
+
+## Permissions
+
+### Repository admin permissions
+
+For the smoothest setup, you should have admin access to the repository. If you don't have admin permissions, you'll see a warning but can still proceed. You may need a repository admin to:
+
+- Approve the GitHub App installation
+- Add the `FACTORY_API_KEY` secret
+- Merge the workflow PR
+
+### GitHub App permissions
+
+The Factory Droid GitHub App requires these permissions:
+
+- **Contents:** Read and write (to push workflow files and make code changes)
+- **Pull requests:** Read and write (to create PRs and post reviews)
+- **Issues:** Read and write (to respond to issue comments)
+- **Actions:** Read (to monitor workflow runs)
+
+## Tips and best practices
+
+<AccordionGroup>
+  <Accordion title="Which workflows should I enable?">
+    - **Start with @Droid only** if you want manual control over when Droid participates
+    - **Enable both** for full automation with code review on every PR
+    - **Droid Review alone** if you only want automated reviews without @droid mentions
+  </Accordion>
+
+  <Accordion title="Troubleshooting preflight failures">
+    | Error | Solution |
+    |-------|----------|
+    | GitHub CLI not installed | Install `gh` using the commands above |
+    | Not logged in | Run `gh auth login` |
+    | Missing permissions | Run `gh auth refresh -s repo,read:org` |
+    | API access error | Check your internet connection and run `gh auth status` |
+  </Accordion>
+
+  <Accordion title="Navigating the setup UI">
+    - Press **Esc** to go back at any step
+    - Press **Ctrl+C** to exit the entire flow
+    - Use **arrow keys** to navigate options
+    - Press **Space** to toggle workflow selection
+    - Press **Enter** to confirm and continue
+  </Accordion>
+
+  <Accordion title="Multiple repositories">
+    Run `/install-gh-app` separately for each repository you want to configure. The flow automatically detects the current repository from your git remote.
+  </Accordion>
+</AccordionGroup>
+
+## Example workflow
+
+```bash
+# Start droid in your repository
+cd my-project
+droid
+
+# Run the installation command
+> /install-gh-app
+
+# Preflight checks pass automatically if gh is configured
+# Select: Use current repository (my-org/my-project)
+# Browser opens to install the GitHub App
+# Select both workflows: @Droid and Droid Review
+# PR is created with workflow files
+
+# After the flow completes:
+# 1. Add FACTORY_API_KEY secret to repository
+# 2. Merge the PR
+# 3. Tag @droid in an issue to test!
+```
+
+## See also
+
+- [GitHub Actions setup guide](https://github.com/Factory-AI/droid-action/blob/main/docs/setup.md) - Manual setup instructions
+- [Factory GitHub App](https://github.com/apps/factory-droid) - Direct link to install the app
+- [API keys](https://app.factory.ai/settings/api-keys) - Generate your Factory API key
+- [Code Review](/cli/features/code-review) - Local code review with `/review` command
+- [Droid Exec GitHub Actions](/guides/droid-exec/github-actions) - More GitHub Actions automation examples
