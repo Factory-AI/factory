@@ -1,0 +1,631 @@
+---
+title: Rules and Conventions
+description: Organize coding standards and team conventions so Droid follows them consistently across all work.
+keywords: ['rules', 'conventions', 'standards', 'coding style', 'guidelines', 'team', 'consistency']
+---
+
+Rules are codified standards that Droid follows every time. Unlike memories (which capture decisions and context), rules define how code should be written. This guide shows you how to organize rules effectively for individuals and teams.
+
+---
+
+## Rules vs Other Configuration
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **Rules** | How code should be written | "Use early returns instead of nested conditionals" |
+| **Memory** | What was decided and why | "We chose Zustand because Redux was too verbose" |
+| **AGENTS.md** | How to build/test/run | "Run `npm test` before completing work" |
+| **Skills** | How to do specific tasks | "Steps to implement a new API endpoint" |
+
+Rules are **prescriptive**—they tell Droid what to do. Use them for standards that should apply consistently.
+
+---
+
+## Setting Up a Rules Directory
+
+### Basic Structure
+
+Create a `.factory/rules/` directory in your project:
+
+```
+.factory/
+└── rules/
+    ├── typescript.md      # TypeScript conventions
+    ├── react.md           # React patterns
+    ├── testing.md         # Testing requirements
+    ├── api.md             # API design rules
+    └── security.md        # Security requirements
+```
+
+For personal rules that apply across all projects:
+
+```
+~/.factory/
+└── rules/
+    ├── style.md           # Your personal style
+    └── tools.md           # Tool preferences
+```
+
+### Referencing Rules in AGENTS.md
+
+Add a section to your `AGENTS.md`:
+
+```markdown
+## Coding Standards
+
+Follow the conventions documented in `.factory/rules/`:
+- **TypeScript**: `.factory/rules/typescript.md`
+- **React**: `.factory/rules/react.md`
+- **Testing**: `.factory/rules/testing.md`
+- **API Design**: `.factory/rules/api.md`
+- **Security**: `.factory/rules/security.md`
+
+When working on a file, check the relevant rules first.
+```
+
+---
+
+## Writing Effective Rules
+
+### Rule Structure
+
+Each rule should be:
+- **Specific**: Clear enough to follow without interpretation
+- **Actionable**: Tells what to do, not just what to avoid
+- **Scoped**: States when it applies
+- **Justified** (optional): Explains why for complex rules
+
+### Template
+
+```markdown
+# [Category] Rules
+
+## [Rule Name]
+**Applies to**: [file types, contexts]
+**Rule**: [specific instruction]
+**Example**: [code showing correct usage]
+**Rationale**: [why this matters - optional]
+```
+
+---
+
+## Example Rules Files
+
+### TypeScript Rules
+
+Create `.factory/rules/typescript.md`:
+
+```markdown
+# TypeScript Rules
+
+## Type Definitions
+
+### Use `interface` for object shapes
+**Applies to**: All type definitions for objects
+**Rule**: Use `interface` for object types, `type` for unions, intersections, and primitives.
+
+```typescript
+// ✅ Correct
+interface User {
+  id: string;
+  name: string;
+}
+
+type Status = 'active' | 'inactive';
+type UserWithStatus = User & { status: Status };
+
+// ❌ Avoid
+type User = {
+  id: string;
+  name: string;
+};
+```
+
+### Avoid `any`
+**Applies to**: All TypeScript files
+**Rule**: Never use `any`. Use `unknown` with type guards, or define proper types.
+
+```typescript
+// ✅ Correct
+function processData(data: unknown): string {
+  if (typeof data === 'string') {
+    return data.toUpperCase();
+  }
+  throw new Error('Expected string');
+}
+
+// ❌ Avoid
+function processData(data: any): string {
+  return data.toUpperCase();
+}
+```
+
+## Function Patterns
+
+### Use early returns
+**Applies to**: All functions with conditionals
+**Rule**: Return early for edge cases instead of nesting.
+
+```typescript
+// ✅ Correct
+function processUser(user: User | null): string {
+  if (!user) return 'No user';
+  if (!user.active) return 'User inactive';
+  return `Processing ${user.name}`;
+}
+
+// ❌ Avoid
+function processUser(user: User | null): string {
+  if (user) {
+    if (user.active) {
+      return `Processing ${user.name}`;
+    } else {
+      return 'User inactive';
+    }
+  } else {
+    return 'No user';
+  }
+}
+```
+
+### Named exports over default
+**Applies to**: All module exports
+**Rule**: Use named exports for better refactoring and import clarity.
+
+```typescript
+// ✅ Correct
+export function createUser() {}
+export const USER_ROLES = ['admin', 'user'] as const;
+
+// ❌ Avoid
+export default function createUser() {}
+```
+```
+
+### React Rules
+
+Create `.factory/rules/react.md`:
+
+```markdown
+# React Rules
+
+## Component Structure
+
+### Functional components only
+**Applies to**: All React components
+**Rule**: Use functional components with hooks. Never use class components.
+
+### Props interface naming
+**Applies to**: All components with props
+**Rule**: Name props interface as `{ComponentName}Props`.
+
+```tsx
+// ✅ Correct
+interface UserCardProps {
+  user: User;
+  onSelect: (user: User) => void;
+}
+
+export function UserCard({ user, onSelect }: UserCardProps) {
+  return <div onClick={() => onSelect(user)}>{user.name}</div>;
+}
+```
+
+### Component file structure
+**Applies to**: All component files
+**Rule**: Order sections as: imports, types, component, exports.
+
+```tsx
+// 1. Imports (React, external, internal, types)
+import { useState } from 'react';
+import { Button } from '@/components/ui';
+import type { User } from '@/types';
+
+// 2. Types
+interface UserListProps {
+  users: User[];
+}
+
+// 3. Component
+export function UserList({ users }: UserListProps) {
+  const [selected, setSelected] = useState<string | null>(null);
+  
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## State Management
+
+### Zustand for client state
+**Applies to**: Client-side state that isn't server data
+**Rule**: Use Zustand stores in `src/stores/`. One store per domain.
+
+```typescript
+// src/stores/useUserStore.ts
+import { create } from 'zustand';
+
+interface UserState {
+  currentUser: User | null;
+  setUser: (user: User) => void;
+  logout: () => void;
+}
+
+export const useUserStore = create<UserState>((set) => ({
+  currentUser: null,
+  setUser: (user) => set({ currentUser: user }),
+  logout: () => set({ currentUser: null }),
+}));
+```
+
+### React Query for server state
+**Applies to**: All data fetched from APIs
+**Rule**: Use React Query. Queries go in `src/queries/`.
+
+```typescript
+// src/queries/useUsers.ts
+import { useQuery } from '@tanstack/react-query';
+
+export function useUsers() {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: () => fetch('/api/users').then(r => r.json()),
+  });
+}
+```
+```
+
+### Testing Rules
+
+Create `.factory/rules/testing.md`:
+
+```markdown
+# Testing Rules
+
+## File Organization
+
+### Colocate test files
+**Applies to**: All tests except E2E
+**Rule**: Place test files next to source files.
+
+```
+src/
+└── components/
+    └── UserCard/
+        ├── UserCard.tsx
+        ├── UserCard.test.tsx    # ✅ Colocated
+        └── index.ts
+```
+
+### E2E tests in dedicated directory
+**Applies to**: End-to-end tests
+**Rule**: Place E2E tests in `e2e/` at project root.
+
+## Test Structure
+
+### Descriptive test names
+**Applies to**: All test cases
+**Rule**: Format as "should [action] when [condition]".
+
+```typescript
+// ✅ Correct
+it('should display error message when login fails', () => {});
+it('should redirect to dashboard when login succeeds', () => {});
+
+// ❌ Avoid
+it('login error', () => {});
+it('works', () => {});
+```
+
+### One assertion per test
+**Applies to**: Unit tests
+**Rule**: Test one behavior per test case. Multiple assertions OK if testing same behavior.
+
+```typescript
+// ✅ Correct - testing one behavior
+it('should format user name correctly', () => {
+  const result = formatUserName({ first: 'John', last: 'Doe' });
+  expect(result).toBe('John Doe');
+});
+
+// ✅ Also correct - same behavior, multiple aspects
+it('should return complete user object', () => {
+  const user = createUser('John');
+  expect(user.id).toBeDefined();
+  expect(user.name).toBe('John');
+  expect(user.createdAt).toBeInstanceOf(Date);
+});
+
+// ❌ Avoid - testing multiple behaviors
+it('should handle user operations', () => {
+  expect(createUser('John').name).toBe('John');
+  expect(deleteUser('123')).toBe(true);
+  expect(listUsers()).toHaveLength(0);
+});
+```
+
+## Mocking
+
+### Mock at boundaries
+**Applies to**: All mocked dependencies
+**Rule**: Mock external APIs and services, not internal functions.
+
+```typescript
+// ✅ Correct - mock external API
+vi.mock('@/lib/api', () => ({
+  fetchUser: vi.fn().mockResolvedValue({ id: '1', name: 'John' }),
+}));
+
+// ❌ Avoid - mock internal implementation
+vi.mock('@/utils/formatName', () => ({
+  formatName: vi.fn().mockReturnValue('John'),
+}));
+```
+
+### Use MSW for API mocking in integration tests
+**Applies to**: Integration tests that need API responses
+**Rule**: Use Mock Service Worker instead of mocking fetch directly.
+
+```typescript
+// ✅ Correct
+import { http, HttpResponse } from 'msw';
+
+const handlers = [
+  http.get('/api/users', () => {
+    return HttpResponse.json([{ id: '1', name: 'John' }]);
+  }),
+];
+```
+```
+
+### Security Rules
+
+Create `.factory/rules/security.md`:
+
+```markdown
+# Security Rules
+
+## Secrets Management
+
+### Never hardcode secrets
+**Applies to**: All code
+**Rule**: Use environment variables for all secrets. Never commit secrets.
+
+```typescript
+// ✅ Correct
+const apiKey = process.env.API_KEY;
+
+// ❌ Never do this
+const apiKey = 'sk-1234567890abcdef';
+```
+
+### Validate environment variables
+**Applies to**: Application startup
+**Rule**: Validate required env vars exist at startup.
+
+```typescript
+// ✅ Correct
+const config = {
+  apiKey: requireEnv('API_KEY'),
+  dbUrl: requireEnv('DATABASE_URL'),
+};
+
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing required env var: ${name}`);
+  return value;
+}
+```
+
+## Input Validation
+
+### Validate all external input
+**Applies to**: API routes, form handlers
+**Rule**: Use Zod to validate all input from users or external sources.
+
+```typescript
+// ✅ Correct
+import { z } from 'zod';
+
+const CreateUserSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100),
+});
+
+export async function createUser(input: unknown) {
+  const data = CreateUserSchema.parse(input);
+  // data is now typed and validated
+}
+```
+
+## Error Handling
+
+### Never expose internal errors
+**Applies to**: API error responses
+**Rule**: Log detailed errors server-side; return generic messages to clients.
+
+```typescript
+// ✅ Correct
+try {
+  await processPayment(data);
+} catch (error) {
+  console.error('Payment failed:', error); // Detailed log
+  throw new ApiError('Payment processing failed', 500); // Generic message
+}
+```
+
+## Authentication
+
+### Check authentication on every protected route
+**Applies to**: All API routes requiring auth
+**Rule**: Use middleware or guards. Never assume auth from client.
+
+```typescript
+// ✅ Correct
+export async function GET(request: Request) {
+  const session = await getSession(request);
+  if (!session) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+  // ... handle authenticated request
+}
+```
+```
+
+---
+
+## Organizing Team Rules
+
+### Layered Rules
+
+For teams, organize rules in layers:
+
+```
+.factory/rules/
+├── _base/                    # Foundation rules (everyone follows)
+│   ├── typescript.md
+│   └── security.md
+├── frontend/                 # Frontend-specific
+│   ├── react.md
+│   └── styling.md
+├── backend/                  # Backend-specific
+│   ├── api.md
+│   └── database.md
+└── testing/                  # Testing standards
+    ├── unit.md
+    └── integration.md
+```
+
+Reference in AGENTS.md:
+
+```markdown
+## Rules
+- Base rules: `.factory/rules/_base/` - Apply to all code
+- Frontend rules: `.factory/rules/frontend/` - React components
+- Backend rules: `.factory/rules/backend/` - API and services
+- Testing rules: `.factory/rules/testing/` - All tests
+```
+
+### Rule Ownership
+
+Add ownership to track who maintains each rule set:
+
+```markdown
+# TypeScript Rules
+
+**Owner**: Platform Team
+**Last Updated**: 2024-02-15
+**Review Cycle**: Quarterly
+
+[rules content...]
+```
+
+---
+
+## Current Limitation: No Glob Pattern Support
+
+<Warning>
+Currently, Droid doesn't support conditional rule application based on file patterns (e.g., "apply these rules only to `*.tsx` files"). This is on the roadmap.
+</Warning>
+
+**Workarounds:**
+
+1. **Organize by file type**: Create separate rules files and reference them contextually
+
+```markdown
+# In AGENTS.md
+When working on React components (*.tsx), follow `.factory/rules/react.md`
+When working on API routes, follow `.factory/rules/api.md`
+```
+
+2. **Use clear scoping in rules**: State applicability clearly
+
+```markdown
+## This rule applies to: React component files (*.tsx)
+```
+
+3. **Use skills for complex workflows**: Skills can encode file-type-specific instructions
+
+---
+
+## Rules Maintenance
+
+### Adding New Rules
+
+When you find yourself correcting Droid repeatedly:
+
+1. Identify the pattern
+2. Write a clear rule with examples
+3. Add to appropriate rules file
+4. Update AGENTS.md if needed
+5. Test by asking Droid to do similar work
+
+### Reviewing Rules
+
+Quarterly review checklist:
+
+- [ ] Remove rules that are now enforced by linting
+- [ ] Update rules that have changed
+- [ ] Add rules for new patterns
+- [ ] Check that examples are still accurate
+- [ ] Verify AGENTS.md references are current
+
+### Deprecating Rules
+
+When a rule becomes outdated:
+
+```markdown
+## ~~Use PropTypes for type checking~~ (DEPRECATED)
+**Status**: Deprecated as of 2024-02
+**Reason**: We now use TypeScript for all type checking
+**Replacement**: See TypeScript rules for prop typing
+```
+
+---
+
+## Quick Reference
+
+### File Locations
+
+| Scope | Location | Use For |
+|-------|----------|---------|
+| Personal | `~/.factory/rules/` | Your style preferences |
+| Project | `.factory/rules/` | Team standards |
+
+### Rule Format
+
+```markdown
+## [Rule Name]
+**Applies to**: [scope]
+**Rule**: [what to do]
+**Example**: [code]
+**Rationale**: [why - optional]
+```
+
+### Good Rules Are
+
+- ✅ Specific and unambiguous
+- ✅ Include code examples
+- ✅ State when they apply
+- ✅ Actionable (do X, not "consider X")
+- ❌ Not vague ("write clean code")
+- ❌ Not duplicating linter rules
+- ❌ Not contradicting other rules
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Setup Checklist" href="/guides/power-user/setup-checklist" icon="list-check">
+    Complete power user configuration
+  </Card>
+  <Card title="Memory Management" href="/guides/power-user/memory-management" icon="brain">
+    Capture decisions and context
+  </Card>
+</CardGroup>
