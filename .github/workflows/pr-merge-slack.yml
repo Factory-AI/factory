@@ -50,4 +50,4 @@ jobs:
               ]
             }')
 
-          curl -X POST -H 'Content-type: application/json' --data "$payload" "$WEBHOOK_URL"
+          curl --fail-with-body --max-time 30 -X POST -H 'Content-type: application/json' --data "$payload" "$WEBHOOK_URL"
