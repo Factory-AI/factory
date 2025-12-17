@@ -207,31 +207,71 @@ The Factory Droid GitHub App requires these permissions:
   </Accordion>
 </AccordionGroup>
 
-## Example workflow
+## Example usage
 
 ```bash
-# Start droid in your repository
 cd my-project
 droid
 
-# Run the installation command
 > /install-gh-app
-
-# Preflight checks pass automatically if gh is configured
-# Select: Use current repository (my-org/my-project)
-# Browser opens to install the GitHub App
-# Select both workflows: @Droid and Droid Review
-# PR is created with workflow files
-
-# After the flow completes:
-# 1. Add FACTORY_API_KEY secret to repository
-# 2. Merge the PR
-# 3. Tag @droid in an issue to test!
 ```
+
+After completing the guided flow, Droid creates a PR with workflow files. Here's what the generated Droid Review workflow looks like:
+
+<Accordion title="Generated Droid Review Workflow">
+```yaml
+name: Droid Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: droid-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+  contents: read
+  issues: write
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install Droid CLI
+        run: |
+          curl -fsSL https://app.factory.ai/cli | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Configure git identity
+        run: |
+          git config user.name "Droid Agent"
+          git config user.email "droidagent@factory.ai"
+
+      - name: Perform automated code review
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
+```
+</Accordion>
+
+To customize the workflow after installation, see the [Automated Code Review guide](/guides/droid-exec/code-review#customizing-the-workflow).
 
 ## See also
 
-- [GitHub Actions setup guide](https://github.com/Factory-AI/droid-action/blob/main/docs/setup.md) - Manual setup instructions
+- [Automated Code Review](/guides/droid-exec/code-review) - Customizing the code review workflow
 - [Factory GitHub App](https://github.com/apps/factory-droid) - Direct link to install the app
 - [API keys](https://app.factory.ai/settings/api-keys) - Generate your Factory API key
 - [Code Review](/cli/features/code-review) - Local code review with `/review` command
