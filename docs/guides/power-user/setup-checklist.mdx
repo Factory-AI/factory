@@ -7,12 +7,16 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
 This checklist transforms a basic Droid installation into a fully optimized development environment. Each section builds on the previous one—complete them in order for best results.
 
 <Note>
-  **Time investment:** About 30 minutes for the full setup. Each section can be done independently if you prefer to spread it out.
+  Each section can be done independently if you prefer to spread it out.
 </Note>
+
+<Info>
+  **Using Factory App?** Most of this guide applies to both CLI and [Factory App](/web/getting-started/overview). Where the experience differs, we've noted the App-specific approach.
+</Info>
 
 ---
 
-## Level 1: Essential Setup (5 minutes)
+## Level 1: Essential Setup
 
 These foundational items give you the biggest immediate impact.
 
@@ -29,7 +33,7 @@ These foundational items give you the biggest immediate impact.
   </Step>
   
   <Step title="Create your AGENTS.md">
-    Create a basic `AGENTS.md` at your repository root:
+    Create a basic [`AGENTS.md`](/cli/configuration/agents-md) at your repository root:
     
     ```markdown
     # Project Guidelines
@@ -45,17 +49,20 @@ These foundational items give you the biggest immediate impact.
     - Write tests for new features
     ```
     
-    Start minimal—you'll expand this as you work.
+    Start minimal—you'll expand this as you work. See the [AGENTS.md guide](/cli/configuration/agents-md) for more examples.
   </Step>
   
   <Step title="Configure your default model">
     Set your preferred model in settings:
     
+    **CLI:**
     ```bash
     droid
     > /settings
     # Navigate to Model and select your default
     ```
+    
+    **Factory App:** Use the model selector dropdown in the chat interface.
     
     **Recommendation:** Start with Claude Opus 4.5 (default) for complex work, switch to Haiku 4.5 or GPT-5.1-Codex for routine tasks.
   </Step>
@@ -67,7 +74,7 @@ These foundational items give you the biggest immediate impact.
 
 ---
 
-## Level 2: Memory & Context (10 minutes)
+## Level 2: Memory & Context
 
 Build persistent memory so Droid remembers your preferences across sessions.
 
@@ -127,9 +134,13 @@ Build persistent memory so Droid remembers your preferences across sessions.
   **Checkpoint:** Droid now has access to your preferences and project history without you repeating them.
 </Check>
 
+<Tip>
+  **Want automated memory capture?** Set up a hook to automatically save memories when you say "remember this:". See [Memory Management](/guides/power-user/memory-management#automatic-memory-capture) for setup instructions, or explore the [memory-capture skill example](https://github.com/Factory-AI/factory/tree/main/examples/power-user-skills/memory-capture).
+</Tip>
+
 ---
 
-## Level 3: Rules & Conventions (10 minutes)
+## Level 3: Rules & Conventions
 
 Organize your coding standards so Droid follows them consistently.
 
@@ -209,11 +220,22 @@ Organize your coding standards so Droid follows them consistently.
   **Checkpoint:** Your coding standards are now documented and Droid will follow them consistently.
 </Check>
 
+<Tip>
+  **Enforce rules automatically:** Use [PostToolUse hooks](/cli/configuration/hooks-guide) to run linters after edits. See [Code Validation hooks](/guides/hooks/code-validation) for examples.
+</Tip>
+
 ---
 
-## Level 4: Skills & Automation (10 minutes)
+## Level 4: Skills & Automation
 
 Add reusable skills and automation hooks.
+
+<Info>
+  **Three ways to automate:** 
+  - **[Skills](/cli/configuration/skills)** — Droid invokes them based on task context
+  - **[Hooks](/cli/configuration/hooks-guide)** — Run automatically on specific events
+  - **[Custom Slash Commands](/cli/configuration/custom-slash-commands)** — You invoke with `/command-name`
+</Info>
 
 <Steps>
   <Step title="Create a prompt refiner skill">
@@ -257,11 +279,11 @@ Add reusable skills and automation hooks.
       "hooks": {
         "PostToolUse": [
           {
-            "matcher": "Edit|Create",
+            "matcher": "Edit|Write",
             "hooks": [
               {
                 "type": "command",
-                "command": "npx prettier --write \"$(jq -r '.tool_input.file_path' 2>/dev/null || echo '')\" 2>/dev/null || true"
+                "command": "cd \"$FACTORY_PROJECT_DIR\" && npx prettier --write \"$(jq -r '.tool_input.file_path' 2>/dev/null || echo '')\" 2>/dev/null || true"
               }
             ]
           }
@@ -285,7 +307,7 @@ Add reusable skills and automation hooks.
             "hooks": [
               {
                 "type": "command",
-                "command": "jq -r '.tool_input.file_path' | xargs -I {} npm test -- --findRelatedTests {} --passWithNoTests 2>/dev/null || true"
+                "command": "cd \"$FACTORY_PROJECT_DIR\" && jq -r '.tool_input.file_path' | xargs -I {} npm test -- --findRelatedTests {} --passWithNoTests 2>/dev/null || true"
               }
             ]
           }
@@ -302,7 +324,7 @@ Add reusable skills and automation hooks.
 
 ---
 
-## Level 5: Token Optimization (5 minutes)
+## Level 5: Token Optimization
 
 Fine-tune for cost efficiency without sacrificing quality.
 
@@ -326,10 +348,13 @@ Fine-tune for cost efficiency without sacrificing quality.
   <Step title="Run the readiness report">
     Check your project's AI-readiness:
     
+    **CLI:**
     ```bash
     droid
     > /readiness-report
     ```
+    
+    **Factory App:** View your readiness score in the [Agent Readiness Dashboard](/web/agent-readiness/dashboard).
     
     Address high-impact items first—linting, type checking, and fast tests dramatically reduce token waste.
   </Step>

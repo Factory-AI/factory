@@ -6,6 +6,10 @@ keywords: ['tokens', 'efficiency', 'cost', 'optimization', 'usage', 'pricing', '
 
 Token usage isn't just about cost—it's about feedback loop speed and context window limits. This guide shows you how to get more done with fewer tokens through project optimization, smart model selection, and workflow patterns.
 
+<Info>
+  **Using Factory App?** These strategies apply to both CLI and [Factory App](/web/getting-started/overview). You can view your project's readiness score in the [Agent Readiness Dashboard](/web/agent-readiness/dashboard).
+</Info>
+
 ---
 
 ## Understanding Token Usage
@@ -130,13 +134,13 @@ Different models have different cost multipliers and capabilities. Match the mod
 
 | Model | Multiplier | Best For |
 |-------|------------|----------|
-| Gemini 3 Flash | 0.2× | High-volume tasks, fast iteration |
 | GLM-4.6 (Droid Core) | 0.25× | Bulk automation, simple tasks |
 | Claude Haiku 4.5 | 0.4× | Quick edits, routine work |
 | GPT-5.1 / GPT-5.1-Codex | 0.5× | Implementation, debugging |
 | Gemini 3 Pro | 0.8× | Research, analysis |
 | Claude Sonnet 4.5 | 1.2× | Balanced quality/cost |
 | Claude Opus 4.5 | 2× | Complex reasoning, architecture |
+| Claude Opus 4.1 | 6× | Maximum capability (use sparingly) |
 
 ### Task-Based Model Selection
 
@@ -161,11 +165,17 @@ Higher reasoning = more "thinking" tokens but often fewer retries.
 
 **Rule of thumb:** Use higher reasoning for tasks where a wrong first attempt would be expensive to fix.
 
+<Tip>
+  **Configure mixed models** to automatically use different models for planning vs implementation. See [Mixed Models](/cli/configuration/mixed-models) for setup.
+</Tip>
+
 ---
 
 ## Workflow Patterns for Efficiency
 
 ### Pattern 1: Spec Mode for Complex Work
+
+Use [Specification Mode](/cli/user-guides/specification-mode) (`Shift+Tab` or `/spec`) to plan before implementing.
 
 **Without Spec Mode:**
 ```

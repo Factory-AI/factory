@@ -6,6 +6,10 @@ keywords: ['rules', 'conventions', 'standards', 'coding style', 'guidelines', 't
 
 Rules are codified standards that Droid follows every time. Unlike memories (which capture decisions and context), rules define how code should be written. This guide shows you how to organize rules effectively for individuals and teams.
 
+<Info>
+  **Works with Factory App:** These conventions work identically in both CLI and [Factory App](/web/getting-started/overview)—Droid reads the same `.factory/rules/` files regardless of interface.
+</Info>
+
 ---
 
 ## Rules vs Other Configuration
@@ -585,6 +589,60 @@ When a rule becomes outdated:
 **Reason**: We now use TypeScript for all type checking
 **Replacement**: See TypeScript rules for prop typing
 ```
+
+---
+
+## Enforcing Rules Automatically
+
+While Droid follows rules from your `.factory/rules/` files, you can add automated enforcement with [hooks](/cli/configuration/hooks-guide).
+
+### Run Linters After Edits
+
+Add a PostToolUse hook to run your linter after every file edit:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$FACTORY_PROJECT_DIR\" && npm run lint -- --fix 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Validate Code Style
+
+Run Prettier or your formatter automatically:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$FACTORY_PROJECT_DIR\" && npx prettier --write \"$(jq -r '.tool_input.file_path')\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+<Tip>
+  See [Auto-formatting hooks](/guides/hooks/auto-formatting) and [Code Validation hooks](/guides/hooks/code-validation) for more examples.
+</Tip>
 
 ---
 
