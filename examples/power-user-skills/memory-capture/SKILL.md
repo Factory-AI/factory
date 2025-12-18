@@ -154,3 +154,52 @@ Capture as:
 3. **Note the "why"** - Future you will want to know
 4. **Link to issues/PRs** - For traceability
 5. **Review periodically** - Archive outdated memories
+
+---
+
+## Alternative Implementations
+
+This skill is one of three ways to capture memories. Choose based on your workflow:
+
+### Option 1: This Skill (Interactive)
+
+Droid invokes this skill when you ask to remember something. Best when you want help categorizing and formatting memories.
+
+**Usage:** "Remember that we chose PostgreSQL for ACID compliance"
+
+### Option 2: Hook (Automatic)
+
+A [UserPromptSubmit hook](/cli/configuration/hooks-guide) that triggers on phrases like "remember this:". Best for zero-friction capture.
+
+See the [Memory Management guide](/guides/power-user/memory-management#automatic-memory-capture) for the hook implementation.
+
+**Usage:** "Remember this: we use the repository pattern for data access"
+
+### Option 3: Custom Slash Command (Manual)
+
+A [custom slash command](/cli/configuration/custom-slash-commands) for quick, consistent capture.
+
+Create `~/.factory/commands/remember.md`:
+
+```markdown
+---
+description: Save a memory to your memories file
+argument-hint: <what to remember>
+---
+
+Add this to my memories file (~/.factory/memories.md):
+
+$ARGUMENTS
+
+Format it appropriately based on whether it's a preference, decision, or learning. Include today's date.
+```
+
+**Usage:** `/remember we chose PostgreSQL for ACID compliance`
+
+### Comparison
+
+| Approach | Trigger | Best For |
+|----------|---------|----------|
+| **Skill** | Droid decides | Interactive categorization |
+| **Hook** | Automatic on keywords | Zero-friction capture |
+| **Slash Command** | You type `/remember` | Quick manual capture |

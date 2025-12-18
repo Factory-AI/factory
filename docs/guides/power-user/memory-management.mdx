@@ -6,6 +6,10 @@ keywords: ['memory', 'context', 'preferences', 'persistent', 'sessions', 'histor
 
 Droid doesn't have built-in memory between sessions, but you can create a powerful memory system using markdown files, AGENTS.md references, and hooks. This guide shows you how to build memory that persists and grows.
 
+<Info>
+  **Works with Factory App:** These memory patterns work identically in both CLI and [Factory App](/web/getting-started/overview)—just ensure your working directory is set to your repository root.
+</Info>
+
 ---
 
 ## The Memory System Architecture
@@ -220,63 +224,112 @@ Create a hook that helps you capture memories as you work.
 
 When you say "remember this:" followed by content, automatically append to memories.
 
-Create `~/.factory/hooks/memory-capture.py`:
+You can trigger memory capture with either **special characters** or **phrases**. Choose based on your preference:
 
-```python
-#!/usr/bin/env python3
-"""
-Captures "remember this:" statements and appends to memories.md
-"""
-import json
-import sys
-import os
-from datetime import datetime
+<Tabs>
+  <Tab title="# prefix trigger">
+    Trigger with `#` at the start of your message for quick capture.
+    
+    **Usage:**
+    - "#we use the repository pattern"
+    - "##I prefer early returns" (double `##` for personal)
+    
+    Create `~/.factory/hooks/memory-capture.py`:
 
-def main():
-    try:
-        data = json.load(sys.stdin)
-        prompt = data.get('prompt', '').lower()
-        
-        # Check for memory trigger phrases
-        triggers = ['remember this:', 'remember:', 'note:', 'save this:']
-        
-        for trigger in triggers:
-            if trigger in prompt.lower():
-                # Extract the content after the trigger
-                idx = prompt.lower().index(trigger)
-                content = data.get('prompt', '')[idx + len(trigger):].strip()
+    ```python
+    #!/usr/bin/env python3
+    """Captures messages starting with # and appends to memories.md"""
+    import json, sys, os
+    from datetime import datetime
+
+    def main():
+        try:
+            data = json.load(sys.stdin)
+            prompt = data.get('prompt', '').strip()
+            
+            if not prompt.startswith('#'):
+                return
+            
+            # ## = personal, # = project
+            if prompt.startswith('##'):
+                content = prompt[2:].strip()
+                mem_file = os.path.expanduser('~/.factory/memories.md')
+            else:
+                content = prompt[1:].strip()
+                project_dir = os.environ.get('FACTORY_PROJECT_DIR', os.getcwd())
+                project_factory = os.path.join(project_dir, '.factory')
+                if os.path.exists(project_factory):
+                    mem_file = os.path.join(project_factory, 'memories.md')
+                else:
+                    mem_file = os.path.expanduser('~/.factory/memories.md')
+            
+            if content:
+                timestamp = datetime.now().strftime('%Y-%m-%d')
+                with open(mem_file, 'a') as f:
+                    f.write(f"\n- [{timestamp}] {content}\n")
                 
-                if content:
-                    # Determine which memories file to use
-                    if 'personal' in prompt.lower() or 'my preference' in prompt.lower():
-                        mem_file = os.path.expanduser('~/.factory/memories.md')
-                    else:
-                        # Default to project memories if .factory exists
-                        project_mem = '.factory/memories.md'
-                        if os.path.exists('.factory'):
-                            mem_file = project_mem
-                        else:
-                            mem_file = os.path.expanduser('~/.factory/memories.md')
-                    
-                    # Append the memory
-                    timestamp = datetime.now().strftime('%Y-%m-%d')
-                    entry = f"\n- [{timestamp}] {content}\n"
-                    
-                    with open(mem_file, 'a') as f:
-                        f.write(entry)
-                    
-                    # Signal to Droid that we captured the memory
-                    print(json.dumps({
-                        'systemMessage': f'✓ Saved to {mem_file}'
-                    }))
-                break
-    except Exception as e:
-        # Don't fail the prompt on memory errors
-        pass
+                print(json.dumps({'systemMessage': f'✓ Saved to {mem_file}'}))
+        except:
+            pass
 
-if __name__ == '__main__':
-    main()
-```
+    if __name__ == '__main__':
+        main()
+    ```
+  </Tab>
+  
+  <Tab title="Phrase trigger">
+    Trigger with phrases like "remember this:", "note:", etc.
+    
+    **Usage:**
+    - "Remember this: we use the repository pattern"
+    - "Note: auth tokens expire after 24 hours"
+    
+    Create `~/.factory/hooks/memory-capture.py`:
+
+    ```python
+    #!/usr/bin/env python3
+    """Captures 'remember this:' statements and appends to memories.md"""
+    import json, sys, os
+    from datetime import datetime
+
+    def main():
+        try:
+            data = json.load(sys.stdin)
+            prompt = data.get('prompt', '')
+            
+            triggers = ['remember this:', 'remember:', 'note:', 'save this:']
+            
+            for trigger in triggers:
+                if trigger in prompt.lower():
+                    idx = prompt.lower().index(trigger)
+                    content = prompt[idx + len(trigger):].strip()
+                    
+                    if content:
+                        # Personal if specified, otherwise project
+                        if 'personal' in prompt.lower():
+                            mem_file = os.path.expanduser('~/.factory/memories.md')
+                        else:
+                            project_dir = os.environ.get('FACTORY_PROJECT_DIR', os.getcwd())
+                            project_factory = os.path.join(project_dir, '.factory')
+                            if os.path.exists(project_factory):
+                                mem_file = os.path.join(project_factory, 'memories.md')
+                            else:
+                                mem_file = os.path.expanduser('~/.factory/memories.md')
+                        
+                        timestamp = datetime.now().strftime('%Y-%m-%d')
+                        with open(mem_file, 'a') as f:
+                            f.write(f"\n- [{timestamp}] {content}\n")
+                        
+                        print(json.dumps({'systemMessage': f'✓ Saved to {mem_file}'}))
+                    break
+        except:
+            pass
+
+    if __name__ == '__main__':
+        main()
+    ```
+  </Tab>
+</Tabs>
 
 Make it executable and configure the hook:
 
@@ -304,10 +357,47 @@ Add to your hooks configuration via `/hooks`:
 }
 ```
 
-Now you can say things like:
+**With # prefix:**
+- "#we decided to use Zustand for state management"
+- "##I prefer early returns" (double `##` saves to personal)
+
+**With phrase triggers:**
 - "Remember this: we decided to use Zustand for state management"
 - "Note: the auth module uses JWT with 24-hour expiration"
-- "Remember (personal): I prefer early returns"
+
+### Alternative: Memory Capture Skill
+
+Instead of a hook, you can use a [skill](/cli/configuration/skills) that Droid invokes when you ask to remember something. This gives you more interactive control over categorization.
+
+See the [memory-capture skill example](https://github.com/Factory-AI/factory/tree/main/examples/power-user-skills/memory-capture) for a ready-to-use implementation.
+
+### Alternative: Custom Slash Command
+
+For quick manual capture, create a [custom slash command](/cli/configuration/custom-slash-commands):
+
+Create `~/.factory/commands/remember.md`:
+
+```markdown
+---
+description: Save a memory to your memories file
+argument-hint: <what to remember>
+---
+
+Add this to my memories file (~/.factory/memories.md):
+
+$ARGUMENTS
+
+Format it appropriately based on whether it's a preference, decision, or learning. Include today's date.
+```
+
+Then use `/remember we chose PostgreSQL for better ACID compliance` to capture memories on demand.
+
+<Info>
+  **Which approach to choose?**
+  - **Hook** — Best for automatic capture without extra steps
+  - **Skill** — Best when you want Droid to help categorize and format
+  - **Slash Command** — Best for quick manual capture with consistent formatting
+</Info>
 
 ---
 
