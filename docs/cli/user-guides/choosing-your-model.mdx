@@ -19,7 +19,7 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 | 5    | **GPT-5.1**                   | Good generalist, especially when you want OpenAI ergonomics with flexible reasoning effort.                                                     |
 | 6    | **Claude Haiku 4.5**          | Fast, cost-efficient for routine tasks and high-volume automation.                                                                              |
 | 7    | **Gemini 3 Pro**              | Strong at mixed reasoning with Low/High settings; helpful for researchy flows with structured outputs.                                         |
-| 8    | **Claude Opus 4.1**           | Highest raw capability for extremely complex work; choose when you need maximum reasoning power despite higher cost.                           |
+| 8    | **Gemini 3 Flash**            | Fast, cheap (0.2× multiplier) with full reasoning support; great for high-volume tasks where speed matters.                                    |
 | 9    | **Droid Core (GLM-4.6)**      | Open-source, 0.25× multiplier, great for bulk automation or air-gapped environments; note: no image support.                                   |
 
 <Note>
@@ -40,7 +40,7 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 | **High-volume automation, frequent quick turns**                 | **Haiku 4.5** for speedy feedback. **Droid Core** when cost is critical or you need air-gapped deployment. |
 
 <Tip>
-  **Claude Opus 4.1** remains available for extremely complex architecture decisions or critical work where you need maximum reasoning capability. Most tasks don't require Opus-level power—start with Sonnet 4.5 and escalate only if needed.
+  **Claude Opus 4.5** is the top-tier option for extremely complex architecture decisions or critical work where you need maximum reasoning capability. Most tasks don't require Opus-level power—start with Sonnet 4.5 and escalate only if needed.
 </Tip>
 
 Tip: you can swap models mid-session with `/model` or by toggling in the settings panel (`Shift+Tab` → **Settings**).
@@ -64,6 +64,7 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 - **GPT-5.1-Codex-Max**: Low / Medium / High / **Extra High** (default: Medium)
 - **GPT-5.2**: Low / Medium / High (default: Low)
 - **Gemini 3 Pro**: Low / High (default: High)
+- **Gemini 3 Flash**: Minimal / Low / Medium / High (default: High)
 - **Droid Core (GLM-4.6)**: None only (default: None; no image support)
 
 Reasoning effort increases latency and cost—start low for simple work and escalate as needed. **Extra High** is only available on GPT-5.1-Codex-Max.
