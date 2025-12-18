@@ -1,0 +1,433 @@
+---
+title: Memory and Context Management
+description: Build persistent memory so Droid remembers your preferences, decisions, and project history across sessions.
+keywords: ['memory', 'context', 'preferences', 'persistent', 'sessions', 'history', 'memories']
+---
+
+Droid doesn't have built-in memory between sessions, but you can create a powerful memory system using markdown files, AGENTS.md references, and hooks. This guide shows you how to build memory that persists and grows.
+
+---
+
+## The Memory System Architecture
+
+Your memory system consists of three layers:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    AGENTS.md                         │
+│         (References and orchestrates memory)         │
+└─────────────────────────────────────────────────────┘
+                         │
+          ┌──────────────┼──────────────┐
+          ▼              ▼              ▼
+┌─────────────────┐ ┌─────────────┐ ┌─────────────────┐
+│ Personal Memory │ │ Project     │ │ Rules &         │
+│ ~/.factory/     │ │ Memory      │ │ Conventions     │
+│ memories.md     │ │ .factory/   │ │ .factory/rules/ │
+│                 │ │ memories.md │ │                 │
+│ • Preferences   │ │ • Decisions │ │ • Standards     │
+│ • Style         │ │ • History   │ │ • Patterns      │
+│ • Tools         │ │ • Context   │ │ • Guidelines    │
+└─────────────────┘ └─────────────┘ └─────────────────┘
+```
+
+---
+
+## Setting Up Personal Memory
+
+Personal memory follows you across all projects.
+
+### Step 1: Create the Memory File
+
+Create `~/.factory/memories.md`:
+
+```markdown
+# My Development Memory
+
+## Code Style Preferences
+
+### General
+- I prefer functional programming patterns over OOP
+- I like early returns to reduce nesting
+- I use 2-space indentation (but defer to project config)
+
+### TypeScript
+- I prefer `interface` over `type` for object shapes
+- I use strict mode always
+- I avoid `enum` in favor of `as const` objects
+
+### React
+- Functional components only
+- I prefer Zustand over Redux for state
+- I use React Query for server state
+
+## Tool Preferences
+- Package manager: pnpm (prefer) > npm > yarn
+- Testing: Vitest > Jest
+- Formatting: Prettier with defaults
+- Linting: ESLint with strict TypeScript rules
+
+## Communication Style
+- I prefer concise explanations over verbose ones
+- Show me the code first, explain after if needed
+- When debugging, show me your reasoning
+
+## Past Decisions (Personal Projects)
+- [2024-01] Switched from Create React App to Vite
+- [2024-02] Adopted Tailwind CSS as default styling
+- [2024-03] Using Supabase for personal projects
+```
+
+### Step 2: Reference in AGENTS.md
+
+Add to your `~/.factory/AGENTS.md` or project `AGENTS.md`:
+
+```markdown
+## Personal Preferences
+My coding preferences and tool choices are documented in `~/.factory/memories.md`.
+Refer to this file when making decisions about code style, architecture, or tooling.
+```
+
+---
+
+## Setting Up Project Memory
+
+Project memory captures decisions and context specific to a codebase.
+
+### Step 1: Create Project Memory
+
+Create `.factory/memories.md` in your project root:
+
+```markdown
+# Project Memory
+
+## Project Context
+- **Name**: Acme Dashboard
+- **Type**: B2B SaaS application
+- **Stack**: Next.js 14, TypeScript, Prisma, PostgreSQL
+- **Started**: January 2024
+
+## Architecture Decisions
+
+### 2024-01-15: Database Choice
+**Decision**: PostgreSQL over MongoDB
+**Reasoning**: Strong relational data model, ACID compliance needed for financial data
+**Trade-offs**: More rigid schema, but better for reporting queries
+
+### 2024-02-01: Authentication Approach
+**Decision**: NextAuth.js with custom credentials provider
+**Reasoning**: Need to integrate with existing enterprise LDAP
+**Implementation**: See `src/lib/auth/` for setup
+
+### 2024-02-20: State Management
+**Decision**: Zustand for client state, React Query for server state
+**Reasoning**: Simpler than Redux, better separation of concerns
+**Pattern**: Store files in `src/stores/`, queries in `src/queries/`
+
+## Known Technical Debt
+- [ ] Auth refresh token logic needs refactoring (#234)
+- [ ] Dashboard queries should be optimized with proper indexes
+- [ ] Legacy API endpoints in `/api/v1/` need deprecation
+
+## Domain Knowledge
+
+### Business Rules
+- Users belong to Organizations (multi-tenant)
+- Subscription tiers: Free, Pro, Enterprise
+- Free tier limited to 3 team members
+- Data retention: 90 days for Free, unlimited for paid
+
+### Key Entities
+- `User`: Individual accounts, can belong to multiple orgs
+- `Organization`: Tenant container, has subscription
+- `Project`: Work container within an org
+- `Task`: Work items within projects
+
+## Team Conventions
+- PR titles follow conventional commits
+- All PRs need at least one approval
+- Deploy to staging on merge to `develop`
+- Deploy to production on merge to `main`
+```
+
+### Step 2: Reference in Project AGENTS.md
+
+Update your project's `AGENTS.md`:
+
+```markdown
+## Project Memory
+Architecture decisions, domain knowledge, and project history are documented in `.factory/memories.md`.
+Always check this file before making significant architectural or design decisions.
+```
+
+---
+
+## Memory Categories
+
+Organize your memories into useful categories:
+
+### Preferences (Personal)
+What you like and how you work:
+
+```markdown
+## Preferences
+- Code style choices
+- Tool preferences  
+- Communication style
+- Learning style
+```
+
+### Decisions (Project)
+What was decided and why:
+
+```markdown
+## Decisions
+- Architecture choices with reasoning
+- Library selections with trade-offs
+- Design patterns adopted
+- Standards agreed upon
+```
+
+### Context (Project)
+Background information:
+
+```markdown
+## Context
+- Business domain knowledge
+- Key entities and relationships
+- External integrations
+- Performance requirements
+```
+
+### History (Both)
+What happened when:
+
+```markdown
+## History
+- Major refactors completed
+- Migrations performed
+- Issues resolved
+- Lessons learned
+```
+
+---
+
+## Automatic Memory Capture
+
+Create a hook that helps you capture memories as you work.
+
+### The "Remember This" Hook
+
+When you say "remember this:" followed by content, automatically append to memories.
+
+Create `~/.factory/hooks/memory-capture.py`:
+
+```python
+#!/usr/bin/env python3
+"""
+Captures "remember this:" statements and appends to memories.md
+"""
+import json
+import sys
+import os
+from datetime import datetime
+
+def main():
+    try:
+        data = json.load(sys.stdin)
+        prompt = data.get('prompt', '').lower()
+        
+        # Check for memory trigger phrases
+        triggers = ['remember this:', 'remember:', 'note:', 'save this:']
+        
+        for trigger in triggers:
+            if trigger in prompt.lower():
+                # Extract the content after the trigger
+                idx = prompt.lower().index(trigger)
+                content = data.get('prompt', '')[idx + len(trigger):].strip()
+                
+                if content:
+                    # Determine which memories file to use
+                    if 'personal' in prompt.lower() or 'my preference' in prompt.lower():
+                        mem_file = os.path.expanduser('~/.factory/memories.md')
+                    else:
+                        # Default to project memories if .factory exists
+                        project_mem = '.factory/memories.md'
+                        if os.path.exists('.factory'):
+                            mem_file = project_mem
+                        else:
+                            mem_file = os.path.expanduser('~/.factory/memories.md')
+                    
+                    # Append the memory
+                    timestamp = datetime.now().strftime('%Y-%m-%d')
+                    entry = f"\n- [{timestamp}] {content}\n"
+                    
+                    with open(mem_file, 'a') as f:
+                        f.write(entry)
+                    
+                    # Signal to Droid that we captured the memory
+                    print(json.dumps({
+                        'systemMessage': f'✓ Saved to {mem_file}'
+                    }))
+                break
+    except Exception as e:
+        # Don't fail the prompt on memory errors
+        pass
+
+if __name__ == '__main__':
+    main()
+```
+
+Make it executable and configure the hook:
+
+```bash
+chmod +x ~/.factory/hooks/memory-capture.py
+```
+
+Add to your hooks configuration via `/hooks`:
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.factory/hooks/memory-capture.py"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Now you can say things like:
+- "Remember this: we decided to use Zustand for state management"
+- "Note: the auth module uses JWT with 24-hour expiration"
+- "Remember (personal): I prefer early returns"
+
+---
+
+## Memory Maintenance
+
+Keep your memories useful with regular maintenance.
+
+### Monthly Review Checklist
+
+```markdown
+## Monthly Memory Review
+
+### Personal Memory (~/.factory/memories.md)
+- [ ] Remove outdated preferences (tools you no longer use)
+- [ ] Update decisions that have changed
+- [ ] Add new patterns you've adopted
+- [ ] Archive old entries that are no longer relevant
+
+### Project Memory (.factory/memories.md)
+- [ ] Review architecture decisions - still valid?
+- [ ] Update technical debt items
+- [ ] Add new domain knowledge learned
+- [ ] Document recent major changes
+```
+
+### Archiving Old Memories
+
+When memories become stale, move them to an archive:
+
+```markdown
+# memories.md
+
+## Current Decisions
+[active decisions here]
+
+## Archive (2023)
+<details>
+<summary>Archived decisions from 2023</summary>
+
+### 2023-06: Original Auth System
+**Decision**: Custom JWT implementation
+**Status**: Replaced by NextAuth.js in 2024-02
+**Reason for change**: Maintenance burden, security updates
+
+</details>
+```
+
+---
+
+## Advanced: Memory-Aware Skills
+
+Create skills that leverage your memory files:
+
+```markdown
+---
+name: context-aware-implementation
+description: Implement features using project memory and conventions.
+---
+
+# Context-Aware Implementation
+
+Before implementing any feature:
+
+1. **Check project memory** (`.factory/memories.md`):
+   - What architecture decisions apply?
+   - What patterns should I follow?
+   - What constraints exist?
+
+2. **Check personal preferences** (`~/.factory/memories.md`):
+   - What code style does the user prefer?
+   - What tools should I use?
+
+3. **Check rules** (`.factory/rules/`):
+   - What conventions apply to this file type?
+   - What testing requirements exist?
+
+Then implement following all discovered context.
+```
+
+---
+
+## Quick Reference
+
+### File Locations
+
+| Memory Type | Location | Scope |
+|-------------|----------|-------|
+| Personal preferences | `~/.factory/memories.md` | All projects |
+| Project decisions | `.factory/memories.md` | This project |
+| Team conventions | `.factory/rules/*.md` | This project |
+
+### When to Add Memories
+
+| Event | What to Record | Where |
+|-------|---------------|-------|
+| Made an architecture decision | Decision + reasoning | Project |
+| Discovered a preference | What you prefer | Personal |
+| Learned domain knowledge | Business rules, entities | Project |
+| Changed your workflow | New tool or pattern | Personal |
+| Resolved a tricky issue | Solution and context | Project |
+
+### Memory Format Template
+
+```markdown
+### [Date]: [Title]
+**Decision/Preference**: [What]
+**Reasoning**: [Why]
+**Context**: [When this applies]
+**Trade-offs**: [What you gave up]
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Setup Checklist" href="/guides/power-user/setup-checklist" icon="list-check">
+    Complete power user configuration
+  </Card>
+  <Card title="Rules Guide" href="/guides/power-user/rules-conventions" icon="scale-balanced">
+    Organize team conventions
+  </Card>
+</CardGroup>
