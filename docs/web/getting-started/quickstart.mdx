@@ -1,156 +1,107 @@
 ---
 title: "Quickstart"
-description: "Connect to your machine and execute on tasks in just 5 minutes"
+description: "Get up and running with the Factory App in 5 minutes"
+keywords: ['quickstart', 'getting started', 'factory app', 'desktop app', 'droid', 'factory bridge', 'bridge', 'remote workspaces', 'setup', 'install', 'download', 'local machine', 'working directory']
 ---
 
-In this Quickstart Guide, you'll learn how to launch Factory, connect to your codebase, and start making code changes with AI assistance.
-
 <Note>
-  Make sure you have access to Factory before getting started.
+  **Research Preview**: The Factory App is now available for download on Mac and Windows.
 </Note>
 
-## Step 1: Launch Factory
+## Step 1: Download and Install
 
 <Steps>
-  <Step title="Open Factory">
-    Open the Factory application in your browser.
+  <Step title="Download Factory">
+    <CardGroup cols={3}>
+      <Card title="Mac (Apple Silicon)" icon="apple" href="https://app.factory.ai/api/desktop?platform=darwin&architecture=arm64">
+        M1/M2/M3
+      </Card>
+      <Card title="Mac (Intel)" icon="apple" href="https://app.factory.ai/api/desktop?platform=darwin&architecture=x64">
+        Intel
+      </Card>
+      <Card title="Windows" icon="windows" href="https://app.factory.ai/api/desktop?platform=win32">
+        Windows x64
+      </Card>
+    </CardGroup>
+  </Step>
 
-    <Frame>
-      ![factoryhomepage.png](/images/web/factoryhomepage.png)
-    </Frame>
+  <Step title="Install">
+    - **Mac**: Open the `.dmg` file and drag Factory to Applications
+    - **Windows**: Run the installer
+  </Step>
 
-    <Note>
-      By default, your session is configured with settings from your most recent session. First-time users will see default settings: Code Droid, remote connection, and an empty workspace.
-    </Note>
+  <Step title="Sign In">
+    Launch Factory and sign in with your account.
   </Step>
 </Steps>
 
-## Step 2: Configure Your Session
+## Step 2: Connect to Your Codebase
 
 <Steps>
-  <Step title="Select Your Droid">
-    Click the Droid Selection button to choose the appropriate droid based on your project needs.
-
-    <Frame>
-      ![droid-selection.gif](/images/web/droid-selection.gif)
-    </Frame>
-  </Step>
-  
-  <Step title="Select Your Machine Connection">
-    <Frame>
-      ![machine-connection-start.gif](/images/web/machine-connection-start.gif)
-    </Frame>
-
-    Choose between Local (via Bridge) or Remote connection.
-
-    ### Local Connection (Bridge)
-    1. Download Factory Bridge and open the application
-    2. Enter the pairing code displayed in the Machine Connection menu
-    3. Set your root directory to your working directory
-    4. Bridge automatically scans for repositories from the root directory
-    5. Select repositories relevant to this session
-
-    <Frame>
-      ![bridge-connection.gif](/images/web/bridge-connection.gif)
-    </Frame>
-
-    ### Remote Connection
-    Connect to a remote workspace (requires GitHub or GitLab integration).
-
-    <Note>
-      See our [Integrations guide](/onboarding/integrating-with-your-engineering-system/github-cloud) to connect GitHub or GitLab for remote workspaces.
-    </Note>
+  <Step title="Set Your Working Directory">
+    Set your working directory to your project folder. Factory connects directly to your local machine.
   </Step>
 
-  <Step title="Select Model and Tools">
-    Choose your desired model and activate the necessary tools for your task.
-
-    <Frame>
-      ![model-tool-selection.gif](/images/web/model-tool-selection.gif)
-    </Frame>
-
-    <Note>
-      Tools extend Factory's capabilities through external integrations to connect with Jira, Notion, Slack, and other platforms.
-    </Note>
+  <Step title="Select Your Model">
+    Choose your preferred AI model from the model selector. You can change this anytime.
   </Step>
 </Steps>
 
-## Step 3: Explore Your Codebase
+## Step 3: Start Building
 
 <Steps>
-  <Step title="Analyze Your Architecture">
-    Start with a comprehensive overview of your project:
+  <Step title="Ask Droid Anything">
+    Start with something simple:
 
     ```
-    > Analyze this codebase and explain the overall architecture
+    Analyze this codebase and explain the architecture
     ```
 
-    Droid reads your files contextually and leverages organizational knowledge to provide comprehensive insights about your project structure and conventions.
+    Or jump straight into coding:
 
-    <Note>
-      Use the context panel to explore all context leveraged by Droid.
-    </Note>
+    ```
+    Add error handling to the user authentication flow
+    ```
+
+    Droid will analyze your codebase, propose changes, and show you exactly what will be modified before applying anything.
   </Step>
 </Steps>
 
-## Step 4: Make Your First Code Change
+## Example Workflows
 
-<Steps>
-  <Step title="Request a Simple Modification">
-    Try a simple modification to see Droid in action:
+### Feature Development
+```
+Implement a dark mode toggle following our existing theme patterns
+```
 
-    ```
-    > Add comprehensive logging to the main application startup
-    ```
+### Bug Fixing
+```
+Fix the authentication timeout issue where users get logged out after 5 minutes
+```
 
-    Droid will:
-    1. Analyze your current logging setup
-    2. Propose specific changes with a clear plan
-    3. Show you exactly what will be modified
+### Code Review
+```
+Review this PR and suggest improvements for error handling and edge cases
+```
 
-    <Note>
-      This transparent review process ensures you maintain full control over all code modifications.
-    </Note>
-  </Step>
-</Steps>
+### Security Audit
+```
+Audit this codebase for security vulnerabilities and create a remediation plan
+```
 
-## Step 5: Experience Enterprise Workflows
+## Tips
 
-<Steps>
-  <Step title="Complex Tasks with External Context">
-    Try more complex tasks that showcase Factory's enterprise capabilities:
+- **Be specific**: Include relevant details like file names, error messages, or ticket numbers
+- **Use context**: Reference team tools with '@' mentions or paste links directly
+- **Review changes**: Always review Droid's proposed changes before approval
 
-    ### Security Audit
-    ```
-    > Audit this codebase for security vulnerabilities and create a remediation plan
-    ```
+## Next Steps
 
-    ### Integration with Team Tools
-    Provide context from your team's tools using '@' mentions or direct links.
-
-
-    <Note>
-      If you've integrated these platforms through Factory's dashboard, Droid can automatically read context from Jira, Notion, Slack, and other sources.
-    </Note>
-  </Step>
-</Steps>
-
-## Best Practices
-
-### Be Specific with Context
-**Instead of:** "Fix the bug"  
-**Try:** "Fix the authentication timeout issue where users get logged out after 5 minutes instead of the configured 30 minutes"
-
-### Leverage Organizational Knowledge
-"Following our team's coding standards, implement the user preferences feature described in ticket PROJ-123"
-
-### Use the Review Workflow
-Always review Droid's proposed changes before approval. The transparent diff view helps you understand exactly what will be modified.
-
-## Congratulations! 🎉
-
-You've successfully connected Factory to your codebase and made your first AI-assisted code changes.
-
-### Next Steps
-
-Continue exploring Factory's web platform to maximize your productivity with AI-assisted development.
+<CardGroup cols={2}>
+  <Card title="Integrations" icon="plug" href="/web/integrations/linear">
+    Connect Slack, Linear, and other tools
+  </Card>
+  <Card title="CLI" icon="terminal" href="/cli/getting-started/overview">
+    Use Droid from your terminal
+  </Card>
+</CardGroup>

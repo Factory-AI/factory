@@ -1,25 +1,25 @@
 ---
-title: Maturity Dashboard
-description: Track and analyze your organization's Autonomy Maturity scores in the Factory app.
+title: Readiness Dashboard
+description: Track and analyze your organization's Agent Readiness scores in the Factory app.
 keywords:
   [
-    "autonomy maturity",
+    "agent readiness",
     "dashboard",
-    "maturity tracking",
+    "readiness tracking",
     "repository scores",
     "analytics",
   ]
 ---
 
-The Autonomy Maturity dashboard provides a centralized view of your organization's maturity scores across all repositories, with historical trends and detailed breakdowns.
+The Agent Readiness dashboard provides a centralized view of your organization's readiness scores across all repositories, with historical trends and detailed breakdowns.
 
-![Autonomy Maturity Dashboard](/images/web/maturity-dashboard.png)
+![Agent Readiness Dashboard](/images/web/readiness-dashboard.png)
 
 ---
 
 ## Accessing the Dashboard
 
-Navigate to **Settings → Analytics → Autonomy Maturity** in the Factory app.
+Navigate to **Settings → Analytics → Agent Readiness** in the Factory app.
 
 ---
 
@@ -33,13 +33,13 @@ At the top, you'll see key metrics:
 
 | Metric                   | Description                                                                 |
 | :----------------------- | :-------------------------------------------------------------------------- |
-| **Organization Score**   | Average maturity level across all measured repositories (rounded down)      |
-| **Repositories Tracked** | Number of repositories with maturity reports vs. total enabled repositories |
-| **Last Updated**         | Time since the most recent maturity evaluation                              |
+| **Organization Score**   | Average readiness level across all measured repositories (rounded down)      |
+| **Repositories Tracked** | Number of repositories with readiness reports vs. total enabled repositories |
+| **Last Updated**         | Time since the most recent readiness evaluation                              |
 
 ### Progress Graph
 
-A time-series chart showing your organization's maturity level over time. Use the period filters to view different time ranges:
+A time-series chart showing your organization's readiness level over time. Use the period filters to view different time ranges:
 
 - **7d** — Last 7 days
 - **1m** — Last month
@@ -52,7 +52,7 @@ A time-series chart showing your organization's maturity level over time. Use th
 A searchable, paginated table of all repositories showing:
 
 - **Repository name** — Click to view details
-- **Level** — Current maturity level (1-5)
+- **Level** — Current readiness level (1-5)
 - **Progress** — Percentage complete toward next level
 - **Last Update** — When the repository was last evaluated
 
@@ -62,9 +62,9 @@ Use the search bar to filter repositories by name or URL.
 
 ## Repository Detail Page
 
-Click any repository row to view its detailed maturity breakdown.
+Click any repository row to view its detailed readiness breakdown.
 
-![Repository Detail Page](/images/web/maturity-criteria.png)
+![Repository Detail Page](/images/web/readiness-criteria.png)
 
 ### Header
 
@@ -72,7 +72,7 @@ Shows the repository name, current level achieved, last evaluation time, and a *
 
 ### Level Accordions
 
-Each maturity level (Functional through Autonomous) has an expandable accordion section showing:
+Each readiness level (Functional through Autonomous) has an expandable accordion section showing:
 
 - **Percentage complete** — How much of that level's criteria are passing
 - **Lock status** — Levels are locked until the previous level reaches 80%
@@ -96,13 +96,13 @@ Soon, failing criteria will display a **Fix** button that triggers automated rem
 
 ## Triggering a Refresh
 
-There are two ways to refresh a maturity evaluation:
+There are two ways to refresh a readiness evaluation:
 
 ### From the Web Dashboard
 
 1. Navigate to the repository detail page
 2. Click the **Refresh** button in the header
-3. A new session starts on a remote workspace for the repo
+3. A new session starts to evaluate the repository
 4. Once done, the dashboard will update with results from the latest report
 
 ### From the CLI
@@ -115,9 +115,9 @@ droid
 ```
 
 <Note>
-  Re-evaluations run the full maturity assessment against the current state of
+  Re-evaluations run the full readiness assessment against the current state of
   your repository. This is useful after making infrastructure improvements or
-  merging changes that can affect a maturity criterion.
+  merging changes that can affect a readiness criterion.
 </Note>
 
 ---
@@ -149,7 +149,7 @@ The percentage shown for each level indicates progress toward completing that le
 
 ## Best Practices
 
-- **Regular evaluations:** Run maturity reports after significant infrastructure changes
+- **Regular evaluations:** Run readiness reports after significant infrastructure changes
 - **Focus on current level:** Address failing criteria in your current level before jumping ahead to focus on foundational improvements first
 - **Track trends:** Use the progress graph to monitor improvement over time
 - **Prioritize high-impact fixes:** The action items in CLI reports highlight the most impactful improvements

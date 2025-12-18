@@ -1,17 +1,17 @@
 ---
-title: Maturity Reports API
-description: REST API reference for programmatic access to autonomy maturity reports.
+title: Readiness Reports API
+description: REST API reference for programmatic access to agent readiness reports.
 keywords:
   [
     "api",
-    "maturity reports",
-    "autonomy maturity",
+    "readiness reports",
+    "agent readiness",
     "rest api",
     "programmatic access",
   ]
 ---
 
-The Maturity Level Reports API provides programmatic access to your organization's autonomy maturity evaluation data.
+The Readiness Reports API provides programmatic access to your organization's agent readiness evaluation data.
 
 ---
 
@@ -37,9 +37,9 @@ https://app.factory.ai
 
 ## Endpoints
 
-### List Maturity Reports
+### List Readiness Reports
 
-Retrieves maturity level reports for your organization.
+Retrieves readiness reports for your organization.
 
 ```
 GET /api/organization/maturity-level-reports
@@ -105,7 +105,7 @@ curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limi
 
 ---
 
-## Report Schema
+## Readiness Report Schema
 
 ### Report Object
 
@@ -168,7 +168,7 @@ curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10&st
 
 ### CI/CD Integration
 
-Track maturity scores over time by fetching reports after each evaluation:
+Track readiness scores over time by fetching reports after each evaluation:
 
 ```bash
 # Get latest report for a specific repository
@@ -194,7 +194,7 @@ const avgLevel =
 
 ### Automated Alerting
 
-Set up alerts when maturity scores drop below thresholds:
+Set up alerts when readiness scores drop below thresholds:
 
 ```bash
 # Fetch recent reports and check for regressions

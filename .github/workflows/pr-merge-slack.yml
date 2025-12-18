@@ -1,0 +1,53 @@
+name: PR Merge Slack Notifier
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  notify:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack notification
+        env:
+          WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          if [ -z "${WEBHOOK_URL}" ]; then
+            echo "Slack webhook URL not provided." >&2
+            exit 1
+          fi
+
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "jq is required but not available" >&2
+            exit 1
+          fi
+
+          SHORT_SHA="${MERGE_SHA:0:7}"
+
+          payload=$(jq -n \
+            --arg url "$PR_URL" \
+            --arg title "$PR_TITLE" \
+            --arg author "$PR_AUTHOR" \
+            --arg sha "$SHORT_SHA" \
+            '{
+              text: ("PR merged: " + $title),
+              unfurl_links: false,
+              unfurl_media: false,
+              blocks: [
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: ("*<" + $url + "|" + $title + ">*\nMerged by " + $author + " • `" + $sha + "`")
+                  }
+                }
+              ]
+            }')
+
+          curl --fail-with-body --max-time 30 -X POST -H 'Content-type: application/json' --data "$payload" "$WEBHOOK_URL"
