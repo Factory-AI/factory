@@ -1,0 +1,39 @@
+import { BarChart } from '/snippets/leaderboards/bar-chart.jsx'
+
+export const nextjsEvalData = [
+  { name: "Factory Droid (GPT-5.2)", accuracy: 66.0 },
+  { name: "Factory Droid (Claude Opus 4.5)", accuracy: 56.0 },
+  { name: "Factory Droid (Claude Sonnet 4.5)", accuracy: 50.0 },
+  { name: "Factory Droid (Gemini 3 Pro)", accuracy: 46.0 },
+  { name: "Claude Code (Claude Opus 4.5)", accuracy: 42.0 },
+  { name: "Cursor (Claude Sonnet 4.5)", accuracy: 38.0 },
+]
+
+## Next.js Evals
+
+Official benchmark from [Vercel](https://nextjs.org/evals) measuring AI model performance on Next.js code generation and migration tasks. Evaluates success rate, execution time, token usage, and quality improvements.
+
+### Results
+
+<BarChart data={nextjsEvalData} valueKey="accuracy" valueLabel="%" maxValue={100} />
+
+*Last updated: December 2025*
+
+### Methodology
+
+| Category | Description |
+|----------|-------------|
+| **Code Generation** | Creating Next.js components, pages, and API routes |
+| **Migration** | Upgrading from Pages Router to App Router |
+| **Best Practices** | Following Next.js patterns and conventions |
+| **TypeScript** | Proper type safety and inference |
+
+Scoring metrics:
+- **Success Rate** - Percentage of tasks completed correctly
+- **Execution Time** - Time to complete tasks
+- **Token Usage** - Efficiency of model responses
+- **Quality Score** - Code quality and best practices
+
+<Card title="Next.js Evals" icon="trophy" href="https://nextjs.org/evals">
+  View live results and methodology
+</Card>
