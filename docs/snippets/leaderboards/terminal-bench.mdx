@@ -1,0 +1,35 @@
+import { BarChart } from '/snippets/leaderboards/bar-chart.jsx'
+
+export const terminalBenchData = [
+  { name: "Factory Droid", model: "Claude Opus 4.5", accuracy: 63.1 },
+  { name: "OpenAI Codex CLI", model: "GPT-5.1-Codex-Max", accuracy: 60.4 },
+  { name: "Warp", model: "Claude Opus 4.5", accuracy: 59.1 },
+  { name: "OpenHands", model: "Gemini 3 Pro", accuracy: 43.8 },
+  { name: "Anthropic Claude Code", model: "Gemini 3 Pro", accuracy: 40.1 },
+]
+
+## Terminal Bench
+
+Benchmark from [tbench.ai](https://www.tbench.ai) evaluating AI coding agents on real-world software engineering tasks using terminal-based interfaces. Measures how effectively agents can navigate codebases, execute commands, and implement solutions through command-line interactions.
+
+### Results
+
+<BarChart data={terminalBenchData} valueKey="accuracy" valueLabel="%" maxValue={100} />
+
+*Last updated: December 2025*
+
+### Methodology
+
+| Category | Description |
+|----------|-------------|
+| **Code Navigation** | Finding and understanding relevant code |
+| **Bug Fixing** | Identifying and resolving issues |
+| **Feature Implementation** | Adding new functionality |
+| **Refactoring** | Improving existing code structure |
+| **Testing** | Writing and running tests |
+
+Tasks are scored on **correctness**, **efficiency**, and **code quality**.
+
+<Card title="Terminal Bench Leaderboard" icon="trophy" href="https://www.tbench.ai/leaderboard/terminal-bench/2.0">
+  View live rankings and submit your agent
+</Card>
