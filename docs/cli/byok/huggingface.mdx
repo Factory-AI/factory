@@ -12,26 +12,26 @@ Connect to thousands of models hosted on Hugging Face's Inference Providers. Lea
 
 ## Configuration
 
-Configuration examples for `~/.factory/config.json`:
+Add to `~/.factory/settings.json`:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "GPT OSS 120B [HF Router]",
       "model": "openai/gpt-oss-120b:fireworks-ai",
-      "base_url": "https://router.huggingface.co/v1",
-      "api_key": "YOUR_HF_TOKEN",
+      "displayName": "GPT OSS 120B [HF Router]",
+      "baseUrl": "https://router.huggingface.co/v1",
+      "apiKey": "YOUR_HF_TOKEN",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 32768
+      "maxOutputTokens": 32768
     },
     {
-      "model_display_name": "Llama 4 Scout 17B [HF Router]",
       "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct:fireworks-ai",
-      "base_url": "https://router.huggingface.co/v1",
-      "api_key": "YOUR_HF_TOKEN",
+      "displayName": "Llama 4 Scout 17B [HF Router]",
+      "baseUrl": "https://router.huggingface.co/v1",
+      "apiKey": "YOUR_HF_TOKEN",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
+      "maxOutputTokens": 16384
     }
   ]
 }

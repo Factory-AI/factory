@@ -8,26 +8,26 @@ Access high-performance inference for open-source models with Fireworks AI's opt
 
 ## Configuration
 
-Configuration examples for `~/.factory/config.json`:
+Add to `~/.factory/settings.json`:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "GLM 4.5 [Fireworks]",
       "model": "accounts/fireworks/models/glm-4p5",
-      "base_url": "https://api.fireworks.ai/inference/v1",
-      "api_key": "YOUR_FIREWORKS_API_KEY",
+      "displayName": "GLM 4.5 [Fireworks]",
+      "baseUrl": "https://api.fireworks.ai/inference/v1",
+      "apiKey": "YOUR_FIREWORKS_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
+      "maxOutputTokens": 16384
     },
     {
-      "model_display_name": "Deepseek V3.1 Terminus [Fireworks]",
       "model": "accounts/fireworks/models/deepseek-v3p1-terminus",
-      "base_url": "https://api.fireworks.ai/inference/v1",
-      "api_key": "YOUR_FIREWORKS_API_KEY",
+      "displayName": "Deepseek V3.1 Terminus [Fireworks]",
+      "baseUrl": "https://api.fireworks.ai/inference/v1",
+      "apiKey": "YOUR_FIREWORKS_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 20480
+      "maxOutputTokens": 20480
     }
   ]
 }

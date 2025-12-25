@@ -8,18 +8,18 @@ Connect to OpenRouter for access to models from multiple providers through a sin
 
 ## Configuration
 
-Configuration examples for `~/.factory/config.json`:
+Add to `~/.factory/settings.json`:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "GPT-OSS-20B [OpenRouter]",
       "model": "openai/gpt-oss-20b",
-      "base_url": "https://openrouter.ai/api/v1",
-      "api_key": "YOUR_OPENROUTER_KEY",
+      "displayName": "GPT-OSS-20B [OpenRouter]",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "YOUR_OPENROUTER_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 32000
+      "maxOutputTokens": 32000
     }
   ]
 }
