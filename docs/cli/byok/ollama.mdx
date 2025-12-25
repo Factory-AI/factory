@@ -17,26 +17,26 @@ Run models entirely on your machine with no internet required.
 
 ### Configuration
 
-Configuration examples for `~/.factory/config.json`:
+Add to `~/.factory/settings.json`:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Qwen 2.5 Coder 32B [Local]",
       "model": "qwen2.5-coder:32b",
-      "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",  # add any non-empty value
+      "displayName": "Qwen 2.5 Coder 32B [Local]",
+      "baseUrl": "http://localhost:11434/v1",
+      "apiKey": "not-needed",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 16000
+      "maxOutputTokens": 16000
     },
     {
-      "model_display_name": "Qwen 2.5 Coder 7B [Local]",
       "model": "qwen2.5-coder:7b",
-      "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",  # add any non-empty value
+      "displayName": "Qwen 2.5 Coder 7B [Local]",
+      "baseUrl": "http://localhost:11434/v1",
+      "apiKey": "not-needed",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 4000
+      "maxOutputTokens": 4000
     }
   ]
 }
@@ -90,14 +90,14 @@ For a full list of available cloud models, visit: [ollama.com/search?c=cloud](ht
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "qwen3-coder [Online]",
       "model": "qwen3-coder:480b-cloud",
-      "base_url": "http://localhost:11434/v1/",
-      "api_key": "not-needed",  # add any non-empty value
+      "displayName": "qwen3-coder [Online]",
+      "baseUrl": "http://localhost:11434/v1/",
+      "apiKey": "not-needed",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 128000
+      "maxOutputTokens": 128000
     }
   ]
 }

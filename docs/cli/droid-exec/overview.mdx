@@ -377,16 +377,16 @@ droid exec --auto medium --disabled-tools execute-cli "run edits only"
 
 ### Custom models
 
-You can configure custom models to use with droid exec by adding them to your `~/.factory/config.json` file:
+You can configure custom models to use with droid exec by adding them to your `~/.factory/settings.json` file:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "My Custom Model",
       "model": "gpt-5.1-codex-custom",
-      "base_url": "https://api.openai.com/v1",
-      "api_key": "your-api-key-here",
+      "displayName": "My Custom Model",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKey": "your-api-key-here",
       "provider": "openai"
     }
   ]
@@ -403,22 +403,22 @@ If you have multiple custom models configured:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Kimi K2 [Groq]",
       "model": "kimi-k2",
-      "base_url": "https://api.groq.com/openai/v1",
-      "api_key": "your-groq-key",
+      "displayName": "Kimi K2 [Groq]",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "apiKey": "your-groq-key",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
+      "maxOutputTokens": 16384
     },
     {
-      "model_display_name": "GPT-OSS-20B [OpenRouter]",
       "model": "openai/gpt-oss-20b",
-      "base_url": "https://openrouter.ai/api/v1",
-      "api_key": "YOUR_OPENROUTER_KEY",
+      "displayName": "GPT-OSS-20B [OpenRouter]",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "YOUR_OPENROUTER_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 32000
+      "maxOutputTokens": 32000
     }
   ]
 }
@@ -426,9 +426,9 @@ If you have multiple custom models configured:
 
 You would reference them as:
 - `--model "custom:Kimi-K2-[Groq]-0"`
-- `--model "custom:GPT-OSS-20B [OpenRouter]-1"`
+- `--model "custom:GPT-OSS-20B-[OpenRouter]-1"`
 
-The index corresponds to the position in the `custom_models` array (0-based).
+The index corresponds to the position in the `customModels` array (0-based).
 
 <Note>
 Reasoning effort (`-r` / `--reasoning-effort`) is not yet supported for custom models, but coming soon.

@@ -8,18 +8,18 @@ Deploy and serve custom models with Baseten's enterprise-grade infrastructure fo
 
 ## Configuration
 
-Add these configurations to `~/.factory/config.json`:
+Add to `~/.factory/settings.json`:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Qwen3-Coder-480B [Baseten]",
       "model": "Qwen/Qwen3-Coder-480B-A35B-Instruct",
-      "base_url": "https://inference.baseten.co/v1",
-      "api_key": "YOUR_BASETEN_API_KEY",
+      "displayName": "Qwen3-Coder-480B [Baseten]",
+      "baseUrl": "https://inference.baseten.co/v1",
+      "apiKey": "YOUR_BASETEN_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 8192
+      "maxOutputTokens": 8192
     }
   ]
 }

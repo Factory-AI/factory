@@ -18,18 +18,37 @@ Factory CLI supports custom model configurations through BYOK (Bring Your Own Ke
 
 ## Configuration Reference
 
-Add custom models in `~/.factory/config.json` under the `custom_models` array.
+Add custom models to `~/.factory/settings.json` under the `customModels` array:
+
+```json
+{
+  "customModels": [
+    {
+      "model": "your-model-id",
+      "displayName": "My Custom Model",
+      "baseUrl": "https://api.provider.com/v1",
+      "apiKey": "YOUR_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 16384
+    }
+  ]
+}
+```
+
+<Note>
+  **Legacy support**: Custom models in `~/.factory/config.json` using snake_case field names (`custom_models`, `base_url`, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with `settings.json` taking priority.
+</Note>
 
 ### Supported Fields
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `model_display_name` | ✓ | Human-friendly name shown in model selector |
 | `model` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
-| `base_url` | ✓ | API endpoint base URL |
-| `api_key` | ✓ | Your API key for the provider. Can't be empty. |
+| `displayName` | | Human-friendly name shown in model selector |
+| `baseUrl` | ✓ | API endpoint base URL |
+| `apiKey` | ✓ | Your API key for the provider. Can't be empty. |
 | `provider` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
-| `max_tokens` | ✓ | Maximum output tokens for model responses |
+| `maxOutputTokens` | | Maximum output tokens for model responses |
 
 ---
 
@@ -76,19 +95,19 @@ Use your own API keys for cost control and billing transparency:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Sonnet 4.5 [Custom]",
       "model": "claude-sonnet-4-5-20250929",
-      "base_url": "https://api.anthropic.com",
-      "api_key": "YOUR_ANTHROPIC_KEY",
+      "displayName": "Sonnet 4.5 [Custom]",
+      "baseUrl": "https://api.anthropic.com",
+      "apiKey": "YOUR_ANTHROPIC_KEY",
       "provider": "anthropic"
     },
     {
-      "model_display_name": "GPT5-Codex [Custom]",
       "model": "gpt-5-codex",
-      "base_url": "https://api.openai.com/v1",
-      "api_key": "YOUR_OPENAI_KEY",
+      "displayName": "GPT5-Codex [Custom]",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKey": "YOUR_OPENAI_KEY",
       "provider": "openai"
     }
   ]
@@ -101,14 +120,14 @@ Connect to OpenRouter for access to models from multiple providers:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "GPT-OSS-20B",
       "model": "openai/gpt-oss-20b",
-      "base_url": "https://openrouter.ai/api/v1",
-      "api_key": "YOUR_OPENROUTER_KEY",
+      "displayName": "GPT-OSS-20B",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "YOUR_OPENROUTER_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 32000
+      "maxOutputTokens": 32000
     }
   ]
 }
@@ -122,22 +141,22 @@ Access high-performance inference for open-source models with optimized serving:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "GLM 4.5 [Fireworks]",
       "model": "accounts/fireworks/models/glm-4p5",
-      "base_url": "https://api.fireworks.ai/inference/v1",
-      "api_key": "YOUR_FIREWORKS_API_KEY",
+      "displayName": "GLM 4.5 [Fireworks]",
+      "baseUrl": "https://api.fireworks.ai/inference/v1",
+      "apiKey": "YOUR_FIREWORKS_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
+      "maxOutputTokens": 16384
     },
     {
-      "model_display_name": "Llama 3.1 405B [Fireworks]",
       "model": "accounts/fireworks/models/llama-v3p1-405b-instruct",
-      "base_url": "https://api.fireworks.ai/inference/v1",
-      "api_key": "YOUR_FIREWORKS_API_KEY",
+      "displayName": "Llama 3.1 405B [Fireworks]",
+      "baseUrl": "https://api.fireworks.ai/inference/v1",
+      "apiKey": "YOUR_FIREWORKS_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 131072
+      "maxOutputTokens": 131072
     }
   ]
 }
@@ -151,22 +170,22 @@ Deploy and serve custom models with enterprise-grade infrastructure:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Custom Model [Baseten]",
       "model": "YOUR_MODEL_ID",
-      "base_url": "https://inference.baseten.co/v1",
-      "api_key": "YOUR_BASETEN_API_KEY",
+      "displayName": "Custom Model [Baseten]",
+      "baseUrl": "https://inference.baseten.co/v1",
+      "apiKey": "YOUR_BASETEN_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 8192
+      "maxOutputTokens": 8192
     },
     {
-      "model_display_name": "Llama 3.1 70B [Baseten]",
       "model": "llama-3.1-70b-instruct",
-      "base_url": "https://inference.baseten.co/v1",
-      "api_key": "YOUR_BASETEN_API_KEY",
+      "displayName": "Llama 3.1 70B [Baseten]",
+      "baseUrl": "https://inference.baseten.co/v1",
+      "apiKey": "YOUR_BASETEN_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 131072
+      "maxOutputTokens": 131072
     }
   ]
 }
@@ -182,30 +201,30 @@ Access cost-effective inference for a wide variety of open-source models:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "GLM 4.6 [DeepInfra]",
       "model": "zai-org/GLM-4.6",
-      "base_url": "https://api.deepinfra.com/v1/openai",
-      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "displayName": "GLM 4.6 [DeepInfra]",
+      "baseUrl": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "YOUR_DEEPINFRA_TOKEN",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
+      "maxOutputTokens": 16384
     },
     {
-      "model_display_name": "Qwen 2.5 Coder 32B [DeepInfra]",
       "model": "Qwen/Qwen2.5-Coder-32B-Instruct",
-      "base_url": "https://api.deepinfra.com/v1/openai",
-      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "displayName": "Qwen 2.5 Coder 32B [DeepInfra]",
+      "baseUrl": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "YOUR_DEEPINFRA_TOKEN",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 32768
+      "maxOutputTokens": 32768
     },
     {
-      "model_display_name": "DeepSeek V3 [DeepInfra]",
       "model": "deepseek-ai/DeepSeek-V3",
-      "base_url": "https://api.deepinfra.com/v1/openai",
-      "api_key": "YOUR_DEEPINFRA_TOKEN",
+      "displayName": "DeepSeek V3 [DeepInfra]",
+      "baseUrl": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "YOUR_DEEPINFRA_TOKEN",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 65536
+      "maxOutputTokens": 65536
     }
   ]
 }
@@ -219,22 +238,22 @@ Connect to models hosted on Hugging Face's Inference API:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Mistral 7B [HF]",
       "model": "mistralai/Mistral-7B-Instruct-v0.3",
-      "base_url": "https://api-inference.huggingface.co/models",
-      "api_key": "YOUR_HF_TOKEN",
+      "displayName": "Mistral 7B [HF]",
+      "baseUrl": "https://api-inference.huggingface.co/models",
+      "apiKey": "YOUR_HF_TOKEN",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 32768
+      "maxOutputTokens": 32768
     },
     {
-      "model_display_name": "CodeLlama 13B [HF]",
       "model": "codellama/CodeLlama-13b-Instruct-hf",
-      "base_url": "https://api-inference.huggingface.co/models",
-      "api_key": "YOUR_HF_TOKEN",
+      "displayName": "CodeLlama 13B [HF]",
+      "baseUrl": "https://api-inference.huggingface.co/models",
+      "apiKey": "YOUR_HF_TOKEN",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
+      "maxOutputTokens": 16384
     }
   ]
 }
@@ -252,22 +271,22 @@ Run models locally on your hardware with Ollama:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Qwen 2.5 Coder [Local]",
       "model": "qwen2.5-coder:7b",
-      "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",
+      "displayName": "Qwen 2.5 Coder [Local]",
+      "baseUrl": "http://localhost:11434/v1",
+      "apiKey": "not-needed",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 8192
+      "maxOutputTokens": 8192
     },
     {
-      "model_display_name": "DeepSeek Coder V2 [Local]",
       "model": "deepseek-coder-v2:16b",
-      "base_url": "http://localhost:11434/v1",
-      "api_key": "not-needed",
+      "displayName": "DeepSeek Coder V2 [Local]",
+      "baseUrl": "http://localhost:11434/v1",
+      "apiKey": "not-needed",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 16384
+      "maxOutputTokens": 16384
     }
   ]
 }
@@ -287,15 +306,15 @@ Use Ollama's cloud service for hosted model inference:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Llama 3.1 8B [Ollama Cloud]",
       "model": "llama3.1:8b",
-      "base_url": "https://ollama.com",
-      "api_key": "YOUR_OLLAMA_API_KEY",
+      "displayName": "Llama 3.1 8B [Ollama Cloud]",
+      "baseUrl": "https://ollama.com",
+      "apiKey": "YOUR_OLLAMA_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 131072,
-      "headers": {
+      "maxOutputTokens": 131072,
+      "extraHeaders": {
         "Authorization": "Bearer YOUR_OLLAMA_API_KEY"
       }
     }
@@ -313,14 +332,14 @@ Access Google's Gemini models using your Gemini AI API key:
 
 ```json
 {
-  "custom_models": [
+  "customModels": [
     {
-      "model_display_name": "Gemini 2.5 Pro",
       "model": "gemini-2.5-pro",
-      "base_url": "https://generativelanguage.googleapis.com/v1beta/",
-      "api_key": "YOUR_GEMINI_API_KEY",
+      "displayName": "Gemini 2.5 Pro",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/",
+      "apiKey": "YOUR_GEMINI_API_KEY",
       "provider": "generic-chat-completion-api",
-      "max_tokens": 32000
+      "maxOutputTokens": 32000
     }
   ]
 }
@@ -338,15 +357,15 @@ Once configured, access your custom models in the CLI:
 2. Your custom models appear in a separate "Custom models" section below Factory-provided models
 3. Select any model to start using it
 
-Custom models display with the name you set in `model_display_name`, making it easy to identify different providers and configurations.
+Custom models display with the name you set in `displayName`, making it easy to identify different providers and configurations.
 
 ---
 
 ## Troubleshooting
 
 ### Model not appearing in selector
-- Check JSON syntax in `~/.factory/config.json`
-- Restart the CLI after making configuration changes
+- Check JSON syntax in `~/.factory/settings.json` (or `config.json` if using legacy format)
+- Settings changes are detected automatically via file watching
 - Verify all required fields are present
 
 ### "Invalid provider" error

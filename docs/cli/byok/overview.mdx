@@ -19,55 +19,82 @@ Factory CLI supports custom model configurations through BYOK (Bring Your Own Ke
 
 ## Configuration Reference
 
-Add custom models in `~/.factory/config.json` under the `custom_models` array.
+Add custom models to `~/.factory/settings.json` under the `customModels` array:
+
+```json
+{
+  "customModels": [
+    {
+      "model": "your-model-id",
+      "displayName": "My Custom Model",
+      "baseUrl": "https://api.provider.com/v1",
+      "apiKey": "YOUR_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 16384
+    }
+  ]
+}
+```
+
+<Note>
+  **Legacy support**: Custom models in `~/.factory/config.json` using snake_case field names (`custom_models`, `base_url`, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with `settings.json` taking priority.
+</Note>
 
 ### Supported Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `model_display_name` | `string` | | Human-friendly name shown in model selector |
 | `model` | `string` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
-| `base_url` | `string` | ✓ | API endpoint base URL |
-| `api_key` | `string` | ✓ | Your API key for the provider. Can't be empty. |
+| `displayName` | `string` | | Human-friendly name shown in model selector |
+| `baseUrl` | `string` | ✓ | API endpoint base URL |
+| `apiKey` | `string` | ✓ | Your API key for the provider. Can't be empty. |
 | `provider` | `string` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
-| `max_tokens` | `number` | | Maximum output tokens for model responses |
-| `supports_images` | `boolean` | | Whether the model supports image inputs |
-| `extra_args` | `object` | | Additional provider-specific arguments to include in API requests |
-| `extra_headers` | `object` | | Additional HTTP headers to send with requests |
+| `maxOutputTokens` | `number` | | Maximum output tokens for model responses |
+| `supportsImages` | `boolean` | | Whether the model supports image inputs |
+| `extraArgs` | `object` | | Additional provider-specific arguments to include in API requests |
+| `extraHeaders` | `object` | | Additional HTTP headers to send with requests |
 
-### Using extra_args
+### Using extraArgs
 
 Pass provider-specific parameters like temperature or top_p:
 
 ```json
 {
-  "model_display_name": "Custom Model",
-  "model": "your-model",
-  "base_url": "https://your-provider.com/v1",
-  "api_key": "YOUR_API_KEY",
-  "provider": "generic-chat-completion-api",
-  "extra_args": {
-    "temperature": 0.7,
-    "top_p": 0.9
-  }
+  "customModels": [
+    {
+      "model": "your-model",
+      "displayName": "Custom Model",
+      "baseUrl": "https://your-provider.com/v1",
+      "apiKey": "YOUR_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "extraArgs": {
+        "temperature": 0.7,
+        "top_p": 0.9
+      }
+    }
+  ]
 }
 ```
 
-### Using extra_headers
+### Using extraHeaders
 
 Add custom HTTP headers to API requests:
 
 ```json
 {
-  "model_display_name": "Custom Model",
-  "model": "your-model",
-  "base_url": "https://your-provider.com/v1",
-  "api_key": "YOUR_API_KEY",
-  "provider": "generic-chat-completion-api",
-  "extra_headers": {
-    "X-Custom-Header": "value",
-    "Authorization": "Bearer YOUR_TOKEN"
-  }
+  "customModels": [
+    {
+      "model": "your-model",
+      "displayName": "Custom Model",
+      "baseUrl": "https://your-provider.com/v1",
+      "apiKey": "YOUR_API_KEY",
+      "provider": "generic-chat-completion-api",
+      "extraHeaders": {
+        "X-Custom-Header": "value",
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  ]
 }
 ```
 
@@ -136,15 +163,15 @@ Once configured, access your custom models in the CLI:
 2. Your custom models appear in a separate "Custom models" section below Factory-provided models
 3. Select any model to start using it
 
-Custom models display with the name you set in `model_display_name`, making it easy to identify different providers and configurations.
+Custom models display with the name you set in `displayName`, making it easy to identify different providers and configurations.
 
 ---
 
 ## Troubleshooting
 
 ### Model not appearing in selector
-- Check JSON syntax in `~/.factory/config.json`
-- Restart the CLI after making configuration changes
+- Check JSON syntax in `~/.factory/settings.json` (or `config.json` if using legacy format)
+- Settings changes are detected automatically via file watching
 - Verify all required fields are present
 
 ### "Invalid provider" error
