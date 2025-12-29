@@ -53,6 +53,10 @@ jobs:
           const { LINEAR_API_KEY, LINEAR_TEAM_ID, LINEAR_ASSIGNEE_ID, LINEAR_PROJECT_ID, LINEAR_LABEL_ID, CHANGELOG_FILE } = process.env;
 
           function parseChangelog(filePath) {
+            if (!filePath || !fs.existsSync(filePath)) {
+              console.error(`Changelog file not found: ${filePath}`);
+              return null;
+            }
             const content = fs.readFileSync(filePath, 'utf-8');
             const updateMatch = content.match(/<Update\s+label="([^"]+)"[^>]*>([\s\S]*?)<\/Update>/);
             if (!updateMatch) return null;
@@ -93,8 +97,12 @@ jobs:
                 let responseData = '';
                 res.on('data', chunk => responseData += chunk);
                 res.on('end', () => {
-                  const parsed = JSON.parse(responseData);
-                  parsed.errors ? reject(new Error(JSON.stringify(parsed.errors))) : resolve(parsed.data);
+                  try {
+                    const parsed = JSON.parse(responseData);
+                    parsed.errors ? reject(new Error(JSON.stringify(parsed.errors))) : resolve(parsed.data);
+                  } catch (e) {
+                    reject(new Error(`Failed to parse Linear API response: ${responseData.substring(0, 200)}`));
+                  }
                 });
               });
               req.on('error', reject);
