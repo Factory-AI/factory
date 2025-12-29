@@ -1,0 +1,147 @@
+name: Create Linear Tickets from Changelog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/changelog/*.mdx'
+
+jobs:
+  create-tickets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get changed changelog files
+        id: changes
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | grep 'docs/changelog/' || echo "")
+          echo "Changed files: $CHANGED_FILES"
+          if [ -n "$CHANGED_FILES" ]; then
+            FIRST_FILE=$(echo "$CHANGED_FILES" | head -n 1)
+            echo "file=$FIRST_FILE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node.js
+        if: steps.changes.outputs.file != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create Linear tickets
+        if: steps.changes.outputs.file != ''
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          LINEAR_TEAM_ID: ${{ secrets.LINEAR_TEAM_ID }}
+          LINEAR_ASSIGNEE_ID: ${{ secrets.LINEAR_ASSIGNEE_ID }}
+          LINEAR_PROJECT_ID: ${{ secrets.LINEAR_PROJECT_ID }}
+          LINEAR_LABEL_ID: ${{ secrets.LINEAR_LABEL_ID }}
+          CHANGELOG_FILE: ${{ steps.changes.outputs.file }}
+        run: |
+          if [ -z "${LINEAR_API_KEY}" ]; then
+            echo "Linear API key not provided. Skipping Linear ticket creation."
+            exit 0
+          fi
+          
+          node << 'EOF'
+          const fs = require('fs');
+          const https = require('https');
+
+          const { LINEAR_API_KEY, LINEAR_TEAM_ID, LINEAR_ASSIGNEE_ID, LINEAR_PROJECT_ID, LINEAR_LABEL_ID, CHANGELOG_FILE } = process.env;
+
+          function parseChangelog(filePath) {
+            const content = fs.readFileSync(filePath, 'utf-8');
+            const updateMatch = content.match(/<Update\s+label="([^"]+)"[^>]*>([\s\S]*?)<\/Update>/);
+            if (!updateMatch) return null;
+            
+            const [, date, body] = updateMatch;
+            const versionMatch = body.match(/`([^`]+)`/);
+            const version = versionMatch ? versionMatch[1] : '';
+            
+            const newFeaturesMatch = body.match(/## New features\s*([\s\S]*?)(?=##|\s*$)/);
+            const improvementsMatch = body.match(/## Improvements\s*([\s\S]*?)(?=##|\s*$)/);
+            const featuresSection = newFeaturesMatch?.[1] || improvementsMatch?.[1] || '';
+            
+            const features = [];
+            for (const line of featuresSection.split('\n')) {
+              const trimmed = line.trim();
+              if (trimmed.startsWith('* **')) {
+                const match = trimmed.match(/\*\s+\*\*([^*]+)\*\*\s*[-:]?\s*(.*)/);
+                if (match) features.push({ title: match[1].trim(), description: match[2].trim() });
+              }
+            }
+            return { date, version, features };
+          }
+
+          function makeLinearRequest(query, variables) {
+            return new Promise((resolve, reject) => {
+              const data = JSON.stringify({ query, variables });
+              const req = https.request({
+                hostname: 'api.linear.app',
+                port: 443,
+                path: '/graphql',
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': LINEAR_API_KEY,
+                  'Content-Length': Buffer.byteLength(data)
+                }
+              }, (res) => {
+                let responseData = '';
+                res.on('data', chunk => responseData += chunk);
+                res.on('end', () => {
+                  const parsed = JSON.parse(responseData);
+                  parsed.errors ? reject(new Error(JSON.stringify(parsed.errors))) : resolve(parsed.data);
+                });
+              });
+              req.on('error', reject);
+              req.write(data);
+              req.end();
+            });
+          }
+
+          async function createIssue(feature, version, date) {
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 7);
+            
+            const input = {
+              teamId: LINEAR_TEAM_ID,
+              title: `[${version}] ${feature.title}`,
+              description: `**From changelog (${date})**\n\n${feature.description || 'No additional description.'}\n\n---\n*Auto-created from changelog*`,
+              dueDate: dueDate.toISOString().split('T')[0],
+            };
+            if (LINEAR_ASSIGNEE_ID) input.assigneeId = LINEAR_ASSIGNEE_ID;
+            if (LINEAR_PROJECT_ID) input.projectId = LINEAR_PROJECT_ID;
+            if (LINEAR_LABEL_ID) input.labelIds = [LINEAR_LABEL_ID];
+            
+            const mutation = `mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { identifier url } } }`;
+            return makeLinearRequest(mutation, { input });
+          }
+
+          async function main() {
+            if (!LINEAR_TEAM_ID) { console.error('LINEAR_TEAM_ID required'); process.exit(1); }
+            
+            const changelog = parseChangelog(CHANGELOG_FILE);
+            if (!changelog || changelog.features.length === 0) {
+              console.log('No features found');
+              process.exit(0);
+            }
+            
+            console.log(`Found ${changelog.features.length} features in ${changelog.version} (${changelog.date})`);
+            
+            for (const feature of changelog.features) {
+              try {
+                const result = await createIssue(feature, changelog.version, changelog.date);
+                if (result.issueCreate?.success) {
+                  console.log(`Created: ${result.issueCreate.issue.identifier} - ${result.issueCreate.issue.url}`);
+                }
+              } catch (error) {
+                console.error(`Error creating ticket for ${feature.title}: ${error.message}`);
+              }
+            }
+          }
+          main();
+          EOF
