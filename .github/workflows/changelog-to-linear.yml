@@ -111,12 +111,12 @@ jobs:
             });
           }
 
-          async function createIssue(feature, version, date) {
+          async function createIssue(feature, version, date, teamId) {
             const dueDate = new Date();
             dueDate.setDate(dueDate.getDate() + 7);
             
             const input = {
-              teamId: LINEAR_TEAM_ID,
+              teamId: teamId,
               title: `[${version}] ${feature.title}`,
               description: `**From changelog (${date})**\n\n${feature.description || 'No additional description.'}\n\n---\n*Auto-created from changelog*`,
               dueDate: dueDate.toISOString().split('T')[0],
@@ -127,6 +127,20 @@ jobs:
             
             const mutation = `mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { identifier url } } }`;
             return makeLinearRequest(mutation, { input });
+          }
+
+          async function getTeamId(teamKeyOrId) {
+            // If it's already a UUID, return it
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (uuidRegex.test(teamKeyOrId)) return teamKeyOrId;
+            
+            // Otherwise, look up the team by key
+            const query = `query { teams { nodes { id key name } } }`;
+            const result = await makeLinearRequest(query, {});
+            const team = result.teams?.nodes?.find(t => t.key === teamKeyOrId);
+            if (!team) throw new Error(`Team with key "${teamKeyOrId}" not found`);
+            console.log(`Resolved team key "${teamKeyOrId}" to UUID: ${team.id}`);
+            return team.id;
           }
 
           async function main() {
@@ -140,15 +154,38 @@ jobs:
             
             console.log(`Found ${changelog.features.length} features in ${changelog.version} (${changelog.date})`);
             
+            // Resolve team key to UUID if needed
+            let teamId;
+            try {
+              teamId = await getTeamId(LINEAR_TEAM_ID);
+            } catch (error) {
+              console.error(`Failed to resolve team ID: ${error.message}`);
+              process.exit(1);
+            }
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
             for (const feature of changelog.features) {
               try {
-                const result = await createIssue(feature, changelog.version, changelog.date);
+                const result = await createIssue(feature, changelog.version, changelog.date, teamId);
                 if (result.issueCreate?.success) {
                   console.log(`Created: ${result.issueCreate.issue.identifier} - ${result.issueCreate.issue.url}`);
+                  successCount++;
+                } else {
+                  console.error(`Failed to create ticket for ${feature.title}: unexpected response`);
+                  errorCount++;
                 }
               } catch (error) {
                 console.error(`Error creating ticket for ${feature.title}: ${error.message}`);
+                errorCount++;
               }
+            }
+            
+            console.log(`\nSummary: ${successCount} created, ${errorCount} failed`);
+            if (errorCount > 0) {
+              console.error('Some tickets failed to create');
+              process.exit(1);
             }
           }
           main();
