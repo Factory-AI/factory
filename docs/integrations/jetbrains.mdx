@@ -1,0 +1,156 @@
+---
+title: JetBrains IDEs
+description: Use Factory Droid as an AI agent inside JetBrains IDEs via ACP.
+keywords:
+  [
+    'jetbrains',
+    'intellij',
+    'pycharm',
+    'webstorm',
+    'android studio',
+    'clion',
+    'goland',
+    'rubymine',
+    'datagrip',
+    'rider',
+    'ai assistant',
+    'acp',
+  ]
+---
+
+## Prerequisites
+
+Before wiring JetBrains to Factory Droid, make sure you have:
+
+1. **Factory account and API key**
+   - Sign up at https://app.factory.ai.
+   - Add a payment method if prompted.
+   - Create an API key at https://app.factory.ai/settings/api-keys.
+2. **Factory CLI installed (supported on all operating systems except Windows ARM machines)**
+
+   - Install via:
+
+     ```bash
+     curl -fsSL https://app.factory.ai/cli | sh
+     ```
+
+   - Set the `FACTORY_API_KEY` environment variable in your shell (for example, add `export FACTORY_API_KEY=your_key_here` to your shell profile).
+   - Ensure the `droid` binary is on your PATH (or note its full path).
+
+3. **JetBrains IDE with AI Assistant**
+   - Any modern JetBrains IDE that supports AI Assistant / AI Chat and custom agent servers.
+
+<Note>
+  You cannot sign up for Factory or manage billing entirely inside JetBrains.
+  Account creation and API key management always happen in the web app.
+</Note>
+
+## Configure Factory Droid as an AI Agent
+
+Add a **Factory Droid** entry to your JetBrains AI agent server configuration so the AI Assistant can launch the CLI in ACP mode.
+
+```json
+{
+  "agent_servers": {
+    "Factory Droid": {
+      "command": "*path/to/droid/cli*",
+      "args": ["exec", "--output-format", "acp"],
+      "env": {
+        "FACTORY_API_KEY": "*get this from inside our web portal*"
+      }
+    }
+  }
+}
+```
+
+- `command` – full path to the `droid` binary
+- `args` – run Droid in exec mode and speak ACP back to JetBrains
+- `FACTORY_API_KEY` – API key from https://app.factory.ai/settings/api-keys
+
+## Start a Droid Session in JetBrains
+
+Once the agent server is configured, you interact with Droid entirely through the AI Assistant UI.
+
+### Open the AI Chat Panel
+
+- **Search Everywhere:** Press `Shift`+`Shift`, type **"AI Assistant"**, and open the tool window.
+- **Menu:** Go to **View → Tool Windows → AI Assistant** (exact name may vary slightly by IDE).
+
+### Start a New Chat with Factory Droid
+
+1. In the **AI Chat** panel, click **+ New Chat**.
+2. In the bottom-left agent dropdown, choose **Factory Droid**.
+3. Start chatting as you would in the CLI.
+
+The session uses your last-selected settings for Factory Droid (model, autonomy level, etc.).
+
+![AI Chat panel with + New Chat clicked and Factory Droid selected in the bottom-left dropdown](/images/jetbrains/new-chat.png)
+
+## Resume Existing Sessions
+
+JetBrains manages sessions through the AI Chat UI rather than CLI commands.
+
+- In the AI Chat panel, click the **clock icon** in the top-right corner.
+- Choose a past conversation to reopen it.
+
+<img
+  src="/images/jetbrains/chat-history.png"
+  alt="AI Chat session history dropdown (clock icon) with previous Factory Droid sessions listed"
+  style={{ width: '35%', height: 'auto' }}
+/>
+
+## Models and Autonomy Controls
+
+You can change models and autonomy levels directly from the AI Chat footer.
+
+### Switch Models
+
+- Use the **model dropdown** at the bottom of the AI Chat panel.
+- Pick any Factory-supported model (for example, Claude Opus/Sonnet, GPT-5.1 variants, or others configured via BYOK).
+
+<img
+  src="/images/jetbrains/select-model.png"
+  alt="AI Chat footer showing model dropdown expanded"
+  style={{ width: '50%', height: 'auto' }}
+/>
+
+### Change Autonomy Level
+
+- Use the **autonomy dropdown** next to the model selector.
+- Choose the autonomy level that matches your risk tolerance and workflow.
+
+Recommended pattern:
+
+- Start with a **planning-first** flow (low autonomy, spec-style prompts) for medium and large tasks.
+- Once you are happy with the plan, increase autonomy to **Auto low** or **Auto medium** so Droid can execute more steps without constant confirmation.
+
+<img
+  src="/images/jetbrains/select-autonomy-mode.png"
+  alt="AI Chat footer showing autonomy dropdown expanded"
+  style={{ width: '43%', height: 'auto' }}
+/>
+
+## Editor Context and Limitations
+
+The current JetBrains integration speaks ACP but does not yet expose full editor context to Droid.
+
+- No automatic sharing of open files, selections, or diagnostics
+- No IDE-native diff viewer wired directly to Droid patches
+
+Treat this like a rich chat front-end to the CLI:
+
+- Use clear prompts, reference files by path, and rely on autonomy modes and spec-style planning to manage larger changes.
+
+## Troubleshooting
+
+If Factory Droid does not appear or respond in AI Chat:
+
+- Verify the **CLI**:
+  - Run `droid exec --output-format acp` in a regular terminal to confirm the binary and API key work.
+- Double-check the **agent server configuration**:
+  - Correct path to `droid`
+  - `args` includes both `exec` and `--output-format acp`
+  - `FACTORY_API_KEY` is present and valid
+- Confirm you are not on **Windows on ARM**, which is not yet supported.
+
+For MCP-related issues, check that each MCP server’s command, arguments, and environment variables are valid when run outside JetBrains.

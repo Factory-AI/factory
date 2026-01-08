@@ -1,7 +1,22 @@
 ---
 title: IDE Integrations
 description: Run droid directly inside your editor for richer context and a smoother workflow.
-keywords: ['ide', 'vscode', 'vs code', 'cursor', 'windsurf', 'jetbrains', 'intellij', 'pycharm', 'webstorm', 'editor', 'plugin', 'extension', 'integration']
+keywords:
+  [
+    'ide',
+    'vscode',
+    'vs code',
+    'cursor',
+    'windsurf',
+    'jetbrains',
+    'intellij',
+    'pycharm',
+    'webstorm',
+    'editor',
+    'plugin',
+    'extension',
+    'integration',
+  ]
 ---
 
 Droid works great with any Integrated Development Environment (IDE) that has a terminal. Just run `droid`, and you're ready to go.
@@ -31,65 +46,22 @@ To install Droid on VS Code and popular forks like Cursor, Windsurf, and VSCodiu
   here](https://marketplace.visualstudio.com/items?itemName=Factory.factory-vscode-extension).
 </Note>
 
-### JetBrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, etc.)
+### Other IDEs
 
-Factory provides two ways to work with JetBrains IDEs:
-
-1. **Dedicated Plugin**: [Install the official Factory Droid plugin](https://plugins.jetbrains.com/plugin/28649-factory-droid) from the JetBrains Marketplace for enhanced IDE integration
-2. **Terminal Integration**: Run `droid` in the integrated terminal (no plugin required)
-
-**Supported JetBrains IDEs:**
-- IntelliJ IDEA (Ultimate and Community)
-- PyCharm (Professional and Community)
-- WebStorm
-- PhpStorm  
-- Android Studio
-- GoLand
-- CLion
-- RubyMine
-- DataGrip
-- Rider
-
-#### Option 1: Install the Factory Droid Plugin (Recommended)
-
-1. Open your JetBrains IDE
-2. Go to **Settings/Preferences** → **Plugins**
-3. Click the **Marketplace** tab
-4. Search for "Factory Droid"
-5. Click **Install** on the Factory Droid plugin
-6. Restart your IDE when prompted
-7. The Factory Droid toolbar will appear - click it to launch
-
-<Note>
-  You can download the plugin directly [here](https://plugins.jetbrains.com/plugin/28649-factory-droid)
-</Note>
-
-<img
-  src="/images/intellij.png"
-  alt="Factory Droid plugin in IntelliJ IDEA"
-  style={{ width: '100%', height: 'auto' }}
-  className="rounded-lg"
-/>
-
-#### Option 2: Terminal Integration  
-
-1. Open your JetBrains IDE
-2. Open the integrated terminal (`Alt+F12` on Windows/Linux, `Option+F12` on macOS)
-3. Navigate to your project root directory
-4. Run `droid` - all Factory features will be automatically available
-
-**Plugin Features (Option 1):**
-- **Toolbar Integration**: Launch Factory Droid directly from the IDE toolbar
-- **MCP-powered Context**: Secure context sharing with awareness of files you're editing
-- **Real-time Diagnostics**: View compiler errors and warnings shared with Droid
-- **Diff Visualization**: Review proposed changes before applying them
-- **Seamless CLI Integration**: Run tasks locally or in cloud sandboxes
-- **Enhanced Security**: Enterprise-grade guardrails for team collaboration
-
-**Terminal Integration Features (Option 2):**
-- **Project Context**: Droid automatically understands your project structure and build configuration
-- **File Navigation**: Quick file references and code exploration work seamlessly
-- **Multi-language Support**: Full support for all languages supported by your JetBrains IDE
+<CardGroup cols={2}>
+  <Card
+    title="JetBrains IDEs"
+    icon="sparkles"
+    href="/integrations/jetbrains-ide"
+  >
+    Step-by-step setup and usage for IntelliJ IDEA, PyCharm, WebStorm, and other
+    JetBrains IDEs.
+  </Card>
+  <Card title="Zed" icon="terminal" href="/integrations/zed">
+    Configure Factory Droid as a custom agent in Zed with MCP servers and Agent
+    Panel workflows.
+  </Card>
+</CardGroup>
 
 ## Usage
 
@@ -106,6 +78,7 @@ Use the `/ide` command within droid to manage your IDE integrations:
 ```
 
 This command will:
+
 - Show the current extension version if installed
 - Prompt to install the extension if not yet installed
 - Works with VS Code, Cursor, and Windsurf
@@ -123,15 +96,6 @@ This command will:
   - If not installed, use `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux) and search for "Shell Command: Install 'code' command in PATH" (or the equivalent for your IDE)
 - Check that VS Code has permission to install extensions
 
-### JetBrains/IntelliJ terminal issues
-
-- Ensure you're running Droid from the project root directory
-- Use the integrated terminal inside the IDE rather than an external shell
-- Completely restart the IDE if terminal state issues persist
-- **For IntelliJ IDEA**: Make sure the terminal is using your system shell (not the embedded terminal)
-- **Project SDK**: Ensure your project SDK is properly configured if using language-specific features
-- **Terminal Settings**: Go to Settings → Tools → Terminal and verify shell path is correct
-
 ### ESC key configuration
 
 If the ESC key doesn't interrupt Droid operations in JetBrains terminals:
@@ -146,14 +110,14 @@ This allows the ESC key to properly interrupt Droid operations.
 
 ### Common issues
 
-| Symptom                                   | Fix                                                                                        |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Symptom                                   | Fix                                                                                          |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------- |
 | **"Editor integration disabled" message** | Verify the VS Code extension is installed or update `editorIntegration` to match your editor |
-| CLI cannot find Node/Bun                  | Ensure the `droid` binary is on the PATH VS Code/JetBrains uses (restart after install)    |
-| Missing file context                      | Save files; unsaved buffers older than 500 KB are skipped for performance                  |
-| Stale diagnostics                         | Run **↻ Refresh Diagnostics** command (VS Code Command Palette)                            |
-| VS Code terminal closes immediately       | Check your shell's startup scripts: they must not auto-exit                                |
-| Network blocked in corporate proxy        | Configure proxy variables in settings or set `HTTP_PROXY`/`HTTPS_PROXY` env vars           |
+| CLI cannot find Node/Bun                  | Ensure the `droid` binary is on the PATH VS Code/JetBrains uses (restart after install)      |
+| Missing file context                      | Save files; unsaved buffers older than 500 KB are skipped for performance                    |
+| Stale diagnostics                         | Run **↻ Refresh Diagnostics** command (VS Code Command Palette)                              |
+| VS Code terminal closes immediately       | Check your shell's startup scripts: they must not auto-exit                                  |
+| Network blocked in corporate proxy        | Configure proxy variables in settings or set `HTTP_PROXY`/`HTTPS_PROXY` env vars             |
 
 For additional help, email support@factory.ai with logs from `~/.factory/logs/`
 
