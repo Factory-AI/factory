@@ -1,0 +1,271 @@
+---
+title: "Part 4: Data Pipelines"
+description: SQL-based transformations with dbt/SQLMesh, incremental loads, and debugging pipeline issues.
+keywords: ['dbt', 'sqlmesh', 'etl', 'pipeline', 'transformation', 'incremental']
+---
+
+Scripts are great for one-off reports. But when you need data transformed consistently, you want a pipeline.
+
+Data pipelines take raw data from sources, transform it into useful shapes, and load it somewhere queryable. The classic ETL pattern. What's different with agents is how you build and maintain these pipelines.
+
+Instead of writing every transformation by hand, you describe what you want the data to look like. The agent generates the dbt models, serverless functions, or whatever infrastructure you need. When requirements change, you describe the change and the pipeline updates.
+
+## SQL-Based Transformation Tools
+
+The most common approach to building transformation pipelines is with SQL-based tools like dbt, SQLMesh, or Dataform. They're version controlled, testable, and well understood by agents.
+
+<Info>
+The concepts are identical across tools. Pick your transformation tool (dbt, SQLMesh, Dataform) and the patterns translate directly.
+</Info>
+
+A typical project structure:
+
+```
+dbt/
+├── models/
+│   ├── staging/          # Light transformations from raw
+│   │   └── stg_events.sql
+│   ├── intermediate/     # Business logic
+│   │   └── int_org_metrics.sql
+│   └── marts/            # Final tables for analysis
+│       ├── dim_organizations.sql
+│       └── fct_sessions.sql
+├── dbt_project.yml
+└── profiles.yml
+```
+
+The naming convention encodes the purpose:
+- `stg_` = staging (clean up raw data)
+- `int_` = intermediate (apply business logic)
+- `dim_` = dimension (slowly changing entities)
+- `fct_` = fact (events and transactions)
+
+## Building a New Model
+
+Say you need a new fact table tracking user sessions. The conversation might go:
+
+```
+You: Create a dbt model called fct_sessions that aggregates session 
+data from stg_events. Include session_id, user_id, org_id, 
+start_time, end_time, message_count, and total_usage. Partition by 
+date and cluster by org_id.
+```
+
+The agent generates:
+
+```sql
+-- models/marts/fct_sessions.sql
+{{
+    config(
+        materialized='table',
+        partition_by={
+            "field": "session_date",
+            "data_type": "date",
+            "granularity": "day"
+        },
+        cluster_by=["organization_id"]
+    )
+}}
+
+with session_events as (
+    select 
+        session_id,
+        user_id,
+        organization_id,
+        timestamp,
+        cast(json_value(properties, '$.value') as float64) as usage
+    from {{ ref('stg_events') }}
+    where event_type = 'activity'
+),
+
+session_metrics as (
+    select
+        session_id,
+        user_id,
+        organization_id,
+        date(min(timestamp)) as session_date,
+        min(timestamp) as session_start,
+        max(timestamp) as session_end,
+        count(*) as message_count,
+        sum(usage) as total_usage
+    from session_events
+    group by session_id, user_id, organization_id
+)
+
+select * from session_metrics
+```
+
+Plus the YAML documentation:
+
+```yaml
+models:
+  - name: fct_sessions
+    description: Aggregated session metrics from events
+    columns:
+      - name: session_id
+        description: Unique session identifier
+      - name: message_count
+        description: Number of messages in the session
+      - name: total_usage
+        description: Sum of usage for the session
+```
+
+Test it locally, commit, push. Your scheduled job picks it up automatically.
+
+## Handling Incremental Loads
+
+For large tables, you don't want to rebuild everything every hour. dbt supports incremental models that only process new data:
+
+```sql
+{{
+    config(
+        materialized='incremental',
+        unique_key='event_id',
+        incremental_strategy='merge'
+    )
+}}
+
+select 
+    message_id as event_id,
+    user_id,
+    timestamp,
+    usage
+from {{ ref('stg_events') }}
+
+{% if is_incremental() %}
+where timestamp > (select max(timestamp) from {{ this }})
+{% endif %}
+```
+
+The agent knows these patterns. When you ask for a model that handles "millions of events per day," it will suggest incremental materialization.
+
+## Real-Time and Streaming Pipelines
+
+Not everything fits the hourly batch model. Sometimes you need data loaded continuously.
+
+The approach varies by platform:
+
+<CardGroup cols={2}>
+  <Card title="Event Streaming">
+    - Kafka/Confluent with warehouse connectors
+    - AWS Kinesis to Redshift/S3
+    - Google Pub/Sub to BigQuery
+    - Segment, Rudderstack, or similar CDPs
+  </Card>
+  <Card title="Serverless Loaders">
+    - AWS Lambda triggered by S3 events
+    - Google Cloud Functions triggered by GCS
+    - Azure Functions with Event Grid
+  </Card>
+</CardGroup>
+
+Example prompt for building a loader:
+
+```
+You: Create a serverless function that loads new event files from 
+cloud storage into our warehouse. It should discover all source 
+folders automatically and load the JSON files incrementally.
+```
+
+The agent generates code appropriate for your cloud:
+
+```python
+def load_events(event, context):
+    # 1. List new files in storage bucket
+    new_files = list_files_since_last_run(bucket, prefix='events/')
+    
+    # 2. Load each file into warehouse
+    for file in new_files:
+        data = read_json_file(file)
+        insert_to_warehouse(data, table='events_raw')
+    
+    # 3. Record checkpoint for next run
+    update_checkpoint(new_files[-1].timestamp)
+    
+    return {"loaded": len(new_files)}
+```
+
+## Debugging Pipeline Issues
+
+Pipelines break. Data sources change. Schemas drift. The agent can help diagnose issues.
+
+```
+You: The fct_sessions table hasn't updated since yesterday. 
+What's wrong?
+```
+
+The agent might:
+1. Check the transformation job logs (dbt Cloud, Dagster, Airflow, etc.)
+2. Query for recent data in upstream tables
+3. Look for schema changes in source tables
+4. Check loader function execution logs
+
+```
+Agent: I found the issue. The stg_events model failed because 
+events_raw has a new field 'context.device.type' that's sometimes 
+an object instead of a string. The JSON parsing is failing.
+
+Here's a fix that handles both cases:
+
+[shows SQL fix]
+
+Want me to apply this and re-run the pipeline?
+```
+
+This diagnostic workflow used to take 30 minutes of clicking through logs. Now it's a 2-minute conversation.
+
+## Pipeline Best Practices
+
+<AccordionGroup>
+  <Accordion title="Test with known-good data">
+    Keep a reference organization with predictable data for testing:
+    ```sql
+    SELECT * FROM {{ ref('fct_sessions') }}
+    WHERE organization_id = 'test-org-12345'
+    ```
+  </Accordion>
+  
+  <Accordion title="Add data quality tests">
+    dbt has built-in testing:
+    ```yaml
+    models:
+      - name: fct_sessions
+        columns:
+          - name: session_id
+            tests:
+              - unique
+              - not_null
+          - name: message_count
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 1
+    ```
+  </Accordion>
+  
+  <Accordion title="Document your models">
+    Future you will thank present you:
+    ```yaml
+    models:
+      - name: fct_sessions
+        description: |
+          Aggregated session metrics from events.
+          
+          Updated hourly via scheduled job.
+          
+          Note: Only includes sessions with at least one message.
+    ```
+  </Accordion>
+  
+  <Accordion title="Version your schema">
+    When you make breaking changes, create a new model:
+    ```
+    fct_sessions      # current version
+    fct_sessions_v2   # new schema, running in parallel
+    ```
+    Migrate consumers, then deprecate the old version.
+  </Accordion>
+</AccordionGroup>
+
+## What's Next
+
+[Part 5](/guides/data/migrations) covers data migrations: schema mapping, transformation scripts, validation queries, and coordinating cutovers.
