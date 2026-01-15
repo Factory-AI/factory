@@ -4,9 +4,30 @@ description: Use Factory Droid as a custom AI agent inside Zed, with full MCP se
 keywords: ['zed', 'zed editor', 'ai agent', 'acp', 'mcp', 'context servers']
 ---
 
-## Prerequisites
+## Setup
 
-Before wiring Zed to Factory Droid, make sure you have:
+Before wiring Zed to Factory Droid, make sure you have Zed installed. Afterwards:
+
+1. Install the Factory Droid extension.
+2. Open the Agent Panel.
+3. Click the **+** button in the top-right corner.
+4. In the agent dropdown, select **Factory Droid**.
+5. If you are unauthenticated you will see a message indicating you must authenticate.
+   1. Keep track of the device code rendered, and click the "Login" button.
+
+      <img
+        src="/images/zed/authentication-flow-zed.png"
+        alt="Zed authentication screen showing a device code and Login button"
+        style={{ width: '70%' }}
+      />
+
+   2. This will open your web browser and ask you to login/signup to Factory, followed by a screen to confirm your device's code.
+
+      ![Factory web authentication screen prompting for device code confirmation](/images/zed/authentication-flow-factory.png)
+
+## (Alternative) Manual Setup
+
+If you prefer to manually configure Droid inside Zed, you can follow the instructions below.
 
 1. **Factory account and API key**
    - Sign up at https://app.factory.ai.
@@ -20,8 +41,8 @@ Before wiring Zed to Factory Droid, make sure you have:
      curl -fsSL https://app.factory.ai/cli | sh
      ```
 
-- Set the `FACTORY_API_KEY` environment variable in your shell (for example, add `export FACTORY_API_KEY=your_key_here` to your shell profile).
-- Ensure `droid` is on your PATH, or note its full path.
+   - Set the `FACTORY_API_KEY` environment variable in your shell (for example, add `export FACTORY_API_KEY=your_key_here` to your shell profile).
+   - Ensure `droid` is on your PATH, or note its full path.
 
 3. **Zed installed**
    - Zed on macOS, Linux, or x86_64 Windows.
@@ -32,7 +53,7 @@ Before wiring Zed to Factory Droid, make sure you have:
   account setup happens in the Factory web app.
 </Note>
 
-## Configure Factory Droid as an Agent (`agent_servers`)
+### Configure Factory Droid as an Agent (`agent_servers`)
 
 Edit `~/.config/zed/settings.json` and add a **Factory Droid** entry under `agent_servers`:
 
