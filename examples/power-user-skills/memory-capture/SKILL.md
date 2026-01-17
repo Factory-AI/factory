@@ -125,13 +125,12 @@ Capture as:
 
 ### Domain Knowledge
 
-User says: "Note that free tier users are limited to 3 team members"
+User says: "Note that plan limits vary by tier—Pro allows up to 20 team members"
 
 Capture as:
 ```markdown
 ### Business Rules
 
-- Free tier: Limited to 3 team members
 - Pro tier: Up to 20 team members
 - Enterprise: Unlimited team members
 ```
