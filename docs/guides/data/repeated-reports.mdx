@@ -1,0 +1,253 @@
+---
+title: "Part 3: Repeated Reports"
+description: Weekly engineering reports, flaky test tracking, SaaS replacement analysis, and scheduling.
+keywords: ['reports', 'automation', 'slack', 'scheduling', 'cron', 'github-actions']
+---
+
+Ad-hoc analysis is great for one-off questions. But some analyses need to happen regularly: weekly metrics, monthly reports, daily monitors.
+
+The traditional approach is building dashboards or scheduling SQL queries. Both work, but they're rigid. Dashboards require a BI tool and maintenance. Scheduled queries run whether you need them or not.
+
+Agent-native reporting is more flexible. You describe what you want, and the agent generates a script that can run on any schedule. When requirements change, you describe the change and the script updates.
+
+## The Weekly Engineering Report
+
+Here's a real example. Every Monday, we want a summary of platform health to share in Slack:
+
+- Key metrics (DAU, MAU, total sessions)
+- Week-over-week changes
+- Any anomalies worth investigating
+
+Instead of building a dashboard, we asked the agent to create a script:
+
+```
+You: Create a script that generates a weekly platform health report. 
+It should show DAU, MAU, sessions, and usage for the past week 
+compared to the previous week. Format it for Slack.
+```
+
+The agent produced a Python script that:
+1. Queries the warehouse for current and previous week metrics
+2. Calculates week-over-week changes
+3. Flags any metrics that changed more than 20%
+4. Formats everything as a Slack message
+
+```python
+# weekly_platform_report.py
+import pandas as pd
+
+def get_weekly_metrics(conn, weeks_ago=0):
+    query = f"""
+    SELECT 
+        COUNT(DISTINCT user_id) as dau_avg,
+        COUNT(DISTINCT CASE WHEN days_active >= 7 THEN user_id END) as wau,
+        SUM(sessions_count) as total_sessions,
+        SUM(usage_amount) as total_usage
+    FROM analytics.fct_daily_metrics
+    WHERE date BETWEEN 
+        CURRENT_DATE - INTERVAL '{7 + (weeks_ago * 7)} days' AND 
+        CURRENT_DATE - INTERVAL '{1 + (weeks_ago * 7)} days'
+    """
+    return pd.read_sql(query, conn).iloc[0]
+
+def format_slack_message(current, previous):
+    def change_emoji(pct):
+        if pct > 10: return "📈"
+        if pct < -10: return "📉"
+        return "➡️"
+    
+    metrics = []
+    for name in ['dau_avg', 'wau', 'total_sessions', 'total_usage']:
+        curr = current[name]
+        prev = previous[name]
+        pct = ((curr - prev) / prev * 100) if prev else 0
+        metrics.append(f"{change_emoji(pct)} {name}: {curr:,} ({pct:+.1f}%)")
+    
+    return "*Weekly Platform Report*\n" + "\n".join(metrics)
+
+if __name__ == "__main__":
+    # Connection setup varies by warehouse
+    conn = create_connection()
+    current = get_weekly_metrics(conn, 0)
+    previous = get_weekly_metrics(conn, 1)
+    print(format_slack_message(current, previous))
+```
+
+Now this runs every Monday via cron, and posts to Slack via webhook.
+
+## Flaky Test Reports
+
+Engineering teams often want to track flaky tests. The data usually lives in CI/CD logs, which you can pull via API.
+
+The workflow:
+1. Query GitHub Actions API for recent test runs
+2. Identify tests that sometimes pass and sometimes fail
+3. Generate a report showing the worst offenders
+4. Email the relevant team
+
+```
+You: Create a script that identifies flaky tests from our GitHub Actions 
+runs. A test is flaky if it failed at least once but also passed at 
+least once in the past 7 days. Rank by flakiness rate and email the 
+report to the platform team.
+```
+
+The agent can generate this by combining:
+- GitHub API calls to get workflow runs
+- Parsing test result artifacts
+- Calculating flakiness metrics
+- Sending via your email provider (SendGrid, SES, or even Gmail CLI)
+
+The key insight is that you don't need to pre-build all this infrastructure. Describe the workflow you want, and let the agent figure out the implementation.
+
+## SaaS Replacement Analysis
+
+Here's a more interesting use case: figuring out which SaaS tools you're paying for that could be replaced with internal software built by coding agents.
+
+If you're using Ramp, Brex, Expensify, or similar tools, they have APIs. Same goes for cloud cost data from AWS Cost Explorer, GCP Billing, or Azure Cost Management.
+
+```
+You: Pull our engineering SaaS subscriptions from Ramp. For each tool 
+over $500/month, analyze whether we could build a replacement internally 
+using coding agents. Score each on:
+- Feasibility (how hard would it be to build?)
+- Time estimate (days/weeks to functional replacement)
+- Risk (what could go wrong, compliance concerns, etc.)
+- ROI (break-even timeline given our spend)
+
+Focus on tools where we're only using 20-30% of features.
+```
+
+This produces an analysis that looks at each vendor and actually reasons about replaceability:
+
+| Tool | Monthly Cost | Feasibility | Build Time | Risk | ROI |
+|------|-------------|-------------|------------|------|-----|
+| Internal wiki | $2,400 | High | 3 days | Low - just markdown files | 1 month |
+| Status page | $800 | High | 1 day | Low - static site + monitoring | 1 month |
+| Feature flags | $1,200 | Medium | 1 week | Medium - need rollout testing | 2 months |
+| Error tracking | $3,600 | Low | 2+ weeks | High - Sentry is very mature | 6+ months |
+
+The agent can look at what each tool actually does, estimate complexity based on similar open source projects, and flag risks like compliance requirements or integration complexity. A human should review these recommendations, but having the analysis generated automatically turns a multi-day research project into a conversation.
+
+## Patterns for Report Scripts
+
+A few patterns make these scripts more maintainable:
+
+<AccordionGroup>
+  <Accordion title="Separate data fetching from formatting">
+    ```python
+    def fetch_metrics():
+        # query logic here
+        return data
+
+    def format_report(data, format_type):
+        if format_type == "slack":
+            return format_for_slack(data)
+        elif format_type == "email":
+            return format_for_email(data)
+        elif format_type == "pdf":
+            return format_for_pdf(data)
+    ```
+  </Accordion>
+  
+  <Accordion title="Include a dry-run mode">
+    ```python
+    if __name__ == "__main__":
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--dry-run", action="store_true")
+        args = parser.parse_args()
+        
+        report = generate_report()
+        
+        if args.dry_run:
+            print(report)
+        else:
+            send_to_slack(report)
+    ```
+  </Accordion>
+  
+  <Accordion title="Log what you're doing">
+    ```python
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"Fetching metrics for {date_range}")
+    logger.info(f"Found {len(results)} records")
+    logger.info(f"Sending report to {channel}")
+    ```
+  </Accordion>
+  
+  <Accordion title="Handle failures gracefully">
+    ```python
+    try:
+        data = fetch_from_api()
+    except APIError as e:
+        logger.error(f"API call failed: {e}")
+        send_alert("Report generation failed", str(e))
+        sys.exit(1)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Scheduling and Delivery
+
+Once you have a script, you need to run it. Options:
+
+<Tabs>
+  <Tab title="cron">
+    ```bash
+    # Every Monday at 9am
+    0 9 * * 1 /path/to/venv/bin/python /path/to/weekly_report.py
+    ```
+  </Tab>
+  <Tab title="GitHub Actions">
+    ```yaml
+    name: Weekly Report
+    on:
+      schedule:
+        - cron: '0 9 * * 1'
+    jobs:
+      report:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - run: pip install -r requirements.txt
+          - run: python scripts/weekly_report.py
+            env:
+              SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    ```
+  </Tab>
+  <Tab title="Serverless">
+    ```python
+    # AWS Lambda, Google Cloud Functions, Azure Functions, etc.
+    def generate_report(event, context):
+        report = build_report()
+        send_to_slack(report)
+        return {"statusCode": 200}
+    ```
+  </Tab>
+  <Tab title="Orchestrators">
+    For complex workflows, use Dagster, Prefect, Airflow, or Temporal. Great when reports depend on data freshness checks or have multiple steps.
+  </Tab>
+</Tabs>
+
+The agent can help set up any of these. Just describe where you want it to run.
+
+## Iterating on Reports
+
+Reports evolve. Someone will ask "can we also include X?" or "can we change the format to Y?"
+
+This is where agent-native development shines. You don't edit the script manually. You describe the change:
+
+```
+You: Update the weekly report to also include our top 5 growing 
+accounts by usage. Show their name, this week's usage, 
+and the percentage increase from last week.
+```
+
+The agent modifies the script, you review the changes, and you're done. The barrier to iterating is low enough that reports actually improve over time instead of becoming stale.
+
+## What's Next
+
+[Part 4](/guides/data/pipelines) covers building data pipelines: SQL-based transformations, incremental loads, and debugging pipeline issues.

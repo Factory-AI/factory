@@ -1,0 +1,210 @@
+---
+title: "Part 1: Building Your Data Foundation"
+description: Connect agents to your data warehouse and teach them your schema and domain knowledge.
+keywords: ['data', 'warehouse', 'bigquery', 'snowflake', 'schema', 'skills', 'setup']
+---
+
+The biggest unlock for agent-based data work is the access layer.
+
+When you give an agent the ability to query your data warehouse, something interesting happens. The barrier between "I wonder if..." and "here's the answer" collapses. Questions that used to require context-switching into a SQL client, remembering table schemas, and debugging syntax errors now flow naturally in conversation.
+
+But getting there requires some upfront investment. You need to connect your agent to your data sources, teach it your schema conventions, and encode the tribal knowledge that prevents costly mistakes.
+
+## The Access Layer
+
+Your agent needs three things to work effectively with data:
+
+1. **Tool access** to execute queries
+2. **Schema knowledge** to know what's available  
+3. **Domain knowledge** to avoid common mistakes
+
+## Connecting to Your Warehouse
+
+The simplest path is giving your agent access to your warehouse's CLI. Once authenticated, it can run any query directly.
+
+<Tabs>
+  <Tab title="BigQuery">
+    ```bash
+    gcloud auth application-default login --account=you@company.com
+    gcloud config set project your-project
+    bq query --use_legacy_sql=false "SELECT * FROM analytics.users LIMIT 10"
+    ```
+  </Tab>
+  <Tab title="Snowflake">
+    ```bash
+    snowsql -c your_connection -q "SELECT * FROM analytics.users LIMIT 10"
+    ```
+  </Tab>
+  <Tab title="Databricks">
+    ```bash
+    databricks sql execute --sql "SELECT * FROM analytics.users LIMIT 10"
+    ```
+  </Tab>
+  <Tab title="Redshift">
+    ```bash
+    psql -h your-cluster.redshift.amazonaws.com -U user -d analytics -c "SELECT * FROM users LIMIT 10"
+    ```
+  </Tab>
+  <Tab title="ClickHouse">
+    ```bash
+    clickhouse-client --query "SELECT * FROM analytics.users LIMIT 10"
+    ```
+  </Tab>
+  <Tab title="DuckDB">
+    ```bash
+    duckdb analytics.db "SELECT * FROM users LIMIT 10"
+    ```
+  </Tab>
+  <Tab title="Postgres">
+    ```bash
+    psql -c "SELECT * FROM users LIMIT 10"
+    ```
+  </Tab>
+</Tabs>
+
+The key is that your agent can execute queries and see results directly. Every major warehouse has a CLI, and they all work the same way from the agent's perspective: run a command, get tabular output.
+
+<Tip>
+If you're using MCP (Model Context Protocol), there are pre-built servers for most data warehouses. MCP servers handle connection pooling and provide a standardized interface. But for most teams, the CLI approach is simpler to set up and debug.
+</Tip>
+
+## Teaching Schema Knowledge
+
+Raw CLI access isn't enough. Your agent needs to know what tables exist and what they contain.
+
+The naive approach is dumping your entire schema into context. This works for small warehouses but falls apart quickly. A better pattern is building a quick-reference guide that maps common questions to specific tables.
+
+Here's an example:
+
+```markdown
+## Quick Decision Guide
+
+| What You Need | Use This Table | Example |
+|---------------|----------------|---------|
+| Org-level metrics (30d, lifetime) | `dim_organizations` | `SELECT revenue_30d FROM dim_organizations WHERE id = 'ORG_ID'` |
+| User-level activity | `fct_user_activity` | `SELECT user_email, activity_30d FROM fct_user_activity WHERE organization_id = 'ORG_ID'` |
+| Session details | `fct_sessions` | `SELECT * FROM fct_sessions WHERE session_id = 'SESSION_ID'` |
+| Trial analytics | `fct_trials` | `SELECT * FROM fct_trials WHERE is_trial_active = true` |
+```
+
+This approach scales because you're encoding the answer to "which table do I use for X?" rather than trying to document every column.
+
+## Encoding Domain Knowledge with Skills
+
+Schema knowledge tells your agent what exists. Domain knowledge tells it how to use things correctly.
+
+One effective pattern is organizing domain knowledge into "skills" that get loaded based on context. Each skill is a focused document covering one domain.
+
+```
+.factory/skills/
+├── salesforce.md             # CRM queries and account lookups
+├── bigquery-tables.md        # Table schemas and structure
+├── otel-pipeline.md          # OpenTelemetry trace ingestion
+├── token-queries.md          # Usage and billing metrics
+└── reports.md                # Generating recurring reports
+```
+
+The critical one is `data-pitfalls`. This is the list of everything that will bite you if you don't know about it:
+
+```markdown
+## Common Pitfalls
+
+### Don't Query Raw Tables Directly
+- ❌ `events_raw` often has duplicates from ingestion
+- ✅ Use `stg_events` or your deduped staging layer
+
+### Always Filter Inactive Records
+- ❌ Counting all records in production analytics
+- ✅ Add `WHERE is_active = true` or equivalent
+
+### Use Native Timezone Handling  
+- ❌ `DATEADD(hour, -8, timestamp)` breaks twice yearly for DST
+- ✅ Use your warehouse's timezone conversion:
+  - BigQuery: `DATETIME(timestamp, 'America/Los_Angeles')`
+  - Snowflake: `CONVERT_TIMEZONE('America/Los_Angeles', timestamp)`
+  - Postgres: `timestamp AT TIME ZONE 'America/Los_Angeles'`
+
+### Never Query "Today" for Financial Data
+- ❌ `revenue_today` is incomplete due to timing lag
+- ✅ Use `revenue_yesterday` or completed periods for reliable comparisons
+```
+
+This is the compounding part. Every time someone discovers a gotcha, it goes into the pitfalls doc. The agent learns it permanently. The mistake never happens again.
+
+## Enabling Your Team
+
+Once you have the access layer working, sharing it with your team is straightforward. Check everything into your repo:
+
+```
+your-data-repo/
+├── AGENTS.md                 # Main agent instructions
+├── .factory/skills/          # Domain-specific knowledge
+│   ├── data-pitfalls.md
+│   └── revenue-queries.md
+├── dbt/                      # Transformation models
+└── docs/
+    └── QUICK_REFERENCE.md    # Table lookup guide
+```
+
+New team members clone the repo and immediately have an agent that understands your data warehouse. The instructions file at the root gives the overview:
+
+```markdown
+# Data Engineering Agent Guidelines
+
+## Quick Start
+1. Authenticate with your warehouse CLI
+2. Query data: [your warehouse command here]
+3. For transformation work: `cd dbt && dbt run --select model_name`
+
+## Table Quick Reference
+[mapping table here]
+
+## Common Mistakes
+[pitfalls here]
+```
+
+The goal is that anyone on your team can ask "show me our highest-usage customers this month" and get an accurate answer without knowing which tables to use or which gotchas to avoid.
+
+## Platform-Specific Setup
+
+<AccordionGroup>
+  <Accordion title="Cloud Warehouses">
+    | Platform | Install | Auth | Test Query |
+    |----------|---------|------|------------|
+    | BigQuery | `brew install google-cloud-sdk` | `gcloud auth application-default login` | `bq query "SELECT 1"` |
+    | Snowflake | `brew install snowflake-snowsql` | SSO via config file | `snowsql -q "SELECT 1"` |
+    | Databricks | `pip install databricks-cli` | Personal access token | `databricks sql execute --sql "SELECT 1"` |
+    | Redshift | `psql` (built-in) | IAM or password | `psql -c "SELECT 1"` |
+  </Accordion>
+  
+  <Accordion title="Open Source / Self-Hosted">
+    | Platform | Install | Test Query |
+    |----------|---------|------------|
+    | ClickHouse | `brew install clickhouse` | `clickhouse-client --query "SELECT 1"` |
+    | DuckDB | `brew install duckdb` | `duckdb -c "SELECT 1"` |
+    | Postgres | `brew install postgresql` | `psql -c "SELECT 1"` |
+    | Trino | `brew install trino` | `trino --execute "SELECT 1"` |
+  </Accordion>
+  
+  <Accordion title="Transformation Tools">
+    | Tool | Install | Config Location | Run Models |
+    |------|---------|-----------------|------------|
+    | dbt | `pip install dbt-[adapter]` | `~/.dbt/profiles.yml` | `dbt run` |
+    | SQLMesh | `pip install sqlmesh` | `config.yaml` | `sqlmesh run` |
+    | Dataform | Via GCP Console | `dataform.json` | `dataform run` |
+  </Accordion>
+  
+  <Accordion title="Observability Tools">
+    | Tool | Data Access |
+    |------|-------------|
+    | Datadog | API or Log Archive to S3/GCS |
+    | Axiom | Direct SQL via ClickHouse protocol |
+    | Honeycomb | Query API |
+    | Grafana/Loki | LogQL or direct datasource |
+    | OpenTelemetry | Export to your warehouse |
+  </Accordion>
+</AccordionGroup>
+
+## What's Next
+
+With the foundation in place, you can start doing real work. [Part 2](/guides/data/ad-hoc-analysis) covers ad-hoc analysis: the kinds of questions you can ask and what to expect when things are working well.
