@@ -4,6 +4,78 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="January 23" rss={{ title: "CLI Updates", description: "Marketplace auto-updates and background processes flag" }}>
+  `v0.55.2`
+
+  ## New features
+
+  * **Marketplace auto-updates** - New management UI with auto-update setting and silent auto-installation of missing marketplaces on startup
+  * **`--allow-background-processes` flag** - Added flag support for interactive and resumed sessions
+
+  ## Bug fixes
+
+  * **AskUser tool parsing** - Improved parsing logic for questionnaire formatting
+
+</Update>
+
+<Update label="January 22" rss={{ title: "CLI Updates", description: "OTEL tracing, bug reporting improvements, and review command fixes" }}>
+  `v0.55.1`
+
+  ## New features
+
+  * **OpenTelemetry tracing** - Implemented OTEL tracing for the CLI to improve observability and debugging
+  * **Mandatory bug report titles** - Added title requirement for `/bug` reporting to ensure clearer issue tracking
+
+  ## Bug fixes
+
+  * **`/review` default branch** - Fixed the `/review` command to correctly identify and use the repository's default branch
+  * **Bug reporting AWS auth** - Upgraded the bug reporting skill to support the latest AWS authentication requirements
+  * **npm leak check** - Fixed an issue with the npm leak check mechanism
+
+</Update>
+
+<Update label="January 21" rss={{ title: "CLI Updates", description: "Autonomy mode reskin and agent-browser integration" }}>
+  `v0.55.0`
+
+  ## New features
+
+  * **Autonomy mode reskin** - Refreshed UI for autonomy mode indicators and transitions for better clarity
+  * **Agent-browser integration** - CLI now uses the `agent-browser` CLI for browser automations, providing more reliable and token-efficient interactions
+
+</Update>
+
+<Update label="January 20" rss={{ title: "CLI Updates", description: "Readiness report improvements and AskUser fixes" }}>
+  `v0.54.0`
+
+  ## New features
+
+  * **OTEL metrics for hooks and slash commands** - Customer metrics for `droid.hook.invocations` and `droid.slash_command.invocations`
+  * **Optional `/readiness-report` model switching** - Users can now continue with their current model while seeing a recommendation, instead of being forced to switch
+
+  ## Improvements
+
+  * **Autonomy indicator format** - Updated format to show `Spec | Auto (X)` when spec mode is active; `Medium` shortened to `Med`
+
+  ## Bug fixes
+
+  * **AskUser tool improvements** - Questionnaire parsing now supports bullets/`1)` numbering, ignores headers/code fences, normalizes multi-word topics. AskUser can now run alongside TodoWrite with other tools deferred properly. Fixed TUI input handling via `KeypressProvider` subscription
+
+</Update>
+
+<Update label="January 16" rss={{ title: "CLI Updates", description: "Readiness report in exec mode and settings stability" }}>
+  `v0.53.0`
+
+  ## New features
+
+  * **`/readiness-report` in exec mode** - Support for `/readiness-report` slash command in droid exec mode with optional custom instructions
+
+  ## Bug fixes
+
+  * **Settings.json corruption prevention** - Settings file now uses atomic writes to prevent corruption
+  * **Terminal info disabled** - Disabled getTerminalInfo to prevent issues
+
+</Update>
+
 <Update label="January 15" rss={{ title: "CLI Updates", description: "Session sharing, ctrl+z suspend, and bug fixes" }}>
   `v0.52.0`
 
