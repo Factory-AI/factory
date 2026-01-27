@@ -1,10 +1,10 @@
 ---
 title: Building Plugins
-description: Create shareable plugins with skills, commands, hooks, and tools for Droid.
-keywords: ['plugins', 'building', 'development', 'skills', 'commands', 'hooks', 'marketplace', 'distribution']
+description: Create shareable plugins with skills, commands, and tools for Droid.
+keywords: ['plugins', 'building', 'development', 'skills', 'commands', 'marketplace', 'distribution']
 ---
 
-This guide walks you through creating plugins for Droid. Plugins bundle skills, commands, hooks, and tools into shareable packages that work across projects and teams.
+This guide walks you through creating plugins for Droid. Plugins bundle skills, commands, and tools into shareable packages that work across projects and teams.
 
 ## Quick start
 
@@ -35,10 +35,12 @@ This guide walks you through creating plugins for Droid. Plugins bundle skills, 
     ```
   </Step>
   <Step title="Test your plugin">
+    Install from local directory to test:
     ```bash
-    droid --plugin-dir ./my-plugin
+    droid plugin marketplace add ./my-plugin
+    droid plugin install my-plugin@my-plugin
     ```
-    Then run `/my-plugin:hello` to test.
+    Then run `/hello` to test.
   </Step>
 </Steps>
 
@@ -65,7 +67,7 @@ The manifest file at `.factory-plugin/plugin.json` defines your plugin's metadat
 
 | Field | Description |
 |-------|-------------|
-| `name` | Unique identifier. Lowercase letters, digits, hyphens. Used as command namespace. |
+| `name` | Unique identifier. Lowercase letters, digits, hyphens. |
 | `description` | Short description shown in plugin manager. |
 | `version` | Semantic version (e.g., `1.0.0`). |
 
@@ -146,7 +148,7 @@ If the user provides arguments: $ARGUMENTS
 Use them to focus on specific areas of the review.
 ```
 
-Commands are namespaced by plugin name. A command at `commands/review-pr.md` in a plugin named `my-plugin` becomes `/my-plugin:review-pr`.
+A command at `commands/review-pr.md` becomes `/review-pr`.
 
 ### Command arguments
 
@@ -160,86 +162,15 @@ description: Greet a user by name
 Greet the user named "$ARGUMENTS" warmly.
 ```
 
-Usage: `/my-plugin:greet Alice`
-
-## Adding hooks
-
-Hooks run automatically on events. Define them in `hooks/hooks.json`:
-
-```
-my-plugin/
-└── hooks/
-    └── hooks.json
-```
-
-### Hooks format
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Create",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'File being modified: $FILE'"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "npm run lint:fix $FILE"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-### Hook events
-
-| Event | Trigger | Common uses |
-|-------|---------|-------------|
-| `PreToolUse` | Before a tool runs | Validation, security checks |
-| `PostToolUse` | After a tool completes | Auto-formatting, linting |
-| `SessionStart` | When a session begins | Context injection, setup |
-| `Stop` | When session ends | Cleanup, notifications |
-| `UserPromptSubmit` | Before user prompt is processed | Input validation |
-
-### Hook types
-
-**Command hooks** run shell commands:
-
-```json
-{
-  "type": "command",
-  "command": "npm run lint:fix $FILE"
-}
-```
-
-**Script hooks** run scripts with more context:
-
-```json
-{
-  "type": "script",
-  "script": "./hooks/validate.sh"
-}
-```
+Usage: `/greet Alice`
 
 ## Adding agents
 
-Define specialized subagents in the `agents/` directory:
+Define specialized subagents in the `droids/` directory:
 
 ```
 my-plugin/
-└── agents/
+└── droids/
     └── security-reviewer.md
 ```
 
@@ -268,7 +199,7 @@ See [Custom Droids](/cli/configuration/custom-droids) for full agent configurati
 
 ## Adding MCP servers
 
-Configure MCP servers in `.mcp.json` at the plugin root:
+Configure MCP servers in `mcp.json` at the plugin root:
 
 ```json
 {
@@ -288,16 +219,11 @@ Configure MCP servers in `.mcp.json` at the plugin root:
 
 ### Local testing
 
-Use `--plugin-dir` to test during development:
+Install from a local directory to test during development:
 
 ```bash
-droid --plugin-dir ./my-plugin
-```
-
-Test multiple plugins:
-
-```bash
-droid --plugin-dir ./plugin-one --plugin-dir ./plugin-two
+droid plugin marketplace add ./my-plugin
+droid plugin install my-plugin@my-plugin
 ```
 
 ### Validation checklist
@@ -307,7 +233,6 @@ Before sharing your plugin:
 - [ ] Manifest has required fields (`name`, `description`, `version`)
 - [ ] All skills have `name` and `description` in frontmatter
 - [ ] Commands work with and without arguments
-- [ ] Hooks don't block or slow down normal operations
 - [ ] No hardcoded paths or machine-specific config
 - [ ] README documents all commands and features
 
@@ -337,26 +262,49 @@ Create `.factory-plugin/marketplace.json`:
 {
   "name": "my-marketplace",
   "description": "A collection of useful plugins",
+  "owner": {
+    "name": "Your Name"
+  },
   "plugins": [
     {
       "name": "plugin-one",
-      "path": "./plugin-one"
+      "description": "Description of plugin one",
+      "source": "./plugin-one"
     },
     {
       "name": "plugin-two",
-      "path": "./plugin-two"
+      "description": "Description of plugin two",
+      "source": "./plugin-two"
     }
   ]
 }
 ```
 
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Marketplace identifier |
+| `description` | No | Shown when browsing marketplaces |
+| `owner` | No | Contact information |
+| `plugins[].name` | Yes | Plugin identifier |
+| `plugins[].source` | Yes | Relative path to plugin directory |
+| `plugins[].description` | No | Shown in plugin browser |
+| `plugins[].category` | No | For organizing plugins |
+
 ### Version management
 
-Use semantic versioning in your plugin manifest:
+Use semantic versioning in your plugin manifest for documentation purposes:
 
 - **Major** (1.0.0 → 2.0.0): Breaking changes
 - **Minor** (1.0.0 → 1.1.0): New features, backward compatible
 - **Patch** (1.0.0 → 1.0.1): Bug fixes
+
+<Note>
+Droid tracks plugin versions by Git commit hash, not semantic version. When users update a plugin, they always get the latest commit from the marketplace. Version pinning is not currently supported.
+</Note>
+
+## Claude Code compatibility
+
+Droid is fully compatible with Claude Code plugins. If you find a Claude Code plugin, you can install it directly and Droid will automatically translate the format.
 
 ## Best practices
 
@@ -383,7 +331,7 @@ Use semantic versioning in your plugin manifest:
   </Accordion>
   
   <Accordion title="Handle errors gracefully">
-    Hooks and scripts should fail gracefully without blocking the user. Log errors but don't crash sessions.
+    Scripts should fail gracefully without blocking the user. Log errors but don't crash sessions.
   </Accordion>
   
   <Accordion title="Respect user privacy">
@@ -404,10 +352,8 @@ code-review-plugin/
 ├── skills/
 │   └── review-patterns/
 │       └── SKILL.md
-├── agents/
+├── droids/
 │   └── reviewer.md
-├── hooks/
-│   └── hooks.json
 └── README.md
 ```
 
@@ -448,7 +394,7 @@ Check code for:
 - Test coverage gaps
 ```
 
-**`agents/reviewer.md`:**
+**`droids/reviewer.md`:**
 ```markdown
 ---
 name: reviewer
@@ -475,8 +421,8 @@ Suggestions:
   <Card title="Skills" href="/cli/configuration/skills" icon="wand-magic-sparkles">
     Deep dive into creating powerful skills.
   </Card>
-  <Card title="Hooks reference" href="/reference/hooks-reference" icon="bolt">
-    Complete reference for hook events and configuration.
+  <Card title="Custom commands" href="/cli/configuration/custom-slash-commands" icon="terminal">
+    Create user-invoked slash commands.
   </Card>
   <Card title="Custom Droids" href="/cli/configuration/custom-droids" icon="robot">
     Create specialized subagents for your plugins.

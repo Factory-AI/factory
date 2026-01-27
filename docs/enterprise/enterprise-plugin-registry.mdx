@@ -84,17 +84,22 @@ Create `.factory-plugin/marketplace.json` to register your plugins:
 
 ## Org-level configuration
 
-Configure the registry at the organization level so it's automatically available to all users. Add to your org-level `.factory/settings.json`:
+Configure the registry at the organization level so it's automatically available to all users. Add to your org-managed settings:
 
 ```json
 {
-  "extraKnownMarketplaces": [
-    "your-org/droid-plugins"
-  ],
-  "enabledPlugins": [
-    "security-toolkit@acme-corp-plugins",
-    "platform-tools@acme-corp-plugins"
-  ]
+  "extraKnownMarketplaces": {
+    "acme-corp-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "your-org/droid-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "security-toolkit@acme-corp-plugins": true,
+    "platform-tools@acme-corp-plugins": true
+  }
 }
 ```
 
@@ -103,24 +108,42 @@ Configure the registry at the organization level so it's automatically available
 | `extraKnownMarketplaces` | Registers the marketplace so users can browse and install plugins |
 | `enabledPlugins` | Pre-installs specific plugins for all users (optional) |
 
+### Restricting marketplaces
+
+To prevent users from adding unapproved marketplaces, use `strictKnownMarketplaces`:
+
+```json
+{
+  "strictKnownMarketplaces": [
+    { "source": "github", "repo": "your-org/droid-plugins" },
+    { "source": "github", "repo": "Factory-AI/factory-plugins" }
+  ]
+}
+```
+
+When `strictKnownMarketplaces` is set:
+- Users can only add marketplaces from the approved list
+- Plugin installations from non-approved marketplaces are blocked
+- Existing unapproved marketplaces continue to work but cannot be updated
+
 With this configuration:
-- The registry appears automatically when users run `/plugin`
+- The registry appears automatically when users run `/plugins`
 - Pre-enabled plugins are available immediately without manual installation
 - Users can install additional plugins from the registry as needed
 
 ## User experience
 
-Once the org configures the registry, users interact with it like any other marketplace:
+Users manage plugins via the `/plugins` UI:
+
+1. Run `/plugins` to open the plugin manager
+2. Browse tab shows plugins from all registered marketplaces including the org registry
+3. Org-enabled plugins are pre-installed automatically on startup
+
+For CLI access:
 
 ```bash
-# Browse available plugins
-/plugin
-
-# Install a plugin
-/plugin install frontend-standards@acme-corp-plugins
-
-# Update plugins
-/plugin update security-toolkit@acme-corp-plugins
+droid plugin install frontend-standards@acme-corp-plugins
+droid plugin update security-toolkit@acme-corp-plugins
 ```
 
 Users see the registry alongside public marketplaces, with org plugins clearly labeled.
@@ -164,51 +187,34 @@ plugins/
 
 ## Pre-installing plugins
 
-For critical capabilities that everyone needs, use `enabledPlugins` to pre-install:
+For critical capabilities that everyone needs, use `enabledPlugins` in org-managed settings:
 
 ```json
 {
-  "enabledPlugins": [
-    "security-toolkit@acme-corp-plugins",
-    "code-standards@acme-corp-plugins"
-  ]
+  "enabledPlugins": {
+    "security-toolkit@acme-corp-plugins": true,
+    "code-standards@acme-corp-plugins": true
+  }
 }
 ```
 
 Pre-installed plugins:
 - Are available immediately on first Droid session
-- Cannot be uninstalled by users (org policy)
-- Update automatically when the registry is updated
+- Are installed with `org` scope automatically
+- Can be updated via `/plugins` UI or `droid plugin update`
 
 ## Version management
 
-Control which plugin versions are available:
+Plugins are versioned by Git commit hash. When a plugin is updated, Droid fetches the latest commit from the marketplace.
 
-### Pin specific versions
+To control versions, use Git branches:
+- `main` - Production-ready for all users
+- `staging` - For early adopters
+- `dev` - For internal testing
 
-In your marketplace manifest, reference tagged releases:
-
-```json
-{
-  "plugins": [
-    {
-      "name": "security-toolkit",
-      "source": "./plugins/security-toolkit",
-      "version": "2.1.0"
-    }
-  ]
-}
-```
-
-### Staged rollouts
-
-Use branches for staged deployment:
-
-1. **Development branch** - Latest changes, available to platform team
-2. **Staging branch** - Validated changes, available to early adopters
-3. **Main branch** - Production-ready, available to all users
-
-Configure different teams to use different branches via project-level settings.
+<Note>
+Version pinning via the `version` field is not currently supported. The field is for documentation only.
+</Note>
 
 ## Private repository access
 
@@ -231,6 +237,61 @@ git config --global credential.helper store
 ### SSH-based access
 
 Ensure SSH keys are configured for the repository host.
+
+## Local marketplaces
+
+For air-gapped environments or when Git access is restricted, you can use local directory marketplaces. This is useful for:
+- Environments without internet access
+- Testing plugins before publishing
+- Internal distribution via shared network drives
+
+### Setting up a local marketplace
+
+Create a directory with the standard marketplace structure:
+
+```
+/shared/company-plugins/
+├── .factory-plugin/
+│   └── marketplace.json
+└── plugins/
+    ├── security-toolkit/
+    │   └── .factory-plugin/
+    │       └── plugin.json
+    └── code-standards/
+        └── .factory-plugin/
+            └── plugin.json
+```
+
+### Adding a local marketplace
+
+Via UI: `/plugins` → Marketplaces tab → "Add new marketplace" → enter absolute path
+
+Via CLI:
+
+```bash
+droid plugin marketplace add /shared/company-plugins
+```
+
+### Configuration for auto-registration
+
+Use the `local` source type in settings:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "company-local-plugins": {
+      "source": {
+        "source": "local",
+        "path": "/shared/company-plugins"
+      }
+    }
+  }
+}
+```
+
+<Note>
+When removing a local marketplace from the registry, Droid does **not** delete the source directory. Only Git-cloned marketplaces have their directories removed on deletion.
+</Note>
 
 ## Best practices
 
@@ -288,18 +349,23 @@ A financial services company sets up their registry:
 - `risk-models` - For risk management teams
 - `regulatory-reporting` - For compliance teams
 
-**Configuration:**
+**Configuration (org-managed-settings.json):**
 
 ```json
 {
-  "extraKnownMarketplaces": [
-    "acme-financial/droid-plugins"
-  ],
-  "enabledPlugins": [
-    "compliance-checks@acme-financial-plugins",
-    "security-scanner@acme-financial-plugins",
-    "audit-logging@acme-financial-plugins"
-  ]
+  "extraKnownMarketplaces": {
+    "acme-financial-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "acme-financial/droid-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "compliance-checks@acme-financial-plugins": true,
+    "security-scanner@acme-financial-plugins": true,
+    "audit-logging@acme-financial-plugins": true
+  }
 }
 ```
 
