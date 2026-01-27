@@ -4,6 +4,33 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="January 27" rss={{ title: "CLI Updates", description: "ACP daemon mode, lazy session loading, and model updates" }}>
+  `v0.56.0`
+
+  ## New features
+
+  * **ACP daemon mode** - New daemon mode for Agent Control Protocol enabling persistent background sessions with improved session loading
+  * **Lazy session loading** - Sessions now load messages lazily for faster startup when resuming large sessions
+  * **Dynamic default settings** - Settings now support dynamic defaults for better configuration flexibility
+
+  ## Improvements
+
+  * **Parallel context gathering** - Mission workers now encouraged to read all context files in parallel for faster startup
+
+  ## Bug fixes
+
+  * **MCP tool schema isolation** - Broken tool schemas in one MCP server no longer affect other MCP servers
+  * **Symlinked skill directories** - Fixed discovery of symlinked skill directories in `.factory/skills`
+  * **Windows spec mode UI** - Fixed spec mode UI and autonomy mode text rendering on Windows
+  * **AskUser parallel tool calling** - Fixed parallel tool calling with AskUser tool
+  * **Skills menu rendering** - Fixed skills menu to always render correctly
+  * **OpenAI custom model routing** - Fixed routing bug for OpenAI custom models
+  * **Linear remote delegation** - Fixed Linear remote delegation issues
+  * **Authentication atomic writes** - Auth writes now use atomic operations to prevent corruption
+  * **ACP session loading** - Fixed multiple issues with ACP session loading
+
+</Update>
+
 <Update label="January 23" rss={{ title: "CLI Updates", description: "Marketplace auto-updates and background processes flag" }}>
   `v0.55.2`
 
