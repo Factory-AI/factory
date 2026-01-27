@@ -1,0 +1,312 @@
+---
+title: Enterprise Plugin Registry
+description: Centralize and distribute approved plugins across your organization with a private plugin marketplace.
+---
+
+An **Enterprise Plugin Registry** is a centralized, private repository where organizations maintain approved plugins for company-wide distribution. Instead of individual teams discovering and vetting plugins independently, the registry provides a curated catalog of capabilities that are pre-approved, maintained, and ready to use.
+
+## Why use an Enterprise Plugin Registry?
+
+| Challenge | Solution |
+|-----------|----------|
+| **Inconsistent tooling** across teams | Single source of approved plugins ensures everyone uses the same capabilities |
+| **Security and compliance review** for each plugin | Vet plugins once at the org level, distribute everywhere |
+| **Onboarding new developers** | New team members instantly access all approved capabilities |
+| **Role-specific tooling** | Package plugins by team function (security, frontend, data, etc.) |
+| **Version control** | Manage plugin versions centrally, roll out updates organization-wide |
+
+## Setting up a registry
+
+An Enterprise Plugin Registry is a Git repository containing your organization's approved plugins with a marketplace manifest.
+
+### Repository structure
+
+```
+your-org/droid-plugins/
+├── .factory-plugin/
+│   └── marketplace.json      # Registry manifest
+├── plugins/
+│   ├── security-toolkit/     # Security team plugins
+│   │   ├── .factory-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   ├── frontend-standards/   # Frontend team plugins
+│   │   ├── .factory-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   ├── data-engineering/     # Data team plugins
+│   │   └── ...
+│   └── platform-tools/       # Platform/DevOps plugins
+│       └── ...
+└── README.md
+```
+
+### Marketplace manifest
+
+Create `.factory-plugin/marketplace.json` to register your plugins:
+
+```json
+{
+  "name": "acme-corp-plugins",
+  "description": "ACME Corp approved Droid plugins",
+  "owner": {
+    "name": "ACME Platform Team",
+    "email": "platform@acme.com"
+  },
+  "plugins": [
+    {
+      "name": "security-toolkit",
+      "description": "Security review, threat modeling, and vulnerability scanning",
+      "source": "./plugins/security-toolkit",
+      "category": "security"
+    },
+    {
+      "name": "frontend-standards",
+      "description": "React component patterns, accessibility checks, design system integration",
+      "source": "./plugins/frontend-standards",
+      "category": "frontend"
+    },
+    {
+      "name": "data-engineering",
+      "description": "SQL review, pipeline validation, data quality checks",
+      "source": "./plugins/data-engineering",
+      "category": "data"
+    },
+    {
+      "name": "platform-tools",
+      "description": "CI/CD helpers, infrastructure review, deployment automation",
+      "source": "./plugins/platform-tools",
+      "category": "platform"
+    }
+  ]
+}
+```
+
+## Org-level configuration
+
+Configure the registry at the organization level so it's automatically available to all users. Add to your org-level `.factory/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    "your-org/droid-plugins"
+  ],
+  "enabledPlugins": [
+    "security-toolkit@acme-corp-plugins",
+    "platform-tools@acme-corp-plugins"
+  ]
+}
+```
+
+| Field | Purpose |
+|-------|---------|
+| `extraKnownMarketplaces` | Registers the marketplace so users can browse and install plugins |
+| `enabledPlugins` | Pre-installs specific plugins for all users (optional) |
+
+With this configuration:
+- The registry appears automatically when users run `/plugin`
+- Pre-enabled plugins are available immediately without manual installation
+- Users can install additional plugins from the registry as needed
+
+## User experience
+
+Once the org configures the registry, users interact with it like any other marketplace:
+
+```bash
+# Browse available plugins
+/plugin
+
+# Install a plugin
+/plugin install frontend-standards@acme-corp-plugins
+
+# Update plugins
+/plugin update security-toolkit@acme-corp-plugins
+```
+
+Users see the registry alongside public marketplaces, with org plugins clearly labeled.
+
+## Organizing plugins by role
+
+Structure your registry to match your organization's teams and workflows:
+
+### By team function
+
+```
+plugins/
+├── security/           # AppSec team
+├── frontend/           # Web/mobile teams  
+├── backend/            # API/services teams
+├── data/               # Data engineering/science
+├── platform/           # DevOps/SRE
+└── compliance/         # Legal/compliance
+```
+
+### By capability
+
+```
+plugins/
+├── code-review/        # Review and quality
+├── testing/            # Test generation and validation
+├── documentation/      # Doc generation and maintenance
+├── migrations/         # Code and data migrations
+└── security/           # Security scanning and review
+```
+
+### By project type
+
+```
+plugins/
+├── microservices/      # Service development patterns
+├── monolith/           # Legacy system tools
+├── data-pipelines/     # ETL and batch processing
+└── ml-projects/        # ML/AI development
+```
+
+## Pre-installing plugins
+
+For critical capabilities that everyone needs, use `enabledPlugins` to pre-install:
+
+```json
+{
+  "enabledPlugins": [
+    "security-toolkit@acme-corp-plugins",
+    "code-standards@acme-corp-plugins"
+  ]
+}
+```
+
+Pre-installed plugins:
+- Are available immediately on first Droid session
+- Cannot be uninstalled by users (org policy)
+- Update automatically when the registry is updated
+
+## Version management
+
+Control which plugin versions are available:
+
+### Pin specific versions
+
+In your marketplace manifest, reference tagged releases:
+
+```json
+{
+  "plugins": [
+    {
+      "name": "security-toolkit",
+      "source": "./plugins/security-toolkit",
+      "version": "2.1.0"
+    }
+  ]
+}
+```
+
+### Staged rollouts
+
+Use branches for staged deployment:
+
+1. **Development branch** - Latest changes, available to platform team
+2. **Staging branch** - Validated changes, available to early adopters
+3. **Main branch** - Production-ready, available to all users
+
+Configure different teams to use different branches via project-level settings.
+
+## Private repository access
+
+For private Git repositories, ensure Droid can authenticate:
+
+### GitHub Enterprise
+
+```bash
+# Users authenticate via gh CLI
+gh auth login --hostname github.your-company.com
+```
+
+### GitLab Self-Hosted
+
+```bash
+# Configure git credentials
+git config --global credential.helper store
+```
+
+### SSH-based access
+
+Ensure SSH keys are configured for the repository host.
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Establish a review process">
+    Before adding plugins to the registry:
+    - Security review for any external dependencies
+    - Code review by platform team
+    - Testing in isolated environment
+    - Documentation requirements
+  </Accordion>
+
+  <Accordion title="Document each plugin">
+    Every plugin should have a README covering:
+    - What capabilities it provides
+    - When to use it (and when not to)
+    - Any prerequisites or dependencies
+    - Example usage
+  </Accordion>
+
+  <Accordion title="Version semantically">
+    Use semantic versioning so teams know what to expect:
+    - **Major**: Breaking changes to commands or behavior
+    - **Minor**: New capabilities, backward compatible
+    - **Patch**: Bug fixes only
+  </Accordion>
+
+  <Accordion title="Monitor adoption">
+    Track which plugins are being used:
+    - Installation counts
+    - Active usage metrics
+    - Feedback from teams
+    - Issues and feature requests
+  </Accordion>
+
+  <Accordion title="Plan for deprecation">
+    When retiring plugins:
+    - Announce deprecation timeline
+    - Provide migration path to alternatives
+    - Keep deprecated plugins available (read-only) during transition
+  </Accordion>
+</AccordionGroup>
+
+## Example: Financial services org
+
+A financial services company sets up their registry:
+
+**Mandatory plugins** (pre-installed for everyone):
+- `compliance-checks` - PCI-DSS and SOX compliance validation
+- `security-scanner` - OWASP vulnerability detection
+- `audit-logging` - Enhanced audit trail for all Droid actions
+
+**Team-specific plugins** (available for install):
+- `trading-systems` - For quantitative and trading teams
+- `risk-models` - For risk management teams
+- `regulatory-reporting` - For compliance teams
+
+**Configuration:**
+
+```json
+{
+  "extraKnownMarketplaces": [
+    "acme-financial/droid-plugins"
+  ],
+  "enabledPlugins": [
+    "compliance-checks@acme-financial-plugins",
+    "security-scanner@acme-financial-plugins",
+    "audit-logging@acme-financial-plugins"
+  ]
+}
+```
+
+This ensures every developer has compliance and security tooling from day one, while specialized teams can add domain-specific capabilities.
+
+## Related
+
+- [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) - How org-level settings work
+- [Plugins](/cli/configuration/plugins) - Plugin basics and installation
+- [Building Plugins](/guides/building/building-plugins) - Create your own plugins
