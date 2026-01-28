@@ -27,7 +27,7 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 
 | Setting | Options | Default | Description |
 | ------- | ------- | ------- | ----------- |
-| `model` | `sonnet`, `opus`, `GPT-5`, `gpt-5-codex`, `gpt-5-codex-max`, `haiku`, `droid-core`, `custom-model` | `opus` | The default AI model used by droid |
+| `model` | `sonnet`, `opus`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.1-codex-max`, `haiku`, `gemini-3-pro`, `custom-model` | `opus` | The default AI model used by droid |
 | `reasoningEffort` | `off`, `none`, `low`, `medium`, `high` (availability depends on the model) | Model-dependent default | Controls how much structured thinking the model performs. |
 | `autonomyLevel` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
 | `cloudSessionSync` | `true`, `false` | `true` | Mirror CLI sessions to Factory web. |
@@ -56,13 +56,11 @@ Choose the default AI model that powers your droid:
 
 - **`opus`** - Claude Opus 4.5 (current default)
 - **`sonnet`** - Claude Sonnet 4.5, balanced cost and quality
-- **`gpt-5.1`** - OpenAI GPT-5.1
-- **`gpt-5.1-codex`** - Advanced coding-focused model
-- **`gpt-5.1-codex-max`** - GPT-5.1-Codex-Max, supports Extra High reasoning
 - **`gpt-5.2`** - OpenAI GPT-5.2
+- **`gpt-5.2-codex`** - Advanced coding-focused model
+- **`gpt-5.1-codex-max`** - GPT-5.1-Codex-Max, supports Extra High reasoning
 - **`haiku`** - Claude Haiku 4.5, fast and cost-effective
 - **`gemini-3-pro`** - Gemini 3 Pro
-- **`droid-core`** - GLM-4.6 open-source model
 - **`custom-model`** - Your own configured model via BYOK
 
 [You can also add custom models and BYOK.](/cli/configuration/byok)
@@ -74,7 +72,7 @@ Choose the default AI model that powers your droid:
 - **`off` / `none`** – disable structured reasoning (fastest).
 - **`low`**, **`medium`**, **`high`** – progressively increase deliberation time for more complex reasoning.
 
-Anthropic models default to `off`, while GPT-5 starts on `medium`.
+Anthropic models default to `off`, while GPT-5.2 starts on `low`.
 
 ### Autonomy level
 
