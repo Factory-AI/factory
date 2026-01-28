@@ -29,11 +29,7 @@ Before wiring Zed to Factory Droid, make sure you have Zed installed. Afterwards
 
 If you prefer to manually configure Droid inside Zed, you can follow the instructions below.
 
-1. **Factory account and API key**
-   - Sign up at https://app.factory.ai.
-   - Configure billing if required.
-   - Create an API key at https://app.factory.ai/settings/api-keys.
-2. **Factory CLI installed (supported on all operating systems except Windows ARM machines)**
+1. **Factory CLI installed (supported on all operating systems except Windows ARM machines)**
 
    - Install via:
 
@@ -41,12 +37,17 @@ If you prefer to manually configure Droid inside Zed, you can follow the instruc
      curl -fsSL https://app.factory.ai/cli | sh
      ```
 
-   - Set the `FACTORY_API_KEY` environment variable in your shell (for example, add `export FACTORY_API_KEY=your_key_here` to your shell profile).
    - Ensure `droid` is on your PATH, or note its full path.
 
-3. **Zed installed**
+2. **Zed installed**
    - Zed on macOS, Linux, or x86_64 Windows.
    - Access to `~/.config/zed/settings.json`.
+
+3. **(Optional) Factory API key** - instead of using the login flow, you can set up an API key:
+   - Sign up at https://app.factory.ai.
+   - Configure billing if required.
+   - Create an API key at https://app.factory.ai/settings/api-keys.
+   - Set the `FACTORY_API_KEY` environment variable in your shell (for example, add `export FACTORY_API_KEY=your_key_here` to your shell profile).
 
 <Note>
   You cannot create a Factory account or manage billing from inside Zed. All
@@ -62,10 +63,7 @@ Edit `~/.config/zed/settings.json` and add a **Factory Droid** entry under `agen
   "Factory Droid": {
     "type": "custom",
     "command": "*path/to/droid/cli*",
-    "args": ["exec", "--output-format", "acp"],
-    "env": {
-      "FACTORY_API_KEY": "$FACTORY_API_KEY"
-    }
+    "args": ["exec", "--output-format", "acp"]
   }
 }
 ```
@@ -73,7 +71,21 @@ Edit `~/.config/zed/settings.json` and add a **Factory Droid** entry under `agen
 - `type: "custom"` – tells Zed this is a user-defined agent
 - `command` – full path to the `droid` binary
 - `args` – run Droid in exec mode and speak ACP to Zed
-- `FACTORY_API_KEY` – pulled from your shell environment or replaced with a literal key
+
+If you prefer to use an API key instead of the login flow, add an `env` block:
+
+```json
+"agent_servers": {
+  "Factory Droid": {
+    "type": "custom",
+    "command": "*path/to/droid/cli*",
+    "args": ["exec", "--output-format", "acp"],
+    "env": {
+      "FACTORY_API_KEY": "$FACTORY_API_KEY"
+    }
+  }
+}
+```
 
 ## Start a Droid Session in Zed
 
