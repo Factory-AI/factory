@@ -17,6 +17,7 @@ Plugins are directories containing a manifest file (`.factory-plugin/plugin.json
 | **Skills** | Reusable capabilities with instructions and tools | Model-invoked automatically based on task |
 | **Commands** | Slash commands for specific workflows | User-invoked via `/command-name` |
 | **Agents** | Specialized subagent definitions | Called via Task tool |
+| **Hooks** | Lifecycle event handlers | Automatic on matching events |
 | **MCP Servers** | External tool integrations | Available as tools when plugin is active |
 
 ## When to use plugins vs standalone configuration
@@ -91,8 +92,42 @@ my-plugin/
 ```
 
 <Warning>
-Don't put `commands/`, `skills/`, or `droids/` inside the `.factory-plugin/` directory. Only `plugin.json` goes inside `.factory-plugin/`. All other directories must be at the plugin root level.
+Don't put `commands/`, `skills/`, `droids/`, or `hooks/` inside the `.factory-plugin/` directory. Only `plugin.json` goes inside `.factory-plugin/`. All other directories must be at the plugin root level.
 </Warning>
+
+### Plugin hooks
+
+Plugins can include hooks that execute at specific lifecycle events. Add a `hooks/` directory with a `hooks.json` file:
+
+```
+my-plugin/
+├── .factory-plugin/
+│   └── plugin.json
+├── hooks/
+│   ├── hooks.json         # Hook configuration
+│   └── my-script.sh       # Hook scripts
+└── ...
+```
+
+**hooks/hooks.json example:**
+
+```json
+{
+  "PostToolUse": [
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${DROID_PLUGIN_ROOT}/hooks/format.sh"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Use `${DROID_PLUGIN_ROOT}` to reference files within your plugin directory. This variable is expanded to the actual plugin path when the hook runs. See [Hooks reference](/reference/hooks-reference#plugin-hooks) for details.
 
 ### Plugin manifest
 

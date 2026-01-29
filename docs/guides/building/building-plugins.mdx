@@ -197,6 +197,47 @@ Report findings with severity levels and remediation steps.
 
 See [Custom Droids](/cli/configuration/custom-droids) for full agent configuration options.
 
+## Adding hooks
+
+Define lifecycle hooks in `hooks/hooks.json`:
+
+```
+my-plugin/
+└── hooks/
+    ├── hooks.json
+    └── format-check.sh
+```
+
+### Hook configuration
+
+```json
+{
+  "PostToolUse": [
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${DROID_PLUGIN_ROOT}/hooks/format-check.sh",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Environment variables
+
+| Variable | Description |
+|----------|-------------|
+| `${DROID_PLUGIN_ROOT}` | Absolute path to your plugin directory |
+| `${CLAUDE_PLUGIN_ROOT}` | Alias for `${DROID_PLUGIN_ROOT}` (Claude Code compatibility) |
+
+<Note>
+Plugin hooks cannot be imported via `/hooks import`. They only function within installed plugins where the plugin root path can be resolved.
+</Note>
+
 ## Adding MCP servers
 
 Configure MCP servers in `mcp.json` at the plugin root:
