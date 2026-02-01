@@ -1,0 +1,415 @@
+---
+title: "Daemon Reference"
+description: "Reference documentation for factoryd, the background service that orchestrates droid sessions and terminals"
+keywords: ['factoryd', 'daemon', 'droid daemon', 'websocket', 'json-rpc', 'terminals', 'sessions', 'mcp', 'api']
+---
+
+The Factory daemon (`factoryd`) is a background service that orchestrates droid agent processes and provides terminal access. It serves as the communication layer between Factory clients (CLI, web, desktop) and the droid processes that execute your tasks.
+
+<Tip>
+  Most users never interact with the daemon directly — it runs automatically when you use droid. This reference is for developers building integrations or troubleshooting advanced scenarios.
+</Tip>
+
+---
+
+## Quick Start
+
+The daemon is bundled with the droid CLI. Start it manually when building integrations:
+
+```bash
+droid daemon
+```
+
+Check if it's running:
+
+```bash
+curl http://localhost:37643/health
+```
+
+---
+
+## How It Works
+
+<CardGroup cols={2}>
+  <Card title="Session Management" icon="layer-group">
+    Spawns and manages droid agent processes, routing messages between clients and agents
+  </Card>
+  <Card title="Terminal Access" icon="terminal">
+    Provides PTY terminal sessions for command execution and interactive shells
+  </Card>
+  <Card title="MCP Coordination" icon="plug">
+    Manages Model Context Protocol servers and routes tool calls to external services
+  </Card>
+  <Card title="SSH Tunneling" icon="lock">
+    Enables secure connections to remote workspaces via WebSocket tunnels
+  </Card>
+</CardGroup>
+
+### Architecture
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Factory   │     │             │     │    Droid    │
+│  Web/CLI    │────▶│  factoryd   │────▶│   Process   │
+│   Client    │◀────│   (Daemon)  │◀────│   (Agent)   │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                   │
+       │            ┌──────┴──────┐
+       │            │             │
+       ▼            ▼             ▼
+   WebSocket    Terminal      MCP Servers
+   JSON-RPC     Manager       (External)
+```
+
+---
+
+## Distribution
+
+The daemon ships in two forms:
+
+| Distribution | Description |
+| :----------- | :---------- |
+| **CLI bundled** | Run via `droid daemon` — the daemon is compiled into the droid binary |
+| **Standalone** | Downloaded from `downloads.factory.ai` onto remote sandboxes automatically |
+
+---
+
+## CLI Usage
+
+### Starting the Daemon
+
+<CodeGroup>
+
+```bash Basic
+droid daemon
+```
+
+```bash Custom Port
+droid daemon --port 9000
+```
+
+```bash Debug Mode
+droid daemon --debug
+```
+
+```bash Unix Socket
+droid daemon --unix /tmp/factoryd.sock
+```
+
+</CodeGroup>
+
+### Options
+
+| Option | Default | Description |
+| :----- | :------ | :---------- |
+| `-p, --port <port>` | 37643 (prod) / 41723 (dev) | TCP port to listen on |
+| `-h, --host <host>` | 127.0.0.1 | Host interface to bind to |
+| `--unix <path>` | — | Unix socket path (alternative to TCP) |
+| `-d, --debug` | false | Enable verbose debug logging |
+| `--droid-path <path>` | "droid" | Path to droid executable for spawning sessions |
+| `-v, --version` | — | Show version and exit |
+| `--help` | — | Show help and exit |
+
+### Environment Variables
+
+| Variable | Description |
+| :------- | :---------- |
+| `FACTORYD_DISABLE_AUTO_UPDATE` | Set to `true` to skip auto-update check on startup |
+| `FACTORYD_WS_URL` | Override the daemon WebSocket URL |
+| `FACTORYD_PORT` | Override the daemon port |
+| `FACTORY_OTEL_ENABLED` | Set to `true` to enable OpenTelemetry tracing |
+
+---
+
+## HTTP Endpoints
+
+The daemon exposes REST endpoints for health monitoring:
+
+| Endpoint | Method | Description |
+| :------- | :----- | :---------- |
+| `/health` | GET | Health check with uptime, version, platform, terminal count |
+| `/status` | GET | Detailed status including terminals and WebSocket connections |
+
+### Example: Health Check
+
+```bash
+curl http://localhost:37643/health
+```
+
+```json
+{
+  "status": "ok",
+  "uptime": 3600,
+  "terminalCount": 2,
+  "connections": 1,
+  "platform": "darwin",
+  "version": "1.10.0"
+}
+```
+
+---
+
+## WebSocket API
+
+The daemon uses **JSON-RPC 2.0** over WebSocket for all client communication.
+
+**Default URL:** `ws://localhost:37643` (production) or `ws://localhost:41723` (development)
+
+### Authentication
+
+All WebSocket connections must authenticate before making API calls:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "daemon.authenticate",
+  "params": {
+    "token": "your-jwt-token",
+    "caller": "cli"
+  },
+  "id": 1
+}
+```
+
+<Note>
+  Get a JWT token by authenticating with Factory via `droid login`. For programmatic access, use an API key from [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys).
+</Note>
+
+---
+
+## API Methods
+
+### Session Methods
+
+Manage droid agent sessions:
+
+| Method | Description |
+| :----- | :---------- |
+| `daemon.initialize_session` | Create a new session and spawn a droid process |
+| `daemon.load_session` | Load an existing session |
+| `daemon.add_user_message` | Send a user message to the active session |
+| `daemon.interrupt_session` | Interrupt the current agent execution |
+| `daemon.list_opened_sessions` | List currently loaded sessions |
+| `daemon.list_available_sessions` | List all available sessions with pagination |
+| `daemon.search_sessions` | Search sessions by query |
+| `daemon.update_session_settings` | Update session settings |
+| `daemon.validate_working_directory` | Validate a directory path exists |
+
+**Example: Initialize Session**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "daemon.initialize_session",
+  "params": {
+    "workingDirectory": "/path/to/project",
+    "model": "claude-opus-4-5-20251101"
+  },
+  "id": 2
+}
+```
+
+### Terminal Methods
+
+Manage PTY terminal sessions:
+
+| Method | Description |
+| :----- | :---------- |
+| `daemon.create_terminal` | Create a new PTY terminal session |
+| `daemon.write_terminal_data` | Send input data to a terminal |
+| `daemon.resize_terminal` | Resize terminal dimensions |
+| `daemon.close_terminal` | Close a terminal session |
+| `daemon.list_terminals` | List active terminal sessions |
+
+**Example: Create Terminal**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "daemon.create_terminal",
+  "params": {
+    "cols": 120,
+    "rows": 40,
+    "cwd": "/path/to/project"
+  },
+  "id": 3
+}
+```
+
+### MCP Methods
+
+Manage Model Context Protocol servers:
+
+| Method | Description |
+| :----- | :---------- |
+| `daemon.get_mcp_config` | Get current MCP configuration |
+| `daemon.update_mcp_config` | Update MCP configuration |
+| `daemon.add_mcp_server` | Add a new MCP server |
+| `daemon.remove_mcp_server` | Remove an MCP server |
+| `daemon.toggle_mcp_server` | Enable/disable an MCP server |
+| `daemon.list_mcp_registry` | List available MCP servers from registry |
+| `daemon.list_mcp_tools` | List tools from connected MCP servers |
+| `daemon.toggle_mcp_tool` | Enable/disable a specific MCP tool |
+| `daemon.authenticate_mcp_server` | Authenticate with an MCP server |
+| `daemon.cancel_mcp_auth` | Cancel pending MCP authentication |
+| `daemon.clear_mcp_auth` | Clear MCP authentication credentials |
+
+### File Methods
+
+| Method | Description |
+| :----- | :---------- |
+| `daemon.list_files` | List files in a directory |
+| `daemon.search_files` | Search for files by pattern |
+
+### Settings Methods
+
+| Method | Description |
+| :----- | :---------- |
+| `daemon.get_default_settings` | Get default daemon settings |
+
+---
+
+## Server-to-Client Events
+
+The daemon pushes events to connected clients via JSON-RPC notifications:
+
+| Event | Description |
+| :---- | :---------- |
+| `daemon.terminal_data` | Terminal output data |
+| `daemon.terminal_exit` | Terminal session exited |
+| `daemon.session_notification` | Session activity notification (agent messages, tool calls) |
+| `daemon.request_permission` | Permission request from droid (requires user response) |
+
+---
+
+## SSH Tunneling
+
+The daemon supports TCP tunneling over WebSocket for SSH connections to remote workspaces.
+
+**Tunnel URL:** `ws://localhost:37643/?tunnel=<port>`
+
+### Protocol Flow
+
+<Steps>
+  <Step title="Connect">
+    Client connects with authentication token in header to `/?tunnel=<port>`
+  </Step>
+  <Step title="Initialize">
+    Client sends `tunnel.init` with SSH public key
+  </Step>
+  <Step title="Authenticate">
+    Daemon validates credentials and installs SSH key on target
+  </Step>
+  <Step title="Ready">
+    Daemon sends `tunnel.ready` and bidirectional binary forwarding begins
+  </Step>
+</Steps>
+
+---
+
+## Session Timeouts
+
+| Environment | Timeout |
+| :---------- | :------ |
+| Local (CLI/Desktop) | 24 hours |
+| Remote (E2B sandbox) | 5 minutes |
+
+<Note>
+  Remote sandbox timeouts align with E2B's idle timeout to optimize resource usage.
+</Note>
+
+---
+
+## Building Integrations
+
+Connect to the daemon WebSocket API to build custom integrations:
+
+```javascript
+const WebSocket = require('ws');
+
+const ws = new WebSocket('ws://localhost:37643');
+
+ws.on('open', () => {
+  // Authenticate first
+  ws.send(JSON.stringify({
+    jsonrpc: '2.0',
+    method: 'daemon.authenticate',
+    params: { token: 'your-jwt-token', caller: 'custom-integration' },
+    id: 1
+  }));
+});
+
+ws.on('message', (data) => {
+  const response = JSON.parse(data);
+  
+  if (response.id === 1 && !response.error) {
+    // Authenticated — initialize a session
+    ws.send(JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'daemon.initialize_session',
+      params: { workingDirectory: '/my/project' },
+      id: 2
+    }));
+  }
+  
+  // Handle session notifications
+  if (response.method === 'daemon.session_notification') {
+    console.log('Session event:', response.params);
+  }
+});
+```
+
+---
+
+## Troubleshooting
+
+### Daemon won't start
+
+<Steps>
+  <Step title="Check for existing instances">
+    ```bash
+    lsof -i :37643
+    ```
+  </Step>
+  <Step title="Try a different port">
+    ```bash
+    droid daemon --port 9000
+    ```
+  </Step>
+  <Step title="Enable debug logging">
+    ```bash
+    droid daemon --debug
+    ```
+  </Step>
+</Steps>
+
+### Connection refused
+
+1. Verify daemon is running: `curl http://localhost:37643/health`
+2. Check firewall settings
+3. Ensure correct port (dev vs prod defaults differ)
+
+### Authentication failures
+
+1. Verify your JWT token is valid
+2. Check token expiration
+3. Ensure you're authenticated with Factory: `droid login`
+
+---
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="CLI Reference" icon="terminal" href="/reference/cli-reference">
+    Complete reference for droid commands
+  </Card>
+  <Card title="MCP Configuration" icon="plug" href="/cli/configuration/mcp">
+    Connect external tools via Model Context Protocol
+  </Card>
+  <Card title="Settings" icon="gear" href="/cli/configuration/settings">
+    Configure droid for your workflow
+  </Card>
+  <Card title="Hooks Reference" icon="webhook" href="/reference/hooks-reference">
+    Automate workflows with lifecycle hooks
+  </Card>
+</CardGroup>
