@@ -1,0 +1,85 @@
+---
+title: Cloud Templates – Troubleshooting
+description: Diagnose and resolve common problems when creating, connecting to, or working inside a cloud template
+---
+
+Even the smoothest cloud template can hit a snag. This guide walks you through the quickest fixes for the most common cloud template issues.
+
+## Quick Reference
+
+| Category               | Typical Symptoms                                                              |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| **Workspace Creation** | “Provisioning” forever, cloning errors, setup script fails             |
+| **Connection**         | Can’t attach from session, pairing spinner never stops, “Machine unavailable” |
+| **Performance**        | Slow rebuilds, high latency in terminal, laggy editor                         |
+| **Devcontainer**       | Build errors, “command not found”, ports not reachable                        |
+| **General Usage**      | Git asks for credentials, disk full, permission denied                        |
+
+---
+
+## 1. Workspace Creation Issues
+
+<AccordionGroup>
+
+  <Accordion title="Repository clone failed">
+    **Diagnose**  
+    - Error toast shows *“clone failed”* with a Git exit code  
+    - Private repo? Missing OAuth scopes?
+
+    **Resolve**
+    1. Verify the repo is enabled and displays **Connected** in Integrations
+    2. Refresh your OAuth token if prompted
+
+  </Accordion>
+
+</AccordionGroup>
+
+---
+
+## 2. Connection Problems
+
+<Steps>
+
+  <Step title="Check Machine Selector">
+    In your session, click the **CPU** icon → ensure **Cloud Machine** is selected.  
+    If it shows **Local Machine**, switch to **Cloud Machine** and pick the template.
+  </Step>
+
+  <Step title="Browser & Network">
+    - Use **Chrome** or **Edge** (other browsers may block WebSocket upgrades).  
+    - Disable VPN/proxy to rule out WebSocket filtering.  
+    - Reload the session tab (⌘R / Ctrl-R).
+  </Step>
+
+</Steps>
+
+---
+
+## 3. Performance & Speed
+
+| Symptom                   | Fix                                                                                                                              |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Rebuild takes > 5 min** | Add `.dockerignore` for `node_modules`, `*.pyc`, build outputs• Use a lighter base image (e.g., alpine)                        |
+| **Terminal latency**      | Close unused browser tabs with heavy JS• Check local bandwidth (>5 Mbps recommended)• Pause real-time spell-checker extensions |
+| **Editor lag**            | Disable file watchers in dev tools (`nodemon`, `webpack --watch`) unless needed• Use auto-save only when collaborating         |
+
+---
+
+## 4. General Usage Troubles
+
+| Issue                              | Resolution                                                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Git prompts for credentials**    | Make sure the repo integration is connected; cloud template injects HTTPS tokens automatically.                        |
+| **Disk quota exceeded**            | Clear package caches (`npm cache clean --force`, `pip cache purge`), remove large build artifacts, or rebuild template. |
+| **Permission denied on file save** | File is outside the repo template; save inside `/workspaces/<repo>/`.                                                |
+| **Cannot install global packages** | Use `npm install -g` or `pip install --user`. If still blocked, add commands to `postCreateCommand`.                     |
+| **History lost after rebuild**     | Anything outside `/workspaces` is cleared during rebuild. Commit important scripts or store them inside the repo.        |
+
+---
+
+## Need More Help?
+
+- **Best Practices** – Optimize performance with the [Cloud Template Best Practices guide](/web/machine-connection/cloud-templates/best-practices)
+- **Support** – Reach out in your Factory support channel with template ID and error message
+
+> A quick rebuild fixes 80 % of issues—don’t hesitate to click **Rebuild** when in doubt.
