@@ -3,14 +3,18 @@ title: Skills
 description: Reusable capabilities that your AI agent invokes on demand.
 keywords: ['skills', 'capabilities', 'tools', 'workflows', 'expertise', 'reusable', 'invoke', 'skill']
 ---
-Skills are **reusable capabilities** that your AI agent invokes on demand. They pack instructions, expertise, and tools into a lightweight package.
+Skills are **reusable capabilities** that extend what your Droid can do. Create a `SKILL.md` file with instructions, and the Droid adds it to its toolkit. The Droid uses skills when relevant, or you can invoke one directly with `/skill-name`.
 
 <Tip>
 Explore the full [skills cookbooks](/guides/skills) for examples.
 </Tip>
 
+<Note>
+**Custom slash commands have been merged into skills.** A file at `.factory/commands/review.md` and a skill at `.factory/skills/review/SKILL.md` both create `/review` and work the same way. Your existing `.factory/commands/` files keep working. Skills add optional features: a directory for supporting files, frontmatter to [control who can invoke them](#control-who-invokes-a-skill), and the ability for Droids to load them automatically when relevant.
+</Note>
+
 **Key properties:**
-- **Model-invoked** – Droids decide when to use them based on the task, not typed commands
+- **Flexible invocation** – Both you and the Droid can invoke skills. Type `/skill-name` or let the Droid decide when to use them.
 - **Composable** – can be chained together as part of larger workflows
 - **Token-efficient** – lightweight and focused, not bloated with unused tools or repeated instructions
 
@@ -52,7 +56,7 @@ description: Summarize the staged git diff in 3–5 bullets. Use when the user a
 3. Call out any migrations, risky areas, or tests that should be run.
 ```
 
-You can also include additional frontmatter fields such as `allowed-tools` in future iterations; for now, `name` and `description` are the key fields that help Droids discover and use your skill.
+You can also include additional frontmatter fields to control behavior. See [Frontmatter reference](#frontmatter-reference) for all available options.
 
 ## Where skills live
 
@@ -95,6 +99,78 @@ In large monorepos, you can either:
 
 Project skills are the primary way to share and standardize capabilities inside an engineering org; personal skills are ideal for individual workflows or experiments.
 
+## Frontmatter reference
+
+Skills support YAML frontmatter fields between `---` markers at the top of your `SKILL.md` file:
+
+```yaml
+---
+name: my-skill
+description: What this skill does and when to use it
+user-invocable: true
+disable-model-invocation: false
+---
+
+Your skill instructions here...
+```
+
+| Field                      | Required    | Default | Description                                                                                                                                           |
+| :------------------------- | :---------- | :------ | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                     | No          | Directory name | Display name for the skill. Lowercase letters, numbers, and hyphens only.                    |
+| `description`              | Recommended | —       | What the skill does and when to use it. The Droid uses this to decide when to apply the skill. |
+| `user-invocable`           | No          | `true`  | Set to `false` to hide from the `/` slash command menu. Use for background knowledge users shouldn't invoke directly. |
+| `disable-model-invocation` | No          | `false` | Set to `true` to prevent the Droid from automatically loading this skill. Use for workflows you want to trigger manually with `/skill-name`. |
+
+## Control who invokes a skill
+
+By default, both you and the Droid can invoke any skill. You can type `/skill-name` to invoke it directly, and the Droid can load it automatically when relevant to your conversation. Two frontmatter fields let you restrict this:
+
+- **`disable-model-invocation: true`**: Only you can invoke the skill. Use this for workflows with side effects or that you want to control timing, like `/deploy` or `/send-notification`. You don't want the Droid deciding to deploy because your code looks ready.
+
+- **`user-invocable: false`**: Only the Droid can invoke the skill. Use this for background knowledge that isn't actionable as a command. A `legacy-system-context` skill explains how an old system works. The Droid should know this when relevant, but `/legacy-system-context` isn't a meaningful action for users to take.
+
+### Examples
+
+**Deploy skill (user-only):**
+
+```yaml
+---
+name: deploy
+description: Deploy the application to production
+disable-model-invocation: true
+---
+
+Deploy $ARGUMENTS to production:
+
+1. Run the test suite
+2. Build the application  
+3. Push to the deployment target
+4. Verify the deployment succeeded
+```
+
+**Background context (Droid-only):**
+
+```yaml
+---
+name: legacy-api-context
+description: Context about our legacy REST API patterns
+user-invocable: false
+---
+
+When working with the legacy API in `src/api/v1/`:
+- All endpoints use XML responses (not JSON)
+- Authentication uses custom headers, not OAuth
+- Rate limiting is handled at the nginx layer
+```
+
+### Invocation summary
+
+| Frontmatter                      | User can `/invoke` | Droid can invoke |
+| :------------------------------- | :----------------- | :--------------- |
+| (default)                        | Yes                | Yes              |
+| `disable-model-invocation: true` | Yes                | No               |
+| `user-invocable: false`          | No                 | Yes              |
+
 ## Quickstart
 
 <Steps>
@@ -124,12 +200,13 @@ Project skills are the primary way to share and standardize capabilities inside 
 Skills sit alongside other ways of shaping Droid behavior:
 
 - **Custom droids** – define *which* model and tools to use and at what autonomy level; they are full agent configurations.
-- **Custom slash commands** – are **user-invoked** macros you call explicitly (e.g., `/review-pr`); they don’t automatically trigger based on the task.
+- **Legacy slash commands** (`.factory/commands/`) – user-invoked macros that still work but are now superseded by skills. Skills offer the same `/command` functionality plus optional Droid invocation and supporting files.
 - **MCP servers** – expose external systems (APIs, databases, SaaS tools) as tools; they are about *connecting* resources, not encoding your workflow.
 
 Skills are different because they:
 
 - Package **how work should be done** (your engineering playbook) as reusable capabilities.
+- Support **flexible invocation** – both you (via `/skill-name`) and the Droid can trigger them, with [fine-grained control](#control-who-invokes-a-skill) over who can invoke what.
 - Are **discoverable and composable** – the Droid can chain multiple skills inside a plan.
 - Can sit on top of tools, custom droids, and MCP servers to orchestrate them safely.
 
