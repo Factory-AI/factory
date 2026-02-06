@@ -1,0 +1,308 @@
+---
+title: "Part 5: Data Migrations"
+description: Schema mapping, transformation scripts, validation queries, and coordinating cutovers.
+keywords: ['migration', 'schema', 'validation', 'cutover', 'etl']
+---
+
+The final frontier: moving data between systems. Database migrations, warehouse consolidation, table restructuring.
+
+These projects are traditionally painful. Schema mapping, data validation, handling edge cases, coordinating cutovers. Agents don't eliminate the complexity, but they dramatically speed up the tedious parts.
+
+## The Migration Pattern
+
+Most migrations follow a pattern:
+
+1. **Map** the source schema to the target
+2. **Transform** data to fit the new shape
+3. **Validate** that nothing was lost or corrupted
+4. **Cutover** to the new system
+5. **Clean up** the old one
+
+Agents can help with each step.
+
+## Schema Mapping
+
+Say you're migrating between databases (Postgres to Snowflake, MySQL to BigQuery, on-prem to cloud, or even just restructuring within the same warehouse). First step is understanding both schemas:
+
+```
+You: Compare the schema of our source 'users' table with our 
+target 'dim_users' table. Identify any fields that exist in 
+one but not the other. Note any type mismatches.
+```
+
+The agent queries both systems:
+
+```
+Agent: Here's the comparison:
+
+Fields in source only:
+- legacy_id (integer) - appears to be an old ID system
+- phone_number (varchar) - not in target
+
+Fields in target only:  
+- user_id (string) - using new ID format
+- enrichment_data (struct/json) - added from analytics pipeline
+
+Type mismatches:
+- created_at: timestamp vs datetime
+- preferences: jsonb vs string
+
+The legacy_id field maps to user_id via a lookup table 
+'legacy_user_mapping'.
+```
+
+This gives you a clear picture of what needs to happen.
+
+## Transformation Scripts
+
+Once you know the mapping, the agent can generate transformation logic:
+
+```
+You: Generate a transformation model that migrates the source users 
+data to match our target dim_users schema. Handle the legacy_id to 
+user_id mapping and convert the preferences field appropriately.
+```
+
+```sql
+-- models/migrations/mig_users_source_to_target.sql
+{{
+    config(
+        materialized='table',
+        tags=['migration', 'one-time']
+    )
+}}
+
+with source_users as (
+    select * from {{ source('source_export', 'users') }}
+),
+
+id_mapping as (
+    select * from {{ source('source_export', 'legacy_user_mapping') }}
+),
+
+transformed as (
+    select
+        m.new_user_id as user_id,
+        p.email,
+        p.name,
+        cast(p.created_at as datetime) as created_at,
+        -- JSON conversion syntax varies by warehouse
+        cast(p.preferences as string) as preferences,
+        -- Fields not in source, will be enriched later
+        null as enrichment_data
+    from source_users p
+    left join id_mapping m on p.legacy_id = m.legacy_id
+)
+
+select * from transformed
+```
+
+## Validation Queries
+
+Before cutting over, you need confidence that the migration worked:
+
+```
+You: Generate validation queries that compare row counts, null rates, 
+and sample values between source and target.
+```
+
+```sql
+-- Validation 1: Row counts
+SELECT 'source' as system, COUNT(*) as row_count 
+FROM source_export.users
+UNION ALL
+SELECT 'target', COUNT(*) 
+FROM analytics.dim_users;
+
+-- Validation 2: Null rates for key fields
+SELECT 
+  'source' as system,
+  SUM(CASE WHEN email IS NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as email_null_rate,
+  SUM(CASE WHEN created_at IS NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as created_null_rate
+FROM source_export.users
+UNION ALL
+SELECT 
+  'target',
+  SUM(CASE WHEN email IS NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*),
+  SUM(CASE WHEN created_at IS NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*)
+FROM analytics.dim_users;
+
+-- Validation 3: Sample comparison
+SELECT 
+  s.legacy_id,
+  s.email as source_email,
+  t.email as target_email,
+  s.email = t.email as email_matches
+FROM source_export.users s
+JOIN analytics.dim_users t 
+  ON s.legacy_id = (SELECT legacy_id FROM source_export.legacy_user_mapping WHERE new_user_id = t.user_id)
+LIMIT 100;
+```
+
+The agent can run these and interpret results:
+
+```
+Agent: Validation results:
+
+✅ Row counts match: 167,432 in both
+✅ Email null rate: 0.02% in both
+⚠️ Created_at null rate: 0.00% (source) vs 0.01% (target) - 12 records
+
+The 12 records with null created_at in target are users with 
+invalid timestamps in source (year 0001). I can show you 
+those records if you want to handle them specially.
+```
+
+## Handling Edge Cases
+
+Migrations always surface weird data. The agent can help investigate:
+
+```
+You: Show me those 12 users with invalid created_at timestamps. 
+What's special about them?
+```
+
+```
+Agent: Here they are:
+
+| legacy_id | email              | created_at (pg)    |
+|-----------|--------------------|--------------------|
+| 8234      | test1@example.com  | 0001-01-01 00:00   |
+| 8235      | test2@example.com  | 0001-01-01 00:00   |
+...
+
+These all have emails containing "test" or "example.com" and 
+were created in a single batch on 2019-03-15. They appear to 
+be test accounts from the early days. The invalid timestamp 
+was probably a default value in the old system.
+
+Recommendation: Set their created_at to the batch creation 
+date (2019-03-15) or exclude them if they're pure test data.
+```
+
+## Coordinating Cutovers
+
+The scariest part of migration is the cutover. The agent can help plan:
+
+```
+You: Generate a cutover checklist for switching from the source 
+users table to the target dim_users. Include rollback steps.
+```
+
+<Steps>
+  <Step title="Pre-cutover (T-1 day)">
+    - Final validation queries pass
+    - All downstream consumers identified
+    - Rollback procedure tested
+    - On-call team notified
+  </Step>
+  <Step title="Cutover (T-0)">
+    - Stop writes to source users table
+    - Run final incremental sync
+    - Validate row counts match
+    - Update application connection strings
+    - Deploy application changes
+    - Monitor error rates for 30 minutes
+    - Confirm queries hitting new table
+  </Step>
+  <Step title="Rollback (if needed)">
+    - Revert application connection strings
+    - Deploy rollback application changes
+    - Verify queries hitting source
+    - Document what went wrong
+  </Step>
+  <Step title="Post-cutover (T+1 week)">
+    - Confirm no queries hitting old table
+    - Archive source users table
+    - Update documentation
+    - Close migration ticket
+  </Step>
+</Steps>
+
+## Table Restructuring
+
+Sometimes you're not migrating between systems, just reorganizing within one.
+
+```
+You: Our dim_organizations table has gotten bloated. Split it into 
+dim_organizations (core fields only) and fct_org_metrics (the 
+computed metrics). Show me how the dependent models need to change.
+```
+
+The agent can:
+1. Identify which fields are "core" vs "computed"
+2. Generate the two new models
+3. Find all models that reference dim_organizations
+4. Generate the SQL changes needed for each
+5. Suggest an order of operations that minimizes breakage
+
+This kind of refactoring used to be a multi-day project. With agent assistance, it's a few hours of review and testing.
+
+## Migration Best Practices
+
+<AccordionGroup>
+  <Accordion title="Never delete source data immediately">
+    Keep the old table around for at least a month after cutover. You'll be glad you did.
+  </Accordion>
+  
+  <Accordion title="Use feature flags for consumers">
+    If applications read from the table:
+    ```python
+    if feature_flags.use_new_users_table:
+        query = "SELECT * FROM analytics.dim_users"
+    else:
+        query = "SELECT * FROM postgres.users"
+    ```
+    This lets you roll back without deploying code.
+  </Accordion>
+  
+  <Accordion title="Migrate incrementally when possible">
+    Instead of big-bang migrations:
+    1. Set up continuous sync from old to new
+    2. Migrate readers one at a time
+    3. Once all readers migrated, stop writing to old
+    4. Clean up
+  </Accordion>
+  
+  <Accordion title="Document everything">
+    Future you will not remember why you made certain decisions:
+    ```markdown
+    ## Migration Notes: users table (2025-01)
+
+    ### Why we migrated
+    Source users table was 50GB and growing. Queries were slow.
+    Target warehouse gives us columnar storage and better analytics tooling.
+
+    ### Decisions made
+    - Dropped phone_number field (unused, only 2% populated)
+    - Converted legacy_id to new user_id format
+    - Invalid timestamps set to 2019-03-15 (batch creation date)
+
+    ### Known issues
+    - 3 duplicate emails exist (test accounts, left as-is)
+    - enrichment_data field populated async, may be null for new users
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Closing Thoughts
+
+We've covered a lot of ground: building data access layers, doing ad-hoc analysis, creating repeated reports, building pipelines, and running migrations.
+
+The common thread is that agents change the economics of data work. Things that used to require specialized knowledge or significant time investment become accessible to anyone who can describe what they want.
+
+This doesn't eliminate the need for data expertise. Someone still needs to design the schema, understand the business logic, and catch mistakes. But it dramatically lowers the barrier to getting work done.
+
+### The Practical Advice
+
+1. **Start with access.** Get your agent connected to your data warehouse. Make sure it can run queries.
+
+2. **Encode your knowledge.** Build an AGENTS.md that captures your schema conventions and common pitfalls. Add to it every time something goes wrong.
+
+3. **Use skills for depth.** When you have complex domains (billing, timezones, specific pipelines), create focused documentation that the agent can load when relevant.
+
+4. **Let the agent iterate.** Don't try to specify everything upfront. Describe what you want, see what you get, refine. The feedback loop is fast.
+
+5. **Compound your learnings.** Every mistake the agent makes should become a permanent lesson in your documentation. This is how the system gets better over time.
+
+The tools will keep improving. But the patterns in this series should remain useful: give agents access, teach them your domain, and let them help you move faster.
