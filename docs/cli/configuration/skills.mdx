@@ -129,40 +129,6 @@ By default, both you and the Droid can invoke any skill. You can type `/skill-na
 
 - **`user-invocable: false`**: Only the Droid can invoke the skill. Use this for background knowledge that isn't actionable as a command. A `legacy-system-context` skill explains how an old system works. The Droid should know this when relevant, but `/legacy-system-context` isn't a meaningful action for users to take.
 
-### Examples
-
-**Deploy skill (user-only):**
-
-```yaml
----
-name: deploy
-description: Deploy the application to production
-disable-model-invocation: true
----
-
-Deploy $ARGUMENTS to production:
-
-1. Run the test suite
-2. Build the application  
-3. Push to the deployment target
-4. Verify the deployment succeeded
-```
-
-**Background context (Droid-only):**
-
-```yaml
----
-name: legacy-api-context
-description: Context about our legacy REST API patterns
-user-invocable: false
----
-
-When working with the legacy API in `src/api/v1/`:
-- All endpoints use XML responses (not JSON)
-- Authentication uses custom headers, not OAuth
-- Rate limiting is handled at the nginx layer
-```
-
 ### Invocation summary
 
 | Frontmatter                      | User can `/invoke` | Droid can invoke |
