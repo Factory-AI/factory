@@ -1,0 +1,73 @@
+---
+title: Cloud Templates – Setup Script
+description: Configure a setup script to run during template creation
+---
+
+The setup script is a shell script that Factory runs during template creation, after your repository is cloned and before the template is activated. Use this feature to set up your template and give droid tools to work with your codebase.
+
+## 1. How to define a setup script
+
+1. In the modal for template creation, in the "Setup Script (Optional)" section, add your initialization script. You can write a multi-line bash script with all the commands you need.
+2. Submit. The script runs in the repo root with bash strict mode (consider using `set -euo pipefail` at the start of your script). Script failures will stop the build.
+3. Keep your script non‑interactive and idempotent. Write commands that can be safely re-run.
+4. Review build logs if anything fails to see detailed output from your script execution.
+
+Examples:
+
+**Node.js (Next.js):**
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+npm ci
+npm run build
+```
+
+**PNPM monorepo:**
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+pnpm -w i
+pnpm -w build
+```
+
+**Python:**
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+pip install -r requirements.txt
+pytest -q
+```
+
+**Multi-language project:**
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Install Node.js dependencies
+npm ci
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run setup script
+bash ./scripts/setup.sh
+```
+
+What happens under the hood:
+- The script executes after repository cloning, inside the build container at the repo root.
+- Environment variables specified in template settings are available during script execution.
+- Errors are surfaced clearly (e.g., `Setup script failed: ...`) for quick fixes.
+
+## 2. Troubleshooting Tips
+
+| Issue | Fix |
+|---|---|
+| Setup fails with "Setup script failed: …" | Check the build logs for specific error messages. Run the script locally to debug, add error handling, use non‑interactive flags (e.g., `-y`), then retry. |
+| Command not found | Install required tools earlier in your script or ensure they're available in the base Ubuntu image. |
+| Permission denied (scripts) | Make scripts executable (`chmod +x ./scripts/setup.sh`) or invoke via interpreter (`bash ./scripts/setup.sh`). |
+| Env var not found | Add it in Environment Variables section and reference as `$VAR`. Avoid echoing secrets in your script. |
+| Long builds | Keep your script minimal; prefer cached installs (`npm ci` over `npm install`); avoid heavy, non‑essential work. |
+| Path/file not found | Scripts run at the repo root. Verify relative paths and that files exist after clone. |

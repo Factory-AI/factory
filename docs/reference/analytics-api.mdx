@@ -1,0 +1,697 @@
+---
+title: Analytics API
+description: REST API for organization-level usage metrics, token consumption, tool usage, and productivity analytics.
+keywords:
+  [
+    "api",
+    "analytics",
+    "usage metrics",
+    "tokens",
+    "activity",
+    "productivity",
+    "rest api",
+  ]
+---
+
+The Analytics API provides programmatic access to organization-level usage data for Factory. Query token consumption, tool invocations, user activity, and productivity metrics across your entire organization.
+
+---
+
+## Quick Start
+
+```bash
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
+```
+
+---
+
+## Authentication
+
+All requests require a Factory API key in the `Authorization` header:
+
+```bash
+Authorization: Bearer fk-your-api-key
+```
+
+Generate API keys at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys).
+
+### Permissions
+
+Only users with **Manager** or **Owner** roles can access the Analytics API. Members and guests will receive a `403` error.
+
+---
+
+## Base URL
+
+```
+https://api.factory.ai/api/v1/analytics
+```
+
+---
+
+## Response Format
+
+All responses follow a consistent envelope structure:
+
+```json
+{
+  "data": [ ... ],
+  "meta": { ... }
+}
+```
+
+| Field  | Type   | Description                                                    |
+| :----- | :----- | :------------------------------------------------------------- |
+| `data` | array  | Array of result objects (one per day, or per group when using `group_by`) |
+| `meta` | object | Request metadata: `org_id`, `start_date`, `end_date`, and pagination info for `/users` |
+
+---
+
+## Endpoints
+
+The Analytics API provides five endpoints, each focused on a specific category of metrics:
+
+| Endpoint         | Description                           |
+| :--------------- | :------------------------------------ |
+| `/tokens`        | Token consumption by model and user   |
+| `/tools`         | Tool invocations and autonomy metrics |
+| `/activity`      | Daily, weekly, and monthly active users |
+| `/productivity`  | File operations and git activity      |
+| `/users`         | Per-user metrics with pagination      |
+
+---
+
+## Understanding `group_by`
+
+Several endpoints support a `group_by` parameter. Here's how it works:
+
+- **Without `group_by`**: Returns one row per day with nested breakdowns (e.g., `by_model`, `by_tool`, `daily_active_users_by_client`). Use this when you want all dimensions in a single response.
+
+- **With `group_by`**: Flattens one of those nested arrays into separate rows. Each row has a `group_key` field identifying the dimension value. Use this when piping data into tools that expect flat rows (spreadsheets, BI tools, time-series databases).
+
+For example, `/activity` without `group_by` returns `daily_active_users_by_client` as an object. With `group_by=client`, you get separate rows for `terminal-ui`, `web`, and `non-interactive-cli` - useful for plotting each client type as its own line on a chart.
+
+---
+
+## Token Usage
+
+Returns daily token consumption across your organization.
+
+```
+GET /tokens
+```
+
+### Query Parameters
+
+| Parameter   | Type   | Required | Description                                    |
+| :---------- | :----- | :------- | :--------------------------------------------- |
+| `startDate` | string | Yes      | Start date in `YYYY-MM-DD` format              |
+| `endDate`   | string | Yes      | End date in `YYYY-MM-DD` format                |
+| `group_by`  | string | No       | Set to `model` to group results by model       |
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "date": "2026-01-15",
+      "billable_tokens": 1250000,
+      "input_tokens": 980000,
+      "output_tokens": 270000,
+      "cache_read_tokens": 150000,
+      "cache_write_tokens": 45000,
+      "by_model": [
+        {
+          "model_id": "claude-sonnet-4-20250514",
+          "model_tier": "standard",
+          "billable_tokens": 800000,
+          "input_tokens": 620000,
+          "output_tokens": 180000
+        }
+      ],
+      "by_user": [
+        {
+          "user_id": "user_01HPMQ7NXKHM7Y7PR3TTZY3JZS",
+          "user_email": "developer@company.com",
+          "billable_tokens": 450000,
+          "by_model": [...]
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "org_id": "org_01HPMQ6ABCDE...",
+    "start_date": "2026-01-15",
+    "end_date": "2026-01-15"
+  }
+}
+```
+
+### Response Fields
+
+| Field               | Type   | Description                                              |
+| :------------------ | :----- | :------------------------------------------------------- |
+| `date`              | string | Date in `YYYY-MM-DD` format                              |
+| `billable_tokens`   | number | Total billable tokens (input + output, with cache discounts) |
+| `input_tokens`      | number | Raw input tokens sent to model                           |
+| `output_tokens`     | number | Tokens generated by model                                |
+| `cache_read_tokens` | number | Tokens read from prompt cache                            |
+| `cache_write_tokens`| number | Tokens written to prompt cache                           |
+| `by_model`          | array  | Breakdown per model                                      |
+| `by_user`           | array  | Breakdown per user                                       |
+
+### Grouped Response
+
+When `group_by=model`, returns one row per model per day inside `data`:
+
+```json
+{
+  "data": [
+    {
+      "date": "2026-01-15",
+      "group_key": "claude-sonnet-4-20250514",
+      "billable_tokens": 800000,
+      "input_tokens": 620000,
+      "output_tokens": 180000
+    },
+    {
+      "date": "2026-01-15",
+      "group_key": "claude-opus-4-20250514",
+      "billable_tokens": 450000,
+      "input_tokens": 360000,
+      "output_tokens": 90000
+    }
+  ],
+  "meta": {
+    "org_id": "org_01HPMQ6ABCDE...",
+    "start_date": "2026-01-15",
+    "end_date": "2026-01-15"
+  }
+}
+```
+
+### Example
+
+```bash
+# Token usage for a date range
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
+
+# Grouped by model
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-15&endDate=2026-01-15&group_by=model"
+```
+
+---
+
+## Tool Usage
+
+Returns daily tool invocations, MCP usage, skills, slash commands, and autonomy metrics.
+
+```
+GET /tools
+```
+
+### Query Parameters
+
+| Parameter   | Type   | Required | Description                                      |
+| :---------- | :----- | :------- | :----------------------------------------------- |
+| `startDate` | string | Yes      | Start date in `YYYY-MM-DD` format                |
+| `endDate`   | string | Yes      | End date in `YYYY-MM-DD` format                  |
+| `group_by`  | string | No       | Set to `tool_name` to group results by tool      |
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "date": "2026-01-15",
+      "tool_calls": 45000,
+      "by_tool": [
+        { "tool": "Read", "invocations": 12500 },
+        { "tool": "Edit", "invocations": 8200 },
+        { "tool": "Execute", "invocations": 6100 }
+      ],
+      "mcp_users_with_mcp": 42,
+      "mcp_by_server": [
+        { "server": "github", "invocations": 1200 },
+        { "server": "notion", "invocations": 850 }
+      ],
+      "skills_invocations": 320,
+      "skills_by_name": [
+        { "name": "browser", "count": 180 },
+        { "name": "frontend-ui", "count": 95 }
+      ],
+      "slash_commands_invocations": 1500,
+      "slash_commands_by_name": [
+        { "name": "review", "count": 420 },
+        { "name": "test", "count": 380 }
+      ],
+      "hooks_invocations": 2800,
+      "hooks_by_event": [
+        { "event": "PostToolUse", "matcher": "*.ts", "command": "eslint --fix", "count": 1200 }
+      ],
+      "web_users": 42,
+      "autonomy_ratio_avg": 8.5,
+      "autonomy_ratio_p50": 6.2,
+      "autonomy_ratio_p90": 18.4,
+      "tool_calls_per_session_avg": 45.2,
+      "user_turns_per_session_avg": 5.3,
+      "tool_autonomy_level_ratio": {
+        "auto_high": 0.35,
+        "auto_medium": 0.42,
+        "auto_low": 0.18,
+        "manual": 0.05
+      }
+    }
+  ],
+  "meta": {
+    "org_id": "org_01HPMQ6ABCDE...",
+    "start_date": "2026-01-15",
+    "end_date": "2026-01-15"
+  }
+}
+```
+
+### Response Fields
+
+| Field                        | Type   | Description                                    |
+| :--------------------------- | :----- | :--------------------------------------------- |
+| `date`                       | string | Date in `YYYY-MM-DD` format                    |
+| `tool_calls`                 | number | Total tool invocations                         |
+| `by_tool`                    | array  | Breakdown by tool name                         |
+| `mcp_users_with_mcp`         | number | Users who used MCP servers                     |
+| `mcp_by_server`              | array  | Invocations per MCP server                     |
+| `skills_invocations`         | number | Total skill activations                        |
+| `skills_by_name`             | array  | Breakdown by skill                             |
+| `slash_commands_invocations` | number | Total slash command uses                       |
+| `slash_commands_by_name`     | array  | Breakdown by command                           |
+| `hooks_invocations`          | number | Total hook executions                          |
+| `hooks_by_event`             | array  | Breakdown by event type                        |
+| `web_users`                  | number | Users who used web/workspace interface         |
+| `autonomy_ratio_avg`         | number | Average tool calls per user turn               |
+| `autonomy_ratio_p50`         | number | Median autonomy ratio                          |
+| `autonomy_ratio_p90`         | number | 90th percentile autonomy ratio                 |
+| `tool_calls_per_session_avg` | number | Average tool calls per session                 |
+| `user_turns_per_session_avg` | number | Average user messages per session              |
+| `tool_autonomy_level_ratio`  | object | Distribution of autonomy levels                |
+
+### Grouped Response
+
+When `group_by=tool_name`, returns one row per tool per day inside `data`:
+
+```json
+{
+  "data": [
+    {
+      "date": "2026-01-15",
+      "group_key": "Read",
+      "tool_calls": 12500
+    },
+    {
+      "date": "2026-01-15",
+      "group_key": "Edit",
+      "tool_calls": 8200
+    }
+  ],
+  "meta": {
+    "org_id": "org_01HPMQ6ABCDE...",
+    "start_date": "2026-01-15",
+    "end_date": "2026-01-15"
+  }
+}
+```
+
+---
+
+## User Activity
+
+Returns daily, weekly, and monthly active users along with session counts.
+
+```
+GET /activity
+```
+
+### Query Parameters
+
+| Parameter   | Type   | Required | Description                                       |
+| :---------- | :----- | :------- | :------------------------------------------------ |
+| `startDate` | string | Yes      | Start date in `YYYY-MM-DD` format                 |
+| `endDate`   | string | Yes      | End date in `YYYY-MM-DD` format                   |
+| `group_by`  | string | No       | Set to `client` to group by client type           |
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "date": "2026-01-15",
+      "daily_active_users": 128,
+      "weekly_active_users": 312,
+      "monthly_active_users": 485,
+      "daily_active_users_by_client": {
+        "terminal-ui": 95,
+        "web": 42,
+        "non-interactive-cli": 18
+      },
+      "sessions": 890,
+      "messages": 12500,
+      "user_messages": 4200
+    }
+  ],
+  "meta": {
+    "org_id": "org_01HPMQ6ABCDE...",
+    "start_date": "2026-01-15",
+    "end_date": "2026-01-15"
+  }
+}
+```
+
+### Response Fields
+
+| Field                          | Type   | Description                           |
+| :----------------------------- | :----- | :------------------------------------ |
+| `date`                         | string | Date in `YYYY-MM-DD` format           |
+| `daily_active_users`           | number | Unique users on this day              |
+| `weekly_active_users`          | number | Unique users in trailing 7 days       |
+| `monthly_active_users`         | number | Unique users in trailing 30 days      |
+| `daily_active_users_by_client` | object | DAU breakdown by client type          |
+| `sessions`                     | number | Total sessions started                |
+| `messages`                     | number | Total messages (user + assistant)     |
+| `user_messages`                | number | Messages from users only              |
+
+### Client Types
+
+| Client               | Description                              |
+| :------------------- | :--------------------------------------- |
+| `terminal-ui`        | Interactive CLI sessions                 |
+| `web`                | Factory web interface                    |
+| `non-interactive-cli`| Headless/automated CLI (`droid exec`)    |
+
+### Grouped Response
+
+When `group_by=client`, returns one row per client type per day inside `data`:
+
+```json
+{
+  "data": [
+    {
+      "date": "2026-01-15",
+      "group_key": "terminal-ui",
+      "daily_active_users": 95
+    },
+    {
+      "date": "2026-01-15",
+      "group_key": "web",
+      "daily_active_users": 42
+    }
+  ],
+  "meta": {
+    "org_id": "org_01HPMQ6ABCDE...",
+    "start_date": "2026-01-15",
+    "end_date": "2026-01-15"
+  }
+}
+```
+
+---
+
+## Productivity
+
+Returns daily file operations and git activity.
+
+```
+GET /productivity
+```
+
+### Query Parameters
+
+| Parameter   | Type   | Required | Description                       |
+| :---------- | :----- | :------- | :-------------------------------- |
+| `startDate` | string | Yes      | Start date in `YYYY-MM-DD` format |
+| `endDate`   | string | Yes      | End date in `YYYY-MM-DD` format   |
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "date": "2026-01-15",
+      "files_created": 245,
+      "files_edited": 1820,
+      "by_extension": [
+        { "extension": ".ts", "count": 890 },
+        { "extension": ".tsx", "count": 420 },
+        { "extension": ".py", "count": 310 }
+      ],
+      "by_language": [
+        { "language": "TypeScript", "count": 1310 },
+        { "language": "Python", "count": 310 }
+      ],
+      "git_commits": 156,
+      "git_prs_created": 42
+    }
+  ],
+  "meta": {
+    "org_id": "org_01HPMQ6ABCDE...",
+    "start_date": "2026-01-15",
+    "end_date": "2026-01-15"
+  }
+}
+```
+
+### Response Fields
+
+| Field             | Type   | Description                          |
+| :---------------- | :----- | :----------------------------------- |
+| `date`            | string | Date in `YYYY-MM-DD` format          |
+| `files_created`   | number | New files created by agent           |
+| `files_edited`    | number | Existing files modified by agent     |
+| `by_extension`    | array  | Operations per file extension        |
+| `by_language`     | array  | Operations per programming language  |
+| `git_commits`     | number | Commits made via agent               |
+| `git_prs_created` | number | Pull requests created via agent      |
+
+---
+
+## Per-User Metrics
+
+Returns detailed metrics per user with cursor-based pagination.
+
+```
+GET /users
+```
+
+### Query Parameters
+
+| Parameter   | Type   | Required | Description                                     |
+| :---------- | :----- | :------- | :---------------------------------------------- |
+| `startDate` | string | Yes      | Start date in `YYYY-MM-DD` format               |
+| `endDate`   | string | Yes      | End date in `YYYY-MM-DD` format                 |
+| `limit`     | number | No       | Users per page, 1-100 (default: 20)             |
+| `cursor`    | string | No       | User ID for pagination (from `next_cursor`)     |
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "user_id": "user_01HPMQ7NXKHM7Y7PR3TTZY3JZS",
+      "user_email": "developer@company.com",
+      "date": "2026-01-15",
+      "tool_calls": 1250,
+      "billable_tokens": 450000,
+      "primary_model": "claude-sonnet-4-20250514",
+      "primary_model_tier": "standard",
+      "files_created": 12,
+      "files_edited": 85,
+      "git_commits": 8,
+      "git_prs_created": 2,
+      "mcp_calls": 45,
+      "skill_calls": 8,
+      "slash_commands": 22,
+      "hooks": 120,
+      "sessions": 15,
+      "messages": 180,
+      "user_messages": 62,
+      "assistant_messages": 118,
+      "autonomy_ratio": 9.2,
+      "delegation_level": "auto-high",
+      "languages": ["TypeScript", "Python", "Go"]
+    }
+  ],
+  "meta": {
+    "org_id": "org_01HPMQ6ABCDE...",
+    "start_date": "2026-01-15",
+    "end_date": "2026-01-15",
+    "has_more": true,
+    "next_cursor": "user_01HPMQ8ABCDE7Y7PR3TTZY4KLM"
+  }
+}
+```
+
+### Response Fields
+
+| Field               | Type   | Description                                |
+| :------------------ | :----- | :----------------------------------------- |
+| `user_id`           | string | Unique user identifier                     |
+| `user_email`        | string \| null | User email                        |
+| `date`              | string | Date in `YYYY-MM-DD` format                |
+| `tool_calls`        | number | Tool invocations by this user              |
+| `billable_tokens`   | number | Tokens consumed by this user               |
+| `primary_model`     | string | Most-used model                            |
+| `primary_model_tier`| string | Model tier (`standard` or `thinking`)      |
+| `files_created`     | number | Files created                              |
+| `files_edited`      | number | Files edited                               |
+| `git_commits`       | number | Commits made                               |
+| `git_prs_created`   | number | Pull requests created                      |
+| `mcp_calls`         | number | MCP tool invocations                       |
+| `skill_calls`       | number | Skill activations                          |
+| `slash_commands`    | number | Slash command uses                         |
+| `hooks`             | number | Hook executions                            |
+| `sessions`          | number | Sessions started                           |
+| `messages`          | number | Total messages                             |
+| `user_messages`     | number | User messages only                         |
+| `assistant_messages`| number | Assistant messages                         |
+| `autonomy_ratio`    | number | Tool calls per user turn                   |
+| `delegation_level`  | string | Primary autonomy mode                      |
+| `languages`         | array  | Programming languages worked in            |
+
+### Delegation Levels
+
+| Level         | Description                                        |
+| :------------ | :------------------------------------------------- |
+| `auto-high`   | Maximum autonomy, minimal confirmations            |
+| `auto-medium` | Balanced autonomy with some confirmations          |
+| `auto-low`    | Limited autonomy, frequent confirmations           |
+| `spec`        | Specification mode, planning before execution      |
+| `manual`      | Full manual control, confirm each action           |
+
+### Pagination
+
+Use cursor-based pagination to iterate through users:
+
+```bash
+# First page
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=50"
+
+# Next page
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=50&cursor=user_01HPMQ8ABCDE7Y7PR3TTZY4KLM"
+```
+
+---
+
+## Important Constraints
+
+### Date Requirements
+
+- **Format**: All dates must be `YYYY-MM-DD`
+- **Timezone**: UTC only (no timezone parameter)
+- **Data availability**: Data is available through yesterday (UTC). Requesting today's date returns a `400` error.
+- **Historical data**: Available from January 14, 2026
+
+### Rate Limits
+
+Rate limits vary by plan. [Contact us](mailto:support@factory.ai) for specifics or if you need higher limits for dashboard or automation use cases.
+
+---
+
+## Error Handling
+
+The API returns standard HTTP status codes:
+
+| Status | Description                                          |
+| :----- | :--------------------------------------------------- |
+| `400`  | Invalid date format, today's date requested, or limit out of range |
+| `401`  | Missing or invalid API key                           |
+| `403`  | Insufficient permissions (requires Manager or Owner role) |
+| `500`  | Internal error                                       |
+
+### Error Response Format
+
+```json
+{
+  "title": "Bad Request",
+  "detail": "Cannot query today's date - analytics data has a 24-hour lag",
+  "status": 400,
+  "requestId": "req_01HPMQ9WXYZ..."
+}
+```
+
+---
+
+## Data Pipeline
+
+Analytics data flows through the following pipeline:
+
+```
+CLI/Daemon → OTEL Events → BigQuery (raw) → dbt models → API
+```
+
+- **Source**: OpenTelemetry spans from the CLI and daemon
+- **Processing**: Daily batch aggregation via dbt
+- **Availability**: Data is available the day after it's generated
+
+---
+
+## Data Quality Notes
+
+<Note>
+A few known data quality considerations:
+
+- **MCP server names**: Some duplicates exist due to case sensitivity (e.g., `axiom` vs `Axiom`)
+- **Tool names**: Approximately 0.006% of entries contain parsing artifacts
+- **User counts**: A user active on multiple clients counts once in DAU but appears in each client breakdown
+</Note>
+
+---
+
+## Use Cases
+
+### Cost Monitoring Dashboard
+
+Track token consumption trends and identify cost drivers:
+
+```bash
+# Daily token usage for the month
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
+```
+
+### Adoption Tracking
+
+Monitor DAU/WAU/MAU and identify adoption patterns:
+
+```bash
+# Activity metrics with client breakdown
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/activity?startDate=2026-01-14&endDate=2026-01-28&group_by=client"
+```
+
+### Team Productivity Reports
+
+Measure output and efficiency:
+
+```bash
+# Productivity metrics
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/productivity?startDate=2026-01-14&endDate=2026-01-28"
+```
+
+### Individual Performance
+
+Export per-user metrics for team leads:
+
+```bash
+# Paginate through all users
+curl -H "Authorization: Bearer $FACTORY_API_KEY" \
+  "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=100"
+```
