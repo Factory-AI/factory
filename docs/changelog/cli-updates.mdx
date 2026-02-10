@@ -4,6 +4,281 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="February 9" rss={{ title: "CLI Updates", description: "Skills UX overhaul, terminal tab titles, desktop notifications, and mobile experience" }}>
+  `v0.57.10`
+
+  ## New features
+
+  * **`/skills` UX overhaul** - Tabbed layout with pagination and a dedicated detail view for browsing and importing skills
+  * **Terminal tab titles** - Terminal tab now displays the session name so you can identify Droid sessions across multiple tabs
+  * **`droid update` command** - New command to manually update the CLI, plus ability to disable autoupdate via `/settings`
+  * **Session end hooks** - Hooks now fire when running `/clear` or `/new`, enabling custom cleanup workflows
+  * **Desktop notifications** - Native macOS and Windows notifications when sessions complete, with configurable preferences (app)
+  * **Desktop native view redesign** - Refreshed sidebar layout with smooth animations, new terminal editor icons, and keyboard shortcut formatting (app)
+  * **Mobile experience** - Overhauled mobile and responsive layout with touch-friendly settings and onboarding flows (app)
+
+  ## Bug fixes
+
+  * **`/bug` command memory** - Optimized log loading with streaming I/O to prevent out-of-memory on large log files
+  * **Session persistence** - Thinking and reasoning fields now preserved correctly when saving sessions
+  * **MCP settings UI** - Filled toggle style, clickable tool rows, and capitalized server names (app)
+  * **Git timeout** - Increased git timeout to 60 seconds to prevent failures on slow connections or large repos
+
+</Update>
+
+<Update label="February 7" rss={{ title: "CLI Updates", description: "Opus 4.6 Fast Mode and pricing update" }}>
+  `v0.57.9`
+
+  ## Improvements
+
+  * **Opus 4.6 Fast Mode** - Renamed from "Opus 4.6 Fast" to "Opus 4.6 Fast Mode" for clarity
+  * **Opus 4.6 Fast Mode promo pricing** - Updated token multiplier from 12x to 6x promotional rate
+
+</Update>
+
+<Update label="February 6" rss={{ title: "CLI Updates", description: "Opus 4.6 Fast, /fork command, session archiving, and org-managed settings" }}>
+  `v0.57.7`
+
+  ## New features
+
+  * **Claude Opus 4.6 Fast** - Added Opus 4.6 Fast as a new model option in the model selector
+  * **`/fork` command** - Duplicate your current session with all messages preserved into a new session
+  * **Org-managed settings** - Local settings that are set by your organization are now locked from editing
+  * **Session archiving** - Archive sessions from the web app to keep your sidebar clean (app)
+
+  ## Bug fixes
+
+  * **Shell environment loading** - Shell environment now loads consistently across desktop, sandbox, and computer platforms
+  * **Orphaned browser processes** - Agent-browser daemon processes are now cleaned up properly
+  * **Task tool output** - Progress updates from Task tool are now truncated to prevent UI overflow
+
+</Update>
+
+<Update label="February 5" rss={{ title: "CLI Updates", description: "Opus 4.6, semantic diffs, npm package, plugin hooks, and startup optimizations" }}>
+  `v0.57.5`
+
+  ## New features
+
+  * **Claude Opus 4.6** - Added Claude Opus 4.6 model support
+  * **Semantic structured diffs** - Code change diffs now use semantic structure-aware rendering for better readability
+  * **Plugin hooks** - Added support for plugin hooks with Claude hooks format compatibility
+  * **npm package** - CLI is now installable via npm: `npm install -g droid`
+  * **User-invocable skills as slash commands** - Custom skills marked as user-invocable are now registered as slash commands
+  * **`FACTORY_LOG_FILE` and `FACTORY_DISABLE_KEYRING` env vars** - New environment variables for log file output and keyring control
+  * **Enterprise Controls** - New settings page for managing agent behavior, command policy, model access, and security (app)
+  * **Skills UI** - Skills button and modal added to the chat input for easy skill access (app)
+  * **Ask User tool** - Ask User tool now available in the web and desktop apps (app)
+
+  ## Improvements
+
+  * **Startup latency** - Optimized CLI startup with sub-metric tracking for faster launch times
+
+  ## Bug fixes
+
+  * **Unicode crash** - Fixed CLI crash when sessions contain certain unicode characters
+  * **Marketplace auto-update** - Auto-update now only runs in interactive mode, not during `droid exec`
+
+</Update>
+
+<Update label="February 3" rss={{ title: "CLI Updates", description: "Task tool streaming, image pasting, and skills improvements" }}>
+  `v0.57.3`
+
+  ## New features
+
+  * **Task tool live streaming** - Real-time subagent tool progress display and Execute tool output streaming in web and desktop apps (app)
+  * **Image pasting** - Paste images directly into the chat composer (app)
+  * **`.agent` skills folders** - Skills can now be loaded from `.agent` folders in your project for custom skill support
+
+  ## Improvements
+
+  * **Skills filtering** - Skills are now filtered by model invocability so only relevant skills appear in the Skill tool
+
+  ## Bug fixes
+
+  * **File suggestion UX** - Trailing space now added after file suggestion selection for smoother typing
+
+</Update>
+
+<Update label="January 30" rss={{ title: "CLI Updates", description: "Full text search, MiniMax M2.1, and AskUser improvements" }}>
+  `v0.57.2`
+
+  ## New features
+
+  * **Full text search** - Search across your session history and codebase directly in the CLI
+  * **MiniMax M2.1** - Added MiniMax M2.1 model support
+
+  ## Bug fixes
+
+  * **AskUser tool** - Improved questionnaire parsing and interaction reliability
+
+</Update>
+
+<Update label="January 29" rss={{ title: "CLI Updates", description: "Plugin hooks and ASCII mermaid diagrams" }}>
+  `v0.57.0`
+
+  ## New features
+
+  * **ASCII mermaid diagrams** - Mermaid diagrams now render as ASCII art directly in the terminal
+
+</Update>
+
+<Update label="January 28" rss={{ title: "CLI Updates", description: "MCP tool management and Read tool fixes" }}>
+  `v0.56.1`
+
+  ## Improvements
+
+  * **MCP tool management** - Improved MCP tool status tracking to prevent cross-contamination between servers
+
+  ## Bug fixes
+
+  * **Read tool images** - Fixed image support in the Read tool, along with rate limit retry and reasoning fixes
+  * **Cache block limits** - Ensured no more than 3 cache blocks are sent to the LLM to prevent context issues
+
+</Update>
+
+<Update label="January 27" rss={{ title: "CLI Updates", description: "ACP daemon mode, lazy session loading, and model updates" }}>
+  `v0.56.0`
+
+  ## New features
+
+  * **ACP daemon mode** - New daemon mode for Agent Control Protocol enabling persistent background sessions with improved session loading
+  * **Lazy session loading** - Sessions now load messages lazily for faster startup when resuming large sessions
+  * **Dynamic default settings** - Settings now support dynamic defaults for better configuration flexibility
+
+  ## Improvements
+
+  * **Parallel context gathering** - Mission workers now encouraged to read all context files in parallel for faster startup
+
+  ## Bug fixes
+
+  * **MCP tool schema isolation** - Broken tool schemas in one MCP server no longer affect other MCP servers
+  * **Symlinked skill directories** - Fixed discovery of symlinked skill directories in `.factory/skills`
+  * **Windows spec mode UI** - Fixed spec mode UI and autonomy mode text rendering on Windows
+  * **AskUser parallel tool calling** - Fixed parallel tool calling with AskUser tool
+  * **Skills menu rendering** - Fixed skills menu to always render correctly
+  * **OpenAI custom model routing** - Fixed routing bug for OpenAI custom models
+  * **Linear remote delegation** - Fixed Linear remote delegation issues
+  * **Authentication atomic writes** - Auth writes now use atomic operations to prevent corruption
+  * **ACP session loading** - Fixed multiple issues with ACP session loading
+
+</Update>
+
+<Update label="January 23" rss={{ title: "CLI Updates", description: "Marketplace auto-updates and background processes flag" }}>
+  `v0.55.2`
+
+  ## New features
+
+  * **Marketplace auto-updates** - New management UI with auto-update setting and silent auto-installation of missing marketplaces on startup
+  * **`--allow-background-processes` flag** - Added flag support for interactive and resumed sessions
+
+  ## Bug fixes
+
+  * **AskUser tool parsing** - Improved parsing logic for questionnaire formatting
+
+</Update>
+
+<Update label="January 22" rss={{ title: "CLI Updates", description: "OTEL tracing, bug reporting improvements, and review command fixes" }}>
+  `v0.55.1`
+
+  ## New features
+
+  * **OpenTelemetry tracing** - Implemented OTEL tracing for the CLI to improve observability and debugging
+  * **Mandatory bug report titles** - Added title requirement for `/bug` reporting to ensure clearer issue tracking
+
+  ## Bug fixes
+
+  * **`/review` default branch** - Fixed the `/review` command to correctly identify and use the repository's default branch
+  * **Authentication** - Fixed several issues around authentication persistence and stability
+
+</Update>
+
+<Update label="January 21" rss={{ title: "CLI Updates", description: "Autonomy mode reskin and agent-browser integration" }}>
+  `v0.55.0`
+
+  ## New features
+
+  * **Autonomy mode reskin** - Refreshed UI for autonomy mode indicators and transitions for better clarity
+  * **Agent-browser integration** - CLI now uses the `agent-browser` CLI for browser automations, providing more reliable and token-efficient interactions
+
+</Update>
+
+<Update label="January 20" rss={{ title: "CLI Updates", description: "Readiness report improvements and AskUser fixes" }}>
+  `v0.54.0`
+
+  ## New features
+
+  * **OTEL metrics for hooks and slash commands** - Customer metrics for `droid.hook.invocations` and `droid.slash_command.invocations`
+  * **Optional `/readiness-report` model switching** - Users can now continue with their current model while seeing a recommendation, instead of being forced to switch
+
+  ## Improvements
+
+  * **Autonomy indicator format** - Updated format to show `Spec | Auto (X)` when spec mode is active; `Medium` shortened to `Med`
+
+  ## Bug fixes
+
+  * **AskUser tool improvements** - Questionnaire parsing now supports bullets/`1)` numbering, ignores headers/code fences, normalizes multi-word topics. AskUser can now run alongside TodoWrite with other tools deferred properly. Fixed TUI input handling via `KeypressProvider` subscription
+  * **Windows UI** - Improved autonomy/spec mode status text rendering on Windows terminals
+
+</Update>
+
+<Update label="January 16" rss={{ title: "CLI Updates", description: "Readiness report in exec mode and settings stability" }}>
+  `v0.53.0`
+
+  ## New features
+
+  * **`/readiness-report` in exec mode** - Support for `/readiness-report` slash command in droid exec mode with optional custom instructions
+
+  ## Bug fixes
+
+  * **Settings.json corruption prevention** - Settings file now uses atomic writes to prevent corruption
+  * **Terminal info disabled** - Disabled getTerminalInfo to prevent issues
+  * **Authentication stability** - Bundled keychain dependency in packaged builds to reduce flaky sign-in setups
+
+</Update>
+
+<Update label="January 15" rss={{ title: "CLI Updates", description: "Session sharing, ctrl+z suspend, and bug fixes" }}>
+  `v0.52.0`
+
+  ## New features
+
+  * **`/share` command** - Share your current session with organization members, copies share URL to clipboard
+
+  ## Improvements
+
+  * **Ctrl+Z suspend** - Handle ctrl+z suspend like other TUIs
+  * **Decoupled modes and autonomy** - Modes and autonomy levels are now independent settings in the TUI
+
+  ## Bug fixes
+
+  * **Task tool view** - Fixed Ctrl+O view for Task tool
+  * **Settings file writes** - Avoid unnecessary file writes when updating unrelated settings
+  * **Unified tool display** - Fixed tool result pending display issue
+  * **Subagent version** - Fixed subagent spawning to use correct droid version
+
+</Update>
+
+<Update label="January 14" rss={{ title: "CLI Updates", description: "CLI Axiom skill, custom model fixes, and bug fixes" }}>
+  `v0.49.0`
+
+  ## New features
+
+  * **CLI Axiom skill** - New skill for querying CLI metrics and logs with relevant datasets and fields
+
+  ## Improvements
+
+  * **Custom model requests** - Custom models now properly map to equivalent built-in models for correct request formatting
+
+  ## Bug fixes
+
+  * **iTerm scrollback clearing** - Fixed scrollback clearing for iTerm users with "Disable E3 scrollback clearing" preference enabled
+  * **Memory leak fix** - Fixed memory leak by cleaning up Performance API entries and hinting Bun GC
+  * **Session title generation** - Fixed session title generation for empty strings
+  * **Warmup requests** - Warmup requests no longer consume unnecessary tokens by disabling thinking budget
+  * **Light mode submenus** - Fixed light mode display issues for submenus
+  * **Linux autoupdate** - Fixed autoupdate issues on Linux
+
+</Update>
+
 <Update label="January 13" rss={{ title: "CLI Updates", description: "ACP streaming, Windows autoupdate, and bug fixes" }}>
   `v0.48.0`
 
