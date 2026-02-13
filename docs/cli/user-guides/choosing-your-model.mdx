@@ -4,23 +4,28 @@ description: Balance accuracy, speed, and cost by picking the right model and re
 keywords: ['model', 'models', 'llm', 'claude', 'sonnet', 'opus', 'haiku', 'gpt', 'openai', 'anthropic', 'choose model', 'switch model']
 ---
 
-Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Thursday, December 4th 2025.
+Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Thursday, February 12th 2026.
 
 ---
 
-## 1 · Current stack rank (December 2025)
+## 1 · Current stack rank (February 2026)
 
 | Rank | Model                         | Why we reach for it                                                                                                                               |
 | ---- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1    | **Claude Opus 4.5 (default)** | Highest quality-and-safety balance; current CLI default for both TUI and exec.                                                                   |
-| 2    | **GPT-5.1-Codex-Max**         | Fast coding loops with support up to **Extra High** reasoning; great for heavy implementation and debugging.                                    |
-| 3    | **Claude Sonnet 4.5**         | Strong daily driver with balanced cost/quality; great general-purpose choice when you don’t need Opus-level depth.                              |
-| 4    | **GPT-5.1-Codex**             | Quick iteration with solid code quality at lower cost; bump reasoning when you need more depth.                                                 |
-| 5    | **GPT-5.1**                   | Good generalist, especially when you want OpenAI ergonomics with flexible reasoning effort.                                                     |
-| 6    | **Claude Haiku 4.5**          | Fast, cost-efficient for routine tasks and high-volume automation.                                                                              |
-| 7    | **Gemini 3 Pro**              | Strong at mixed reasoning with Low/High settings; helpful for researchy flows with structured outputs.                                         |
-| 8    | **Gemini 3 Flash**            | Fast, cheap (0.2× multiplier) with full reasoning support; great for high-volume tasks where speed matters.                                    |
-| 9    | **Droid Core (GLM-4.6)**      | Open-source, 0.25× multiplier, great for bulk automation or air-gapped environments; note: no image support.                                   |
+| 1    | **Claude Opus 4.6**           | Latest Anthropic flagship with **Max** reasoning; best depth and safety for complex work.                                                        |
+| 2    | **Claude Opus 4.6 Fast**      | Opus 4.6 tuned for faster response times; 6× promo multiplier.                                                                          |
+| 3    | **Claude Opus 4.5**           | Proven quality-and-safety balance; strong default for TUI and exec.                                                                              |
+| 4    | **GPT-5.1-Codex-Max**         | Fast coding loops with support up to **Extra High** reasoning; great for heavy implementation and debugging.                                    |
+| 5    | **Claude Sonnet 4.5**         | Strong daily driver with balanced cost/quality; great general-purpose choice when you don’t need Opus-level depth.                              |
+| 6    | **GPT-5.2-Codex**             | Latest OpenAI coding model with **Extra High** reasoning; strong for implementation-heavy tasks.                                                |
+| 7    | **GPT-5.1-Codex**             | Quick iteration with solid code quality at lower cost; bump reasoning when you need more depth.                                                 |
+| 8    | **GPT-5.1**                   | Good generalist, especially when you want OpenAI ergonomics with flexible reasoning effort.                                                     |
+| 9    | **GPT-5.2**                   | Advanced OpenAI model with verbosity support and reasoning up to **Extra High**.                                                                |
+| 10   | **Claude Haiku 4.5**          | Fast, cost-efficient for routine tasks and high-volume automation.                                                                              |
+| 11   | **Gemini 3 Pro**              | Strong at mixed reasoning with Low/High settings; helpful for researchy flows with structured outputs.                                         |
+| 12   | **Gemini 3 Flash**            | Fast, cheap (0.2× multiplier) with full reasoning support; great for high-volume tasks where speed matters.                                    |
+| 13   | **Droid Core (GLM-4.7)**      | Open-source, 0.25× multiplier, great for bulk automation or air-gapped environments; note: no image support.                                   |
+| 14   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; good for cost-sensitive work.                                                                 |
 
 <Note>
   We ship model updates regularly. When a new release overtakes the list above,
@@ -33,14 +38,14 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 
 | Scenario                                                         | Recommended model                                                                                                                          |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.5 (default)** for depth and safety. Use **Sonnet 4.5** when you want balanced cost/quality, or **Codex/Codex-Max** for faster iteration with reasoning. |
-| **Full-feature development, large refactors**                    | **Opus 4.5** for default depth and safety. **GPT-5.1-Codex-Max** when you need speed plus **Extra High** reasoning; **Sonnet 4.5** for balanced loops. |
+| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.6** for best depth and safety, or **Opus 4.6 Fast** for faster turnaround. Use **Sonnet 4.5** when you want balanced cost/quality, or **Codex/Codex-Max** for faster iteration with reasoning. |
+| **Full-feature development, large refactors**                    | **Opus 4.6** or **Opus 4.5** for depth and safety. **GPT-5.2-Codex** or **GPT-5.1-Codex-Max** when you need speed plus **Extra High** reasoning; **Sonnet 4.5** for balanced loops. |
 | **Repeatable edits, summarization, boilerplate generation**      | **Haiku 4.5** or **Droid Core** for speed and cost. **GPT-5.1 / GPT-5.1-Codex** when you need higher quality or structured outputs. |
 | **CI/CD or automation loops**                                    | Favor **Haiku 4.5** or **Droid Core** for predictable, low-cost throughput. Use **Codex** or **Codex-Max** when automation needs stronger reasoning. |
 | **High-volume automation, frequent quick turns**                 | **Haiku 4.5** for speedy feedback. **Droid Core** when cost is critical or you need air-gapped deployment. |
 
 <Tip>
-  **Claude Opus 4.5** is the top-tier option for extremely complex architecture decisions or critical work where you need maximum reasoning capability. Most tasks don't require Opus-level power—start with Sonnet 4.5 and escalate only if needed.
+  **Claude Opus 4.6** is the top-tier option for extremely complex architecture decisions or critical work where you need maximum reasoning capability. **Opus 4.6 Fast** is tuned for faster responses at a higher cost. Most tasks don't require Opus-level power—start with Sonnet 4.5 and escalate only if needed.
 </Tip>
 
 Tip: you can swap models mid-session with `/model` or by toggling in the settings panel (`Shift+Tab` → **Settings**).
@@ -58,16 +63,19 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 
 ## 4 · Reasoning effort settings
 
-- **Opus / Sonnet / Haiku**: Off / Low / Medium / High (default: Off)
+- **Opus 4.6 / Opus 4.6 Fast**: Off / Low / Medium / High / **Max** (default: High)
+- **Opus 4.5 / Sonnet 4.5 / Haiku 4.5**: Off / Low / Medium / High (default: Off)
 - **GPT-5.1**: None / Low / Medium / High (default: None)
 - **GPT-5.1-Codex**: Low / Medium / High (default: Medium)
 - **GPT-5.1-Codex-Max**: Low / Medium / High / **Extra High** (default: Medium)
-- **GPT-5.2**: Low / Medium / High (default: Low)
-- **Gemini 3 Pro**: Low / High (default: High)
+- **GPT-5.2**: Off / Low / Medium / High / **Extra High** (default: Low)
+- **GPT-5.2-Codex**: None / Low / Medium / High / **Extra High** (default: Medium)
+- **Gemini 3 Pro**: None / Low / Medium / High (default: High)
 - **Gemini 3 Flash**: Minimal / Low / Medium / High (default: High)
-- **Droid Core (GLM-4.6)**: None only (default: None; no image support)
+- **Droid Core (GLM-4.7)**: None only (default: None; no image support)
+- **Droid Core (Kimi K2.5)**: None only (default: None)
 
-Reasoning effort increases latency and cost—start low for simple work and escalate as needed. **Extra High** is only available on GPT-5.1-Codex-Max.
+Reasoning effort increases latency and cost—start low for simple work and escalate as needed. **Max** is available on Claude Opus 4.6. **Extra High** is available on GPT-5.1-Codex-Max, GPT-5.2, and GPT-5.2-Codex.
 
 <Tip>
   Change reasoning effort from `/model` → **Reasoning effort**, or via the
@@ -82,14 +90,14 @@ Factory ships with managed Anthropic and OpenAI access. If you prefer to run aga
 
 ### Open-source models
 
-**Droid Core (GLM-4.6)** is an open-source alternative available in the CLI. It's useful for:
+**Droid Core (GLM-4.7)** and **Droid Core (Kimi K2.5)** are open-source alternatives available in the CLI. They're useful for:
 
 - **Air-gapped environments** where external API calls aren't allowed
 - **Cost-sensitive projects** needing unlimited local inference
 - **Privacy requirements** where code cannot leave your infrastructure
 - **Experimentation** with open-source model capabilities
 
-**Note:** GLM-4.6 does not support image attachments. For image-based workflows, use Claude or GPT models.
+**Note:** GLM-4.7 does not support image attachments. Kimi K2.5 does support images. For image-based workflows, use Claude, GPT, or Kimi models.
 
 To use open-source models, you'll need to configure them via BYOK with a local inference server (like Ollama) or a hosted provider. See [BYOK documentation](/cli/configuration/byok) for setup instructions.
 
