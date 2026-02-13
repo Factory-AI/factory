@@ -59,6 +59,28 @@ The biggest value we have found in Missions is in the planning phase. Getting th
 
 This is intentional. A well-scoped plan with clear milestones produces dramatically better results than jumping straight into execution on a vague goal.
 
+### Plan the right level of granularity
+
+Two planning levers have an outsized impact on mission quality, cost, and duration:
+
+- **Features** define worker scope. Breaking work into more features gives each worker a tighter, more focused task, which often improves quality—but it can increase total cost.
+- *Milestones** define validation frequency. More milestones trigger validator workers more often, increasing runtime. For simple projects, one milestone is often enough; for longer or complex projects, frequent milestone validation helps keep the foundation stable as work scales.
+
+For smaller, straightforward projects, a single milestone is often enough. For larger or longer-running projects, more granular milestones can prevent drift and reduce expensive rework later.
+
+### Estimating cost and duration
+
+As a rough planning heuristic, mission duration and cost scale with the number of worker runs:
+
+- **Feature workers:** roughly one run per feature
+- **Validator workers:** roughly one run per milestone
+
+So an initial estimate is approximately:
+
+`total runs ≈ #features + #milestones`
+
+In practice, this is a floor rather than a ceiling. Validation may surface issues that require follow-up work, and the orchestrator can create additional fix features during execution.
+
 ## What Missions are good for
 
 We have built and tested Missions across a range of work:
