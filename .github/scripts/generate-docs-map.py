@@ -13,7 +13,7 @@ from typing import List, Dict, Tuple
 from collections import defaultdict
 
 DOCS_ROOT = Path("docs")
-OUTPUT_FILE = DOCS_ROOT / "factory_docs_map.mdx"
+OUTPUT_FILE = DOCS_ROOT / "factory-docs-map.mdx"
 BASE_URL = "https://docs.factory.ai"
 
 def extract_frontmatter(content: str) -> Dict[str, str]:
@@ -111,7 +111,7 @@ def should_exclude_file(file_path: Path) -> bool:
     # Exclude specific files
     if file_path.name.lower() == "readme.md":
         return True
-    if "factory_docs_map" in file_path.name:
+    if "factory-docs-map" in file_path.name or "factory_docs_map" in file_path.name:
         return True
     
     return False
