@@ -1,0 +1,138 @@
+---
+title: Missions
+description: Plan and execute large, multi-feature projects with structured orchestration. Describe your goal, collaborate on the plan, and let Droid manage the work.
+keywords: ['missions', 'mission', 'enter-mission', 'orchestration', 'multi-feature', 'milestones', 'skills', 'large projects', 'planning', 'mission control']
+---
+
+<Note>
+  Missions are a **research preview**. We are actively exploring open questions: Is parallelization necessary or even value-add? How do you maximize correctness across long-running plans? How do you make the right tradeoffs between cost and quality? Your feedback shapes where this goes.
+</Note>
+
+<Frame>
+  <img src="/images/mission-control.png" alt="Mission Control orchestration view" />
+</Frame>
+
+## What are Missions?
+
+Missions are a structured way to take on large, multi-feature work with Droid. Instead of tackling everything in a single session, you collaborate with Droid upfront to build a plan -- features, milestones, and the skills needed to accomplish each part -- then hand off execution to an orchestration layer that manages the work.
+
+Access Missions with the `/missions` command (also available via `/mission` and `/enter-mission`).
+
+<CardGroup cols={2}>
+  <Card title="Collaborative Planning" icon="comments">
+    Work with Droid to define features, milestones, and success criteria before any code is written.
+  </Card>
+  <Card title="Skill-Aware Execution" icon="toolbox">
+    Existing skills are leveraged and new specialized skills are developed for each part of the work.
+  </Card>
+  <Card title="Structured Orchestration" icon="diagram-project">
+    Mission Control manages execution across agents, tracking progress through your plan.
+  </Card>
+  <Card title="Your Config Carries Over" icon="gear">
+    MCP integrations, skills, hooks, and custom droids all work inside missions.
+  </Card>
+</CardGroup>
+
+## How it works
+
+<Steps>
+  <Step title="Enter a Mission">
+    Start by running `/enter-mission` in any Droid session.
+  </Step>
+  <Step title="Collaborate on the plan">
+    Droid interacts with you back and forth to understand your goal. It asks clarifying questions, probes for constraints, and works with you to define what you actually want built. This is a conversation, not a one-shot prompt.
+  </Step>
+  <Step title="Build features and milestones">
+    Based on the conversation, Droid constructs a structured plan: a set of features organized into milestones. Each milestone represents a meaningful checkpoint in the work.
+  </Step>
+  <Step title="Skills are leveraged or developed">
+    Droid pulls in your existing skills where they apply, and develops specialized skills for parts of the work that need them. This means the execution is tailored to your project and workflow, not generic.
+  </Step>
+  <Step title="Enter Mission Control">
+    Once the plan is approved, Droid enters the Mission -- an orchestration view that manages execution of the plan. You can monitor progress, see which features are being worked on, and intervene when needed.
+  </Step>
+</Steps>
+
+## The planning phase matters most
+
+The biggest value we have found in Missions is in the planning phase. Getting the upfront plan right -- the features, the ordering, the milestones, the skills involved -- is what determines whether the execution succeeds. Droid will push back, ask questions, and iterate with you until the plan is solid.
+
+This is intentional. A well-scoped plan with clear milestones produces dramatically better results than jumping straight into execution on a vague goal.
+
+## What Missions are good for
+
+We have built and tested Missions across a range of work:
+
+- **Full-stack development** -- Building complete applications with frontend, backend, database, and deployment.
+- **Research** -- Deep investigation tasks that require exploring multiple approaches, synthesizing findings, and producing structured output.
+- **Brownfield migrations** -- Modernizing existing codebases, swapping frameworks, or restructuring large projects while preserving existing behavior.
+- **Ambitious prototypes** -- Product experiments that need to be functional, not just sketched out.
+
+The common thread: work that benefits from upfront planning and structured decomposition rather than ad-hoc prompting.
+
+## Working with Mission Control
+
+Once the plan is approved, Droid enters Mission Control -- the orchestration view that manages execution. From here you can track progress across features and milestones, see which agents are working on what, and intervene when things need adjustment.
+
+### Intervening and redirecting
+
+Missions are not fire-and-forget. The orchestrator is an agent, and you can talk to it. The most effective way to use Missions is to treat yourself as the project manager -- monitoring progress, unblocking workers, and redirecting when the plan needs to change.
+
+<AccordionGroup>
+  <Accordion title="The mission freezes or stops making progress">
+    If the mission appears stuck and nothing is happening, pause the orchestrator and tell it what you are seeing. Be direct: explain that the mission appears frozen or broken, describe what the last visible activity was, and ask it to recover. The orchestrator can re-assess the state and pick back up.
+
+    **Example:** *"The mission seems frozen -- the last worker finished 10 minutes ago and nothing new has started. Re-assess and continue."*
+  </Accordion>
+
+  <Accordion title="A worker is taking too long on a single item">
+    If one worker is spinning on a task for too long without making meaningful progress, you do not need to wait for it to finish. Pause the orchestrator and tell it to mark the current item as complete and move on. You can always come back to that item later, or handle it manually.
+
+    **Example:** *"The worker on the auth integration has been stuck for 20 minutes. Mark it as complete and move to the next feature."*
+  </Accordion>
+
+  <Accordion title="The mission is stuck on a milestone">
+    Sometimes the orchestrator hits a milestone that has become blocked -- maybe an earlier assumption was wrong, or a dependency is missing. When this happens, ask the orchestrator to re-assess the remaining work and figure out why it has become blocked. It can re-plan around the obstacle, reorder features, or adjust the milestone scope.
+
+    **Example:** *"We are stuck on Milestone 3. Re-assess the remaining work and tell me what is blocking progress."*
+  </Accordion>
+
+  <Accordion title="You want to change direction mid-mission">
+    If you realize the plan needs to change -- a feature should be dropped, a new requirement has come in, or the approach is wrong -- pause and tell the orchestrator. It can update the plan, re-scope milestones, and continue from the new direction.
+
+    **Example:** *"Drop the email notification feature and add Slack integration instead. Re-plan the remaining milestones."*
+  </Accordion>
+</AccordionGroup>
+
+### A new kind of debugging
+
+The skillset for working with Missions looks less like traditional debugging and more like **project management of agents**. You are not stepping through code line by line -- you are monitoring a team of workers, unblocking them when they get stuck, redirecting them when priorities change, and making judgment calls about when to push through versus when to re-plan.
+
+This is a meaningfully different way of working with AI. The core skill is knowing when and how to intervene, not writing the code yourself.
+
+## Configuration inheritance
+
+Missions inherit your existing Droid configuration:
+
+- **MCP integrations** -- Workers can use your connected tools (Linear, Sentry, Notion, etc.)
+- **Custom skills** -- Your existing skills are available and new ones can be developed during planning.
+- **Hooks** -- Lifecycle hooks fire during mission execution.
+- **Custom droids** -- Subagents configured in your project are available to workers.
+- **AGENTS.md** -- Workers follow your project conventions and coding standards.
+
+## Open questions
+
+Missions are early. We are shipping this as a research preview because there are fundamental questions we are still working through:
+
+- **Is parallelization necessary?** Running multiple agents in parallel sounds good in theory, but does it actually produce better results than sequential execution? We are testing this.
+- **How do you maximize correctness?** Long-running plans accumulate errors. What validation and correction strategies work best at each stage?
+- **Cost vs. quality tradeoffs** -- How aggressive should the orchestrator be? More planning and validation means higher cost but potentially better output. Where is the right balance?
+
+We want your feedback on these. Use Missions, push them hard, and tell us what works and what does not.
+
+## See also
+
+- [Specification Mode](/cli/user-guides/specification-mode) -- For well-scoped tasks that benefit from planning before implementation
+- [Implementing Large Features](/cli/user-guides/implementing-large-features) -- Manual workflow for multi-phase projects
+- [Custom Droids](/cli/configuration/custom-droids) -- Build specialized subagents that missions can use
+- [Skills](/cli/configuration/skills) -- Create and manage skills that missions can leverage
