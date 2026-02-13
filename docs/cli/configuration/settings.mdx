@@ -27,7 +27,7 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 
 | Setting | Options | Default | Description |
 | ------- | ------- | ------- | ----------- |
-| `model` | `sonnet`, `opus`, `GPT-5`, `gpt-5-codex`, `gpt-5-codex-max`, `haiku`, `droid-core`, `custom-model` | `opus` | The default AI model used by droid |
+| `model` | `opus`, `opus-4-6`, `opus-4-6-fast`, `sonnet`, `gpt-5.1`, `gpt-5.1-codex`, `gpt-5.1-codex-max`, `gpt-5.2`, `gpt-5.2-codex`, `haiku`, `gemini-3-pro`, `droid-core`, `kimi-k2.5`, `custom-model` | `opus` | The default AI model used by droid |
 | `reasoningEffort` | `off`, `none`, `low`, `medium`, `high` (availability depends on the model) | Model-dependent default | Controls how much structured thinking the model performs. |
 | `autonomyLevel` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
 | `cloudSessionSync` | `true`, `false` | `true` | Mirror CLI sessions to Factory web. |
@@ -55,14 +55,18 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 Choose the default AI model that powers your droid:
 
 - **`opus`** - Claude Opus 4.5 (current default)
+- **`opus-4-6`** - Claude Opus 4.6, latest flagship with Max reasoning
+- **`opus-4-6-fast`** - Claude Opus 4.6 Fast, same quality with faster responses
 - **`sonnet`** - Claude Sonnet 4.5, balanced cost and quality
 - **`gpt-5.1`** - OpenAI GPT-5.1
 - **`gpt-5.1-codex`** - Advanced coding-focused model
 - **`gpt-5.1-codex-max`** - GPT-5.1-Codex-Max, supports Extra High reasoning
 - **`gpt-5.2`** - OpenAI GPT-5.2
+- **`gpt-5.2-codex`** - GPT-5.2-Codex, latest OpenAI coding model with Extra High reasoning
 - **`haiku`** - Claude Haiku 4.5, fast and cost-effective
 - **`gemini-3-pro`** - Gemini 3 Pro
-- **`droid-core`** - GLM-4.6 open-source model
+- **`droid-core`** - GLM-4.7 open-source model
+- **`kimi-k2.5`** - Kimi K2.5 open-source model with image support
 - **`custom-model`** - Your own configured model via BYOK
 
 [You can also add custom models and BYOK.](/cli/configuration/byok)
