@@ -4,6 +4,71 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="February 16" rss={{ title: "CLI Updates", description: "Opus 4.6 Fast Mode pricing update" }}>
+  `v0.57.15`
+
+  ## Improvements
+
+  * **Opus 4.6 Fast Mode pricing** - Removed promotional pricing for Opus 4.6 Fast Mode
+
+</Update>
+
+<Update label="February 13" rss={{ title: "CLI Updates", description: "Session tags, word-level diffs, new models, and built-in skills" }}>
+  `v0.57.14`
+
+  ## New features
+
+  * **Session tags** - Categorize sessions with custom tags using the new `--tag` CLI flag for better organization
+  * **Word-level diff highlighting** - GitHub diff mode now highlights only changed words within lines instead of entire lines
+  * **GPT-5.3-Codex model** - Added GPT-5.3-Codex model with multi-turn phase support
+  * **GLM-5 model** - Added GLM-5 model via Fireworks
+  * **MiniMax M2.5 model** - Added MiniMax M2.5, replacing M2.1
+  * **Create-PR skill** - New built-in skill for guided pull request creation with local verification checklist
+  * **Worker droid** - Basic worker droid now ships as a built-in droid for task delegation
+  * **PR linking** - Sessions now display a status indicator showing linked PRs from git operations
+
+  ## Bug fixes
+
+  * **Stdin character corruption** - Replaced text input component to eliminate character corruption and broken special keys
+  * **NODE_ENV injection** - Stopped injecting `NODE_ENV=production` into shell environment, fixing `npm` devDependencies issues
+  * **MCP SDK alignment** - Updated to MCP SDK 1.26 with proper schema validation
+  * **File watcher limits** - More granular file watching to avoid "too many open file descriptors" errors
+  * **Desktop connection race** - Fixed daemon connection race condition in desktop app with polling retry logic (app)
+  * **Sidebar sessions** - Fixed sessions disappearing from sidebar (app)
+  * **Open in editor** - Fixed "open in editor" functionality in desktop app (app)
+
+</Update>
+
+<Update label="February 11" rss={{ title: "CLI Updates", description: "Spec approval with comment and input stability" }}>
+  `v0.57.12`
+
+  ## New features
+
+  * **Spec approval with comment** - Added a "Proceed with comment" option to spec approval, letting you approve a spec and attach a guiding comment in one action
+
+  ## Bug fixes
+
+  * **Fast model switching** - Fixed edge cases when switching models mid-conversation, including proper conversation state management
+  * **Invalid MCP output schemas** - Tolerates invalid MCP tool output schemas instead of crashing
+  * **Opus 4.5 max tokens** - Corrected incorrect Opus 4.5 max output tokens in model registry
+  * **Ctrl+O during AskUser** - Allows Ctrl+O (open in editor) during the AskUser tool flow
+  * **AskUser context** - Ensures context is clear when using the AskUser tool
+  * **Session file table overflow** - Limits concurrency when fetching sessions in daemon to avoid "file table overflow" errors
+  * **Duplicate plan steps** - Fixed duplicate plan steps in web UI when multiple TodoWrite calls share the same title (app)
+
+</Update>
+
+<Update label="February 10" rss={{ title: "CLI Updates", description: "Subagent fixes and model switching improvements" }}>
+  `v0.57.11`
+
+  ## Bug fixes
+
+  * **Subagent prompting** - Fixed subagent tool prompting and description handling
+  * **AskUser tool** - Handles edge cases preventing stuck states when sessions are interrupted or messages arrive out of order (app)
+  * **Sidebar staleness** - Fixed missing last message and stale status indicators on the session sidebar (app)
+
+</Update>
+
 <Update label="February 9" rss={{ title: "CLI Updates", description: "Skills UX overhaul, terminal tab titles, desktop notifications, and mobile experience" }}>
   `v0.57.10`
 
