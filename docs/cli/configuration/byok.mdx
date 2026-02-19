@@ -36,7 +36,7 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 ```
 
 <Tip>
-  In `settings.json` (and `settings.local.json`), `apiKey` supports environment variable references using `${VAR_NAME}` syntax.
+  In `settings.json` (and `settings.local.json`), `apiKey` supports environment variable references using `${VAR_NAME}` syntax. For example, `"apiKey": "${PROVIDER_API_KEY}"` reads from the environment variable named `PROVIDER_API_KEY` (for example: `export PROVIDER_API_KEY=your_key_here`).
 </Tip>
 
 <Note>
@@ -50,7 +50,7 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 | `model` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
 | `displayName` | | Human-friendly name shown in model selector |
 | `baseUrl` | ✓ | API endpoint base URL |
-| `apiKey` | ✓ | Your API key for the provider. Can't be empty. Supports `${VAR_NAME}` in `settings.json`/`settings.local.json`. |
+| `apiKey` | ✓ | Your API key for the provider. Can't be empty. Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g., `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable). |
 | `provider` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
 | `maxOutputTokens` | | Maximum output tokens for model responses |
 
