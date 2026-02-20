@@ -1,0 +1,182 @@
+---
+title: "Part 2: Ad-Hoc Analysis"
+description: Product analytics, billing queries, engineering metrics, and structuring effective questions.
+keywords: ['data', 'analytics', 'sql', 'queries', 'product', 'billing', 'metrics']
+---
+
+This is where agent-native data work really shines. The feedback loop between question and answer shrinks from minutes to seconds.
+
+Traditional data analysis involves a lot of friction. You have a question. You open your SQL client. You remember (or look up) which tables you need. You write the query. You debug the syntax error. You realize you used the wrong field. You fix it. You get your answer. By then, you've forgotten why you asked.
+
+With an agent that knows your data, the workflow becomes conversational. You describe what you want to know in plain language. The agent writes the query, runs it, and shows you results. If something looks wrong, you ask follow-up questions.
+
+The key is learning how to structure these conversations for different types of analysis.
+
+## Product Analytics
+
+Understanding user behavior is one of the most common use cases. The questions usually follow a pattern:
+
+**User-level questions:**
+- "What did user X do yesterday?"
+- "Who are the most active users in org Y?"
+- "Show me users who haven't logged in for 30 days"
+
+**Org-level questions:**
+- "How is org X trending over the past month?"
+- "Which orgs have the highest engagement?"
+- "Show me orgs that started a trial but haven't converted"
+
+Here's how a real conversation might look:
+
+```
+You: Show me the top 10 users by consumption at Acme Corp this month
+
+Agent: I'll query the user activity table for that org.
+
+[runs query]
+
+| user_email              | usage_30d      | messages |
+|------------------------|----------------|----------|
+| alice@acme.com         | 45.2M          | 3,241    |
+| bob@acme.com           | 38.7M          | 2,892    |
+| charlie@acme.com       | 22.1M          | 1,456    |
+...
+
+Alice is consuming about 17% more than the next highest user. 
+Her average usage per message (13,946) is also higher than 
+the org average (11,203), suggesting she's working on more 
+complex tasks.
+```
+
+The agent interprets results and surfaces interesting patterns automatically.
+
+## Billing and Revenue Analysis
+
+Billing data requires extra care because mistakes can affect real money. The agent needs to know which tables are authoritative.
+
+Your AGENTS.md should encode your source of truth. For example, if you use Stripe, Orb, Chargebee, or another billing system:
+
+```markdown
+## Billing Source of Truth
+
+- Organization-level billing: Use `dim_customers.mrr` (synced from [your billing system])
+- User-level attribution: Use `fct_user_usage` (approximation from event data)
+- Raw invoice data: Use `billing.invoices` 
+
+Never use `events.amount` for billing - it's unreliable.
+```
+
+With this knowledge, the agent can answer questions like:
+
+```
+You: What's our monthly revenue by plan type?
+
+Agent: I'll aggregate from the billing tables.
+
+[runs query]
+
+| plan_name        | mrr           | customers  | avg_per_customer |
+|-----------------|---------------|------------|------------------|
+| Enterprise      | $42,361,500   | 1,150      | $36,836          |
+| Pro             | $11,728,000   | 62,350     | $188             |
+| Free            | $0            | 934,000    | $0               |
+
+Enterprise customers represent 78% of revenue from 
+less than 1% of the customer base.
+```
+
+## Engineering Metrics
+
+Engineering teams generate tons of useful data that often goes unanalyzed.
+
+**Error analysis:**
+- "What are our most common error types this week?"
+- "Which endpoints have the highest latency?"
+- "Show me errors correlated with the deploy on Tuesday"
+
+**Pipeline health:**
+- "When did our ETL job last run successfully?"
+- "Are there any data freshness issues?"
+- "How long is our dbt run taking?"
+
+**Usage patterns:**
+- "Which API endpoints are getting the most traffic?"
+- "What's our p99 response time trend?"
+- "Show me requests that are hitting rate limits"
+
+If your observability data is queryable (whether you're using Datadog Log Archives, Axiom, OpenTelemetry exports to your warehouse, or logs in S3/GCS), the agent can analyze it the same way:
+
+```
+You: Show me the top error messages from the last 24 hours
+
+Agent: I'll query the traces table for error spans.
+
+[runs query]
+
+| error_message                          | count | affected_users |
+|---------------------------------------|-------|----------------|
+| Connection timeout to postgres         | 1,247 | 89             |
+| Rate limit exceeded                    | 834   | 234            |
+| Invalid authentication token           | 412   | 156            |
+
+The postgres connection timeouts spiked around 3pm yesterday.
+That correlates with when we deployed v2.4.1. Want me to look
+at which specific queries were timing out?
+```
+
+## Structuring Good Questions
+
+Some question patterns work better than others. Here's what we've learned:
+
+<CardGroup cols={2}>
+  <Card title="Be specific about time ranges">
+    - Bad: "Show me user activity"
+    - Good: "Show me user activity for the past 7 days"
+  </Card>
+  <Card title="Name the entity you care about">
+    - Bad: "What's our usage looking like?"
+    - Good: "What's usage looking like for Acme Corp?"
+  </Card>
+  <Card title="Ask for comparisons explicitly">
+    - Bad: "Is this number good?"
+    - Good: "How does this compare to last month?"
+  </Card>
+  <Card title="Request the format you want">
+    - Bad: "Show me the data"
+    - Good: "Show me a breakdown by day in a table"
+  </Card>
+</CardGroup>
+
+The agent will usually figure out what you mean, but explicit questions get better results faster.
+
+## When Things Go Wrong
+
+Sometimes the agent will write a query that returns unexpected results. This is where domain knowledge matters.
+
+Common issues we've seen:
+
+**Wrong table**: The agent uses `events_raw` instead of the deduped staging table. Results are inflated due to duplicate events. Fix: add this to your pitfalls doc so it never happens again.
+
+**Missing filter**: The agent forgets to filter inactive records. Numbers include churned customers. Fix: make the default query template include the filter.
+
+**Timezone mismatch**: The agent uses UTC timestamps when comparing to billing data that uses a different timezone. Daily totals don't match. Fix: document the timezone convention and the correct conversion pattern for your warehouse.
+
+Each of these becomes a permanent lesson. You add it to your AGENTS.md or skills, and the agent won't make that mistake again. This is the compounding effect.
+
+<Warning>
+When you catch an agent mistake, always add it to your pitfalls documentation. This turns a one-time fix into a permanent lesson.
+</Warning>
+
+## Building Intuition
+
+The more you use agent-assisted analysis, the more you develop intuition for what's possible. Questions that used to feel like "big projects" become quick checks:
+
+- "Before this meeting, pull up the usage trends for these 5 accounts"
+- "That bug report mentions slow queries. What's the p99 for that endpoint?"
+- "The CEO asked about trial conversions. What's our current rate?"
+
+The agent becomes an extension of your own analytical capability. You start asking questions you wouldn't have bothered with before because the cost of getting an answer is so low.
+
+## What's Next
+
+[Part 3](/guides/data/repeated-reports) covers building repeated reports: weekly metrics, automated monitoring, and SaaS replacement analysis.
