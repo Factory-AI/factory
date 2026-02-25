@@ -27,8 +27,201 @@ Each `.factory/` folder can contain:
 - `droids/` – droid definitions.
 - `commands/` – custom commands.
 - `hooks/` – hook definitions.
+- `skills/` – skill definitions.
 
 The **same schema** applies at every level. What changes is **precedence**.
+
+---
+
+## Settings JSON schema
+
+Below is the full schema for org-managed settings. These are configured by org admins through the [Enterprise Controls](https://app.factory.ai) page in the Factory app. Every property is optional — omit any field you do not need to set.
+
+<ResponseField name="sessionDefaultSettings" type="object">
+  Session default preferences.
+  <Expandable title="properties">
+    <ResponseField name="model" type="string">
+      Default model identifier (e.g. `claude-opus-4-6`, `gpt-5.3-codex`).
+    </ResponseField>
+    <ResponseField name="reasoningEffort" type="string">
+      How much thinking the model does before responding. One of `none`, `dynamic`, `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`.
+    </ResponseField>
+    <ResponseField name="interactionMode" type="string">
+      Droid interaction mode. One of `auto`, `spec`, `agi`.
+    </ResponseField>
+    <ResponseField name="autonomyLevel" type="string">
+      Autonomy level for the session. One of `off`, `low`, `medium`, `high`.
+    </ResponseField>
+    <ResponseField name="specModeModel" type="string">
+      Model to use when spec mode is active.
+    </ResponseField>
+    <ResponseField name="specModeReasoningEffort" type="string">
+      Reasoning effort override for spec mode. Same values as `reasoningEffort`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="maxAutonomyLevel" type="string">
+  Maximum autonomy level any user or project can set. One of `off`, `low`, `medium`, `high`.
+</ResponseField>
+
+<ResponseField name="cloudSessionSync" type="boolean">
+  Whether sessions are synced to the cloud.
+</ResponseField>
+
+<ResponseField name="includeCoAuthoredByDroid" type="boolean">
+  Include a `Co-authored-by: Droid` trailer in git commits.
+</ResponseField>
+
+<ResponseField name="enableDroidShield" type="boolean">
+  Enable Droid Shield safety checks.
+</ResponseField>
+
+<ResponseField name="ideAutoConnect" type="boolean">
+  Automatically connect to the IDE on session start.
+</ResponseField>
+
+<ResponseField name="commandAllowlist" type="string[]">
+  Shell command patterns that are always allowed (accumulated across levels).
+</ResponseField>
+
+<ResponseField name="commandDenylist" type="string[]">
+  Shell command patterns that are always denied (accumulated across levels).
+</ResponseField>
+
+<ResponseField name="customModels" type="object[]">
+  Org-provisioned custom model definitions.
+  <Expandable title="properties">
+    <ResponseField name="model" type="string" required>
+      Model name sent to the provider API.
+    </ResponseField>
+    <ResponseField name="id" type="string" required>
+      Unique identifier for this custom model entry. Must start with `custom:` (e.g. `custom:my-internal-model-v1`).
+    </ResponseField>
+    <ResponseField name="index" type="integer" required>
+      Display order index.
+    </ResponseField>
+    <ResponseField name="baseUrl" type="string" required>
+      Base URL of the model API endpoint.
+    </ResponseField>
+    <ResponseField name="apiKey" type="string" required>
+      API key for authenticating with the provider.
+    </ResponseField>
+    <ResponseField name="provider" type="string" required>
+      Provider type. One of `anthropic`, `openai`, `generic-chat-completion-api`, `factory`, `google`, `xai`, `voyage`.
+    </ResponseField>
+    <ResponseField name="displayName" type="string" required>
+      Human-readable name shown in the model picker.
+    </ResponseField>
+    <ResponseField name="maxContextLimit" type="integer">
+      Maximum context window size in tokens.
+    </ResponseField>
+    <ResponseField name="enableThinking" type="boolean">
+      Enable extended thinking / chain-of-thought.
+    </ResponseField>
+    <ResponseField name="thinkingMaxTokens" type="integer">
+      Maximum tokens for the thinking phase.
+    </ResponseField>
+    <ResponseField name="maxOutputTokens" type="integer">
+      Maximum output tokens.
+    </ResponseField>
+    <ResponseField name="extraHeaders" type="object">
+      Additional HTTP headers to send with each request. Map of header name to value.
+    </ResponseField>
+    <ResponseField name="extraArgs" type="object">
+      Additional provider-specific arguments passed to the API.
+    </ResponseField>
+    <ResponseField name="noImageSupport" type="boolean" required>
+      Set to `true` if the model does not support image inputs.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="modelPolicy" type="object">
+  Org-level model access control.
+  <Expandable title="properties">
+    <ResponseField name="allowedModelIds" type="string[]">
+      Model IDs that are explicitly allowed. See [supported model IDs](#supported-model-ids) below.
+    </ResponseField>
+    <ResponseField name="blockedModelIds" type="string[]">
+      Model IDs that are explicitly blocked.
+    </ResponseField>
+    <ResponseField name="allowCustomModels" type="boolean">
+      Whether users may add their own custom models.
+    </ResponseField>
+    <ResponseField name="allowedBaseUrls" type="string[]">
+      Base URLs that custom models are allowed to connect to.
+    </ResponseField>
+    <ResponseField name="allowAllFactoryModels" type="boolean">
+      Allow all Factory-hosted models regardless of the allow/block lists.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="userModelPolicies" type="object">
+  Per-user model overrides. Map of user ID to policy object.
+  <Expandable title="properties">
+    <ResponseField name="allowedModelIds" type="string[]">
+      Model IDs this user is allowed to use.
+    </ResponseField>
+    <ResponseField name="blockedModelIds" type="string[]">
+      Model IDs this user is blocked from using.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="enabledPlugins" type="object">
+  Map of plugin name in `plugin@marketplace` format to `true` (enabled) or `false` (disabled). Plugins set to `true` are automatically installed on CLI startup once their marketplace is available.
+</ResponseField>
+
+<ResponseField name="extraKnownMarketplaces" type="object">
+  Additional plugin marketplaces. Map of marketplace name to a source object. Marketplaces listed here are automatically cloned and registered on CLI startup.
+  <Expandable title="properties">
+    <ResponseField name="source" type="object" required>
+      Marketplace source — one of the following shapes, discriminated by the `source` field:
+      <Expandable title="github">
+        <ResponseField name="source" type="string" required>
+          Must be `"github"`.
+        </ResponseField>
+        <ResponseField name="repo" type="string" required>
+          GitHub repository in `owner/repo` format.
+        </ResponseField>
+      </Expandable>
+      <Expandable title="url">
+        <ResponseField name="source" type="string" required>
+          Must be `"url"`.
+        </ResponseField>
+        <ResponseField name="url" type="string" required>
+          URL of the marketplace manifest.
+        </ResponseField>
+      </Expandable>
+      <Expandable title="local">
+        <ResponseField name="source" type="string" required>
+          Must be `"local"`.
+        </ResponseField>
+        <ResponseField name="path" type="string" required>
+          Local filesystem path to the marketplace.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="strictKnownMarketplaces" type="object[]">
+  Marketplace sources that are strictly enforced. Each entry is a source object directly (e.g. `{ "source": "github", "repo": "owner/repo" }`), not wrapped in a `source` key like `extraKnownMarketplaces` values.
+</ResponseField>
+
+### Supported model IDs
+
+The following model identifiers can be used in `allowedModelIds` and `blockedModelIds`:
+
+| Provider | Model IDs |
+|---|---|
+| **Anthropic** | `claude-sonnet-4-5-20250929`, `claude-sonnet-4-6`, `claude-opus-4-5-20251101`, `claude-opus-4-6`, `claude-opus-4-6-fast`, `claude-haiku-4-5-20251001` |
+| **OpenAI** | `gpt-5.1`, `gpt-5.1-codex`, `gpt-5.1-codex-max`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex` |
+| **Google** | `gemini-3-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview` |
+| **XAI** | `grok-code-fast-1` |
+| **Open source** | `glm-4.7`, `glm-5`, `kimi-k2.5`, `minimax-m2.5` |
 
 ---
 
@@ -51,8 +244,8 @@ For simple scalar values (strings, numbers, booleans):
 
 Examples:
 
-- `sessionDefaults.model`
-- `sessionDefaults.autonomyLevel`
+- `sessionDefaultSettings.model`
+- `sessionDefaultSettings.autonomyLevel`
 - `maxAutonomyLevel`
 
 This guarantees that org decisions (such as which models or autonomy levels are allowed) remain authoritative.
@@ -171,6 +364,81 @@ You could:
 3. Optionally, define stricter folder‑level policies for particularly sensitive repos.
 
 Again, users cannot override these rules; they can only choose safer personal defaults within the allowed space.
+
+---
+
+## Example: full org-managed settings
+
+```json
+{
+  "sessionDefaultSettings": {
+    "model": "claude-opus-4-6",
+    "reasoningEffort": "high",
+    "interactionMode": "auto",
+    "autonomyLevel": "medium",
+    "specModeModel": "claude-sonnet-4-6",
+    "specModeReasoningEffort": "medium"
+  },
+  "maxAutonomyLevel": "high",
+  "cloudSessionSync": true,
+  "includeCoAuthoredByDroid": true,
+  "enableDroidShield": true,
+  "ideAutoConnect": true,
+  "commandAllowlist": ["npm *", "yarn *", "pnpm *", "make *"],
+  "commandDenylist": ["rm -rf /", "sudo *"],
+  "customModels": [
+    {
+      "model": "my-internal-model",
+      "id": "custom:my-internal-model-v1",
+      "index": 0,
+      "baseUrl": "https://llm-gateway.internal.example.com/v1",
+      "apiKey": "${INTERNAL_MODEL_API_KEY}",
+      "provider": "generic-chat-completion-api",
+      "displayName": "Internal Model v1",
+      "maxContextLimit": 128000,
+      "enableThinking": true,
+      "thinkingMaxTokens": 8192,
+      "maxOutputTokens": 16384,
+      "extraHeaders": {
+        "X-Team": "platform"
+      },
+      "extraArgs": {},
+      "noImageSupport": false
+    }
+  ],
+  "modelPolicy": {
+    "allowedModelIds": ["claude-opus-4-6", "claude-sonnet-4-6", "gpt-5.3-codex"],
+    "blockedModelIds": [],
+    "allowCustomModels": true,
+    "allowedBaseUrls": ["https://llm-gateway.internal.example.com/v1"],
+    "allowAllFactoryModels": false
+  },
+  "userModelPolicies": {
+    "user-abc-123": {
+      "allowedModelIds": ["claude-opus-4-6"],
+      "blockedModelIds": []
+    }
+  },
+  "enabledPlugins": {
+    "my-org-plugin@internal-marketplace": true,
+    "experimental-plugin@internal-marketplace": false
+  },
+  "extraKnownMarketplaces": {
+    "internal-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "my-org/factory-plugins"
+      }
+    }
+  },
+  "strictKnownMarketplaces": [
+    {
+      "source": "github",
+      "repo": "my-org/factory-plugins"
+    }
+  ]
+}
+```
 
 ---
 

@@ -78,8 +78,8 @@ The Factory example uses a simple pattern: spawn `droid exec` with `--output-for
 function runDroidExec(prompt: string, repoPath: string) {
   const args = ["exec", "--output-format", "debug"];
   
-  // Optional: configure model (defaults to glm-4.6)
-  const model = process.env.DROID_MODEL_ID ?? "glm-4.6";
+  // Optional: configure model (defaults to glm-4.7)
+  const model = process.env.DROID_MODEL_ID ?? "glm-4.7";
   args.push("-m", model);
   
   // Optional: reasoning level (off|low|medium|high)
@@ -105,7 +105,7 @@ function runDroidExec(prompt: string, repoPath: string) {
 - Alternative: `--output-format json` for final output only
 
 **`-m` (model)**: Choose your AI model
-- `glm-4.6` - Fast, cheap (default)
+- `glm-4.7` - Fast, cheap (default)
 - `gpt-5-codex` - Most powerful for complex code
 - `claude-sonnet-4-5-20250929` - Best balance of speed and capability
 
@@ -311,7 +311,7 @@ The example supports environment variables:
 
 ```bash
 # .env
-DROID_MODEL_ID=gpt-5-codex  # Default: glm-4.6
+DROID_MODEL_ID=gpt-5-codex  # Default: glm-4.7
 DROID_REASONING=low         # Default: low (off|low|medium|high)
 PORT=4000                   # Default: 4000
 HOST=localhost              # Default: localhost
@@ -376,7 +376,7 @@ fs.writeFileSync('./repos/site-content/page.md', markdown);
 function runWithModel(prompt: string, model: string) {
   return Bun.spawn([
     "droid", "exec",
-    "-m", model,  // glm-4.6, gpt-5-codex, etc.
+    "-m", model,  // glm-4.7, gpt-5-codex, etc.
     "--output-format", "debug",
     prompt
   ], { cwd: repoPath });

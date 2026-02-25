@@ -28,7 +28,7 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
       "model": "your-model-id",
       "displayName": "My Custom Model",
       "baseUrl": "https://api.provider.com/v1",
-      "apiKey": "YOUR_API_KEY",
+      "apiKey": "${PROVIDER_API_KEY}",
       "provider": "generic-chat-completion-api",
       "maxOutputTokens": 16384
     }
@@ -36,8 +36,12 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 }
 ```
 
+<Tip>
+  In `settings.json` (and `settings.local.json`), `apiKey` supports environment variable references using `${VAR_NAME}` syntax. For example, `"apiKey": "${PROVIDER_API_KEY}"` reads from the environment variable named `PROVIDER_API_KEY` (for example: `export PROVIDER_API_KEY=your_key_here`).
+</Tip>
+
 <Note>
-  **Legacy support**: Custom models in `~/.factory/config.json` using snake_case field names (`custom_models`, `base_url`, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with `settings.json` taking priority.
+  **Legacy support**: Custom models in `~/.factory/config.json` using snake_case field names (`custom_models`, `base_url`, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with `settings.json` taking priority. Env var expansion for `apiKey` applies to `settings.json`/`settings.local.json` and not to legacy `config.json`.
 </Note>
 
 ### Supported Fields
@@ -47,7 +51,7 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 | `model` | `string` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
 | `displayName` | `string` | | Human-friendly name shown in model selector |
 | `baseUrl` | `string` | ✓ | API endpoint base URL |
-| `apiKey` | `string` | ✓ | Your API key for the provider. Can't be empty. |
+| `apiKey` | `string` | ✓ | Your API key for the provider. Can't be empty. Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g., `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable). |
 | `provider` | `string` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
 | `maxOutputTokens` | `number` | | Maximum output tokens for model responses |
 | `supportsImages` | `boolean` | | Whether the model supports image inputs |
