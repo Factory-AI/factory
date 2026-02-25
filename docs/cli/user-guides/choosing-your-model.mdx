@@ -4,7 +4,7 @@ description: Balance accuracy, speed, and cost by picking the right model and re
 keywords: ['model', 'models', 'llm', 'claude', 'sonnet', 'opus', 'haiku', 'gpt', 'openai', 'anthropic', 'choose model', 'switch model']
 ---
 
-Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Friday, February 14th 2026.
+Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Wednesday, February 25th 2026.
 
 ---
 
@@ -23,11 +23,13 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 | 9    | **GPT-5.1**                   | Good generalist, especially when you want OpenAI ergonomics with flexible reasoning effort.                                                     |
 | 10   | **GPT-5.2**                   | Advanced OpenAI model with verbosity support and reasoning up to **Extra High**.                                                                |
 | 11   | **Claude Haiku 4.5**          | Fast, cost-efficient for routine tasks and high-volume automation.                                                                              |
-| 12   | **Gemini 3 Pro**              | Strong at mixed reasoning with Low/High settings; helpful for researchy flows with structured outputs.                                         |
-| 13   | **Gemini 3 Flash**            | Fast, cheap (0.2× multiplier) with full reasoning support; great for high-volume tasks where speed matters.                                    |
-| 14   | **Droid Core (MiniMax M2.5)** | Open-source, 0.12× multiplier with reasoning support (Low/Medium/High); cheapest model available. No image support.                            |
-| 15   | **Droid Core (GLM-4.7)**      | Open-source, 0.25× multiplier, great for bulk automation or air-gapped environments; note: no image support.                                   |
-| 16   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; good for cost-sensitive work.                                                                 |
+| 12   | **Gemini 3.1 Pro**            | Newer Gemini Pro generation with strong structured outputs and mixed reasoning controls for research-heavy tasks.                                |
+| 13   | **Gemini 3 Pro**              | Strong at mixed reasoning with Low/High settings; helpful for researchy flows with structured outputs.                                           |
+| 14   | **Gemini 3 Flash**            | Fast, cheap (0.2× multiplier) with full reasoning support; great for high-volume tasks where speed matters.                                     |
+| 15   | **Droid Core (MiniMax M2.5)** | Open-source, 0.12× multiplier with reasoning support (Low/Medium/High); cheapest model available. No image support.                             |
+| 16   | **Droid Core (GLM-5)**        | Open-source, 0.4× multiplier with updated GLM capabilities for bulk automation and air-gapped environments; no image support.                   |
+| 17   | **Droid Core (GLM-4.7)**      | Open-source, 0.25× multiplier, stable choice for bulk automation or air-gapped environments; note: no image support.                            |
+| 18   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; good for cost-sensitive work.                                                                  |
 
 <Note>
   We ship model updates regularly. When a new release overtakes the list above,
@@ -73,8 +75,10 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 - **GPT-5.2**: Off / Low / Medium / High / **Extra High** (default: Low)
 - **GPT-5.2-Codex**: None / Low / Medium / High / **Extra High** (default: Medium)
 - **GPT-5.3-Codex**: None / Low / Medium / High / **Extra High** (default: Medium)
+- **Gemini 3.1 Pro**: Low / Medium / High (default: High)
 - **Gemini 3 Pro**: None / Low / Medium / High (default: High)
 - **Gemini 3 Flash**: Minimal / Low / Medium / High (default: High)
+- **Droid Core (GLM-5)**: None only (default: None; no image support)
 - **Droid Core (GLM-4.7)**: None only (default: None; no image support)
 - **Droid Core (Kimi K2.5)**: None only (default: None)
 - **Droid Core (MiniMax M2.5)**: Low / Medium / High (default: High)
@@ -94,14 +98,14 @@ Factory ships with managed Anthropic and OpenAI access. If you prefer to run aga
 
 ### Open-source models
 
-**Droid Core (GLM-4.7)**, **Droid Core (Kimi K2.5)**, and **Droid Core (MiniMax M2.5)** are open-source alternatives available in the CLI. They're useful for:
+**Droid Core (GLM-5)**, **Droid Core (GLM-4.7)**, **Droid Core (Kimi K2.5)**, and **Droid Core (MiniMax M2.5)** are open-source alternatives available in the CLI. They're useful for:
 
 - **Air-gapped environments** where external API calls aren't allowed
 - **Cost-sensitive projects** needing unlimited local inference
 - **Privacy requirements** where code cannot leave your infrastructure
 - **Experimentation** with open-source model capabilities
 
-**Note:** GLM-4.7 and MiniMax M2.5 do not support image attachments. Kimi K2.5 does support images. MiniMax M2.5 is the cheapest model available (0.12× multiplier) and uniquely supports reasoning (Low/Medium/High) among Droid Core models. For image-based workflows, use Claude, GPT, or Kimi models.
+**Note:** GLM-5, GLM-4.7, and MiniMax M2.5 do not support image attachments. Kimi K2.5 does support images. MiniMax M2.5 is the cheapest model available (0.12× multiplier) and uniquely supports reasoning (Low/Medium/High) among Droid Core models. For image-based workflows, use Claude, GPT, or Kimi models.
 
 To use open-source models, you'll need to configure them via BYOK with a local inference server (like Ollama) or a hosted provider. See [BYOK documentation](/cli/configuration/byok) for setup instructions.
 
