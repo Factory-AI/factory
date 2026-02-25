@@ -208,7 +208,7 @@ Below is the full schema for org-managed settings. These are configured by org a
 </ResponseField>
 
 <ResponseField name="strictKnownMarketplaces" type="object[]">
-  Marketplace sources that are strictly enforced. Same source shape as `extraKnownMarketplaces` entries.
+  Marketplace sources that are strictly enforced. Each entry is a source object directly (e.g. `{ "source": "github", "repo": "owner/repo" }`), not wrapped in a `source` key like `extraKnownMarketplaces` values.
 </ResponseField>
 
 ### Supported model IDs
