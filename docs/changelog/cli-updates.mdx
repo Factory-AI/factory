@@ -4,12 +4,11 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
-<Update label="February 27" rss={{ title: "CLI Updates", description: "Wiki command, diagnostics command, GitHub comments in diff viewer, and mission mode fixes" }}>
+<Update label="February 27" rss={{ title: "CLI Updates", description: "Diagnostics command, GitHub comments in diff viewer, and mission mode fixes" }}>
   `v0.65.0`
 
   ## New features
 
-  * **/wiki command** - New `/wiki` command for generating, storing, and viewing project documentation directly from the CLI
   * **/diagnostics command** - New `/diagnostics` command with overlay menu and footer status for troubleshooting CLI issues
   * **Unstaged changes in diff viewer** - View and manage unstaged changes directly in the diff viewer panel (app)
   * **GitHub comments in diff viewer** - View GitHub PR comments alongside code changes in the diff viewer (app)
@@ -20,9 +19,141 @@ rss: true
 
   * **Mission mode model selection** - Fixed model selection issues when using mission mode
   * **Mission mode validation** - Validation contracts now update correctly when mission requirements change
-  * **Mission mode commands** - Split mission mode enter and exit into separate commands for improved reliability
   * **Bug report smart trimming** - Bug reports now smart-trim large files instead of failing
   * **Plugin auto-install** - Fixed duplicate core plugin auto-install failures being surfaced to users
+
+</Update>
+
+<Update label="February 26" rss={{ title: "CLI Updates", description: "Session archiving, inline rename, custom model reasoning effort, and mission mode improvements" }}>
+  `v0.64.0`
+
+  ## New features
+
+  * **Session archiving** - Archive sessions from the CLI to keep your session list clean
+  * **Inline session rename** - Rename sessions inline with cloud sync support
+  * **Custom model reasoning effort** - Added reasoning effort support for custom models
+  * **Concurrent mission warnings** - Warns on mission entry and confirms concurrent mission runs
+  * **Dry-run validation** - New dry-run validation approach during mission planning
+  * **/model scope clarity** - Clarified `/model` command scope and added set-as-default action
+
+  ## Bug fixes
+
+  * **Mission mode commands** - Split mission mode enter and exit into separate commands for improved reliability
+  * **Context management** - Fixed context management triggering too frequently for OpenAI models
+  * **OpenAI reasoning effort** - Fixed maximum reasoning effort setting for OpenAI models
+  * **Gemini rate limiting** - Improved Gemini 429 error handling with throttle-aware retry
+  * **Bedrock reasoning effort** - Fixed reasoning effort settings for Bedrock models
+  * **Empty end_turn responses** - No longer treats empty end_turn responses as errors
+
+</Update>
+
+<Update label="February 25" rss={{ title: "CLI Updates", description: "Model selector redesign, session default settings, and Droid Shield improvements" }}>
+  `v0.63.0`
+
+  ## New features
+
+  * **Top 5 model selector** - Model selector now shows top 5 models with a "show more" option for cleaner UI
+  * **Session default settings** - All session default settings (model, autonomy, reasoning) now exposed in `/settings` menu
+
+
+  ## Bug fixes
+
+  * **Droid Shield false positives** - Reduced false positives on example files and placeholders
+  * **Glob tool patterns** - Fixed handling of non-array patterns input in Glob tool
+  * **BYOK auth in exec mode** - Fixed authentication validation for BYOK custom models in exec mode
+  * **Session model auth** - Check effective session model for BYOK auth skip, not just CLI flag
+  * **Session loading** - Fixed session loading issues with long conversation histories
+
+</Update>
+
+<Update label="February 24" rss={{ title: "CLI Updates", description: "Bedrock/Vertex support, session-scoped settings, readiness-fix command, and token rate limits" }}>
+  `v0.62.0`
+
+  ## New features
+
+  * **Bedrock/Vertex support** - Added Bedrock and Vertex support for Claude Sonnet 4.6 and Opus 4.6
+  * **Session-scoped settings** - Model, autonomy, and reasoning settings are now session-scoped instead of global
+  * **`/readiness-fix` command** - New slash command to automatically fix issues found in readiness reports
+  * **Token rate limits UI** - Added UI handling for token rate limit notifications
+  * **README requirement for missions** - Missions now require README updates before completion
+
+  ## Bug fixes
+
+  * **MCP reload prevention** - Avoided unnecessary MCP reloads on non-MCP settings changes
+  * **Custom model migration** - Prevented no-op custom model migration writes
+  * **Autonomy persistence** - Preserved autonomy level when spec sessions persist
+
+</Update>
+
+<Update label="February 23" rss={{ title: "CLI Updates", description: "Vertex/Bedrock Opus support, mission control polish, and interactive command prevention" }}>
+  `v0.61.0`
+
+  ## New features
+
+  * **Vertex/Bedrock Opus support** - All latest Opus models now available via Vertex and Bedrock
+  * **Online research in missions** - Added online research and environment setup during mission planning
+  * **Recent local directories** - Quick access to recently used local directories
+
+  ## Bug fixes
+
+  * **Mission control polish** - Visual improvements to mission control UI
+  * **Interactive command prevention** - Prevent interactive command execution that could block the agent
+  * **Mission latency** - Reduced `/enter-mission` latency and improved daemon error UX
+  * **Spec/autonomy decoupling** - Decoupled spec and autonomy settings and permission outcomes
+
+</Update>
+
+<Update label="February 20" rss={{ title: "CLI Updates", description: "Faster search, mission model selector, and mission validation overhaul" }}>
+  `v0.60.0`
+
+  ## New features
+
+  * **Mission model selector** - Choose specific models for mission workers
+  * **Prevent idle sleep** - CLI now prevents system idle sleep during mission execution
+
+  ## Improvements
+
+  * **Faster search** - Sped up search functionality in large repositories with fuzzy search support
+
+  ## Bug fixes
+
+  * **Mission validation overhaul** - Complete overhaul of missions validation for improved reliability
+  * **Mission worker timeouts** - Improved mission worker timeout handling
+  * **Subagent model inheritance** - Fixed model inheritance for subagents
+  * **Diff word highlights** - Fixed incorrect line wrapping in diff word-level highlights
+  * **Gemini tool usage** - Improved Gemini tool usage reliability
+  * **Readiness report sanitization** - Improved sanitization of sensitive data in readiness reports
+  * **TUI daemon shutdown** - Fixed stopping TUI-spawned daemon on shutdown
+
+</Update>
+
+<Update label="February 19" rss={{ title: "CLI Updates", description: "Local settings override, environment variable references in custom models, and mission UX improvements" }}>
+  `v0.58.0`
+
+  ## New features
+
+  * **Local settings override** - New `settings.local.json` for local project/folder-level settings overrides
+  * **Environment variable references** - Custom model API keys now support environment variable references
+  * **Gemini 3.1 Pro model** - Added Gemini 3.1 Pro model support
+  * **Mission planning pausing** - Allow pausing during planning phases with in-context resume in mission control view
+
+  ## Bug fixes
+
+  * **Anthropic provider reset** - Fixed stale Anthropic provider state on model switch
+  * **MCP toggle effects** - MCP toggle changes now apply immediately without restart
+  * **Browser MCP isolation** - Stopped auto-adding `--isolated` flag for browser MCP servers
+  * **Windows PowerShell** - Fixed PowerShell execution issues on Windows
+  * **GLM 4.7 routing** - Fixed GLM 4.7 model routing issues
+  * **Ctrl+G spam prevention** - Blocked Ctrl+G while the agent is streaming to prevent notification spam
+
+</Update>
+
+<Update label="February 17" rss={{ title: "CLI Updates", description: "Claude Sonnet 4.6 model support" }}>
+  `v0.57.16`
+
+  ## New features
+
+  * **Claude Sonnet 4.6** - Added Claude Sonnet 4.6 model support
 
 </Update>
 
