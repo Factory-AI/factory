@@ -15,8 +15,8 @@ Settings are defined in `.factory/` folders with a consistent structure at four 
 
 ```text
 Org         → Central `.factory/` bundle (or config endpoint)
-Project     → <git-root>/.factory/
 Folder      → <git-root>/.../subfolder/.factory/
+Project     → <git-root>/.factory/
 User        → ~/.factory/
 ```
 
@@ -49,8 +49,8 @@ Below is the full schema for org-managed settings. These are configured by org a
     <ResponseField name="interactionMode" type="string">
       Droid interaction mode. One of `auto`, `spec`, `agi`.
     </ResponseField>
-    <ResponseField name="autonomyLevel" type="string">
-      Autonomy level for the session. One of `off`, `low`, `medium`, `high`.
+    <ResponseField name="autonomyMode" type="string">
+      Autonomy mode for the session. One of `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high`.
     </ResponseField>
     <ResponseField name="specModeModel" type="string">
       Model to use when spec mode is active.
@@ -245,7 +245,7 @@ For simple scalar values (strings, numbers, booleans):
 Examples:
 
 - `sessionDefaultSettings.model`
-- `sessionDefaultSettings.autonomyLevel`
+- `sessionDefaultSettings.autonomyMode`
 - `maxAutonomyLevel`
 
 This guarantees that org decisions (such as which models or autonomy levels are allowed) remain authoritative.
@@ -375,7 +375,7 @@ Again, users cannot override these rules; they can only choose safer personal de
     "model": "claude-opus-4-6",
     "reasoningEffort": "high",
     "interactionMode": "auto",
-    "autonomyLevel": "medium",
+    "autonomyMode": "auto-medium",
     "specModeModel": "claude-sonnet-4-6",
     "specModeReasoningEffort": "medium"
   },

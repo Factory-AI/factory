@@ -260,8 +260,11 @@ To clear authentication for a server, use the `/mcp` interactive manager and sel
 
 Each server entry includes:
 
-- **type**: Server type (`stdio` or `http`)
-- **disabled**: Boolean flag to temporarily disable the server (default: `false`)
+| Field | Type | Description |
+| :---- | :--- | :---------- |
+| `type` | `"stdio" \| "http"` | Server type |
+| `disabled` | `boolean` | Temporarily disable the server (default: `false`) |
+| `disabledTools` | `string[]` | List of tool names to disable for this MCP server |
 
 For **stdio** servers:
 - **command**: Executable to run

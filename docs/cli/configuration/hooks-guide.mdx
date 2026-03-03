@@ -79,9 +79,9 @@ Droid feedback on what to do differently.
 
 ### Step 2: Add a matcher
 
-Select `+ Add new matcher…` to run your hook only on Bash tool calls.
+Select `+ Add new matcher…` to run your hook only on Execute tool calls.
 
-Type `Bash` for the matcher.
+Type `Execute` for the matcher.
 
 <Note>You can use `*` to match all tools.</Note>
 
@@ -110,7 +110,7 @@ Run `/hooks` again or check `~/.factory/settings.json` to see your configuration
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Execute",
         "hooks": [
           {
             "type": "command",
@@ -152,7 +152,7 @@ Automatically format TypeScript files after editing:
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Create",
         "hooks": [
           {
             "type": "command",
@@ -174,7 +174,7 @@ Automatically fix missing language tags and formatting issues in markdown files:
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Create",
         "hooks": [
           {
             "type": "command",
@@ -319,7 +319,7 @@ Block edits to sensitive files:
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Create",
         "hooks": [
           {
             "type": "command",
