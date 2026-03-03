@@ -76,21 +76,20 @@ on:
       - '!**/*.test.ts'  # Skip test files
 ```
 
-### Adjust the review focus
+### Custom review guidelines
 
-Edit the prompt in the workflow to change what Droid looks for. For example, to add framework-specific checks:
+Add repository-specific review guidelines by creating a `.factory/skills/review-guidelines/SKILL.md` file in your repo:
 
-```yaml
-run: |
-  cat > prompt.txt << 'EOF'
-  You are an automated code review system...
-  
-  Additional checks for this codebase:
-  - React hooks rules violations
-  - Missing TypeScript types on public APIs
-  - Prisma query performance issues
-  EOF
+```markdown
+<!-- .factory/skills/review-guidelines/SKILL.md -->
+
+Additional checks for this codebase:
+- React hooks rules violations
+- Missing TypeScript types on public APIs
+- Prisma query performance issues
 ```
+
+These guidelines are automatically picked up and injected into every review run. No workflow changes needed.
 
 ### Change the model
 
