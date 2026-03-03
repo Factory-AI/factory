@@ -25,8 +25,7 @@ export OTEL_TELEMETRY_HEADERS="Authorization=Bearer <your-token>"
 
 ## How it works
 
-- Factory already collects product-analytics metrics and ships them to its own OTEL collector.
-- When `OTEL_TELEMETRY_ENDPOINT` is set, the same metrics batch is also sent to your endpoint in the same export cycle via a fan-out exporter -- no extra timers, no duplication of metric readers.
+- When `OTEL_TELEMETRY_ENDPOINT` is set, metrics are sent to your endpoint in the same export cycle via a fan-out exporter -- no extra timers, no duplication of metric readers.
 - Failures to your collector do not affect Factory's own export. Each endpoint is isolated.
 - Metrics use **delta temporality** -- each export contains only new values since the last flush (60-second intervals).
 
