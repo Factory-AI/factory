@@ -24,7 +24,7 @@ When you run `/install-github-app`, droid guides you through verifying prerequis
     Droid verifies that you have:
     - GitHub CLI (`gh`) installed
     - Authenticated with GitHub (`gh auth login`)
-    - Required OAuth scopes (`repo`, `read:org`)
+    - Required OAuth scopes (`repo`, `read:org`, `workflow`)
   </Step>
 
   <Step title="Select a repository">
@@ -93,10 +93,10 @@ gh auth login
 
 ### Verify required scopes
 
-The CLI needs `repo` and `read:org` scopes. If missing, refresh your authentication:
+The CLI needs `repo`, `read:org`, and `workflow` scopes. If missing, refresh your authentication:
 
 ```bash
-gh auth refresh -s repo,read:org
+gh auth refresh -s repo,read:org,workflow
 ```
 
 ## Available workflows
@@ -190,7 +190,7 @@ The Factory Droid GitHub App requires these permissions:
     |-------|----------|
     | GitHub CLI not installed | Install `gh` using the commands above |
     | Not logged in | Run `gh auth login` |
-    | Missing permissions | Run `gh auth refresh -s repo,read:org` |
+    | Missing permissions | Run `gh auth refresh -s repo,read:org,workflow` |
     | API access error | Check your internet connection and run `gh auth status` |
   </Accordion>
 
@@ -220,50 +220,38 @@ After completing the guided flow, Droid creates a PR with workflow files. Here's
 
 <Accordion title="Generated Droid Review Workflow">
 ```yaml
-name: Droid Code Review
+name: Droid Auto Review
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, ready_for_review, reopened]
 
 concurrency:
-  group: droid-review-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  pull-requests: write
-  contents: read
-  issues: write
-
 jobs:
-  code-review:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+  droid-review:
     if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
 
-      - name: Install Droid CLI
-        run: |
-          curl -fsSL https://app.factory.ai/cli | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Configure git identity
-        run: |
-          git config user.name "Droid Agent"
-          git config user.email "droidagent@factory.ai"
-
-      - name: Perform automated code review
-        env:
-          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
+      - name: Run Droid Auto Review
+        uses: Factory-AI/droid-action@v3
+        with:
+          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+          automatic_review: true
 ```
 </Accordion>
 

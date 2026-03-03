@@ -8,7 +8,7 @@ The setup script is a shell script that Factory runs during template creation, a
 ## 1. How to define a setup script
 
 1. In the modal for template creation, in the "Setup Script (Optional)" section, add your initialization script. You can write a multi-line bash script with all the commands you need.
-2. Submit. The script runs in the repo root with bash strict mode (consider using `set -euo pipefail` at the start of your script). Script failures will stop the build.
+2. Submit. The script runs in the repo root exactly as provided. Add `set -euo pipefail` at the top of your script if you want strict error handling. Script failures will stop the build.
 3. Keep your script non‑interactive and idempotent. Write commands that can be safely re-run.
 4. Review build logs if anything fails to see detailed output from your script execution.
 

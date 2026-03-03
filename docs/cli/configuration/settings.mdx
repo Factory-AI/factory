@@ -23,13 +23,22 @@ Changes take effect immediately and are saved to your settings file.
 
 If the file doesn't exist, it's created with defaults the first time you run **droid**.
 
+### Local overrides
+
+You can create a `settings.local.json` alongside `settings.json` in any `.factory/` folder:
+
+- `~/.factory/settings.local.json` (user-level)
+- `<project>/.factory/settings.local.json` (project-level)
+
+Local overrides merge on top of the corresponding `settings.json` at the same level and follow the same hierarchy precedence. Add `settings.local.json` to `.gitignore` if you want to keep machine-specific preferences out of version control.
+
 ## Available settings
 
 | Setting | Options | Default | Description |
 | ------- | ------- | ------- | ----------- |
 | `model` | `opus`, `opus-4-6`, `opus-4-6-fast`, `sonnet`, `gpt-5.1`, `gpt-5.1-codex`, `gpt-5.1-codex-max`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex`, `haiku`, `gemini-3-pro`, `gemini-3.1-pro`, `droid-core`, `glm-5`, `kimi-k2.5`, `minimax-m2.5`, `custom-model` | `opus` | The default AI model used by droid |
 | `reasoningEffort` | `off`, `none`, `low`, `medium`, `high` (availability depends on the model) | Model-dependent default | Controls how much structured thinking the model performs. |
-| `autonomyLevel` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
+| `autonomyMode` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
 | `cloudSessionSync` | `true`, `false` | `true` | Mirror CLI sessions to Factory web. |
 | `diffMode` | `github`, `unified` | `github` | Choose between split GitHub-style diffs and a single-column view. |
 | `completionSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`, or custom file path | `fx-ok01` | Audio cue when a response finishes. |
@@ -42,12 +51,7 @@ If the file doesn't exist, it's created with defaults the first time you run **d
 | `hooksDisabled` | `true`, `false` | `false` | Globally disable all hooks execution. |
 | `ideAutoConnect` | `true`, `false` | `false` | Auto-connect to IDE from external terminals. |
 | `todoDisplayMode` | `inline`, `pinned` | `pinned` | How the todo list is displayed in the UI. |
-| `specSaveEnabled` | `true`, `false` | `false` | Persist spec outputs to disk. |
-| `specSaveDir` | File path | `.factory/docs` | Directory used when `specSaveEnabled` is `true`. |
-| `enableCustomDroids` | `true`, `false` | `true` | Toggle the Custom Droids feature. |
 | `showThinkingInMainView` | `true`, `false` | `false` | Display AI thinking/reasoning blocks in the main chat view. |
-| `allowBackgroundProcesses` | `true`, `false` | `false` | Allow droid to spawn background processes (experimental). |
-| `enableReadinessReport` | `true`, `false` | `false` | Enable the `/readiness-report` slash command (experimental). |
 | `customModels` | Array of model configs | `[]` | Custom model configurations for BYOK. See [BYOK docs](/cli/configuration/byok). |
 
 ### Model
@@ -86,7 +90,7 @@ Anthropic models default to `off`, while GPT-5 starts on `medium`.
 
 ### Autonomy level
 
-`autonomyLevel` controls how proactively droid executes commands when sessions begin. Start at `normal`, or select an `auto-*` preset to pre-authorize additional actions.
+`autonomyMode` controls how proactively droid executes commands when sessions begin. Start at `normal`, or select an `auto-*` preset to pre-authorize additional actions.
 
 ### Diff mode
 
