@@ -5,10 +5,6 @@ description: Export OpenTelemetry metrics from Droid to your own OTLP-compatible
 
 Droid can export OpenTelemetry (OTEL) metrics to your own OTLP-compatible collector, giving you full visibility into Droid activity within your existing observability stack. Metrics are sent to both Factory's collector and yours in the same export cycle -- if your collector is unreachable, Factory's own export is not affected.
 
-<Note>
-The `otel_telemetry_collection` feature flag must be enabled for your organization. Contact your Factory account team to enable it.
-</Note>
-
 ---
 
 ## Configuration
@@ -116,4 +112,4 @@ Tool-specific attributes (`tool.name`, `mcp.server`, `skill.name`, etc.) are inc
 - Verify your collector accepts OTLP HTTP on the `/v1/metrics` path.
 - Confirm `OTEL_TELEMETRY_HEADERS` includes valid auth credentials.
 - Ensure network connectivity from the machine running Droid to your collector.
-- The feature requires the `otel_telemetry_collection` feature flag to be enabled for your org.
+
