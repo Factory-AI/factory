@@ -12,11 +12,11 @@ keywords: ['missions', 'mission', 'enter-mission', 'orchestration', 'multi-featu
   <img src="/images/mission-control.png" alt="Mission Control orchestration view" />
 </Frame>
 
-## What are Missions?
+## Missions とは？
 
-Missions are a structured way to take on large, multi-feature work with Droid. Instead of tackling everything in a single session, you collaborate with Droid upfront to build a plan -- features, milestones, and the skills needed to accomplish each part -- then hand off execution to an orchestration layer that manages the work.
+Missions は、Droid を使って大規模でマルチ機能の作業を構造化された方法で取り組むための仕組みです。すべてを単一のセッションで処理するのではなく、まず Droid と協力してプラン（機能、マイルストーン、各部分を達成するために必要なスキル）を構築し、その後作業を管理するオーケストレーション層に実行を委ねます。
 
-Access Missions with the `/missions` command (also available via `/mission` and `/enter-mission`).
+Missions には `/missions` コマンドでアクセスできます（`/mission` と `/enter-mission` でも利用可能）。
 
 <CardGroup cols={2}>
   <Card title="Collaborative Planning" icon="comments">
@@ -33,7 +33,7 @@ Access Missions with the `/missions` command (also available via `/mission` and 
   </Card>
 </CardGroup>
 
-## How it works
+## 動作の仕組み
 
 <Steps>
   <Step title="Enter a Mission">
@@ -53,49 +53,49 @@ Access Missions with the `/missions` command (also available via `/mission` and 
   </Step>
 </Steps>
 
-## The planning phase matters most
+## 計画段階が最も重要
 
-The biggest value we have found in Missions is in the planning phase. Getting the upfront plan right -- the features, the ordering, the milestones, the skills involved -- is what determines whether the execution succeeds. Droid will push back, ask questions, and iterate with you until the plan is solid.
+Missions において最も価値があるのは計画段階です。事前のプランを正しく組み立てる（機能、順序、マイルストーン、関連するスキル）ことが、実行の成功を決定します。Droid は異議を唱え、質問を投げかけ、プランが確実になるまであなたと反復作業を行います。
 
-This is intentional. A well-scoped plan with clear milestones produces dramatically better results than jumping straight into execution on a vague goal.
+これは意図的なものです。明確なマイルストーンを持つ適切にスコープされたプランは、曖昧な目標でいきなり実行に飛び込むよりもはるかに良い結果を生み出します。
 
-### Validation
+### 検証
 
-- *Milestones** define validation frequency. Validation workers run at the end of each milestone, verifying its work. For simple projects, one milestone is often enough; for longer or complex projects, more frequent milestone validation helps keep the foundation stable as work scales.
+- **マイルストーン**は検証頻度を定義します。検証ワーカーは各マイルストーンの終了時に実行され、その作業を検証します。シンプルなプロジェクトでは1つのマイルストーンで十分なことが多いですが、より長期または複雑なプロジェクトでは、より頻繁なマイルストーン検証が作業の規模拡大時の基盤安定性を保つのに役立ちます。
 
-For smaller, straightforward projects, a single milestone is often enough. For larger or longer-running projects, more granular milestones can prevent drift and reduce expensive rework later.
+小規模で単純なプロジェクトでは、単一のマイルストーンで十分なことが多いです。大規模または長期間のプロジェクトでは、より詳細なマイルストーンがドリフトを防ぎ、後の高コストな再作業を削減できます。
 
-### Estimating cost and duration
+### コストと期間の見積もり
 
-As a rough planning heuristic, mission duration and cost scale with the number of worker runs:
+大まかな計画のヒューリスティックとして、ミッションの期間とコストはワーカーの実行回数に比例します：
 
-- **Feature workers:** roughly one run per feature
-- **Validator workers:** roughly one run per milestone
+- **機能ワーカー：** 機能あたり約1回の実行
+- **検証ワーカー：** マイルストーンあたり約1回の実行
 
-So an initial estimate is approximately:
+つまり、初期見積もりは約：
 
 `total runs ≈ #features + 2 * #milestones`
 
-In practice, this is a floor rather than a ceiling. Validation may surface issues that require follow-up work, and the orchestrator can create additional fix features during execution.
+実際には、これは上限ではなく下限です。検証でフォローアップ作業が必要な問題が浮上する可能性があり、オーケストレーターは実行中に追加の修正機能を作成できます。
 
-## What Missions are good for
+## Missions が適している用途
 
-We have built and tested Missions across a range of work:
+私たちは様々な作業で Missions を構築・テストしてきました：
 
-- **Full-stack development** -- Building complete applications with frontend, backend, database, and deployment.
-- **Research** -- Deep investigation tasks that require exploring multiple approaches, synthesizing findings, and producing structured output.
-- **Brownfield migrations** -- Modernizing existing codebases, swapping frameworks, or restructuring large projects while preserving existing behavior.
-- **Ambitious prototypes** -- Product experiments that need to be functional, not just sketched out.
+- **フルスタック開発** -- フロントエンド、バックエンド、データベース、デプロイメントを含む完全なアプリケーションの構築
+- **リサーチ** -- 複数のアプローチを探索し、発見を統合し、構造化された出力を生成する深い調査タスク
+- **ブラウンフィールド移行** -- 既存の動作を保持しながら、既存コードベースの現代化、フレームワークの交換、大規模プロジェクトの再構築
+- **野心的なプロトタイプ** -- 単なるスケッチではなく、機能的である必要がある製品実験
 
-The common thread: work that benefits from upfront planning and structured decomposition rather than ad-hoc prompting.
+共通点：アドホックなプロンプトではなく、事前計画と構造化された分解から恩恵を受ける作業。
 
-## Working with Mission Control
+## Mission Control での作業
 
-Once the plan is approved, Droid enters Mission Control -- the orchestration view that manages execution. From here you can track progress across features and milestones, see which agents are working on what, and intervene when things need adjustment.
+プランが承認されると、Droid は実行を管理するオーケストレーションビューである Mission Control に入ります。ここから機能とマイルストーンの進捗を追跡し、どのエージェントが何に取り組んでいるかを確認し、調整が必要な時に介入できます。
 
-### Intervening and redirecting
+### 介入とリダイレクト
 
-Missions are not fire-and-forget. The orchestrator is an agent, and you can talk to it. The most effective way to use Missions is to treat yourself as the project manager -- monitoring progress, unblocking workers, and redirecting when the plan needs to change.
+Missions は設定したら放置するものではありません。オーケストレーターはエージェントであり、会話することができます。Missions を最も効果的に使用する方法は、自分をプロジェクトマネージャーとして扱うことです - 進捗を監視し、ワーカーのブロックを解除し、プランの変更が必要な時にリダイレクトします。
 
 <AccordionGroup>
   <Accordion title="The mission freezes or stops making progress">
@@ -123,35 +123,35 @@ Missions are not fire-and-forget. The orchestrator is an agent, and you can talk
   </Accordion>
 </AccordionGroup>
 
-### A new kind of debugging
+### 新しい種類のデバッグ
 
-The skillset for working with Missions looks less like traditional debugging and more like **project management of agents**. You are not stepping through code line by line -- you are monitoring a team of workers, unblocking them when they get stuck, redirecting them when priorities change, and making judgment calls about when to push through versus when to re-plan.
+Missions で作業するスキルセットは、従来のデバッグというよりも**エージェントのプロジェクト管理**に近いものです。コードを1行ずつステップ実行するのではなく、ワーカーチームを監視し、詰まった時にブロックを解除し、優先順位が変わった時にリダイレクトし、押し通すか再計画するかの判断を下します。
 
-This is a meaningfully different way of working with AI. The core skill is knowing when and how to intervene, not writing the code yourself.
+これは AI との意味的に異なる作業方法です。核となるスキルは、いつどのように介入するかを知ることであり、自分でコードを書くことではありません。
 
-## Configuration inheritance
+## 設定の継承
 
-Missions inherit your existing Droid configuration:
+Missions は既存の Droid 設定を継承します：
 
-- **MCP integrations** -- Workers can use your connected tools (Linear, Sentry, Notion, etc.)
-- **Custom skills** -- Your existing skills are available and new ones can be developed during planning.
-- **Hooks** -- Lifecycle hooks fire during mission execution.
-- **Custom droids** -- Subagents configured in your project are available to workers.
-- **AGENTS.md** -- Workers follow your project conventions and coding standards.
+- **MCP 統合** -- ワーカーは接続されたツール（Linear、Sentry、Notion など）を使用できます
+- **カスタムスキル** -- 既存のスキルが利用可能で、計画中に新しいものを開発できます
+- **フック** -- ライフサイクルフックはミッション実行中に発火します
+- **カスタム droids** -- プロジェクトで設定されたサブエージェントがワーカーで利用できます
+- **AGENTS.md** -- ワーカーはプロジェクトの慣例とコーディング標準に従います
 
-## Open questions
+## 未解決の問題
 
-Missions are early. We are shipping this as a research preview because there are fundamental questions we are still working through:
+Missions は初期段階です。まだ取り組んでいる根本的な問題があるため、これをリサーチプレビューとして提供しています：
 
-- **Is parallelization necessary?** Running multiple agents in parallel sounds good in theory, but does it actually produce better results than sequential execution? We are testing this.
-- **How do you maximize correctness?** Long-running plans accumulate errors. What validation and correction strategies work best at each stage?
-- **Cost vs. quality tradeoffs** -- How aggressive should the orchestrator be? More planning and validation means higher cost but potentially better output. Where is the right balance?
+- **並列化は必要か？** 複数のエージェントを並列実行するのは理論的には良く聞こえますが、実際に逐次実行よりも良い結果を生み出すのでしょうか？これをテストしています。
+- **正確性を最大化するには？** 長期間のプランはエラーが蓄積されます。各段階でどの検証と修正戦略が最も効果的でしょうか？
+- **コスト vs. 品質のトレードオフ** -- オーケストレーターはどの程度積極的であるべきでしょうか？より多くの計画と検証は高コストを意味しますが、潜在的により良い出力をもたらします。適切なバランスはどこでしょうか？
 
-We want your feedback on these. Use Missions, push them hard, and tell us what works and what does not.
+これらについてあなたのフィードバックが欲しいです。Missions を使用し、限界まで押し、何が機能し何が機能しないかを教えてください。
 
-## See also
+## 関連項目
 
-- [Specification Mode](/cli/user-guides/specification-mode) -- For well-scoped tasks that benefit from planning before implementation
-- [Implementing Large Features](/cli/user-guides/implementing-large-features) -- Manual workflow for multi-phase projects
-- [Custom Droids](/cli/configuration/custom-droids) -- Build specialized subagents that missions can use
-- [Skills](/cli/configuration/skills) -- Create and manage skills that missions can leverage
+- [Specification Mode](/cli/user-guides/specification-mode) -- 実装前の計画から恩恵を受ける適切にスコープされたタスクに対して
+- [Implementing Large Features](/cli/user-guides/implementing-large-features) -- マルチフェーズプロジェクトのマニュアルワークフロー
+- [Custom Droids](/cli/configuration/custom-droids) -- ミッションが使用できる専門的なサブエージェントを構築
+- [Skills](/cli/configuration/skills) -- ミッションが活用できるスキルの作成と管理

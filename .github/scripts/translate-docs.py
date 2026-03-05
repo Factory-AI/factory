@@ -15,7 +15,12 @@ import re
 import anthropic
 
 def extract_preservable_blocks(content):
-    """Replace code blocks and MDX components with placeholders."""
+    """Replace code blocks, tags, and links with placeholders.
+
+    Only the *tags themselves* are preserved for MDX/JSX components so that
+    translatable prose inside wrapper components (e.g. <Update>, <Steps>)
+    still gets sent to the translator.
+    """
     placeholders = []
     counter = [0]
 
@@ -25,12 +30,14 @@ def extract_preservable_blocks(content):
         counter[0] += 1
         return f"__PRESERVE_{idx}__"
 
-    # Preserve fenced code blocks
+    # Preserve fenced code blocks (``` ... ```)
     content = re.sub(r'```[\s\S]*?```', replace_with_placeholder, content)
     # Preserve inline code
     content = re.sub(r'`[^`\n]+`', replace_with_placeholder, content)
-    # Preserve MDX/JSX components (multi-line)
-    content = re.sub(r'<[A-Z][^>]*>[\s\S]*?</[A-Z][a-zA-Z]*>', replace_with_placeholder, content)
+    # Preserve MDX/JSX opening tags (e.g. <Update label="...">, <Step title="...">)
+    content = re.sub(r'<[A-Z][a-zA-Z]*(?:\s[^>]*)?\s*>', replace_with_placeholder, content)
+    # Preserve MDX/JSX closing tags (e.g. </Update>, </Step>)
+    content = re.sub(r'</[A-Z][a-zA-Z]*>', replace_with_placeholder, content)
     # Preserve self-closing MDX components
     content = re.sub(r'<[A-Z][^/]*?/>', replace_with_placeholder, content)
     # Preserve HTML-like tags
@@ -47,6 +54,9 @@ def restore_preserved_blocks(content, placeholders):
     """Restore preserved blocks from placeholders."""
     for i, block in enumerate(placeholders):
         content = content.replace(f"__PRESERVE_{i}__", block)
+    remaining = re.findall(r'__PRESERVE_\d+__', content)
+    if remaining:
+        print(f"    WARNING: {len(remaining)} unresolved placeholders remain: {remaining[:5]}")
     return content
 
 
@@ -59,13 +69,42 @@ def split_frontmatter(content):
 
 
 def translate_text(client, text):
-    """Translate English text to Japanese using Claude."""
+    """Translate English text to Japanese using Claude.
+    
+    Splits large texts into chunks to avoid output truncation.
+    """
     if not text.strip():
         return text
 
+    lines = text.split('\n')
+    # For small texts, translate in one shot
+    if len(lines) <= 200:
+        return _translate_chunk(client, text)
+
+    # Split into chunks at paragraph boundaries
+    chunks = []
+    current = []
+    for line in lines:
+        current.append(line)
+        if len(current) >= 150 and line.strip() == '':
+            chunks.append('\n'.join(current))
+            current = []
+    if current:
+        chunks.append('\n'.join(current))
+
+    translated = []
+    for i, chunk in enumerate(chunks):
+        print(f"    Translating chunk {i+1}/{len(chunks)}...")
+        translated.append(_translate_chunk(client, chunk))
+
+    return '\n'.join(translated)
+
+
+def _translate_chunk(client, text):
+    """Translate a single chunk of text."""
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=8192,
+        max_tokens=16384,
         messages=[
             {
                 "role": "user",
@@ -73,12 +112,13 @@ def translate_text(client, text):
 
 Rules:
 - Translate all prose text to natural Japanese
-- Do NOT translate any placeholder tokens like __PRESERVE_0__, __PRESERVE_1__, etc. Keep them exactly as-is
+- CRITICAL: Do NOT translate, modify, or remove any placeholder tokens like __PRESERVE_0__, __PRESERVE_1__, etc. Keep them EXACTLY as-is in the EXACT same position
 - Do NOT translate brand names (Factory, Droid, GitHub, etc.)
 - Do NOT translate technical terms that are commonly kept in English in Japanese tech docs (API, CLI, SDK, MCP, SSO, SCIM, etc.)
 - Keep markdown formatting (headers ##, bold **, italic *, lists -, etc.) intact
 - Keep the same line structure and paragraph breaks
 - Translate heading text after # symbols
+- Output ONLY the translated text, no preamble or explanation
 
 Text to translate:
 {text}"""

@@ -11,103 +11,103 @@ keywords:
   ]
 ---
 
-The Agent Readiness dashboard provides a centralized view of your organization's readiness scores across all repositories, with historical trends and detailed breakdowns.
+Agent Readinessダッシュボードは、組織のすべてのリポジトリにわたる準備状況スコアの一元化されたビューを提供し、履歴トレンドと詳細な内訳を表示します。
 
 ![Agent Readiness Dashboard](/images/web/readiness-dashboard.png)
 
 ---
 
-## Accessing the Dashboard
+## ダッシュボードへのアクセス
 
-Navigate to **Settings → Analytics → Agent Readiness** in the Factory app.
+Factoryアプリで**Settings → Analytics → Agent Readiness**に移動します。
 
 ---
 
-## Main Dashboard View
+## メインダッシュボードビュー
 
-The dashboard shows an organization-level overview with three main sections:
+ダッシュボードは、3つの主要セクションで構成された組織レベルの概要を表示します：
 
-### Summary Cards
+### サマリーカード
 
-At the top, you'll see key metrics:
+上部には、主要な指標が表示されます：
 
-| Metric                   | Description                                                                 |
+| 指標                      | 説明                                                                        |
 | :----------------------- | :-------------------------------------------------------------------------- |
-| **Organization Score**   | Average readiness level across all measured repositories (rounded down)      |
-| **Repositories Tracked** | Number of repositories with readiness reports vs. total enabled repositories |
-| **Last Updated**         | Time since the most recent readiness evaluation                              |
+| **Organization Score**   | 測定対象の全リポジトリにおける平均準備レベル（切り下げ）                             |
+| **Repositories Tracked** | 準備状況レポートのあるリポジトリ数 vs 有効化された総リポジトリ数                     |
+| **Last Updated**         | 最新の準備状況評価からの経過時間                                                |
 
-### Progress Graph
+### 進捗グラフ
 
-A time-series chart showing your organization's readiness level over time. Use the period filters to view different time ranges:
+組織の準備レベルの時系列推移を示すグラフです。期間フィルターを使用して異なる時間範囲を表示できます：
 
-- **7d** — Last 7 days
-- **1m** — Last month
-- **6m** — Last 6 months
-- **1y** — Last year
-- **all** — All time
+- **7d** — 過去7日間
+- **1m** — 過去1か月
+- **6m** — 過去6か月
+- **1y** — 過去1年
+- **all** — 全期間
 
-### Repositories Table
+### リポジトリテーブル
 
-A searchable, paginated table of all repositories showing:
+検索・ページネーション機能付きの全リポジトリテーブルで、以下を表示します：
 
-- **Repository name** — Click to view details
-- **Level** — Current readiness level (1-5)
-- **Progress** — Percentage complete toward next level
-- **Last Update** — When the repository was last evaluated
+- **Repository name** — クリックして詳細を表示
+- **Level** — 現在の準備レベル（1-5）
+- **Progress** — 次のレベルまでの完了率
+- **Last Update** — リポジトリが最後に評価された日時
 
-Use the search bar to filter repositories by name or URL.
+検索バーを使用してリポジトリを名前またはURLでフィルタリングできます。
 
 ---
 
-## Repository Detail Page
+## リポジトリ詳細ページ
 
-Click any repository row to view its detailed readiness breakdown.
+任意のリポジトリ行をクリックすると、詳細な準備状況の内訳が表示されます。
 
 ![Repository Detail Page](/images/web/readiness-criteria.png)
 
-### Header
+### ヘッダー
 
-Shows the repository name, current level achieved, last evaluation time, and a **Refresh** button to trigger a new evaluation.
+リポジトリ名、現在達成しているレベル、最終評価時刻、および新しい評価をトリガーする**Refresh**ボタンが表示されます。
 
-### Level Accordions
+### レベルアコーディオン
 
-Each readiness level (Functional through Autonomous) has an expandable accordion section showing:
+各準備レベル（FunctionalからAutonomousまで）には展開可能なアコーディオンセクションがあり、以下が表示されます：
 
-- **Percentage complete** — How much of that level's criteria are passing
-- **Lock status** — Levels are locked until the previous level reaches 80%
+- **Percentage complete** — そのレベルの条件のうち合格している割合
+- **Lock status** — 前のレベルが80%に達するまでレベルはロックされます
 
-### Criterion Rows
+### 条件行
 
-Within each level, individual criteria display:
+各レベル内で、個別の条件は以下を表示します：
 
-| Element       | Description                                        |
+| 要素          | 説明                                               |
 | :------------ | :------------------------------------------------- |
-| **Name**      | The criterion being evaluated                      |
-| **Score**     | Format `[X/Y]` — numerator/denominator             |
-| **Status**    | Pass (green) or fail (red) indicator               |
-| **Rationale** | Click to expand and see the evaluation explanation |
+| **Name**      | 評価される条件                                      |
+| **Score**     | 形式`[X/Y]` — 分子/分母                      |
+| **Status**    | 合格（緑）または不合格（赤）のインジケーター            |
+| **Rationale** | クリックして展開し、評価の説明を確認                  |
 
-### Remediation (Coming Soon)
+### 修復（近日公開）
 
-Soon, failing criteria will display a **Fix** button that triggers automated remediation. Select the criteria you want to fix, and the system will implement the necessary changes to your repository.
+近日中に、不合格の条件には自動修復をトリガーする**Fix**ボタンが表示されます。修正したい条件を選択すると、システムがリポジトリに必要な変更を実装します。
 
 ---
 
-## Triggering a Refresh
+## 更新のトリガー
 
-There are two ways to refresh a readiness evaluation:
+準備状況評価を更新する方法は2つあります：
 
-### From the Web Dashboard
+### Webダッシュボードから
 
-1. Navigate to the repository detail page
-2. Click the **Refresh** button in the header
-3. A new session starts to evaluate the repository
-4. Once done, the dashboard will update with results from the latest report
+1. リポジトリ詳細ページに移動
+2. ヘッダーの**Refresh**ボタンをクリック
+3. リポジトリを評価する新しいセッションが開始
+4. 完了後、最新レポートの結果でダッシュボードが更新されます
 
-### From the CLI
+### CLIから
 
-Run the `/readiness-report` [slash command](/cli/features/readiness-report) in the Factory CLI while in the repository directory:
+リポジトリディレクトリ内でFactory CLIの`/readiness-report` [slash command](/cli/features/readiness-report)を実行します：
 
 ```bash
 droid
@@ -122,11 +122,11 @@ droid
 
 ---
 
-## Understanding the Metrics
+## 指標の理解
 
-### Organization Level Calculation
+### 組織レベルの計算
 
-The organization-level score is calculated as the **average of all repository levels, rounded down**. For example:
+組織レベルのスコアは、**全リポジトリレベルの平均を切り下げ**して計算されます。例：
 
 - Repo A: Level 3
 - Repo B: Level 2
@@ -134,22 +134,22 @@ The organization-level score is calculated as the **average of all repository le
 
 Organization Level = floor((3 + 2 + 3) / 3) = floor(2.67) = **Level 2**
 
-### Repository Level Calculation
+### リポジトリレベルの計算
 
-A repository's level is determined by the **80% threshold system**:
+リポジトリのレベルは**80%閾値システム**によって決定されます：
 
-1. Start at Level 1
-2. If 80% of Level 1 criteria pass → achieve Level 2
-3. If 80% of Level 2 criteria pass → achieve Level 3
-4. Continue through Level 5
+1. Level 1から開始
+2. Level 1の条件の80%が合格 → Level 2達成
+3. Level 2の条件の80%が合格 → Level 3達成
+4. Level 5まで継続
 
-The percentage shown for each level indicates progress toward completing that level's criteria.
+各レベルに表示される割合は、そのレベルの条件完了に向けた進捗を示しています。
 
 ---
 
-## Best Practices
+## ベストプラクティス
 
-- **Regular evaluations:** Run readiness reports after significant infrastructure changes
-- **Focus on current level:** Address failing criteria in your current level before jumping ahead to focus on foundational improvements first
-- **Track trends:** Use the progress graph to monitor improvement over time
-- **Prioritize high-impact fixes:** The action items in CLI reports highlight the most impactful improvements
+- **定期的な評価：** インフラストラクチャの重要な変更後に準備状況レポートを実行
+- **現在のレベルに集中：** 先に進む前に現在のレベルの不合格条件に対処し、基盤的改善を優先
+- **トレンドの追跡：** 進捗グラフを使用して時間経過に伴う改善を監視
+- **高インパクトの修正を優先：** CLIレポートのアクション項目は最もインパクトの大きい改善を強調表示

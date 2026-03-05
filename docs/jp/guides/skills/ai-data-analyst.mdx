@@ -4,11 +4,11 @@ description: A reusable skill for performing comprehensive data analysis, visual
 keywords: ['data analyst', 'data analysis', 'visualization', 'statistics', 'python', 'skill', 'charts', 'insights']
 ---
 
-This skill enables Droids to act as an AI-powered data analyst, performing exploratory data analysis, statistical modeling, data visualization, and generating insights from structured and unstructured data. Unlike point-solution data analysis tools, this skill runs entirely in your local environment with full Python ecosystem access and customization capabilities.
+このスキルは、DroidをAI駆動のデータアナリストとして機能させ、探索的データ分析、統計モデリング、データ可視化、および構造化・非構造化データからの洞察生成を実行できるようにします。特定用途のデータ分析ツールとは異なり、このスキルは完全にローカル環境で動作し、Pythonエコシステムへのフルアクセスとカスタマイズ機能を提供します。
 
-## Setup Instructions
+## セットアップ手順
 
-To use this skill with Factory, create the following directory structure in your repository:
+このスキルをFactoryで使用するには、リポジトリに以下のディレクトリ構造を作成してください：
 
 ```
 .factory/skills/ai-data-analyst/
@@ -18,22 +18,22 @@ To use this skill with Factory, create the following directory structure in your
 └── example-analyses.md (optional)
 ```
 
-### Quick Start
+### クイックスタート
 
-1. **Create the skill directory:**
+1. **スキルディレクトリを作成する：**
    ```bash
    mkdir -p .factory/skills/ai-data-analyst
    ```
 
-2. **Copy the skill content below into `.factory/skills/ai-data-analyst/SKILL.md` (or `skill.mdx`)**
+2. **以下のスキルコンテンツを`.factory/skills/ai-data-analyst/SKILL.md`（または`skill.mdx`）にコピーする**
 
 <Tip>
 When you ask Factory to perform data analysis, create visualizations, or build statistical models, it will automatically invoke this skill based on the task description.
 </Tip>
 
-## Skill Definition
+## スキル定義
 
-Copy the following content into `.factory/skills/ai-data-analyst/SKILL.md`:
+以下の内容を`.factory/skills/ai-data-analyst/SKILL.md`にコピーしてください：
 
 ````md
 ---
@@ -187,17 +187,17 @@ Unlike point-solution data analysis tools:
 Run the following to verify the analysis:
 
 ```bash
-# Create virtual environment
+# 仮想環境を作成
 python3 -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+source venv/bin/activate  # Windowsでは `venv\Scripts\activate`
 
-# Install dependencies
+# 依存関係をインストール
 pip install -r requirements.txt
 
-# Run analysis script
+# 分析スクリプトを実行
 python analysis.py
 
-# Check outputs generated
+# 生成された出力を確認
 ls -lh outputs/
 ```
 
@@ -217,20 +217,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load and inspect data
+# データの読み込みと検査
 df = pd.read_csv('data.csv')
 print(df.info())
 print(df.describe())
 
-# Check for missing values
+# 欠損値の確認
 print(df.isnull().sum())
 
-# Visualize distributions
+# 分布の可視化
 df.hist(figsize=(12, 10), bins=30)
 plt.tight_layout()
 plt.savefig('distributions.png', dpi=300)
 
-# Check correlations
+# 相関の確認
 corr = df.corr()
 sns.heatmap(corr, annot=True, cmap='coolwarm')
 plt.savefig('correlations.png', dpi=300)
@@ -242,21 +242,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.tsa.seasonal import seasonal_decompose
 
-# Load time series data
+# 時系列データの読み込み
 df = pd.read_csv('timeseries.csv', parse_dates=['date'])
 df.set_index('date', inplace=True)
 
-# Decompose time series
+# 時系列の分解
 decomposition = seasonal_decompose(df['value'], model='additive', period=30)
 fig = decomposition.plot()
 fig.set_size_inches(12, 8)
 plt.savefig('decomposition.png', dpi=300)
 
-# Calculate rolling statistics
+# 移動統計量の計算
 df['rolling_mean'] = df['value'].rolling(window=7).mean()
 df['rolling_std'] = df['value'].rolling(window=7).std()
 
-# Plot with trends
+# トレンドを含むプロット
 plt.figure(figsize=(12, 6))
 plt.plot(df['value'], label='Original')
 plt.plot(df['rolling_mean'], label='7-day Moving Avg', linewidth=2)
@@ -273,25 +273,25 @@ plt.savefig('trends.png', dpi=300)
 from scipy import stats
 import numpy as np
 
-# Compare two groups
+# 2つのグループの比較
 group_a = df[df['group'] == 'A']['metric']
 group_b = df[df['group'] == 'B']['metric']
 
-# Check normality
+# 正規性の確認
 _, p_norm_a = stats.shapiro(group_a)
 _, p_norm_b = stats.shapiro(group_b)
 
-# Choose appropriate test
+# 適切なテストの選択
 if p_norm_a > 0.05 and p_norm_b > 0.05:
-    # Parametric test (t-test)
+    # パラメトリックテスト（t検定）
     statistic, p_value = stats.ttest_ind(group_a, group_b)
     test_used = "Independent t-test"
 else:
-    # Non-parametric test (Mann-Whitney U)
+    # ノンパラメトリックテスト（Mann-Whitney U検定）
     statistic, p_value = stats.mannwhitneyu(group_a, group_b)
     test_used = "Mann-Whitney U test"
 
-# Calculate effect size (Cohen's d)
+# 効果量の計算（Cohen's d）
 pooled_std = np.sqrt((group_a.std()**2 + group_b.std()**2) / 2)
 cohens_d = (group_a.mean() - group_b.mean()) / pooled_std
 
@@ -308,20 +308,20 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 
-# Prepare data
+# データの準備
 X = df.drop('target', axis=1)
 y = df['target']
 
-# Split data
+# データの分割
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# Train model
+# モデルの訓練
 model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
-# Evaluate
+# 評価
 y_pred = model.predict(X_test)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 r2 = r2_score(y_test, y_pred)
@@ -329,7 +329,7 @@ r2 = r2_score(y_test, y_pred)
 print(f"RMSE: {rmse:.4f}")
 print(f"R² Score: {r2:.4f}")
 
-# Feature importance
+# 特徴量重要度
 importance = pd.DataFrame({
     'feature': X.columns,
     'importance': model.feature_importances_

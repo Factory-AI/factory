@@ -4,9 +4,9 @@ description: Automatic secret detection to prevent accidental exposure of creden
 keywords: ['droid shield', 'secrets', 'credentials', 'api keys', 'detection', 'security']
 ---
 
-## What is Droid Shield?
+## Droid Shieldとは？
 
-Droid Shield is a built-in security feature that automatically scans un-committed changes for potential secrets before committing and pushing them to remote. It acts as a safety net to prevent accidental exposure of sensitive credentials like API keys, tokens, and passwords in your version control history.
+Droid Shieldは、コミットしてリモートにプッシュする前に、未コミットの変更を自動的にスキャンして潜在的なシークレットを検出する組み込みセキュリティ機能です。APIキー、トークン、パスワードなどの機密認証情報がバージョン管理履歴に誤って公開されることを防ぐセーフティネットとして機能します。
 
 <Tip>
   **Looking for advanced protection?** [Droid Shield Plus](/cli/account/droid-shield-plus) provides AI-powered security scanning with prompt injection detection, enhanced secrets detection, and sensitive data protection. Available for enterprise customers.
@@ -14,14 +14,14 @@ Droid Shield is a built-in security feature that automatically scans un-committe
 
 ---
 
-## How Droid Shield Works
+## Droid Shieldの動作原理
 
-When you use Droid to perform `git commit` or `git push` operations, Droid Shield automatically:
+Droidを使用して`git commit`または`git push`操作を実行すると、Droid Shieldは自動的に以下を行います：
 
-1. **Scans the diff** - Analyzes only the lines being added (not removed or unchanged)
-2. **Detects secrets** - Uses pattern matching to identify potential credentials
-3. **Blocks execution** - Stops the git operation if secrets are detected
-4. **Reports findings** - Shows exactly where potential secrets were found
+1. **差分をスキャン** - 追加される行のみを分析（削除や変更されていない行は対象外）
+2. **シークレットを検出** - パターンマッチングを使用して潜在的な認証情報を識別
+3. **実行をブロック** - シークレットが検出された場合、git操作を停止
+4. **検出結果を報告** - 潜在的なシークレットが見つかった正確な場所を表示
 
 <Note>
   Droid Shield only scans git operations performed through Droid. Manual git commands run outside of Droid are not affected.
@@ -29,9 +29,9 @@ When you use Droid to perform `git commit` or `git push` operations, Droid Shiel
 
 ---
 
-## What Droid Shield Detects
+## Droid Shieldが検出する対象
 
-Droid Shield scans for a wide range of credential patterns, including:
+Droid Shieldは、以下を含む幅広い認証情報パターンをスキャンします：
 
 <CardGroup cols={2}>
   <Card title="API Keys & Tokens" icon="key">
@@ -48,22 +48,22 @@ Droid Shield scans for a wide range of credential patterns, including:
   </Card>
 </CardGroup>
 
-### Detection Algorithm
+### 検出アルゴリズム
 
-Droid Shield uses smart pattern matching with randomness validation:
+Droid Shieldは、ランダム性検証を伴うスマートパターンマッチングを使用します：
 
-- **Pattern matching** - Identifies credentials by format
-- **Randomness check** - Validates that captured values look like actual secrets
-- **Context awareness** - Considers variable names and assignment patterns to reduce false positives
+- **パターンマッチング** - フォーマットによる認証情報の識別
+- **ランダム性チェック** - キャプチャされた値が実際のシークレットのように見えるかを検証
+- **コンテキスト認識** - 変数名と代入パターンを考慮して誤検出を減らす
 
 ---
 
-## When Droid Shield Activates
+## Droid Shieldが起動するタイミング
 
-Droid Shield automatically activates during these git operations:
+Droid Shieldは以下のgit操作中に自動的に起動します：
 
-- **`git commit`** - Scans staged changes before creating the commit
-- **`git push`** - Scans commits that would be pushed to the remote
+- **`git commit`** - コミット作成前にステージされた変更をスキャン
+- **`git push`** - リモートにプッシュされるコミットをスキャン
 
 <Warning>
   If secrets are detected, the git operation is blocked to prevent credential exposure. You'll need to remove the secrets before proceeding.
@@ -71,16 +71,16 @@ Droid Shield automatically activates during these git operations:
 
 ---
 
-## Managing Droid Shield Settings
+## Droid Shield設定の管理
 
-### In the CLI
+### CLIでの操作
 
-You can toggle Droid Shield on or off through the settings menu:
+設定メニューからDroid Shieldのオン/オフを切り替えることができます：
 
-1. Run `droid`
-2. Enter `/settings`
-3. Toggle **"Droid Shield"** setting
-4. Changes take effect immediately
+1. `droid`を実行
+2. `/settings`を入力
+3. **「Droid Shield」**設定を切り替え
+4. 変更は即座に有効になります
 
 <Info>
   Droid Shield is **enabled by default** for your protection. We strongly recommend keeping it enabled.
@@ -88,9 +88,9 @@ You can toggle Droid Shield on or off through the settings menu:
 
 ---
 
-## What to Do if Secrets are Detected
+## シークレットが検出された場合の対処法
 
-When Droid Shield detects potential secrets, you'll see an error message like:
+Droid Shieldが潜在的なシークレットを検出すると、以下のようなエラーメッセージが表示されます：
 
 ```
 Droid-Shield has detected potential secrets in 2 location(s) across files:
@@ -101,7 +101,7 @@ If you would like to override, you can either:
 2. Disable Droid Shield by running /settings and toggling the "Droid Shield" option
 ```
 
-### Recommended Actions
+### 推奨される対処方法
 
 <Steps>
   <Step title="Review the findings">
@@ -122,17 +122,17 @@ If you would like to override, you can either:
   **Never disable Droid Shield just to bypass the check.** Exposed credentials can lead to security breaches, unauthorized access, and compliance violations.
 </Warning>
 
-### If You Get a False Positive
+### 誤検出の場合
 
-Droid Shield uses conservative patterns to err on the side of caution. If you believe a detection is a false positive:
+Droid Shieldは慎重を期すために保守的なパターンを使用します。検出が誤検出だと思われる場合：
 
-1. **Verify it's not a real secret** - Double-check that the value isn't sensitive
-2. **Use a manual commit** - Perform the git operation yourself outside of Droid
-3. **Report the pattern** - Contact support@factory.ai if you encounter recurring false positives
+1. **実際のシークレットでないことを確認** - その値が機密情報でないことを再確認
+2. **手動コミットを使用** - Droid以外でgit操作を直接実行
+3. **パターンを報告** - 繰り返し発生する誤検出がある場合はsupport@factory.aiまでご連絡ください
 
 ---
 
-## Best Practices
+## ベストプラクティス
 
 <AccordionGroup>
   <Accordion title="Use environment variables">
@@ -162,7 +162,7 @@ Droid Shield uses conservative patterns to err on the side of caution. If you be
 
 ---
 
-## Limitations
+## 制限事項
 
 <Note>
   **Droid Shield is a detection tool, not a guarantee.** While it catches many common secret patterns, it cannot detect:
@@ -176,7 +176,7 @@ Droid Shield uses conservative patterns to err on the side of caution. If you be
 
 ---
 
-## Related Resources
+## 関連リソース
 
 <CardGroup cols={2}>
   <Card title="Security Overview" icon="shield" href="/cli/account/security">
@@ -189,7 +189,7 @@ Droid Shield uses conservative patterns to err on the side of caution. If you be
 
 ---
 
-## Need Help?
+## サポートが必要ですか？
 
 <CardGroup cols={2}>
   <Card title="Security Questions" icon="envelope">

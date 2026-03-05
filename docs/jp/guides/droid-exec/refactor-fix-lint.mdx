@@ -4,24 +4,24 @@ description: 'Automatically fix ESLint violations across your codebase using Dro
 keywords: ['lint', 'eslint', 'fix', 'automation', 'code quality', 'droid exec']
 ---
 
-This tutorial demonstrates how to use Droid Exec to automatically fix ESLint violations across your codebase. The script identifies files with lint errors and intelligently fixes them while preserving functionality.
+このチュートリアルでは、Droid Execを使用してコードベース全体のESLint違反を自動修正する方法を説明します。このスクリプトは、lint エラーのあるファイルを特定し、機能を保持しながらインテリジェントに修正します。
 
 <Info>
 This approach works with any ESLint rule - from simple formatting issues to complex architectural patterns.
 </Info>
 
-## How it works
+## 動作原理
 
-The script:
+このスクリプトは以下のように動作します：
 
-1. **Finds violations**: Runs ESLint to identify all route.ts files missing middleware
-2. **Analyzes context**: Determines the appropriate middleware type based on the route path
-3. **Adds middleware**: Inserts the correct handle*Middleware call as the first statement
-4. **Preserves logic**: Wraps existing code in the middleware callback
-5. **Maintains types**: Ensures TypeScript types are correctly preserved
-6. **Formats code**: Maintains consistent code style
+1. **違反を検出**: ESLintを実行してmiddlewareが不足している全てのroute.tsファイルを特定
+2. **コンテキストを分析**: ルートパスに基づいて適切なmiddlewareタイプを決定
+3. **middlewareを追加**: 最初のステートメントとして正しいhandle*Middleware呼び出しを挿入
+4. **ロジックを保持**: 既存のコードをmiddlewareコールバック内にラップ
+5. **型を維持**: TypeScript型が正しく保持されるようにする
+6. **コードをフォーマット**: 一貫したコードスタイルを維持
 
-## Get the script
+## スクリプトの取得
 
 <Accordion title="View full script source">
 ```bash
@@ -285,19 +285,19 @@ exit 0
   The more specific your examples, the better Droid will understand and implement the fix pattern.
 </Warning>
 
-## Prerequisites
+## 前提条件
 
-Before you begin, ensure you have completed the [Droid Exec installation](/cli/droid-exec/overview#installation)
+開始する前に、[Droid Exec installation](/cli/droid-exec/overview#installation)が完了していることを確認してください。
 
-## Basic usage
+## 基本的な使用方法
 
-### Preview violations (dry run)
+### 違反のプレビュー（ドライラン）
 
 <Warning>
   Always start with a dry run to see which files need fixing before making changes.
 </Warning>
 
-The dry run shows you which files violate the middleware rule and what type of middleware would be added:
+ドライランでは、middlewareルールに違反しているファイルと追加されるmiddlewareのタイプが表示されます：
 
 ```bash
 # Preview what would happen (no changes made)
@@ -326,18 +326,18 @@ DRY_RUN=true ./droid-fix-route-middleware.sh apps/factory-admin/src/app/api
 # Files processed: 0
 ```
 
-**How dry run works:**
-- When `DRY_RUN=true`: Identifies violations and shows what middleware type would be added
-- When `DRY_RUN=false` (default): Actually fixes the violations by adding middleware
+**ドライランの動作原理：**
+- `DRY_RUN=true`の場合：違反を特定し、追加されるmiddlewareタイプを表示
+- `DRY_RUN=false`（デフォルト）の場合：middlewareを追加して違反を実際に修正
 
-This helps you:
-- Understand which routes are missing middleware
-- Verify the correct middleware type will be used
-- Estimate the scope of changes
+これにより以下のことが可能になります：
+- どのルートにmiddlewareが不足しているかを理解
+- 正しいmiddlewareタイプが使用されることを確認
+- 変更の範囲を見積もり
 
-### Apply fixes
+### 修正の適用
 
-Once ready, run the actual fix:
+準備ができたら、実際の修正を実行します：
 
 ```bash
 # Fix all violations in a directory
@@ -362,9 +362,9 @@ Once ready, run the actual fix:
 # ✓ Fixed middleware violations
 ```
 
-## Real-world transformations
+## 実際の変換例
 
-### Example 1: Simple GET Handler
+### 例1：シンプルなGETハンドラー
 
 <Tabs>
   <Tab title="Before">
@@ -411,7 +411,7 @@ Once ready, run the actual fix:
   </Tab>
 </Tabs>
 
-### Example 2: Cron Job Handler  
+### 例2：Cronジョブハンドラー  
 
 <Tabs>
   <Tab title="Before">
@@ -479,7 +479,7 @@ Once ready, run the actual fix:
 </Tabs>
 
 
-## Best practices
+## ベストプラクティス
 
 <Note>
   Follow these best practices for safe and effective middleware addition.

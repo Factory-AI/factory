@@ -4,16 +4,16 @@ description: Use Factory Droid as a custom AI agent inside Zed, with full MCP se
 keywords: ['zed', 'zed editor', 'ai agent', 'acp', 'mcp', 'context servers']
 ---
 
-## Setup
+## セットアップ
 
-Before wiring Zed to Factory Droid, make sure you have Zed installed. Afterwards:
+ZedをFactory Droidに接続する前に、Zedがインストールされていることを確認してください。その後：
 
 1. [Install the Factory Droid extension.](https://zed.dev/extensions/factory-droid)
-2. Open the Agent Panel.
-3. Click the **+** button in the top-right corner.
-4. In the agent dropdown, select **Factory Droid**.
-5. If you are unauthenticated you will see a message indicating you must authenticate.
-   1. Keep track of the device code rendered, and click the "Login" button.
+2. Agent Panelを開きます。
+3. 右上角の**+**ボタンをクリックします。
+4. agentドロップダウンで、**Factory Droid**を選択します。
+5. 未認証の場合、認証が必要であることを示すメッセージが表示されます。
+   1. 表示されるデバイスコードを控え、「Login」ボタンをクリックします。
 
       <img
         src="/images/zed/authentication-flow-zed.png"
@@ -21,42 +21,42 @@ Before wiring Zed to Factory Droid, make sure you have Zed installed. Afterwards
         style={{ width: '70%' }}
       />
 
-   2. This will open your web browser and ask you to login/signup to Factory, followed by a screen to confirm your device's code.
+   2. これによりWebブラウザが開き、Factoryへのログイン/サインアップを求められ、続いてデバイスコードを確認する画面が表示されます。
 
       ![Factory web authentication screen prompting for device code confirmation](/images/zed/authentication-flow-factory.png)
 
-## (Alternative) Manual Setup
+## （代替）手動セットアップ
 
-If you prefer to manually configure Droid inside Zed, you can follow the instructions below.
+Zed内でDroidを手動で設定したい場合は、以下の手順に従ってください。
 
-1. **Factory CLI installed (supported on all operating systems except Windows ARM machines)**
+1. **Factory CLIがインストール済み（Windows ARMマシンを除くすべてのオペレーティングシステムでサポート）**
 
-   - Install via:
+   - 以下でインストール：
 
      ```bash
      curl -fsSL https://app.factory.ai/cli | sh
      ```
 
-   - Ensure `droid` is on your PATH, or note its full path.
+   - `droid`がPATHにあることを確認するか、フルパスをメモしてください。
 
-2. **Zed installed**
-   - Zed on macOS, Linux, or x86_64 Windows.
-   - Access to `~/.config/zed/settings.json`.
+2. **Zedがインストール済み**
+   - macOS、Linux、またはx86_64 WindowsのZed。
+   - `~/.config/zed/settings.json`へのアクセス。
 
-3. **(Optional) Factory API key** - instead of using the login flow, you can set up an API key:
-   - Sign up at https://app.factory.ai.
-   - Configure billing if required.
-   - Create an API key at https://app.factory.ai/settings/api-keys.
-   - Set the `FACTORY_API_KEY` environment variable in your shell (for example, add `export FACTORY_API_KEY=your_key_here` to your shell profile).
+3. **（オプション）Factory APIキー** - ログインフローの代わりに、APIキーを設定できます：
+   - https://app.factory.ai でサインアップ。
+   - 必要に応じて課金を設定。
+   - https://app.factory.ai/settings/api-keys でAPIキーを作成。
+   - シェルで`FACTORY_API_KEY`環境変数を設定（例：シェルプロファイルに`export FACTORY_API_KEY=your_key_here`を追加）。
 
 <Note>
   You cannot create a Factory account or manage billing from inside Zed. All
   account setup happens in the Factory web app.
 </Note>
 
-### Configure Factory Droid as an Agent (`agent_servers`)
+### Factory Droidをエージェントとして設定（`agent_servers`）
 
-Edit `~/.config/zed/settings.json` and add a **Factory Droid** entry under `agent_servers`:
+`~/.config/zed/settings.json`を編集し、`agent_servers`の下に**Factory Droid**エントリを追加します：
 
 ```json
 "agent_servers": {
@@ -68,11 +68,11 @@ Edit `~/.config/zed/settings.json` and add a **Factory Droid** entry under `agen
 }
 ```
 
-- `type: "custom"` – tells Zed this is a user-defined agent
-- `command` – full path to the `droid` binary
-- `args` – run Droid in exec mode and speak ACP to Zed
+- `type: "custom"` – これがユーザー定義エージェントであることをZedに通知
+- `command` – `droid`バイナリへのフルパス
+- `args` – Droidをexecモードで実行し、ZedにACPで通信
 
-If you prefer to use an API key instead of the login flow, add an `env` block:
+ログインフローの代わりにAPIキーを使用したい場合は、`env`ブロックを追加します：
 
 ```json
 "agent_servers": {
@@ -87,39 +87,39 @@ If you prefer to use an API key instead of the login flow, add an `env` block:
 }
 ```
 
-## Start a Droid Session in Zed
+## ZedでDroidセッションを開始
 
-Once `agent_servers` and `context_servers` are configured, you can start chatting with Droid from the Agent Panel.
+`agent_servers`と`context_servers`が設定されたら、Agent PanelからDroidとチャットを開始できます。
 
-### Open the Agent Panel
+### Agent Panelを開く
 
-- macOS: `Cmd` + `?`
-- Linux/Windows: `Ctrl` + `?`
+- macOS：`Cmd` + `?`
+- Linux/Windows：`Ctrl` + `?`
 
-### Start a New Chat with Factory Droid
+### Factory Droidで新しいチャットを開始
 
-1. Open the Agent Panel.
-2. Click the **+** button in the top-right corner.
-3. In the agent dropdown, select **Factory Droid**.
-4. Start chatting.
+1. Agent Panelを開きます。
+2. 右上角の**+**ボタンをクリックします。
+3. agentドロップダウンで、**Factory Droid**を選択します。
+4. チャットを開始します。
 
 ![Zed Agent Panel with + button highlighted and Factory Droid selected in the agent dropdown](/images/zed/start-a-new-chat.png)
 
-## Resume Existing Sessions
+## 既存セッションの再開
 
-Zed does not currently provide a way to reload or restore past Factory Droid sessions from the Agent Panel.
+Zedは現在、Agent PanelからFactory Droidの過去のセッションを再読み込みまたは復元する方法を提供していません。
 
-- Each Agent Panel conversation is effectively a fresh session.
-- For longer work streams, keep the panel open or start new chats with a brief recap so Droid can quickly reorient.
+- 各Agent Panelの会話は実質的に新しいセッションです。
+- 長期間の作業では、パネルを開いたままにするか、簡潔な要約で新しいチャットを開始して、Droidが迅速に状況を把握できるようにします。
 
-## Editor Context and Limitations
+## エディタコンテキストと制限事項
 
-There is no dedicated Factory Droid plugin for Zed yet, but Zed supports **`@`-tagging files** inside agent chats.
+Zed用の専用Factory Droidプラグインはまだありませんが、Zedはエージェントチャット内での**`@`によるファイルタグ付け**をサポートしています。
 
-- Use `@` to reference relevant files when you ask Droid to inspect or modify code.
-- Combine `@`-tags with plain-language instructions, just as you would in the CLI.
+- Droidにコードの検査や変更を依頼する際は、`@`を使用して関連ファイルを参照します。
+- `@`タグを自然言語の指示と組み合わせて、CLIでの場合と同様に使用します。
 
-Example:
+例：
 
 ```text
 Refactor the state management in @src/components/TodoList.tsx to use a reducer instead of multiple useState hooks.
@@ -127,19 +127,19 @@ Refactor the state management in @src/components/TodoList.tsx to use a reducer i
 
 ![Zed Agent Panel showing a message with an @-tagged file reference](/images/zed/@-tag-file.png)
 
-## Models and Autonomy
+## モデルと自動化
 
-Model selection and autonomy behavior inside Zed follow the same rules as the Droid CLI.
+Zed内でのモデル選択と自動化動作は、Droid CLIと同じルールに従います。
 
-- Choose your model and reasoning level using the same patterns described in [Choosing Your Model](/cli/user-guides/choosing-your-model).
-- Use lower autonomy for planning and higher autonomy once you trust the plan.
-- Zed supports **`Shift+Tab` for switching autonomy modes**, matching the default shortcut in the Droid CLI.
+- [Choosing Your Model](/cli/user-guides/choosing-your-model)で説明されているのと同じパターンを使用して、モデルと推論レベルを選択します。
+- 計画時は低い自動化を使用し、計画を信頼できるようになったら高い自動化を使用します。
+- ZedはDroid CLIのデフォルトショートカットと同じ**自動化モードを切り替える`Shift+Tab`**をサポートしています。
 
-## (Optional) Configure MCP Servers (`context_servers`)
+## （オプション）MCPサーバーの設定（`context_servers`）
 
-Zed’s `context_servers` section is where you configure **MCP servers**. Each entry is a real MCP server that exposes tools and context, which Factory Droid can call while you chat.
+Zedの`context_servers`セクションは、**MCPサーバー**を設定する場所です。各エントリは実際のMCPサーバーで、ツールとコンテキストを公開し、チャット中にFactory Droidが呼び出すことができます。
 
-For example, to add a Chrome DevTools MCP server:
+例えば、Chrome DevTools MCPサーバーを追加するには：
 
 ```json
 "context_servers": {
@@ -150,24 +150,24 @@ For example, to add a Chrome DevTools MCP server:
 }
 ```
 
-- `chrome-devtools` – server name used inside Zed
-- `command` – executable to run (here, `npx`)
-- `args` – how to launch the MCP server; update the package name to the actual server you want to use
+- `chrome-devtools` – Zed内で使用されるサーバー名
+- `command` – 実行する実行可能ファイル（ここでは`npx`）
+- `args` – MCPサーバーの起動方法；使用したい実際のサーバーにパッケージ名を更新
 
-You can define multiple MCP servers under `context_servers` for internal tools, data sources, or other services.
+内部ツール、データソース、その他のサービス用に`context_servers`の下で複数のMCPサーバーを定義できます。
 
-When you chat with **Factory Droid** in Zed, it can call any of these MCP servers as tools.
+Zedで**Factory Droid**とチャットする際、これらのMCPサーバーをツールとして呼び出すことができます。
 
-## Troubleshooting
+## トラブルシューティング
 
-If Factory Droid does not appear or respond in Zed:
+Factory DroidがZedで表示されない、または応答しない場合：
 
-- Verify the CLI:
-  - Run `droid exec --output-format acp` in a regular terminal to ensure the CLI and API key work.
-- Check `settings.json`:
-  - Confirm the `agent_servers` and `context_servers` blocks are valid JSON (including commas and quotes).
-  - Ensure the `command` and `args` for both Droid and your MCP servers run successfully outside Zed.
-- Confirm your OS:
-  - Make sure you are not running on Windows on ARM.
+- CLIを確認：
+  - 通常のターミナルで`droid exec --output-format acp`を実行して、CLIとAPIキーが機能することを確認します。
+- `settings.json`を確認：
+  - `agent_servers`と`context_servers`ブロックが有効なJSON（カンマと引用符を含む）であることを確認します。
+  - DroidとMCPサーバー両方の`command`と`args`がZed外で正常に実行されることを確認します。
+- OSを確認：
+  - Windows on ARMで実行していないことを確認します。
 
-If an MCP server is failing, try launching it manually with the same `command` and `args` used in `context_servers` to debug configuration or dependency issues.
+MCPサーバーが失敗している場合は、`context_servers`で使用されているのと同じ`command`と`args`で手動で起動し、設定や依存関係の問題をデバッグしてみてください。

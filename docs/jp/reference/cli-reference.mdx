@@ -3,7 +3,7 @@ title: "CLIリファレンス"
 description: Complete reference for droid command-line interface, including commands and flags
 ---
 
-## Installation
+## インストール
 
 <CodeGroup>
 
@@ -17,67 +17,67 @@ irm https://app.factory.ai/cli/windows | iex
 
 </CodeGroup>
 
-The CLI operates in two modes:
+CLIは2つのモードで動作します：
 
-- **Interactive (`droid`)** - Chat-first REPL with slash commands
-- **Non-interactive (`droid exec`)** - Single-shot execution for automation and scripting
+- **インタラクティブ (`droid`)** - スラッシュコマンド付きのチャット中心のREPL
+- **非インタラクティブ (`droid exec`)** - 自動化とスクリプト実行のための単発実行
 
-## CLI commands
+## CLIコマンド
 
-| Command                          | Description                                 | Example                                         |
+| コマンド                          | 説明                                 | 例                                         |
 | :------------------------------- | :------------------------------------------ | :---------------------------------------------- |
-| `droid`                          | Start interactive REPL                      | `droid`                                         |
-| `droid "query"`                  | Start REPL with initial prompt              | `droid "explain this project"`                  |
-| `droid exec "query"`             | Execute task without interactive mode       | `droid exec "summarize src/auth"`               |
-| `droid exec -f prompt.md`        | Load prompt from file                       | `droid exec -f .factory/prompts/review.md`      |
-| `cat file \| droid exec`         | Process piped content                       | `git diff \| droid exec "draft release notes"` |
-| `droid exec -s <id> "query"`     | Resume existing session in exec mode        | `droid exec -s session-123 "continue"`          |
-| `droid exec --list-tools`        | List available tools, then exit             | `droid exec --list-tools`                       |
-| `droid update`                   | Manually update the CLI to latest version   | `droid update`                                  |
+| `droid`                          | インタラクティブREPLを開始                      | `droid`                                         |
+| `droid "query"`                  | 初期プロンプトでREPLを開始              | `droid "explain this project"`                  |
+| `droid exec "query"`             | インタラクティブモードなしでタスクを実行       | `droid exec "summarize src/auth"`               |
+| `droid exec -f prompt.md`        | ファイルからプロンプトを読み込み                       | `droid exec -f .factory/prompts/review.md`      |
+| `cat file \| droid exec`         | パイプされたコンテンツを処理                       | `git diff \| droid exec "draft release notes"` |
+| `droid exec -s <id> "query"`     | 既存のセッションをexecモードで再開        | `droid exec -s session-123 "continue"`          |
+| `droid exec --list-tools`        | 使用可能なツールを一覧表示して終了             | `droid exec --list-tools`                       |
+| `droid update`                   | CLIを最新バージョンに手動更新   | `droid update`                                  |
 
-## CLI flags
+## CLIフラグ
 
-Customize droid's behavior with command-line flags:
+コマンドラインフラグでdroidの動作をカスタマイズできます：
 
-| Flag                                 | Description                                                                                                  | Example                                                    |
+| フラグ                                 | 説明                                                                                                  | 例                                                    |
 | :----------------------------------- | :----------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------- |
-| `-f, --file <path>`                  | Read prompt from a file                                                                                      | `droid exec -f plan.md`                                    |
-| `-m, --model <id>`                   | Select a specific model (see [model IDs](#available-models))                                                 | `droid exec -m claude-opus-4-6`                            |
-| `-s, --session-id <id>`              | Continue an existing session                                                                                 | `droid exec -s session-abc123`                             |
-| `--auto <level>`                     | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)                                             | `droid exec --auto medium "run tests"`                     |
-| `--enabled-tools <ids>`              | Force-enable specific tools (comma or space separated)                                                       | `droid exec --enabled-tools ApplyPatch,Bash`               |
-| `--disabled-tools <ids>`             | Disable specific tools for this run                                                                          | `droid exec --disabled-tools execute-cli`                  |
-| `--list-tools`                       | Print available tools and exit                                                                               | `droid exec --list-tools`                                  |
-| `-o, --output-format <format>`       | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)                                              | `droid exec -o json "document API"`                        |
-| `--input-format <format>`            | Input format (`stream-json`, `stream-jsonrpc` for multi-turn)                                                | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
-| `-r, --reasoning-effort <level>`     | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`)                                           | `droid exec -r high "debug flaky test"`                    |
-| `--spec-model <id>`                  | Use a different model for specification planning                                                             | `droid exec --spec-model claude-sonnet-4-5-20250929`       |
-| `--spec-reasoning-effort <level>`    | Override reasoning effort for spec mode                                                                      | `droid exec --use-spec --spec-reasoning-effort high`       |
-| `--use-spec`                         | Start in specification mode (plan before executing)                                                          | `droid exec --use-spec "add user profiles"`                |
-| `--skip-permissions-unsafe`          | Skip all permission prompts (⚠️ use with extreme caution)                                                    | `droid exec --skip-permissions-unsafe`                     |
-| `--cwd <path>`                       | Execute from a specific working directory                                                                    | `droid exec --cwd ../service "run tests"`                  |
-| `--tag <spec>`                       | Session tag (name or JSON, repeatable)                                                                       | `droid exec --tag code-review`                             |
-| `--log-group-id <id>`                | Log group ID for filtering logs                                                                              | `droid exec --log-group-id grp-123`                        |
-| `-v, --version`                      | Display CLI version                                                                                          | `droid -v`                                                 |
-| `-h, --help`                         | Show help information                                                                                        | `droid --help`                                             |
+| `-f, --file <path>`                  | ファイルからプロンプトを読み込み                                                                                      | `droid exec -f plan.md`                                    |
+| `-m, --model <id>`                   | 特定のモデルを選択 （[model IDs](#available-models)を参照）                                                 | `droid exec -m claude-opus-4-6`                            |
+| `-s, --session-id <id>`              | 既存のセッションを続行                                                                                 | `droid exec -s session-abc123`                             |
+| `--auto <level>`                     | [autonomy level](#autonomy-levels)を設定 （`low`、`medium`、`high`）                                             | `droid exec --auto medium "run tests"`                     |
+| `--enabled-tools <ids>`              | 特定のツールを強制有効化（カンマまたはスペース区切り）                                                       | `droid exec --enabled-tools ApplyPatch,Bash`               |
+| `--disabled-tools <ids>`             | 今回の実行で特定のツールを無効化                                                                          | `droid exec --disabled-tools execute-cli`                  |
+| `--list-tools`                       | 使用可能なツールを表示して終了                                                                               | `droid exec --list-tools`                                  |
+| `-o, --output-format <format>`       | 出力形式 （`text`、`json`、`stream-json`、`stream-jsonrpc`）                                              | `droid exec -o json "document API"`                        |
+| `--input-format <format>`            | 入力形式 （`stream-json`、マルチターン用は`stream-jsonrpc`）                                                | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
+| `-r, --reasoning-effort <level>`     | 推論努力レベルを上書き （`off`、`none`、`low`、`medium`、`high`）                                           | `droid exec -r high "debug flaky test"`                    |
+| `--spec-model <id>`                  | 仕様プランニング用に別のモデルを使用                                                             | `droid exec --spec-model claude-sonnet-4-5-20250929`       |
+| `--spec-reasoning-effort <level>`    | specモード用の推論努力レベルを上書き                                                                      | `droid exec --use-spec --spec-reasoning-effort high`       |
+| `--use-spec`                         | 仕様モードで開始（実行前にプランを作成）                                                          | `droid exec --use-spec "add user profiles"`                |
+| `--skip-permissions-unsafe`          | すべての権限プロンプトをスキップ（⚠️ 十分に注意して使用）                                                    | `droid exec --skip-permissions-unsafe`                     |
+| `--cwd <path>`                       | 特定の作業ディレクトリから実行                                                                    | `droid exec --cwd ../service "run tests"`                  |
+| `--tag <spec>`                       | セッションタグ（名前またはJSON、繰り返し可能）                                                                       | `droid exec --tag code-review`                             |
+| `--log-group-id <id>`                | ログフィルタリング用のロググループID                                                                              | `droid exec --log-group-id grp-123`                        |
+| `-v, --version`                      | CLIバージョンを表示                                                                                          | `droid -v`                                                 |
+| `-h, --help`                         | ヘルプ情報を表示                                                                                        | `droid --help`                                             |
 
 <Tip>
   Use `--output-format json` for scripting and automation, allowing you to parse droid's responses programmatically.
 </Tip>
 
-## Autonomy levels
+## 自律性レベル
 
-`droid exec` uses tiered autonomy to control what operations the agent can perform. Only raise access when the environment is safe.
+`droid exec`は段階的な自律性を使用して、エージェントが実行できる操作を制御します。環境が安全な場合のみアクセスレベルを上げてください。
 
-| Level                         | Intended for             | Notable allowances                                                                 |
+| レベル                         | 用途             | 注目すべき許可事項                                                                 |
 | :---------------------------- | :----------------------- | :--------------------------------------------------------------------------------- |
-| *(default)*                   | Read-only reconnaissance | File reads, git diffs, environment inspection                                      |
-| `--auto low`                  | Safe edits               | Create/edit files, run formatters, non-destructive commands                        |
-| `--auto medium`               | Local development        | Install dependencies, build/test, local git commits                                |
-| `--auto high`                 | CI/CD & orchestration    | Git push, deploy scripts, long-running operations                                  |
-| `--skip-permissions-unsafe`   | Isolated sandboxes only  | Removes all guardrails (⚠️ use only in disposable containers)                      |
+| *(デフォルト)*                   | 読み取り専用の偵察 | ファイル読み取り、gitの差分、環境検査                                      |
+| `--auto low`                  | 安全な編集               | ファイルの作成/編集、フォーマッター実行、非破壊的コマンド                        |
+| `--auto medium`               | ローカル開発        | 依存関係のインストール、ビルド/テスト、ローカルgitコミット                                |
+| `--auto high`                 | CI/CDとオーケストレーション    | gitプッシュ、デプロイスクリプト、長時間実行操作                                  |
+| `--skip-permissions-unsafe`   | 分離されたサンドボックスのみ  | すべてのガードレールを削除（⚠️ 使い捨てコンテナでのみ使用）                      |
 
-**Examples:**
+**例:**
 
 ```bash
 # Default (read-only)
@@ -97,9 +97,9 @@ droid exec --auto high "Run tests, commit, and push changes"
   `--skip-permissions-unsafe` removes all safety checks. Use **only** in isolated environments like Docker containers.
 </Warning>
 
-## Available models
+## 利用可能なモデル
 
-| Model ID                      | Name                         | Reasoning support                        | Default reasoning |
+| モデルID                      | 名前                         | 推論サポート                        | デフォルト推論 |
 | :---------------------------- | :--------------------------- | :--------------------------------------- | :---------------- |
 | `claude-opus-4-6`             | Claude Opus 4.6              | Yes (Off/Low/Medium/High/Max)            | high              |
 | `claude-opus-4-6-fast`        | Claude Opus 4.6 Fast         | Yes (Off/Low/Medium/High/Max)            | high              |
@@ -121,77 +121,77 @@ droid exec --auto high "Run tests, commit, and push changes"
 | `kimi-k2.5`                   | Droid Core (Kimi K2.5)       | None only                                | none              |
 | `minimax-m2.5`                | Droid Core (MiniMax M2.5)    | Yes (Low/Medium/High)                    | high              |
 
-Custom models configured via [BYOK](/cli/configuration/byok) use the format: `custom:<alias>`
+[BYOK](/cli/configuration/byok)経由で設定されたカスタムモデルは次の形式を使用：`custom:<alias>`
 
-See [Choosing Your Model](/cli/user-guides/choosing-your-model) for detailed guidance on which model to use for different tasks.
+異なるタスクに対してどのモデルを使用するかの詳細なガイダンスについては[Choosing Your Model](/cli/user-guides/choosing-your-model)を参照してください。
 
-## Interactive mode features
+## インタラクティブモードの機能
 
-### Bash mode
+### bashモード
 
-Press `!` when the input is empty to toggle bash mode. In bash mode, commands execute directly in your shell without AI interpretation—useful for quick operations like checking `git status` or running `npm test`.
+入力が空の時に`!`を押すとbashモードを切り替えできます。bashモードでは、コマンドはAIの解釈なしに直接シェルで実行されます—`git status`のチェックや`npm test`の実行などの素早い操作に便利です。
 
-- **Toggle on:** Press `!` (when input is empty)
-- **Execute commands:** Type any shell command and press Enter
-- **Toggle off:** Press `Esc` to return to normal AI chat mode
+- **オン切り替え:** `!`を押す（入力が空の時）
+- **コマンド実行:** 任意のシェルコマンドを入力してEnterキーを押す
+- **オフ切り替え:** `Esc`を押して通常のAIチャットモードに戻る
 
-The prompt changes from `>` to `$` when bash mode is active.
+bashモードがアクティブな時、プロンプトは`>`から`$`に変わります。
 
-### Slash commands
+### スラッシュコマンド
 
-Available when running `droid` in interactive mode. Type the command at the prompt:
+`droid`をインタラクティブモードで実行している時に利用可能です。プロンプトでコマンドを入力してください：
 
-| Command                  | Description                                           |
+| コマンド                  | 説明                                           |
 | :----------------------- | :---------------------------------------------------- |
-| `/account`               | Open Factory account settings in browser              |
-| `/billing`               | View and manage billing settings                      |
-| `/bg-process`            | Manage background processes                           |
-| `/bug [title]`           | Create a bug report with session data and logs        |
-| `/clear`                 | Start a new session (alias for `/new`)                |
-| `/commands`              | Manage custom slash commands                          |
-| `/compress [prompt]`     | Compress session and move to new one with summary     |
-| `/cost`                  | Show token usage statistics                           |
-| `/create-skill`          | Create a reusable skill from current session          |
-| `/droids`                | Manage custom droids                                  |
-| `/enter-mission`         | Enter Mission mode                                    |
-| `/favorite`              | Mark current session as a favorite                    |
-| `/fork`                  | Duplicate current session with all messages into a new session |
-| `/generate_blog`         | Generate semantic diff blog post                      |
-| `/help`                  | Show available slash commands                         |
-| `/hooks`                 | Manage lifecycle hooks                                |
-| `/ide`                   | Configure IDE integrations                            |
-| `/install-github-app`    | Install Factory GitHub App                            |
-| `/login`                 | Sign in to Factory                                    |
-| `/logout`                | Sign out of Factory                                   |
-| `/mcp`                   | Manage Model Context Protocol servers                 |
-| `/mission`               | Open Mission Control                                  |
-| `/missions`              | List and select missions to resume                    |
-| `/model`                 | Switch AI model mid-session                           |
-| `/new`                   | Start a new session                                   |
-| `/plugins`               | Manage plugins and marketplaces                       |
-| `/quit`                  | Exit droid (alias: `exit`, or press Ctrl+C)           |
-| `/readiness-report`      | Generate readiness report                             |
-| `/rename`                | Rename current session                                |
-| `/review`                | Start AI-powered code review workflow                 |
-| `/rewind-conversation`   | Undo recent changes in the session                    |
-| `/sessions`              | List and select previous sessions                     |
-| `/settings`              | Configure application settings                        |
-| `/share`                 | Share session with organization                       |
-| `/skills`                | Manage and invoke skills                              |
-| `/status`                | Show current droid status and configuration           |
-| `/statusline`            | Configure custom status line                          |
-| `/terminal-setup`        | Configure terminal keybindings for Shift+Enter        |
-| `/wrapped`               | Show Droid usage statistics                           |
+| `/account`               | Factoryアカウントセッティングをブラウザで開く              |
+| `/billing`               | 請求設定を表示・管理                      |
+| `/bg-process`            | バックグラウンドプロセスを管理                           |
+| `/bug [title]`           | セッションデータとログでバグレポートを作成        |
+| `/clear`                 | 新しいセッションを開始（`/new`のエイリアス）                |
+| `/commands`              | カスタムスラッシュコマンドを管理                          |
+| `/compress [prompt]`     | セッションを圧縮して要約付きで新しいセッションに移動     |
+| `/cost`                  | トークン使用統計を表示                           |
+| `/create-skill`          | 現在のセッションから再利用可能なスキルを作成          |
+| `/droids`                | カスタムdroidを管理                                  |
+| `/enter-mission`         | Missionモードに入る                                    |
+| `/favorite`              | 現在のセッションをお気に入りにマーク                    |
+| `/fork`                  | 現在のセッションをすべてのメッセージと共に新しいセッションに複製 |
+| `/generate_blog`         | セマンティック差分ブログ投稿を生成                      |
+| `/help`                  | 利用可能なスラッシュコマンドを表示                         |
+| `/hooks`                 | ライフサイクルフックを管理                                |
+| `/ide`                   | IDE統合を設定                            |
+| `/install-github-app`    | Factory GitHub Appをインストール                            |
+| `/login`                 | Factoryにサインイン                                    |
+| `/logout`                | Factoryからサインアウト                                   |
+| `/mcp`                   | Model Context Protocolサーバーを管理                 |
+| `/mission`               | Mission Controlを開く                                  |
+| `/missions`              | 再開するmissionを一覧表示・選択                    |
+| `/model`                 | セッション途中でAIモデルを切り替え                           |
+| `/new`                   | 新しいセッションを開始                                   |
+| `/plugins`               | プラグインとマーケットプレースを管理                       |
+| `/quit`                  | droidを終了（エイリアス：`exit`、またはCtrl+Cを押す）           |
+| `/readiness-report`      | レディネスレポートを生成                             |
+| `/rename`                | 現在のセッション名を変更                                |
+| `/review`                | AI搭載のコードレビューワークフローを開始                 |
+| `/rewind-conversation`   | セッション内の最近の変更を取り消し                    |
+| `/sessions`              | 以前のセッションを一覧表示・選択                     |
+| `/settings`              | アプリケーション設定を構成                        |
+| `/share`                 | セッションを組織と共有                       |
+| `/skills`                | スキルを管理・呼び出し                              |
+| `/status`                | 現在のdroidのステータスと設定を表示           |
+| `/statusline`            | カスタムステータス行を設定                          |
+| `/terminal-setup`        | Shift+Enter用のターミナルキーバインドを設定        |
+| `/wrapped`               | Droidの使用統計を表示                           |
 
-For detailed information on slash commands, see the [interactive mode documentation](/cli/getting-started/quickstart#useful-slash-commands).
+スラッシュコマンドの詳細情報については、[interactive mode documentation](/cli/getting-started/quickstart#useful-slash-commands)を参照してください。
 
-### MCP command reference
+### MCPコマンドリファレンス
 
-The `/mcp` slash command opens an interactive manager UI for browsing and managing MCP servers.
+`/mcp`スラッシュコマンドは、MCPサーバーの閲覧と管理のためのインタラクティブマネージャーUIを開きます。
 
-**Quick start:** Type `/mcp` and select **"Add from Registry"** to browse 40+ pre-configured servers (Linear, Sentry, Notion, Stripe, Vercel, and more). Select a server, authenticate if required, and you're ready to go.
+**クイックスタート:** `/mcp`と入力して**「Add from Registry」**を選択し、40以上の事前設定済みサーバー（Linear、Sentry、Notion、Stripe、Vercel等）を参照してください。サーバーを選択し、必要に応じて認証すれば準備完了です。
 
-**CLI commands** for scripting and automation:
+**スクリプトと自動化用のCLIコマンド:**
 
 ```bash
 droid mcp add <name> <url> --type http    # Add HTTP server
@@ -199,12 +199,12 @@ droid mcp add <name> "<command>"          # Add stdio server
 droid mcp remove <name>                   # Remove a server
 ```
 
-See [MCP Configuration](/cli/configuration/mcp) for the full registry list, CLI options (`--env`, `--header`), configuration files, and how user vs project config layering works.
+完全なレジストリリスト、CLIオプション（`--env`、`--header`）、設定ファイル、およびユーザー対プロジェクト設定の階層化の仕組みについては[MCP Configuration](/cli/configuration/mcp)を参照してください。
 
-## Authentication
+## 認証
 
-1. Generate an API key at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)
-2. Set the environment variable:
+1. [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)でAPIキーを生成
+2. 環境変数を設定：
 
 <CodeGroup>
 
@@ -222,23 +222,23 @@ set FACTORY_API_KEY=fk-...
 
 </CodeGroup>
 
-**Persist the variable** in your shell profile (`~/.bashrc`, `~/.zshrc`, or PowerShell `$PROFILE`) for long-term use.
+長期使用のために、シェルプロファイル（`~/.bashrc`、`~/.zshrc`、またはPowerShell `$PROFILE`）に**変数を永続化**してください。
 
 <Warning>
   Never commit API keys to source control. Use environment variables or secure secret management.
 </Warning>
 
-## Exit codes
+## 終了コード
 
-| Code | Meaning                        |
+| コード | 意味                        |
 | :--- | :----------------------------- |
-| `0`  | Success                        |
-| `1`  | General runtime error          |
-| `2`  | Invalid CLI arguments/options  |
+| `0`  | 成功                        |
+| `1`  | 一般的な実行時エラー          |
+| `2`  | 無効なCLI引数/オプション  |
 
-## Common workflows
+## 一般的なワークフロー
 
-### Code review
+### コードレビュー
 
 ```bash
 # Interactive review workflow
@@ -251,9 +251,9 @@ droid exec "Review this PR for security issues"
 droid exec --auto low "Review code and add missing type hints"
 ```
 
-See the [Code Review documentation](/cli/features/code-review) for detailed guidance on review types, workflows, and best practices.
+レビューの種類、ワークフロー、ベストプラクティスの詳細なガイダンスについては[Code Review documentation](/cli/features/code-review)を参照してください。
 
-### Testing and debugging
+### テストとデバッグ
 
 ```bash
 # Investigation
@@ -263,7 +263,7 @@ droid exec "Analyze failing tests and explain root cause"
 droid exec --auto medium "Fix failing tests and run test suite"
 ```
 
-### Refactoring
+### リファクタリング
 
 ```bash
 # Planning
@@ -273,7 +273,7 @@ droid exec "Create refactoring plan for auth module"
 droid exec --auto low --use-spec "Refactor auth module"
 ```
 
-### CI/CD integration
+### CI/CD統合
 
 ```yaml
 # GitHub Actions example
@@ -284,13 +284,13 @@ droid exec --auto low --use-spec "Refactor auth module"
     droid exec --auto medium -f .github/prompts/deploy.md
 ```
 
-## See also
+## 参照
 
-- [Quickstart guide](/cli/getting-started/quickstart) - Getting started with Factory CLI
-- [Interactive mode](/cli/getting-started/quickstart) - Shortcuts, input modes, and features
-- [Choosing your model](/cli/user-guides/choosing-your-model) - Model selection guidance
-- [Settings](/cli/configuration/settings) - Configuration options
-- [Custom commands](/cli/configuration/custom-slash-commands) - Create your own shortcuts
-- [Custom droids](/cli/configuration/custom-droids) - Build specialized agents
-- [Droid Exec overview](/cli/droid-exec/overview) - Detailed automation guide
-- [MCP configuration](/cli/configuration/mcp) - External tool integration
+- [Quickstart guide](/cli/getting-started/quickstart) - Factory CLIを始める
+- [Interactive mode](/cli/getting-started/quickstart) - ショートカット、入力モード、機能
+- [Choosing your model](/cli/user-guides/choosing-your-model) - モデル選択ガイダンス
+- [Settings](/cli/configuration/settings) - 設定オプション
+- [Custom commands](/cli/configuration/custom-slash-commands) - 独自のショートカットを作成
+- [Custom droids](/cli/configuration/custom-droids) - 特殊化されたエージェントを構築
+- [Droid Exec overview](/cli/droid-exec/overview) - 詳細な自動化ガイド
+- [MCP configuration](/cli/configuration/mcp) - 外部ツール統合

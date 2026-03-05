@@ -3,21 +3,21 @@ title: "プライバシー、データフロー、ガバナンス"
 description: How code, prompts, and telemetry move in cloud, hybrid, and fully airgapped Droid deployments, and how to control those flows.
 ---
 
-High‑security organizations need precise answers to **what data goes where, when, and under whose control**.
+高セキュリティ組織には、**どのデータがどこに、いつ、誰の管理下で移動するか**について正確な回答が必要です。
 
-Factory’s answer is simple: **data boundaries are determined by the models, gateways, and deployment pattern you choose**, and Droid is configurable to respect those boundaries.
+Factoryの回答はシンプルです：**データ境界は、選択するモデル、ゲートウェイ、およびデプロイメントパターンによって決定されます**。そしてDroidは、これらの境界を尊重するよう設定可能です。
 
 ---
 
-## Overview: three main data flows
+## 概要：3つの主要なデータフロー
 
-When you run Droid, there are three primary ways data can move:
+Droidを実行する際、データが移動する主な経路は3つあります：
 
-1. **Code and files** – local reads and writes on your filesystem and git repositories.
-2. **LLM traffic** – prompts and context sent to model providers or LLM gateways.
-3. **Telemetry** – metrics, traces, and logs emitted via OpenTelemetry.
+1. **コードとファイル** – ファイルシステムとgitリポジトリでのローカル読み書き。
+2. **LLMトラフィック** – モデルプロバイダーやLLMゲートウェイに送信されるプロンプトとコンテキスト。
+3. **テレメトリ** – OpenTelemetryを介して出力されるメトリクス、トレース、ログ。
 
-How far each flow travels depends on whether you are in a **cloud‑managed**, **hybrid**, or **fully airgapped** deployment.
+各フローがどこまで到達するかは、**クラウド管理**、**ハイブリッド**、または**完全エアギャップ**デプロイメントのどれを使用しているかによって決まります。
 
 <CardGroup cols={3}>
   <Card title="Cloud‑managed" icon="cloud">
@@ -37,106 +37,106 @@ How far each flow travels depends on whether you are in a **cloud‑managed**, *
 
 ---
 
-## Code and file access
+## コードとファイルアクセス
 
-Droid is a filesystem‑native agent:
+Droidはファイルシステムネイティブなエージェントです：
 
-- It reads your code, configuration, and test files **directly from the local filesystem** at the moment they’re needed.
-- It uses LLMs to analyze existing code and generate new code, then applies patches on disk, with git as the source of truth where available.
-- It does **not** upload or index your codebase into a remote datastore; there is no static or “cold” copy of your repository stored in Factory cloud.
+- 必要な時点で、コード、設定、テストファイルを**ローカルファイルシステムから直接**読み取ります。
+- LLMを使用して既存のコードを分析し、新しいコードを生成してから、ディスク上でパッチを適用します。利用可能な場合はgitが情報源となります。
+- コードベースをリモートデータストアにアップロードやインデックス化することは**ありません**。Factoryクラウドには、リポジトリの静的または「コールド」コピーは保存されません。
 
-In all deployment patterns:
+すべてのデプロイメントパターンにおいて：
 
-- The **agent loop and runtime execute entirely on the machine** where Droid runs (developer workstation, CI runner, VM, or container).
-- File contents can be included in LLM requests as context, so the data path for code always follows the same LLM request pipeline described below.
-- **File reads and writes remain local** to that environment; only the portions you choose to include in prompts leave the machine, and only to the model endpoints you configure.
-- Hooks and Droid Shield run locally inside that agent loop. By default they behave like local SAST / policy checks; they only send data off the machine if you explicitly configure a hook to call an external service.
+- **エージェントループとランタイムは、Droidが動作するマシン**（開発者ワークステーション、CIランナー、VM、またはコンテナ）で完全に実行されます。
+- ファイル内容はコンテキストとしてLLMリクエストに含まれる可能性があるため、コードのデータパスは常に以下で説明するLLMリクエストパイプラインと同じ経路をたどります。
+- **ファイルの読み書きはその環境内でローカルに留まります**。プロンプトに含めることを選択した部分のみがマシンから出て、設定したモデルエンドポイントにのみ送信されます。
+- HooksとDroid Shieldはそのエージェントループ内でローカルに実行されます。デフォルトでは、ローカルSAST/ポリシーチェックのように動作します。外部サービスを呼び出すようにhookを明示的に設定した場合のみ、マシンの外部にデータを送信します。
 
-You control which files and directories Droid can see through standard OS permissions and your repository layout. See [LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls) for additional file‑level protections.
-
----
-
-## LLM requests and model‑specific guarantees
-
-When Droid needs model output, it sends prompts and context to **your configured models and LLM gateways**.
-
-By default, Droid can target **enterprise‑grade endpoints** for providers like Azure OpenAI, AWS Bedrock, Google Vertex AI, OpenAI, Anthropic, and Gemini, using contracts that support zero data retention and enterprise privacy controls. In these configurations, Factory routes traffic **directly** to the provider’s official APIs; we do not proxy this traffic through third‑party services or store prompts and responses in Factory cloud.
-
-If you instead configure your own endpoints—LLM gateways, self‑hosted models, or generic HTTP APIs—the privacy guarantees are entirely determined by those systems and your agreements with them; Factory does not add additional protections on top.
-
-### Model and gateway options
-
-- **Cloud model providers** – OpenAI, Anthropic, Google, and others via their enterprise offerings.
-- **Cloud AI platforms** – AWS Bedrock, GCP Vertex, Azure OpenAI, using your cloud accounts.
-- **On‑prem / self‑hosted models** – models served inside your network or airgapped environment via HTTP/gRPC gateways.
-- **LLM gateways** – central gateways that normalize traffic, add authentication, enforce rate limits, and log usage.
-
-### How Droid interacts with models
-
-- Org and project policies decide **which models and gateways are allowed**, and whether users can bring their own keys.
-- In high‑security settings, orgs commonly:
-  - Prefer direct enterprise endpoints (for example, Azure OpenAI, AWS Bedrock, Google Vertex AI, OpenAI Enterprise, Anthropic/Claude Enterprise, Gemini Enterprise) to get first‑party zero‑retention guarantees.
-  - Disable ad‑hoc user‑supplied keys and generic internet endpoints.
-  - Treat any LLM gateways or self‑hosted models as in‑scope security systems, subject to the same reviews and monitoring as other critical services.
-
-See [Models, LLM Gateways & Integrations](/enterprise/models-llm-gateways-and-integrations) for configuration details.
+標準のOS権限とリポジトリレイアウトを通じて、Droidがアクセスできるファイルとディレクトリを制御できます。追加のファイルレベル保護については[LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls)を参照してください。
 
 ---
 
-## Telemetry and analytics
+## LLMリクエストとモデル固有の保証
 
-Telemetry is how you understand _what_ Droid is doing and _where_. Factory treats OpenTelemetry as the primary interface for this.
+Droidがモデル出力を必要とする場合、**設定されたモデルとLLMゲートウェイ**にプロンプトとコンテキストを送信します。
 
-### OTEL as the source of truth
+デフォルトでは、DroidはAzure OpenAI、AWS Bedrock、Google Vertex AI、OpenAI、Anthropic、Geminiなどのプロバイダーの**エンタープライズグレードエンドポイント**をターゲットにでき、これらはデータ保持ゼロとエンタープライズプライバシー制御をサポートする契約を使用しています。これらの設定では、Factoryはトラフィックをプロバイダーの公式APIに**直接**ルーティングします。サードパーティサービス経由でこのトラフィックをプロキシしたり、プロンプトとレスポンスをFactoryクラウドに保存したりすることはありません。
 
-- Droid emits **OTLP signals** (metrics, traces, logs) to the endpoints you configure via environment variables or `.factory` settings.
-- Typical destinations include OTEL collectors feeding **Prometheus, Datadog, New Relic, Splunk, Loki, Jaeger, Tempo**, and similar systems.
-- High‑security customers commonly deploy OTEL collectors **inside their own networks** and never send telemetry to Factory.
+代わりに独自のエンドポイント（LLMゲートウェイ、セルフホストモデル、汎用HTTP API）を設定する場合、プライバシー保証は完全にそれらのシステムとの合意によって決定されます。Factoryがその上に追加の保護を加えることはありません。
 
-### Optional Factory cloud analytics
+### モデルとゲートウェイのオプション
 
-In cloud‑managed deployments, you can opt into Factory’s own analytics dashboards, which may:
+- **クラウドモデルプロバイダー** – OpenAI、Anthropic、Googleなどのエンタープライズ提供。
+- **クラウドAIプラットフォーム** – AWS Bedrock、GCP Vertex、Azure OpenAI（お客様のクラウドアカウントを使用）。
+- **オンプレミス/セルフホストモデル** – HTTP/gRPCゲートウェイ経由でネットワーク内またはエアギャップ環境で提供されるモデル。
+- **LLMゲートウェイ** – トラフィックの正規化、認証の追加、レート制限の実行、使用量のログ記録を行う中央ゲートウェイ。
 
-- Aggregate anonymized usage metrics to show adoption, model usage, and cost trends.
-- Surface per‑org and per‑team insights for platform and leadership teams.
+### Droidのモデル連携方法
 
-These analytics are optional; org administrators decide whether to enable them.
+- 組織とプロジェクトのポリシーが**許可されるモデルとゲートウェイ**、およびユーザーが独自のキーを持ち込めるかどうかを決定します。
+- 高セキュリティ設定では、組織は一般的に：
+  - 直接エンタープライズエンドポイント（例：Azure OpenAI、AWS Bedrock、Google Vertex AI、OpenAI Enterprise、Anthropic/Claude Enterprise、Gemini Enterprise）を優先して、ファーストパーティのデータ保持ゼロ保証を取得します。
+  - アドホックなユーザー提供キーと汎用インターネットエンドポイントを無効にします。
+  - LLMゲートウェイやセルフホストモデルを、他の重要なサービスと同様のレビューと監視の対象となるスコープ内セキュリティシステムとして扱います。
 
-For more on signals and schema, see [Usage, Cost & Productivity Analytics](/enterprise/usage-cost-and-analytics) and [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
-
----
-
-## Data retention and residency
-
-### Factory‑hosted components
-
-In cloud‑managed mode, Factory may store limited operational logs and metrics for:
-
-- Authentication and administrative actions (for example, org configuration changes).
-- Service health and debugging.
-
-Retention and residency for these logs are documented in the Trust Center and can be tuned per customer engagement.
-
-### Customer‑hosted components
-
-For hybrid and airgapped deployments:
-
-- **LLM traffic** is handled entirely by your providers and gateways; Factory does not see it.
-- **Telemetry** is stored in your observability stack; retention is governed by your own policies.
-- **Code, configuration, and secrets** never leave your environment unless you explicitly send them to external services via hooks or gateways.
-
-In fully airgapped environments, Factory never receives any runtime data; you are responsible for all retention and residency decisions.
+設定の詳細については[Models, LLM Gateways & Integrations](/enterprise/models-llm-gateways-and-integrations)を参照してください。
 
 ---
 
-## Governance controls in practice
+## テレメトリと分析
 
-To make these guarantees enforceable rather than aspirational, Factory exposes **governance levers** at the org and project levels:
+テレメトリは、Droidが_何を_しているか、_どこで_しているかを理解する方法です。FactoryはOpenTelemetryをこのための主要なインターフェースとして扱っています。
 
-- Model and gateway allow/deny lists.
-- Policies for whether user‑supplied BYOK keys are allowed.
-- Global and project‑specific hooks for DLP, redaction, and approval workflows.
-- OTEL endpoint configuration (including requiring on‑prem collectors).
-- Maximum autonomy level and other safety controls, especially in less‑trusted environments.
+### 情報源としてのOTEL
 
-These levers are implemented through the **hierarchical settings** system described in [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control).
+- Droidは、環境変数または`.factory`設定を介して設定したエンドポイントに**OTLP信号**（メトリクス、トレース、ログ）を出力します。
+- 典型的な送信先には、**Prometheus、Datadog、New Relic、Splunk、Loki、Jaeger、Tempo**などのシステムに供給するOTELコレクターが含まれます。
+- 高セキュリティ顧客は一般的に、**自社ネットワーク内**にOTELコレクターを配備し、Factoryにテレメトリを送信することはありません。
+
+### オプションのFactoryクラウド分析
+
+クラウド管理デプロイメントでは、Factoryの独自分析ダッシュボードにオプトインできます。これらは以下を行う可能性があります：
+
+- 匿名化された使用メトリクスを集約して、採用状況、モデル使用量、コスト傾向を表示。
+- プラットフォームチームとリーダーシップチーム向けの組織別・チーム別インサイトの提供。
+
+これらの分析はオプションです。組織管理者がそれらを有効にするかどうかを決定します。
+
+信号とスキーマの詳細については、[Usage, Cost & Productivity Analytics](/enterprise/usage-cost-and-analytics)と[Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring)を参照してください。
+
+---
+
+## データ保持と保存場所
+
+### Factoryホスト型コンポーネント
+
+クラウド管理モードでは、Factoryは以下の目的で限定的な運用ログとメトリクスを保存する場合があります：
+
+- 認証と管理アクション（例：組織設定変更）。
+- サービスヘルスとデバッグ。
+
+これらのログの保持と保存場所はTrust Centerに文書化されており、顧客エンゲージメントごとに調整可能です。
+
+### 顧客ホスト型コンポーネント
+
+ハイブリッドとエアギャップデプロイメントの場合：
+
+- **LLMトラフィック**は完全にお客様のプロバイダーとゲートウェイによって処理されます。Factoryがこれを見ることはありません。
+- **テレメトリ**はお客様の可観測性スタックに保存され、保持はお客様独自のポリシーによって管理されます。
+- **コード、設定、シークレット**は、hooksやゲートウェイ経由で明示的に外部サービスに送信しない限り、お客様の環境を離れることはありません。
+
+完全にエアギャップされた環境では、Factoryはランタイムデータを一切受信しません。すべての保持と保存場所の決定はお客様の責任となります。
+
+---
+
+## 実践におけるガバナンス制御
+
+これらの保証を願望的ではなく実行可能なものにするため、Factoryは組織とプロジェクトレベルで**ガバナンスレバー**を公開しています：
+
+- モデルとゲートウェイの許可/拒否リスト。
+- ユーザー提供のBYOKキーが許可されるかどうかのポリシー。
+- DLP、秘匿化、承認ワークフローのためのグローバルおよびプロジェクト固有のhooks。
+- OTELエンドポイント設定（オンプレミスコレクターの必須化を含む）。
+- 最大自律レベルとその他の安全制御、特に信頼度の低い環境での制御。
+
+これらのレバーは、[Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control)で説明されている**階層設定**システムを通じて実装されています。

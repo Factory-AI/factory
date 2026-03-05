@@ -4,163 +4,163 @@ description: Configure how droid behaves and integrates with your workflow.
 keywords: ['settings', 'configuration', 'config', 'preferences', 'options', 'customize', 'settings.json']
 ---
 
-## Accessing settings
+## 設定へのアクセス
 
-To configure droid settings:
+droidの設定を構成するには：
 
-1. Run `droid`
-2. Enter `/settings`
-3. Adjust your preferences interactively
+1. `droid`を実行します
+2. `/settings`を入力します
+3. 対話的に設定を調整します
 
-Changes take effect immediately and are saved to your settings file.
+変更は即座に有効になり、設定ファイルに保存されます。
 
-## Where settings live
+## 設定の保存場所
 
-| OS        | Location                               |
+| OS        | 場所                               |
 | --------- | -------------------------------------- |
 | macOS / Linux | `~/.factory/settings.json` |
 | Windows   | `%USERPROFILE%\.factory\settings.json` |
 
-If the file doesn't exist, it's created with defaults the first time you run **droid**.
+ファイルが存在しない場合は、**droid**を初回実行時にデフォルト値で作成されます。
 
-### Local overrides
+### ローカルオーバーライド
 
-You can create a `settings.local.json` alongside `settings.json` in any `.factory/` folder:
+任意の`.factory/`フォルダ内で、`settings.json`と並んで`settings.local.json`を作成できます：
 
-- `~/.factory/settings.local.json` (user-level)
-- `<project>/.factory/settings.local.json` (project-level)
+- `~/.factory/settings.local.json`（ユーザーレベル）
+- `<project>/.factory/settings.local.json`（プロジェクトレベル）
 
-Local overrides merge on top of the corresponding `settings.json` at the same level and follow the same hierarchy precedence. Add `settings.local.json` to `.gitignore` if you want to keep machine-specific preferences out of version control.
+ローカルオーバーライドは、同じレベルの対応する`settings.json`の上にマージされ、同じ階層の優先順位に従います。マシン固有の設定をバージョン管理から除外したい場合は、`.gitignore`に`settings.local.json`を追加してください。
 
-## Available settings
+## 利用可能な設定
 
-| Setting | Options | Default | Description |
+| 設定 | オプション | デフォルト | 説明 |
 | ------- | ------- | ------- | ----------- |
-| `model` | `opus`, `opus-4-6`, `opus-4-6-fast`, `sonnet`, `gpt-5.1`, `gpt-5.1-codex`, `gpt-5.1-codex-max`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex`, `haiku`, `gemini-3-pro`, `gemini-3.1-pro`, `droid-core`, `glm-5`, `kimi-k2.5`, `minimax-m2.5`, `custom-model` | `opus` | The default AI model used by droid |
-| `reasoningEffort` | `off`, `none`, `low`, `medium`, `high` (availability depends on the model) | Model-dependent default | Controls how much structured thinking the model performs. |
-| `autonomyMode` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | Sets the default autonomy mode when starting droid. |
-| `cloudSessionSync` | `true`, `false` | `true` | Mirror CLI sessions to Factory web. |
-| `diffMode` | `github`, `unified` | `github` | Choose between split GitHub-style diffs and a single-column view. |
-| `completionSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`, or custom file path | `fx-ok01` | Audio cue when a response finishes. |
-| `awaitingInputSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`, or custom file path | `fx-ack01` | Audio cue when droid is waiting for user input. |
-| `soundFocusMode` | `always`, `focused`, `unfocused` | `always` | When to play sound notifications. |
-| `commandAllowlist` | Array of commands | Safe defaults provided | Commands that run without extra confirmation. |
-| `commandDenylist` | Array of commands | Restrictive defaults provided | Commands that always require confirmation. |
-| `includeCoAuthoredByDroid` | `true`, `false` | `true` | Automatically append the Droid co-author trailer to commits. |
-| `enableDroidShield` | `true`, `false` | `true` | Enable secret scanning and git guardrails. |
-| `hooksDisabled` | `true`, `false` | `false` | Globally disable all hooks execution. |
-| `ideAutoConnect` | `true`, `false` | `false` | Auto-connect to IDE from external terminals. |
-| `todoDisplayMode` | `inline`, `pinned` | `pinned` | How the todo list is displayed in the UI. |
-| `showThinkingInMainView` | `true`, `false` | `false` | Display AI thinking/reasoning blocks in the main chat view. |
-| `customModels` | Array of model configs | `[]` | Custom model configurations for BYOK. See [BYOK docs](/cli/configuration/byok). |
+| `model` | `opus`, `opus-4-6`, `opus-4-6-fast`, `sonnet`, `gpt-5.1`, `gpt-5.1-codex`, `gpt-5.1-codex-max`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex`, `haiku`, `gemini-3-pro`, `gemini-3.1-pro`, `droid-core`, `glm-5`, `kimi-k2.5`, `minimax-m2.5`, `custom-model` | `opus` | droidが使用するデフォルトのAIモデル |
+| `reasoningEffort` | `off`, `none`, `low`, `medium`, `high`（利用可能性はモデルに依存） | モデル依存のデフォルト | モデルが実行する構造化思考の量を制御します。 |
+| `autonomyMode` | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high` | `normal` | droid開始時のデフォルト自律モードを設定します。 |
+| `cloudSessionSync` | `true`, `false` | `true` | CLIセッションをFactory webにミラーします。 |
+| `diffMode` | `github`, `unified` | `github` | 分割GitHub形式のdiffと単一カラム表示を選択します。 |
+| `completionSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`、またはカスタムファイルパス | `fx-ok01` | レスポンス完了時の音声合図。 |
+| `awaitingInputSound` | `off`, `bell`, `fx-ok01`, `fx-ack01`、またはカスタムファイルパス | `fx-ack01` | droidがユーザー入力を待機している時の音声合図。 |
+| `soundFocusMode` | `always`, `focused`, `unfocused` | `always` | サウンド通知を再生するタイミング。 |
+| `commandAllowlist` | コマンドの配列 | 安全なデフォルト値を提供 | 追加確認なしで実行されるコマンド。 |
+| `commandDenylist` | コマンドの配列 | 制限的なデフォルト値を提供 | 常に確認が必要なコマンド。 |
+| `includeCoAuthoredByDroid` | `true`, `false` | `true` | コミットにDroid共同作成者トレーラーを自動追加。 |
+| `enableDroidShield` | `true`, `false` | `true` | シークレットスキャンとgitガードレールを有効化。 |
+| `hooksDisabled` | `true`, `false` | `false` | 全フック実行をグローバルに無効化。 |
+| `ideAutoConnect` | `true`, `false` | `false` | 外部ターミナルからIDEへの自動接続。 |
+| `todoDisplayMode` | `inline`, `pinned` | `pinned` | UIでのtodoリストの表示方法。 |
+| `showThinkingInMainView` | `true`, `false` | `false` | メインチャットビューでのAI思考/推論ブロックの表示。 |
+| `customModels` | モデル設定の配列 | `[]` | BYOKのカスタムモデル設定。[BYOK docs](/cli/configuration/byok)を参照してください。 |
 
-### Model
+### モデル
 
-Choose the default AI model that powers your droid:
+droidを動かすデフォルトのAIモデルを選択します：
 
-- **`opus`** - Claude Opus 4.5 (current default)
-- **`opus-4-6`** - Claude Opus 4.6, latest flagship with Max reasoning
-- **`opus-4-6-fast`** - Claude Opus 4.6 Fast, tuned for faster responses
-- **`sonnet`** - Claude Sonnet 4.5, balanced cost and quality
+- **`opus`** - Claude Opus 4.5（現在のデフォルト）
+- **`opus-4-6`** - Claude Opus 4.6、Max推論機能を持つ最新フラグシップモデル
+- **`opus-4-6-fast`** - Claude Opus 4.6 Fast、高速レスポンス用にチューニングされたモデル
+- **`sonnet`** - Claude Sonnet 4.5、コストと品質のバランス型
 - **`gpt-5.1`** - OpenAI GPT-5.1
-- **`gpt-5.1-codex`** - Advanced coding-focused model
-- **`gpt-5.1-codex-max`** - GPT-5.1-Codex-Max, supports Extra High reasoning
+- **`gpt-5.1-codex`** - 高度なコーディング特化モデル
+- **`gpt-5.1-codex-max`** - GPT-5.1-Codex-Max、Extra High推論をサポート
 - **`gpt-5.2`** - OpenAI GPT-5.2
-- **`gpt-5.2-codex`** - GPT-5.2-Codex, OpenAI coding model with Extra High reasoning
-- **`gpt-5.3-codex`** - GPT-5.3-Codex, latest OpenAI coding model with Extra High reasoning and verbosity support
-- **`haiku`** - Claude Haiku 4.5, fast and cost-effective
+- **`gpt-5.2-codex`** - GPT-5.2-Codex、Extra High推論機能を持つOpenAIコーディングモデル
+- **`gpt-5.3-codex`** - GPT-5.3-Codex、Extra High推論と詳細性サポートを持つ最新OpenAIコーディングモデル
+- **`haiku`** - Claude Haiku 4.5、高速で費用対効果の高いモデル
 - **`gemini-3-pro`** - Gemini 3 Pro
 - **`gemini-3.1-pro`** - Gemini 3.1 Pro
-- **`droid-core`** - GLM-4.7 open-source model
-- **`glm-5`** - GLM-5 open-source model
-- **`kimi-k2.5`** - Kimi K2.5 open-source model with image support
-- **`minimax-m2.5`** - MiniMax M2.5 open-source model with reasoning support (0.12× multiplier)
-- **`custom-model`** - Your own configured model via BYOK
+- **`droid-core`** - GLM-4.7 オープンソースモデル
+- **`glm-5`** - GLM-5 オープンソースモデル
+- **`kimi-k2.5`** - Kimi K2.5 画像サポート付きオープンソースモデル
+- **`minimax-m2.5`** - MiniMax M2.5 推論サポート付きオープンソースモデル（0.12×倍率）
+- **`custom-model`** - BYOK経由で設定されたカスタムモデル
 
 [You can also add custom models and BYOK.](/cli/configuration/byok)
 
-### Reasoning effort
+### 推論努力レベル
 
-`reasoningEffort` adjusts how much structured thinking the model performs before replying. Available values depend on the model, but typically include:
+`reasoningEffort`は、モデルが回答前に実行する構造化思考の量を調整します。利用可能な値はモデルによって異なりますが、通常は以下を含みます：
 
-- **`off` / `none`** – disable structured reasoning (fastest).
-- **`low`**, **`medium`**, **`high`** – progressively increase deliberation time for more complex reasoning.
+- **`off` / `none`** – 構造化推論を無効化（最速）。
+- **`low`**、**`medium`**、**`high`** – より複雑な推論のために段階的に検討時間を増加。
 
-Anthropic models default to `off`, while GPT-5 starts on `medium`.
+Anthropicモデルは`off`がデフォルトで、GPT-5は`medium`で開始します。
 
-### Autonomy level
+### 自律レベル
 
-`autonomyMode` controls how proactively droid executes commands when sessions begin. Start at `normal`, or select an `auto-*` preset to pre-authorize additional actions.
+`autonomyMode`は、セッション開始時にdroidがどの程度積極的にコマンドを実行するかを制御します。`normal`から始めるか、`auto-*`プリセットを選択して追加のアクションを事前承認してください。
 
-### Diff mode
+### Diffモード
 
-Control how droid displays code changes:
+droidのコード変更の表示方法を制御します：
 
-- **`github`** – Side-by-side, higher fidelity render (recommended).
-- **`unified`** – Traditional single-column diff format.
+- **`github`** – 並列表示、より高精度な表示（推奨）。
+- **`unified`** – 従来の単一カラムdiff形式。
 
-### Cloud session sync
+### クラウドセッション同期
 
-When this switch is on, every CLI session is mirrored to Factory web so you can revisit conversations in the browser:
+このスイッチをオンにすると、すべてのCLIセッションがFactory webにミラーされ、ブラウザで会話を再確認できます：
 
-- **`true`** – Sync sessions to the web app.
-- **`false`** – Keep sessions local only.
+- **`true`** – セッションをウェブアプリに同期。
+- **`false`** – セッションをローカルのみに保持。
 
-### Sound notifications
+### サウンド通知
 
-Configure audio feedback for droid events:
+droidイベントの音声フィードバックを設定します：
 
-**Completion sound** (`completionSound`) - plays when a response finishes:
-- **`fx-ok01`** – Built-in completion sound (default) - soft success bloop
-- **`fx-ack01`** – Alternative built-in sound effect - tactile ripple feedback
-- **`bell`** – Use the system terminal bell
-- **`off`** – No sound notifications
-- **Custom path** – Provide a file path to your own sound file (e.g., `"/path/to/sound.wav"`)
+**完了音**（`completionSound`） - レスポンス終了時に再生：
+- **`fx-ok01`** – 内蔵完了音（デフォルト） - ソフトな成功音
+- **`fx-ack01`** – 代替内蔵効果音 - 触覚的なリップル音
+- **`bell`** – システムターミナルベルを使用
+- **`off`** – サウンド通知なし
+- **カスタムパス** – 独自のサウンドファイルのパスを指定（例：`"/path/to/sound.wav"`）
 
-**Awaiting input sound** (`awaitingInputSound`) - plays when droid is waiting for user input. Same options as completion sound, defaults to `fx-ack01`.
+**入力待機音**（`awaitingInputSound`） - droidがユーザー入力を待機している時に再生。完了音と同じオプション、デフォルトは`fx-ack01`。
 
-**Sound focus mode** (`soundFocusMode`) - controls when sounds play:
-- **`always`** – Play sounds regardless of window focus (default)
-- **`focused`** – Only play sounds when the terminal is focused
-- **`unfocused`** – Only play sounds when the terminal is not focused
+**サウンドフォーカスモード**（`soundFocusMode`） - サウンドの再生タイミングを制御：
+- **`always`** – ウィンドウフォーカスに関係なくサウンドを再生（デフォルト）
+- **`focused`** – ターミナルがフォーカスされている時のみサウンドを再生
+- **`unfocused`** – ターミナルがフォーカスされていない時のみサウンドを再生
 
 <Note>
   Access sound settings via `/settings` or `Shift+Tab` → **Settings** in the TUI.
 </Note>
 
-### Hooks
+### フック
 
-The `hooksDisabled` setting provides a global toggle to disable all hooks execution without removing your hook configurations:
+`hooksDisabled`設定は、フック設定を削除することなく、すべてのフック実行を無効にするグローバルトグルを提供します：
 
-- **`false`** – Hooks are enabled and will execute normally (default)
-- **`true`** – All hooks are disabled globally
+- **`false`** – フックが有効で正常に実行されます（デフォルト）
+- **`true`** – すべてのフックがグローバルに無効化されます
 
-You can also toggle this from the `/hooks` menu or `/settings`.
+これは`/hooks`メニューや`/settings`からも切り替えできます。
 
-### IDE auto-connect
+### IDE自動接続
 
-The `ideAutoConnect` setting controls whether droid automatically connects to your IDE when running from external terminals (outside the IDE's built-in terminal):
+`ideAutoConnect`設定は、外部ターミナル（IDEの内蔵ターミナル以外）から実行時にdroidが自動的にIDEに接続するかを制御します：
 
-- **`false`** – Only auto-connect when running inside IDE terminal (default)
-- **`true`** – Auto-connect to IDE from any terminal
+- **`false`** – IDEターミナル内で実行時のみ自動接続（デフォルト）
+- **`true`** – 任意のターミナルからIDEへ自動接続
 
-### Todo display mode
+### Todo表示モード
 
-The `todoDisplayMode` setting controls how the todo list is displayed in the UI:
+`todoDisplayMode`設定は、UIでのtodoリストの表示方法を制御します：
 
-- **`pinned`** – Todo list is pinned above the input area (default)
-- **`inline`** – Todo list appears inline within the message flow
+- **`pinned`** – Todoリストを入力エリアの上に固定表示（デフォルト）
+- **`inline`** – Todoリストをメッセージフロー内にインライン表示
 
-## Command allowlist & denylist
+## コマンド許可リスト・拒否リスト
 
-Use these settings to control which commands droid can execute automatically and which it must never run:
+これらの設定を使用して、droidが自動実行できるコマンドと絶対に実行してはいけないコマンドを制御します：
 
-- **`commandAllowlist`** – Commands in this array are treated as safe and run without additional confirmation, regardless of autonomy prompts. Include only low-risk utilities you rely on frequently (for example `ls`, `pwd`, `dir`).
-- **`commandDenylist`** – Commands in this array always require confirmation and are typically blocked because they are destructive or unsafe (for example recursive `rm`, `mkfs`, or privileged system operations).
+- **`commandAllowlist`** – この配列のコマンドは安全として扱われ、自律プロンプトに関係なく追加確認なしで実行されます。頻繁に使用する低リスクユーティリティのみを含めてください（例：`ls`、`pwd`、`dir`）。
+- **`commandDenylist`** – この配列のコマンドは常に確認が必要で、破壊的または危険なため通常はブロックされます（例：再帰的な`rm`、`mkfs`、特権システム操作）。
 
-Commands that appear in both lists default to the denylist behavior. Any command that is in neither list falls back to the autonomy level you selected for the session.
+両方のリストに含まれるコマンドは、拒否リストの動作がデフォルトになります。どちらのリストにもないコマンドは、セッションで選択した自律レベルにフォールバックします。
 
-### Example allow/deny configuration
+### 許可/拒否設定の例
 
 ```json
 {
@@ -177,9 +177,9 @@ Commands that appear in both lists default to the denylist behavior. Any command
 }
 ```
 
-Review and update these arrays periodically to match your workflow and security posture, especially when sharing configurations across teams.
+これらの配列を定期的に確認・更新して、ワークフローとセキュリティポスチャに一致させてください。特にチーム間で設定を共有する場合は重要です。
 
-## Example configuration
+## 設定例
 
 ```json
 {
@@ -196,9 +196,9 @@ Review and update these arrays periodically to match your workflow and security 
 
 ---
 
-### Need more?
+### さらなる情報が必要ですか？
 
-- [CLI Overview](/cli/getting-started/overview) – see the main TUI workflow
-- [CLI Reference](/reference/cli-reference) – command flags & options
-- [IDE Integrations](/cli/configuration/ide-integrations) – editor-specific setup
-- [Custom models & BYOK](/cli/configuration/byok) - add custom models and API keys
+- [CLI Overview](/cli/getting-started/overview) – メインTUIワークフローを参照
+- [CLI Reference](/reference/cli-reference) – コマンドフラグとオプション
+- [IDE Integrations](/cli/configuration/ide-integrations) – エディター固有のセットアップ
+- [Custom models & BYOK](/cli/configuration/byok) - カスタムモデルとAPIキーの追加

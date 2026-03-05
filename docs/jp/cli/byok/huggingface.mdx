@@ -4,15 +4,15 @@ description: Connect to models hosted on Hugging Face's Inference Providers
 keywords: ['huggingface', 'hugging face', 'api key', 'byok', 'inference', 'custom model', 'open source']
 ---
 
-Connect to thousands of models hosted on Hugging Face's Inference Providers. Learn more in the [Inference Providers documentation](https://huggingface.co/docs/inference-providers/en/index).
+Hugging Faceの推論プロバイダーでホストされている数千のモデルに接続できます。詳細は[Inference Providers documentation](https://huggingface.co/docs/inference-providers/en/index)をご覧ください。
 
 <Note>
   **Model Performance**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While HuggingFace hosts many smaller models that can be useful for experimentation, they are generally not recommended for production coding work. Consider using models with 30B+ parameters for complex software engineering tasks.
 </Note>
 
-## Configuration
+## 設定
 
-Add to `~/.factory/settings.json`:
+`~/.factory/settings.json`に追加してください：
 
 ```json
 {
@@ -37,15 +37,15 @@ Add to `~/.factory/settings.json`:
 }
 ```
 
-## Getting Started
+## はじめに
 
-1. Sign up at [huggingface.co](https://huggingface.co)
-2. Get your token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
-3. Browse models at [huggingface.co/models](https://huggingface.co/models?pipeline_tag=text-generation&inference_provider=all&sort=trending)
-4. Add desired models to your configuration
+1. [huggingface.co](https://huggingface.co)でサインアップしてください
+2. [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)からトークンを取得してください
+3. [huggingface.co/models](https://huggingface.co/models?pipeline_tag=text-generation&inference_provider=all&sort=trending)でモデルを閲覧してください
+4. 希望するモデルを設定に追加してください
 
-## Notes
+## 注意事項
 
-- Model names must match the exact Hugging Face repository ID
-- Some models require accepting license agreements on HF website first
-- Large models may not be available on free tier
+- モデル名は正確なHugging Faceリポジトリ IDと一致する必要があります
+- 一部のモデルはHFウェブサイトで最初にライセンス契約に同意する必要があります
+- 大きなモデルは無料ティアでは利用できない場合があります

@@ -3,16 +3,16 @@ title: "クラウドテンプレート – セットアップスクリプト"
 description: Configure a setup script to run during template creation
 ---
 
-The setup script is a shell script that Factory runs during template creation, after your repository is cloned and before the template is activated. Use this feature to set up your template and give droid tools to work with your codebase.
+セットアップスクリプトは、Factoryがテンプレート作成時に実行するシェルスクリプトです。リポジトリがクローンされた後、テンプレートがアクティブ化される前に実行されます。この機能を使用して、テンプレートをセットアップし、droidがあなたのコードベースで作業するためのツールを提供してください。
 
-## 1. How to define a setup script
+## 1. セットアップスクリプトの定義方法
 
-1. In the modal for template creation, in the "Setup Script (Optional)" section, add your initialization script. You can write a multi-line bash script with all the commands you need.
-2. Submit. The script runs in the repo root exactly as provided. Add `set -euo pipefail` at the top of your script if you want strict error handling. Script failures will stop the build.
-3. Keep your script non‑interactive and idempotent. Write commands that can be safely re-run.
-4. Review build logs if anything fails to see detailed output from your script execution.
+1. テンプレート作成のモーダルで、「Setup Script (Optional)」セクションに初期化スクリプトを追加します。必要なコマンドをすべて含む複数行のbashスクリプトを記述できます。
+2. 送信します。スクリプトは提供された通りにリポジトリルートで実行されます。厳密なエラーハンドリングが必要な場合は、スクリプトの先頭に `set -euo pipefail` を追加してください。スクリプトの失敗はビルドを停止します。
+3. スクリプトは非対話的で冪等性を保つようにしてください。安全に再実行できるコマンドを記述してください。
+4. 何か失敗した場合は、ビルドログを確認してスクリプト実行の詳細な出力を確認してください。
 
-Examples:
+例：
 
 **Node.js (Next.js):**
 ```bash
@@ -41,7 +41,7 @@ pip install -r requirements.txt
 pytest -q
 ```
 
-**Multi-language project:**
+**多言語プロジェクト:**
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -56,18 +56,18 @@ pip install -r requirements.txt
 bash ./scripts/setup.sh
 ```
 
-What happens under the hood:
-- The script executes after repository cloning, inside the build container at the repo root.
-- Environment variables specified in template settings are available during script execution.
-- Errors are surfaced clearly (e.g., `Setup script failed: ...`) for quick fixes.
+内部で何が起こるか：
+- スクリプトは、リポジトリのクローン後、ビルドコンテナ内のリポジトリルートで実行されます。
+- テンプレート設定で指定された環境変数は、スクリプト実行時に利用できます。
+- エラーは明確に表示され（例：`Setup script failed: ...`）、迅速な修正が可能です。
 
-## 2. Troubleshooting Tips
+## 2. トラブルシューティングのヒント
 
-| Issue | Fix |
+| 問題 | 修正方法 |
 |---|---|
-| Setup fails with "Setup script failed: …" | Check the build logs for specific error messages. Run the script locally to debug, add error handling, use non‑interactive flags (e.g., `-y`), then retry. |
-| Command not found | Install required tools earlier in your script or ensure they're available in the base Ubuntu image. |
-| Permission denied (scripts) | Make scripts executable (`chmod +x ./scripts/setup.sh`) or invoke via interpreter (`bash ./scripts/setup.sh`). |
-| Env var not found | Add it in Environment Variables section and reference as `$VAR`. Avoid echoing secrets in your script. |
-| Long builds | Keep your script minimal; prefer cached installs (`npm ci` over `npm install`); avoid heavy, non‑essential work. |
-| Path/file not found | Scripts run at the repo root. Verify relative paths and that files exist after clone. |
+| セットアップが「Setup script failed: …」で失敗する | ビルドログで具体的なエラーメッセージを確認してください。ローカルでスクリプトを実行してデバッグし、エラーハンドリングを追加し、非対話的フラグ（例：`-y`）を使用してから、再試行してください。 |
+| Command not found | スクリプトの早い段階で必要なツールをインストールするか、ベースUbuntuイメージで利用可能であることを確認してください。 |
+| Permission denied (scripts) | スクリプトを実行可能にする（`chmod +x ./scripts/setup.sh`）か、インタープリター経由で呼び出してください（`bash ./scripts/setup.sh`）。 |
+| 環境変数が見つからない | Environment Variablesセクションで追加し、`$VAR` として参照してください。スクリプト内でシークレットをechoすることは避けてください。 |
+| 長いビルド | スクリプトは最小限に保ってください。`npm install` より `npm ci` のようなキャッシュされたインストールを優先し、重い非必須作業は避けてください。 |
+| パス/ファイルが見つからない | スクリプトはリポジトリルートで実行されます。相対パスとクローン後にファイルが存在することを確認してください。 |

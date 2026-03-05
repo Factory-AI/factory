@@ -4,22 +4,22 @@ description: "Automatically organize imports across your entire codebase using D
 keywords: ['imports', 'organize imports', 'refactor', 'automation', 'codebase', 'droid exec']
 ---
 
-This tutorial demonstrates how to use Droid Exec to refactor import statements across hundreds of files simultaneously. The script intelligently groups, sorts, and optimizes imports while removing unused dependencies and converting module formats.
+このチュートリアルでは、Droid Execを使用して数百のファイル全体でimport文を同時にリファクタリングする方法を説明します。このスクリプトはインポートを賢く分類、並び替え、最適化し、未使用の依存関係を削除してモジュール形式を変換します。
 
-## How it works
+## 動作原理
 
-The script:
+スクリプトは以下の処理を行います：
 
-1. **Finds files**: Searches for all `.js`, `.jsx`, `.ts`, and `.tsx` files
-2. **Filters smartly**: Excludes `node_modules`, `.git`, `dist`, and `build` directories
-3. **Checks for imports**: Only processes files that contain import statements
-4. **Groups imports**: Organizes into external, internal, and relative imports
-5. **Sorts alphabetically**: Within each group for consistency
-6. **Removes unused**: Eliminates imports that aren't referenced
-7. **Modernizes syntax**: Converts `require()` to ES6 `import`
-8. **Consolidates duplicates**: Merges multiple imports from the same module
+1. **ファイルを検索**: すべての`.js`、`.jsx`、`.ts`、`.tsx`ファイルを検索します
+2. **スマートフィルタリング**: `node_modules`、`.git`、`dist`、`build`ディレクトリを除外します
+3. **インポートをチェック**: import文を含むファイルのみを処理します
+4. **インポートを分類**: 外部、内部、相対インポートに整理します
+5. **アルファベット順に並び替え**: 各グループ内で一貫性を保ちます
+6. **未使用を削除**: 参照されていないインポートを削除します
+7. **構文を現代化**: `require()`をES6 `import`に変換します
+8. **重複を統合**: 同じモジュールからの複数のインポートをマージします
 
-## Get the script
+## スクリプトを入手
 
 <Accordion title="View full script source">
 ```bash
@@ -149,19 +149,19 @@ fi
 ```
 </Accordion>
 
-## Prerequisites
+## 前提条件
 
-Before you begin, complete the [Droid Exec installation](/cli/droid-exec/overview#installation).
+開始する前に、[Droid Exec installation](/cli/droid-exec/overview#installation)を完了してください。
 
-## Basic usage
+## 基本的な使用方法
 
-### Preview changes (dry run)
+### 変更をプレビュー（ドライラン）
 
 <Warning>
   Always start with a dry run to preview changes before modifying files. This helps you understand what transformations will be applied.
 </Warning>
 
-The dry run feature is controlled by the `DRY_RUN` environment variable:
+ドライラン機能は`DRY_RUN`環境変数によって制御されます：
 
 ```bash
 # Preview what would happen (no changes made)
@@ -181,18 +181,18 @@ DRY_RUN=true ./droid-refactor-imports.sh src
 #   [DRY RUN] Would refactor imports
 ```
 
-**How dry run works:**
-- When `DRY_RUN=true`: The script finds all files that need processing and shows which files have imports to refactor, but doesn't modify any files
-- When `DRY_RUN=false` (default): Actually runs the AI refactoring and modifies the files
+**ドライランの動作:**
+- `DRY_RUN=true`の場合：スクリプトは処理が必要なすべてのファイルを検索し、リファクタリングが必要なインポートを持つファイルを表示しますが、ファイルは変更しません
+- `DRY_RUN=false`（デフォルト）の場合：実際にAIリファクタリングを実行してファイルを変更します
 
-This is particularly useful for:
-- Testing on a small directory first to understand the changes
-- Estimating time/cost before processing a large codebase
-- Verifying the script finds the right files before committing to changes
+これは以下の場合に特に有用です：
+- 変更を理解するために小さなディレクトリで最初にテストする
+- 大きなコードベースを処理する前に時間/コストを見積もる
+- 変更をコミットする前にスクリプトが正しいファイルを見つけることを確認する
 
-### Apply refactoring
+### リファクタリングを適用
 
-Once you're satisfied with the preview, run the actual refactoring:
+プレビューに満足したら、実際のリファクタリングを実行します：
 
 ```bash
 # Actually refactor the imports (default behavior)
@@ -205,7 +205,7 @@ DRY_RUN=false ./droid-refactor-imports.sh packages/models
 CONCURRENCY=10 ./droid-refactor-imports.sh packages/models
 ```
 
-Actual execution example:
+実際の実行例：
 ```
 === Droid Import Refactoring ===
 Directory: packages/models
@@ -227,9 +227,9 @@ The imports are now properly organized with comments separating external package
 ...
 ```
 
-## Real-world transformations
+## 実世界での変換
 
-### Example 1: CommonJS to ES6 Conversion
+### 例1：CommonJSからES6への変換
 
 <Tabs>
   <Tab title="Before">
@@ -251,7 +251,7 @@ The imports are now properly organized with comments separating external package
   </Tab>
 </Tabs>
 
-### Example 2: Consolidating Duplicate Imports
+### 例2：重複インポートの統合
 
 <Tabs>
   <Tab title="Before">
@@ -299,7 +299,7 @@ The imports are now properly organized with comments separating external package
   </Tab>
 </Tabs>
 
-## Best practices
+## ベストプラクティス
 
 <Note>
   Follow these best practices for safe and effective import refactoring.

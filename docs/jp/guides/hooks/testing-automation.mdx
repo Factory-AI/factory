@@ -4,21 +4,21 @@ description: "Automate test execution, coverage tracking, and test result valida
 keywords: ['testing', 'tests', 'coverage', 'automation', 'test runner', 'tdd', 'hook']
 ---
 
-This cookbook shows how to automatically run tests when Droid modifies code, maintain test coverage, and enforce testing requirements.
+このクックブックでは、Droidがコードを変更した際に自動的にテストを実行し、テストカバレッジを維持し、テスト要件を強制する方法を説明します。
 
-## How it works
+## 仕組み
 
-Testing hooks can:
+テストフックでは以下のことができます：
 
-1. **Auto-run tests**: Execute tests after code changes
-2. **Track coverage**: Monitor and enforce coverage thresholds
-3. **Validate test files**: Ensure tests exist for new code
-4. **Run specific tests**: Execute only relevant test suites
-5. **Generate reports**: Create test and coverage reports
+1. **テストの自動実行**: コード変更後にテストを実行
+2. **カバレッジの追跡**: カバレッジの閾値を監視・強制
+3. **テストファイルの検証**: 新しいコードに対応するテストの存在を確認
+4. **特定テストの実行**: 関連するテストスイートのみを実行
+5. **レポートの生成**: テストとカバレッジのレポートを作成
 
-## Prerequisites
+## 前提条件
 
-Install testing frameworks for your stack:
+あなたのスタック用のテストフレームワークをインストールしてください：
 
 <CodeGroup>
 
@@ -39,13 +39,13 @@ go install github.com/gotestyourself/gotestsum@latest  # Better test output
 
 </CodeGroup>
 
-## Basic testing automation
+## 基本的なテスト自動化
 
-### Run tests after code changes
+### コード変更後のテスト実行
 
-Automatically run tests when Droid edits files.
+Droidがファイルを編集した際に自動的にテストを実行します。
 
-Create `.factory/hooks/run-tests.sh`:
+`.factory/hooks/run-tests.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -140,7 +140,7 @@ exit 0
 chmod +x .factory/hooks/run-tests.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加：
 
 ```json
 {
@@ -161,11 +161,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Enforce test coverage
+### テストカバレッジの強制
 
-Block changes that decrease test coverage.
+テストカバレッジを低下させる変更をブロックします。
 
-Create `.factory/hooks/check-coverage.sh`:
+`.factory/hooks/check-coverage.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -236,18 +236,18 @@ exit 0
 chmod +x .factory/hooks/check-coverage.sh
 ```
 
-Configure coverage threshold:
+カバレッジ閾値を設定：
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export DROID_MIN_COVERAGE=75
 ```
 
-### Require tests for new files
+### 新しいファイルに対するテストの必須化
 
-Ensure new code files have corresponding tests.
+新しいコードファイルに対応するテストの存在を確認します。
 
-Create `.factory/hooks/require-tests.sh`:
+`.factory/hooks/require-tests.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -319,13 +319,13 @@ chmod +x .factory/hooks/require-tests.sh
 ```
 
 
-## Advanced testing automation
+## 高度なテスト自動化
 
-### Smart test selection
+### スマートテスト選択
 
-Only run tests affected by changes.
+変更の影響を受けるテストのみを実行します。
 
-Create `.factory/hooks/run-affected-tests.sh`:
+`.factory/hooks/run-affected-tests.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -389,11 +389,11 @@ chmod +x .factory/hooks/run-affected-tests.sh
 ```
 
 
-### Snapshot testing validation
+### スナップショットテストの検証
 
-Detect and validate snapshot updates.
+スナップショットの更新を検出・検証します。
 
-Create `.factory/hooks/validate-snapshots.sh`:
+`.factory/hooks/validate-snapshots.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -445,11 +445,11 @@ chmod +x .factory/hooks/validate-snapshots.sh
 ```
 
 
-### Test performance monitoring
+### テストパフォーマンスの監視
 
-Track test execution time and warn on slow tests.
+テストの実行時間を追跡し、遅いテストに対して警告を出します。
 
-Create `.factory/hooks/monitor-test-perf.py`:
+`.factory/hooks/monitor-test-perf.py`を作成：
 
 ```python
 #!/usr/bin/env python3
@@ -535,13 +535,13 @@ chmod +x .factory/hooks/monitor-test-perf.py
 ```
 
 
-### Test flakiness detector
+### テストの不安定性検出器
 
-Detect and report flaky tests:
+不安定なテストを検出・報告します：
 
 
 
-Create `.factory/hooks/detect-flaky-tests.sh`:
+`.factory/hooks/detect-flaky-tests.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -602,7 +602,7 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
 ```
 
 
-## Best practices
+## ベストプラクティス
 
 <Steps>
   <Step title="Run tests asynchronously when possible">
@@ -660,13 +660,13 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
   </Step>
 </Steps>
 
-## Troubleshooting
+## トラブルシューティング
 
 
   
-    **Problem**: Test execution blocks workflow
+    **問題**: テスト実行がワークフローをブロックする
     
-    **Solution**: Run only unit tests, skip integration:
+    **解決策**: ユニットテストのみを実行し、統合テストをスキップ：
     ```bash
     # Fast unit tests only
     npm test -- --testPathPattern="unit" "$file"
@@ -681,9 +681,9 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
   
   
   
-    **Problem**: Tests fail in hooks but pass manually
+    **問題**: フック内でテストが失敗するが、手動実行では成功する
     
-    **Solution**: Check environment differences:
+    **解決策**: 環境の違いを確認：
     ```bash
     # Ensure same environment
     export NODE_ENV=test
@@ -695,9 +695,9 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
   
   
   
-    **Problem**: Coverage includes generated files
+    **問題**: カバレッジに生成ファイルが含まれる
     
-    **Solution**: Configure coverage exclusions:
+    **解決策**: カバレッジの除外設定を構成：
     ```json
     // jest.config.js
     {
@@ -712,9 +712,9 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
   
 
 
-## See also
+## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - Complete hooks API documentation
-- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
-- [Code validation](/guides/hooks/code-validation) - Validate code quality
-- [Git workflows](/guides/hooks/git-workflows) - Git integration
+- [Hooks reference](/reference/hooks-reference) - 完全なフックAPI文書
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Code validation](/guides/hooks/code-validation) - コード品質の検証
+- [Git workflows](/guides/hooks/git-workflows) - Git統合

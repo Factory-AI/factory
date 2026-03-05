@@ -4,7 +4,7 @@ description: Choose low, medium, or high autonomy so droid can execute work that
 keywords: ['auto run', 'autorun', 'autonomy', 'automatic', 'auto mode', 'yolo', 'permissions', 'risk', 'approval']
 ---
 
-Auto-Run Mode lets you decide how much autonomy droid has after you approve a plan. Instead of confirming every tool call, pick the level of risk you are comfortable with and droid will keep moving while still surfacing everything it does.
+Auto-Run Modeでは、プランを承認した後にdroidにどの程度の自律性を与えるかを決めることができます。すべてのツール呼び出しを確認する代わりに、快適に感じるリスクレベルを選択すれば、droidが行うすべての作業を表示しながら継続して動作します。
 
 <CardGroup cols={2}>
   <Card title="Configurable Autonomy" icon="slider">
@@ -21,78 +21,78 @@ Auto-Run Mode lets you decide how much autonomy droid has after you approve a pl
   </Card>
 </CardGroup>
 
-## Autonomy levels at a glance
+## 自律性レベルの概要
 
-| Level | What runs automatically | Typical examples |
+| レベル | 自動実行される内容 | 典型的な例 |
 | --- | --- | --- |
-| **Auto (Low)** | File edits, file creation, and read-only commands from the built-in allowlist | `Edit`, `Create`, `ls`, `git status`, `rg` |
-| **Auto (Medium)** | Everything from Low plus reversible commands that change your workspace | `npm install`, `pip install`, `git commit`, `mv`, `cp`, build tooling |
-| **Auto (High)** | All commands that are not explicitly blocked for safety | `docker compose up`, `git push` (if allowed), migrations, custom scripts |
+| **Auto (Low)** | ファイル編集、ファイル作成、組み込み許可リストからの読み取り専用コマンド | `Edit`, `Create`, `ls`, `git status`, `rg` |
+| **Auto (Medium)** | Lowのすべてに加えて、ワークスペースを変更する可逆的なコマンド | `npm install`, `pip install`, `git commit`, `mv`, `cp`, ビルドツール |
+| **Auto (High)** | 安全上の理由で明示的にブロックされていないすべてのコマンド | `docker compose up`, `git push` (許可されている場合), マイグレーション, カスタムスクリプト |
 
-Auto-Run always shows streamed output and highlights every file change, regardless of the autonomy level.
+Auto-Runは、自律性レベルに関係なく、常にストリーミング出力を表示し、すべてのファイル変更をハイライト表示します。
 
-## Risk classification
+## リスク分類
 
-Every command sent through the CLI includes a risk rating (`low`, `medium`, or `high`) along with a short justification. Auto-Run compares that rating to your selected autonomy level:
+CLIを通じて送信されるすべてのコマンドには、簡潔な理由とともにリスク評価（`low`、`medium`、または`high`）が含まれます。Auto-Runは、その評価を選択した自律性レベルと比較します：
 
-- **Low risk** – read-only operations and changes that cannot create irreversible damage (listing files, showing logs, git diff).
-- **Medium risk** – actions that alter your workspace but are straightforward to undo (package installs, moving files, local git operations, builds).
-- **High risk** – commands that could be destructive, hard to roll back, or security sensitive (sudo, wiping directories, deploying, piping remote scripts).
+- **Low risk** – 読み取り専用の操作や、不可逆的な損害を与えることができない変更（ファイル一覧表示、ログ表示、git diff）。
+- **Medium risk** – ワークスペースを変更するが、元に戻すのが簡単なアクション（パッケージインストール、ファイル移動、ローカルgit操作、ビルド）。
+- **High risk** – 破壊的、ロールバックが困難、またはセキュリティに敏感なコマンド（sudo、ディレクトリの削除、デプロイ、リモートスクリプトのパイプ）。
 
-Commands run automatically only when their risk level is less than or equal to your current setting. If a tool labels a command above your threshold, the CLI pauses and asks for confirmation.
+コマンドは、そのリスクレベルが現在の設定以下の場合にのみ自動実行されます。ツールがしきい値を超えるコマンドにラベルを付けた場合、CLIは一時停止して確認を求めます。
 
-## How Auto-Run decides what to execute
+## Auto-Runが実行内容を決定する方法
 
-- **File tools** (`Create`, `Edit`, `MultiEdit`, `ApplyPatch`) are treated as low risk and run instantly whenever Auto-Run is active.
-- **Execute commands** follow the risk threshold. Low autonomy auto-accepts only read-only allowlisted commands. Medium adds reversible commands. High accepts any command with a declared risk level, except for those blocked below.
-- **Safety interlocks** always trigger confirmation, even in Auto (High): dangerous patterns (`rm -rf /`, `dd of=/dev/*`, etc.), command substitution (`$(...)`, backticks), or anything explicitly flagged by the CLI security checks.
-- **Allowlist expansion** – when you approve a command, you can add it to the session allowlist so future occurrences run without another prompt.
+- **ファイルツール**（`Create`、`Edit`、`MultiEdit`、`ApplyPatch`）は低リスクとして扱われ、Auto-Runがアクティブな場合は即座に実行されます。
+- **実行コマンド**はリスクしきい値に従います。Low自律性は読み取り専用の許可リストコマンドのみを自動承認します。Mediumは可逆的なコマンドを追加します。Highは宣言されたリスクレベルを持つ任意のコマンドを受け入れますが、以下でブロックされたものは除きます。
+- **安全インターロック**は、Auto（High）でも常に確認をトリガーします：危険なパターン（`rm -rf /`、`dd of=/dev/*`など）、コマンド置換（`$(...)`、バッククォート）、またはCLIセキュリティチェックで明示的にフラグされたもの。
+- **許可リスト拡張** – コマンドを承認する際に、セッション許可リストに追加して、今後の発生時に再度プロンプトが表示されないようにできます。
 
-## Enabling and switching modes
+## モードの有効化と切り替え
 
-- **Cycle from the keyboard** – press **Shift+Tab** (or `Ctrl+T` on Windows) to move through Normal → Spec → Auto (Low) → Auto (Medium) → Auto (High) → back to Normal. The active mode is shown in the status banner and Help popup.
-- **Set a default in Settings** – open the CLI settings menu, choose your preferred autonomy level, and the CLI persists it for future sessions.
-- **Choose it after a spec** – when approving a Specification Mode plan, pick “Proceed” (manual), or enable Auto-Run at Low, Medium, or High for the implementation phase.
-- **Return to manual control** at any time by cycling back to Normal; droid will resume asking for each file change and command.
+- **キーボードから切り替え** – **Shift+Tab**（Windowsでは`Ctrl+T`）を押して、Normal → Spec → Auto（Low）→ Auto（Medium）→ Auto（High）→ Normalに戻る順で移動します。アクティブなモードはステータスバナーとヘルプポップアップに表示されます。
+- **設定でデフォルトを設定** – CLI設定メニューを開き、希望する自律性レベルを選択すると、CLIが将来のセッション用に保持します。
+- **仕様の後に選択** – Specification Modeプランを承認する際に、「進行」（手動）を選択するか、実装フェーズでAuto-RunをLow、Medium、またはHighで有効にします。
+- いつでもNormalに戻すことで**手動制御に戻る**ことができ、droidは各ファイル変更とコマンドを再び確認するようになります。
 
-## Workflow examples
+## ワークフローの例
 
-**Auto (Low)** – quick file updates and reconnaissance
+**Auto（Low）** – 迅速なファイル更新と調査
 ```
 - Update docs/README.md with new instructions
 - Run ls, git status, and rg searches as needed
 ```
-All edits and read-only checks happen without prompts, while anything that modifies dependencies still asks first.
+すべての編集と読み取り専用チェックはプロンプトなしで実行され、依存関係を変更するものは最初に確認を求めます。
 
-**Auto (Medium)** – feature work that needs tooling
+**Auto（Medium）** – ツールが必要な機能作業
 ```
 - Add a new React component (multiple file edits)
 - npm install @acme/widget
 - npm run lint
 ```
-File changes, dependency installs, and build scripts execute automatically so long as they are reversible.
+ファイル変更、依存関係のインストール、ビルドスクリプトは、可逆的である限り自動的に実行されます。
 
-**Auto (High)** – migrations or integration tests
+**Auto（High）** – マイグレーションまたは統合テスト
 ```
 - Run database migration script
 - docker compose up test-environment
 - git push origin feature/autonomy-docs
 ```
-Droid executes the entire sequence without pauses while still blocking obviously dangerous commands.
+明らかに危険なコマンドをブロックしながら、droidは一時停止なしで全体のシーケンスを実行します。
 
-## When you will still get prompted
+## まだプロンプトが表示される場合
 
-- A command is rated above your current autonomy level.
-- The CLI detects command substitution or a dangerous pattern.
-- A tool requests something outside the session allowlist and you are in Auto (Low).
-- Droid needs clarity (e.g., missing context, ambiguous edits) and asks for input.
-- You manually interrupt with **Esc** (single tap interrupts operations; double tap clears current input).
+- コマンドが現在の自律性レベルを上回る評価を受けている。
+- CLIがコマンド置換または危険なパターンを検出した。
+- ツールがセッション許可リスト外の何かを要求し、Auto（Low）モードにいる。
+- Droidが明確化を必要とし（例：コンテキストの欠如、曖昧な編集）、入力を求めている。
+- **Esc**で手動で中断した（1回タップで操作を中断、2回タップで現在の入力をクリア）。
 
-## Best practices
+## ベストプラクティス
 
-- Start new or high-stakes work in Normal or Auto (Low) until you trust the plan.
-- Use Auto (Medium) for day-to-day feature development and refactors that rely on package managers or build steps.
-- Reserve Auto (High) for well-understood pipelines where you expect droid to run end-to-end scripts.
-- If you spot a suspect command, interrupt, provide guidance, and resume at the autonomy level that fits the remaining risk.
+- 新しい作業や重要な作業は、プランを信頼するまでNormalまたはAuto（Low）で開始する。
+- パッケージマネージャーやビルドステップに依存する日常的な機能開発とリファクタリングにはAuto（Medium）を使用する。
+- droidがエンドツーエンドスクリプトを実行することが期待される、よく理解されたパイプラインにはAuto（High）を予約する。
+- 疑わしいコマンドを発見した場合は、中断し、ガイダンスを提供し、残りのリスクに適した自律性レベルで再開する。
 
-Ready to try it? Cycle into the level you need with **Shift+Tab**, or pick the desired option when you approve your next spec.
+試してみる準備はできましたか？**Shift+Tab**で必要なレベルに切り替えるか、次の仕様を承認する際に希望するオプションを選択してください。

@@ -4,25 +4,25 @@ description: "Model pricing in Standard Tokens"
 keywords: ['pricing', 'models', 'model id', 'model pricing', 'tokens', 'standard tokens', 'multiplier', 'cost', 'plans', 'subscription']
 ---
 
-## Pricing Tiers
+## 料金プラン
 
-Factory measures usage through Standard Tokens. Cached tokens are billed at one-tenth of a Standard Token (10 cached tokens = 1 Standard Token). We offer two subscription plans:
+Factoryは、Standard Tokenを通じて使用量を測定しています。キャッシュされたトークンは、Standard Tokenの10分の1の料金で請求されます（キャッシュトークン10個 = Standard Token 1個）。2つのサブスクリプションプランを提供しています：
 
-| Plan     | Standard Tokens / Month                       | Price / Month |
+| プラン     | Standard Tokens / 月                          | 月額料金      |
 | -------- | --------------------------------------------- | ------------- |
 | **Free** | BYOK                                          | $0            | 
-| **Pro**  | 20 million                                    | $20           |
-| **Max**  | 200 million                                   | $200          | 
+| **Pro**  | 2,000万                                       | $20           |
+| **Max**  | 2億                                           | $200          | 
 
-Overage is billed at $2.70 per million Factory Standard Tokens.
+超過分は、Factory Standard Token 100万あたり$2.70で請求されます。
 
-## Model Pricing
+## モデル料金
 
-Different models have different multipliers applied to calculate Standard Token usage.
+異なるモデルには、Standard Token使用量を計算するために異なる倍率が適用されます。
 
-### Pricing Table
+### 料金表
 
-| Model                    | Model ID                     | Multiplier |
+| モデル                    | モデルID                     | 倍率       |
 | ------------------------ | ---------------------------- | ---------- |
 | Droid Core (MiniMax M2.5)| `minimax-m2.5`               | 0.12×      |
 | Gemini 3 Flash           | `gemini-3-flash-preview`     | 0.2×       |
@@ -44,6 +44,6 @@ Different models have different multipliers applied to calculate Standard Token 
 | Claude Opus 4.6          | `claude-opus-4-6`            | 2×         |
 | Claude Opus 4.6 Fast     | `claude-opus-4-6-fast`       | 12×        |
 
-## Thinking About Tokens
+## トークンについて考える
 
-As a reference point, using GPT-5.1-Codex at its 0.5× multiplier alongside our typical cache ratio of 4–8× means your effective Standard Token usage goes dramatically further than raw on-demand calls. Switching to very expensive models frequently—or rotating models often enough to invalidate the cache—will lower that benefit, but most workloads see materially higher usage ceilings compared with buying capacity directly from individual model providers. Our aim is for you to run your workloads without worrying about token math; the plans are designed so common usage patterns outperform comparable direct offerings.
+参考として、GPT-5.1-Codexを0.5×の倍率で使用し、一般的なキャッシュ比率である4〜8倍を併用すると、実効的なStandard Token使用量は、オンデマンドでの直接呼び出しよりもはるかに効率的になります。非常に高価なモデルを頻繁に切り替えたり、キャッシュが無効になるほど頻繁にモデルをローテーションしたりすると、その効果は低下しますが、ほとんどのワークロードでは、個別のモデルプロバイダーから直接容量を購入する場合と比較して、大幅に高い使用上限を実現できます。私たちの目標は、トークンの計算を気にすることなくワークロードを実行していただくことです。プランは、一般的な使用パターンが類似の直接提供サービスを上回る性能を発揮するよう設計されています。

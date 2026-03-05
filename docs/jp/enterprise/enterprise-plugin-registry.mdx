@@ -3,23 +3,23 @@ title: "エンタープライズプラグインレジストリ"
 description: Centralize and distribute approved plugins across your organization with a private plugin marketplace.
 ---
 
-An **Enterprise Plugin Registry** is a centralized, private repository where organizations maintain approved plugins for company-wide distribution. Instead of individual teams discovering and vetting plugins independently, the registry provides a curated catalog of capabilities that are pre-approved, maintained, and ready to use.
+**Enterprise Plugin Registry**は、組織が社内全体での配布用に承認されたプラグインを管理する、中央集約型のプライベートリポジトリです。各チームが個別にプラグインを発見し検証する代わりに、レジストリは事前承認済み、保守され、すぐに使用可能な機能のキュレートされたカタログを提供します。
 
-## Why use an Enterprise Plugin Registry?
+## Enterprise Plugin Registryを使用する理由
 
-| Challenge | Solution |
+| 課題 | 解決策 |
 |-----------|----------|
-| **Inconsistent tooling** across teams | Single source of approved plugins ensures everyone uses the same capabilities |
-| **Security and compliance review** for each plugin | Vet plugins once at the org level, distribute everywhere |
-| **Onboarding new developers** | New team members instantly access all approved capabilities |
-| **Role-specific tooling** | Package plugins by team function (security, frontend, data, etc.) |
-| **Version control** | Manage plugin versions centrally, roll out updates organization-wide |
+| チーム間での**ツールの一貫性の欠如** | 承認されたプラグインの単一ソースにより、全員が同じ機能を使用することを保証 |
+| 各プラグインの**セキュリティとコンプライアンス審査** | 組織レベルでプラグインを一度審査し、どこでも配布 |
+| **新しい開発者のオンボーディング** | 新しいチームメンバーが承認されたすべての機能に即座にアクセス |
+| **役割固有のツール** | チーム機能別（セキュリティ、フロントエンド、データなど）にプラグインをパッケージ化 |
+| **バージョン管理** | プラグインバージョンを中央管理し、組織全体でアップデートを展開 |
 
-## Setting up a registry
+## レジストリの設定
 
-An Enterprise Plugin Registry is a Git repository containing your organization's approved plugins with a marketplace manifest.
+Enterprise Plugin Registryは、組織の承認されたプラグインとマーケットプレイスマニフェストを含むGitリポジトリです。
 
-### Repository structure
+### リポジトリ構造
 
 ```
 your-org/droid-plugins/
@@ -41,9 +41,9 @@ your-org/droid-plugins/
 └── README.md
 ```
 
-### Marketplace manifest
+### マーケットプレイスマニフェスト
 
-Create `.factory-plugin/marketplace.json` to register your plugins:
+プラグインを登録するために`.factory-plugin/marketplace.json`を作成します：
 
 ```json
 {
@@ -82,9 +82,9 @@ Create `.factory-plugin/marketplace.json` to register your plugins:
 }
 ```
 
-## Org-level configuration
+## 組織レベルの設定
 
-Configure the registry at the organization level so it's automatically available to all users. Add to your org-managed settings:
+レジストリを組織レベルで設定することで、すべてのユーザーが自動的に利用できるようになります。組織管理設定に追加します：
 
 ```json
 {
@@ -103,14 +103,14 @@ Configure the registry at the organization level so it's automatically available
 }
 ```
 
-| Field | Purpose |
+| フィールド | 目的 |
 |-------|---------|
-| `extraKnownMarketplaces` | Registers the marketplace so users can browse and install plugins |
-| `enabledPlugins` | Pre-installs specific plugins for all users (optional) |
+| `extraKnownMarketplaces` | ユーザーがプラグインを閲覧・インストールできるようにマーケットプレイスを登録 |
+| `enabledPlugins` | すべてのユーザーに特定のプラグインを事前インストール（オプション） |
 
-### Restricting marketplaces
+### マーケットプレイスの制限
 
-To prevent users from adding unapproved marketplaces, use `strictKnownMarketplaces`:
+ユーザーが未承認のマーケットプレイスを追加することを防ぐには、`strictKnownMarketplaces`を使用します：
 
 ```json
 {
@@ -121,38 +121,38 @@ To prevent users from adding unapproved marketplaces, use `strictKnownMarketplac
 }
 ```
 
-When `strictKnownMarketplaces` is set:
-- Users can only add marketplaces from the approved list
-- Plugin installations from non-approved marketplaces are blocked
-- Existing unapproved marketplaces continue to work but cannot be updated
+`strictKnownMarketplaces`が設定されている場合：
+- ユーザーは承認リストからのマーケットプレイスのみ追加可能
+- 未承認のマーケットプレイスからのプラグインインストールはブロック
+- 既存の未承認マーケットプレイスは動作し続けるが更新不可
 
-With this configuration:
-- The registry appears automatically when users run `/plugins`
-- Pre-enabled plugins are available immediately without manual installation
-- Users can install additional plugins from the registry as needed
+この設定により：
+- ユーザーが`/plugins`を実行すると、レジストリが自動的に表示される
+- 事前有効化されたプラグインは手動インストールなしですぐに利用可能
+- ユーザーは必要に応じてレジストリから追加のプラグインをインストール可能
 
-## User experience
+## ユーザーエクスペリエンス
 
-Users manage plugins via the `/plugins` UI:
+ユーザーは`/plugins` UIを通じてプラグインを管理します：
 
-1. Run `/plugins` to open the plugin manager
-2. Browse tab shows plugins from all registered marketplaces including the org registry
-3. Org-enabled plugins are pre-installed automatically on startup
+1. `/plugins`を実行してプラグインマネージャーを開く
+2. ブラウズタブで組織レジストリを含む登録されたすべてのマーケットプレイスからプラグインを閲覧
+3. 組織が有効にしたプラグインは起動時に自動的に事前インストール
 
-For CLI access:
+CLI アクセスの場合：
 
 ```bash
 droid plugin install frontend-standards@acme-corp-plugins
 droid plugin update security-toolkit@acme-corp-plugins
 ```
 
-Users see the registry alongside public marketplaces, with org plugins clearly labeled.
+ユーザーは公開マーケットプレイスと並んでレジストリを確認でき、組織のプラグインは明確にラベル付けされています。
 
-## Organizing plugins by role
+## 役割別のプラグイン整理
 
-Structure your registry to match your organization's teams and workflows:
+組織のチームとワークフローに合わせてレジストリを構造化します：
 
-### By team function
+### チーム機能別
 
 ```
 plugins/
@@ -164,7 +164,7 @@ plugins/
 └── compliance/         # Legal/compliance
 ```
 
-### By capability
+### 機能別
 
 ```
 plugins/
@@ -175,7 +175,7 @@ plugins/
 └── security/           # Security scanning and review
 ```
 
-### By project type
+### プロジェクトタイプ別
 
 ```
 plugins/
@@ -185,9 +185,9 @@ plugins/
 └── ml-projects/        # ML/AI development
 ```
 
-## Pre-installing plugins
+## プラグインの事前インストール
 
-For critical capabilities that everyone needs, use `enabledPlugins` in org-managed settings:
+全員が必要とする重要な機能については、組織管理設定で`enabledPlugins`を使用します：
 
 ```json
 {
@@ -198,27 +198,27 @@ For critical capabilities that everyone needs, use `enabledPlugins` in org-manag
 }
 ```
 
-Pre-installed plugins:
-- Are available immediately on first Droid session
-- Are installed with `org` scope automatically
-- Can be updated via `/plugins` UI or `droid plugin update`
+事前インストールされたプラグイン：
+- 初回のDroidセッションですぐに利用可能
+- `org`スコープで自動的にインストール
+- `/plugins` UIまたは`droid plugin update`で更新可能
 
-## Version management
+## バージョン管理
 
-Plugins are versioned by Git commit hash. When a plugin is updated, Droid fetches the latest commit from the marketplace.
+プラグインはGitコミットハッシュでバージョン管理されます。プラグインが更新されると、Droidはマーケットプレイスから最新のコミットを取得します。
 
-To control versions, use Git branches:
-- `main` - Production-ready for all users
-- `staging` - For early adopters
-- `dev` - For internal testing
+バージョンを制御するには、Gitブランチを使用します：
+- `main` - すべてのユーザー向けのプロダクション準備完了
+- `staging` - 早期採用者向け
+- `dev` - 内部テスト向け
 
 <Note>
 Version pinning via the `version` field is not currently supported. The field is for documentation only.
 </Note>
 
-## Private repository access
+## プライベートリポジトリアクセス
 
-For private Git repositories, ensure Droid can authenticate:
+プライベートGitリポジトリの場合、Droidが認証できることを確認します：
 
 ### GitHub Enterprise
 
@@ -227,27 +227,27 @@ For private Git repositories, ensure Droid can authenticate:
 gh auth login --hostname github.your-company.com
 ```
 
-### GitLab Self-Hosted
+### GitLab セルフホスト
 
 ```bash
 # Configure git credentials
 git config --global credential.helper store
 ```
 
-### SSH-based access
+### SSHベースのアクセス
 
-Ensure SSH keys are configured for the repository host.
+リポジトリホスト用のSSHキーが設定されていることを確認してください。
 
-## Local marketplaces
+## ローカルマーケットプレイス
 
-For air-gapped environments or when Git access is restricted, you can use local directory marketplaces. This is useful for:
-- Environments without internet access
-- Testing plugins before publishing
-- Internal distribution via shared network drives
+エアギャップ環境やGitアクセスが制限されている場合、ローカルディレクトリマーケットプレイスを使用できます。これは以下の場合に便利です：
+- インターネットアクセスがない環境
+- 公開前のプラグインテスト
+- 共有ネットワークドライブ経由での内部配布
 
-### Setting up a local marketplace
+### ローカルマーケットプレイスの設定
 
-Create a directory with the standard marketplace structure:
+標準的なマーケットプレイス構造でディレクトリを作成します：
 
 ```
 /shared/company-plugins/
@@ -262,19 +262,19 @@ Create a directory with the standard marketplace structure:
             └── plugin.json
 ```
 
-### Adding a local marketplace
+### ローカルマーケットプレイスの追加
 
-Via UI: `/plugins` → Marketplaces tab → "Add new marketplace" → enter absolute path
+UI経由：`/plugins` → マーケットプレイスタブ → 「新しいマーケットプレイスを追加」→ 絶対パスを入力
 
-Via CLI:
+CLI経由：
 
 ```bash
 droid plugin marketplace add /shared/company-plugins
 ```
 
-### Configuration for auto-registration
+### 自動登録の設定
 
-Use the `local` source type in settings:
+設定で`local`ソースタイプを使用します：
 
 ```json
 {
@@ -293,7 +293,7 @@ Use the `local` source type in settings:
 When removing a local marketplace from the registry, Droid does **not** delete the source directory. Only Git-cloned marketplaces have their directories removed on deletion.
 </Note>
 
-## Best practices
+## ベストプラクティス
 
 <AccordionGroup>
   <Accordion title="Establish a review process">
@@ -335,21 +335,21 @@ When removing a local marketplace from the registry, Droid does **not** delete t
   </Accordion>
 </AccordionGroup>
 
-## Example: Financial services org
+## 例：金融サービス組織
 
-A financial services company sets up their registry:
+金融サービス会社がレジストリを設定する場合：
 
-**Mandatory plugins** (pre-installed for everyone):
-- `compliance-checks` - PCI-DSS and SOX compliance validation
-- `security-scanner` - OWASP vulnerability detection
-- `audit-logging` - Enhanced audit trail for all Droid actions
+**必須プラグイン**（全員に事前インストール）：
+- `compliance-checks` - PCI-DSSおよびSOXコンプライアンス検証
+- `security-scanner` - OWASP脆弱性検出
+- `audit-logging` - すべてのDroidアクションの強化された監査証跡
 
-**Team-specific plugins** (available for install):
-- `trading-systems` - For quantitative and trading teams
-- `risk-models` - For risk management teams
-- `regulatory-reporting` - For compliance teams
+**チーム固有プラグイン**（インストール可能）：
+- `trading-systems` - 定量分析および取引チーム向け
+- `risk-models` - リスク管理チーム向け
+- `regulatory-reporting` - コンプライアンスチーム向け
 
-**Configuration (org-managed-settings.json):**
+**設定 (org-managed-settings.json):**
 
 ```json
 {
@@ -369,10 +369,10 @@ A financial services company sets up their registry:
 }
 ```
 
-This ensures every developer has compliance and security tooling from day one, while specialized teams can add domain-specific capabilities.
+これにより、すべての開発者が初日からコンプライアンスとセキュリティツールを持ちながら、専門チームはドメイン固有の機能を追加できます。
 
-## Related
+## 関連
 
-- [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) - How org-level settings work
-- [Plugins](/cli/configuration/plugins) - Plugin basics and installation
-- [Building Plugins](/guides/building/building-plugins) - Create your own plugins
+- [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) - 組織レベル設定の仕組み
+- [Plugins](/cli/configuration/plugins) - プラグインの基本とインストール
+- [Building Plugins](/guides/building/building-plugins) - 独自プラグインの作成

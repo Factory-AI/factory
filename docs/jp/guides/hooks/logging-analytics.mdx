@@ -4,21 +4,21 @@ description: "Track Droid usage, collect metrics, and analyze development patter
 keywords: ['logging', 'analytics', 'metrics', 'tracking', 'usage', 'reports', 'hook']
 ---
 
-This cookbook shows how to use hooks to track Droid usage, collect development metrics, analyze patterns, and generate insights about your development workflow.
+このクックブックでは、フックを使用してDroidの使用状況を追跡し、開発メトリクスを収集し、パターンを分析し、開発ワークフローに関する洞察を生成する方法を説明します。
 
-## How it works
+## 仕組み
 
-Logging and analytics hooks can:
+ロギングおよび分析フックでは以下のことができます：
 
-1. **Track tool usage**: Log which tools Droid uses most frequently
-2. **Measure performance**: Track session duration, command execution time
-3. **Analyze patterns**: Identify common workflows and bottlenecks
-4. **Generate reports**: Create usage summaries and insights
-5. **Monitor costs**: Track token usage and API costs
+1. **ツール使用状況の追跡**: Droidが最も頻繁に使用するツールをログに記録
+2. **パフォーマンスの測定**: セッション期間、コマンド実行時間を追跡
+3. **パターンの分析**: 一般的なワークフローとボトルネックを特定
+4. **レポートの生成**: 使用状況の概要と洞察を作成
+5. **コストの監視**: トークン使用量とAPIコストを追跡
 
-## Prerequisites
+## 前提条件
 
-Tools for logging and data collection:
+ロギングとデータ収集のためのツール：
 
 <CodeGroup>
 
@@ -44,13 +44,13 @@ docker run -d -p 8123:8123 clickhouse/clickhouse-server
 
 </CodeGroup>
 
-## Basic logging
+## 基本的なロギング
 
-### Log all commands
+### 全コマンドのログ記録
 
-Track every command Droid executes.
+Droidが実行するすべてのコマンドを追跡します。
 
-Create `.factory/hooks/log-commands.sh`:
+`.factory/hooks/log-commands.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -86,7 +86,7 @@ exit 0
 chmod +x .factory/hooks/log-commands.sh
 ```
 
-Add to `~/.factory/settings.json`:
+`~/.factory/settings.json`に追加：
 
 ```json
 {
@@ -107,7 +107,7 @@ Add to `~/.factory/settings.json`:
 }
 ```
 
-Analyze logs:
+ログの分析：
 
 ```bash
 # Most common commands
@@ -117,11 +117,11 @@ jq -r '.command' ~/.factory/command-log.jsonl | sort | uniq -c | sort -rn | head
 jq -r '"\(.session_id): \(.command)"' ~/.factory/command-log.jsonl
 ```
 
-### Track file modifications
+### ファイル変更の追跡
 
-Log all file edits and writes.
+すべてのファイル編集と書き込みをログに記録します。
 
-Create `.factory/hooks/track-file-changes.sh`:
+`.factory/hooks/track-file-changes.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -182,7 +182,7 @@ exit 0
 chmod +x .factory/hooks/track-file-changes.sh
 ```
 
-Query the database:
+データベースへのクエリ：
 
 ```bash
 # Most edited files
@@ -202,13 +202,13 @@ sqlite3 ~/.factory/file-changes.db \
 ```
 
 
-### Session duration tracking
+### セッション期間の追跡
 
-Measure how long sessions last:
+セッションの継続時間を測定します：
 
 
 
-Create `.factory/hooks/track-session.sh`:
+`.factory/hooks/track-session.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -269,7 +269,7 @@ exit 0
 chmod +x .factory/hooks/track-session.sh
 ```
 
-Add to hooks:
+フックに追加：
 
 ```json
 {
@@ -300,7 +300,7 @@ Add to hooks:
 }
 ```
 
-Query session stats:
+セッション統計のクエリ：
 
 ```bash
 # Average session duration
@@ -320,15 +320,15 @@ sqlite3 ~/.factory/sessions.db \
 ```
 
 
-## Advanced analytics
+## 高度な分析
 
-### Usage heatmap
+### 使用状況ヒートマップ
 
-Track when Droid is used most:
+Droidが最も使用される時間帯を追跡します：
 
 
 
-Create `.factory/hooks/usage-heatmap.py`:
+`.factory/hooks/usage-heatmap.py`を作成：
 
 ```python
 #!/usr/bin/env python3
@@ -395,7 +395,7 @@ if __name__ == '__main__':
 chmod +x .factory/hooks/usage-heatmap.py
 ```
 
-Run periodically:
+定期的に実行：
 
 ```bash
 # Add to weekly report
@@ -403,13 +403,13 @@ Run periodically:
 ```
 
 
-### Tool usage statistics
+### ツール使用統計
 
-Track which tools are used most:
+最も使用されているツールを追跡します：
 
 
 
-Create `.factory/hooks/tool-stats.sh`:
+`.factory/hooks/tool-stats.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -430,7 +430,7 @@ exit 0
 chmod +x .factory/hooks/tool-stats.sh
 ```
 
-Add to PreToolUse for all tools:
+すべてのツールのPreToolUseに追加：
 
 ```json
 {
@@ -451,7 +451,7 @@ Add to PreToolUse for all tools:
 }
 ```
 
-Generate report:
+レポートの生成：
 
 ```bash
 # Most used tools
@@ -465,13 +465,13 @@ awk '{print $1}' ~/.factory/tool-usage.log | cut -d'T' -f2 | cut -d':' -f1 | sor
 ```
 
 
-### Performance metrics
+### パフォーマンスメトリクス
 
-Track hook execution performance:
+フック実行パフォーマンスを追跡します：
 
 
 
-Create `.factory/hooks/perf-monitor.sh`:
+`.factory/hooks/perf-monitor.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -503,7 +503,7 @@ fi
 exit 0
 ```
 
-Analyze performance:
+パフォーマンスの分析：
 
 ```bash
 # Slowest hooks
@@ -515,13 +515,13 @@ awk '{sum[$2]+=$4; count[$2]++} END {for (event in sum) print event, sum[event]/
 ```
 
 
-### Cost tracking
+### コスト追跡
 
-Monitor token usage and API costs:
+トークン使用量とAPIコストを監視します：
 
 
 
-Create `.factory/hooks/track-costs.sh`:
+`.factory/hooks/track-costs.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -586,7 +586,7 @@ exit 0
 chmod +x .factory/hooks/track-costs.sh
 ```
 
-Query costs:
+コストのクエリ：
 
 ```bash
 # Total costs
@@ -605,13 +605,13 @@ sqlite3 ~/.factory/costs.db \
 ```
 
 
-### Generate weekly reports
+### 週次レポートの生成
 
-Compile usage reports:
+使用状況レポートをコンパイルします：
 
 
 
-Create `.factory/hooks/weekly-report.py`:
+`.factory/hooks/weekly-report.py`を作成：
 
 ```python
 #!/usr/bin/env python3
@@ -713,7 +713,7 @@ if __name__ == '__main__':
 chmod +x .factory/hooks/weekly-report.py
 ```
 
-Schedule weekly:
+週次でスケジュール：
 
 ```bash
 # Add to crontab
@@ -722,7 +722,7 @@ Schedule weekly:
 ```
 
 
-## Best practices
+## ベストプラクティス
 
 <Steps>
   <Step title="Use structured logging">
@@ -780,13 +780,13 @@ Schedule weekly:
   </Step>
 </Steps>
 
-## Troubleshooting
+## トラブルシューティング
 
 
   
-    **Problem**: Log files consuming too much disk space
+    **問題**: ログファイルがディスク容量を過度に消費する
     
-    **Solution**: Implement log rotation:
+    **解決策**: ログローテーションを実装する：
     ```bash
     # Compress old logs
     find ~/.factory -name "*.log" -mtime +7 -exec gzip {} \;
@@ -797,9 +797,9 @@ Schedule weekly:
   
   
   
-    **Problem**: SQLite database locked during concurrent access
+    **問題**: 同時アクセス中にSQLiteデータベースがロックされる
     
-    **Solution**: Use WAL mode and retry logic:
+    **解決策**: WALモードとリトライロジックを使用する：
     ```bash
     # Enable WAL mode
     sqlite3 db.db "PRAGMA journal_mode=WAL;"
@@ -810,9 +810,9 @@ Schedule weekly:
   
   
   
-    **Problem**: Hooks take too long
+    **問題**: フックの実行に時間がかかりすぎる
     
-    **Solution**: Use async logging:
+    **解決策**: 非同期ロギングを使用する：
     ```bash
     # Background logging
     (
@@ -825,9 +825,9 @@ Schedule weekly:
   
 
 
-## See also
+## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - Complete hooks API documentation
-- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
-- [Session automation](/guides/hooks/session-automation) - Automate session setup
-- [Custom notifications](/guides/hooks/notifications) - Get notified about events
+- [Hooks reference](/reference/hooks-reference) - 完全なフックAPI documentation
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Session automation](/guides/hooks/session-automation) - セッションセットアップの自動化
+- [Custom notifications](/guides/hooks/notifications) - イベントについての通知を受け取る

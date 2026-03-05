@@ -12,42 +12,42 @@ description: "Learn how to set up droid on a VPS for remote access and headless 
   allowFullScreen
 ></iframe>
 
-## What this doc covers
+## このドキュメントで扱う内容
 
-- Set up Factory's CLI, Droid, on a Virtual Private Server (VPS) for remote access from anywhere
-- Configure SSH authentication with key pairs for secure, passwordless server connections
-- Use `droid exec` for headless automation tasks and system administration on your server
-
----
-
-## 1. Prerequisites and installation
-
-Before starting, you'll need:
-
-- **Factory CLI installed locally** - Follow the [installation guide](/cli/getting-started/quickstart)
-- **Factory account** - Sign up at [factory.ai](https://factory.ai)
-- **VPS provider account** - This tutorial uses [Hetzner](https://www.hetzner.com/), but works with any VPS provider (DigitalOcean, Linode, AWS EC2, etc.)
-- **Basic terminal familiarity** - You'll be running commands in your local terminal and on the server
-
-**Cost estimate**: A basic VPS suitable for running droid costs around $5-10/month.
+- リモートアクセスのためにVirtual Private Server（VPS）上でFactoryのCLIであるDroidをセットアップする
+- セキュアでパスワード不要のサーバー接続のためのSSH認証とキーペアの設定
+- サーバー上でのヘッドレス自動化タスクとシステム管理での`droid exec`の使用
 
 ---
 
-## 2. Why use droid on a VPS?
+## 1. 前提条件とインストール
 
-Running AI agents locally limits you to when you're at your computer. Production debugging, scheduled automation, and mobile access all require a server that's always available. Without a VPS, you can't monitor servers from your phone, run headless automation 24/7, or access droid while traveling.
+開始する前に、以下が必要です：
 
-By deploying droid on a VPS, you get an always-available AI assistant accessible from any device. Perfect for system administration, production debugging, and building custom automation workflows with `droid exec`.
+- **Factory CLIのローカルインストール** - [installation guide](/cli/getting-started/quickstart)に従ってください
+- **Factoryアカウント** - [factory.ai](https://factory.ai)でサインアップ
+- **VPSプロバイダーアカウント** - このチュートリアルでは[Hetzner](https://www.hetzner.com/)を使用しますが、任意のVPSプロバイダー（DigitalOcean、Linode、AWS EC2など）で動作します
+- **基本的なターミナルの知識** - ローカルターミナルとサーバー上でコマンドを実行します
+
+**コストの見積もり**: droidの実行に適した基本的なVPSは月額約5-10ドルです。
 
 ---
 
-## 3. Setup and basic usage
+## 2. VPS上でdroidを使用する理由
 
-Let's walk through the complete setup process, from creating SSH keys to connecting to your VPS.
+AIエージェントをローカルで実行すると、コンピューターの前にいる時間に制限されます。本番デバッグ、スケジュール化された自動化、モバイルアクセスには、常に利用可能なサーバーが必要です。VPSがなければ、携帯電話からサーバーを監視したり、24時間365日ヘッドレス自動化を実行したり、出張中にdroidにアクセスしたりできません。
 
-### Step 1: Generate SSH keys with droid
+VPS上にdroidをデプロイすることで、あらゆるデバイスからアクセス可能な常時利用可能なAIアシスタントが得られます。システム管理、本番デバッグ、`droid exec`でのカスタム自動化ワークフローの構築に最適です。
 
-We'll use droid locally to create an SSH key pair. This is more secure than password authentication and enables seamless connections.
+---
+
+## 3. セットアップと基本的な使用方法
+
+SSHキーの作成からVPSへの接続まで、完全なセットアップ手順を見ていきましょう。
+
+### ステップ1: droidでSSHキーを生成
+
+ローカルでdroidを使用してSSHキーペアを作成します。これはパスワード認証よりもセキュアで、シームレスな接続を可能にします。
 
 ```bash
 # Start droid in your local terminal
@@ -57,46 +57,46 @@ droid
 > Create a new SSH key pair called example
 ```
 
-Droid will generate two files:
-- `~/.ssh/example` - Private key (keep this secret, never share)
-- `~/.ssh/example.pub` - Public key (safe to share, will be added to your VPS)
+Droidは2つのファイルを生成します：
+- `~/.ssh/example` - 秘密鍵（秘密に保つ、決して共有しない）
+- `~/.ssh/example.pub` - 公開鍵（共有しても安全、VPSに追加される）
 
-### Step 2: Copy the public key
+### ステップ2: 公開鍵をコピー
 
 ```bash
 # Ask droid to copy the public key to your clipboard
 > Copy the public key to the clipboard
 ```
 
-### Step 3: Create your VPS and add the SSH key
+### ステップ3: VPSを作成してSSHキーを追加
 
-In your VPS provider dashboard (Hetzner example):
+VPSプロバイダーのダッシュボードで（Hetznerの例）：
 
-1. **Create a new server**:
-   - Choose your server type (e.g., CPX22 - $4.99/month)
-   - Select a location (e.g., Ashburn, Virginia)
-   - Keep default options
+1. **新しいサーバーを作成**：
+   - サーバータイプを選択（例：CPX22 - $4.99/月）
+   - 場所を選択（例：バージニア州アッシュバーン）
+   - デフォルトオプションを維持
 
-2. **Add your SSH key**:
-   - In the "SSH Keys" section, click "Add SSH Key"
-   - Paste the public key you copied
-   - Name it "example" (or any descriptive name)
-   - Add the key to the server
+2. **SSHキーを追加**：
+   - 「SSH Keys」セクションで「Add SSH Key」をクリック
+   - コピーした公開鍵を貼り付け
+   - 「example」（または説明的な名前）で名前を付ける
+   - サーバーにキーを追加
 
-3. **Name and create**:
-   - Optionally name your server (e.g., "example-vps")
-   - Click "Create" and wait for the server to spin up
+3. **名前を付けて作成**：
+   - 必要に応じてサーバーに名前を付ける（例：「example-vps」）
+   - 「Create」をクリックしてサーバーの起動を待つ
 
-### Step 4: Configure SSH for easy access
+### ステップ4: 簡単なアクセスのためのSSH設定
 
-Once your server is ready, copy its IP address (e.g., `123.45.67.89`) and ask droid to configure your SSH settings:
+サーバーの準備ができたら、IPアドレス（例：`123.45.67.89`）をコピーして、droidにSSH設定の構成を依頼します：
 
 ```bash
 # In droid
 > Add 123.45.67.89 to my SSH config file with an alias called example so I can connect easily
 ```
 
-Droid will update your `~/.ssh/config` file to include something like:
+Droidは`~/.ssh/config`ファイルを以下のような内容で更新します：
 
 ```ssh-config
 Host example
@@ -105,9 +105,9 @@ Host example
     IdentityFile ~/.ssh/example
 ```
 
-**What this enables**: Instead of typing `ssh root@123.45.67.89 -i ~/.ssh/example` every time, you can simply run `ssh example`.
+**これで可能になること**: 毎回`ssh root@123.45.67.89 -i ~/.ssh/example`と入力する代わりに、単に`ssh example`を実行するだけでよくなります。
 
-### Step 5: Connect and install Droid on the VPS
+### ステップ5: 接続してVPS上にDroidをインストール
 
 ```bash
 # In a new terminal window, connect to your VPS
@@ -123,83 +123,83 @@ source ~/.bashrc  # or source ~/.zshrc if using zsh
 droid --version
 ```
 
-### Step 6: Authenticate Droid on the VPS
+### ステップ6: VPS上でDroidを認証
 
 ```bash
 # Run droid for the first time
 droid
 ```
 
-On first run, droid will prompt you to log in:
-1. It displays a URL and an authentication code
-2. Copy the code
-3. Click the URL (or paste it in your browser)
-4. Paste the code to authenticate
-5. You're now logged in and can use droid on your VPS
+初回実行時、droidはログインを促します：
+1. URLと認証コードを表示
+2. コードをコピー
+3. URLをクリック（またはブラウザに貼り付け）
+4. コードを貼り付けて認証
+5. ログインが完了し、VPS上でdroidを使用できます
 
-**Success check**: You should now see the droid prompt on your VPS, ready to accept commands.
+**成功チェック**: VPS上でdroidプロンプトが表示され、コマンドを受け付ける準備ができているはずです。
 
 ---
 
-## 4. Advanced example: System administration with droid
+## 4. 高度な例: droidでのシステム管理
 
-Now that droid is running on your VPS, let's use it for practical server administration. This example shows how droid can handle complex setup tasks like configuring a web server.
+VPS上でdroidが動作しているので、実用的なサーバー管理に使用してみましょう。この例では、droidがWebサーバーの設定のような複雑なセットアップタスクをどのように処理できるかを示します。
 
-### Setting up Nginx with Docker
+### DockerでNginxをセットアップ
 
 ```bash
 # In your VPS, with droid running
 > Set up Nginx with Docker and serve a hello world page
 ```
 
-Droid will:
-1. Install Docker if not already present
-2. Create a basic Nginx configuration
-3. Create an HTML file with "Hello World"
-4. Set up and run the Docker container
-5. Configure networking and ports
+Droidは以下を実行します：
+1. Dockerがまだ存在しない場合はインストール
+2. 基本的なNginx設定を作成
+3. 「Hello World」でHTMLファイルを作成
+4. Dockerコンテナのセットアップと実行
+5. ネットワーキングとポートの設定
 
-**Verification**: Open a browser and navigate to your VPS IP address (e.g., `http://123.45.67.89`). You should see "Hello World" displayed.
+**検証**: ブラウザを開いてVPSのIPアドレス（例：`http://123.45.67.89`）にアクセスしてください。「Hello World」が表示されるはずです。
 
-**What makes this powerful**: Tasks that normally require multiple commands, configuration files, and troubleshooting are handled by droid with a single natural language instruction. Droid understands best practices and handles edge cases automatically.
+**強力な点**: 通常であれば複数のコマンド、設定ファイル、トラブルシューティングが必要なタスクが、droidでは単一の自然言語指示で処理されます。Droidはベストプラクティスを理解し、エッジケースを自動的に処理します。
 
 ---
 
-## 5. Droid exec: Headless automation and custom agents
+## 5. Droid exec: ヘッドレス自動化とカスタムエージェント
 
-The real power of running droid on a VPS is `droid exec` - a headless mode that enables programmatic access for building automation workflows and custom agents.
+VPS上でdroidを実行する真の力は`droid exec`にあります - 自動化ワークフローやカスタムエージェントの構築のためのプログラマティックアクセスを可能にするヘッドレスモードです。
 
-### What is droid exec?
+### droid execとは？
 
-`droid exec` runs droid commands without an interactive session, making it perfect for:
-- Scheduled automation tasks
-- Building custom agent frameworks
-- Integrating droid into scripts and applications
-- Running quick queries from CI/CD pipelines
+`droid exec`は対話セッションなしでdroidコマンドを実行し、以下に最適です：
+- スケジュール化された自動化タスク
+- カスタムエージェントフレームワークの構築
+- スクリプトやアプリケーションへのdroidの統合
+- CI/CDパイプラインからのクイッククエリの実行
 
 <Note>See the full droid exec docs [here](/cli/droid-exec/overview).</Note>
 
-### Basic droid exec usage
+### 基本的なdroid execの使用法
 
 ```bash
 # Simple query with a fast model (GLM 4.7)
 droid exec --model glm-4.7 "Tell me a joke"
 ```
 
-### Advanced: System exploration
+### 高度な例: システム探索
 
 ```bash
 # Ask droid to explore your system and find specific information
 droid exec --model glm-4.7 "Explore my system and tell me where the file is that I'm serving with Nginx"
 ```
 
-Droid will:
-1. Search for Nginx configuration files
-2. Identify the document root
-3. Locate the HTML/content files being served
-4. Report back with file paths and relevant configuration
+Droidは以下を実行します：
+1. Nginx設定ファイルを検索
+2. ドキュメントルートを特定
+3. 提供されているHTML/コンテンツファイルを見つける
+4. ファイルパスと関連する設定を報告
 
-**Output example**:
+**出力例**：
 ```
 Configuration file: /etc/nginx/nginx.conf
 Content file: /var/www/html/index.html
@@ -209,11 +209,11 @@ Server running on: port 80
 
 ---
 
-## 6. Remote access from anywhere
+## 6. どこからでもリモートアクセス
 
-One of the biggest advantages of having droid on a VPS is accessing it from any device, including mobile.
+VPS上にdroidを持つ最大の利点の一つは、モバイルを含む任意のデバイスからアクセスできることです。
 
-### Using Termius for mobile SSH access
+### モバイルSSHアクセスのためのTermiusの使用
 
 <iframe
   className="w-full aspect-video rounded-xl"
@@ -224,25 +224,25 @@ One of the biggest advantages of having droid on a VPS is accessing it from any 
   allowFullScreen
 ></iframe>
 
-[Termius](https://termius.com/) is a modern SSH client available for:
-- macOS, Windows, Linux (desktop)
-- iOS and Android (mobile)
+[Termius](https://termius.com/)は以下で利用可能な現代的なSSHクライアントです：
+- macOS、Windows、Linux（デスクトップ）
+- iOSとAndroid（モバイル）
 
-**Setup steps**:
+**セットアップ手順**：
 
-1. **Install Termius** on your device
-2. **Add your SSH key**:
-   - In Termius, go to Keychain
-   - Add a new key
-   - Import your private key (`~/.ssh/example`)
-3. **Add your VPS host**:
-   - Create a new host
-   - Hostname: Your VPS IP address
-   - Username: `root` (or your configured user)
-   - Key: Select the key you imported
-4. **Connect**: Tap the host to connect
+1. **Termiusをインストール** デバイスに
+2. **SSHキーを追加**：
+   - Termiusでキーチェーンに移動
+   - 新しいキーを追加
+   - 秘密鍵（`~/.ssh/example`）をインポート
+3. **VPSホストを追加**：
+   - 新しいホストを作成
+   - ホスト名: VPSのIPアドレス
+   - ユーザー名: `root`（または設定したユーザー）
+   - キー: インポートしたキーを選択
+4. **接続**: ホストをタップして接続
 
-**Mobile workflow**:
+**モバイルワークフロー**：
 ```bash
 # On your phone via Termius
 ssh example
@@ -254,22 +254,22 @@ droid
 droid exec --model glm-4-flash "Check system resources and uptime"
 ```
 
-### Real-world scenarios
+### 実用的なシナリオ
 
-- **Travel troubleshooting**: Server goes down while you're away? SSH in from your phone and let droid help diagnose and fix the issue
-- **On-call debugging**: Respond to alerts from anywhere with AI-assisted investigation
-- **Quick queries**: Check system status, review logs, or make configuration changes without needing your laptop
+- **出張時のトラブルシューティング**: 外出中にサーバーがダウン？携帯電話からSSHして、droidに問題の診断と修正を手伝ってもらう
+- **オンコールデバッグ**: どこからでもAI支援調査でアラートに対応
+- **クイッククエリ**: ラップトップなしでシステムステータスのチェック、ログのレビュー、設定変更を実行
 
-## Next steps
+## 次のステップ
 
-Now that you have droid running on your VPS:
+VPS上でdroidが動作しているので：
 
-1. **Explore automation**: Start with simple `droid exec` commands and build up to custom scripts
-2. **Set up monitoring**: Use droid to help configure system monitoring and alerting
-3. **Create scheduled tasks**: Combine droid exec with cron jobs for recurring automation
-4. **Join the community**: Share your use cases and learn from others in the [Factory Discord](https://discord.gg/zuudFXxg69)
+1. **自動化を探索**: 簡単な`droid exec`コマンドから始めて、カスタムスクリプトまで構築
+2. **監視をセットアップ**: droidを使用してシステム監視とアラート機能の設定を支援
+3. **スケジュールタスクを作成**: droid execをcronジョブと組み合わせて定期的な自動化を実現
+4. **コミュニティに参加**: 使用事例を共有し、[Factory Discord](https://discord.gg/zuudFXxg69)で他の人から学ぶ
 
-For more information:
+詳細情報：
 - [Factory CLI Documentation](/cli/getting-started/overview)
 - [Droid Exec Reference](/cli/droid-exec/overview)
 - [Custom Droids Guide](/cli/configuration/custom-droids)

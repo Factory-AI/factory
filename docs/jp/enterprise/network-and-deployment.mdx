@@ -3,19 +3,19 @@ title: "ネットワークとデプロイ設定"
 description: Reference architectures and network requirements for cloud, hybrid, and fully airgapped Droid deployments.
 ---
 
-Droids are designed to run anywhere: on laptops, in CI pipelines, on VMs and Kubernetes clusters, and in fully airgapped environments.
+Droidはどこでも実行できるよう設計されています：ノートパソコン、CIパイプライン、VMとKubernetesクラスター、完全にエアギャップされた環境で。
 
-This page describes the **supported deployment patterns**, their **network requirements**, and how to combine Droid with proxies, custom CAs, mTLS, and sandboxed containers.
+このページでは**サポートされるデプロイメントパターン**、その**ネットワーク要件**、そしてDroidをプロキシ、カスタムCA、mTLS、サンドボックス化されたコンテナと組み合わせる方法について説明します。
 
 ---
 
-## Deployment patterns
+## デプロイメントパターン
 
-Factory supports three canonical patterns. You can mix patterns across teams and environments.
+Factoryでは3つの標準的なパターンをサポートしています。チームや環境間でパターンを組み合わせることができます。
 
-### 1. Cloud‑managed deployment
+### 1. クラウド管理型デプロイメント
 
-In this pattern, Droid runs on developer machines and build infrastructure, while **Factory cloud** provides orchestration and optional analytics.
+このパターンでは、Droidが開発者マシンとビルドインフラストラクチャで実行され、**Factory cloud**がオーケストレーションとオプションの分析機能を提供します。
 
 <CardGroup cols={2}>
   <Card title="Where Droid runs" icon="terminal">
@@ -30,79 +30,79 @@ In this pattern, Droid runs on developer machines and build infrastructure, whil
   </Card>
 </CardGroup>
 
-LLM traffic can still be routed through **your own gateways and providers**; Factory does not need to broker model access.
+LLMトラフィックは**独自のゲートウェイとプロバイダー**を通じてルーティングすることができます。Factoryがモデルアクセスを仲介する必要はありません。
 
-Cloud‑managed deployments are ideal for organizations that allow well‑scoped cloud usage but want strong governance over models, keys, and telemetry.
+クラウド管理型デプロイメントは、適切にスコープされたクラウド利用を許可しながら、モデル、キー、テレメトリーに対する強力なガバナンスを求める組織に理想的です。
 
-### 2. Hybrid enterprise deployment
+### 2. ハイブリッドエンタープライズデプロイメント
 
-In hybrid deployments, Droid runs entirely within your infrastructure, while you may still use Factory cloud selectively for user experience and coordination.
+ハイブリッドデプロイメントでは、Droidは完全に貴社のインフラストラクチャ内で実行されますが、ユーザーエクスペリエンスと調整のためにFactory cloudを選択的に使用することもできます。
 
-- Droid processes run on **your VMs, containers, CI runners, and remote dev environments**.
-- LLM traffic goes through **your LLM gateways or cloud providers** under your accounts.
-- OTEL telemetry is sent to **your collectors and observability stack**.
-- Factory cloud may see limited metadata (for example, org and project identifiers) if you enable cloud features.
+- Droidプロセスは**貴社のVM、コンテナ、CIランナー、リモート開発環境**で実行されます。
+- LLMトラフィックは貴社のアカウント下で**貴社のLLMゲートウェイまたはクラウドプロバイダー**を通じて送信されます。
+- OTELテレメトリーは**貴社のコレクタと可観測性スタック**に送信されます。
+- クラウド機能を有効にした場合、Factory cloudは限定的なメタデータ（例：組織とプロジェクトの識別子）のみを確認することがあります。
 
-This pattern is common for large enterprises and critical infrastructure where **network segmentation** and **central governance** are mandatory.
+このパターンは、**ネットワーク分離**と**中央ガバナンス**が必須の大企業や重要なインフラストラクチャで一般的です。
 
-### 3. Fully airgapped deployment
+### 3. 完全エアギャップデプロイメント
 
-In fully airgapped deployments:
+完全エアギャップデプロイメントでは：
 
-- Droid runs in an isolated network with **no outbound internet connectivity**.
-- Models are served from **on‑prem or in‑network endpoints**.
-- OTEL collectors and observability tooling are hosted entirely inside the airgap.
-- Factory cloud is not reachable at runtime; any artifacts (binaries, configuration) are imported via offline processes.
+- Droidは**外部インターネット接続がない**隔離されたネットワークで実行されます。
+- モデルは**オンプレミスまたはネットワーク内エンドポイント**から提供されます。
+- OTELコレクタと可観測性ツールはエアギャップ内で完全にホストされます。
+- Factory cloudは実行時に到達できません。アーティファクト（バイナリ、設定）はオフラインプロセスを通じてインポートされます。
 
-This is the default pattern for national security, defense, and other highly classified workloads.
-
----
-
-## Network requirements
-
-Network requirements vary per pattern.
-
-### Cloud‑managed
-
-In addition to your model providers and OTEL collector endpoints, Droid typically needs:
-
-- Access to Factory cloud endpoints (for example, `*.factory.ai` and related domains).
-- Outbound access to any configured LLM providers or LLM gateways.
-- Outbound access to OTEL collectors if they are hosted outside the local network.
-
-Your security team can tighten access by:
-
-- Restricting outbound hosts to the minimum set of domains.
-- Using HTTPS proxies and custom CAs as described below.
-- Routing all LLM traffic through a central gateway and monitoring.
-
-### Hybrid
-
-In hybrid mode, Droid generally needs only:
-
-- Access to your **internal LLM gateways and model endpoints**.
-- Access to your **internal OTEL collectors and SIEM/observability stack**.
-- Optional, tightly scoped access to Factory cloud endpoints for specific features.
-
-You can run Droid within private subnets, VPNs, and Kubernetes clusters, inheriting all existing firewall and network controls.
-
-### Fully airgapped
-
-In fully airgapped environments:
-
-- Droid traffic is entirely **contained inside your network**.
-- No external domains are required at runtime.
-- Updates to Droid and configuration bundles are handled through your own artifact repositories or offline processes.
+これは国家安全保障、防衛、その他の高度に機密性の高いワークロードのデフォルトパターンです。
 
 ---
 
-## Proxies, custom CAs, and mTLS
+## ネットワーク要件
 
-Enterprise networks frequently require HTTP(S) proxies, organization‑specific certificate authorities, and mutual TLS.
+ネットワーク要件はパターンごとに異なります。
 
-### HTTP(S) proxy support
+### クラウド管理型
 
-Droid respects standard proxy environment variables:
+モデルプロバイダーとOTELコレクタエンドポイントに加えて、Droidは通常次のものが必要です：
+
+- Factory cloudエンドポイント（例：`*.factory.ai`および関連ドメイン）へのアクセス。
+- 設定されたLLMプロバイダーまたはLLMゲートウェイへの外部アクセス。
+- OTELコレクタがローカルネットワーク外でホストされている場合、それらへの外部アクセス。
+
+セキュリティチームは以下によってアクセスを制限できます：
+
+- 外部ホストを最小限のドメインセットに制限する。
+- 以下で説明するHTTPSプロキシとカスタムCAを使用する。
+- すべてのLLMトラフィックを中央ゲートウェイを通じてルーティングし監視する。
+
+### ハイブリッド
+
+ハイブリッドモードでは、Droidは通常以下のみが必要です：
+
+- **内部LLMゲートウェイとモデルエンドポイント**へのアクセス。
+- **内部OTELコレクタとSIEM/可観測性スタック**へのアクセス。
+- 特定の機能に対するFactory cloudエンドポイントへのオプションの、厳密にスコープされたアクセス。
+
+プライベートサブネット、VPN、Kubernetesクラスター内でDroidを実行し、既存のすべてのファイアウォールとネットワーク制御を継承できます。
+
+### 完全エアギャップ
+
+完全エアギャップ環境では：
+
+- Droidトラフィックは完全に**貴社のネットワーク内に封じ込められます**。
+- 実行時に外部ドメインは必要ありません。
+- Droidと設定バンドルの更新は、独自のアーティファクトリポジトリまたはオフラインプロセスを通じて処理されます。
+
+---
+
+## プロキシ、カスタムCA、mTLS
+
+エンタープライズネットワークでは、HTTP(S)プロキシ、組織固有の認証局、相互TLSが頻繁に必要になります。
+
+### HTTP(S)プロキシサポート
+
+Droidは標準的なプロキシ環境変数を尊重します：
 
 ```bash
 export HTTPS_PROXY="https://proxy.example.com:8080"
@@ -112,46 +112,46 @@ export HTTP_PROXY="http://proxy.example.com:8080"
 export NO_PROXY="localhost,127.0.0.1,internal.example.com,.corp.example.com"
 ```
 
-Use these to route traffic from Droid to LLM gateways and any Factory cloud endpoints through your corporate proxy.
+これらを使用して、DroidからLLMゲートウェイや任意のFactory cloudエンドポイントへのトラフィックを企業プロキシ経由でルーティングします。
 
-### Custom certificate authorities
+### カスタム認証局
 
-If your organization uses custom CAs for HTTPS inspection or internal endpoints, configure the runtime environment so Droid trusts those CAs (for example, via `NODE_EXTRA_CA_CERTS` or OS‑level trust stores).
+組織がHTTPS検査や内部エンドポイントにカスタムCAを使用している場合、DroidがそれらのCAを信頼するよう実行時環境を設定してください（例：`NODE_EXTRA_CA_CERTS`やOS レベルの信頼ストア経由）。
 
-### Mutual TLS (mTLS)
+### 相互TLS (mTLS)
 
-For environments that require client certificates when calling gateways or internal APIs, configure your containers, VMs, or runners with the appropriate certificate, key, and passphrase. These settings are usually handled at the HTTP client or proxy layer that Droid uses.
-
----
-
-## Running in secure containers and VMs
-
-Running Droid inside hardened containers and VMs is one of the most effective ways to **bound the blast radius** of any agent mistakes or misconfigurations.
-
-Recommended patterns include:
-
-- **Devcontainers for untrusted code**
-  - Use locked‑down devcontainers with restricted filesystem mounts and outbound network rules.
-  - Run Droid with higher autonomy only inside these containers, never directly on the host.
-
-- **Isolated VMs for sensitive operations**
-  - Create dedicated VMs for production‑adjacent work (for example, migration tooling).
-  - Use OS policies to restrict which repos, secrets, and networks those VMs can access.
-
-- **CI/CD pipelines**
-  - Run Droid in ephemeral CI jobs with short‑lived credentials and minimal privileges.
-  - Combine with hooks and Droid Shield to prevent leaks and enforce approval workflows.
-
-See [LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls) for how autonomy, allow/deny lists, and Droid Shield interact with these environments.
+ゲートウェイや内部APIを呼び出す際にクライアント証明書が必要な環境では、適切な証明書、キー、パスフレーズでコンテナ、VM、ランナーを設定してください。これらの設定は通常、Droidが使用するHTTPクライアントまたはプロキシレイヤーで処理されます。
 
 ---
 
-## Configuration surfaces
+## セキュアなコンテナとVMでの実行
 
-Network and deployment configuration is expressed through:
+強化されたコンテナとVM内でDroidを実行することは、エージェントのミスや設定ミスによる**影響範囲を制限**する最も効果的な方法の一つです。
 
-- **Environment variables** – proxies, gateways, OTEL endpoints, custom certificates.
-- **Org and project `.factory/settings.json`** – hierarchical policies about where Droid may run, which models and gateways are allowed, and default telemetry destinations.
-- **Org config endpoints** – for large organizations, a central configuration service can distribute a standard `.factory` bundle to all environments.
+推奨パターンには以下があります：
 
-For details on the hierarchy and merge behavior, see [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control).
+- **信頼できないコード用のDevcontainer**
+  - 制限されたファイルシステムマウントと外部ネットワークルールを持つロックダウンされたdevcontainerを使用。
+  - これらのコンテナ内でのみ、ホスト上では決して直接実行せず、より高い自律性でDroidを実行。
+
+- **機密性の高い操作用の隔離されたVM**
+  - 本番環境に近い作業（例：移行ツール）専用のVMを作成。
+  - OSポリシーを使用して、それらのVMがアクセスできるリポジトリ、シークレット、ネットワークを制限。
+
+- **CI/CDパイプライン**
+  - 短命な認証情報と最小限の権限を持つ一時的なCIジョブでDroidを実行。
+  - フックとDroid Shieldと組み合わせて、リークを防止し承認ワークフローを強制。
+
+これらの環境で自律性、許可/拒否リスト、Droid Shieldがどのように相互作用するかについては、[LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls)を参照してください。
+
+---
+
+## 設定画面
+
+ネットワークとデプロイメント設定は以下を通じて表現されます：
+
+- **環境変数** – プロキシ、ゲートウェイ、OTELエンドポイント、カスタム証明書。
+- **組織とプロジェクトの`.factory/settings.json`** – Droidが実行できる場所、許可されるモデルとゲートウェイ、デフォルトのテレメトリー送信先に関する階層的ポリシー。
+- **組織設定エンドポイント** – 大組織向けに、中央設定サービスがすべての環境に標準的な`.factory`バンドルを配布可能。
+
+階層と統合動作の詳細については、[Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control)を参照してください。

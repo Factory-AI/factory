@@ -4,21 +4,21 @@ description: "Integrate hooks with Git for commit validation, branch protection,
 keywords: ['git', 'commit', 'branch', 'workflow', 'validation', 'pre-commit', 'hook']
 ---
 
-This cookbook shows how to use hooks to enforce Git workflows, validate commits, protect branches, and automate changelog generation.
+このクックブックでは、Gitワークフローを強制し、コミットを検証し、ブランチを保護し、変更ログ生成を自動化するためのフックの使用方法を説明します。
 
-## How it works
+## 動作原理
 
-Git workflow hooks can:
+Gitワークフローフックでできること：
 
-1. **Validate commits**: Check commit messages follow conventions
-2. **Protect branches**: Prevent accidental commits to main/production
-3. **Generate changelogs**: Auto-create changelog entries from commits
-4. **Run pre-push checks**: Validate code before pushing
-5. **Enforce PR requirements**: Check branch names, linear issues, etc.
+1. **コミットを検証**: コミットメッセージが規約に従っているかチェック
+2. **ブランチを保護**: main/productionへの誤ったコミットを防止
+3. **変更ログを生成**: コミットから変更ログエントリを自動作成
+4. **プッシュ前チェックを実行**: プッシュ前にコードを検証
+5. **PR要件を強制**: ブランチ名、線形issues等をチェック
 
-## Prerequisites
+## 前提条件
 
-Basic Git tools:
+基本的なGitツール：
 
 <CodeGroup>
 
@@ -37,13 +37,13 @@ npm install -g commitlint @commitlint/cli @commitlint/config-conventional
 
 </CodeGroup>
 
-## Basic Git hooks
+## 基本的なGitフック
 
-### Commit message validation
+### コミットメッセージ検証
 
-Enforce conventional commit format.
+従来型コミット形式を強制します。
 
-Create `.factory/hooks/validate-commit-msg.sh`:
+`.factory/hooks/validate-commit-msg.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -105,7 +105,7 @@ exit 0
 chmod +x .factory/hooks/validate-commit-msg.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json` に追加：
 
 ```json
 {
@@ -126,11 +126,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Branch protection
+### ブランチ保護
 
-Prevent commits directly to protected branches.
+保護されたブランチへの直接コミットを防止します。
 
-Create `.factory/hooks/protect-branches.sh`:
+`.factory/hooks/protect-branches.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -177,13 +177,13 @@ chmod +x .factory/hooks/protect-branches.sh
 ```
 
 
-### Enforce branch naming
+### ブランチ命名の強制
 
-Require feature branches to follow naming conventions:
+フィーチャーブランチが命名規約に従うことを要求：
 
 
 
-Create `.factory/hooks/validate-branch-name.sh`:
+`.factory/hooks/validate-branch-name.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -226,15 +226,15 @@ chmod +x .factory/hooks/validate-branch-name.sh
 ```
 
 
-## Advanced Git automation
+## 高度なGit自動化
 
-### Auto-generate changelog entries
+### 変更ログエントリの自動生成
 
-Automatically create changelog entries from commits:
+コミットから変更ログエントリを自動作成：
 
 
 
-Create `.factory/hooks/update-changelog.sh`:
+`.factory/hooks/update-changelog.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -315,7 +315,7 @@ exit 0
 chmod +x .factory/hooks/update-changelog.sh
 ```
 
-Add to PostToolUse:
+PostToolUseに追加：
 
 ```json
 {
@@ -337,13 +337,13 @@ Add to PostToolUse:
 ```
 
 
-### Pre-push validation
+### プッシュ前検証
 
-Run tests and checks before allowing git push:
+git pushを許可する前にテストとチェックを実行：
 
 
 
-Create `.factory/hooks/pre-push-check.sh`:
+`.factory/hooks/pre-push-check.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -410,13 +410,13 @@ chmod +x .factory/hooks/pre-push-check.sh
 ```
 
 
-### Auto-create PR when pushing new branch
+### 新しいブランチをプッシュ時にPRを自動作成
 
-Automatically open a PR when pushing a feature branch:
+フィーチャーブランチをプッシュ時に自動的にPRを開く：
 
 
 
-Create `.factory/hooks/auto-create-pr.sh`:
+`.factory/hooks/auto-create-pr.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -480,13 +480,13 @@ chmod +x .factory/hooks/auto-create-pr.sh
 ```
 
 
-### Enforce co-authorship in commits
+### コミットでの共同著者の強制
 
-Add co-author trailers to commits:
+コミットに共同著者トレーラーを追加：
 
 
 
-Create `.factory/hooks/add-coauthor.sh`:
+`.factory/hooks/add-coauthor.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -539,15 +539,15 @@ chmod +x .factory/hooks/add-coauthor.sh
 ```
 
 
-## Real-world examples
+## 実際の使用例
 
-### Example 1: Monorepo commit validation
+### 例1: モノレポコミット検証
 
-Ensure commits only touch one package:
+コミットが1つのパッケージのみに触れることを確保：
 
 
 
-Create `.factory/hooks/validate-monorepo-scope.sh`:
+`.factory/hooks/validate-monorepo-scope.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -588,13 +588,13 @@ exit 0
 ```
 
 
-### Example 2: Release automation
+### 例2: リリース自動化
 
-Auto-tag releases when version changes:
+バージョン変更時にリリースを自動タグ付け：
 
 
 
-Create `.factory/hooks/auto-tag-release.sh`:
+`.factory/hooks/auto-tag-release.sh` を作成：
 
 ```bash
 #!/bin/bash
@@ -639,7 +639,7 @@ exit 0
 ```
 
 
-## Best practices
+## ベストプラクティス
 
 <Steps>
   <Step title="Use PreToolUse for prevention">
@@ -690,13 +690,13 @@ exit 0
   </Step>
 </Steps>
 
-## Troubleshooting
+## トラブルシューティング
 
 
   
-    **Problem**: Validation too strict
+    **問題**: 検証が厳しすぎる
     
-    **Solution**: Add escape hatches:
+    **解決策**: エスケープハッチを追加：
     ```bash
     # Allow bypass with special prefix
     if echo "$commit_msg" | grep -q "^WIP:"; then
@@ -707,9 +707,9 @@ exit 0
   
   
   
-    **Problem**: Both Droid hooks and .git/hooks running
+    **問題**: DroidフックとGit/hooksの両方が実行される
     
-    **Solution**: Coordinate or choose one:
+    **解決策**: 調整するかどちらかを選択：
     ```bash
     # In .git/hooks/pre-commit
     if [ -n "$DROID_SESSION" ]; then
@@ -719,9 +719,9 @@ exit 0
   
   
   
-    **Problem**: Tests take too long
+    **問題**: テストに時間がかかりすぎる
     
-    **Solution**: Run quick checks only:
+    **解決策**: 高速チェックのみ実行：
     ```bash
     # Run fast subset of tests
     npm run test:unit  # Skip slow integration tests
@@ -733,9 +733,9 @@ exit 0
   
 
 
-## See also
+## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - Complete hooks API documentation
-- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
-- [Code validation](/guides/hooks/code-validation) - Validate code quality
-- [Testing automation](/guides/hooks/testing-automation) - Automate tests
+- [Hooks reference](/reference/hooks-reference) - 完全なフック API ドキュメント
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフック入門
+- [Code validation](/guides/hooks/code-validation) - コード品質の検証
+- [Testing automation](/guides/hooks/testing-automation) - テストの自動化

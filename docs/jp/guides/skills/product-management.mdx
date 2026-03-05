@@ -4,11 +4,11 @@ description: A reusable skill for assisting with product management workflows in
 keywords: ['product management', 'pm', 'prd', 'roadmap', 'features', 'skill', 'user research', 'planning']
 ---
 
-This skill enables Droids to act as a product management assistant, helping with the documentation, analysis, and planning activities that are core to the PM role. Unlike point-solution PM tools, this skill integrates directly with your development workflow, codebase, and documentation.
+このスキルは、Droidがプロダクト管理アシスタントとして機能し、PM役割の中核となる文書化、分析、計画立案活動を支援することを可能にします。特化型PMツールとは異なり、このスキルは開発ワークフロー、コードベース、文書と直接統合されます。
 
-## Setup Instructions
+## セットアップ手順
 
-To use this skill with Factory, create the following directory structure in your repository:
+このスキルをFactoryで使用するには、リポジトリ内に以下のディレクトリ構造を作成してください：
 
 ```
 .factory/skills/product-management/
@@ -18,22 +18,22 @@ To use this skill with Factory, create the following directory structure in your
 └── user-research-templates.md (optional)
 ```
 
-### Quick Start
+### クイックスタート
 
-1. **Create the skill directory:**
+1. **スキルディレクトリを作成:**
    ```bash
    mkdir -p .factory/skills/product-management
    ```
 
-2. **Copy the skill content below into `.factory/skills/product-management/SKILL.md` (or `skill.mdx`)**
+2. **以下のスキルコンテンツを`.factory/skills/product-management/SKILL.md`（または`skill.mdx`）にコピー**
 
 <Tip>
 When you ask Factory to help with PRDs, feature analysis, roadmap planning, or research synthesis, it will automatically invoke this skill based on the task description.
 </Tip>
 
-## Skill Definition
+## スキル定義
 
-Copy the following content into `.factory/skills/product-management/SKILL.md`:
+以下のコンテンツを`.factory/skills/product-management/SKILL.md`にコピーしてください：
 
 ````md
 ---
@@ -199,96 +199,96 @@ Depending on the task, generate:
 ### Example 1: Writing a PRD for a new feature
 
 ```markdown
-# PRD: Advanced Search Functionality
+# PRD: 高度検索機能
 
-## Problem Statement
-Users frequently report difficulty finding specific items in our catalog when they have multiple criteria (price range, location, category, features). Our current search only supports simple text queries, leading to:
-- High bounce rates on search results pages (65% bounce rate vs 32% site average)
-- Increased support tickets asking for search help (150/month)
-- Lost conversion opportunities (estimated $500K annual revenue impact)
+## 問題の説明
+ユーザーは、複数の条件（価格帯、場所、カテゴリ、機能）でカタログ内の特定のアイテムを見つけるのに困難を感じているとの報告が頻繁にあります。現在の検索は単純なテキストクエリのみをサポートしており、以下の結果をもたらしています：
+- 検索結果ページの高い離脱率（サイト平均32%に対し65%の離脱率）
+- 検索ヘルプを求めるサポートチケットの増加（月150件）
+- コンバージョン機会の損失（年間売上影響額推定50万ドル）
 
-## Goals and Success Metrics
-**Primary Goal**: Enable users to find relevant items quickly using multiple filters.
+## 目標と成功指標
+**主要目標**: ユーザーが複数のフィルターを使用して関連するアイテムを迅速に見つけられるようにする。
 
-**Success Metrics**:
-- Reduce search result page bounce rate from 65% to <40%
-- Increase search-to-purchase conversion rate by 25%
-- Reduce search-related support tickets by 50%
-- 70% of users engage with at least one filter within 30 days
+**成功指標**:
+- 検索結果ページの離脱率を65%から40%未満に削減
+- 検索からの購入コンバージョン率を25%向上
+- 検索関連サポートチケットを50%削減
+- 30日以内にユーザーの70%が少なくとも1つのフィルターを使用
 
-## User Stories
+## ユーザーストーリー
 
 ### Must Have
-1. As a buyer, I want to filter by price range so I can find items within my budget
-2. As a buyer, I want to filter by location so I can find items near me
-3. As a buyer, I want to filter by category so I can narrow down item types
-4. As a buyer, I want to combine multiple filters so I can find exactly what I need
-5. As a buyer, I want to see filter counts so I know how many items match before applying
+1. 購入者として、予算内のアイテムを見つけられるよう価格帯でフィルタリングしたい
+2. 購入者として、近くのアイテムを見つけられるよう場所でフィルタリングしたい
+3. 購入者として、アイテムタイプを絞り込むためにカテゴリでフィルタリングしたい
+4. 購入者として、必要なものを正確に見つけるために複数のフィルターを組み合わせたい
+5. 購入者として、適用前にマッチするアイテム数を知るためにフィルター件数を見たい
 
 ### Should Have
-6. As a buyer, I want to save my filter preferences so I don't have to reapply them
-7. As a buyer, I want to see suggested filters based on my search query
-8. As a buyer, I want to sort filtered results by relevance, price, or date
+6. 購入者として、再適用の必要がないようフィルター設定を保存したい
+7. 購入者として、検索クエリに基づく推奨フィルターを見たい
+8. 購入者として、フィルタリングされた結果を関連度、価格、または日付で並び替えたい
 
 ### Nice to Have
-9. As a buyer, I want to create saved searches that notify me of new matches
-10. As a buyer, I want to share a filtered search URL with others
+9. 購入者として、新しいマッチを通知する保存検索を作成したい
+10. 購入者として、フィルタリングされた検索URLを他の人と共有したい
 
-## Requirements
+## 要件
 
-### Functional Requirements
+### 機能要件
 
-**Filter Types** (Priority: Must Have)
-- Price range filter: min/max inputs + common presets ($0-50, $50-100, etc.)
-- Location filter: radius selector + zip code input
-- Category filter: hierarchical category tree with multi-select
-- Custom attribute filters: based on item type (size, color, condition, etc.)
+**フィルタータイプ** （優先度: Must Have）
+- 価格帯フィルター: 最小/最大入力 + 一般的なプリセット（$0-50、$50-100など）
+- 場所フィルター: 半径選択 + 郵便番号入力
+- カテゴリフィルター: 複数選択可能な階層カテゴリツリー
+- カスタム属性フィルター: アイテムタイプに基づく（サイズ、色、状態など）
 
-**Filter Behavior** (Priority: Must Have)
-- Filters apply instantly (no "Apply" button) or with <500ms latency
-- URL updates to reflect active filters (shareable links)
-- Clear all filters button visible when any filter is active
-- Filter state persists within session
-- Mobile-friendly filter UI (drawer or modal on mobile)
+**フィルター動作** （優先度: Must Have）
+- フィルターは即座に適用（「適用」ボタンなし）または500ms未満の遅延
+- アクティブフィルターを反映したURL更新（共有可能リンク）
+- フィルターがアクティブな時に全フィルタークリアボタンが表示
+- セッション内でフィルター状態が持続
+- モバイルフレンドリーなフィルターUI（モバイルではドロワーまたはモーダル）
 
-**Search Integration** (Priority: Must Have)
-- Filters work alongside text search query
-- Filter facet counts update based on text query
-- Auto-suggest filters based on search terms (e.g., "red" → suggest color filter)
+**検索統合** （優先度: Must Have）
+- フィルターがテキスト検索クエリと連動
+- テキストクエリに基づくフィルターファセット件数の更新
+- 検索語に基づく自動フィルター提案（例：「赤」→ 色フィルターを提案）
 
-### Non-Functional Requirements
+### 非機能要件
 
-**Performance** (Priority: Must Have)
-- Initial page load <2s at p95
-- Filter application response <500ms at p95
-- Support 10,000+ concurrent users without degradation
-- Efficient indexing for 1M+ items
+**パフォーマンス** （優先度: Must Have）
+- 初期ページ読み込み時間p95で2秒未満
+- フィルター適用応答時間p95で500ms未満
+- 性能劣化なしに10,000以上の同時ユーザーをサポート
+- 100万以上のアイテムに対する効率的なインデックス化
 
-**Scalability** (Priority: Should Have)
-- Filter definitions configurable without code changes
-- Support for 50+ filter types
-- Easily add new filter types for new categories
+**スケーラビリティ** （優先度: Should Have）
+- コード変更なしに設定可能なフィルター定義
+- 50以上のフィルタータイプのサポート
+- 新カテゴリ用の新フィルタータイプを簡単に追加
 
-**Accessibility** (Priority: Must Have)
-- Keyboard navigation for all filters
-- Screen reader support with proper ARIA labels
-- High contrast mode support
-- Touch target sizes ≥44×44px on mobile
+**アクセシビリティ** （優先度: Must Have）
+- すべてのフィルターでキーボードナビゲーション
+- 適切なARIAラベルによるスクリーンリーダーサポート
+- ハイコントラストモードサポート
+- モバイルでタッチターゲットサイズ≥44×44px
 
-## Technical Considerations
+## 技術的考慮事項
 
-### Architecture
-- **Search Backend**: Extend existing Elasticsearch cluster with filter aggregations
-- **API Changes**: New `/search` endpoint query params for filters; return filter facets in response
-- **Frontend**: React components with URL state management (React Router)
-- **Caching**: Cache filter definitions and facet counts (Redis, 5-minute TTL)
+### アーキテクチャ
+- **検索バックエンド**: フィルター集計で既存Elasticsearchクラスターを拡張
+- **API変更**: フィルター用の新しい`/search`エンドポイントクエリパラメータ; レスポンスでフィルターファセットを返す
+- **フロントエンド**: URL状態管理付きReactコンポーネント（React Router）
+- **キャッシュ**: フィルター定義とファセット件数をキャッシュ（Redis、TTL 5分）
 
-### Dependencies
-- Elasticsearch 8.x upgrade (currently on 7.x) to support efficient aggregations
-- Update item schema to include filter-specific fields
-- Backend API versioning to support gradual rollout
+### 依存関係
+- 効率的な集計をサポートするためElasticsearch 8.xへのアップグレード（現在7.x）
+- フィルター固有フィールドを含むようアイテムスキーマを更新
+- 段階的展開をサポートするバックエンドAPIバージョニング
 
-### Data Model
+### データモデル
 ```typescript
 interface SearchFilters {
   price?: { min: number; max: number };
@@ -308,216 +308,216 @@ interface SearchResponse {
 }
 ```
 
-### Technical Risks
-1. **Elasticsearch performance**: Complex aggregations may impact search latency
-   - *Mitigation*: Load test with production data; add caching; consider pre-aggregation
-2. **Index size growth**: More fields = larger indices and slower indexing
-   - *Mitigation*: Monitor index size; potentially separate indices for different item types
-3. **Schema evolution**: Adding new filters requires index updates
-   - *Mitigation*: Design flexible schema; plan for gradual rollout
+### 技術的リスク
+1. **Elasticsearchパフォーマンス**: 複雑な集計が検索遅延に影響する可能性
+   - *軽減策*: 本番データでの負荷テスト; キャッシュ追加; 事前集計を検討
+2. **インデックスサイズ拡大**: より多くのフィールド = より大きなインデックスとより遅いインデックス化
+   - *軽減策*: インデックスサイズを監視; 異なるアイテムタイプに対して分離インデックスを検討
+3. **スキーマ進化**: 新しいフィルター追加にはインデックス更新が必要
+   - *軽減策*: 柔軟なスキーマ設計; 段階的展開を計画
 
-## Design and UX Notes
+## デザインとUXの注意点
 
-### Desktop Layout
-- Filters in left sidebar (persistent, not collapsible)
-- Main results area with sort controls at top
-- Filter chips above results showing active filters
+### デスクトップレイアウト
+- 左サイドバーのフィルター（持続的、折りたたみ不可）
+- 上部にソートコントロールがあるメイン結果エリア
+- アクティブフィルターを示すフィルターチップを結果の上に配置
 
-### Mobile Layout
-- "Filters" button in header opens bottom sheet
-- Show active filter count badge on button
-- Apply button in bottom sheet (don't auto-apply on mobile to reduce requests)
+### モバイルレイアウト
+- ヘッダーの「フィルター」ボタンがボトムシートを開く
+- ボタンにアクティブフィルター件数のバッジを表示
+- ボトムシートに適用ボタン（リクエスト削減のためモバイルでは自動適用しない）
 
-### Filter UI Patterns
-- Price: Dual slider + text inputs
-- Location: Autocomplete location search + radius selector
-- Category: Expandable tree with checkboxes
-- Attributes: Checkbox groups, collapsible sections
+### フィルターUIパターン
+- 価格: デュアルスライダー + テキスト入力
+- 場所: 場所検索オートコンプリート + 半径選択
+- カテゴリ: チェックボックス付き展開可能ツリー
+- 属性: チェックボックスグループ、折りたたみ可能セクション
 
-## Risks and Mitigations
+## リスクと軽減策
 
-| Risk | Likelihood | Impact | Mitigation |
+| リスク | 可能性 | 影響 | 軽減策 |
 |------|-----------|--------|------------|
-| Performance degradation with complex filters | Medium | High | Load testing; caching; gradual rollout with feature flag |
-| Low filter adoption by users | Medium | High | User testing; prominent UI; tutorial on first visit |
-| Elasticsearch upgrade issues | Low | High | Test in staging; plan rollback; off-peak deployment |
-| Filter options become overwhelming | Medium | Medium | User research to prioritize filters; consider "More filters" progressive disclosure |
+| 複雑フィルターでのパフォーマンス劣化 | 中 | 高 | 負荷テスト; キャッシュ; 機能フラグによる段階展開 |
+| ユーザーによるフィルター採用率の低さ | 中 | 高 | ユーザーテスト; 目立つUI; 初回訪問時のチュートリアル |
+| Elasticsearchアップグレード問題 | 低 | 高 | ステージングでテスト; ロールバック計画; オフピーク時デプロイ |
+| フィルターオプションが圧倒的になる | 中 | 中 | フィルター優先順位付けのためのユーザー調査; 「その他フィルター」段階的開示を検討 |
 
-## Launch Plan
+## ローンチ計画
 
-### Phase 1: MVP (Week 1-2)
-- Price, location, and category filters only
-- Desktop web only
-- 5% rollout to test performance
+### フェーズ1: MVP (週1-2)
+- 価格、場所、カテゴリフィルターのみ
+- デスクトップウェブのみ
+- パフォーマンステストのため5%展開
 
-### Phase 2: Expansion (Week 3-4)
-- Add custom attribute filters
-- Mobile responsive design
-- Expand to 25% of users
+### フェーズ2: 拡張 (週3-4)
+- カスタム属性フィルターを追加
+- モバイル対応デザイン
+- 25%のユーザーに拡張
 
-### Phase 3: Full Launch (Week 5-6)
-- Saved search preferences (logged-in users)
-- 100% rollout
-- Monitor metrics and iterate
+### フェーズ3: 完全ローンチ (週5-6)
+- 保存検索設定（ログインユーザー）
+- 100%展開
+- メトリクス監視と改善
 
-### Feature Flags
-- `advanced_search_enabled`: Master flag for entire feature
-- `advanced_search_filters`: Individual filter types can be enabled/disabled
-- `advanced_search_saved_prefs`: Saved preferences feature
+### 機能フラグ
+- `advanced_search_enabled`: 機能全体のマスターフラグ
+- `advanced_search_filters`: 個別のフィルタータイプを有効/無効にできる
+- `advanced_search_saved_prefs`: 保存設定機能
 
-### Monitoring
-- Dashboards tracking success metrics (bounce rate, conversion, engagement)
-- Error rates and latency for search API
-- Filter usage analytics (which filters used most, combinations)
-- Alerts for search latency >1s or error rate >1%
+### 監視
+- 成功メトリクス（離脱率、コンバージョン、エンゲージメント）を追跡するダッシュボード
+- 検索APIのエラー率と遅延
+- フィルター使用状況分析（最もよく使われるフィルター、組み合わせ）
+- 検索遅延>1秒またはエラー率>1%のアラート
 
-## Open Questions
+## 未解決の質問
 
-1. **Filter Defaults**: Should any filters be pre-applied based on user history or location? (Owner: PM, Due: Week 1)
-2. **Personalization**: How should we handle conflicting saved preferences vs. shared filter URLs? (Owner: Eng, Due: Week 2)
-3. **Mobile UX**: Should mobile use instant apply or require an "Apply" button? (Owner: Design, Due: Week 1)
-4. **Analytics**: What specific filter interactions should we track? (Owner: Data, Due: Week 2)
+1. **フィルターデフォルト**: ユーザー履歴や場所に基づいて事前適用すべきフィルターはあるか？（担当者: PM、期限: 週1）
+2. **パーソナライゼーション**: 保存設定と共有フィルターURLの競合をどう処理するか？（担当者: Eng、期限: 週2）
+3. **モバイルUX**: モバイルは即座適用か「適用」ボタンが必要か？（担当者: Design、期限: 週1）
+4. **分析**: どの特定のフィルター操作を追跡すべきか？（担当者: Data、期限: 週2）
 
-## Stakeholders and Reviewers
+## ステークホルダーとレビュワー
 
-- **PM Owner**: Jane Doe
-- **Engineering Lead**: John Smith
-- **Design**: Alice Johnson
-- **Data Science**: Bob Lee (metrics and instrumentation)
-- **Approvals Needed**: VP Product, VP Engineering
+- **PM担当**: Jane Doe
+- **エンジニアリングリード**: John Smith
+- **デザイン**: Alice Johnson
+- **データサイエンス**: Bob Lee（メトリクスと計装）
+- **承認必要**: VP Product、VP Engineering
 
 ---
-*Last Updated*: 2025-11-19
-*Status*: Draft → Review → Approved → In Progress
+*最終更新*: 2025-11-19
+*ステータス*: 下書き → レビュー → 承認 → 進行中
 ```
 
 ### Example 2: Feature request analysis
 
 ```markdown
-# Feature Analysis: Dark Mode Support
+# 機能分析: ダークモードサポート
 
-## Request Summary
-**Source**: User feedback (150+ requests in past 6 months), competitive pressure
-**Description**: Add dark mode theme option to web and mobile apps
+## リクエスト要約
+**ソース**: ユーザーフィードバック（過去6ヶ月で150以上のリクエスト）、競合圧力
+**説明**: ウェブおよびモバイルアプリにダークモードテーマオプションを追加
 
-## User Need
-Users working in low-light environments report eye strain with current light-only theme. Power users (25% of DAU) spend 3+ hours/day in app and strongly prefer dark mode. Common feedback: "I use dark mode everywhere else, why not here?"
+## ユーザーニーズ
+低照度環境で作業するユーザーが、現在のライトモードのみのテーマで目の疲労を報告。パワーユーザー（DAUの25%）は1日3時間以上アプリを使用し、ダークモードを強く好む。よくあるフィードバック：「他のところではダークモードを使っているのに、なぜここでは使えないのか？」
 
-## Target Users
-- Power users: 300K users, 3+ hrs/day usage
-- Evening/night users: 450K users who primarily use app 6pm-12am
-- Accessibility users: Users with light sensitivity or visual impairments
+## 対象ユーザー
+- パワーユーザー: 30万ユーザー、1日3時間以上の使用
+- 夜間/夜のユーザー: 主に午後6時から午前12時にアプリを使用する45万ユーザー
+- アクセシビリティユーザー: 光過敏症や視覚障害のあるユーザー
 
-## Impact Assessment
+## 影響評価
 
-### User Impact
-- **Reach**: ~750K users (45% of user base) have requested or would use dark mode
-- **Impact Score**: 8/10 - High impact for target users; neutral for others
-- **Confidence**: 85% - Strong signal from user research and competitive data
+### ユーザー影響
+- **リーチ**: 約75万ユーザー（ユーザーベースの45%）がダークモードをリクエストまたは使用する
+- **影響スコア**: 8/10 - 対象ユーザーには高影響; 他のユーザーには中立
+- **確信度**: 85% - ユーザー調査と競合データからの強いシグナル
 
-### Business Impact
-- **Retention**: Likely improves retention for power users (high-value segment)
-- **Acquisition**: Table stakes for competitive positioning
-- **Revenue**: Indirect impact through retention and satisfaction
-- **Estimated Value**: +2% overall retention = ~$800K annual revenue
+### ビジネス影響
+- **リテンション**: パワーユーザー（高価値セグメント）のリテンション向上の可能性
+- **獲得**: 競合ポジショニングのための必要最低条件
+- **収益**: リテンションと満足度を通じた間接的影響
+- **推定価値**: 全体リテンション+2% = 年間約80万ドルの収益
 
-## Effort Assessment
+## 工数評価
 
-### Engineering Effort
-- **Frontend**: 3 weeks (2 engineers)
-  - Design system updates (color tokens, theme provider)
-  - Component updates (~150 components)
-  - Testing across browsers and devices
-- **Backend**: 1 week (1 engineer)
-  - User preference storage and API
-  - Default theme logic
-- **Total Effort**: ~7 engineer-weeks
+### エンジニアリング工数
+- **フロントエンド**: 3週間（エンジニア2名）
+  - デザインシステム更新（カラートークン、テーマプロバイダー）
+  - コンポーネント更新（約150コンポーネント）
+  - ブラウザーとデバイス間でのテスト
+- **バックエンド**: 1週間（エンジニア1名）
+  - ユーザー設定保存とAPI
+  - デフォルトテーマロジック
+- **総工数**: 約7エンジニア週
 
-### Design Effort
-- 2 weeks to design and validate dark theme
-- Audit all screens and components
-- Accessibility testing for contrast ratios
+### デザイン工数
+- ダークテーマの設計と検証に2週間
+- すべての画面とコンポーネントの監査
+- コントラスト比のアクセシビリティテスト
 
-### Dependencies
-- Requires design system update first (already planned Q2)
-- Mobile apps need React Native theme provider update
-- Email templates will remain light mode (out of scope for now)
+### 依存関係
+- まずデザインシステム更新が必要（Q2に既に計画済み）
+- モバイルアプリにはReact Nativeテーマプロバイダー更新が必要
+- メールテンプレートはライトモードのまま（現在の範囲外）
 
-## Alternatives Considered
+## 検討した代替案
 
-### Option 1: Full Dark Mode (Recommended)
-- **Pros**: Meets user needs; industry standard; future-proof
-- **Cons**: More implementation work upfront
-- **Effort**: 7 engineer-weeks
+### オプション1: フルダークモード（推奨）
+- **長所**: ユーザーニーズに対応; 業界標準; 将来性
+- **短所**: 最初により多くの実装作業
+- **工数**: 7エンジニア週
 
-### Option 2: Auto Dark Mode Only (follow system preference)
-- **Pros**: Simpler (no user preference storage); still helps users
-- **Cons**: Doesn't give user control; may not match user preference
-- **Effort**: 5 engineer-weeks
+### オプション2: 自動ダークモードのみ（システム設定に従う）
+- **長所**: よりシンプル（ユーザー設定保存なし）; それでもユーザーを助ける
+- **短所**: ユーザーにコントロールを与えない; ユーザー設定に合わない可能性
+- **工数**: 5エンジニア週
 
-### Option 3: Premium Feature (dark mode for paid users)
-- **Pros**: Potential revenue from feature upgrades
-- **Cons**: User backlash (expected table stakes); limits adoption
-- **Effort**: 7 engineer-weeks + paywall logic
+### オプション3: プレミアム機能（有料ユーザー向けダークモード）
+- **長所**: 機能アップグレードからの潜在的収益
+- **短所**: ユーザーの反発（必要最低条件として期待される）; 採用を制限
+- **工数**: 7エンジニア週 + ペイウォールロジック
 
-## Prioritization Score
+## 優先順位スコア
 
-Using RICE framework:
-- **Reach**: 750K users = 750
-- **Impact**: 8/10 (high for target segment) = 0.8
-- **Confidence**: 85% = 0.85
-- **Effort**: 7 weeks = 7
+RICEフレームワークを使用：
+- **リーチ**: 75万ユーザー = 750
+- **影響**: 8/10（対象セグメントに高い） = 0.8
+- **確信度**: 85% = 0.85
+- **工数**: 7週間 = 7
 
-**RICE Score**: (750 × 0.8 × 0.85) / 7 = **73.2**
+**RICEスコア**: (750 × 0.8 × 0.85) / 7 = **73.2**
 
-For comparison:
-- Recent feature A: RICE = 45
-- Recent feature B: RICE = 92
-- Average feature RICE: 55
+比較：
+- 最近の機能A: RICE = 45
+- 最近の機能B: RICE = 92
+- 平均機能RICE: 55
 
-## Risks
+## リスク
 
-1. **Scope Creep**: Easy to bikeshed colors; need clear design authority
-   - *Mitigation*: Lock designs early; time-box feedback cycles
-2. **Accessibility**: Poor contrast choices could harm accessibility
-   - *Mitigation*: WCAG AA testing; accessibility audit before launch
-3. **Maintenance Burden**: Need to test everything in both modes going forward
-   - *Mitigation*: Automated visual regression testing; CI checks
-4. **Incomplete Coverage**: Users notice when parts don't respect theme
-   - *Mitigation*: Comprehensive component audit; phased rollout
+1. **スコープクリープ**: 色についての細かい議論が起こりやすい; 明確なデザイン権限が必要
+   - *軽減策*: 早期にデザインを確定; フィードバックサイクルを時間制限
+2. **アクセシビリティ**: 悪いコントラスト選択がアクセシビリティを損なう可能性
+   - *軽減策*: WCAG AAテスト; ローンチ前のアクセシビリティ監査
+3. **保守負担**: 今後すべてを両モードでテストする必要
+   - *軽減策*: 自動視覚回帰テスト; CIチェック
+4. **不完全なカバレッジ**: 一部がテーマを尊重しない場合にユーザーが気づく
+   - *軽減策*: 包括的コンポーネント監査; 段階的展開
 
-## Strategic Alignment
+## 戦略的整合性
 
-**Product Strategy**: ✅ Aligned - Improves core user experience for power users (strategic segment)
-**Technical Strategy**: ✅ Aligned - Modernizes design system and component architecture
-**Business Goals**: ✅ Aligned - Supports retention goals and competitive positioning
+**プロダクト戦略**: ✅ 整合 - パワーユーザー（戦略セグメント）のコアユーザー体験を向上
+**技術戦略**: ✅ 整合 - デザインシステムとコンポーネントアーキテクチャを近代化
+**ビジネス目標**: ✅ 整合 - リテンション目標と競合ポジショニングをサポート
 
-## Recommendation
+## 推奨事項
 
-**✅ Proceed with Option 1 (Full Dark Mode)**
+**✅ オプション1（フルダークモード）で進める**
 
-**Reasoning**:
-- High impact for large user segment (45% of base)
-- Strong user demand and competitive pressure
-- Effort is reasonable relative to value
-- RICE score above our threshold (>50)
-- Aligns with product, technical, and business strategy
+**理由**:
+- 大規模ユーザーセグメント（ベースの45%）への高い影響
+- 強いユーザー需要と競合圧力
+- 価値に対して工数が妥当
+- RICEスコアが閾値（>50）を上回る
+- プロダクト、技術、ビジネス戦略に整合
 
-**Suggested Timeline**:
-- Q2 2025: Design and design system updates
-- Q3 2025: Implementation and testing
-- Q4 2025: Launch with marketing push
+**推奨タイムライン**:
+- 2025年Q2: デザインとデザインシステム更新
+- 2025年Q3: 実装とテスト
+- 2025年Q4: マーケティングプッシュでローンチ
 
-**Next Steps**:
-1. Get stakeholder approval
-2. Add to Q2 roadmap
-3. Kick off design work
-4. Plan engineering sprint allocation
+**次のステップ**:
+1. ステークホルダー承認を得る
+2. Q2ロードマップに追加
+3. デザイン作業を開始
+4. エンジニアリングスプリント配分を計画
 
 ---
-*Analysis by*: Jane Doe (PM)
-*Reviewed by*: Design, Engineering, Data
-*Date*: 2025-11-19
+*分析者*: Jane Doe (PM)
+*レビュー者*: Design、Engineering、Data
+*日付*: 2025-11-19
 ```
 
 ## Common PM artifacts

@@ -4,40 +4,40 @@ description: "Automatically update documentation when code changes using CI/CD w
 keywords: ['documentation', 'docs', 'automation', 'ci/cd', 'github actions', 'droid exec']
 ---
 
-This cookbook demonstrates how to use Droid Exec in GitHub Actions to automatically update documentation when code is merged to main. The workflow analyzes code changes, discovers relevant documentation, updates it, and creates a pull request for human review.
+このクックブックでは、GitHub ActionsでDroid Execを使用して、コードがmainにマージされた際に自動的にドキュメントを更新する方法を説明します。ワークフローはコードの変更を分析し、関連するドキュメントを発見して更新し、人間によるレビュー用のプルリクエストを作成します。
 
-## How it works
+## 仕組み
 
-End-to-end automated workflow:
+エンドツーエンドの自動化ワークフロー：
 
-1. **Trigger**: Code merged to main branch
-2. **Explore**: Droid exec explores codebase structure (project type, tech stack)
-3. **Analyze**: Identifies changed files and their purpose
-4. **Discover**: Searches docs/ directory for relevant documentation
-5. **Update**: Updates affected documentation sections
-6. **Commit**: Workflow creates commit
-7. **PR**: Bot opens pull request for team review
+1. **トリガー**: mainブランチにコードがマージされる
+2. **探索**: Droid execがコードベース構造（プロジェクトタイプ、技術スタック）を探索
+3. **分析**: 変更されたファイルとその目的を特定
+4. **発見**: docs/ディレクトリ内の関連ドキュメントを検索
+5. **更新**: 影響を受けるドキュメントセクションを更新
+6. **コミット**: ワークフローがコミットを作成
+7. **PR**: Botがチームレビュー用のプルリクエストを開く
 
-## Prerequisites
+## 前提条件
 
-To get started, you'll need:
-- Droid installed
-- A Factory API key
-- GitHub repository with Actions enabled
-- `FACTORY_API_KEY` in repository secrets (Settings → Secrets → Actions)
-- Existing documentation directory
+開始するには、以下が必要です：
+- Droidのインストール
+- Factory APIキー
+- Actions が有効化されたGitHub リポジトリ
+- リポジトリシークレット内の`FACTORY_API_KEY`（Settings → Secrets → Actions）
+- 既存のドキュメントディレクトリ
 
 <Note>
     See the Droid Exec setup [here](/cli/droid-exec/overview#installation).
 </Note>
 
-## Complete GitHub Actions workflow
+## 完全なGitHub Actions ワークフロー
 
 <Info>
   This workflow will create pull requests automatically. Review the generated PRs carefully before merging to ensure accuracy.
 </Info>
 
-Create `.github/workflows/update-docs.yml`:
+`.github/workflows/update-docs.yml`を作成：
 
 ```yaml
 name: Auto-Update Documentation
@@ -163,13 +163,13 @@ This PR was automatically generated after code was merged to main." \
             --label "documentation,automated"
 ```
 
-**Key workflow features:**
-- Uses `--auto low` for file modifications only (following cookbook patterns)
-- Explicit instruction: "DO NOT commit or push" (separation of concerns)
-- Workflow handles git operations in separate step
-- Droid autonomously explores codebase and discovers relevant docs (no mapping file needed)
+**主要なワークフロー機能：**
+- ファイル変更のみに`--auto low`を使用（クックブックパターンに従う）
+- 明示的な指示：「コミットやプッシュは行わない」（関心事の分離）
+- ワークフローが別ステップでgit操作を処理
+- Droid が自律的にコードベースを探索し、関連ドキュメントを発見（マッピングファイル不要）
 
-## Best practices
+## ベストプラクティス
 
 <Steps>
   <Step title="Scope triggers carefully">
@@ -213,11 +213,11 @@ This PR was automatically generated after code was merged to main." \
   </Step>
 </Steps>
 
-## Variations
+## バリエーション
 
-### Weekly comprehensive review
+### 週次包括レビュー
 
-For repositories with frequent changes, batch updates into a weekly review:
+頻繁に変更があるリポジトリの場合、更新を週次レビューにバッチ処理：
 
 ```yaml
 on:
@@ -226,9 +226,9 @@ on:
   workflow_dispatch:  # Allow manual trigger
 ```
 
-### Multiple documentation directories
+### 複数のドキュメントディレクトリ
 
-If your docs are spread across multiple locations:
+ドキュメントが複数の場所に分散している場合：
 
 ```bash
 droid exec --auto low "
@@ -237,9 +237,9 @@ based on these code changes: $(cat changed_files.txt)
 "
 ```
 
-### Language-specific targeting
+### 言語固有のターゲティング
 
-Focus on specific file types:
+特定のファイルタイプに焦点を当てる：
 
 ```yaml
 on:
@@ -251,7 +251,7 @@ on:
       # TypeScript changes only
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 <Accordion title="No PR created even though code changed">
   Droid may have determined no docs needed updates. Check the workflow logs or add more specific search instructions in the prompt. You can also check if `doc-update-summary.md` was created to see what droid analyzed.
@@ -272,8 +272,8 @@ on:
   - Using scheduled updates instead of triggering on every merge
 </Accordion>
 
-## See also
+## 関連項目
 
-- [Droid Exec Overview](/cli/droid-exec/overview) - Autonomy levels and capabilities
-- [GitHub Actions Cookbook](/guides/droid-exec/github-actions) - More workflow examples
-- [Documentation Sync Hooks](/guides/hooks/documentation-sync) - Preventive approach
+- [Droid Exec Overview](/cli/droid-exec/overview) - 自律性レベルと機能
+- [GitHub Actions Cookbook](/guides/droid-exec/github-actions) - より多くのワークフロー例
+- [Documentation Sync Hooks](/guides/hooks/documentation-sync) - 予防的アプローチ

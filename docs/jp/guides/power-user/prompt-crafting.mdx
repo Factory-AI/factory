@@ -4,7 +4,7 @@ description: Model-specific prompting techniques to get better results from Clau
 keywords: ['prompts', 'prompting', 'claude', 'gpt', 'opus', 'sonnet', 'techniques', 'best practices']
 ---
 
-Different AI models respond better to different prompting styles. This guide covers model-specific techniques and provides ready-to-use prompt refiner skills.
+異なるAIモデルは、それぞれ異なるプロンプトスタイルによりよく応答します。このガイドでは、モデル固有のテクニックをカバーし、すぐに使用できるプロンプト改良スキルを提供します。
 
 <Info>
   **Works everywhere:** These prompting techniques apply to both CLI and [Factory App](/web/getting-started/overview).
@@ -12,9 +12,9 @@ Different AI models respond better to different prompting styles. This guide cov
 
 ---
 
-## Universal Prompting Principles
+## 汎用プロンプト原則
 
-These principles work across all models:
+これらの原則は全てのモデルで機能します：
 
 <AccordionGroup>
   <Accordion title="Be specific about the outcome">
@@ -44,11 +44,11 @@ These principles work across all models:
 
 ---
 
-## Claude Models (Opus, Sonnet, Haiku)
+## Claudeモデル（Opus、Sonnet、Haiku）
 
-Claude models excel with structured, explicit instructions and respond particularly well to certain formatting patterns.
+Claudeモデルは構造化された明示的な指示に優れ、特定のフォーマットパターンに特によく応答します。
 
-### Key Techniques for Claude
+### Claudeの主要テクニック
 
 <Steps>
   <Step title="Use XML tags for structure">
@@ -106,9 +106,9 @@ Claude models excel with structured, explicit instructions and respond particula
   Ready-to-use prompt refiner skills are available in the [examples folder](https://github.com/Factory-AI/factory/tree/main/examples/power-user-skills). Copy them to `~/.factory/skills/` to use them. Learn more about skills in the [Skills documentation](/cli/configuration/skills).
 </Tip>
 
-### Claude Prompt Refiner Skill
+### Claudeプロンプト改良スキル
 
-Create `~/.factory/skills/prompt-refiner-claude/SKILL.md`:
+`~/.factory/skills/prompt-refiner-claude/SKILL.md`を作成してください：
 
 ```markdown
 ---
@@ -169,36 +169,36 @@ Present the improved prompt with:
 **After:**
 ```
 <context>
-The /api/products endpoint currently queries the database on every request.
-Average response time is 200ms. We use Redis for other caching in the app.
+/api/productsエンドポイントは現在、すべてのリクエストでデータベースにクエリしています。
+平均応答時間は200msです。アプリの他のキャッシュにはRedisを使用しています。
 </context>
 
 <task>
-Add Redis caching to the /api/products endpoint to reduce database load.
+データベース負荷を軽減するために/api/productsエンドポイントにRedisキャッシュを追加する。
 </task>
 
 <requirements>
-- Cache TTL of 5 minutes
-- Cache invalidation when products are updated
-- Graceful fallback to database if Redis is unavailable
-- Add cache hit/miss metrics logging
+- 5分のキャッシュTTL
+- 製品が更新された時のキャッシュ無効化
+- Redisが利用できない場合のデータベースへのグレースフルフォールバック
+- キャッシュヒット/ミスメトリクスログの追加
 </requirements>
 
 <constraints>
-- Don't change the response format
-- Must pass existing integration tests
-- Use our existing Redis connection from src/lib/redis.ts
+- レスポンス形式を変更しない
+- 既存の統合テストに合格する必要がある
+- src/lib/redis.tsの既存のRedis接続を使用する
 </constraints>
 ```
 ```
 
 ---
 
-## GPT Models (GPT-5, GPT-5.1, Codex)
+## GPTモデル（GPT-5、GPT-5.1、Codex）
 
-GPT models excel with clear system-level context and benefit from explicit role framing.
+GPTモデルは明確なシステムレベルのコンテキストで優れ、明示的な役割設定から恩恵を受けます。
 
-### Key Techniques for GPT
+### GPTの主要テクニック
 
 <Steps>
   <Step title="Frame the role explicitly">
@@ -239,9 +239,9 @@ GPT models excel with clear system-level context and benefit from explicit role 
   </Step>
 </Steps>
 
-### GPT Prompt Refiner Skill
+### GPTプロンプト改良スキル
 
-Create `~/.factory/skills/prompt-refiner-gpt/SKILL.md`:
+`~/.factory/skills/prompt-refiner-gpt/SKILL.md`を作成してください：
 
 ```markdown
 ---
@@ -304,40 +304,40 @@ Present with:
 
 **After:**
 ```
-You are a senior security engineer conducting a security audit of a Node.js payment processing service.
+あなたはNode.js決済処理サービスのセキュリティ監査を実施するシニアセキュリティエンジニアです。
 
-Context: This service handles credit card transactions and communicates with Stripe's API. It runs in AWS ECS.
+コンテキスト：このサービスはクレジットカード取引を処理し、StripeのAPIと通信します。AWS ECSで実行されています。
 
-Task: Review the code in src/payments/ for security vulnerabilities.
+タスク：src/payments/のコードをセキュリティ脆弱性についてレビューしてください。
 
-Steps:
-1. Check for proper input validation on all endpoints
-2. Verify secrets are not hardcoded or logged
-3. Review authentication and authorization logic
-4. Check for SQL injection and XSS vulnerabilities
-5. Verify proper error handling that doesn't leak sensitive info
+手順：
+1. 全てのエンドポイントで適切な入力検証を確認
+2. シークレットがハードコードされていない、またはログに記録されていないことを確認
+3. 認証・認可ロジックをレビュー
+4. SQLインジェクションとXSS脆弱性を確認
+5. 機密情報を漏らさない適切なエラーハンドリングを確認
 
-Output format:
-Return a security report in markdown with:
-- **Critical**: Issues that must be fixed before deployment
-- **High**: Significant risks that should be addressed soon
-- **Medium**: Improvements to consider
-- **Recommendations**: General security enhancements
+出力形式：
+以下を含むmarkdown形式のセキュリティレポートを返してください：
+- **Critical**：デプロイメント前に修正が必要な問題
+- **High**：早急に対処すべき重大なリスク
+- **Medium**：検討すべき改善点
+- **Recommendations**：一般的なセキュリティ強化
 
-For each issue, include:
-- File and line number
-- Description of the vulnerability
-- Recommended fix with code example
+各問題について以下を含める：
+- ファイルと行番号
+- 脆弱性の説明
+- コード例付きの推奨修正
 ```
 ```
 
 ---
 
-## Gemini Models
+## Geminiモデル
 
-Gemini models handle long context well and work effectively with structured reasoning.
+Geminiモデルは長いコンテキストをうまく処理し、構造化された推論で効果的に動作します。
 
-### Key Techniques for Gemini
+### Geminiの主要テクニック
 
 <Steps>
   <Step title="Leverage long context">
@@ -366,24 +366,24 @@ Gemini models handle long context well and work effectively with structured reas
 
 ---
 
-## Model Selection Strategy
+## モデル選択戦略
 
-Match the model to the task:
+タスクにモデルをマッチさせる：
 
-| Task Type | Recommended Model | Reasoning Level |
+| タスクタイプ | 推奨モデル | 推論レベル |
 |-----------|-------------------|-----------------|
-| **Complex architecture** | Opus 4.6 or Opus 4.5 | High-Max |
-| **Feature implementation** | Sonnet 4.5 or GPT-5.1-Codex | Medium |
-| **Quick edits, formatting** | Haiku 4.5 | Off/Low |
-| **Code review** | GPT-5.1-Codex-Max | High |
-| **Bulk automation** | GLM-4.7 (Droid Core) | None |
-| **Research/analysis** | Gemini 3 Pro | High |
+| **複雑なアーキテクチャ** | Opus 4.6または Opus 4.5 | High-Max |
+| **機能実装** | Sonnet 4.5またはGPT-5.1-Codex | Medium |
+| **クイック編集、フォーマット** | Haiku 4.5 | Off/Low |
+| **コードレビュー** | GPT-5.1-Codex-Max | High |
+| **バルク自動化** | GLM-4.7 (Droid Core) | None |
+| **リサーチ/分析** | Gemini 3 Pro | High |
 
 ---
 
-## Creating Your Own Prompt Refiner
+## 独自プロンプト改良の作成
 
-For team-specific needs, create a custom prompt refiner:
+チーム固有のニーズのために、カスタムプロンプト改良を作成してください：
 
 ```markdown
 ---
@@ -406,38 +406,38 @@ description: Refine prompts using our team's conventions and project context.
 
 ## Template
 ```
-Context: [What exists, what module/layer]
-Task: [Specific action]
-Patterns to follow: [Reference existing similar code]
-Tests: [What tests to add/update]
-Done when: [Acceptance criteria]
+コンテキスト：[既存のもの、モジュール/レイヤー]
+タスク：[具体的なアクション]
+従うべきパターン：[既存の類似コードを参照]
+テスト：[追加/更新するテスト]
+完了条件：[受け入れ基準]
 ```
 ```
 
 ---
 
-## Quick Reference Card
+## クイックリファレンスカード
 
-### Claude (Opus/Sonnet/Haiku)
-- ✅ XML tags for structure
-- ✅ Context before instructions
-- ✅ Examples in dedicated sections
-- ✅ "Think through..." for reasoning
+### Claude（Opus/Sonnet/Haiku）
+- ✅ 構造化のためのXMLタグ
+- ✅ 指示の前にコンテキスト
+- ✅ 専用セクションでの例
+- ✅ 推論のための「Think through...」
 
-### GPT (GPT-5/Codex)
-- ✅ Role framing ("You are a...")
-- ✅ Numbered step procedures
-- ✅ Explicit output format
-- ✅ "Step by step" for reasoning
+### GPT（GPT-5/Codex）
+- ✅ 役割設定（「あなたは...」）
+- ✅ 番号付き手順
+- ✅ 明示的な出力形式
+- ✅ 推論のための「ステップバイステップ」
 
 ### Gemini
-- ✅ Extensive context inclusion
-- ✅ Low/High reasoning levels
-- ✅ Structured output requests
+- ✅ 広範囲なコンテキスト包含
+- ✅ Low/High推論レベル
+- ✅ 構造化された出力リクエスト
 
 ---
 
-## Next Steps
+## 次のステップ
 
 <CardGroup cols={2}>
   <Card title="Setup Checklist" href="/guides/power-user/setup-checklist" icon="list-check">

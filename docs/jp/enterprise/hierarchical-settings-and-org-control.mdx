@@ -3,15 +3,15 @@ title: "階層設定と組織制御"
 description: How org, project, folder, and user settings combine to control models, tools, safety policies, and telemetry for Droid.
 ---
 
-Factory’s enterprise story is built on a **single, predictable settings hierarchy**. Instead of ad‑hoc per‑machine configuration, orgs express policy once and have it apply consistently across laptops, CI, VMs, and airgapped environments.
+Factoryのエンタープライズストーリーは、**単一で予測可能な設定階層**に基づいて構築されています。マシンごとのアドホックな設定ではなく、組織がポリシーを一度定義すれば、ラップトップ、CI、VM、エアギャップ環境全体で一貫して適用されます。
 
-This page explains how the hierarchy works and how to use it to govern models, tools, safety policies, and telemetry.
+このページでは、階層の仕組みと、モデル、ツール、セーフティポリシー、テレメトリーを管理するための使用方法について説明します。
 
 ---
 
-## The four levels
+## 4つのレベル
 
-Settings are defined in `.factory/` folders with a consistent structure at four levels:
+設定は、4つのレベルで一貫した構造を持つ`.factory/`フォルダーで定義されます：
 
 ```text
 Org         → Central `.factory/` bundle (or config endpoint)
@@ -20,22 +20,22 @@ Project     → <git-root>/.factory/
 User        → ~/.factory/
 ```
 
-Each `.factory/` folder can contain:
+各`.factory/`フォルダーには以下を含めることができます：
 
-- `settings.json` – general settings (models, safety, preferences, telemetry).
-- `mcp.json` – MCP server configurations.
-- `droids/` – droid definitions.
-- `commands/` – custom commands.
-- `hooks/` – hook definitions.
-- `skills/` – skill definitions.
+- `settings.json` – 一般設定（モデル、セーフティ、設定、テレメトリー）
+- `mcp.json` – MCPサーバー設定
+- `droids/` – droid定義
+- `commands/` – カスタムコマンド
+- `hooks/` – フック定義
+- `skills/` – スキル定義
 
-The **same schema** applies at every level. What changes is **precedence**.
+**同じスキーマ**がすべてのレベルに適用されます。変わるのは**優先順位**です。
 
 ---
 
-## Settings JSON schema
+## 設定JSONスキーマ
 
-Below is the full schema for org-managed settings. These are configured by org admins through the [Enterprise Controls](https://app.factory.ai) page in the Factory app. Every property is optional — omit any field you do not need to set.
+以下は、組織管理設定の完全なスキーマです。これらは、Factoryアプリの[Enterprise Controls](https://app.factory.ai)ページを通じて組織管理者によって設定されます。すべてのプロパティはオプションです — 設定する必要のないフィールドは省略してください。
 
 <ResponseField name="sessionDefaultSettings" type="object">
   Session default preferences.
@@ -211,163 +211,163 @@ Below is the full schema for org-managed settings. These are configured by org a
   Marketplace sources that are strictly enforced. Each entry is a source object directly (e.g. `{ "source": "github", "repo": "owner/repo" }`), not wrapped in a `source` key like `extraKnownMarketplaces` values.
 </ResponseField>
 
-### Supported model IDs
+### サポートされているモデルID
 
-The following model identifiers can be used in `allowedModelIds` and `blockedModelIds`:
+以下のモデル識別子は`allowedModelIds`と`blockedModelIds`で使用できます：
 
-| Provider | Model IDs |
+| プロバイダー | モデルID |
 |---|---|
 | **Anthropic** | `claude-sonnet-4-5-20250929`, `claude-sonnet-4-6`, `claude-opus-4-5-20251101`, `claude-opus-4-6`, `claude-opus-4-6-fast`, `claude-haiku-4-5-20251001` |
 | **OpenAI** | `gpt-5.1`, `gpt-5.1-codex`, `gpt-5.1-codex-max`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex` |
 | **Google** | `gemini-3-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview` |
 | **XAI** | `grok-code-fast-1` |
-| **Open source** | `glm-4.7`, `glm-5`, `kimi-k2.5`, `minimax-m2.5` |
+| **オープンソース** | `glm-4.7`, `glm-5`, `kimi-k2.5`, `minimax-m2.5` |
 
 ---
 
-## Extension‑only semantics
+## 拡張のみのセマンティクス
 
-Factory uses **extension‑only** semantics instead of traditional “override” behavior.
+Factoryは、従来の「オーバーライド」動作の代わりに**拡張のみ**のセマンティクスを使用します。
 
-- Higher levels (org, project) **cannot be overridden** by lower levels.
-- Lower levels (folder, user) can only **add** to what higher levels define when those fields are unset.
-- This ensures org policies remain intact even as projects and users customize their experience.
+- 上位レベル（組織、プロジェクト）は下位レベルで**オーバーライドできません**。
+- 下位レベル（フォルダー、ユーザー）は、上位レベルで未設定のフィールドに対してのみ**追加**できます。
+- これにより、プロジェクトやユーザーがエクスペリエンスをカスタマイズしても、組織ポリシーは確実に保持されます。
 
-There are three merge modes depending on the data type.
+データ型に応じて3つのマージモードがあります。
 
-### 1. Simple values – first wins
+### 1. 単純な値 – 最初の値が優先
 
-For simple scalar values (strings, numbers, booleans):
+単純なスカラー値（文字列、数値、真偽値）の場合：
 
-- The first level that sets a value “wins.”
-- Lower levels cannot change or remove that value.
+- 値を設定した最初のレベルが「優先」されます。
+- 下位レベルはその値を変更または削除できません。
 
-Examples:
+例：
 
 - `sessionDefaultSettings.model`
 - `sessionDefaultSettings.autonomyMode`
 - `maxAutonomyLevel`
 
-This guarantees that org decisions (such as which models or autonomy levels are allowed) remain authoritative.
+これにより、組織の決定（どのモデルや自律レベルが許可されるかなど）が権威あるものとして確実に保たれます。
 
-### 2. Arrays – union, cannot remove
+### 2. 配列 – 結合、削除不可
 
-Array fields accumulate across levels:
+配列フィールドはレベル間で蓄積されます：
 
-- Org entries are always present and **cannot be removed**.
-- Project and folder levels can add more entries.
-- User level can add more entries but cannot remove or weaken higher‑level entries.
+- 組織のエントリは常に存在し、**削除できません**。
+- プロジェクトとフォルダーレベルでエントリを追加できます。
+- ユーザーレベルでエントリを追加できますが、上位レベルのエントリを削除または弱体化することはできません。
 
-Examples:
+例：
 
-- Command **allow lists** and **deny lists**.
-- Lists of enabled hooks or features.
+- コマンド**許可リスト**と**拒否リスト**
+- 有効なフックや機能のリスト
 
-This pattern is ideal for policies like “these commands are always denied” or “these hooks are always enabled,” while still allowing teams to extend the list.
+このパターンは「これらのコマンドは常に拒否される」や「これらのフックは常に有効」などのポリシーに理想的で、チームがリストを拡張することは可能です。
 
-### 3. Objects – keys are locked per level
+### 3. オブジェクト – キーはレベルごとにロック
 
-For object fields:
+オブジェクトフィールドの場合：
 
-- Keys defined at a higher level are **locked**; their contents cannot be changed by lower levels.
-- Lower levels can add new keys but not modify or delete existing ones.
+- 上位レベルで定義されたキーは**ロック**され、下位レベルで内容を変更できません。
+- 下位レベルは新しいキーを追加できますが、既存のキーを変更または削除はできません。
 
-Examples:
+例：
 
-- `customModels` – org defines `claude-enterprise`; projects can add `payments-gpt`, users can add `personal-experimental`, but none can change or remove `claude-enterprise`.
-- MCP server definitions – org defines which servers exist and how they connect; projects decide which to use.
+- `customModels` – 組織が`claude-enterprise`を定義；プロジェクトは`payments-gpt`を追加可能、ユーザーは`personal-experimental`を追加可能、ただし誰も`claude-enterprise`を変更・削除はできない
+- MCPサーバー定義 – 組織がどのサーバーが存在し、どのように接続するかを定義；プロジェクトがどれを使用するかを決定
 
-This keeps critical configuration (like model endpoints and MCP servers) under centralized control.
-
----
-
-## Org configuration
-
-Large organizations typically manage an **org‑level `.factory` bundle** or config endpoint that:
-
-- Specifies allowed models, gateways, and BYOK policies.
-- Defines global command allow/deny lists.
-- Sets defaults for autonomy, reasoning effort, and safety features like Droid Shield.
-- Configures OTEL defaults (endpoints, sampling, and attributes).
-- Publishes org‑standard droids, commands, and hooks.
-
-This bundle is distributed to all environments where Droid runs—developer machines, CI, VMs, and airgapped clusters.
-
-Org policy is the foundation; projects and users build on top of it.
+これにより、重要な設定（モデルエンドポイントやMCPサーバーなど）が中央制御下に保たれます。
 
 ---
 
-## Project and folder configuration
+## 組織設定
 
-Projects and folders use `.factory/` directories checked into version control to specialize org policy for particular codebases and teams.
+大規模組織は通常、**組織レベルの`.factory`バンドル**または設定エンドポイントを管理し、以下を行います：
 
-Common responsibilities include:
+- 許可されたモデル、ゲートウェイ、BYOKポリシーの指定
+- グローバルコマンド許可/拒否リストの定義
+- 自律性、推論努力、Droid Shieldなどのセーフティ機能のデフォルト設定
+- OTELデフォルト（エンドポイント、サンプリング、属性）の設定
+- 組織標準のdroid、コマンド、フックの公開
 
-- Adding project‑specific models and gateways within the allowed set.
-- Defining project‑specific droids (for example, `/migrate-service`, `/refactor-module`).
-- Configuring hooks that know about the project’s tests, linters, and deployment processes.
-- Tightening safety controls for high‑risk repositories.
+このバンドルは、Droidが動作するすべての環境—開発者マシン、CI、VM、エアギャップクラスター—に配布されます。
 
-Folder‑level `.factory/` directories are useful in monorepos where different subsystems have different policies.
-
----
-
-## User configuration
-
-Developers can configure `~/.factory/` for **personal preferences only** where higher levels are silent.
-
-Examples:
-
-- Choosing a preferred model from the allowed set.
-- Setting default behavior for display options and minor UX preferences.
-- Enabling additional hooks or tools that do not conflict with org policy.
-
-Because of extension‑only semantics, users cannot:
-
-- Re‑enable models or tools that org or project settings have disallowed.
-- Loosen command allow/deny lists.
-- Reduce autonomy or safety requirements set by org or project.
+組織ポリシーは基盤であり、プロジェクトとユーザーはその上に構築します。
 
 ---
 
-## Example: enforcing a model policy
+## プロジェクトとフォルダー設定
 
-Suppose your org wants to:
+プロジェクトとフォルダーは、特定のコードベースとチーム向けに組織ポリシーを専門化するために、バージョン管理にチェックインされた`.factory/`ディレクトリを使用します。
 
-- Allow only approved enterprise models.
-- Disallow user‑supplied API keys.
-- Force all prompts through a particular LLM gateway.
+一般的な責任には以下が含まれます：
 
-You would:
+- 許可されたセット内でプロジェクト固有のモデルとゲートウェイを追加
+- プロジェクト固有のdroid定義（例：`/migrate-service`、`/refactor-module`）
+- プロジェクトのテスト、リンター、デプロイメントプロセスを理解するフックの設定
+- 高リスクリポジトリ向けのセーフティ制御の強化
 
-1. Define the allowed models and gateway endpoints in the org `.factory/settings.json`.
-2. Set a policy flag to disable user BYOK entirely.
-3. Configure hooks to verify that any model selection or endpoint use matches the org‑approved set.
-
-Projects and users can still choose **which of the approved models** to use for different tasks, but cannot break these guarantees.
+フォルダーレベルの`.factory/`ディレクトリは、異なるサブシステムが異なるポリシーを持つモノレポで有用です。
 
 ---
 
-## Example: environment‑specific autonomy
+## ユーザー設定
 
-Consider an org that wants to:
+開発者は、上位レベルが未設定の場合に限り、**個人設定のみ**のために`~/.factory/`を設定できます。
 
-- Allow high autonomy in CI and sandboxed containers.
-- Limit autonomy on developer laptops.
+例：
 
-You could:
+- 許可されたセットから好みのモデルを選択
+- 表示オプションと軽微なUX設定のデフォルト動作設定
+- 組織ポリシーと競合しない追加フックやツールの有効化
 
-1. At org level, set `maxAutonomyLevel` to `high`.
-2. In project settings, define environment‑aware hooks that:
-   - Inspect environment tags (for example, `environment.type=local|ci|sandbox`).
-   - Downgrade or block autonomy levels above `medium` when running on laptops.
-3. Optionally, define stricter folder‑level policies for particularly sensitive repos.
+拡張のみのセマンティクスにより、ユーザーは以下ができません：
 
-Again, users cannot override these rules; they can only choose safer personal defaults within the allowed space.
+- 組織またはプロジェクト設定で許可されていないモデルやツールの再有効化
+- コマンド許可/拒否リストの緩和
+- 組織またはプロジェクトによって設定された自律性やセーフティ要件の軽減
 
 ---
 
-## Example: full org-managed settings
+## 例：モデルポリシーの強制
+
+組織が以下を望む場合を想定します：
+
+- 承認されたエンタープライズモデルのみを許可
+- ユーザー提供のAPIキーを禁止
+- すべてのプロンプトを特定のLLMゲートウェイ経由で強制
+
+以下を行います：
+
+1. 組織の`.factory/settings.json`で許可されたモデルとゲートウェイエンドポイントを定義
+2. ユーザーBYOKを完全に無効にするポリシーフラグを設定
+3. モデル選択やエンドポイント使用が組織承認セットと一致することを確認するフックを設定
+
+プロジェクトとユーザーは、さまざまなタスクに対して**承認されたモデルのどれ**を使用するかを選択できますが、これらの保証を破ることはできません。
+
+---
+
+## 例：環境固有の自律性
+
+組織が以下を望む場合を考えてみます：
+
+- CIとサンドボックス化されたコンテナで高い自律性を許可
+- 開発者ラップトップでは自律性を制限
+
+以下が可能です：
+
+1. 組織レベルで`maxAutonomyLevel`を`high`に設定
+2. プロジェクト設定で、以下を行う環境認識フックを定義：
+   - 環境タグを検査（例：`environment.type=local|ci|sandbox`）
+   - ラップトップで実行時に`medium`を超える自律性レベルをダウングレードまたはブロック
+3. 特に機密なリポジトリに対して、オプションでより厳しいフォルダーレベルポリシーを定義
+
+ここでも、ユーザーはこれらのルールをオーバーライドできず、許可された範囲内でのみより安全な個人デフォルトを選択できます。
+
+---
+
+## 例：完全な組織管理設定
 
 ```json
 {
@@ -442,15 +442,15 @@ Again, users cannot override these rules; they can only choose safer personal de
 
 ---
 
-## Putting it all together
+## すべてをまとめる
 
-The hierarchical settings system underpins everything described in the other enterprise pages:
+階層設定システムは、他のエンタープライズページで説明されているすべての基盤となります：
 
-- [Identity & Access Management](/enterprise/identity-and-access) – who can change which level of settings.
-- [Privacy, Data Flows & Governance](/enterprise/privacy-and-data-flows) – where data and telemetry are allowed to go.
-- [Network & Deployment Configuration](/enterprise/network-and-deployment) – which environments Droid can run in and how it connects.
-- [LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls) – policies for commands, tools, and Droid Shield.
-- [Models, LLM Gateways & Integrations](/enterprise/models-llm-gateways-and-integrations) – control over models, gateways, MCP servers, droids, and commands.
-- [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring) – guarantees and telemetry used to prove compliance.
+- [Identity & Access Management](/enterprise/identity-and-access) – どのレベルの設定を誰が変更できるか
+- [Privacy, Data Flows & Governance](/enterprise/privacy-and-data-flows) – データとテレメトリーがどこに行くことが許可されるか
+- [Network & Deployment Configuration](/enterprise/network-and-deployment) – Droidがどの環境で実行でき、どのように接続するか
+- [LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls) – コマンド、ツール、Droid Shieldのポリシー
+- [Models, LLM Gateways & Integrations](/enterprise/models-llm-gateways-and-integrations) – モデル、ゲートウェイ、MCPサーバー、droid、コマンドの制御
+- [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring) – コンプライアンス証明に使用される保証とテレメトリー
 
-By expressing policy once at the right level, you can run Droid across cloud, hybrid, and airgapped environments **without per‑machine drift or one‑off configuration**.
+適切なレベルで一度ポリシーを表現することで、クラウド、ハイブリッド、エアギャップ環境全体で**マシンごとのドリフトや一回限りの設定なしに**Droidを実行できます。

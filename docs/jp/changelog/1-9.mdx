@@ -4,7 +4,7 @@ description: "Mixed models, custom subagents, and GitHub PR reviews"
 draft: false
 ---
 
-Factory 1.9 brings mixed models to let you choose the right model for each phase of work, custom subagents you can tailor to your workflow, and automated PR reviews through our new GitHub App.
+Factory 1.9では、作業の各段階に適切なモデルを選択できる混合モデル、ワークフローに合わせてカスタマイズできるカスタムサブエージェント、そして新しいGitHub Appによる自動化されたPRレビュー機能を提供します。
 
 <iframe
   className="w-full aspect-video rounded-xl"
@@ -15,44 +15,44 @@ Factory 1.9 brings mixed models to let you choose the right model for each phase
   allowFullScreen
 ></iframe>
 
-## Mixed models
+## 混合モデル
 
-Plan complex features with a more capable model, then execute efficiently with a faster one—all in the same session without restarting.
+より高性能なモデルで複雑な機能を計画し、高速なモデルで効率的に実行—すべて同じセッション内で再起動することなく実現できます。
 
-Access the `/model` command to configure your spec model separately from execution. Switch between Sonnet 4.5 for architectural planning and Haiku 4.5 for implementation, or test different combinations to optimize for cost and latency.
+`/model` コマンドにアクセスして、実行用とは別にスペックモデルを設定できます。アーキテクチャ計画にはSonnet 4.5を、実装にはHaiku 4.5を使用したり、さまざまな組み合わせをテストしてコストとレイテンシを最適化できます。
 
 <Note>Learn more about [mixed models](/cli/configuration/mixed-models).</Note>
 
-## Custom subagents
+## カスタムサブエージェント
 
-Build specialized Droids for your workflow. Configure tools, models, and behavior.
+ワークフロー専用のDroidを構築できます。ツール、モデル、動作を設定しましょう。
 
-**How it works**
+**動作の仕組み**
 
-1. Enable Custom Droids in `/settings`
-2. Launch `/droids` to open the Droids Manager
-3. Create subagents manually or let Factory generate them
-4. Configure which tools and models each subagent uses
-5. Delegate tasks to your custom Droids mid-session
+1. `/settings` でCustom Droidsを有効にする
+2. `/droids` を起動してDroids Managerを開く
+3. サブエージェントを手動で作成するか、Factoryに生成させる
+4. 各サブエージェントが使用するツールとモデルを設定する
+5. セッション中にカスタムDroidsにタスクを委任する
 
-**Use cases**
+**用途例**
 
-- Security specialists for code review and compliance checks
-- Codebase explorers for architectural analysis
-- Test generators for comprehensive test coverage
-- Documentation writers for API and feature docs
+- コードレビューとコンプライアンスチェック用のセキュリティスペシャリスト
+- アーキテクチャ分析用のコードベースエクスプローラー
+- 包括的なテストカバレッジ用のテストジェネレーター
+- APIと機能ドキュメント用のドキュメンテーションライター
 
 <Note>Explore [custom droids](/cli/configuration/custom-droids)</Note>
 
-## Factory GitHub App for PR reviews
+## PRレビュー用Factory GitHub App
 
-Automate code reviews directly in your pull requests. Factory's GitHub App provides inline feedback with full context—no manual CLI setup required.
+プルリクエスト内で直接コードレビューを自動化します。FactoryのGitHub Appは、手動でのCLI設定を必要とせず、完全なコンテキストでインラインフィードバックを提供します。
 
 [Install Factory Droid Review on GitHub Marketplace →](https://github.com/marketplace/actions/factory-droid-review)
 
-Add the app to your repository and configure your workflow with the `Factory-AI/droid-code-review@latest` action. Droids analyze PR changes and leave detailed comments on specific lines, catching issues early and maintaining code quality standards.
+リポジトリにアプリを追加し、`Factory-AI/droid-code-review@latest` アクションでワークフローを設定します。DroidsがPRの変更を分析し、特定の行に詳細なコメントを残すことで、問題を早期に発見し、コード品質基準を維持します。
 
-**Example**
+**例**
 
 ```yaml
 - name: Droid Review

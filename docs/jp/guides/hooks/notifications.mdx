@@ -4,21 +4,21 @@ description: "Get notified when Droid needs attention using desktop alerts, soun
 keywords: ['notifications', 'alerts', 'slack', 'desktop', 'sounds', 'webhook', 'hook']
 ---
 
-This cookbook shows how to set up custom notifications so you know when Droid needs your input or when important events occur during a session.
+このクックブックでは、Droidがあなたの入力を必要としている時や、セッション中に重要なイベントが発生した時に知ることができるカスタム通知の設定方法を説明します。
 
-## How it works
+## 仕組み
 
-Notification hooks can:
+通知フックは以下のことができます：
 
-1. **Trigger on multiple events**: Notification, Stop, SubagentStop, SessionEnd
-2. **Support multiple channels**: Desktop notifications, system sounds, Slack, email, webhooks
-3. **Provide context**: Include session details, task completion status, error messages
-4. **Filter intelligently**: Only notify on important events
-5. **Work cross-platform**: macOS, Linux, Windows
+1. **複数のイベントでトリガー**: 通知、停止、サブエージェント停止、セッション終了
+2. **複数のチャンネルに対応**: デスクトップ通知、システム音、Slack、メール、webhook
+3. **コンテキストを提供**: セッション詳細、タスク完了状況、エラーメッセージを含む
+4. **インテリジェントフィルタリング**: 重要なイベントのみを通知
+5. **クロスプラットフォーム対応**: macOS、Linux、Windows
 
-## Prerequisites
+## 前提条件
 
-Install notification tools for your platform:
+お使いのプラットフォーム用の通知ツールをインストール：
 
 <CodeGroup>
 
@@ -42,15 +42,15 @@ Install-Module -Name BurntToast -Scope CurrentUser
 
 </CodeGroup>
 
-For Slack notifications, create a webhook at [api.slack.com/messaging/webhooks](https://api.slack.com/messaging/webhooks).
+Slack通知については、[api.slack.com/messaging/webhooks](https://api.slack.com/messaging/webhooks)でwebhookを作成してください。
 
-## Basic notifications
+## 基本的な通知
 
-### Desktop notification when Droid waits
+### Droidが待機している時のデスクトップ通知
 
-Get notified when Droid is waiting for your input.
+Droidがあなたの入力を待っている時に通知を受け取ります。
 
-Create `.factory/hooks/notify-wait.sh`:
+`.factory/hooks/notify-wait.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -83,7 +83,7 @@ exit 0
 chmod +x .factory/hooks/notify-wait.sh
 ```
 
-Add to `~/.factory/settings.json` (user-wide):
+`~/.factory/settings.json`に追加（ユーザー全体）：
 
 ```json
 {
@@ -103,11 +103,11 @@ Add to `~/.factory/settings.json` (user-wide):
 }
 ```
 
-### Sound alert when task completes
+### タスク完了時の音声アラート
 
-Play a sound when Droid finishes.
+Droidが終了した時に音を再生します。
 
-Create `.factory/hooks/completion-sound.sh`:
+`.factory/hooks/completion-sound.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -137,7 +137,7 @@ exit 0
 chmod +x .factory/hooks/completion-sound.sh
 ```
 
-Add to `~/.factory/settings.json`:
+`~/.factory/settings.json`に追加：
 
 ```json
 {
@@ -157,13 +157,13 @@ Add to `~/.factory/settings.json`:
 }
 ```
 
-## Advanced notifications
+## 高度な通知
 
-### Slack integration
+### Slack連携
 
-Send Slack messages when Droid completes tasks.
+Droidがタスクを完了した時にSlackメッセージを送信します。
 
-Create `.factory/hooks/slack-notify.sh`:
+`.factory/hooks/slack-notify.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -237,14 +237,14 @@ exit 0
 chmod +x .factory/hooks/slack-notify.sh
 ```
 
-Set your webhook URL:
+webhook URLを設定：
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 ```
 
-Add to `~/.factory/settings.json`:
+`~/.factory/settings.json`に追加：
 
 ```json
 {
@@ -275,11 +275,11 @@ Add to `~/.factory/settings.json`:
 }
 ```
 
-### Email notifications
+### メール通知
 
-Send email alerts for important events.
+重要なイベントのメールアラートを送信します。
 
-Create `.factory/hooks/email-notify.sh`:
+`.factory/hooks/email-notify.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -332,7 +332,7 @@ exit 0
 chmod +x .factory/hooks/email-notify.sh
 ```
 
-Configure environment:
+環境を設定：
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
@@ -340,11 +340,11 @@ export DROID_NOTIFY_EMAIL="your-email@example.com"
 ```
 
 
-### Rich desktop notifications with actions
+### アクション付きリッチデスクトップ通知
 
-macOS notifications with action buttons.
+アクションボタン付きのmacOS通知。
 
-Create `.factory/hooks/rich-notify-macos.sh`:
+`.factory/hooks/rich-notify-macos.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -402,13 +402,13 @@ chmod +x .factory/hooks/rich-notify-macos.sh
 ```
 
 
-### Webhook integration
+### Webhook連携
 
-Send notifications to custom webhooks:
+カスタムwebhookに通知を送信：
 
 
 
-Create `.factory/hooks/webhook-notify.sh`:
+`.factory/hooks/webhook-notify.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -439,15 +439,15 @@ export DROID_WEBHOOK_URL="https://your-webhook-url.com/droid-events"
 ```
 
 
-## Real-world examples
+## 実際の使用例
 
-### Example 1: Focus mode notifications
+### 例1: フォーカスモード通知
 
-Only notify when you're away from your desk:
+デスクから離れている時のみ通知：
 
 
 
-Create `.factory/hooks/smart-notify.sh`:
+`.factory/hooks/smart-notify.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -472,13 +472,13 @@ exit 0
 ```
 
 
-### Example 2: Team notification dashboard
+### 例2: チーム通知ダッシュボード
 
-Log all events to a shared dashboard:
+すべてのイベントを共有ダッシュボードに記録：
 
 
 
-Create `.factory/hooks/team-logger.sh`:
+`.factory/hooks/team-logger.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -515,7 +515,7 @@ exit 0
 ```
 
 
-## Best practices
+## ベストプラクティス
 
 <Steps>
   <Step title="Keep notification scripts fast">
@@ -561,13 +561,13 @@ exit 0
   </Step>
 </Steps>
 
-## Troubleshooting
+## トラブルシューティング
 
 
   
-    **Problem**: No notifications show up
+    **問題**: 通知が表示されない
     
-    **Solution**: Check notification permissions:
+    **解決策**: 通知の権限を確認：
     ```bash
     # macOS - check System Settings > Notifications
     # Linux - verify notify-send works
@@ -579,9 +579,9 @@ exit 0
   
   
   
-    **Problem**: Slack messages not sending
+    **問題**: Slackメッセージが送信されない
     
-    **Solution**: Test webhook directly:
+    **解決策**: webhookを直接テスト：
     ```bash
     curl -X POST "$SLACK_WEBHOOK_URL" \
       -H 'Content-Type: application/json' \
@@ -590,9 +590,9 @@ exit 0
   
   
   
-    **Problem**: Getting spammed with alerts
+    **問題**: アラートスパムを受け取る
     
-    **Solution**: Add rate limiting:
+    **解決策**: レート制限を追加：
     ```bash
     # Only notify once every 5 minutes
     LAST_NOTIFY_FILE="/tmp/droid-last-notify"
@@ -611,9 +611,9 @@ exit 0
   
   
   
-    **Problem**: No audio alert
+    **問題**: 音声アラートが鳴らない
     
-    **Solution**: Check audio system:
+    **解決策**: 音声システムを確認：
     ```bash
     # macOS - list available sounds
     ls /System/Library/Sounds/
@@ -627,9 +627,9 @@ exit 0
   
 
 
-## See also
+## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - Complete hooks API documentation  
-- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
-- [Session automation](/guides/hooks/session-automation) - Automate session setup
-- [Logging and analytics](/guides/hooks/logging-analytics) - Track Droid usage
+- [Hooks reference](/reference/hooks-reference) - 完全なhooks API文書  
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なhooksの紹介
+- [Session automation](/guides/hooks/session-automation) - セッション設定の自動化
+- [Logging and analytics](/guides/hooks/logging-analytics) - Droid使用状況の追跡

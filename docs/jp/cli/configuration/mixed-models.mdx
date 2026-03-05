@@ -4,17 +4,17 @@ description: Use a different AI model for Specification Mode planning than your 
 keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple models', 'planning model', 'default model']
 ---
 
-## What are mixed models?
+## 混合モデルとは？
 
-Mixed models allow you to use a different AI model specifically for Specification Mode planning while keeping a separate default model for regular coding sessions. This gives you the flexibility to optimize both planning and implementation phases independently.
+混合モデルを使用すると、通常のコーディングセッション用のデフォルトモデルとは別に、Specification Mode専用の異なるAIモデルを使用できます。これにより、プランニング段階と実装段階を独立して最適化する柔軟性が得られます。
 
-For example, you might want to use a more powerful model for comprehensive specification planning, while using a faster model for day-to-day implementation work.
+例えば、包括的な仕様プランニングにはより強力なモデルを使用し、日常的な実装作業にはより高速なモデルを使用することができます。
 
 ---
 
-## Why use mixed models?
+## なぜ混合モデルを使用するのか？
 
-Different models excel at different tasks. Separating your spec mode model from your default model lets you:
+異なるモデルは異なるタスクで優れた性能を発揮します。spec modeモデルをデフォルトモデルから分離することで、以下が可能になります：
 
 <CardGroup cols={2}>
   <Card title="Optimize for Planning" icon="brain">
@@ -33,30 +33,30 @@ Different models excel at different tasks. Separating your spec mode model from 
 
 ---
 
-## How to configure mixed models
+## 混合モデルの設定方法
 
-### Accessing the Configuration
+### 設定へのアクセス
 
-1. Run `droid` to start the CLI
-2. Enter `/model` to open the model selector
-3. Navigate to **"Configure Spec Mode Model"** (first option in the list)
-4. Press **Enter** to begin configuration
+1. `droid`を実行してCLIを開始します
+2. `/model`を入力してモデルセレクターを開きます
+3. **「Configure Spec Mode Model」**（リストの最初のオプション）に移動します
+4. **Enter**キーを押して設定を開始します
 
-### Configuration Options
+### 設定オプション
 
-When you open the configurator, you'll see three options:
+設定ツールを開くと、3つのオプションが表示されます：
 
-- **Yes, configure spec mode model** - Select a different model for Specification Mode
-- **No, keep using [current configuration/main model]** - Exit without making changes
-- **Clear spec mode model (use main model)** - Remove the spec mode model and use your default model for everything *(only shown if you already have a spec mode model configured)*
+- **Yes, configure spec mode model** - Specification Mode用に異なるモデルを選択
+- **No, keep using [current configuration/main model]** - 変更せずに終了
+- **Clear spec mode model (use main model)** - spec modeモデルを削除してデフォルトモデルをすべてに使用 *（spec modeモデルが既に設定されている場合のみ表示）*
 
-### Selecting a Model
+### モデルの選択
 
-1. Choose **"Yes, configure spec mode model"**
-2. Browse the list of available models
-3. Select your preferred model for Specification Mode
-4. If the model supports reasoning, choose your reasoning effort level
-5. The configuration is saved automatically
+1. **「Yes, configure spec mode model」**を選択します
+2. 利用可能なモデルのリストを参照します
+3. Specification Mode用の希望するモデルを選択します
+4. モデルが推論をサポートしている場合は、推論努力レベルを選択します
+5. 設定は自動的に保存されます
 
 <Note>
   Only compatible models will be available in the selector based on your current default model. See [Model Compatibility](#model-compatibility) below.
@@ -64,11 +64,11 @@ When you open the configurator, you'll see three options:
 
 ---
 
-## Model Compatibility
+## モデルの互換性
 
-Not all model combinations work together due to how different AI providers handle reasoning traces and context. Here are the compatibility rules:
+異なるAIプロバイダーが推論トレースとコンテキストを処理する方法により、すべてのモデルの組み合わせが一緒に動作するわけではありません。互換性ルールは以下の通りです：
 
-### Compatibility Rules
+### 互換性ルール
 
 <AccordionGroup>
   <Accordion title="OpenAI Models">
@@ -105,16 +105,16 @@ Not all model combinations work together due to how different AI providers handl
 
 ---
 
-## Reasoning Effort Configuration
+## 推論努力の設定
 
-If you select an Anthropic model that supports reasoning (like Sonnet 4.5), you'll be prompted to choose a reasoning effort level:
+推論をサポートするAnthropic モデル（Sonnet 4.5など）を選択した場合、推論努力レベルを選択するよう求められます：
 
-- **Off** - No extended thinking, faster responses
-- **Low** - Brief consideration, balanced speed and depth
-- **Medium** - Moderate thinking time for complex decisions
-- **High** - Deep analysis for critical architectural choices
+- **Off** - 拡張思考なし、より高速な応答
+- **Low** - 簡潔な考慮、スピードと深度のバランス
+- **Medium** - 複雑な決定のための適度な思考時間
+- **High** - 重要なアーキテクチャ選択のための深い分析
 
-The reasoning effort for your spec mode model is independent of your default model's reasoning setting, giving you complete control over each phase.
+spec modeモデルの推論努力は、デフォルトモデルの推論設定とは独立しており、各段階を完全に制御できます。
 
 <Tip>
   For specification planning, **Medium** or **High** reasoning effort often produces better results since thorough analysis during planning prevents issues during implementation.
@@ -122,37 +122,37 @@ The reasoning effort for your spec mode model is independent of your default mod
 
 ---
 
-## Common Configurations
+## 一般的な設定
 
-Here are some effective model combinations for different scenarios:
+さまざまなシナリオに対する効果的なモデルの組み合わせを以下に示します：
 
-### Anthropic Models
+### Anthrop モデル
 
-**Best for:** Most development workflows, flexible reasoning control
+**最適な用途：** ほとんどの開発ワークフロー、柔軟な推論制御
 
-- **Default model:** Haiku 4.5 or Sonnet 4.5 (select reasoning of your choice if supported)
-- **Spec mode model:** Opus 4.6 (reasoning: high) or Sonnet 4.5 (reasoning: high)
-- **Benefits:** Fast implementation with deep planning analysis. Opus 4.6 offers **Max** reasoning for the most thorough planning.
+- **デフォルトモデル：** Haiku 4.5またはSonnet 4.5（サポートされている場合は任意の推論を選択）
+- **Spec modeモデル：** Opus 4.6（推論：高）またはSonnet 4.5（推論：高）
+- **利点：** 深いプランニング分析による高速実装。Opus 4.6は最も徹底的なプランニングのために**Max**推論を提供
 
-### OpenAI Models
+### OpenAI モデル
 
-**Best for:** Teams using OpenAI models exclusively, cost-conscious projects
+**最適な用途：** OpenAIモデルのみを使用するチーム、コストを重視するプロジェクト
 
-- **Default model:** GPT-5-Codex
-- **Spec mode model:** GPT-5 (high reasoning)
-- **Benefits:** Consistent reasoning format, specialized coding model for specs
+- **デフォルトモデル：** GPT-5-Codex
+- **Spec modeモデル：** GPT-5（高推論）
+- **利点：** 一貫した推論形式、仕様用の専用コーディングモデル
 
 ---
 
-## How It Works
+## 動作原理
 
-Once configured, Droid automatically uses your spec mode model whenever you enter Specification Mode:
+設定が完了すると、Droid はSpecification Modeに入るたびに自動的にspec modeモデルを使用します：
 
-1. **Activate Specification Mode** with **Shift+Tab**
-2. **Provide your feature description**
-3. **Droid uses your spec mode model** to analyze, plan, and generate the specification
-4. **Review and approve** the generated spec
-5. **Implementation uses your default model** to write the actual code
+1. **Shift+Tab**で**Specification Modeを有効化**
+2. **機能の説明を提供**
+3. **Droidがspec modeモデルを使用**して分析、プランニング、仕様生成を実行
+4. 生成された仕様を**確認・承認**
+5. **実装ではデフォルトモデルを使用**して実際のコードを記述
 
 <Note>
   Your default model is always used for regular coding sessions and implementation work. The spec mode model is only active during the planning phase of Specification Mode.
@@ -160,31 +160,31 @@ Once configured, Droid automatically uses your spec mode model whenever you ente
 
 ---
 
-## Checking Your Configuration
+## 設定の確認
 
-To see which models you're currently using:
+現在使用中のモデルを確認するには：
 
-1. Enter `/model` in the CLI
-2. Your current default model is highlighted
-3. If you have a spec mode model configured, it's displayed at the top of the selector
-
----
-
-## Clearing your mixed models configuration
-
-If you want to go back to using a single model for everything:
-
-1. Enter `/model` in the CLI
-2. Navigate to **"Configure Spec Mode Model"**
-3. Press **Enter**
-4. Select **"Clear spec mode model (use main model)"**
-5. Confirm by pressing **Enter**
-
-Your default model will now be used for both regular coding and Specification Mode.
+1. CLI で `/model` を入力
+2. 現在のデフォルトモデルがハイライト表示されます
+3. spec modeモデルが設定されている場合、セレクターの上部に表示されます
 
 ---
 
-## Best Practices
+## 混合モデル設定のクリア
+
+すべてに単一のモデルを使用する設定に戻したい場合：
+
+1. CLI で `/model` を入力
+2. **「Configure Spec Mode Model」**に移動
+3. **Enter**キーを押す
+4. **「Clear spec mode model (use main model)」**を選択
+5. **Enter**キーを押して確認
+
+デフォルトモデルが通常のコーディングとSpecification Modeの両方で使用されるようになります。
+
+---
+
+## ベストプラクティス
 
 <AccordionGroup>
   <Accordion title="Start with the same model">
@@ -210,7 +210,7 @@ Your default model will now be used for both regular coding and Specification Mo
 
 ---
 
-## Troubleshooting
+## トラブルシューティング
 
 <AccordionGroup>
   <Accordion title="Can't select the model I want">
@@ -234,7 +234,7 @@ Your default model will now be used for both regular coding and Specification Mo
 
 ---
 
-## Related Resources
+## 関連リソース
 
 <CardGroup cols={2}>
   <Card title="Specification Mode" icon="file-contract" href="/cli/user-guides/specification-mode">
@@ -252,5 +252,3 @@ Your default model will now be used for both regular coding and Specification Mo
 </CardGroup>
 
 ---
-
-

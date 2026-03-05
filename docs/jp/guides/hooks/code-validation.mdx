@@ -4,21 +4,21 @@ description: "Enforce code standards, security policies, and best practices auto
 keywords: ['validation', 'security', 'standards', 'lint', 'code quality', 'policies', 'hook']
 ---
 
-This cookbook shows how to use hooks to validate code changes, enforce security policies, and maintain code quality standards before Droid makes changes.
+このクックブックでは、Droidが変更を行う前に、フックを使用してコードの変更を検証し、セキュリティポリシーを強制し、コード品質基準を維持する方法を説明します。
 
-## How it works
+## 仕組み
 
-Validation hooks can:
+検証フックでは以下のことができます：
 
-1. **Block unsafe operations**: Prevent edits to sensitive files or directories
-2. **Enforce standards**: Check code against style guides and best practices
-3. **Validate security**: Scan for secrets, vulnerabilities, and security issues
-4. **Provide feedback**: Give Droid specific guidance on what to fix
-5. **Run checks**: Execute linters, type checkers, and custom validators
+1. **安全でない操作をブロック**: 機密ファイルやディレクトリの編集を防止
+2. **基準を強制**: スタイルガイドとベストプラクティスに対してコードをチェック
+3. **セキュリティを検証**: シークレット、脆弱性、セキュリティ問題をスキャン
+4. **フィードバックを提供**: 修正すべき内容についてDroidに具体的なガイダンスを提供
+5. **チェックを実行**: リンター、型チェッカー、カスタムバリデーターを実行
 
-## Prerequisites
+## 前提条件
 
-Install validation tools for your stack:
+お使いのスタック用の検証ツールをインストールしてください：
 
 <CodeGroup>
 
@@ -45,13 +45,13 @@ brew install gitleaks  # macOS
 
 </CodeGroup>
 
-## Basic validation
+## 基本的な検証
 
-### Block sensitive file edits
+### 機密ファイル編集のブロック
 
-Prevent Droid from modifying critical files.
+Droidが重要なファイルを変更することを防止します。
 
-Create `.factory/hooks/protect-files.sh`:
+`.factory/hooks/protect-files.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -98,7 +98,7 @@ exit 0
 chmod +x .factory/hooks/protect-files.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加：
 
 ```json
 {
@@ -119,11 +119,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Validate TypeScript syntax
+### TypeScript構文の検証
 
-Check TypeScript files for type errors before accepting edits.
+編集を受け入れる前にTypeScriptファイルの型エラーをチェックします。
 
-Create `.factory/hooks/validate-typescript.sh`:
+`.factory/hooks/validate-typescript.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -168,7 +168,7 @@ exit 0
 chmod +x .factory/hooks/validate-typescript.sh
 ```
 
-For PostToolUse validation:
+PostToolUse検証の場合：
 
 ```json
 {
@@ -189,13 +189,13 @@ For PostToolUse validation:
 }
 ```
 
-## Security validation
+## セキュリティ検証
 
-### Secret detection
+### シークレット検出
 
-Prevent committing secrets and credentials.
+シークレットや認証情報のコミットを防止します。
 
-Create `.factory/hooks/scan-secrets.sh`:
+`.factory/hooks/scan-secrets.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -267,7 +267,7 @@ exit 0
 chmod +x .factory/hooks/scan-secrets.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加：
 
 ```json
 {
@@ -288,11 +288,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Dependency security scanning
+### 依存関係セキュリティスキャン
 
-Check for vulnerable dependencies.
+脆弱な依存関係をチェックします。
 
-Create `.factory/hooks/check-deps.sh`:
+`.factory/hooks/check-deps.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -346,7 +346,7 @@ exit 0
 chmod +x .factory/hooks/check-deps.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加：
 
 ```json
 {
@@ -367,13 +367,13 @@ Add to `.factory/settings.json`:
 }
 ```
 
-## Code quality validation
+## コード品質検証
 
-### Enforce linting rules
+### リンティングルールの強制
 
-Validate code against linting rules before accepting changes.
+変更を受け入れる前にリンティングルールに対してコードを検証します。
 
-Create `.factory/hooks/lint-check.sh`:
+`.factory/hooks/lint-check.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -438,7 +438,7 @@ exit 0
 chmod +x .factory/hooks/lint-check.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加：
 
 ```json
 {
@@ -459,11 +459,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Complexity checks
+### 複雑度チェック
 
-Reject overly complex code.
+過度に複雑なコードを拒否します。
 
-Create `.factory/hooks/check-complexity.py`:
+`.factory/hooks/check-complexity.py`を作成：
 
 ```python
 #!/usr/bin/env python3
@@ -547,7 +547,7 @@ chmod +x .factory/hooks/check-complexity.py
 pip install radon  # For Python complexity checking
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加：
 
 ```json
 {
@@ -568,13 +568,13 @@ Add to `.factory/settings.json`:
 }
 ```
 
-## Advanced validation
+## 高度な検証
 
-### Custom business logic validation
+### カスタムビジネスロジック検証
 
-Enforce domain-specific rules.
+ドメイン固有のルールを強制します。
 
-Create `.factory/hooks/validate-business-logic.sh`:
+`.factory/hooks/validate-business-logic.sh`を作成：
 
 ```bash
 #!/bin/bash
@@ -619,7 +619,7 @@ exit 0
 chmod +x .factory/hooks/validate-business-logic.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加：
 
 ```json
 {
@@ -640,11 +640,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Architecture compliance
+### アーキテクチャ準拠
 
-Ensure code follows architecture patterns.
+コードがアーキテクチャパターンに従うことを確保します。
 
-Create `.factory/hooks/check-architecture.py`:
+`.factory/hooks/check-architecture.py`を作成：
 
 ```python
 #!/usr/bin/env python3
@@ -717,7 +717,7 @@ except Exception as e:
 chmod +x .factory/hooks/check-architecture.py
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加：
 
 ```json
 {
@@ -738,7 +738,7 @@ Add to `.factory/settings.json`:
 }
 ```
 
-## Best practices
+## ベストプラクティス
 
 <Steps>
   <Step title="Provide clear feedback">
@@ -794,13 +794,13 @@ Add to `.factory/settings.json`:
   </Step>
 </Steps>
 
-## Troubleshooting
+## トラブルシューティング
 
-### False positives
+### 偽陽性
 
-**Problem**: Validation blocks legitimate code
+**問題**: 検証が正当なコードをブロックする
 
-**Solution**: Add exclusion patterns:
+**解決策**: 除外パターンを追加：
 ```bash
 # Skip test files
 if echo "$file_path" | grep -qE '\.(test|spec)\.(ts|js)$'; then
@@ -813,11 +813,11 @@ if echo "$file_path" | grep -qE '(generated|\.gen\.)'; then
 fi
 ```
 
-### Validation too slow
+### 検証が遅すぎる
 
-**Problem**: Hooks take too long to run
+**問題**: フックの実行に時間がかかりすぎる
 
-**Solution**: Optimize validation:
+**解決策**: 検証を最適化：
 ```bash
 # Cache validation results
 CACHE_FILE="/tmp/droid-validation-$(md5sum "$file_path" | cut -d' ' -f1)"
@@ -831,11 +831,11 @@ fi
 touch "$CACHE_FILE"
 ```
 
-### Inconsistent with CI
+### CIとの不整合
 
-**Problem**: Hook passes but CI fails
+**問題**: フックは通るがCIが失敗する
 
-**Solution**: Use same tools and configs:
+**解決策**: 同じツールと設定を使用：
 ```bash
 # Use exact same commands as CI
 # .github/workflows/ci.yml:
@@ -845,9 +845,9 @@ touch "$CACHE_FILE"
 npm run lint "$file_path"
 ```
 
-## See also
+## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - Complete hooks API documentation
-- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
-- [Auto-formatting](/guides/hooks/auto-formatting) - Automatic code formatting
-- [Git workflow hooks](/guides/hooks/git-workflows) - Git integration
+- [Hooks reference](/reference/hooks-reference) - 完全なフックAPIドキュメント
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Auto-formatting](/guides/hooks/auto-formatting) - 自動コードフォーマット
+- [Git workflow hooks](/guides/hooks/git-workflows) - Git統合

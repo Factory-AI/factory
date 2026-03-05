@@ -4,30 +4,22 @@ description: "Learn how to customize and extend Droid's behavior by registering 
 keywords: ['hooks', 'lifecycle', 'automation', 'shell commands', 'events', 'triggers', 'customize', 'extend']
 ---
 
-Droid hooks are user-defined shell commands that execute at various points
-in Droid's lifecycle. Hooks provide deterministic control over Droid's behavior, ensuring certain actions always happen rather than relying on
-Droid to choose to run them.
+Droidフックは、Droidのライフサイクルの様々な段階で実行されるユーザー定義のシェルコマンドです。フックは、Droidの動作を決定論的に制御し、Droidが選択的に実行するのではなく、特定のアクションが常に実行されることを保証します。
 
 <Tip>
   For reference documentation on hooks, see [Hooks reference](/reference/hooks-reference).
   Explore the [hook cookbooks](/guides/hooks/auto-formatting).
 </Tip>
 
-Example use cases for hooks include:
+フックの使用例には以下があります：
 
-* **Notifications**: Customize how you get notified when Droid is awaiting
-  your input or permission to run something.
-* **Automatic formatting**: Run `prettier` on .ts files, `gofmt` on .go files,
-  etc. after every file edit.
-* **Logging**: Track and count all executed commands for compliance or
-  debugging.
-* **Feedback**: Provide automated feedback when Droid produces code that
-  does not follow your codebase conventions.
-* **Custom permissions**: Block modifications to production files or sensitive
-  directories.
+* **通知**: Droidがユーザーの入力や実行許可を待機している際の通知方法をカスタマイズします。
+* **自動フォーマット**: ファイル編集後に.tsファイルに対して`prettier`を、.goファイルに対して`gofmt`を実行します。
+* **ログ記録**: コンプライアンスやデバッグのために、実行されたすべてのコマンドを追跡・カウントします。
+* **フィードバック**: Droidがコードベースの規約に従わないコードを生成した際に、自動フィードバックを提供します。
+* **カスタム権限**: 本番ファイルや機密ディレクトリへの変更をブロックします。
 
-By encoding these rules as hooks rather than prompting instructions, you turn
-suggestions into app-level code that executes every time it is expected to run.
+これらのルールをプロンプト指示ではなくフックとしてエンコードすることで、提案を実行される度に毎回動作するアプリレベルのコードに変換できます。
 
 <Warning>
   You must consider the security implication of hooks as you add them, because hooks run automatically during Droid's execution with your current environment's credentials.
@@ -43,67 +35,61 @@ suggestions into app-level code that executes every time it is expected to run.
   or full paths for global scripts (e.g., `/usr/local/bin/my-hook.sh` or `~/.factory/hooks/script.sh`).
 </Note>
 
-## Hook Events Overview
+## フックイベント概要
 
-Droid provides several hook events that run at different points in the
-workflow:
+Droidは、ワークフローの異なる段階で実行される複数のフックイベントを提供します：
 
-* **PreToolUse**: Runs before tool calls (can block them)
-* **PostToolUse**: Runs after tool calls complete
-* **UserPromptSubmit**: Runs when the user submits a prompt, before Droid processes it
-* **Notification**: Runs when Droid sends notifications
-* **Stop**: Runs when Droid finishes responding
-* **SubagentStop**: Runs when sub-droid tasks complete
-* **PreCompact**: Runs before Droid is about to run a compact operation
-* **SessionStart**: Runs when Droid starts a new session or resumes an existing session
-* **SessionEnd**: Runs when Droid session ends
+* **PreToolUse**: ツール呼び出し前に実行（ブロック可能）
+* **PostToolUse**: ツール呼び出し完了後に実行
+* **UserPromptSubmit**: ユーザーがプロンプトを送信し、Droidが処理する前に実行
+* **Notification**: Droid が通知を送信する際に実行
+* **Stop**: Droidが応答を終了する際に実行
+* **SubagentStop**: サブDroidタスクが完了する際に実行
+* **PreCompact**: Droidがコンパクト操作を実行しようとする前に実行
+* **SessionStart**: Droidが新しいセッションを開始するか、既存のセッションを再開する際に実行
+* **SessionEnd**: Droidセッションが終了する際に実行
 
-Each event receives different data and can control Droid's behavior in
-different ways.
+各イベントは異なるデータを受信し、Droidの動作を異なる方法で制御できます。
 
-## Quickstart
+## クイックスタート
 
-In this quickstart, you'll add a hook that logs the shell commands that Droid runs.
+このクイックスタートでは、Droidが実行するシェルコマンドをログ記録するフックを追加します。
 
-### Prerequisites
+### 前提条件
 
-Install `jq` for JSON processing in the command line.
+コマンドラインでのJSON処理のために`jq`をインストールしてください。
 
-### Step 1: Open hooks configuration
+### ステップ1: フック設定を開く
 
-Run the `/hooks` [slash command](/cli/configuration/custom-slash-commands) and select
-the `PreToolUse` hook event.
+`/hooks` [slash command](/cli/configuration/custom-slash-commands)を実行し、`PreToolUse`フックイベントを選択します。
 
-`PreToolUse` hooks run before tool calls and can block them while providing
-Droid feedback on what to do differently.
+`PreToolUse`フックはツール呼び出し前に実行され、異なる対応についてDroidにフィードバックを提供しながらツール呼び出しをブロックできます。
 
-### Step 2: Add a matcher
+### ステップ2: マッチャーを追加
 
-Select `+ Add new matcher…` to run your hook only on Execute tool calls.
+`+ Add new matcher…`を選択して、Executeツール呼び出しのみでフックを実行します。
 
-Type `Execute` for the matcher.
+マッチャーに`Execute`と入力します。
 
 <Note>You can use `*` to match all tools.</Note>
 
-### Step 3: Add the hook
+### ステップ3: フックを追加
 
-Select `+ Add new hook…` and enter this command:
+`+ Add new hook…`を選択し、以下のコマンドを入力します：
 
 ```bash
 jq -r '.tool_input.command' >> ~/.factory/bash-command-log.txt
 ```
 
-### Step 4: Save your configuration
+### ステップ4: 設定を保存
 
-For storage location, select `User settings` since you're logging to your home
-directory. This hook will then apply to all projects, not just your current
-project.
+ストレージの場所については、ホームディレクトリにログ記録しているため`User settings`を選択します。これにより、フックは現在のプロジェクトだけでなく、すべてのプロジェクトに適用されます。
 
-Then press Esc until you return to the REPL. Your hook is now registered!
+その後、REPLに戻るまでEscを押します。フックが登録されました！
 
-### Step 5: Verify your hook
+### ステップ5: フックを確認
 
-Run `/hooks` again or check `~/.factory/settings.json` to see your configuration:
+再度`/hooks`を実行するか、`~/.factory/settings.json`をチェックして設定を確認します：
 
 ```json
 {
@@ -123,29 +109,29 @@ Run `/hooks` again or check `~/.factory/settings.json` to see your configuration
 }
 ```
 
-### Step 6: Test your hook
+### ステップ6: フックをテスト
 
-Ask Droid to run a simple command like `ls` and check your log file:
+Droidに`ls`のような簡単なコマンドを実行するよう依頼し、ログファイルを確認します：
 
 ```bash
 cat ~/.factory/bash-command-log.txt
 ```
 
-You should see entries like:
+以下のようなエントリが表示されるはずです：
 
 ```
 ls
 ```
 
-## More Examples
+## その他の例
 
 <Note>
   For a complete example implementation, see the [bash command validator example](https://github.com/Factory-AI/factory/tree/main/examples/hooks) in our public codebase.
 </Note>
 
-### Code Formatting Hook
+### コードフォーマットフック
 
-Automatically format TypeScript files after editing:
+編集後にTypeScriptファイルを自動フォーマット：
 
 ```json
 {
@@ -165,9 +151,9 @@ Automatically format TypeScript files after editing:
 }
 ```
 
-### Markdown Formatting Hook
+### Markdownフォーマットフック
 
-Automatically fix missing language tags and formatting issues in markdown files:
+markdownファイルの言語タグの欠落やフォーマットの問題を自動修正：
 
 ```json
 {
@@ -187,7 +173,7 @@ Automatically fix missing language tags and formatting issues in markdown files:
 }
 ```
 
-Create `.factory/hooks/markdown_formatter.py` with this content:
+以下の内容で`.factory/hooks/markdown_formatter.py`を作成：
 
 ```python
 #!/usr/bin/env python3
@@ -332,8 +318,8 @@ Block edits to sensitive files:
 }
 ```
 
-## Learn more
+## 詳細情報
 
-* For reference documentation on hooks, see [Hooks reference](/reference/hooks-reference).
-* For comprehensive security best practices and safety guidelines, see [Security Considerations](/reference/hooks-reference#security-considerations) in the hooks reference documentation.
-* For troubleshooting steps and debugging techniques, see [Debugging](/reference/hooks-reference#debugging) in the hooks reference documentation.
+* フックのリファレンスドキュメントについては、[Hooks reference](/reference/hooks-reference)を参照してください。
+* 包括的なセキュリティのベストプラクティスと安全ガイドラインについては、フックリファレンスドキュメントの[Security Considerations](/reference/hooks-reference#security-considerations)を参照してください。
+* トラブルシューティング手順とデバッグテクニックについては、フックリファレンスドキュメントの[Debugging](/reference/hooks-reference#debugging)を参照してください。

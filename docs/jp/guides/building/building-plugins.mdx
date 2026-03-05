@@ -4,9 +4,9 @@ description: Create shareable plugins with skills, commands, and tools for Droid
 keywords: ['plugins', 'building', 'development', 'skills', 'commands', 'marketplace', 'distribution']
 ---
 
-This guide walks you through creating plugins for Droid. Plugins bundle skills, commands, and tools into shareable packages that work across projects and teams.
+このガイドでは、Droidのプラグイン作成方法を説明します。プラグインは、スキル、コマンド、ツールを共有可能なパッケージにまとめ、プロジェクトやチーム間で利用できるものです。
 
-## Quick start
+## クイックスタート
 
 <Steps>
   <Step title="Create the plugin directory">
@@ -44,9 +44,9 @@ This guide walks you through creating plugins for Droid. Plugins bundle skills, 
   </Step>
 </Steps>
 
-## Plugin manifest
+## プラグインマニフェスト
 
-The manifest file at `.factory-plugin/plugin.json` defines your plugin's metadata:
+`.factory-plugin/plugin.json`にあるマニフェストファイルは、プラグインのメタデータを定義します：
 
 ```json
 {
@@ -63,26 +63,26 @@ The manifest file at `.factory-plugin/plugin.json` defines your plugin's metadat
 }
 ```
 
-### Required fields
+### 必須フィールド
 
-| Field | Description |
+| フィールド | 説明 |
 |-------|-------------|
-| `name` | Unique identifier. Lowercase letters, digits, hyphens. |
-| `description` | Short description shown in plugin manager. |
-| `version` | Semantic version (e.g., `1.0.0`). |
+| `name` | 一意の識別子。小文字、数字、ハイフンを使用。 |
+| `description` | プラグインマネージャーに表示される短い説明。 |
+| `version` | セマンティックバージョン（例：`1.0.0`）。 |
 
-### Optional fields
+### オプションフィールド
 
-| Field | Description |
+| フィールド | 説明 |
 |-------|-------------|
-| `author` | Object with `name` and optional `email`. |
-| `homepage` | URL for plugin documentation. |
-| `repository` | Git repository URL. |
-| `license` | License identifier (e.g., `MIT`, `Apache-2.0`). |
+| `author` | `name`と任意の`email`を含むオブジェクト。 |
+| `homepage` | プラグインドキュメントのURL。 |
+| `repository` | GitリポジトリのURL。 |
+| `license` | ライセンス識別子（例：`MIT`、`Apache-2.0`）。 |
 
-## Adding skills
+## スキルの追加
 
-Skills are model-invoked capabilities. Create them in the `skills/` directory:
+スキルはモデルによって呼び出される機能です。`skills/`ディレクトリに作成してください：
 
 ```
 my-plugin/
@@ -91,7 +91,7 @@ my-plugin/
         └── SKILL.md
 ```
 
-### Skill format
+### スキル形式
 
 ```markdown
 ---
@@ -108,18 +108,18 @@ When reviewing code, check for:
 Provide specific, actionable feedback with line references.
 ```
 
-### Skill frontmatter
+### スキルのフロントマター
 
-| Field | Required | Description |
+| フィールド | 必須 | 説明 |
 |-------|----------|-------------|
-| `name` | Yes | Unique identifier for the skill |
-| `description` | Yes | When to use this skill (helps model decide when to invoke) |
-| `disable-model-invocation` | No | Set `true` to make it user-only |
-| `allowed-tools` | No | Restrict which tools the skill can use |
+| `name` | はい | スキルの一意識別子 |
+| `description` | はい | このスキルをいつ使用するか（モデルがいつ呼び出すかを判断するのに役立つ） |
+| `disable-model-invocation` | いいえ | ユーザー専用にするには`true`を設定 |
+| `allowed-tools` | いいえ | スキルが使用できるツールを制限 |
 
-## Adding commands
+## コマンドの追加
 
-Commands are user-invoked via slash syntax. Create them in the `commands/` directory:
+コマンドはスラッシュ記法でユーザーによって呼び出されます。`commands/`ディレクトリに作成してください：
 
 ```
 my-plugin/
@@ -127,7 +127,7 @@ my-plugin/
     └── review-pr.md
 ```
 
-### Command format
+### コマンド形式
 
 ```markdown
 ---
@@ -148,11 +148,11 @@ If the user provides arguments: $ARGUMENTS
 Use them to focus on specific areas of the review.
 ```
 
-A command at `commands/review-pr.md` becomes `/review-pr`.
+`commands/review-pr.md`にあるコマンドは`/review-pr`になります。
 
-### Command arguments
+### コマンド引数
 
-Use `$ARGUMENTS` to capture user input:
+ユーザー入力を取得するには`$ARGUMENTS`を使用します：
 
 ```markdown
 ---
@@ -162,11 +162,11 @@ description: Greet a user by name
 Greet the user named "$ARGUMENTS" warmly.
 ```
 
-Usage: `/greet Alice`
+使用方法：`/greet Alice`
 
-## Adding agents
+## エージェントの追加
 
-Define specialized subagents in the `droids/` directory:
+`droids/`ディレクトリに特殊化されたサブエージェントを定義します：
 
 ```
 my-plugin/
@@ -174,7 +174,7 @@ my-plugin/
     └── security-reviewer.md
 ```
 
-### Agent format
+### エージェント形式
 
 ```markdown
 ---
@@ -195,11 +195,11 @@ You are a security expert. Review the code for:
 Report findings with severity levels and remediation steps.
 ```
 
-See [Custom Droids](/cli/configuration/custom-droids) for full agent configuration options.
+完全なエージェント設定オプションについては[Custom Droids](/cli/configuration/custom-droids)を参照してください。
 
-## Adding hooks
+## フックの追加
 
-Define lifecycle hooks in `hooks/hooks.json`:
+`hooks/hooks.json`でライフサイクルフックを定義します：
 
 ```
 my-plugin/
@@ -208,7 +208,7 @@ my-plugin/
     └── format-check.sh
 ```
 
-### Hook configuration
+### フック設定
 
 ```json
 {
@@ -227,20 +227,20 @@ my-plugin/
 }
 ```
 
-### Environment variables
+### 環境変数
 
-| Variable | Description |
+| 変数 | 説明 |
 |----------|-------------|
-| `${DROID_PLUGIN_ROOT}` | Absolute path to your plugin directory |
-| `${CLAUDE_PLUGIN_ROOT}` | Alias for `${DROID_PLUGIN_ROOT}` (Claude Code compatibility) |
+| `${DROID_PLUGIN_ROOT}` | プラグインディレクトリへの絶対パス |
+| `${CLAUDE_PLUGIN_ROOT}` | `${DROID_PLUGIN_ROOT}`のエイリアス（Claude Code互換性） |
 
 <Note>
 Plugin hooks cannot be imported via `/hooks import`. They only function within installed plugins where the plugin root path can be resolved.
 </Note>
 
-## Adding MCP servers
+## MCPサーバーの追加
 
-Configure MCP servers in `mcp.json` at the plugin root:
+プラグインルートの`mcp.json`でMCPサーバーを設定します：
 
 ```json
 {
@@ -256,32 +256,32 @@ Configure MCP servers in `mcp.json` at the plugin root:
 }
 ```
 
-## Testing plugins
+## プラグインのテスト
 
-### Local testing
+### ローカルテスト
 
-Install from a local directory to test during development:
+開発中のテストには、ローカルディレクトリからインストールします：
 
 ```bash
 droid plugin marketplace add ./my-plugin
 droid plugin install my-plugin@my-plugin
 ```
 
-### Validation checklist
+### 検証チェックリスト
 
-Before sharing your plugin:
+プラグインを共有する前に：
 
-- [ ] Manifest has required fields (`name`, `description`, `version`)
-- [ ] All skills have `name` and `description` in frontmatter
-- [ ] Commands work with and without arguments
-- [ ] No hardcoded paths or machine-specific config
-- [ ] README documents all commands and features
+- [ ] マニフェストに必須フィールドがある（`name`、`description`、`version`）
+- [ ] すべてのスキルのフロントマターに`name`と`description`がある
+- [ ] コマンドが引数ありでもなしでも動作する
+- [ ] ハードコードされたパスや機械固有の設定がない
+- [ ] READMEですべてのコマンドと機能が文書化されている
 
-## Distributing plugins
+## プラグインの配布
 
-### Creating a marketplace
+### マーケットプレースの作成
 
-A marketplace is a Git repository with a manifest listing available plugins:
+マーケットプレースは、利用可能なプラグインをリストするマニフェストを含むGitリポジトリです：
 
 ```
 my-marketplace/
@@ -295,9 +295,9 @@ my-marketplace/
         └── plugin.json
 ```
 
-### Marketplace manifest
+### マーケットプレースマニフェスト
 
-Create `.factory-plugin/marketplace.json`:
+`.factory-plugin/marketplace.json`を作成します：
 
 ```json
 {
@@ -321,33 +321,33 @@ Create `.factory-plugin/marketplace.json`:
 }
 ```
 
-| Field | Required | Description |
+| フィールド | 必須 | 説明 |
 |-------|----------|-------------|
-| `name` | Yes | Marketplace identifier |
-| `description` | No | Shown when browsing marketplaces |
-| `owner` | No | Contact information |
-| `plugins[].name` | Yes | Plugin identifier |
-| `plugins[].source` | Yes | Relative path to plugin directory |
-| `plugins[].description` | No | Shown in plugin browser |
-| `plugins[].category` | No | For organizing plugins |
+| `name` | はい | マーケットプレース識別子 |
+| `description` | いいえ | マーケットプレースを閲覧時に表示 |
+| `owner` | いいえ | 連絡先情報 |
+| `plugins[].name` | はい | プラグイン識別子 |
+| `plugins[].source` | はい | プラグインディレクトリへの相対パス |
+| `plugins[].description` | いいえ | プラグインブラウザに表示 |
+| `plugins[].category` | いいえ | プラグインを整理するため |
 
-### Version management
+### バージョン管理
 
-Use semantic versioning in your plugin manifest for documentation purposes:
+ドキュメント目的でプラグインマニフェストではセマンティックバージョニングを使用します：
 
-- **Major** (1.0.0 → 2.0.0): Breaking changes
-- **Minor** (1.0.0 → 1.1.0): New features, backward compatible
-- **Patch** (1.0.0 → 1.0.1): Bug fixes
+- **メジャー**（1.0.0 → 2.0.0）：破壊的変更
+- **マイナー**（1.0.0 → 1.1.0）：新機能、後方互換性あり
+- **パッチ**（1.0.0 → 1.0.1）：バグ修正
 
 <Note>
 Droid tracks plugin versions by Git commit hash, not semantic version. When users update a plugin, they always get the latest commit from the marketplace. Version pinning is not currently supported.
 </Note>
 
-## Claude Code compatibility
+## Claude Code互換性
 
-Droid is fully compatible with Claude Code plugins. If you find a Claude Code plugin, you can install it directly and Droid will automatically translate the format.
+DroidはClaude Codeプラグインと完全に互換性があります。Claude Codeプラグインを見つけた場合、直接インストールでき、Droidが自動的に形式を変換します。
 
-## Best practices
+## ベストプラクティス
 
 <AccordionGroup>
   <Accordion title="Keep plugins focused">
@@ -380,9 +380,9 @@ Droid is fully compatible with Claude Code plugins. If you find a Claude Code pl
   </Accordion>
 </AccordionGroup>
 
-## Example: Complete plugin
+## 例：完全なプラグイン
 
-Here's a complete example of a code review plugin:
+コードレビュープラグインの完全な例です：
 
 ```
 code-review-plugin/
@@ -453,7 +453,7 @@ Suggestions:
 - <improvement>
 ```
 
-## Next steps
+## 次のステップ
 
 <CardGroup cols={2}>
   <Card title="Plugins overview" href="/cli/configuration/plugins" icon="puzzle-piece">

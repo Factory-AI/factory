@@ -4,20 +4,20 @@ description: Run models locally on your hardware or use Ollama Cloud
 keywords: ['ollama', 'local', 'self-hosted', 'byok', 'llama', 'offline', 'on-premise']
 ---
 
-Run models locally on your hardware with Ollama, or use Ollama Cloud for hosted inference.
+Ollamaを使用してローカルハードウェアでモデルを実行するか、ホスト型推論にはOllama Cloudを使用してください。
 
 <Note>
   **Performance Notice**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While smaller models (7B, 13B) can be useful for experimentation and learning, they are generally not recommended for production coding work or complex software engineering tasks.
 </Note>
 
 
-## Local Ollama
+## ローカル Ollama
 
-Run models entirely on your machine with no internet required.
+インターネット接続不要で、マシン上で完全にモデルを実行します。
 
-### Configuration
+### 設定
 
-Add to `~/.factory/settings.json`:
+`~/.factory/settings.json` に追加：
 
 ```json
 {
@@ -42,7 +42,7 @@ Add to `~/.factory/settings.json`:
 }
 ```
 
-### Setup
+### セットアップ
 
 <Warning>
   **Context Window Configuration**: For optimal performance with Factory, ensure you set the context window to at least 32,000 tokens. You can either:
@@ -52,23 +52,23 @@ Add to `~/.factory/settings.json`:
   Without adequate context, the experience will be significantly degraded.
 </Warning>
 
-1. Install Ollama from [ollama.com/download](https://ollama.com/download)
-2. Pull desired models:
+1. [ollama.com/download](https://ollama.com/download) からOllamaをインストール
+2. 必要なモデルをプル：
    ```bash
    # Recommended models
    ollama pull qwen2.5-coder:32b
    ollama pull qwen2.5-coder:7b
    ```
-3. Start the Ollama server with extra context:
+3. 追加のコンテキストでOllamaサーバーを開始：
    ```bash
    OLLAMA_CONTEXT_LENGTH=32000 ollama serve
    ```
-4. Add configurations to Factory config
+4. Factory設定に構成を追加
 
 
-### Approximate Hardware Requirements
+### おおよそのハードウェア要件
 
-| Model Size | RAM Required | VRAM (GPU) |
+| モデルサイズ | 必要RAM | VRAM (GPU) |
 |-----------|--------------|------------|
 | 3B params | 4GB | 3GB |
 | 7B params | 8GB | 6GB |
@@ -78,15 +78,15 @@ Add to `~/.factory/settings.json`:
 
 ## Ollama Cloud
 
-Use Ollama's cloud service for hosted model inference without local hardware requirements
+ローカルハードウェア要件なしで、Ollamaのクラウドサービスを使用してホスト型モデル推論を利用
 
-### Recommended Cloud Model
+### 推奨クラウドモデル
 
-The best performance for agentic coding has been observed with **qwen3-coder:480b**. 
+エージェント型コーディングに最適なパフォーマンスは **qwen3-coder:480b** で観測されています。
 
-For a full list of available cloud models, visit: [ollama.com/search?c=cloud](https://ollama.com/search?c=cloud)
+利用可能なクラウドモデルの完全なリストについては：[ollama.com/search?c=cloud](https://ollama.com/search?c=cloud)
 
-### Configuration
+### 設定
 
 ```json
 {
@@ -103,25 +103,25 @@ For a full list of available cloud models, visit: [ollama.com/search?c=cloud](ht
 }
 ```
 
-### Getting Started with Cloud Models
+### クラウドモデルを始める
 
-1. Ensure Ollama is installed and running locally
-2. Cloud models are accessed through your local Ollama instance - no API key needed
-3. Add the configuration above to your Factory config
-4. The model will automatically use cloud compute when requested
+1. Ollamaがインストールされ、ローカルで実行されていることを確認
+2. クラウドモデルはローカルOllamaインスタンス経由でアクセス - APIキー不要
+3. 上記の設定をFactory設定に追加
+4. 要求時にモデルが自動的にクラウドコンピュートを使用
 
-## Troubleshooting
+## トラブルシューティング
 
-### Local server not connecting
-- Ensure Ollama is running: `ollama serve`
-- Check if port 11434 is available
-- Try `curl http://localhost:11434/api/tags` to test
+### ローカルサーバーが接続できない
+- Ollamaが実行中であることを確認：`ollama serve`
+- ポート11434が利用可能かチェック
+- テストには `curl http://localhost:11434/api/tags` を試行
 
-### Model not found
-- Pull the model first: `ollama pull model-name`
-- Check exact model name with `ollama list`
+### モデルが見つからない
+- 最初にモデルをプル：`ollama pull model-name`
+- `ollama list` で正確なモデル名を確認
 
-## Notes
+## 注意事項
 
-- Local API doesn't require authentication (use any placeholder for `api_key`)
-- Models are stored in `~/.ollama/models/`
+- ローカルAPIは認証不要（`api_key` には任意のプレースホルダーを使用）
+- モデルは `~/.ollama/models/` に保存されます

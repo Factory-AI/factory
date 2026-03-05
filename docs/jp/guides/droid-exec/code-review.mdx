@@ -4,7 +4,7 @@ description: Set up automated pull request reviews using the Factory GitHub App
 keywords: ['code review', 'pr review', 'pull request', 'github actions', 'automation', 'droid exec', 'github app']
 ---
 
-Set up automated code review for your repository using the Factory GitHub App. Droid will analyze pull requests, identify issues, and post feedback as inline comments.
+Factory GitHub Appを使用してリポジトリの自動コードレビューを設定します。Droidはプルリクエストを分析し、問題を特定して、インラインコメントとしてフィードバックを投稿します。
 
 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
   <div style={{ flex: '1', minWidth: '300px' }}>
@@ -15,57 +15,57 @@ Set up automated code review for your repository using the Factory GitHub App. D
   </div>
 </div>
 
-## Setup
+## セットアップ
 
-Use the `/install-github-app` command to install the Factory GitHub App and configure the code review workflow:
+`/install-github-app`コマンドを使用してFactory GitHub Appをインストールし、コードレビューワークフローを設定します：
 
 ```bash
 droid
 > /install-github-app
 ```
 
-The guided flow will:
-1. Verify GitHub CLI prerequisites
-2. Install the Factory GitHub App on your repository
-3. Let you select the **Droid Review** workflow
-4. Create a PR with the workflow files
+ガイド付きフローでは以下を行います：
+1. GitHub CLIの前提条件を確認
+2. リポジトリにFactory GitHub Appをインストール
+3. **Droid Review**ワークフローを選択
+4. ワークフローファイルを含むPRを作成
 
-For detailed setup instructions, see the [GitHub App installation guide](/cli/features/install-github-app).
+詳細なセットアップ手順については、[GitHub App installation guide](/cli/features/install-github-app)を参照してください。
 
-## How it works
+## 動作原理
 
-Once enabled, the Droid Review workflow:
+有効にすると、Droid Reviewワークフローは以下を実行します：
 
-1. Triggers on pull request events (opened, synchronized, reopened, ready for review)
-2. Skips draft PRs to avoid noise during development
-3. Fetches the PR diff and existing comments
-4. Analyzes code changes for issues
-5. Posts inline comments on problematic lines
-6. Submits an approval when no issues are found
+1. プルリクエストイベント（開始、同期、再開、レビュー準備完了）でトリガー
+2. 開発中のノイズを避けるためドラフトPRをスキップ
+3. PR差分と既存コメントを取得
+4. コード変更の問題を分析
+5. 問題のある行にインラインコメントを投稿
+6. 問題が見つからない場合は承認を送信
 
-## What Droid reviews
+## Droidがレビューする内容
 
-The automated reviewer focuses on clear bugs and issues:
+自動レビューアーは明確なバグと問題に焦点を当てます：
 
-- Dead/unreachable code
-- Broken control flow (missing break, fallthrough bugs)
-- Async/await mistakes
-- Null/undefined dereferences
-- Resource leaks
-- SQL/XSS injection vulnerabilities
-- Missing error handling
-- Off-by-one errors
-- Race conditions
+- デッド/到達不可能なコード
+- 制御フローの破損（break文の欠如、フォールスルーバグ）
+- async/awaitの間違い
+- null/undefined参照外し
+- リソースリーク
+- SQL/XSSインジェクション脆弱性
+- エラーハンドリングの欠如
+- オフバイワンエラー
+- 競合状態
 
-It skips stylistic concerns, minor optimizations, and architectural opinions.
+スタイル上の懸念、軽微な最適化、アーキテクチャの意見はスキップします。
 
-## Customizing the workflow
+## ワークフローのカスタマイズ
 
-After the workflow is created, you can customize it by editing `.github/workflows/droid-review.yml` in your repository.
+ワークフローが作成された後、リポジトリの`.github/workflows/droid-review.yml`を編集してカスタマイズできます。
 
-### Change the trigger conditions
+### トリガー条件の変更
 
-Modify when reviews run:
+レビューの実行タイミングを変更：
 
 ```yaml
 on:
@@ -76,9 +76,9 @@ on:
       - '!**/*.test.ts'  # Skip test files
 ```
 
-### Custom review guidelines
+### カスタムレビューガイドライン
 
-Add repository-specific review guidelines by creating a `.factory/skills/review-guidelines/SKILL.md` file in your repo:
+リポジトリの`.factory/skills/review-guidelines/SKILL.md`ファイルを作成して、リポジトリ固有のレビューガイドラインを追加：
 
 ```markdown
 <!-- .factory/skills/review-guidelines/SKILL.md -->
@@ -89,11 +89,11 @@ Additional checks for this codebase:
 - Prisma query performance issues
 ```
 
-These guidelines are automatically picked up and injected into every review run. No workflow changes needed.
+これらのガイドラインは自動的に認識され、すべてのレビュー実行に注入されます。ワークフローの変更は不要です。
 
-### Change the model
+### モデルの変更
 
-Use a different model for reviews:
+レビューに異なるモデルを使用：
 
 ```yaml
 droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
@@ -101,9 +101,9 @@ droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
 droid exec --auto high --model claude-haiku-4-5-20251001 -f prompt.txt
 ```
 
-### Skip certain PRs
+### 特定のPRをスキップ
 
-Add conditions to skip reviews for specific cases:
+特定のケースでレビューをスキップする条件を追加：
 
 ```yaml
 jobs:
@@ -115,17 +115,17 @@ jobs:
       !contains(github.event.pull_request.title, '[skip-review]')
 ```
 
-### Limit comment count
+### コメント数の制限
 
-Adjust the maximum number of comments in the prompt:
+プロンプト内のコメントの最大数を調整：
 
 ```
 Guidelines:
 - Submit at most 5 comments total, prioritizing the most critical issues
 ```
 
-## See also
+## 関連項目
 
-- [GitHub App installation](/cli/features/install-github-app) - Full setup guide for `/install-github-app`
-- [GitHub Actions examples](/guides/droid-exec/github-actions) - More automation workflows
-- [Droid Exec](/cli/droid-exec/overview) - Running Droid in CI/CD environments
+- [GitHub App installation](/cli/features/install-github-app) - `/install-github-app`の完全セットアップガイド
+- [GitHub Actions examples](/guides/droid-exec/github-actions) - その他の自動化ワークフロー
+- [Droid Exec](/cli/droid-exec/overview) - CI/CD環境でのDroidの実行

@@ -3,140 +3,140 @@ title: "モデル、LLMゲートウェイ、インテグレーション"
 description: How Droids connect to your models, LLM gateways, MCP servers, droids, commands, and existing engineering tools.
 ---
 
-Factory is designed to plug into the **AI and developer tooling you already use**. This page explains how to control which models Droid can use, how to route traffic through LLM gateways, and how to manage MCP servers, droids, commands, and platform integrations.
+Factory は**既に使用している AI および開発者ツール**に組み込まれるよう設計されています。このページでは、Droid が使用できるモデルの制御方法、LLM ゲートウェイ経由のトラフィックルーティング方法、そして MCP サーバー、Droid、コマンド、プラットフォーム統合の管理方法について説明します。
 
 ---
 
-## Model management and hierarchy
+## モデル管理と階層
 
-Model access is governed by the same hierarchical settings system used throughout Factory:
+モデルアクセスは、Factory 全体で使用される同じ階層設定システムによって管理されます：
 
-- **Org level**
-  - Defines the **authoritative list of allowed models** and categories.
-  - Can explicitly ban models (for example, non‑enterprise APIs) so they cannot be re‑enabled by projects or users.
-  - Decides whether user‑supplied BYOK keys are allowed at all.
+- **組織レベル**
+  - **許可されたモデルとカテゴリの権威あるリスト**を定義します。
+  - モデルを明示的に禁止できるため（例：非エンタープライズ API）、プロジェクトやユーザーが再度有効にすることはできません。
+  - ユーザー提供の BYOK キーが全く許可されるかどうかを決定します。
 
-- **Project level**
-  - Can **add additional models** on top of the org‑approved set (for example, project‑specific fine‑tunes) but cannot re‑enable banned ones.
-  - Can set project defaults—for example, “use a small model for tests, a large model for refactors.”
+- **プロジェクトレベル**
+  - 組織承認済みセットの上に**追加のモデルを追加**できますが（例：プロジェクト固有のファインチューン）、禁止されたものを再有効化することはできません。
+  - プロジェクトデフォルトを設定できます—例：「テストには小さなモデルを使用し、リファクタリングには大きなモデルを使用する」。
 
-- **User level**
-  - Can choose personal defaults **within the allowed set**.
-  - Cannot see or select models that higher levels have disallowed.
+- **ユーザーレベル**
+  - **許可されたセット内で**個人のデフォルトを選択できます。
+  - 上位レベルで許可されていないモデルは表示・選択できません。
 
-Because the hierarchy is extension‑only, upgrades and policy changes at the org level flow consistently across all environments.
-
----
-
-## LLM gateways
-
-Many enterprises centralize model access behind an **LLM gateway** that handles authentication, routing, and policy enforcement.
-
-Factory works with gateways in two ways:
-
-1. **Directly configured gateway endpoints**
-   - `.factory/settings.json` can specify gateway base URLs for specific providers.
-   - Environment variables can route calls (for example, `ANTHROPIC_BASE_URL`, `OPENAI_BASE_URL`).
-   - Custom models configured via [BYOK](/cli/configuration/byok) can point to gateway endpoints using `base_url` and provider‑specific settings, so the same gateway policy applies whether models are built‑in or custom.
-
-2. **Org‑level gateway policy**
-   - Org admins can require that all model traffic go through specific gateways.
-   - BYOK can be restricted so that only centrally managed keys and identities are used.
-
-When you use a gateway, **data handling and retention policies are those of the gateway and underlying providers**; Droid simply uses the endpoints and credentials you configure.
-
-For concrete examples of configuring custom models (including gateway‑backed models), see [Custom models & BYOK](/cli/configuration/byok), which covers the `customModels` array in `~/.factory/settings.json` and how those models appear in the `/model` selector.
+階層は拡張のみであるため、組織レベルでのアップグレードとポリシー変更は、すべての環境で一貫して反映されます。
 
 ---
 
-## Cloud providers and BYOK
+## LLM ゲートウェイ
 
-Factory supports multiple model deployment patterns:
+多くの企業では、認証、ルーティング、ポリシー実施を処理する **LLM ゲートウェイ**の背後にモデルアクセスを集約しています。
 
-- **Direct cloud providers** – calling OpenAI, Anthropic, Google, and others using your enterprise credentials.
-- **Cloud AI platforms** – AWS Bedrock, GCP Vertex, Azure OpenAI, using IAM‑backed authentication.
-- **On‑prem / self‑hosted models** – models running inside your network, exposed via approved gateways.
+Factory は2つの方法でゲートウェイと連携します：
 
-Bring‑your‑own‑key (BYOK) is controlled by policy:
+1. **直接設定されたゲートウェイエンドポイント**
+   - `.factory/settings.json` は特定のプロバイダー向けにゲートウェイベース URL を指定できます。
+   - 環境変数で呼び出しをルーティングできます（例：`ANTHROPIC_BASE_URL`、`OPENAI_BASE_URL`）。
+   - [BYOK](/cli/configuration/byok) 経由で設定されたカスタムモデルは、`base_url` とプロバイダー固有の設定を使用してゲートウェイエンドポイントを指すことができるため、モデルが内蔵かカスタムかに関係なく同じゲートウェイポリシーが適用されます。
 
-- Org admins can allow or block **user‑supplied API keys**.
-- Even when BYOK is allowed, orgs can restrict which providers and endpoints keys may target.
-- Project configs can define shared keys or credentials for team‑wide models in secure stores.
+2. **組織レベルのゲートウェイポリシー**
+   - 組織管理者は、すべてのモデルトラフィックが特定のゲートウェイを経由することを要求できます。
+   - BYOK を制限して、一元管理されたキーとアイデンティティのみが使用されるようにできます。
 
-In high‑security environments, orgs often:
+ゲートウェイを使用する場合、**データ処理と保持ポリシーはゲートウェイと基盤プロバイダーのものです**；Droid は単に設定したエンドポイントと認証情報を使用します。
 
-- Disable user BYOK entirely.
-- Route all traffic through gateways that enforce data residency and audit logging.
-
----
-
-## MCP servers
-
-The **Model Context Protocol (MCP)** lets Droid access external systems—ticket queues, documentation, databases, and more—through well‑defined tools.
-
-MCP servers can be very powerful; they may read from internal systems or perform side‑effecting actions. Factory gives you several levers to control them:
-
-- **Org allowlist/blocklist**
-  - Org admins define which MCP servers are allowed at all.
-  - Servers not on the allowlist are ignored, even if a project tries to configure them.
-
-- **Project‑level configuration**
-  - Projects can enable subsets of the allowed servers and configure environment variables and connection details.
-
-- **User‑level opt‑in**
-  - Users can enable or disable MCP servers from the allowed set for their own sessions.
-
-These controls let you safely expose internal systems to Droid while ensuring each server has passed security and compliance review.
+カスタムモデル（ゲートウェイベースのモデルを含む）の設定の具体例については、[Custom models & BYOK](/cli/configuration/byok) を参照してください。これは `~/.factory/settings.json` 内の `customModels` 配列と、これらのモデルが `/model` セレクターにどのように表示されるかを説明しています。
 
 ---
 
-## Droids, commands, and tools
+## クラウドプロバイダーと BYOK
 
-Factory’s ecosystem of **droids, commands, and hooks** is also governed hierarchically.
+Factory は複数のモデルデプロイメントパターンをサポートしています：
 
-### Org‑level droids and commands
+- **直接クラウドプロバイダー** – 企業認証情報を使用して OpenAI、Anthropic、Google などを呼び出す。
+- **クラウド AI プラットフォーム** – AWS Bedrock、GCP Vertex、Azure OpenAI を IAM ベースの認証で使用。
+- **オンプレミス / セルフホスト型モデル** – ネットワーク内で実行され、承認済みゲートウェイ経由で公開されるモデル。
 
-- Org admins can publish **blessed droids** and **shared commands** into an org‑level `.factory` bundle.
-- These often encode security‑reviewed workflows such as:
+Bring-your-own-key (BYOK) はポリシーによって制御されます：
+
+- 組織管理者は**ユーザー提供 API キー**を許可または禁止できます。
+- BYOK が許可されている場合でも、組織はキーが対象にできるプロバイダーとエンドポイントを制限できます。
+- プロジェクト設定では、セキュアストア内のチーム全体のモデル用の共有キーや認証情報を定義できます。
+
+高セキュリティ環境では、組織は多くの場合：
+
+- ユーザー BYOK を完全に無効にします。
+- データ残留性と監査ログを実施するゲートウェイ経由ですべてのトラフィックをルーティングします。
+
+---
+
+## MCP サーバー
+
+**Model Context Protocol (MCP)** により、Droid は外部システム—チケットキュー、ドキュメント、データベースなど—に明確に定義されたツールを通じてアクセスできます。
+
+MCP サーバーは非常に強力で、内部システムから読み取りを行ったり、副作用のあるアクションを実行する可能性があります。Factory はこれらを制御するためのいくつかのレバーを提供します：
+
+- **組織許可リスト/禁止リスト**
+  - 組織管理者は、どの MCP サーバーが全く許可されるかを定義します。
+  - 許可リストにないサーバーは、プロジェクトが設定を試みても無視されます。
+
+- **プロジェクトレベルの設定**
+  - プロジェクトは許可されたサーバーのサブセットを有効にし、環境変数と接続詳細を設定できます。
+
+- **ユーザーレベルのオプトイン**
+  - ユーザーは自分のセッション用に許可されたセットから MCP サーバーを有効または無効にできます。
+
+これらの制御により、各サーバーがセキュリティとコンプライアンスレビューに合格していることを確保しながら、内部システムを Droid に安全に公開できます。
+
+---
+
+## Droid、コマンド、ツール
+
+Factory の **Droid、コマンド、フック**のエコシステムも階層的に管理されます。
+
+### 組織レベルの Droid とコマンド
+
+- 組織管理者は**承認済み Droid** と**共有コマンド**を組織レベルの `.factory` バンドルに公開できます。
+- これらは多くの場合、次のようなセキュリティレビュー済みワークフローをエンコードします：
   - `/security-review`
   - `/migrate-service`
   - `/refactor-module`
-- Projects and users can use these resources but cannot modify them.
+- プロジェクトとユーザーはこれらのリソースを使用できますが、変更することはできません。
 
-### Project‑level extensions
+### プロジェクトレベルの拡張
 
-- Projects add **specialized droids and commands** in their own `.factory/droids/` and `.factory/commands/` directories.
-- These extend org resources with project‑specific logic—such as knowledge of particular services, schemas, or runbooks.
+- プロジェクトは独自の `.factory/droids/` と `.factory/commands/` ディレクトリに**専用の Droid とコマンド**を追加します。
+- これらは組織リソースをプロジェクト固有のロジック—特定のサービス、スキーマ、ランブックの知識など—で拡張します。
 
-### User‑level customization
+### ユーザーレベルのカスタマイゼーション
 
-- Users can add personal droids and commands in `~/.factory/droids/` and `~/.factory/commands/`.
-- These are useful for individual workflows but must still respect org and project policies (for example, cannot call disallowed tools or models).
+- ユーザーは `~/.factory/droids/` と `~/.factory/commands/` に個人的な Droid とコマンドを追加できます。
+- これらは個人のワークフローに有用ですが、組織とプロジェクトのポリシーを尊重する必要があります（例：許可されていないツールやモデルを呼び出すことはできません）。
 
-Hooks tie everything together by providing enforcement and logging at the edges of these tools. See [LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls) for more.
+フックは、これらのツールの境界で実施とログ記録を提供することで、すべてを結び付けます。詳細は [LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls) を参照してください。
 
 ---
 
-## Integration environments
+## 統合環境
 
-Because Droid is CLI‑first, it integrates with many environments without forcing developers into a particular IDE.
+Droid は CLI ファーストであるため、開発者を特定の IDE に強制することなく、多くの環境と統合できます。
 
-Common patterns include:
+一般的なパターンには以下があります：
 
-- **Terminals and shells**
-  - Direct use of Droid in `bash`, `zsh`, `fish`, or Windows shells.
-  - Shell aliases and scripts to standardize workflows across teams.
+- **ターミナルとシェル**
+  - `bash`、`zsh`、`fish`、または Windows シェルでの Droid の直接使用。
+  - チーム間でワークフローを標準化するためのシェルエイリアスとスクリプト。
 
-- **IDE and editor integrations**
-  - Integrations with IDEs such as VS Code, JetBrains tools, and others that treat Droid as a backend agent.
-  - Policies and telemetry still flow through the same hierarchical settings and OTEL pipelines.
+- **IDE とエディター統合**
+  - VS Code、JetBrains ツールなど、Droid をバックエンドエージェントとして扱う IDE との統合。
+  - ポリシーとテレメトリは同じ階層設定と OTEL パイプライン経由で引き続き流れます。
 
-- **CI/CD pipelines**
-  - Running Droid in GitHub Actions, GitLab CI, or internal pipelines for tasks like code review, refactoring, and migration.
-  - Use separate identities and credentials for CI compared to developers.
+- **CI/CD パイプライン**
+  - GitHub Actions、GitLab CI、または内部パイプラインでコードレビュー、リファクタリング、移行などのタスクのために Droid を実行。
+  - 開発者と比較して CI には別のアイデンティティと認証情報を使用。
 
-- **Remote and locked-down environments**
-  - Running Droid in air-gapped or restricted environments.
-  - Supporting desktop and browser-based interfaces for secure enterprise deployments.
+- **リモートおよび制限された環境**
+  - エアギャップまたは制限された環境での Droid の実行。
+  - セキュアなエンタープライズ配備のためのデスクトップとブラウザベースのインターフェースのサポート。
 
-Across all of these, the same enterprise controls apply: **models, tools, MCP servers, and telemetry are constrained by org and project policy, not by the IDE or environment**.
+これらすべてにおいて、同じ企業制御が適用されます：**モデル、ツール、MCP サーバー、テレメトリは IDE や環境ではなく、組織とプロジェクトのポリシーによって制約されます**。

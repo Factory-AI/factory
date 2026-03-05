@@ -3,7 +3,7 @@ title: "スキル"
 description: Reusable capabilities that your AI agent invokes on demand.
 keywords: ['skills', 'capabilities', 'tools', 'workflows', 'expertise', 'reusable', 'invoke', 'skill']
 ---
-Skills are **reusable capabilities** that extend what your Droid can do. Create a `SKILL.md` file with instructions, and the Droid adds it to its toolkit. The Droid uses skills when relevant, or you can invoke one directly with `/skill-name`.
+スキルは、Droidができることを拡張する**再利用可能な機能**です。指示が書かれた`SKILL.md`ファイルを作成すると、Droidがそれをツールキットに追加します。Droidは関連する場合にスキルを使用するか、`/skill-name`で直接呼び出すことができます。
 
 <Tip>
 Explore the [skills guides](/guides/skills/frontend-ui-integration) for examples.
@@ -13,33 +13,33 @@ Explore the [skills guides](/guides/skills/frontend-ui-integration) for examples
 **Custom slash commands have been merged into skills.** A file at `.factory/commands/review.md` and a skill at `.factory/skills/review/SKILL.md` both create `/review` and work the same way. Your existing `.factory/commands/` files keep working. Skills add optional features: a directory for supporting files, frontmatter to [control who can invoke them](#control-who-invokes-a-skill), and the ability for Droids to load them automatically when relevant.
 </Note>
 
-**Key properties:**
-- **Flexible invocation** – Both you and the Droid can invoke skills. Type `/skill-name` or let the Droid decide when to use them.
-- **Composable** – can be chained together as part of larger workflows
-- **Token-efficient** – lightweight and focused, not bloated with unused tools or repeated instructions
+**主な特徴:**
+- **柔軟な呼び出し** – あなたとDroid の両方がスキルを呼び出せます。`/skill-name`と入力するか、Droidに使用するタイミングを決めさせることができます。
+- **組み合わせ可能** – より大きなワークフローの一部として連鎖させることができます
+- **トークン効率** – 軽量で焦点を絞っており、未使用のツールや繰り返しの指示で肥大化していません
 
-**A skill can be:**
-- **A workflow** – step-by-step instructions (e.g., "navigate to URL, take screenshot, extract data")
-- **Expertise** – domain knowledge and conventions (e.g., "how we implement frontend features with our design system")
-- **Both** – instructions + tools + best practices bundled together
+**スキルの例:**
+- **ワークフロー** – 段階的な指示（例：「URLに移動し、スクリーンショットを取り、データを抽出する」）
+- **専門知識** – ドメインの知識と慣例（例：「デザインシステムでフロントエンド機能を実装する方法」）
+- **両方** – 指示 + ツール + ベストプラクティスをまとめたもの
 
-**Example skills:**
-- `browser` – automate Chrome with CDP tools (navigate, screenshot, evaluate JS)
-- `linear` – manage Linear issues with CLI tools (list, update status, move teams)
-- `frontend-ui-integration` – implement typed React flows following team conventions
+**スキルの例:**
+- `browser` – CDPツールでChromeを自動化（ナビゲート、スクリーンショット、JS評価）
+- `linear` – CLIツールでLinearの課題を管理（リスト、ステータス更新、チーム移動）
+- `frontend-ui-integration` – チームの慣例に従った型付きReactフローの実装
 
-## What is a skill?
+## スキルとは何か？
 
-A skill is a **directory** (e.g. `.factory/skills/frontend-ui-integration/`) containing:
+スキルは以下を含む**ディレクトリ**（例：`.factory/skills/frontend-ui-integration/`）です：
 
-- `SKILL.md` or `skill.mdx` with YAML frontmatter and markdown instructions
-- Optional supporting files (scripts, schemas, checklists)
+- YAMLフロントマターとmarkdown指示を含む`SKILL.md`または`skill.mdx`
+- オプションのサポートファイル（スクリプト、スキーマ、チェックリスト）
 
-Each skill defines what problem it solves, what inputs it expects, and what success looks like. The Droid automatically invokes matching skills when they apply to the current task.
+各スキルは、解決する問題、期待する入力、成功の姿を定義します。Droidは現在のタスクに適用される場合、適合するスキルを自動的に呼び出します。
 
-## Skill file format
+## スキルファイル形式
 
-Skills are defined in Markdown with YAML frontmatter. A small, focused skill can be just a short `SKILL.md`:
+スキルはYAMLフロントマターを持つMarkdownで定義されます。小さく焦点を絞ったスキルは、短い`SKILL.md`だけで済みます：
 
 ```md
 ---
@@ -56,26 +56,26 @@ description: Summarize the staged git diff in 3–5 bullets. Use when the user a
 3. Call out any migrations, risky areas, or tests that should be run.
 ```
 
-You can also include additional frontmatter fields to control behavior. See [Frontmatter reference](#frontmatter-reference) for all available options.
+動作を制御するために、追加のフロントマターフィールドを含めることもできます。利用可能なすべてのオプションについては[Frontmatter reference](#frontmatter-reference)を参照してください。
 
-## Where skills live
+## スキルの保存場所
 
-Skills are discovered from a small set of well-known locations:
+スキルは、少数の既知の場所から発見されます：
 
-| Scope         | Location                            | Purpose                                                                 |
+| スコープ         | 場所                            | 目的                                                                 |
 | ------------- | ----------------------------------- | ----------------------------------------------------------------------- |
-| **Workspace** | `<repo>/.factory/skills/`           | Project skills shared with teammates; checked into git.                 |
-| **Personal**  | `~/.factory/skills/`                | Private skills that follow you across projects on your machine.         |
-| **Compatibility** | `<repo>/.agent/skills/`         | Discovered for compatibility with `.agent` folder conventions.          |
+| **ワークスペース** | `<repo>/.factory/skills/`           | チームメートと共有するプロジェクトスキル；gitにチェックイン。                 |
+| **個人**  | `~/.factory/skills/`                | マシン上でプロジェクト間を移動する個人的なスキル。         |
+| **互換性** | `<repo>/.agent/skills/`         | `.agent`フォルダ慣例との互換性のために発見。          |
 
-Each **skill** lives in its own directory under one of these roots:
+各**スキル**は、これらのルートの下の独自のディレクトリに配置されます：
 
-- Workspace: `<repo>/.factory/skills/<skill-name>/SKILL.md`
-- Personal: `~/.factory/skills/<skill-name>/SKILL.md`
+- ワークスペース：`<repo>/.factory/skills/<skill-name>/SKILL.md`
+- 個人：`~/.factory/skills/<skill-name>/SKILL.md`
 
-In large monorepos, you can either:
+大きなmonorepoでは、以下のどちらかを選択できます：
 
-- Keep a **single, shared** skills folder at the root:
+- ルートに**単一の共有**スキルフォルダを保持：
 
   ```text
   .factory/skills/
@@ -87,7 +87,7 @@ In large monorepos, you can either:
       SKILL.md
   ```
 
-- Or add **per-project** `.factory` folders so skills live alongside each subproject:
+- または**プロジェクト毎**の`.factory`フォルダを追加し、スキルを各サブプロジェクトと一緒に配置：
 
   ```text
   services/payments/.factory/skills/
@@ -98,11 +98,11 @@ In large monorepos, you can either:
       SKILL.md
   ```
 
-Project skills are the primary way to share and standardize capabilities inside an engineering org; personal skills are ideal for individual workflows or experiments.
+プロジェクトスキルは、エンジニアリング組織内で機能を共有し標準化する主要な方法です；個人スキルは個人のワークフローや実験に理想的です。
 
-## Frontmatter reference
+## フロントマターリファレンス
 
-Skills support YAML frontmatter fields between `---` markers at the top of your `SKILL.md` file:
+スキルは`SKILL.md`ファイルの上部で`---`マーカー間のYAMLフロントマターフィールドをサポートします：
 
 ```yaml
 ---
@@ -115,30 +115,30 @@ disable-model-invocation: false
 Your skill instructions here...
 ```
 
-| Field                      | Required    | Default | Description                                                                                                                                           |
+| フィールド                      | 必須    | デフォルト | 説明                                                                                                                                           |
 | :------------------------- | :---------- | :------ | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                     | No          | Directory name | Display name for the skill. Lowercase letters, numbers, and hyphens only.                    |
-| `description`              | Recommended | —       | What the skill does and when to use it. The Droid uses this to decide when to apply the skill. |
-| `user-invocable`           | No          | `true`  | Set to `false` to hide from the `/` slash command menu. Use for background knowledge users shouldn't invoke directly. |
-| `disable-model-invocation` | No          | `false` | Set to `true` to prevent the Droid from automatically loading this skill. Use for workflows you want to trigger manually with `/skill-name`. |
+| `name`                     | いいえ          | ディレクトリ名 | スキルの表示名。小文字、数字、ハイフンのみ。                    |
+| `description`              | 推奨 | —       | スキルの機能と使用タイミング。Droidがスキルを適用するタイミングを決めるために使用。 |
+| `user-invocable`           | いいえ          | `true`  | `false`に設定すると`/`スラッシュコマンドメニューから隠します。ユーザーが直接呼び出すべきでないバックグラウンド知識に使用。 |
+| `disable-model-invocation` | いいえ          | `false` | `true`に設定するとDroidがこのスキルを自動読み込みしません。`/skill-name`で手動でトリガーしたいワークフローに使用。 |
 
-## Control who invokes a skill
+## スキルを呼び出せる人の制御
 
-By default, both you and the Droid can invoke any skill. You can type `/skill-name` to invoke it directly, and the Droid can load it automatically when relevant to your conversation. Two frontmatter fields let you restrict this:
+デフォルトでは、あなたとDroidの両方が任意のスキルを呼び出せます。`/skill-name`と入力して直接呼び出すことができ、Droidは会話に関連する場合に自動的に読み込めます。2つのフロントマターフィールドでこれを制限できます：
 
-- **`disable-model-invocation: true`**: Only you can invoke the skill. Use this for workflows with side effects or that you want to control timing, like `/deploy` or `/send-notification`. You don't want the Droid deciding to deploy because your code looks ready.
+- **`disable-model-invocation: true`**: あなただけがスキルを呼び出せます。`/deploy`や`/send-notification`のような副作用があるワークフローや、タイミングを制御したいワークフローに使用します。コードが準備できて見えるからといって、Droidがデプロイを決定することは望ましくありません。
 
-- **`user-invocable: false`**: Only the Droid can invoke the skill. Use this for background knowledge that isn't actionable as a command. A `legacy-system-context` skill explains how an old system works. The Droid should know this when relevant, but `/legacy-system-context` isn't a meaningful action for users to take.
+- **`user-invocable: false`**: Droidだけがスキルを呼び出せます。コマンドとして実行可能でないバックグラウンド知識に使用します。`legacy-system-context`スキルは古いシステムの動作を説明します。Droidは関連する場合にこれを知っているべきですが、`/legacy-system-context`はユーザーが取る意味のあるアクションではありません。
 
-### Invocation summary
+### 呼び出しサマリー
 
-| Frontmatter                      | User can `/invoke` | Droid can invoke |
+| フロントマター                      | ユーザーが`/invoke`可能 | Droidが呼び出し可能 |
 | :------------------------------- | :----------------- | :--------------- |
-| (default)                        | Yes                | Yes              |
-| `disable-model-invocation: true` | Yes                | No               |
-| `user-invocable: false`          | No                 | Yes              |
+| （デフォルト）                        | はい                | はい              |
+| `disable-model-invocation: true` | はい                | いいえ               |
+| `user-invocable: false`          | いいえ                 | はい              |
 
-## Quickstart
+## クイックスタート
 
 <Steps>
   <Step title="Create a skill folder">
@@ -162,39 +162,38 @@ By default, both you and the Droid can invoke any skill. You can type `/skill-na
   </Step>
 </Steps>
 
-## How skills differ from other configuration
+## スキルと他の設定の違い
 
-Skills sit alongside other ways of shaping Droid behavior:
+スキルはDroidの動作を形作る他の方法と並行して機能します：
 
-- **Custom droids** – define *which* model and tools to use and at what autonomy level; they are full agent configurations.
-- **Legacy slash commands** (`.factory/commands/`) – user-invoked macros that still work but are now superseded by skills. Skills offer the same `/command` functionality plus optional Droid invocation and supporting files.
-- **MCP servers** – expose external systems (APIs, databases, SaaS tools) as tools; they are about *connecting* resources, not encoding your workflow.
+- **カスタムDroid** – *どの*モデルとツールを使用し、どの自律レベルで使用するかを定義；これらは完全なエージェント設定です。
+- **レガシースラッシュコマンド**（`.factory/commands/`） – ユーザーが呼び出すマクロで、まだ動作しますがスキルに置き換えられました。スキルは同じ`/command`機能に加えて、オプションのDroid呼び出しとサポートファイルを提供します。
+- **MCPサーバー** – 外部システム（API、データベース、SaaSツール）をツールとして公開；これらはリソースの*接続*に関するもので、ワークフローのエンコーディングではありません。
 
-Skills are different because they:
+スキルが異なるのは以下の理由です：
 
-- Package **how work should be done** (your engineering playbook) as reusable capabilities.
-- Support **flexible invocation** – both you (via `/skill-name`) and the Droid can trigger them, with [fine-grained control](#control-who-invokes-a-skill) over who can invoke what.
-- Are **discoverable and composable** – the Droid can chain multiple skills inside a plan.
-- Can sit on top of tools, custom droids, and MCP servers to orchestrate them safely.
+- **作業の実行方法**（エンジニアリングプレイブック）を再利用可能な機能としてパッケージ化
+- **柔軟な呼び出し**をサポート – あなた（`/skill-name`経由）とDroidの両方がトリガーでき、誰が何を呼び出せるかの[fine-grained control](#control-who-invokes-a-skill)
+- **発見可能で組み合わせ可能** – Droidは計画内で複数のスキルを連鎖できます
+- ツール、カスタムDroid、MCPサーバーの上に位置し、それらを安全にオーケストレーション
 
-In practice you might:
+実際には以下のようになります：
 
-- Use MCP to expose your internal deployment API.
-- Use a custom droid to define which tools/models are allowed in CI.
-- Use a skill to encode "how to safely roll out a canary deployment" using that API and droid configuration.
+- MCPを使用して内部デプロイAPIを公開
+- カスタムDroidを使用してCIで許可されるツール/モデルを定義
+- スキルを使用してそのAPIとDroid設定を使った「カナリアデプロイメントを安全にロールアウトする方法」をエンコード
 
-## Why skills matter in enterprise codebases
+## エンタープライズコードベースでスキルが重要な理由
 
-Skills are especially valuable in enterprise environments where you need to:
+スキルは以下が必要なエンタープライズ環境で特に価値があります：
 
-- Standardize how Droids do **frontend implementation, service integrations, data querying, and internal tools**.
-- Encode **team conventions, safety rules, and SLAs** once, then reuse them across projects.
-- Make automation **discoverable, auditable, and shareable** via git, not just "whatever happened in one chat".
+- Droidが**フロントエンド実装、サービス統合、データクエリ、内部ツール**を実行する方法を標準化
+- **チームの慣例、安全ルール、SLA**を一度エンコードし、プロジェクト間で再利用
+- 自動化を**発見可能、監査可能、共有可能**にする（git経由）、単なる「一つのチャットで起こったこと」ではなく
 
-You can create skills from scratch for Factory, or reuse existing skills you already invested in for other agents by importing them and wiring them into your droid configuration.
+Factoryのためにゼロからスキルを作成するか、他のエージェントのために既に投資した既存のスキルを再利用し、それらをインポートしてDroid設定に配線できます。
 
-
-# Best practices
+# ベストプラクティス
 
 <AccordionGroup>
   <Accordion title="Keep each skill narrow and outcome-focused">
@@ -247,21 +246,20 @@ You can create skills from scratch for Factory, or reuse existing skills you alr
   </Accordion>
 </AccordionGroup>
 
+## クックブック
 
-## Cookbook
+クックブックは、一般的なエンタープライズソフトウェアワークフローを対象とした意見のあるスキルテンプレートを提供します。
 
-The cookbook provides opinionated skill templates aimed at common enterprise software workflows.
+7つのスキルファミリーに焦点を当てています：
 
-We focus on seven families of skills:
-
-1. **[Frontend implementation skills](/guides/skills/frontend-ui-integration)** – building UI surfaces that integrate with existing APIs
-2. **[Integration skills for complex codebases](/cli/configuration/skills/service-integration)** – extending or wiring together services in large monorepos
-3. **[Internal data querying skills](/cli/configuration/skills/data-querying)** – safe, auditable access to internal analytics or data services
-4. **[Internal tools skills](/cli/configuration/skills/internal-tools)** – building small but robust internal apps that improve developer and operator workflows
-5. **[Vibe coding skills](/cli/configuration/skills/vibe-coding)** – rapidly prototyping and building complete modern web applications from scratch (Lovable/Bolt/v0 replacement)
-6. **[AI data analyst skills](/cli/configuration/skills/ai-data-analyst)** – comprehensive data analysis, visualization, and statistical modeling (data analyst tool replacement)
-7. **[Product management skills](/cli/configuration/skills/product-management)** – assisting with PRDs, feature analysis, and PM workflows (PM tool augmentation)
-8. **[Browser automation skills](/cli/configuration/skills/browser)** – launching Chrome via CDP, navigating live tabs, evaluating DOM state, and collecting screenshots or selectors without running an MCP server
+1. **[Frontend implementation skills](/guides/skills/frontend-ui-integration)** – 既存のAPIと統合するUIサーフェスの構築
+2. **[Integration skills for complex codebases](/cli/configuration/skills/service-integration)** – 大きなmonorepoでのサービスの拡張または配線
+3. **[Internal data querying skills](/cli/configuration/skills/data-querying)** – 内部分析またはデータサービスへの安全で監査可能なアクセス
+4. **[Internal tools skills](/cli/configuration/skills/internal-tools)** – 開発者と運用者のワークフローを改善する小さくても堅牢な内部アプリの構築
+5. **[Vibe coding skills](/cli/configuration/skills/vibe-coding)** – 完全なモダンWebアプリケーションをゼロから迅速にプロトタイピングし構築（Lovable/Bolt/v0の代替）
+6. **[AI data analyst skills](/cli/configuration/skills/ai-data-analyst)** – 包括的なデータ分析、可視化、統計モデリング（データアナリストツールの代替）
+7. **[Product management skills](/cli/configuration/skills/product-management)** – PRD、機能分析、PMワークフローの支援（PMツール拡張）
+8. **[Browser automation skills](/cli/configuration/skills/browser)** – CDP経由でChromeを起動し、ライブタブをナビゲートし、DOM状態を評価し、MCPサーバーを実行せずにスクリーンショットまたはセレクターを収集
 
 <CardGroup cols={2}>
   <Card
@@ -332,13 +330,13 @@ We focus on seven families of skills:
   </Card>
 </CardGroup>
 
-In practice, each skill folder can also contain **supporting utilities** the agent may use alongside the core prompt template – for example:
+実際には、各スキルフォルダにはエージェントがコアプロンプトテンプレートと一緒に使用する**サポートユーティリティ**も含めることができます。例：
 
-- `SKILL.md` or `skill.mdx` – the main skill specification
-- `references.md` – links and pointers to types, APIs, and modules that already exist in your codebase
-- `schemas/` – JSON/YAML schemas or OpenAPI snippets referenced by the skill (not the source-of-truth service code)
-- `checklists.md` – reusable validation or rollout checklists
+- `SKILL.md`または`skill.mdx` – メインのスキル仕様
+- `references.md` – コードベースに既に存在する型、API、モジュールへのリンクとポインター
+- `schemas/` – スキルによって参照されるJSON/YAMLスキーマまたはOpenAPIスニペット（信頼できるソースのサービスコードではない）
+- `checklists.md` – 再利用可能な検証またはロールアウトチェックリスト
 
-These co-located files give the agent a predictable, structured bundle of context to work from when the skill is invoked, without duplicating or relocating production code.
+これらの同じ場所に配置されたファイルは、スキルが呼び出されたときに、プロダクションコードを複製または再配置することなく、エージェントが作業する予測可能で構造化されたコンテキストバンドルを提供します。
 
-Use these as starting points and adapt the inputs, constraints, and verification steps to match your stack and governance requirements.
+これらを出発点として使用し、入力、制約、検証手順をあなたのスタックとガバナンス要件に合わせて調整してください。
