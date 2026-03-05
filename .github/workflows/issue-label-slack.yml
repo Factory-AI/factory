@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Prepare summary
         id: prepare
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const issueBody = (context.payload.issue.body || '').trim();
@@ -30,7 +30,7 @@ jobs:
 
       - name: Add 👀 reaction
         if: github.event.action == 'labeled'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             await github.rest.reactions.createForIssue({
