@@ -4,6 +4,100 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="March 5" rss={{ title: "CLI Updates", description: "VSCode Kitty protocol support and authentication fixes" }}>
+  `v0.68.1`
+
+  ## New features
+
+  * **VSCode Kitty protocol support** - Added Kitty keyboard protocol support for VSCode terminal integration
+
+  ## Bug fixes
+
+  * **Authentication issues on login** - Fixed authentication issues that could occur during login
+
+</Update>
+
+<Update label="March 4" rss={{ title: "CLI Updates", description: "Subagent inactivity timer, token rate limits settings, and streaming stability fixes" }}>
+  `v0.68.0`
+
+  ## New features
+
+  * **Subagent inactivity timer** - Subagents now automatically stop after 3 minutes of inactivity to prevent idle resource usage
+  * **Token rate limits settings** - Configure and view token rate limits directly within sessions and settings (app)
+
+  ## Bug fixes
+
+  * **VS Code auto-installation** - Fixed embedded VS Code auto-installation in the desktop app (app)
+  * **Desktop stability** - Fixed daemon restart issues in the desktop app (app)
+  * **Session resume** - Fixed reliability issues when resuming previous sessions
+  * **Streaming stability** - Fixed a crash that could occur during streaming retries
+  * **BYOK error handling** - Improved error messages for payment and authentication errors with custom API keys
+  * **Context management** - Improved handling when conversations exceed context limits
+  * **Image handling for text-only models** - Images are now properly handled when using text-only models
+  * **GLM-4.7 error handling** - Fixed error handling for GLM-4.7 model errors
+  * **MCP tool compatibility** - Improved MCP tool schema sanitization for better compatibility across model providers
+  * **Custom model streaming** - Fixed streaming issues with custom models
+  * **Reasoning level display** - Fixed reasoning level not displaying correctly after using /model in spec mode
+  * **Authentication reliability** - Reliability improvements to authentication mechanisms
+
+</Update>
+
+<Update label="March 3" rss={{ title: "CLI Updates", description: "CLI banners, /stats command, skills search, and configurable image compression" }}>
+  `v0.67.0`
+
+  ## New features
+
+  * **CLI banners** - Display customizable banners in the CLI for quick access to important information
+  * **`/stats` command** - The `/wrapped` command has been renamed to `/stats` with date range filtering support
+  * **Skills search bar** - Added search bar to the skills menu for quickly finding skills
+  * **Configurable image compression** - New `image_quality` parameter in the Read tool for controlling image compression quality
+  * **Electron app automation** - The agent-browser skill now supports automating Electron desktop applications
+
+  ## Improvements
+
+  * **Automation detail view** - Redesigned automation detail view to align with session UI patterns (app)
+  * **Windows ARM64 and Zed extension** - CLI distribution now includes Windows ARM64 builds and Zed editor extension
+
+  ## Bug fixes
+
+  * **Certificate loading order** - Fixed system certificate loading that could cause authentication failures on startup
+  * **Gemini schema compatibility** - Fixed schema compatibility issues with Gemini models
+  * **Payment redirect on desktop** - Fixed payment page redirect handling in the desktop app (app)
+  * **Character encoding** - Fixed display of malformed UTF characters in messages
+  * **Mission list formatting** - Fixed formatting of feature and worker list descriptions in missions
+  * **BYOK error handling** - Improved error messages for custom model (BYOK) configurations
+  * **MCP server reconnection** - Fixed potential deadlock when MCP servers fail to reload during disconnection
+  * **Execute tool file actions** - Fixed file operations not being applied correctly during command execution
+
+</Update>
+
+<Update label="March 2" rss={{ title: "CLI Updates", description: "/copy command, marketplace management, and mission worker improvements" }}>
+  `v0.66.0`
+
+  ## New features
+
+  * **`/copy` slash command** - Copy content to your clipboard directly from the CLI
+  * **Marketplace management** - New UI for managing marketplace plugins under the Plugins section in enterprise controls (app)
+  * **App version display** - Desktop app now shows the current version number (app)
+  * **Grouped exec sessions** - Droid exec sessions are now grouped under a dedicated tab for cleaner organization (app)
+
+  ## Improvements
+
+  * **Mission worker reliability** - Hardened mission worker lifecycle with improved pause and resume handling
+
+  ## Bug fixes
+
+  * **Subagent model and permissions** - Fixed subagent model inheritance and permissions level
+  * **BYOK compaction errors** - Upstream error details are now surfaced in BYOK compaction failures
+  * **Cross-provider messages** - Fixed message conversion for OpenAI Responses API across providers
+  * **Spec model display** - Corrected spec model display in `/model` selector and prevented global fallback on clear
+  * **Session archiving** - Fixed session archive confirmation flow in the app
+  * **Chat scrolling** - Fixed scroll-to-last-message behavior in session chat (app)
+  * **User limits modal** - Fixed scroll bug in the Individual User Limits modal (app)
+  * **Diff generation** - Fixed potential crash with non-string inputs in diff generation
+
+</Update>
+
 <Update label="February 27" rss={{ title: "CLI Updates", description: "Diagnostics command, GitHub comments in diff viewer, and mission mode fixes" }}>
   `v0.65.0`
 
