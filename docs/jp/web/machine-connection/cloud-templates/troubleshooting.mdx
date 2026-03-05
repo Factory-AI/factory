@@ -3,21 +3,21 @@ title: "クラウドテンプレート – トラブルシューティング"
 description: Diagnose and resolve common problems when creating, connecting to, or working inside a cloud template
 ---
 
-Even the smoothest cloud template can hit a snag. This guide walks you through the quickest fixes for the most common cloud template issues.
+最もスムーズなクラウドテンプレートでも問題が発生することがあります。このガイドでは、最も一般的なクラウドテンプレートの問題に対する最も迅速な修正方法を説明します。
 
-## Quick Reference
+## クイックリファレンス
 
-| Category               | Typical Symptoms                                                              |
+| カテゴリ               | 典型的な症状                                                              |
 | ---------------------- | ----------------------------------------------------------------------------- |
-| **Workspace Creation** | “Provisioning” forever, cloning errors, setup script fails             |
-| **Connection**         | Can’t attach from session, pairing spinner never stops, “Machine unavailable” |
-| **Performance**        | Slow rebuilds, high latency in terminal, laggy editor                         |
-| **Devcontainer**       | Build errors, “command not found”, ports not reachable                        |
-| **General Usage**      | Git asks for credentials, disk full, permission denied                        |
+| **ワークスペース作成** | 「プロビジョニング」が永続、クローンエラー、セットアップスクリプト失敗             |
+| **接続**         | セッションからアタッチできない、ペアリングスピナーが停止しない、「マシン利用不可」 |
+| **パフォーマンス**        | リビルドが遅い、ターミナルの高レイテンシ、エディターの動作が重い                         |
+| **Devcontainer**       | ビルドエラー、「command not found」、ポートにアクセスできない                        |
+| **一般的な使用**      | Gitが認証情報を要求、ディスク容量不足、アクセス拒否                        |
 
 ---
 
-## 1. Workspace Creation Issues
+## 1. ワークスペース作成の問題
 
 <AccordionGroup>
 
@@ -36,7 +36,7 @@ Even the smoothest cloud template can hit a snag. This guide walks you through t
 
 ---
 
-## 2. Connection Problems
+## 2. 接続の問題
 
 <Steps>
 
@@ -55,31 +55,31 @@ Even the smoothest cloud template can hit a snag. This guide walks you through t
 
 ---
 
-## 3. Performance & Speed
+## 3. パフォーマンスと速度
 
-| Symptom                   | Fix                                                                                                                              |
+| 症状                   | 修正方法                                                                                                                              |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| **Rebuild takes > 5 min** | Add `.dockerignore` for `node_modules`, `*.pyc`, build outputs• Use a lighter base image (e.g., alpine)                        |
-| **Terminal latency**      | Close unused browser tabs with heavy JS• Check local bandwidth (>5 Mbps recommended)• Pause real-time spell-checker extensions |
-| **Editor lag**            | Disable file watchers in dev tools (`nodemon`, `webpack --watch`) unless needed• Use auto-save only when collaborating         |
+| **リビルドが5分以上かかる** | `.dockerignore`、`node_modules`、`*.pyc`、ビルド出力に対して`.dockerignore`を追加する• より軽量なベースイメージを使用（例：alpine）                        |
+| **ターミナルのレイテンシ**      | 重いJSを使用している未使用のブラウザタブを閉じる• ローカル帯域幅を確認（5 Mbps以上推奨）• リアルタイムスペルチェック拡張機能を一時停止 |
+| **エディターの遅延**            | 必要でない限り開発ツール（`nodemon`、`webpack --watch`）のファイルウォッチャーを無効化• 自動保存はコラボレーション時のみ使用         |
 
 ---
 
-## 4. General Usage Troubles
+## 4. 一般的な使用上のトラブル
 
-| Issue                              | Resolution                                                                                                               |
+| 問題                              | 解決方法                                                                                                               |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Git prompts for credentials**    | Make sure the repo integration is connected; cloud template injects HTTPS tokens automatically.                        |
-| **Disk quota exceeded**            | Clear package caches (`npm cache clean --force`, `pip cache purge`), remove large build artifacts, or rebuild template. |
-| **Permission denied on file save** | File is outside the repo template; save inside `/workspaces/<repo>/`.                                                |
-| **Cannot install global packages** | Use `npm install -g` or `pip install --user`. If still blocked, add commands to `postCreateCommand`.                     |
-| **History lost after rebuild**     | Anything outside `/workspaces` is cleared during rebuild. Commit important scripts or store them inside the repo.        |
+| **Gitが認証情報を要求する**    | リポジトリ統合が接続されていることを確認してください。クラウドテンプレートはHTTPSトークンを自動的に注入します。                        |
+| **ディスククォータ超過**            | パッケージキャッシュ（`npm cache clean --force`、`pip cache purge`）をクリア、大きなビルドアーティファクトを削除、またはテンプレートをリビルド。 |
+| **ファイル保存でアクセス拒否** | ファイルがリポジトリテンプレート外にあります。`/workspaces/<repo>/`内に保存してください。                                                |
+| **グローバルパッケージをインストールできない** | `npm install -g`または`pip install --user`を使用。まだブロックされる場合は、`postCreateCommand`にコマンドを追加。                     |
+| **リビルド後に履歴が失われる**     | `/workspaces`外のものはリビルド中にクリアされます。重要なスクリプトをコミットするか、リポジトリ内に保存してください。        |
 
 ---
 
-## Need More Help?
+## さらなるヘルプが必要ですか？
 
-- **Best Practices** – Optimize performance with the [Cloud Template Best Practices guide](/web/machine-connection/cloud-templates/best-practices)
-- **Support** – Reach out in your Factory support channel with template ID and error message
+- **ベストプラクティス** – [Cloud Template Best Practices guide](/web/machine-connection/cloud-templates/best-practices)でパフォーマンスを最適化
+- **サポート** – テンプレートIDとエラーメッセージと共にFactoryサポートチャンネルまでご連絡ください
 
-> A quick rebuild fixes 80 % of issues—don’t hesitate to click **Rebuild** when in doubt.
+> クイックリビルドで問題の80%が解決します。迷ったときは躊躇せず**リビルド**をクリックしてください。

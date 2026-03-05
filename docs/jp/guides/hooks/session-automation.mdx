@@ -4,45 +4,37 @@ description: "Automate session setup with context loading, environment configura
 keywords: ['session', 'automation', 'setup', 'environment', 'context', 'dependencies', 'hook']
 ---
 
-This cookbook shows how to use SessionStart hooks to automatically prepare your development environment when Droid starts, saving time and ensuring consistency.
+このクックブックは、SessionStartフックを使用してDroidの起動時に開発環境を自動的に準備し、時間を節約して一貫性を確保する方法を説明します。
 
-## How it works
+## 仕組み
 
-SessionStart hooks:
+SessionStartフック:
 
-1. **Run at session start**: Triggered when starting new sessions or resuming
-2. **Load context**: Add relevant project information to the conversation
-3. **Setup environment**: Configure paths, environment variables, tools
-4. **Check dependencies**: Verify required tools and packages are available
-5. **Persist state**: Set environment variables for the entire session
+1. **セッション開始時に実行**: 新しいセッションの開始時または再開時にトリガーされます
+2. **コンテキストの読み込み**: 関連するプロジェクト情報を会話に追加します
+3. **環境のセットアップ**: パス、環境変数、ツールを設定します
+4. **依存関係の確認**: 必要なツールとパッケージが利用可能であることを確認します
+5. **状態の永続化**: セッション全体の環境変数を設定します
 
-## Prerequisites
+## 前提条件
 
-Basic tools for automation:
+自動化のための基本ツール:
 
 <CodeGroup>
 
-```bash macOS/Linux
-# jq for JSON processing
-brew install jq  # macOS
-sudo apt-get install jq  # Ubuntu/Debian
-```
+__PRESERVE_0__
 
-```bash Git/GitHub CLI
-# For loading Git context
-git --version
-gh --version  # Optional: GitHub CLI
-```
+__PRESERVE_1__
 
 </CodeGroup>
 
-## Basic session automation
+## 基本的なセッション自動化
 
-### Load project context
+### プロジェクトコンテキストの読み込み
 
-Automatically provide Droid with project information.
+Droidにプロジェクト情報を自動的に提供します。
 
-Create `.factory/hooks/load-context.sh`:
+`.factory/hooks/load-context.sh`を作成:
 
 ```bash
 #!/bin/bash
@@ -109,7 +101,7 @@ exit 0
 chmod +x .factory/hooks/load-context.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加:
 
 ```json
 {
@@ -129,11 +121,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Setup development environment
+### 開発環境のセットアップ
 
-Configure tools and paths automatically.
+ツールとパスを自動的に設定します。
 
-Create `.factory/hooks/setup-env.sh`:
+`.factory/hooks/setup-env.sh`を作成:
 
 ```bash
 #!/bin/bash
@@ -210,13 +202,13 @@ chmod +x .factory/hooks/setup-env.sh
 ```
 
 
-## Advanced automation
+## 高度な自動化
 
-### Load recent Linear/GitHub issues
+### 最新のLinear/GitHubイシューの読み込み
 
-Provide Droid with context about current work.
+現在の作業に関するコンテキストをDroidに提供します。
 
-Create `.factory/hooks/load-issues.sh`:
+`.factory/hooks/load-issues.sh`を作成:
 
 ```bash
 #!/bin/bash
@@ -268,11 +260,11 @@ exit 0
 chmod +x .factory/hooks/load-issues.sh
 ```
 
-### Check and install dependencies
+### 依存関係の確認とインストール
 
-Automatically ensure dependencies are up-to-date.
+依存関係が最新であることを自動的に確認します。
 
-Create `.factory/hooks/check-dependencies.sh`:
+`.factory/hooks/check-dependencies.sh`を作成:
 
 ```bash
 #!/bin/bash
@@ -353,11 +345,11 @@ exit 0
 chmod +x .factory/hooks/check-dependencies.sh
 ```
 
-### Load custom project guidelines
+### カスタムプロジェクトガイドラインの読み込み
 
-Provide project-specific instructions automatically.
+プロジェクト固有の指示を自動的に提供します。
 
-Create `.factory/AGENTS.md` with project guidelines:
+プロジェクトガイドラインを含む`.factory/AGENTS.md`を作成:
 
 ```markdown
 # Project Guidelines for Droid
@@ -386,7 +378,7 @@ Create `.factory/AGENTS.md` with project guidelines:
 - Squash commits before merging
 ```
 
-Create `.factory/hooks/load-guidelines.sh`:
+`.factory/hooks/load-guidelines.sh`を作成:
 
 ```bash
 #!/bin/bash
@@ -425,13 +417,13 @@ chmod +x .factory/hooks/load-guidelines.sh
 ```
 
 
-### Smart context based on Git branch
+### Gitブランチに基づくスマートコンテキスト
 
-Load different context based on the current branch:
+現在のブランチに基づいて異なるコンテキストを読み込みます:
 
 
 
-Create `.factory/hooks/branch-context.sh`:
+`.factory/hooks/branch-context.sh`を作成:
 
 ```bash
 #!/bin/bash
@@ -511,15 +503,15 @@ chmod +x .factory/hooks/branch-context.sh
 ```
 
 
-## Real-world examples
+## 実際の例
 
-### Example 1: Monorepo workspace setup
+### 例1: モノレポワークスペースのセットアップ
 
-Automatically switch to the right package:
+適切なパッケージに自動的に切り替えます:
 
 
 
-Create `.factory/hooks/monorepo-setup.sh`:
+`.factory/hooks/monorepo-setup.sh`を作成:
 
 ```bash
 #!/bin/bash
@@ -559,13 +551,13 @@ exit 0
 ```
 
 
-### Example 2: Docker environment check
+### 例2: Docker環境の確認
 
-Ensure Docker services are running:
+Dockerサービスが実行中であることを確認します:
 
 
 
-Create `.factory/hooks/check-docker.sh`:
+`.factory/hooks/check-docker.sh`を作成:
 
 ```bash
 #!/bin/bash
@@ -604,70 +596,42 @@ exit 0
 ```
 
 
-## Best practices
+## ベストプラクティス
 
 <Steps>
   <Step title="Keep context concise">
     Only load essential information:
-    ```bash
-    # Show summary, not full content
-    echo "Found $(wc -l < README.md) lines in README"
-    # Instead of: cat README.md
-    ```
+    __PRESERVE_18__
   </Step>
   
   <Step title="Cache expensive operations">
     Avoid repeated expensive checks:
-    ```bash
-    CACHE_FILE="/tmp/droid-context-$(date +%Y%m%d)"
-    if [ -f "$CACHE_FILE" ]; then
-      cat "$CACHE_FILE"
-      exit 0
-    fi
-    
-    # Generate context...
-    echo "$context" | tee "$CACHE_FILE"
-    ```
+    __PRESERVE_19__
   </Step>
   
   <Step title="Use DROID_ENV_FILE for environment">
     Persist environment variables correctly:
-    ```bash
-    if [ -n "$DROID_ENV_FILE" ]; then
-      echo 'export NODE_ENV=development' >> "$DROID_ENV_FILE"
-      echo 'export API_URL=http://localhost:3000' >> "$DROID_ENV_FILE"
-    fi
-    ```
+    __PRESERVE_20__
   </Step>
   
   <Step title="Handle missing tools gracefully">
     Check before using external commands:
-    ```bash
-    if command -v gh &> /dev/null; then
-      gh issue list
-    else
-      echo "GitHub CLI not installed (skip with: brew install gh)"
-    fi
-    ```
+    __PRESERVE_21__
   </Step>
   
   <Step title="Provide actionable suggestions">
     Tell users what to do next:
-    ```bash
-    echo "⚠️ Dependencies out of date"
-    echo "Action: Run 'npm install' to update"
-    echo "Or: Let me handle this - just ask 'install dependencies'"
-    ```
+    __PRESERVE_22__
   </Step>
 </Steps>
 
-## Troubleshooting
+## トラブルシューティング
 
 
   
-    **Problem**: Too much information loaded
+    **問題**: 読み込まれる情報が多すぎる
     
-    **Solution**: Summarize and link to details:
+    **解決策**: 要約して詳細にリンクします:
     ```bash
     echo "README.md exists ($(wc -l < README.md) lines)"
     echo "Run 'cat README.md' to view full content"
@@ -675,9 +639,9 @@ exit 0
   
   
   
-    **Problem**: Variables not available in Bash commands
+    **問題**: Bashコマンドで変数が利用できない
     
-    **Solution**: Verify DROID_ENV_FILE usage:
+    **解決策**: DROID_ENV_FILEの使用方法を確認します:
     ```bash
     if [ -z "$DROID_ENV_FILE" ]; then
       echo "DROID_ENV_FILE not available" >&2
@@ -690,9 +654,9 @@ exit 0
   
   
   
-    **Problem**: Session start takes too long
+    **問題**: セッション開始に時間がかかりすぎる
     
-    **Solution**: Run expensive operations asynchronously:
+    **解決策**: 負荷の高い操作を非同期で実行します:
     ```bash
     # Start background job for slow operations
     (
@@ -706,9 +670,9 @@ exit 0
   
 
 
-## See also
+## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - Complete hooks API documentation
-- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
-- [Custom notifications](/guides/hooks/notifications) - Get notified about events
-- [Logging and analytics](/guides/hooks/logging-analytics) - Track session metrics
+- [Hooks reference](/reference/hooks-reference) - 完全なフックAPI文書
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Custom notifications](/guides/hooks/notifications) - イベントに関する通知を受け取る
+- [Logging and analytics](/guides/hooks/logging-analytics) - セッションメトリクスを追跡する

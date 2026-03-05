@@ -4,57 +4,57 @@ description: Extend Droid with shareable packages of skills, commands, and tools
 keywords: ['plugins', 'extensions', 'marketplace', 'skills', 'commands', 'mcp', 'shareable']
 ---
 
-Plugins let you extend Droid with custom functionality that can be shared across projects and teams. A plugin bundles skills, slash commands, agents, and MCP servers into a single, distributable package.
+プラグインを使用すると、プロジェクトやチーム間で共有できるカスタム機能でDroidを拡張できます。プラグインは、スキル、スラッシュコマンド、エージェント、MCPサーバーを単一の配布可能なパッケージにバンドルします。
 
-## What are plugins?
+## プラグインとは何ですか？
 
-Plugins are directories containing a manifest file (`.factory-plugin/plugin.json`) and optional components like skills, commands, and agents. Unlike standalone configuration in `.factory/`, plugins are designed for sharing and distribution.
+プラグインは、マニフェストファイル（`.factory-plugin/plugin.json`）と、スキル、コマンド、エージェントなどのオプションコンポーネントを含むディレクトリです。`.factory/` でのスタンドアロン設定とは異なり、プラグインは共有と配布のために設計されています。
 
-**Plugin components:**
+**プラグインコンポーネント:**
 
-| Component | Purpose | Invocation |
+| コンポーネント | 目的 | 呼び出し方法 |
 |-----------|---------|------------|
-| **Skills** | Reusable capabilities with instructions and tools | Model-invoked automatically based on task |
-| **Commands** | Slash commands for specific workflows | User-invoked via `/command-name` |
-| **Agents** | Specialized subagent definitions | Called via Task tool |
-| **Hooks** | Lifecycle event handlers | Automatic on matching events |
-| **MCP Servers** | External tool integrations | Available as tools when plugin is active |
+| **スキル** | 指示とツールを含む再利用可能な機能 | タスクに基づいてモデルが自動的に呼び出し |
+| **コマンド** | 特定のワークフロー用のスラッシュコマンド | `/command-name` を介してユーザーが呼び出し |
+| **エージェント** | 特殊化されたサブエージェント定義 | Taskツールを介して呼び出し |
+| **フック** | ライフサイクルイベントハンドラー | マッチするイベントで自動実行 |
+| **MCPサーバー** | 外部ツール統合 | プラグインがアクティブな時にツールとして利用可能 |
 
-## When to use plugins vs standalone configuration
+## プラグインとスタンドアロン設定をいつ使うか
 
-| Approach | Best for |
+| アプローチ | 最適な用途 |
 |----------|----------|
-| **Standalone** (`.factory/` directory) | Personal workflows, project-specific customizations, quick experiments |
-| **Plugins** | Sharing with teammates, distributing to community, versioned releases, reusable across projects |
+| **スタンドアロン** （`.factory/` ディレクトリ） | 個人的なワークフロー、プロジェクト固有のカスタマイズ、迅速な実験 |
+| **プラグイン** | チームメートとの共有、コミュニティへの配布、バージョン管理されたリリース、プロジェクト間での再利用 |
 
-Start with standalone configuration in `.factory/` for quick iteration, then convert to a plugin when you're ready to share.
+迅速な反復のために `.factory/` でスタンドアロン設定から始め、共有する準備ができたらプラグインに変換してください。
 
-## Managing plugins
+## プラグインの管理
 
-Droid provides two ways to manage plugins:
+Droidはプラグインを管理する2つの方法を提供します：
 
-### Interactive UI (recommended)
+### 対話式UI（推奨）
 
-Use the `/plugins` slash command to open the plugin manager:
+`/plugins` スラッシュコマンドを使用してプラグインマネージャーを開きます：
 
 ```
 /plugins
 ```
 
-This opens a tabbed interface:
-- **Browse** - View and install plugins from registered marketplaces
-- **Installed** - Manage installed plugins (view info, update, uninstall)
-- **Marketplaces** - Add, update, or remove marketplaces
+これによりタブ付きインターフェースが開きます：
+- **ブラウズ** - 登録されたマーケットプレイスからプラグインを表示・インストール
+- **インストール済み** - インストール済みプラグインを管理（情報表示、更新、アンインストール）
+- **マーケットプレイス** - マーケットプレイスの追加、更新、削除
 
-**Navigation:**
-- Left/Right arrows: Switch between tabs
-- Up/Down arrows: Navigate within a tab
-- Enter: Select/confirm
-- Escape: Go back or close
+**ナビゲーション:**
+- 左/右矢印：タブ間の切り替え
+- 上/下矢印：タブ内でのナビゲート
+- Enter：選択/確認
+- Escape：戻る、または閉じる
 
-### CLI commands (for scripting)
+### CLIコマンド（スクリプト用）
 
-For automation, use CLI commands from your shell (not as slash commands):
+自動化のために、シェルからCLIコマンドを使用してください（スラッシュコマンドとしてではありません）：
 
 ```bash
 # Marketplace management
@@ -70,11 +70,11 @@ droid plugin update [plugin@marketplace] [--scope user|project]
 droid plugin list [--scope user|project]
 ```
 
-Plugin IDs use the format `pluginName@marketplaceName` (e.g., `security-guidance@claude-plugins-official`).
+プラグインIDは `pluginName@marketplaceName` の形式を使用します（例：`security-guidance@claude-plugins-official`）。
 
-## Plugin structure
+## プラグインの構造
 
-Every plugin follows this directory structure:
+すべてのプラグインは以下のディレクトリ構造に従います：
 
 ```
 my-plugin/
@@ -92,12 +92,12 @@ my-plugin/
 ```
 
 <Warning>
-Don't put `commands/`, `skills/`, `droids/`, or `hooks/` inside the `.factory-plugin/` directory. Only `plugin.json` goes inside `.factory-plugin/`. All other directories must be at the plugin root level.
+Don't put __PRESERVE_19__, __PRESERVE_20__, __PRESERVE_21__, or __PRESERVE_22__ inside the __PRESERVE_23__ directory. Only __PRESERVE_24__ goes inside __PRESERVE_25__. All other directories must be at the plugin root level.
 </Warning>
 
-### Plugin hooks
+### プラグインフック
 
-Plugins can include hooks that execute at specific lifecycle events. Add a `hooks/` directory with a `hooks.json` file:
+プラグインは特定のライフサイクルイベントで実行されるフックを含むことができます。`hooks.json` ファイルを含む `hooks/` ディレクトリを追加してください：
 
 ```
 my-plugin/
@@ -109,7 +109,7 @@ my-plugin/
 └── ...
 ```
 
-**hooks/hooks.json example:**
+**hooks/hooks.json の例:**
 
 ```json
 {
@@ -127,11 +127,11 @@ my-plugin/
 }
 ```
 
-Use `${DROID_PLUGIN_ROOT}` to reference files within your plugin directory. This variable is expanded to the actual plugin path when the hook runs. See [Hooks reference](/reference/hooks-reference#plugin-hooks) for details.
+`${DROID_PLUGIN_ROOT}` を使用してプラグインディレクトリ内のファイルを参照してください。この変数はフックが実行される際に実際のプラグインパスに展開されます。詳細は [Hooks reference](/reference/hooks-reference#plugin-hooks) を参照してください。
 
-### Plugin manifest
+### プラグインマニフェスト
 
-The manifest at `.factory-plugin/plugin.json` defines your plugin's identity:
+`.factory-plugin/plugin.json` のマニフェストはプラグインのアイデンティティを定義します：
 
 ```json
 {
@@ -144,45 +144,45 @@ The manifest at `.factory-plugin/plugin.json` defines your plugin's identity:
 }
 ```
 
-| Field | Purpose |
+| フィールド | 目的 |
 |-------|---------|
-| `name` | Unique identifier for the plugin. |
-| `description` | Shown in the plugin manager when browsing or installing. |
-| `version` | Track releases using semantic versioning. |
-| `author` | Optional. Helpful for attribution. |
+| `name` | プラグインの一意識別子。 |
+| `description` | ブラウズまたはインストール時にプラグインマネージャーで表示される。 |
+| `version` | セマンティックバージョニングを使用してリリースを追跡。 |
+| `author` | オプション。帰属の表示に役立つ。 |
 
-## Plugin scopes
+## プラグインスコープ
 
-When installing plugins, you choose an installation scope:
+プラグインをインストールする際、インストールスコープを選択します：
 
-| Scope | Location | Visibility |
+| スコープ | 場所 | 可視性 |
 |-------|----------|------------|
-| **User** | `~/.factory/` | Available across all your projects |
-| **Project** | `<project>/.factory/` | Shared with teammates via git |
+| **ユーザー** | `~/.factory/` | すべてのプロジェクトで利用可能 |
+| **プロジェクト** | `<project>/.factory/` | gitを介してチームメートと共有 |
 
 <Note>
-**Org scope**: Plugins enabled via organization managed settings are automatically installed with `org` scope. You cannot manually set org scope.
+**Org scope**: Plugins enabled via organization managed settings are automatically installed with __PRESERVE_36__ scope. You cannot manually set org scope.
 </Note>
 
-A plugin can only exist at one scope. To change scope, uninstall first and reinstall.
+プラグインは1つのスコープにのみ存在できます。スコープを変更するには、まずアンインストールしてから再インストールしてください。
 
-## Version tracking
+## バージョン追跡
 
-Plugins are versioned by Git commit hash, not semantic version. When you update a plugin, Droid fetches the latest commit from the marketplace repository.
+プラグインはセマンティックバージョンではなく、Gitコミットハッシュでバージョン管理されます。プラグインを更新すると、Droidはマーケットプレイスリポジトリから最新のコミットを取得します。
 
 <Note>
 Version pinning is not supported. Updates always fetch the latest version from the marketplace.
 </Note>
 
-## Marketplaces
+## マーケットプレイス
 
-Marketplaces are catalogs of plugins that you can browse and install from.
+マーケットプレイスは、ブラウズしてインストールできるプラグインのカタログです。
 
-### Adding marketplaces
+### マーケットプレイスの追加
 
-Via UI: `/plugins` → Marketplaces tab → "Add new marketplace" → enter URL
+UI経由：`/plugins` → マーケットプレイスタブ → "新しいマーケットプレイスを追加" → URLを入力
 
-Via CLI:
+CLI経由：
 
 ```bash
 # From GitHub
@@ -195,11 +195,11 @@ droid plugin marketplace add https://gitlab.com/company/plugins.git
 droid plugin marketplace add /path/to/local/marketplace
 ```
 
-### Managing marketplaces
+### マーケットプレイスの管理
 
-Via UI: `/plugins` → Marketplaces tab → select marketplace → choose action (Update, Disable auto-update, Delete)
+UI経由：`/plugins` → マーケットプレイスタブ → マーケットプレイスを選択 → アクションを選択（更新、自動更新を無効化、削除）
 
-Via CLI:
+CLI経由：
 
 ```bash
 droid plugin marketplace list
@@ -211,9 +211,9 @@ droid plugin marketplace remove <marketplace-name>
 Removing a marketplace does not uninstall plugins from that marketplace. Installed plugins remain functional from cache.
 </Note>
 
-### Team marketplaces
+### チームマーケットプレイス
 
-Configure automatic marketplace and plugin installation by adding to `.factory/settings.json`:
+`.factory/settings.json` に追加することで、マーケットプレイスとプラグインの自動インストールを設定できます：
 
 ```json
 {
@@ -231,60 +231,60 @@ Configure automatic marketplace and plugin installation by adding to `.factory/s
 }
 ```
 
-When Droid starts, it automatically:
-1. Registers any marketplaces from `extraKnownMarketplaces` that aren't already registered
-2. Installs any plugins from `enabledPlugins` that aren't already installed
+Droidが開始すると、自動的に：
+1. まだ登録されていない `extraKnownMarketplaces` からのマーケットプレイスを登録
+2. まだインストールされていない `enabledPlugins` からのプラグインをインストール
 
-The installation scope depends on where the setting is defined:
-- Org-managed settings → `org` scope
-- User settings → `user` scope
-- Project settings → `project` scope
+インストールスコープは設定が定義された場所によって決まります：
+- 組織管理設定 → `org` スコープ
+- ユーザー設定 → `user` スコープ
+- プロジェクト設定 → `project` スコープ
 
-## Discovering plugins
+## プラグインの発見
 
-### Official Factory plugins
+### 公式Factoryプラグイン
 
-Factory maintains an official plugin marketplace at `Factory-AI/factory-plugins` with curated plugins.
+Factoryは `Factory-AI/factory-plugins` で厳選されたプラグインを含む公式プラグインマーケットプレイスを維持しています。
 
-Add via `/plugins` UI or CLI:
+`/plugins` UIまたはCLI経由で追加：
 
 ```bash
 droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
 ```
 
-**Available plugins:**
+**利用可能なプラグイン:**
 
-| Plugin | Description |
+| プラグイン | 説明 |
 |--------|-------------|
-| **droid-evolved** | Skills for continuous learning: session navigation, human writing, skill creation, visual design, frontend design, browser automation |
-| **security-engineer** | Security review, threat modeling, commit scanning, and vulnerability validation |
+| **droid-evolved** | 継続的学習のためのスキル：セッションナビゲーション、人間的な文章作成、スキル作成、ビジュアルデザイン、フロントエンドデザイン、ブラウザ自動化 |
+| **security-engineer** | セキュリティレビュー、脅威モデリング、コミットスキャン、脆弱性検証 |
 
-Install via `/plugins` UI (Browse tab) or CLI:
+`/plugins` UI（ブラウズタブ）またはCLI経由でインストール：
 
 ```bash
 droid plugin install droid-evolved@factory-plugins
 droid plugin install security-engineer@factory-plugins
 ```
 
-### Community plugins
+### コミュニティプラグイン
 
-| Plugin | Description | Source |
+| プラグイン | 説明 | ソース |
 |--------|-------------|--------|
-| **superpowers** | Complete software development workflow with brainstorming, planning, and subagent-driven development | `obra/superpowers` |
+| **superpowers** | ブレインストーミング、計画、サブエージェント駆動開発を含む完全なソフトウェア開発ワークフロー | `obra/superpowers` |
 
 ### Enterprise Plugin Registry
 
-For organizations that need centralized control over approved plugins, see [Enterprise Plugin Registry](/enterprise/enterprise-plugin-registry). This allows you to:
+承認されたプラグインに対する集中制御が必要な組織については、[Enterprise Plugin Registry](/enterprise/enterprise-plugin-registry) を参照してください。これにより以下のことが可能になります：
 
-- Maintain a private marketplace of approved plugins
-- Pre-install mandatory plugins for all users
-- Organize plugins by team, role, or capability
+- 承認されたプラグインのプライベートマーケットプレイスを維持
+- すべてのユーザーに対して必須プラグインを事前インストール
+- チーム、役割、または機能別にプラグインを整理
 
-### Claude Code compatibility
+### Claude Code互換性
 
-Droid is compatible with plugins built for Claude Code. If you find a Claude Code plugin you'd like to use, you can install it directly - the plugin format is interoperable. See the [Claude Code plugins documentation](https://code.claude.com/docs/en/plugins) for more details.
+DroidはClaude Code用に構築されたプラグインと互換性があります。使用したいClaude Codeプラグインを見つけた場合、直接インストールできます - プラグイン形式は相互運用可能です。詳細は [Claude Code plugins documentation](https://code.claude.com/docs/en/plugins) を参照してください。
 
-## Next steps
+## 次のステップ
 
 <CardGroup cols={2}>
   <Card title="Building plugins" href="/guides/building/building-plugins" icon="hammer">
@@ -299,4 +299,3 @@ Droid is compatible with plugins built for Claude Code. If you find a Claude Cod
   <Card title="Custom Droids" href="/cli/configuration/custom-droids" icon="robot">
     Create specialized subagents for your plugins.
   </Card>
-</CardGroup>

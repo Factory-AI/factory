@@ -11,23 +11,23 @@ keywords:
   ]
 ---
 
-The Readiness Reports API provides programmatic access to your organization's agent readiness evaluation data.
+Readiness Reports APIは、組織のエージェント準備状況評価データへのプログラマティックアクセスを提供します。
 
 ---
 
-## Authentication
+## 認証
 
-All requests require a Factory API key in the `Authorization` header:
+すべてのリクエストには`Authorization`ヘッダーにFactory APIキーが必要です：
 
 ```bash
 Authorization: Bearer fk-your-api-key
 ```
 
-Generate API keys at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys).
+APIキーは[app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)で生成してください。
 
 ---
 
-## Base URL
+## ベースURL
 
 ```
 https://app.factory.ai
@@ -35,25 +35,25 @@ https://app.factory.ai
 
 ---
 
-## Endpoints
+## エンドポイント
 
-### List Readiness Reports
+### Readiness Reportsの一覧取得
 
-Retrieves readiness reports for your organization.
+組織の準備状況レポートを取得します。
 
 ```
 GET /api/organization/maturity-level-reports
 ```
 
-#### Query Parameters
+#### クエリパラメータ
 
-| Parameter    | Type    | Required | Description                                            |
+| パラメータ    | 型    | 必須 | 説明                                            |
 | :----------- | :------ | :------- | :----------------------------------------------------- |
-| `repoId`     | string  | No       | Filter reports by repository ID                        |
-| `limit`      | integer | No       | Maximum number of reports to return (must be positive) |
-| `startAfter` | string  | No       | Report ID for pagination cursor                        |
+| `repoId`     | string  | No       | リポジトリIDでレポートをフィルタ                        |
+| `limit`      | integer | No       | 返すレポートの最大数（正の値である必要があります） |
+| `startAfter` | string  | No       | ページネーションカーソル用のレポートID                        |
 
-#### Response
+#### レスポンス
 
 ```json
 {
@@ -96,7 +96,7 @@ GET /api/organization/maturity-level-reports
 }
 ```
 
-#### Example Request
+#### リクエスト例
 
 ```bash
 curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limit=10" \
@@ -105,54 +105,54 @@ curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limi
 
 ---
 
-## Readiness Report Schema
+## Readiness Reportスキーマ
 
-### Report Object
+### Reportオブジェクト
 
-| Field                 | Type     | Description                                                |
+| フィールド                 | 型     | 説明                                                |
 | :-------------------- | :------- | :--------------------------------------------------------- |
-| `reportId`            | string   | Unique identifier for the report (UUID)                    |
-| `createdAt`           | number   | Unix timestamp in milliseconds when the report was created |
-| `repoUrl`             | string   | Repository URL that was evaluated                          |
-| `apps`                | object   | Map of application paths to description objects            |
-| `report`              | object   | Map of criterion IDs to evaluation results                 |
-| `commitHash`          | string?  | Git commit hash at time of evaluation                      |
-| `branch`              | string?  | Git branch name at time of evaluation                      |
-| `hasLocalChanges`     | boolean? | Whether uncommitted changes existed                        |
-| `hasNonRemoteCommits` | boolean? | Whether unpushed commits existed                           |
-| `modelUsed`           | object?  | Model configuration used for evaluation                    |
-| `droidVersion`        | string?  | CLI version that generated the report                      |
+| `reportId`            | string   | レポートの一意識別子（UUID）                    |
+| `createdAt`           | number   | レポートが作成されたUnixタイムスタンプ（ミリ秒） |
+| `repoUrl`             | string   | 評価されたリポジトリURL                          |
+| `apps`                | object   | アプリケーションパスから説明オブジェクトへのマップ            |
+| `report`              | object   | 基準IDから評価結果へのマップ                 |
+| `commitHash`          | string?  | 評価時のGitコミットハッシュ                      |
+| `branch`              | string?  | 評価時のGitブランチ名                      |
+| `hasLocalChanges`     | boolean? | コミットされていない変更が存在したかどうか                        |
+| `hasNonRemoteCommits` | boolean? | プッシュされていないコミットが存在したかどうか                           |
+| `modelUsed`           | object?  | 評価に使用されたモデル設定                    |
+| `droidVersion`        | string?  | レポートを生成したCLIバージョン                      |
 
-### App Description Object
+### App Descriptionオブジェクト
 
-| Field         | Type   | Description                                    |
+| フィールド         | 型   | 説明                                    |
 | :------------ | :----- | :--------------------------------------------- |
-| `description` | string | Brief description of what the application does |
+| `description` | string | アプリケーションの機能に関する簡潔な説明 |
 
-### Criterion Evaluation Object
+### Criterion Evaluationオブジェクト
 
-| Field         | Type   | Description                                                                 |
+| フィールド         | 型   | 説明                                                                 |
 | :------------ | :----- | :-------------------------------------------------------------------------- |
-| `numerator`   | number | Number of sub-applications passing the criterion (0 to denominator)         |
-| `denominator` | number | Number of sub-applications on which the criterion was evaluated (minimum 1) |
-| `rationale`   | string | Explanation of the evaluation result                                        |
+| `numerator`   | number | 基準を満たしたサブアプリケーションの数（0からdenominatorまで）         |
+| `denominator` | number | 基準が評価されたサブアプリケーションの数（最低1） |
+| `rationale`   | string | 評価結果の説明                                        |
 
-### Model Used Object
+### Model Usedオブジェクト
 
-| Field             | Type   | Description                                             |
+| フィールド             | 型   | 説明                                             |
 | :---------------- | :----- | :------------------------------------------------------ |
-| `id`              | string | Model identifier                                        |
-| `reasoningEffort` | string | Reasoning effort level (`low`, `medium`, `high`, `off`) |
+| `id`              | string | モデル識別子                                        |
+| `reasoningEffort` | string | 推論労力レベル（`low`、`medium`、`high`、`off`） |
 
 ---
 
-## Pagination
+## ページネーション
 
-For large result sets, use cursor-based pagination:
+大きな結果セットに対しては、カーソルベースのページネーションを使用してください：
 
-1. Make initial request with desired `limit`
-2. Get the `reportId` of the last item in the response
-3. Pass that ID as `startAfter` in the next request
+1. 希望する`limit`で初回リクエストを実行
+2. レスポンスの最後のアイテムの`reportId`を取得
+3. そのIDを次のリクエストで`startAfter`として渡す
 
 ```bash
 # First page
@@ -164,11 +164,11 @@ curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10&st
 
 ---
 
-## Use Cases
+## 使用例
 
-### CI/CD Integration
+### CI/CD統合
 
-Track readiness scores over time by fetching reports after each evaluation:
+各評価後にレポートを取得することで、時系列での準備状況スコアを追跡：
 
 ```bash
 # Get latest report for a specific repository
@@ -176,9 +176,9 @@ curl "https://app.factory.ai/api/organization/maturity-level-reports?repoId=123&
   -H "Authorization: Bearer $FACTORY_API_KEY"
 ```
 
-### Custom Dashboards
+### カスタムダッシュボード
 
-Build internal dashboards by fetching all reports and calculating aggregate metrics:
+すべてのレポートを取得し、集約メトリクスを計算することで内部ダッシュボードを構築：
 
 ```javascript
 const response = await fetch(
@@ -192,9 +192,9 @@ const avgLevel =
   reports.reduce((sum, r) => sum + calculateLevel(r), 0) / reports.length;
 ```
 
-### Automated Alerting
+### 自動アラート
 
-Set up alerts when readiness scores drop below thresholds:
+準備状況スコアが閾値を下回った際のアラートを設定：
 
 ```bash
 # Fetch recent reports and check for regressions
@@ -206,10 +206,10 @@ reports=$(curl -s "https://app.factory.ai/api/organization/maturity-level-report
 
 ---
 
-## Error Responses
+## エラーレスポンス
 
-| Status | Description                |
+| ステータス | 説明                |
 | :----- | :------------------------- |
-| `400`  | Invalid request parameters |
-| `401`  | Missing or invalid API key |
-| `500`  | Internal server error      |
+| `400`  | 無効なリクエストパラメータ |
+| `401`  | APIキーが欠如または無効 |
+| `500`  | 内部サーバーエラー      |

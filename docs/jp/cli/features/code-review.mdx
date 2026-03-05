@@ -4,20 +4,18 @@ description: Use the /review command to analyze code changes with AI-powered rev
 keywords: ['code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'security review', 'review workflow', 'AI review', 'code analysis']
 ---
 
-## Overview
+## 概要
 
-The `/review` command provides an interactive workflow for analyzing code changes with AI-powered insights. It offers multiple review modes to fit different development scenarios—from reviewing uncommitted changes to analyzing full branches or specific commits.
+`/review` コマンドは、AI を活用したインサイトでコードの変更を分析するためのインタラクティブなワークフローを提供します。コミットされていない変更のレビューから、完全なブランチや特定のコミットの分析まで、さまざまな開発シナリオに対応する複数のレビューモードを提供しています。
 
-When you run `/review`, droid guides you through selecting a review type, configuring parameters, and then performs a comprehensive analysis of your code changes based on industry-standard review guidelines.
+`/review` を実行すると、Droid がレビュータイプの選択、パラメータの設定を案内し、業界標準のレビューガイドラインに基づいてコード変更の包括的な分析を実行します。
 
-## Quick start
+## クイックスタート
 
 <Steps>
   <Step title="Start the review flow">
     In an interactive droid session, type:
-    ```bash
-    /review
-    ```
+    __PRESERVE_0__
   </Step>
 
   <Step title="Select a review type">
@@ -30,7 +28,7 @@ When you run `/review`, droid guides you through selecting a review type, config
 
   <Step title="Configure parameters">
     Depending on your selection:
-    - For **base branch reviews**: Select the target branch (e.g., `main`, `develop`)
+    - For **base branch reviews**: Select the target branch (e.g., __PRESERVE_12__, __PRESERVE_13__)
     - For **commit reviews**: Choose a commit from the interactive list
     - For **custom reviews**: Enter your review instructions
   </Step>
@@ -44,23 +42,23 @@ When you run `/review`, droid guides you through selecting a review type, config
   </Step>
 </Steps>
 
-## Review types
+## レビュータイプ
 
-### Review against a base branch
+### ベースブランチとの比較レビュー
 
-Compare your current branch against a base branch (like a pull request review). This is ideal for pre-PR reviews or checking what changes would be merged.
+現在のブランチをベースブランチと比較します（プルリクエストレビューのように）。PR前のレビューやマージされる変更の確認に最適です。
 
-**How it works:**
-1. Select "Review against a base branch"
-2. Choose your target base branch from the list (local and remote branches shown)
-3. Droid finds the merge base and reviews the diff
+**動作方法：**
+1. 「Review against a base branch」を選択
+2. リストからターゲットのベースブランチを選択（ローカルとリモートブランチが表示されます）
+3. Droid がマージベースを見つけて差分をレビューします
 
-**Use cases:**
-- Pre-commit PR reviews
-- Checking branch changes before creating a pull request
-- Validating feature branch against main/develop
+**使用例：**
+- コミット前のPRレビュー
+- プルリクエスト作成前のブランチ変更確認
+- main/develop に対するフィーチャーブランチの検証
 
-**Example workflow:**
+**ワークフロー例：**
 ```bash
 > /review
 # Select: Review against a base branch
@@ -68,37 +66,37 @@ Compare your current branch against a base branch (like a pull request review). 
 # Droid reviews all changes that would be merged
 ```
 
-### Review uncommitted changes
+### コミットされていない変更のレビュー
 
-Analyze all current working directory changes—staged files, unstaged modifications, and untracked files.
+現在の作業ディレクトリのすべての変更を分析します—ステージされたファイル、ステージされていない変更、追跡されていないファイルを含みます。
 
-**Use cases:**
-- Quick sanity check before committing
-- Reviewing work in progress
-- Finding issues early in development
+**使用例：**
+- コミット前のクイックサニティチェック
+- 作業中のコードのレビュー
+- 開発初期段階での問題の早期発見
 
-**Example workflow:**
+**ワークフロー例：**
 ```bash
 > /review
 # Select: Review uncommitted changes
 # Droid immediately reviews all working directory changes
 ```
 
-### Review a commit
+### コミットのレビュー
 
-Examine the changes introduced by a specific commit in your repository history.
+リポジトリ履歴内の特定のコミットによって導入された変更を検査します。
 
-**How it works:**
-1. Select "Review a commit"
-2. Browse commits with hash, message, author, and date
-3. Select a commit to review
+**動作方法：**
+1. 「Review a commit」を選択
+2. ハッシュ、メッセージ、作成者、日付でコミットを参照
+3. レビューするコミットを選択
 
-**Use cases:**
-- Reviewing recent commits for issues
-- Understanding changes in a specific commit
-- Post-merge review of teammate's work
+**使用例：**
+- 最近のコミットの問題レビュー
+- 特定のコミットの変更理解
+- チームメイトの作業のマージ後レビュー
 
-**Example workflow:**
+**ワークフロー例：**
 ```bash
 > /review
 # Select: Review a commit
@@ -106,17 +104,17 @@ Examine the changes introduced by a specific commit in your repository history.
 # Droid reviews that specific commit's changes
 ```
 
-### Custom review instructions
+### カスタムレビュー指示
 
-Define your own review criteria for specialized analysis.
+専門的な分析のために独自のレビュー基準を定義します。
 
-**Use cases:**
-- Security-focused reviews
-- Performance analysis
-- Checking specific coding standards
-- Domain-specific validations
+**使用例：**
+- セキュリティに焦点を当てたレビュー
+- パフォーマンス分析
+- 特定のコーディング標準のチェック
+- ドメイン固有の検証
 
-**Example workflow:**
+**ワークフロー例：**
 ```bash
 > /review
 # Select: Custom review instructions
@@ -124,60 +122,60 @@ Define your own review criteria for specialized analysis.
 # Droid performs a targeted security review
 ```
 
-## Review guidelines
+## レビューガイドライン
 
-All code reviews follow a structured rubric designed to provide actionable, high-quality feedback:
+すべてのコードレビューは、実行可能で高品質なフィードバックを提供するように設計された構造化されたルーブリックに従います：
 
-### Severity levels
+### 重要度レベル
 
-Reviews categorize findings using priority levels:
+レビューは優先度レベルを使用して発見事項を分類します：
 
-- **[P0]** - Critical issues blocking release or operations
-- **[P1]** - Urgent issues that should be addressed in the next cycle
-- **[P2]** - Normal priority issues to fix eventually
-- **[P3]** - Low priority nice-to-have improvements
+- **[P0]** - リリースやオペレーションをブロックする重要な問題
+- **[P1]** - 次のサイクルで対処すべき緊急の問題
+- **[P2]** - 最終的に修正すべき通常の優先度の問題
+- **[P3]** - あると良い改善の低優先度項目
 
-### Bug detection criteria
+### バグ検出基準
 
-The AI only flags issues as bugs when they meet ALL of these criteria:
+AI は以下のすべての基準を満たす場合にのみ、問題をバグとしてフラグ付けします：
 
-1. **Meaningful impact** - Affects accuracy, performance, security, or maintainability
-2. **Discrete and actionable** - Clear, specific issue with a clear fix
-3. **Appropriate rigor** - Fix doesn't demand more rigor than the rest of the codebase
-4. **Introduced in changes** - Bug was added in the reviewed changes (not pre-existing)
-5. **Worth fixing** - Author would likely fix if made aware
-6. **No unstated assumptions** - Based on verifiable facts, not speculation
-7. **Provably affected** - Can identify specific affected code, not theoretical
-8. **Not intentional** - Clearly not a deliberate design choice
+1. **有意義な影響** - 正確性、パフォーマンス、セキュリティ、保守性に影響する
+2. **個別で実行可能** - 明確で具体的な問題と明確な修正
+3. **適切な厳密性** - 他のコードベースより多くの厳密性を求めない修正
+4. **変更で導入された** - レビューされた変更で追加されたバグ（既存ではない）
+5. **修正する価値がある** - 作成者が認識すれば修正する可能性が高い
+6. **明記されていない仮定なし** - 推測ではなく検証可能な事実に基づく
+7. **証明可能な影響** - 理論的ではなく、具体的に影響を受けるコードを特定可能
+8. **意図的でない** - 明らかに意図的な設計選択ではない
 
-### Comment style
+### コメントスタイル
 
-Review comments follow these principles:
+レビューコメントは以下の原則に従います：
 
-- **Clear reasoning** - Explains why something is an issue
-- **Appropriate severity** - Communicates impact accurately
-- **Brief** - Maximum 1 paragraph per finding
-- **Minimal code** - Code chunks limited to 3 lines in markdown
-- **Scenario-specific** - Describes affected environments/conditions
-- **Matter-of-fact tone** - Avoids accusatory language
-- **Immediately graspable** - Easy for the author to understand
-- **No excessive flattery** - Focuses on actionable feedback
+- **明確な理由付け** - なぜそれが問題なのかを説明
+- **適切な重要度** - 影響を正確に伝える
+- **簡潔** - 発見事項あたり最大1段落
+- **最小限のコード** - コードチャンクはmarkdownで3行に制限
+- **シナリオ固有** - 影響を受ける環境/条件を記述
+- **事実に基づく口調** - 非難的な言語を避ける
+- **すぐに理解可能** - 作成者が理解しやすい
+- **過度な賛辞なし** - 実行可能なフィードバックに焦点を当てる
 
-### Output format
+### 出力形式
 
-Each finding includes:
+各発見事項には以下が含まれます：
 
-- **Clear title** (≤80 characters, imperative mood)
-- **Explanation** of why this is a problem
-- **File path and line numbers** where applicable
-- **Priority level** [P0-P3]
-- **Suggested fix** (when concrete replacement code is available)
+- **明確なタイトル**（≤80文字、命令形）
+- なぜこれが問題なのかの**説明**
+- 該当する場合の**ファイルパスと行番号**
+- **優先度レベル** [P0-P3]
+- **修正提案**（具体的な置換コードが利用可能な場合）
 
-Plus an **overall assessment**:
-- Whether changes are correct or incorrect
-- 1-3 sentence summary
+さらに**全体的な評価**：
+- 変更が正しいか間違っているか
+- 1〜3文の要約
 
-## Tips and best practices
+## ヒントとベストプラクティス
 
 <AccordionGroup>
   <Accordion title="When to use each review type">
@@ -202,17 +200,15 @@ Plus an **overall assessment**:
   </Accordion>
 
   <Accordion title="Integration with workflows">
-    The `/review` command is interactive and meant for CLI sessions. For automated reviews in CI/CD, use:
-    ```bash
-    droid exec "Review the changes in this PR for security issues and performance regressions"
-    ```
+    The __PRESERVE_14__ command is interactive and meant for CLI sessions. For automated reviews in CI/CD, use:
+    __PRESERVE_5__
     See the [Code Review guide](/guides/droid-exec/code-review) for automation examples.
   </Accordion>
 </AccordionGroup>
 
-## Examples
+## 例
 
-### Pre-PR review
+### PR前レビュー
 
 ```bash
 # Before creating a pull request
@@ -222,7 +218,7 @@ Plus an **overall assessment**:
 # Review findings, fix issues, then create PR
 ```
 
-### Quick WIP check
+### クイック WIP チェック
 
 ```bash
 # Check work in progress
@@ -231,7 +227,7 @@ Plus an **overall assessment**:
 # Get immediate feedback on current changes
 ```
 
-### Security-focused review
+### セキュリティに焦点を当てたレビュー
 
 ```bash
 # Custom security review
@@ -240,7 +236,7 @@ Plus an **overall assessment**:
 # Enter: "Check for security vulnerabilities: SQL injection, XSS, CSRF, insecure dependencies, exposed secrets, and authentication bypasses"
 ```
 
-### Post-merge review
+### マージ後レビュー
 
 ```bash
 # Review a teammate's recent commit
@@ -249,9 +245,9 @@ Plus an **overall assessment**:
 # Choose the recent commit to understand changes
 ```
 
-## See also
+## 関連項目
 
-- [CLI Reference](/reference/cli-reference) - Complete command reference including `/review`
-- [Code Review automation guide](/guides/droid-exec/code-review) - Automate reviews with `droid exec`
-- [Common use cases](/cli/getting-started/common-use-cases) - Other workflows and patterns
-- [How to talk to a droid](/cli/getting-started/how-to-talk-to-a-droid) - Getting better results from AI reviews
+- [CLI Reference](/reference/cli-reference) - `/review` を含む完全なコマンドリファレンス
+- [Code Review automation guide](/guides/droid-exec/code-review) - `droid exec` でレビューを自動化
+- [Common use cases](/cli/getting-started/common-use-cases) - その他のワークフローとパターン
+- [How to talk to a droid](/cli/getting-started/how-to-talk-to-a-droid) - AI レビューからより良い結果を得る

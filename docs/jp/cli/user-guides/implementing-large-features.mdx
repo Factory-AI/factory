@@ -4,7 +4,7 @@ description: A systematic approach to tackling complex, multi-phase development 
 keywords: ['large features', 'complex features', 'big projects', 'refactoring', 'migration', 'multi-phase', 'systematic', 'planning']
 ---
 
-Large-scale features require careful planning and systematic execution to avoid overwhelming complexity. This guide outlines a proven workflow for breaking down massive projects into manageable phases, using specification mode for planning and iterative implementation with frequent validation.
+大規模な機能の実装には、複雑さを避けるために慎重な計画と体系的な実行が必要です。このガイドでは、巨大なプロジェクトを管理可能なフェーズに分割し、計画にはspecification mode、実装には頻繁な検証を伴う反復的アプローチを使用する実証済みのワークフローを説明します。
 
 <CardGroup cols={2}>
   <Card title="Systematic Planning" icon="map">
@@ -22,29 +22,29 @@ Large-scale features require careful planning and systematic execution to avoid 
   </Card>
 </CardGroup>
 
-## When to use this workflow
+## このワークフローを使用するタイミング
 
-This approach is ideal for:
+このアプローチは以下の場合に最適です：
 
-**Massive refactors** - Touching 100+ files across your entire codebase
+**大規模なリファクタリング** - コードベース全体の100以上のファイルに影響を与える場合
 
 ```
 "Migrate from REST API to GraphQL across all frontend components"
 ```
 
-**Major component migrations** - Replacing core system dependencies
+**主要コンポーネントの移行** - コアシステムの依存関係を置き換える場合
 
 ```
 "Switch from Stripe to a new billing provider across the entire payment system"
 ```
 
-**Large feature implementations** - New functionality spanning 30+ files
+**大規模機能の実装** - 30以上のファイルにまたがる新機能の場合
 
 ```
 "Add comprehensive user roles and permissions system to the existing application"
 ```
 
-## The workflow
+## ワークフロー
 
 <Steps>
   <Step title="Create the master plan">
@@ -65,11 +65,11 @@ This approach is ideal for:
   </Step>
 </Steps>
 
-## Phase 1: Master planning with Specification Mode
+## フェーズ1：Specification Modeによるマスタープラン策定
 
-Start by using **Shift+Tab** to enter Specification Mode and create a comprehensive breakdown:
+**Shift+Tab**を使用してSpecification Modeに入り、包括的な分析を作成することから始めます：
 
-**Example prompt:**
+**プロンプト例：**
 
 ```
 Create a detailed implementation plan for migrating our entire authentication system
@@ -81,27 +81,27 @@ testing and validation points. Each phase should be completable in 1-2 days
 and have minimal dependencies on other phases.
 ```
 
-**Specification Mode will generate:**
+**Specification Modeは以下を生成します：**
 
-- **Phase breakdown** - 4-6 major implementation phases
-- **Dependencies mapping** - Which phases must be completed before others
-- **Testing strategy** - How to validate each phase works correctly
-- **Risk assessment** - Potential issues and mitigation strategies
-- **Rollback plan** - How to safely revert if needed
+- **フェーズの分割** - 4-6の主要な実装フェーズ
+- **依存関係のマッピング** - どのフェーズが他のフェーズの前に完了する必要があるか
+- **テスト戦略** - 各フェーズが正しく動作することを検証する方法
+- **リスク評価** - 潜在的な問題と軽減策
+- **ロールバック計画** - 必要に応じて安全に元に戻す方法
 
-**Save the plan** - Approve the specification and save it as `IMPLEMENTATION_PLAN.md` in your project root.
+**計画を保存** - 仕様を承認し、プロジェクトルートに`IMPLEMENTATION_PLAN.md`として保存します。
 
-## Phase 2: Iterative implementation
+## フェーズ2：反復的実装
 
-For each phase in your plan:
+計画の各フェーズについて：
 
-### Start a fresh session
+### 新しいセッションを開始
 
-Begin each phase with a new droid session to maintain focus and clean context.
+各フェーズを新しいdroidセッションで開始し、集中力とクリーンなコンテキストを維持します。
 
-### Reference the master plan
+### マスタープランを参照
 
-**Example prompt for Phase 1:**
+**フェーズ1のプロンプト例：**
 
 ```
 I'm implementing Phase 1 of the authentication migration plan documented in
@@ -114,9 +114,9 @@ Please read the plan document and implement this phase, then update the
 document to mark Phase 1 as complete.
 ```
 
-### Use Specification Mode for complex phases
+### 複雑なフェーズではSpecification Modeを使用
 
-For phases involving significant changes, use **Shift+Tab** to get detailed planning:
+重要な変更を伴うフェーズでは、**Shift+Tab**を使用して詳細な計画を立てます：
 
 ```
 Following IMPLEMENTATION_PLAN.md, implement Phase 3: Update all login components
@@ -124,9 +124,9 @@ to use the new Auth0 service while maintaining backward compatibility with
 the existing Firebase auth as fallback.
 ```
 
-### Commit frequently
+### 頻繁にコミット
 
-After each phase completion, ask Droid to commit your changes:
+各フェーズ完了後、Droidに変更をコミットするよう依頼します：
 
 ```
 Commit all changes for Phase 1 of the auth migration with a detailed message.
@@ -136,11 +136,11 @@ Commit all changes for Phase 1 of the auth migration with a detailed message.
 Create a commit for the Auth0 service setup work with bullet points for each major change.
 ```
 
-Droid will stage all changes and create the commit with proper co-authorship attribution.
+Droidはすべての変更をステージングし、適切な共同執筆者の帰属を含むコミットを作成します。
 
-### Create phase-specific PRs
+### フェーズ固有のPRを作成
 
-Ask Droid to create pull requests for each completed phase:
+Droidに完了した各フェーズのプルリクエストを作成するよう依頼します：
 
 ```
 Create a PR for the auth migration Phase 1 work on a new branch called auth-migration-phase-1.
@@ -150,29 +150,29 @@ Create a PR for the auth migration Phase 1 work on a new branch called auth-migr
 Open a pull request with a comprehensive description of what was completed and testing done.
 ```
 
-Droid will create the branch, push the changes, and generate a detailed PR description based on the commits and changes made.
+Droidはブランチを作成し、変更をプッシュし、コミットと行われた変更に基づいて詳細なPR説明を生成します。
 
-## Phase 3: Validation and testing strategy
+## フェーズ3：検証とテスト戦略
 
-### Test each phase independently
+### 各フェーズを独立してテスト
 
-Don't wait until the end - validate functionality after each phase:
+最後まで待つのではなく、各フェーズ後に機能を検証します：
 
-**Phase 1 completion:**
+**フェーズ1完了：**
 
 ```
 Run the authentication tests and verify the Auth0 service works in isolation.
 Test user registration, login, and logout with the new service.
 ```
 
-**Phase 2 completion:**
+**フェーズ2完了：**
 
 ```
 Test the migration script with a subset of test users. Verify data integrity
 and that users can log in with both old and new systems.
 ```
 
-### Use feature flags for gradual rollout
+### 段階的ロールアウトにフィーチャーフラグを使用
 
 ```
 Add a feature flag for auth0-migration with 10% rollout that can be controlled by environment variable.
@@ -182,7 +182,7 @@ Add a feature flag for auth0-migration with 10% rollout that can be controlled b
 Implement progressive rollout logic using feature flags to gradually migrate users from Firebase to Auth0.
 ```
 
-### Automated testing at phase boundaries
+### フェーズ境界での自動テスト
 
 ```
 Run the full test suite after each phase including unit, integration, and e2e tests.
@@ -192,31 +192,31 @@ Run the full test suite after each phase including unit, integration, and e2e te
 Set up automated testing that validates auth migration functionality at each phase boundary.
 ```
 
-## Best practices
+## ベストプラクティス
 
-**Start with read-only changes** - Begin phases with analysis and preparation before making modifications.
+**読み取り専用の変更から始める** - 変更を行う前に分析と準備でフェーズを開始します。
 
-**Maintain backward compatibility** - Keep old systems working while new ones are being built.
+**後方互換性を維持する** - 新しいシステムを構築している間、古いシステムが動作し続けるようにします。
 
-**Use feature toggles** - Allow gradual rollout and quick rollback if needed.
+**フィーチャートグルを使用する** - 段階的ロールアウトと必要に応じた迅速なロールバックを可能にします。
 
-**Document learnings** - Update your plan based on discoveries during implementation.
+**学習を文書化する** - 実装中の発見に基づいて計画を更新します。
 
-**Test boundary conditions** - Focus testing on the interfaces between old and new systems.
+**境界条件をテストする** - 古いシステムと新しいシステム間のインターフェースにテストを集中します。
 
-**Plan for rollback** - Each phase should be reversible if critical issues are discovered.
+**ロールバックを計画する** - 各フェーズは重大な問題が発見された場合に元に戻せるようにします。
 
-**Communicate progress** - Keep stakeholders updated with regular progress reports.
+**進捗を伝達する** - 定期的な進捗レポートでステークホルダーを最新の状態に保ちます。
 
-## Recovery strategies
+## 回復戦略
 
-If a phase encounters major issues:
+フェーズで重大な問題が発生した場合：
 
-1. **Immediate rollback** - Use git to revert to the last stable state
-2. **Issue analysis** - Document what went wrong and why
-3. **Plan adjustment** - Update remaining phases based on learnings
-4. **Stakeholder communication** - Update timelines and expectations
+1. **即座のロールバック** - gitを使用して最後の安定状態に戻す
+2. **問題分析** - 何が間違っていて、なぜそうなったかを文書化
+3. **計画調整** - 学習に基づいて残りのフェーズを更新
+4. **ステークホルダーとのコミュニケーション** - タイムラインと期待値を更新
 
-The systematic approach ensures large features are delivered reliably while maintaining code quality and system stability throughout the process.
+体系的なアプローチにより、プロセス全体を通じてコード品質とシステムの安定性を維持しながら、大規模機能を確実に提供することができます。
 
-Ready to tackle your next large-scale feature? Start with **Shift+Tab** to create your master implementation plan!
+次の大規模機能に取り組む準備はできましたか？**Shift+Tab**でマスター実装計画の作成を開始しましょう！

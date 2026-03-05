@@ -4,20 +4,20 @@ description: Non-interactive execution mode for CI/CD pipelines and automation s
 keywords: ['droid exec', 'headless', 'ci/cd', 'automation', 'pipeline', 'github actions', 'scripts', 'batch', 'non-interactive']
 ---
 
-Droid Exec is Factory's headless execution mode designed for automation workflows. Unlike the interactive CLI, `droid exec` runs as a one-shot command that completes a task and exits, making it ideal for CI/CD pipelines, shell scripts, and batch processing.
+Droid ExecはFactory自動化ワークフロー向けに設計されたヘッドレス実行モードです。インタラクティブなCLIとは異なり、`droid exec` はタスクを完了して終了するワンショットコマンドとして実行されるため、CI/CDパイプライン、シェルスクリプト、バッチ処理に最適です。
 
 <Tip>
   Explore the [Droid Exec cookbooks](/guides/droid-exec/code-review).
 </Tip>
 
-## Summary and goals
+## 概要と目標
 
-Droid Exec is a one-shot task runner designed to:
+Droid Execは次のことを目的として設計されたワンショットタスクランナーです：
 
-- Produce readable logs, and structured artifacts when requested
-- Enforce opt-in for mutations/command execution (secure-by-default)
-- Fail fast on permission violations with clear errors
-- Support simple composition for batch and parallel work
+- 読みやすいログと、要求された場合は構造化された成果物を生成
+- 変更/コマンド実行にオプトインを強制（デフォルトでセキュア）
+- 明確なエラーメッセージで権限違反時に高速失敗
+- バッチおよび並列処理のシンプルな組み合わせをサポート
 
 <CardGroup cols={2}>
   <Card title="Non-Interactive" icon="terminal">
@@ -34,13 +34,13 @@ Droid Exec is a one-shot task runner designed to:
   </Card>
 </CardGroup>
 
-## Execution model
+## 実行モデル
 
-- Non-interactive single run that writes to stdout/stderr.
-- Default is spec-mode: the agent is only allowed to execute read-only operations.
-- Add `--auto` to enable edits and commands; risk tiers gate what can run.
+- stdout/stderrに書き込む非インタラクティブなシングルラン。
+- デフォルトはspecモード：エージェントは読み取り専用操作の実行のみが許可されます。
+- 編集とコマンドを有効にするには `--auto` を追加します；リスクティアが実行可能なものを制御します。
 
-CLI help (excerpt):
+CLIヘルプ（抜粋）：
 
 ```
 Usage: droid exec [options] [prompt]
@@ -68,7 +68,7 @@ Options:
   -h, --help                      display help for command
 ```
 
-Supported models (examples):
+サポートされているモデル（例）：
 
 - claude-opus-4-6
 - claude-opus-4-6-fast
@@ -93,18 +93,14 @@ Supported models (examples):
 See the [model table](/pricing#pricing-table) for the full list of available models and their costs.
 </Note>
 
-## Installation
+## インストール
 
 <Steps>
   <Step title="Install Droid CLI">
     <CodeGroup>
-    ```bash macOS/Linux
-    curl -fsSL https://app.factory.ai/cli | sh
-    ```
+    __PRESERVE_1__
 
-    ```powershell Windows
-    irm https://app.factory.ai/cli/windows | iex
-    ```
+    __PRESERVE_2__
     </CodeGroup>
   </Step>
 
@@ -114,37 +110,35 @@ See the [model table](/pricing#pricing-table) for the full list of available mod
 
   <Step title="Set Environment Variable">
     Export your API key as an environment variable:
-    ```bash
-    export FACTORY_API_KEY=fk-...
-    ```
+    __PRESERVE_3__
   </Step>
 </Steps>
 
-## Quickstart
+## クイックスタート
 
-- Direct prompt:
+- 直接プロンプト：
   - `droid exec "analyze code quality"`
   - `droid exec "fix the bug in src/main.js" --auto low`
-- From file:
+- ファイルから：
   - `droid exec -f prompt.md`
-- Pipe:
+- パイプ：
   - `echo "summarize repo structure" | droid exec`
-- Session continuation:
+- セッション継続：
   - `droid exec --session-id <session-id> "continue with next steps"`
 
-## Autonomy Levels
+## 自律性レベル
 
-Droid exec uses a tiered autonomy system to control what operations the agent can perform. By default, it runs in read-only mode, requiring explicit flags to enable modifications.
+Droid execは階層化された自律性システムを使用して、エージェントが実行できる操作を制御します。デフォルトでは読み取り専用モードで動作し、変更を有効にするには明示的なフラグが必要です。
 
-### DEFAULT (no flags) - Read-only Mode
-The safest mode for reviewing planned changes without execution:
-- ✅ Reading files or logs: cat, less, head, tail, systemctl status
-- ✅ Display commands: echo, pwd
-- ✅ Information gathering: whoami, date, uname, ps, top
-- ✅ Git read operations: git status, git log, git diff
-- ✅ Directory listing: ls, find (without -delete or -exec)
-- ❌ No modifications to files or system
-- **Use case:** Safe for reviewing what changes would be made
+### DEFAULT（フラグなし） - 読み取り専用モード
+実行せずに計画された変更を確認するための最も安全なモード：
+- ✅ ファイルやログの読み取り：cat、less、head、tail、systemctl status
+- ✅ 表示コマンド：echo、pwd
+- ✅ 情報収集：whoami、date、uname、ps、top
+- ✅ Git読み取り操作：git status、git log、git diff
+- ✅ ディレクトリ一覧：ls、find（-deleteや-execなし）
+- ❌ ファイルやシステムの変更なし
+- **使用例：** どのような変更が行われるかを安全に確認
 
 ```bash
 # Analyze and plan refactoring without making changes
@@ -157,11 +151,11 @@ droid exec "Review the codebase for security vulnerabilities, performance issues
 droid exec "Analyze the project architecture and create a dependency graph showing how modules interact with each other."
 ```
 
-### `--auto low` - Low-risk Operations
-Enables basic file operations while blocking system changes:
-- ✅ File creation/editing in project directories
-- ❌ No system modifications or package installations
-- **Use case:** Documentation updates, code formatting, adding comments
+### `--auto low` - 低リスク操作
+システム変更をブロックしながら基本的なファイル操作を有効化：
+- ✅ プロジェクトディレクトリ内でのファイル作成/編集
+- ❌ システム変更やパッケージインストールなし
+- **使用例：** ドキュメント更新、コード整形、コメント追加
 
 ```bash
 # Safe file operations
@@ -169,15 +163,15 @@ droid exec --auto low "add JSDoc comments to all functions"
 droid exec --auto low "fix typos in README.md"
 ```
 
-### `--auto medium` - Development Operations
-Operations that may have significant side effects, but these side effects are typically harmless and straightforward to recover from.
-Adds common development tasks to low-risk operations:
-- Installing packages from trusted sources: npm install, pip install (without sudo)
-- Network requests to trusted endpoints: curl, wget to known APIs
-- Git operations that modify local repositories: git commit, git checkout, git pull (but not git push)
-- Building code with tools like make, npm run build, mvn compile
-- ❌ No git push, sudo commands, or production changes
-- **Use case:** Local development, testing, dependency management
+### `--auto medium` - 開発操作
+重大な副作用を伴う可能性がある操作ですが、これらの副作用は通常無害で回復が簡単です。
+低リスク操作に一般的な開発タスクを追加：
+- 信頼できるソースからのパッケージインストール：npm install、pip install（sudoなし）
+- 信頼できるエンドポイントへのネットワークリクエスト：既知のAPIへのcurl、wget
+- ローカルリポジトリを変更するGit操作：git commit、git checkout、git pull（ただしgit pushは除く）
+- make、npm run build、mvn compileなどのツールでコードをビルド
+- ❌ git push、sudoコマンド、本番環境の変更なし
+- **使用例：** ローカル開発、テスト、依存関係管理
 
 ```bash
 # Development tasks
@@ -185,15 +179,15 @@ droid exec --auto medium "install deps, run tests, fix issues"
 droid exec --auto medium "update packages and resolve conflicts"
 ```
 
-### `--auto high` - Production Operations
-Commands that may have security implications such as data transfers between untrusted sources or execution of unknown code, or major side effects such as irreversible data loss or modifications of production systems/deployments.
-- Running arbitrary/untrusted code: curl | bash, eval, executing downloaded scripts
-- Exposing ports or modifying firewall rules that could allow external access
-- Git push operations that modify remote repositories: git push, git push --force
-- Irreversible actions to production deployments, database migrations, or other sensitive operations
-- Commands that access or modify sensitive information like passwords or keys
-- ❌ Still blocks: sudo rm -rf /, system-wide changes
-- **Use case:** CI/CD pipelines, automated deployments
+### `--auto high` - 本番操作
+信頼できないソース間でのデータ転送や未知のコードの実行などのセキュリティ上の影響がある可能性があるコマンド、または不可逆的なデータ損失や本番システム/デプロイメントの変更などの重大な副作用を伴うコマンド。
+- 任意/信頼できないコードの実行：curl | bash、eval、ダウンロードしたスクリプトの実行
+- ポートの公開や外部アクセスを許可する可能性があるファイアウォールルールの変更
+- リモートリポジトリを変更するGit push操作：git push、git push --force
+- 本番デプロイメント、データベースマイグレーション、その他の機密操作への不可逆的なアクション
+- パスワードやキーなどの機密情報にアクセスまたは変更するコマンド
+- ❌ それでもブロック：sudo rm -rf /、システム全体の変更
+- **使用例：** CI/CDパイプライン、自動デプロイメント
 
 ```bash
 # Full workflow automation
@@ -201,15 +195,15 @@ droid exec --auto high "fix bug, test, commit, and push to main"
 droid exec --auto high "deploy to staging after running tests"
 ```
 
-### `--skip-permissions-unsafe` - Bypass All Checks
+### `--skip-permissions-unsafe` - すべてのチェックをバイパス
 <Warning>
   DANGEROUS: This mode allows ALL operations without confirmation. Only use in completely isolated environments like Docker containers or throwaway VMs.
 </Warning>
 
-- ⚠️ Allows ALL operations without confirmation
-- ⚠️ Can execute irreversible operations
-- Cannot be combined with --auto flags
-- **Use case:** Isolated environments
+- ⚠️ 確認なしですべての操作を許可
+- ⚠️ 不可逆的な操作を実行可能
+- --autoフラグと組み合わせることはできません
+- **使用例：** 分離された環境
 
 ```bash
 # In a disposable Docker container for CI testing
@@ -227,21 +221,21 @@ droid exec --skip-permissions-unsafe "Modify /etc/hosts for test domains, instal
 droid exec --skip-permissions-unsafe "Run penetration testing tools, modify firewall rules, test privilege escalation scenarios, and generate security audit reports"
 ```
 
-### Fail-fast Behavior
+### 高速失敗動作
 
-If a requested action exceeds the current autonomy level, droid exec will:
-1. Stop immediately with a clear error message
-2. Return a non-zero exit code
-3. Not perform any partial changes
+要求されたアクションが現在の自律性レベルを超える場合、droid execは：
+1. 明確なエラーメッセージで即座に停止
+2. 非ゼロの終了コードを返す
+3. 部分的な変更を実行しない
 
-This ensures predictable behavior in automation scripts and CI/CD pipelines.
+これにより、自動化スクリプトやCI/CDパイプラインで予測可能な動作が保証されます。
 
-## Output formats and artifacts
+## 出力形式と成果物
 
-Droid exec supports three output formats for different use cases:
+Droid execは異なる使用例に対応する3つの出力形式をサポートしています：
 
-### text (default)
-Human-readable output for direct consumption or logs:
+### text（デフォルト）
+直接消費またはログ用の人間が読める出力：
 
 ```bash
 $ droid exec --auto low "create a python file that prints 'hello world'"
@@ -249,7 +243,7 @@ Perfect! I've created a Python file named `hello_world.py` in your home director
 ```
 
 ### json
-Structured JSON output for parsing in scripts and automation:
+スクリプトと自動化で解析するための構造化JSON出力：
 
 ```bash
 $ droid exec "summarize this repository" --output-format json
@@ -264,14 +258,14 @@ $ droid exec "summarize this repository" --output-format json
 }
 ```
 
-Use JSON format when you need to:
-- Parse the result in a script
-- Check success/failure programmatically
-- Extract session IDs for continuation
-- Process results in a pipeline
+次の場合にJSON形式を使用してください：
+- スクリプトで結果を解析する
+- 成功/失敗をプログラム的にチェックする
+- 継続のためのセッションIDを抽出する
+- パイプラインで結果を処理する
 
 ### stream-json / debug
-Streaming JSONL messages showing the agent's execution in real-time. Each line is a separate JSON event that can be parsed independently:
+エージェントの実行をリアルタイムで表示するストリーミングJSONLメッセージ。各行は独立して解析できる個別のJSONイベントです：
 
 ```bash
 $ droid exec "run ls command" --output-format stream-json
@@ -284,44 +278,44 @@ $ droid exec "run ls command" --output-format stream-json
 ```
 
 <Note>
-The `debug` format is a deprecated alias for `stream-json` and works identically.
+The __PRESERVE_42__ format is a deprecated alias for __PRESERVE_43__ and works identically.
 </Note>
 
-### stream-jsonrpc (multi-turn)
-For SDK integration and multi-turn conversations, use the JSON-RPC streaming protocol:
+### stream-jsonrpc（マルチターン）
+SDK統合とマルチターン会話には、JSON-RPCストリーミングプロトコルを使用します：
 
 ```bash
 droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc --auto low
 ```
 
-This mode reads JSONL messages from stdin and outputs JSON-RPC formatted responses, enabling:
-- Multi-turn conversations within a single exec invocation
-- Dynamic mode switching during execution
-- Full tool access like the interactive TUI
+このモードはstdinからJSONLメッセージを読み取り、JSON-RPC形式のレスポンスを出力し、以下を可能にします：
+- 単一のexec呼び出し内でのマルチターン会話
+- 実行中の動的モード切り替え
+- インタラクティブなTUIのような完全なツールアクセス
 
-Send messages via stdin in JSONL format and receive structured JSON-RPC responses.
+JSONL形式でstdin経由でメッセージを送信し、構造化されたJSON-RPCレスポンスを受信します。
 
-Key event types:
-- **system** - Session initialization with available tools and model
-- **message** - User or assistant text messages
-- **tool_call** - Agent calling a tool (Read, Execute, etc.)
-- **tool_result** - Result from tool execution
-- **completion** - Final event with the complete response in `finalText`
+主要なイベントタイプ：
+- **system** - 利用可能なツールとモデルでのセッション初期化
+- **message** - ユーザーまたはアシスタントのテキストメッセージ
+- **tool_call** - エージェントがツールを呼び出し（Read、Executeなど）
+- **tool_result** - ツール実行からの結果
+- **completion** - `finalText` での完全なレスポンスを含む最終イベント
 
-The **completion event** is always emitted last and contains:
-- `finalText` - The agent's final response text
-- `numTurns` - Number of assistant turns taken
-- `durationMs` - Total execution time in milliseconds
-- `session_id` - Session identifier for continuation
+**completionイベント** は常に最後に発行され、以下を含みます：
+- `finalText` - エージェントの最終レスポンステキスト
+- `numTurns` - 実行されたアシスタントターン数
+- `durationMs` - ミリ秒での総実行時間
+- `session_id` - 継続のためのセッション識別子
 
-Stream-JSON format is useful for:
-- Monitoring agent behavior in real-time
-- Streaming progress updates to users
-- Troubleshooting execution issues
-- Understanding tool usage patterns
-- Extracting the final result from `completion.finalText`
+Stream-JSON形式は以下に有用です：
+- エージェントの動作をリアルタイムで監視
+- ユーザーへの進捗更新のストリーミング
+- 実行問題のトラブルシューティング
+- ツール使用パターンの理解
+- `completion.finalText` からの最終結果の抽出
 
-Example parsing in shell script:
+シェルスクリプトでの解析例：
 ```bash
 # Extract just the final result
 droid exec "analyze code" --output-format stream-json | \
@@ -332,51 +326,51 @@ droid exec "complex task" --output-format stream-json | \
   jq -r 'select(.type == "tool_call") | "\(.toolName): \(.parameters.command // .parameters.file_path // "")"'
 ```
 
-For automated pipelines, you can also direct the agent to write specific artifacts:
+自動化パイプラインでは、特定の成果物を書き込むようエージェントに指示することもできます：
 
 ```bash
 droid exec --auto low "Analyze dependencies and write to deps.json"
 droid exec --auto low "Generate metrics report in CSV format to metrics.csv"
 ```
 
-## Working directory
+## 作業ディレクトリ
 
-- Use `--cwd` to scope execution:
+- 実行をスコープするには `--cwd` を使用：
 
 ```
 droid exec --cwd /home/runner/work/repo "Map internal packages and dump graphviz DOT to deps.dot"
 ```
 
-## Models and reasoning effort
+## モデルと推論努力
 
-Choose a model with `-m` and adjust reasoning with `-r`. See the [model table](/pricing#pricing-table) for available models.
+`-m` でモデルを選択し、`-r` で推論を調整します。利用可能なモデルについては [model table](/pricing#pricing-table) を参照してください。
 
 ```bash
 droid exec -m claude-sonnet-4-5-20250929 -r medium -f plan.md
 ```
 
-Use `--use-spec` to start in specification mode, where the agent plans before executing:
+`--use-spec` を使用して、エージェントが実行前に計画する仕様モードで開始します：
 
 ```bash
 droid exec --use-spec --auto low "refactor the auth module"
 ```
 
-You can also use a different model for the spec phase:
+spec段階で別のモデルを使用することもできます：
 
 ```bash
 droid exec --use-spec --spec-model claude-haiku-4-5-20251001 --auto medium "implement feature X"
 ```
 
-### Tool controls
+### ツール制御
 
-List available tools for a model:
+モデルで利用可能なツールを一覧表示：
 
 ```bash
 droid exec --list-tools
 droid exec --model gpt-5-codex --list-tools --output-format json
 ```
 
-Enable or disable specific tools:
+特定のツールを有効または無効にする：
 
 ```bash
 # Enable additional tools
@@ -386,9 +380,9 @@ droid exec --enabled-tools ApplyPatch "refactor files"
 droid exec --auto medium --disabled-tools execute-cli "run edits only"
 ```
 
-### Custom models
+### カスタムモデル
 
-You can configure custom models to use with droid exec by adding them to your `~/.factory/settings.json` file:
+`~/.factory/settings.json` ファイルに追加することで、droid execで使用するカスタムモデルを設定できます：
 
 ```json
 {
@@ -404,13 +398,13 @@ You can configure custom models to use with droid exec by adding them to your `~
 }
 ```
 
-To use a custom model, use the `custom:` prefix followed by the display name (with spaces replaced by dashes) and the index:
+カスタムモデルを使用するには、`custom:` プレフィックスの後に表示名（スペースをダッシュに置換）とインデックスを使用します：
 
 ```bash
 droid exec --model "custom:My-Custom-Model-0" "analyze this codebase"
 ```
 
-If you have multiple custom models configured:
+複数のカスタムモデルが設定されている場合：
 
 ```json
 {
@@ -435,19 +429,19 @@ If you have multiple custom models configured:
 }
 ```
 
-You would reference them as:
+次のように参照します：
 - `--model "custom:Kimi-K2-[Groq]-0"`
 - `--model "custom:GPT-OSS-20B-[OpenRouter]-1"`
 
-The index corresponds to the position in the `customModels` array (0-based).
+インデックスは `customModels` 配列内の位置に対応します（0ベース）。
 
 <Note>
-Reasoning effort (`-r` / `--reasoning-effort`) is not yet supported for custom models, but coming soon.
+Reasoning effort (__PRESERVE_59__ / __PRESERVE_60__) is not yet supported for custom models, but coming soon.
 </Note>
 
-## Batch and parallel patterns
+## バッチと並列パターン
 
-Shell loops (bounded concurrency):
+シェルループ（制限された並行性）：
 
 ```bash
 # Process files in parallel (GNU xargs -P)
@@ -455,7 +449,7 @@ find src -name "*.ts" -print0 | xargs -0 -P 4 -I {} \
   droid exec --auto low "Refactor file: {} to use modern TS patterns"
 ```
 
-Background job parallelization:
+バックグラウンドジョブ並列化：
 
 ```bash
 # Process multiple directories in parallel with job control
@@ -468,7 +462,7 @@ done
 wait  # Wait for all background jobs to complete
 ```
 
-Chunked inputs:
+チャンク入力：
 
 ```bash
 # Split large file lists into manageable chunks
@@ -480,7 +474,7 @@ done
 rm /tmp/files_*  # Clean up temporary files
 ```
 
-Workflow Automation (CI/CD):
+ワークフロー自動化（CI/CD）：
 
 ```yaml
 # Dead code detection and cleanup suggestions
@@ -499,35 +493,35 @@ jobs:
       - run: droid exec --cwd "${{ matrix.module }}" --auto low "Identify unused exports, dead code, and deprecated patterns. Generate cleanup recommendations in cleanup-report.md"
 ```
 
-## Unique usage examples
+## ユニークな使用例
 
-License header enforcer:
+ライセンスヘッダー強制：
 
 ```bash
 git ls-files "*.ts" | xargs -I {} \
   droid exec --auto low "Ensure {} begins with the Apache-2.0 header; add it if missing"
 ```
 
-API contract drift check (read-only):
+APIコントラクトドリフトチェック（読み取り専用）：
 
 ```bash
 droid exec "Compare openapi.yaml operations to our TypeScript client methods and write drift.md with any mismatches"
 ```
 
-Security sweep:
+セキュリティスイープ：
 
 ```bash
 droid exec --auto low "Run a quick audit for sync child_process usage and propose fixes; write findings to sec-audit.csv"
 ```
 
-## Exit behavior
+## 終了動作
 
-- 0: success
-- Non-zero: failure (permission violation, tool error, unmet objective). Treat non-zero as failed in CI.
+- 0：成功
+- 非ゼロ：失敗（権限違反、ツールエラー、目標未達成）。CIでは非ゼロを失敗として扱います。
 
-## Best practices
+## ベストプラクティス
 
-- Favor `--auto low`; keep mutations minimal and commit/push in scripted steps.
-- Avoid `--skip-permissions-unsafe` unless fully sandboxed.
-- Ask the agent to emit artifacts your pipeline can verify.
-- Use `--cwd` to constrain scope in monorepos.
+- `--auto low` を優先；変更を最小限に抑え、スクリプトステップでcommit/pushしてください。
+- 完全にサンドボックス化されていない限り `--skip-permissions-unsafe` は避けてください。
+- パイプラインが検証できる成果物をエージェントに出力させてください。
+- モノレポでスコープを制約するには `--cwd` を使用してください。

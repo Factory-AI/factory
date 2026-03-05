@@ -4,7 +4,7 @@ description: Complete checklist to configure Droid for maximum effectiveness wit
 keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 'productivity', 'best practices']
 ---
 
-This checklist transforms a basic Droid installation into a fully optimized development environment. Each section builds on the previous one—complete them in order for best results.
+このチェックリストは、基本的なDroidインストールを完全に最適化された開発環境に変換します。各セクションは前のセクションをベースに構築されているため、最良の結果を得るためには順番通りに完了してください。
 
 <Note>
   Each section can be done independently if you prefer to spread it out.
@@ -16,38 +16,26 @@ This checklist transforms a basic Droid installation into a fully optimized deve
 
 ---
 
-## Level 1: Essential Setup
+## レベル1：基本セットアップ
 
-These foundational items give you the biggest immediate impact.
+これらの基盤となる項目は、最大の即時効果をもたらします。
 
 <Steps>
   <Step title="Install the Factory IDE Plugin">
     The IDE plugin provides real-time context—open files, errors, selections—so Droid sees what you see.
     
     **VSCode/Cursor:**
-    1. Open Extensions (`Cmd+Shift+X`)
+    1. Open Extensions (__PRESERVE_14__)
     2. Search "Factory"
     3. Install and reload
     
-    **Verify:** Run `droid` and check for "IDE connected" in the status bar.
+    **Verify:** Run __PRESERVE_15__ and check for "IDE connected" in the status bar.
   </Step>
   
   <Step title="Create your AGENTS.md">
-    Create a basic [`AGENTS.md`](/cli/configuration/agents-md) at your repository root:
+    Create a basic [__PRESERVE_16__](/cli/configuration/agents-md) at your repository root:
     
-    ```markdown
-    # Project Guidelines
-    
-    ## Build & Test
-    - Build: `npm run build`
-    - Test: `npm test`
-    - Lint: `npm run lint`
-    
-    ## Code Style
-    - Use TypeScript strict mode
-    - Prefer functional components in React
-    - Write tests for new features
-    ```
+    __PRESERVE_0__
     
     Start minimal—you'll expand this as you work. See the [AGENTS.md guide](/cli/configuration/agents-md) for more examples.
   </Step>
@@ -56,11 +44,7 @@ These foundational items give you the biggest immediate impact.
     Set your preferred model in settings:
     
     **CLI:**
-    ```bash
-    droid
-    > /settings
-    # Navigate to Model and select your default
-    ```
+    __PRESERVE_1__
     
     **Factory App:** Use the model selector dropdown in the chat interface.
     
@@ -74,59 +58,29 @@ These foundational items give you the biggest immediate impact.
 
 ---
 
-## Level 2: Memory & Context
+## レベル2：メモリ＆コンテキスト
 
-Build persistent memory so Droid remembers your preferences across sessions.
+永続的なメモリを構築し、Droidがセッション間であなたの設定を記憶できるようにします。
 
 <Steps>
   <Step title="Create a memories file">
-    Create `~/.factory/memories.md` for personal preferences:
+    Create __PRESERVE_17__ for personal preferences:
     
-    ```markdown
-    # My Development Preferences
-    
-    ## Code Style
-    - I prefer arrow functions over function declarations
-    - I like early returns over nested conditionals
-    - I use 2-space indentation
-    
-    ## Testing
-    - I use React Testing Library, not Enzyme
-    - I prefer integration tests over unit tests for components
-    - Mock external APIs, not internal modules
-    
-    ## Past Decisions
-    - [2024-01] Chose Zustand over Redux for state management
-    - [2024-02] Using Tailwind CSS for styling
-    ```
+    __PRESERVE_2__
     
     Update this file whenever you find yourself repeating instructions to Droid.
   </Step>
   
   <Step title="Reference memories in AGENTS.md">
-    Add to your `AGENTS.md`:
+    Add to your __PRESERVE_18__:
     
-    ```markdown
-    ## Personal Preferences
-    Refer to `~/.factory/memories.md` for my coding preferences and past decisions.
-    ```
+    __PRESERVE_3__
   </Step>
   
   <Step title="Create project-specific memories (optional)">
-    For team projects, create `.factory/memories.md`:
+    For team projects, create __PRESERVE_19__:
     
-    ```markdown
-    # Project Memories
-    
-    ## Architecture Decisions
-    - We use the repository pattern for data access
-    - All API routes go through the /api/v1 prefix
-    - Feature flags are managed via LaunchDarkly
-    
-    ## Known Issues
-    - The auth service has a 5-second timeout issue (#123)
-    - Legacy users table uses snake_case columns
-    ```
+    __PRESERVE_4__
   </Step>
 </Steps>
 
@@ -140,79 +94,33 @@ Build persistent memory so Droid remembers your preferences across sessions.
 
 ---
 
-## Level 3: Rules & Conventions
+## レベル3：ルール＆規約
 
-Organize your coding standards so Droid follows them consistently.
+コーディング標準を整理し、Droidが一貫してそれらに従うようにします。
 
 <Steps>
   <Step title="Create a rules directory">
-    Create `.factory/rules/` in your project:
+    Create __PRESERVE_20__ in your project:
     
-    ```
-    .factory/
-    └── rules/
-        ├── typescript.md
-        ├── testing.md
-        └── security.md
-    ```
+    __PRESERVE_5__
   </Step>
   
   <Step title="Add TypeScript rules">
-    Create `.factory/rules/typescript.md`:
+    Create __PRESERVE_21__:
     
-    ```markdown
-    # TypeScript Conventions
-    
-    ## General
-    - Use `interface` for object types, `type` for unions/intersections
-    - Avoid `any` - use `unknown` with type guards instead
-    - Export types alongside their implementations
-    
-    ## React Components
-    - Use functional components with TypeScript FC type
-    - Props interfaces should be named `{ComponentName}Props`
-    - Use `React.ReactNode` for children, not `React.ReactChild`
-    
-    ## Imports
-    - Group imports: React, external libs, internal modules, types
-    - Use absolute imports from `@/` prefix
-    - Avoid barrel files (index.ts re-exports) for performance
-    ```
+    __PRESERVE_6__
   </Step>
   
   <Step title="Add testing rules">
-    Create `.factory/rules/testing.md`:
+    Create __PRESERVE_22__:
     
-    ```markdown
-    # Testing Conventions
-    
-    ## File Organization
-    - Test files live next to source: `Component.tsx` → `Component.test.tsx`
-    - Integration tests go in `__tests__/integration/`
-    - E2E tests go in `e2e/`
-    
-    ## Test Structure
-    - Use descriptive test names: "should [action] when [condition]"
-    - One assertion per test when possible
-    - Use `beforeEach` for common setup, not `beforeAll`
-    
-    ## Mocking
-    - Mock at the boundary (API calls, not internal functions)
-    - Use MSW for API mocking in integration tests
-    - Reset mocks in `afterEach`
-    ```
+    __PRESERVE_7__
   </Step>
   
   <Step title="Reference rules in AGENTS.md">
-    Update your `AGENTS.md`:
+    Update your __PRESERVE_23__:
     
-    ```markdown
-    ## Coding Standards
-    Follow the conventions documented in:
-    - `.factory/rules/typescript.md` - TypeScript and React patterns
-    - `.factory/rules/testing.md` - Testing conventions
-    - `.factory/rules/security.md` - Security requirements
-    ```
+    __PRESERVE_8__
   </Step>
 </Steps>
 
@@ -226,71 +134,28 @@ Organize your coding standards so Droid follows them consistently.
 
 ---
 
-## Level 4: Skills & Automation
+## レベル4：スキル＆自動化
 
-Add reusable skills and automation hooks.
+再利用可能なスキルと自動化フックを追加します。
 
 <Info>
   **Three ways to automate:** 
   - **[Skills](/cli/configuration/skills)** — Droid invokes them based on task context
   - **[Hooks](/cli/configuration/hooks-guide)** — Run automatically on specific events
-  - **[Custom Slash Commands](/cli/configuration/custom-slash-commands)** — You invoke with `/command-name`
+  - **[Custom Slash Commands](/cli/configuration/custom-slash-commands)** — You invoke with __PRESERVE_24__
 </Info>
 
 <Steps>
   <Step title="Create a prompt refiner skill">
-    Create `~/.factory/skills/prompt-refiner/SKILL.md`:
+    Create __PRESERVE_25__:
     
-    ```markdown
-    ---
-    name: prompt-refiner
-    description: Improve prompts before sending them to get better results. Use when you want to refine a task description.
-    ---
-    
-    # Prompt Refiner
-    
-    ## Instructions
-    
-    When the user wants to refine a prompt:
-    
-    1. Ask for their draft prompt or task description
-    2. Analyze it for:
-       - Clarity: Is the goal specific and measurable?
-       - Context: Does it include relevant background?
-       - Constraints: Are requirements and limitations stated?
-       - Examples: Would examples help clarify expectations?
-    3. Suggest an improved version with explanations
-    4. Offer to iterate if needed
-    
-    ## Good Prompt Patterns
-    
-    - Start with the outcome: "Create a..." not "I want you to..."
-    - Include acceptance criteria: "The result should..."
-    - Specify format: "Return as JSON/markdown/code"
-    - Mention constraints: "Must be compatible with...", "Should not modify..."
-    ```
+    __PRESERVE_9__
   </Step>
   
   <Step title="Add an auto-formatting hook">
-    Run `/hooks` and add a PostToolUse hook for automatic formatting:
+    Run __PRESERVE_26__ and add a PostToolUse hook for automatic formatting:
     
-    ```json
-    {
-      "hooks": {
-        "PostToolUse": [
-          {
-            "matcher": "Edit|Create",
-            "hooks": [
-              {
-                "type": "command",
-                "command": "cd \"$FACTORY_PROJECT_DIR\" && npx prettier --write \"$(jq -r '.tool_input.file_path' 2>/dev/null || echo '')\" 2>/dev/null || true"
-              }
-            ]
-          }
-        ]
-      }
-    }
-    ```
+    __PRESERVE_10__
     
     This automatically formats files after Droid edits them.
   </Step>
@@ -298,23 +163,7 @@ Add reusable skills and automation hooks.
   <Step title="Add a test-on-edit hook (optional)">
     Run related tests after edits:
     
-    ```json
-    {
-      "hooks": {
-        "PostToolUse": [
-          {
-            "matcher": "Edit",
-            "hooks": [
-              {
-                "type": "command",
-                "command": "cd \"$FACTORY_PROJECT_DIR\" && jq -r '.tool_input.file_path' | xargs -I {} npm test -- --findRelatedTests {} --passWithNoTests 2>/dev/null || true"
-              }
-            ]
-          }
-        ]
-      }
-    }
-    ```
+    __PRESERVE_11__
   </Step>
 </Steps>
 
@@ -324,23 +173,19 @@ Add reusable skills and automation hooks.
 
 ---
 
-## Level 5: Token Optimization
+## レベル5：トークン最適化
 
-Fine-tune for cost efficiency without sacrificing quality.
+品質を犠牲にすることなく、コスト効率を微調整します。
 
 <Steps>
   <Step title="Enable Spec Mode for complex work">
-    Use `Shift+Tab` or `/spec` before starting features that touch multiple files. This prevents expensive false starts.
+    Use __PRESERVE_27__ or __PRESERVE_28__ before starting features that touch multiple files. This prevents expensive false starts.
   </Step>
   
   <Step title="Configure model switching">
     Set up a spec mode model for planning:
     
-    ```bash
-    droid
-    > /settings
-    # Set Spec Mode Model to a reasoning-heavy model
-    ```
+    __PRESERVE_12__
     
     Use Opus 4.5 for planning, then Sonnet or Codex for implementation.
   </Step>
@@ -349,10 +194,7 @@ Fine-tune for cost efficiency without sacrificing quality.
     Check your project's AI-readiness:
     
     **CLI:**
-    ```bash
-    droid
-    > /readiness-report
-    ```
+    __PRESERVE_13__
     
     **Factory App:** View your readiness score in the [Agent Readiness Dashboard](/web/agent-readiness/dashboard).
     
@@ -362,35 +204,35 @@ Fine-tune for cost efficiency without sacrificing quality.
 
 ---
 
-## Quick Reference: File Locations
+## クイックリファレンス：ファイルの場所
 
-| Purpose | Personal | Project |
+| 目的 | 個人用 | プロジェクト用 |
 |---------|----------|---------|
-| **Skills** | `~/.factory/skills/<name>/SKILL.md` | `.factory/skills/<name>/SKILL.md` |
-| **Memory** | `~/.factory/memories.md` | `.factory/memories.md` |
-| **Rules** | `~/.factory/rules/*.md` | `.factory/rules/*.md` |
-| **Settings** | `~/.factory/settings.json` | `.factory/settings.json` |
-| **Hooks** | In settings.json | In settings.json |
-| **Agent instructions** | `~/.factory/AGENTS.md` | `./AGENTS.md` |
-| **Custom droids** | `~/.factory/droids/<name>.md` | `.factory/droids/<name>.md` |
+| **スキル** | `~/.factory/skills/<name>/SKILL.md` | `.factory/skills/<name>/SKILL.md` |
+| **メモリ** | `~/.factory/memories.md` | `.factory/memories.md` |
+| **ルール** | `~/.factory/rules/*.md` | `.factory/rules/*.md` |
+| **設定** | `~/.factory/settings.json` | `.factory/settings.json` |
+| **フック** | settings.json内 | settings.json内 |
+| **エージェント指示** | `~/.factory/AGENTS.md` | `./AGENTS.md` |
+| **カスタムdroid** | `~/.factory/droids/<name>.md` | `.factory/droids/<name>.md` |
 
 ---
 
-## Verification Checklist
+## 検証チェックリスト
 
-Run through this checklist to verify your setup:
+セットアップを検証するために、このチェックリストを実行してください：
 
-- [ ] IDE plugin shows "connected" when running Droid
-- [ ] `AGENTS.md` exists with build/test commands
-- [ ] Memories file created with your preferences
-- [ ] Rules directory with at least one rules file
-- [ ] At least one custom skill created
-- [ ] Auto-formatting hook configured
-- [ ] Readiness report shows Level 2 or higher
+- [ ] Droid実行時にIDEプラグインが「接続済み」を表示する
+- [ ] `AGENTS.md`がbuild/testコマンドと共に存在する
+- [ ] あなたの設定を含むメモリファイルが作成されている
+- [ ] 少なくとも1つのルールファイルがあるルールディレクトリが存在する
+- [ ] 少なくとも1つのカスタムスキルが作成されている
+- [ ] 自動フォーマットフックが設定されている
+- [ ] 準備状況レポートがレベル2以上を表示する
 
 ---
 
-## Next Steps
+## 次のステップ
 
 <CardGroup cols={2}>
   <Card title="Prompt Crafting" href="/guides/power-user/prompt-crafting" icon="wand-magic-sparkles">

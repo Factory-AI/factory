@@ -4,59 +4,59 @@ description: Teach agents everything they need to know about your project with a
 keywords: ['agents.md', 'project context', 'instructions', 'conventions', 'guidelines', 'project setup', 'configuration file']
 ---
 
-## 1 · What is **AGENTS.md**?
+## 1 · **AGENTS.md**とは何ですか？
 
-**AGENTS.md** is a Markdown file that lives in your repository (or home directory) and acts as a _briefing packet_ for AI coding agents.
+**AGENTS.md**は、あなたのリポジトリ（またはホームディレクトリ）に置かれるMarkdownファイルで、AIコーディングエージェントの_ブリーフィングパケット_として機能します。
 
-### Why AGENTS.md?
+### なぜAGENTS.mdなのか？
 
-**README.md** files are for humans: quick starts, project descriptions, and contribution guidelines.
+**README.md**ファイルは人間のためのものです：クイックスタート、プロジェクト説明、貢献ガイドラインなどです。
 
-**AGENTS.md** complements this by containing the extra, sometimes detailed context coding agents need: build steps, tests, and conventions that might clutter a README or aren't relevant to human contributors.
+**AGENTS.md**は、これを補完するものとして、コーディングエージェントが必要とする追加の、時には詳細なコンテキストを含みます：ビルドステップ、テスト、READMEを煩雑にしたり人間の貢献者には関係ないかもしれない規約などです。
 
-We intentionally kept it separate to:
+私たちが意図的に分離した理由は：
 
-- Give agents a clear, predictable place for instructions
-- Keep READMEs concise and focused on human contributors
-- Provide precise, agent-focused guidance that complements existing README and docs
+- エージェントに明確で予測可能な指示の場所を提供する
+- READMEを簡潔に保ち、人間の貢献者に焦点を当てる
+- 既存のREADMEやドキュメントを補完する、精密でエージェント向けのガイダンスを提供する
 
-### What it contains:
+### 含まれる内容：
 
-- Describes how to **build, test, and run** your project
-- Explains architectural patterns and conventions
-- Lists external services, environment variables, or design docs
-- Provides domain-specific vocabulary and code style rules
+- プロジェクトの**ビルド、テスト、実行**方法を説明
+- アーキテクチャパターンと規約を説明
+- 外部サービス、環境変数、設計ドキュメントを一覧化
+- ドメイン固有の語彙とコードスタイルルールを提供
 
-Agents read AGENTS.md _before_ planning any change, giving them the same tribal knowledge senior engineers already carry in their heads.
-
----
-
-## 2 · One AGENTS.md works across many agents
-
-Your AGENTS.md file is compatible with a growing ecosystem of AI coding agents and tools, including:
-
-- **Droids** - Factory's AI coding agents
-- **Cursor** - AI-powered code editor
-- **Aider** - AI pair programming in your terminal
-- **Gemini CLI** - Google's command-line AI assistant
-- **Jules** - Google's coding assistant
-- **Codex** - OpenAI's code generation model
-- **Zed** - AI-enhanced editor
-- **Phoenix** - AI development platform
-- And many more emerging tools
-
-Rather than introducing another proprietary file format, AGENTS.md uses a standard that works across the entire AI development ecosystem.
+エージェントは変更を計画する_前に_AGENTS.mdを読み、シニアエンジニアが既に頭の中に持っている部族知識と同じものを得ます。
 
 ---
 
-## 3 · File locations & discovery hierarchy
+## 2 · 一つのAGENTS.mdが多くのエージェントで動作
 
-Agents look for AGENTS.md in this order (first match wins):
+あなたのAGENTS.mdファイルは、成長するAIコーディングエージェントとツールのエコシステムと互換性があります：
 
-1. `./AGENTS.md` in the **current working directory**
-2. The nearest parent directory up to the repo root
-3. Any `AGENTS.md` in sub-folders the agent is working inside
-4. Personal override: `~/.factory/AGENTS.md`
+- **Droids** - FactoryのAIコーディングエージェント
+- **Cursor** - AI駆動のコードエディタ
+- **Aider** - あなたのターミナルでのAIペアプログラミング
+- **Gemini CLI** - GoogleのコマンドラインAIアシスタント
+- **Jules** - Googleのコーディングアシスタント
+- **Codex** - OpenAIのコード生成モデル
+- **Zed** - AI強化エディタ
+- **Phoenix** - AI開発プラットフォーム
+- その他多くの新興ツール
+
+別の独自ファイル形式を導入するのではなく、AGENTS.mdはAI開発エコシステム全体で動作する標準を使用します。
+
+---
+
+## 3 · ファイルの場所と発見階層
+
+エージェントはこの順序でAGENTS.mdを探します（最初にマッチしたものが優先）：
+
+1. **現在の作業ディレクトリ**の`./AGENTS.md`
+2. リポジトリルートまでの最も近い親ディレクトリ
+3. エージェントが作業しているサブフォルダ内の任意の`AGENTS.md`
+4. 個人の上書き設定：`~/.factory/AGENTS.md`
 
 <Note>
   Multiple files can coexist. The closer one to the file being edited takes
@@ -65,9 +65,9 @@ Agents look for AGENTS.md in this order (first match wins):
 
 ---
 
-## 4 · File structure & syntax
+## 4 · ファイル構造と構文
 
-AGENTS.md is plain Markdown; headings provide semantic hints.
+AGENTS.mdはプレーンなMarkdownです；見出しはセマンティックなヒントを提供します。
 
 ```md
 # Build & Test ← exact commands for compiling and testing
@@ -81,32 +81,32 @@ AGENTS.md is plain Markdown; headings provide semantic hints.
 # Conventions & Patterns ← naming, folder layout, code style
 ```
 
-Agents recognize:
+エージェントは以下を認識します：
 
-- **Top-level headings** (`#`) as sections
-- **Bullet lists** for commands or rules
-- **Inline code** (`` ` ``) for exact commands, filenames, env vars
-- **Links** to external docs (GitHub, Figma, Confluence…)
+- **トップレベルの見出し**（`#`）をセクションとして
+- **箇条書き**をコマンドやルールとして
+- **インラインコード**（`` ``）を正確なコマンド、ファイル名、環境変数として
+- **リンク**を外部ドキュメント（GitHub、Figma、Confluence…）として
 
 ---
 
-## 5 · Common sections
+## 5 · 一般的なセクション
 
-| Section                    | Purpose                                                       |
+| セクション                  | 目的                                                           |
 | -------------------------- | ------------------------------------------------------------- |
-| **Build & Test**           | Exact commands for compiling and running the test suite.      |
-| **Architecture Overview**  | One-paragraph summary of major modules and data flow.         |
-| **Security**               | API keys, endpoints, auth flows, rate limits, sensitive data. |
-| **Git Workflows**          | Branching strategy, commit conventions, PR requirements.      |
-| **Conventions & Patterns** | Folder structure, naming patterns, code style, lint rules.    |
+| **Build & Test**           | コンパイルとテストスイート実行のための正確なコマンド。            |
+| **Architecture Overview**  | 主要なモジュールとデータフローの一段落要約。                      |
+| **Security**               | APIキー、エンドポイント、認証フロー、レート制限、機密データ。      |
+| **Git Workflows**          | ブランチ戦略、コミット規約、PR要件。                            |
+| **Conventions & Patterns** | フォルダ構造、命名パターン、コードスタイル、lintルール。          |
 
-Include only what _future you_ will care about—brevity beats encyclopaedia-length files.
+_将来のあなた_が気にかけることだけを含めてください—簡潔さは百科事典のような長いファイルに勝ります。
 
 ---
 
-## 6 · Templates & examples
+## 6 · テンプレートと例
 
-### Factory-style comprehensive example
+### Factory風の包括的な例
 
 ```md
 # MyProject
@@ -165,7 +165,7 @@ A pull request is reviewable when it includes:
 - No drop in coverage, no unexplained runtime deps
 ```
 
-### Node + React monorepo
+### Node + Reactモノレポ
 
 ```md
 # Build & Test
@@ -199,7 +199,7 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
 - Test snapshot paths are absolute—run `npm run test -- --updateSnapshot` after refactors.
 ```
 
-### Python microservice
+### Pythonマイクロサービス
 
 ```md
 # Build & Test
@@ -219,7 +219,7 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
 
 ---
 
-## 7 · Best practices
+## 7 · ベストプラクティス
 
 <AccordionGroup>
   <Accordion title="Keep it short">
@@ -259,7 +259,7 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
 
 ---
 
-## 8 · How agents use AGENTS.md
+## 8 · エージェントがAGENTS.mdを使用する方法
 
 <Steps>
   <Step title="Ingestion">
@@ -270,8 +270,8 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
     after edits).
   </Step>
   <Step title="Tool selection">
-    Folder and naming conventions steer tools like `edit_file` and
-    `create_file`.
+    Folder and naming conventions steer tools like __PRESERVE_9__ and
+    __PRESERVE_10__.
   </Step>
   <Step title="Validation">
     Gotchas and domain vocabulary improve reasoning and reduce hallucinations.
@@ -280,27 +280,27 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
 
 ---
 
-## 9 · When things go wrong
+## 9 · 問題が発生したとき
 
-Like any development work, agent tasks sometimes need course correction when scope creeps or assumptions prove wrong. The same iteration patterns that work with human collaborators apply here.
+あらゆる開発作業と同様に、スコープが拡大したり、前提が間違っていることが判明したりしたとき、エージェントのタスクには軌道修正が必要になることがあります。人間の協力者と連携するときに機能するのと同じ反復パターンがここでも適用されます。
 
-### Warning signs of agent drift:
+### エージェントのドリフトの警告サイン：
 
-- Plans that rewrite themselves mid-execution
-- Edits outside the declared paths
-- Fixes claimed without failing tests to prove they work
-- Diffs bloated with unrelated changes
+- 実行中に自分自身を書き換える計画
+- 宣言されたパスの外での編集
+- 動作することを証明する失敗テストなしに主張される修正
+- 関連のない変更で膨れ上がった差分
 
-### Recovery playbook:
+### 復旧プレイブック：
 
-1. **Tighten the spec**: Narrow the directory or tests the agent may touch
-2. **Salvage the good**: Keep valid artifacts such as a failing test; revert noisy edits
-3. **Restart clean**: Launch a fresh session with improved instructions
-4. **Take over**: When you can tell the agent is failing, pair program the final changes
+1. **仕様を厳密にする**：エージェントが触れることのできるディレクトリやテストを狭める
+2. **良い部分を救出する**：失敗テストなどの有効な成果物を保持；ノイズの多い編集をリバート
+3. **クリーンに再開する**：改善された指示で新しいセッションを開始
+4. **引き継ぐ**：エージェントが失敗していることがわかったら、最終変更をペアプログラミングする
 
 ---
 
-## 10 · Getting started
+## 10 · 始め方
 
 <CardGroup cols={2}>
   <Card
@@ -319,12 +319,12 @@ Like any development work, agent tasks sometimes need course correction when sco
   </Card>
 </CardGroup>
 
-### Summary
+### まとめ
 
-1. Add **AGENTS.md** at your repo root (and optionally submodules).
-2. Document build/test commands, conventions, and gotchas—_concise & actionable_.
-3. Agents read it automatically; no extra flags required.
+1. リポジトリルート（必要に応じてサブモジュールも）に**AGENTS.md**を追加。
+2. ビルド/テストコマンド、規約、注意事項を文書化—_簡潔で実行可能に_。
+3. エージェントは自動的にそれを読みます；追加のフラグは不要。
 
-Pick one modest bug or small feature from your backlog. Write three clear sentences that state where to begin, how to reproduce the issue, and what proof signals completion. Run the agent through Explore → Plan → Code → Verify, review the evidence, and merge.
+バックログから一つの控えめなバグまたは小さな機能を選んでください。どこから始めるか、問題を再現する方法、完了の合図となる証拠を述べる3つの明確な文を書いてください。エージェントを探索 → 計画 → コード → 検証のプロセスで実行し、証拠をレビューして、マージしてください。
 
-Ship faster with fewer surprises—give your agent the playbook it needs!
+エージェントに必要なプレイブックを提供して、より少ない驚きでより速くシップしましょう！

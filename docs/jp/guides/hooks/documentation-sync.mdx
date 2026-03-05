@@ -4,48 +4,39 @@ description: "Keep documentation in sync with code changes automatically"
 keywords: ['documentation', 'docs', 'api docs', 'sync', 'changelog', 'hook']
 ---
 
-This cookbook shows how to automatically update documentation when code changes, ensure docs stay current, and generate API documentation from code.
+このクックブックでは、コードが変更された時にドキュメントを自動更新し、ドキュメントを最新の状態に保ち、コードからAPIドキュメントを生成する方法を説明します。
 
-## How it works
+## 動作原理
 
-Documentation sync hooks can:
+ドキュメント同期フックでできること：
 
-1. **Update API docs**: Generate documentation from code annotations
-2. **Sync code examples**: Keep examples in docs matching actual code
-3. **Validate doc references**: Ensure docs reference correct code paths
-4. **Update changelogs**: Auto-generate changelog entries
-5. **Check doc completeness**: Require documentation for new features
+1. **API ドキュメントの更新**: コードアノテーションからドキュメントを生成
+2. **コード例の同期**: ドキュメント内の例を実際のコードと一致させる
+3. **ドキュメント参照の検証**: ドキュメントが正しいコードパスを参照していることを確認
+4. **変更ログの更新**: 変更ログエントリを自動生成
+5. **ドキュメント完全性チェック**: 新機能にドキュメントを必須にする
 
-## Prerequisites
+## 前提条件
 
-Install documentation tools:
+ドキュメントツールをインストールしてください：
 
 <CodeGroup>
 
-```bash TypeScript/JavaScript
-npm install -D typedoc jsdoc documentation
-npm install -D @readme/openapi-parser  # For OpenAPI
-```
+__PRESERVE_0__
 
-```bash Python
-pip install sphinx pdoc3 mkdocs
-pip install pydoc-markdown  # Markdown docs from docstrings
-```
+__PRESERVE_1__
 
-```bash Go
-go install golang.org/x/tools/cmd/godoc@latest
-go install github.com/swaggo/swag/cmd/swag@latest  # For Swagger
-```
+__PRESERVE_2__
 
 </CodeGroup>
 
-## Basic documentation automation
+## 基本的なドキュメント自動化
 
-### Auto-generate API docs
+### API ドキュメントの自動生成
 
-Generate API documentation when code changes.
+コードが変更された時にAPIドキュメントを生成します。
 
-Create `.factory/hooks/generate-api-docs.sh`:
+`.factory/hooks/generate-api-docs.sh` を作成してください：
 
 ```bash
 #!/bin/bash
@@ -113,7 +104,7 @@ exit 0
 chmod +x .factory/hooks/generate-api-docs.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json` に追加してください：
 
 ```json
 {
@@ -134,11 +125,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Update README on project changes
+### プロジェクト変更時にREADMEを更新
 
-Keep README in sync with project structure.
+README をプロジェクト構造と同期させます。
 
-Create `.factory/hooks/update-readme.sh`:
+`.factory/hooks/update-readme.sh` を作成してください：
 
 ```bash
 #!/bin/bash
@@ -200,13 +191,13 @@ chmod +x .factory/hooks/update-readme.sh
 ```
 
 
-### Sync code examples in documentation
+### ドキュメント内のコード例を同期
 
-Ensure code examples in docs match actual code:
+ドキュメントのコード例が実際のコードと一致することを確認します：
 
 
 
-Create `.factory/hooks/sync-doc-examples.py`:
+`.factory/hooks/sync-doc-examples.py` を作成してください：
 
 ```python
 #!/usr/bin/env python3
@@ -671,7 +662,7 @@ Run on session end:
     ```markdown
     ## Button Component
     
-    Source: [`src/components/Button.tsx`](../src/components/Button.tsx)
+    Source: [__PRESERVE_33__](../src/components/Button.tsx)
     ```
   </Step>
   
@@ -744,9 +735,9 @@ Run on session end:
   
 
 
-## See also
+## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - Complete hooks API documentation
-- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
-- [Code validation](/guides/hooks/code-validation) - Enforce code standards
-- [Git workflows](/guides/hooks/git-workflows) - Git integration
+- [Hooks reference](/reference/hooks-reference) - 完全なフックAPI ドキュメント
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Code validation](/guides/hooks/code-validation) - コード標準の強制
+- [Git workflows](/guides/hooks/git-workflows) - Git統合

@@ -4,48 +4,39 @@ description: "Automatically format code after every file edit using hooks"
 keywords: ['formatting', 'prettier', 'black', 'gofmt', 'rustfmt', 'auto format', 'code style', 'hook']
 ---
 
-This cookbook shows how to automatically format code after Droid edits files, ensuring consistent code style across your project without manual intervention.
+このクックブックは、Droidがファイルを編集した後に自動的にコードをフォーマットし、手動での介入なしにプロジェクト全体で一貫したコードスタイルを確保する方法を示します。
 
-## How it works
+## 動作原理
 
-The hook:
+フック：
 
-1. **Triggers on file edits**: Runs after Write or Edit tool calls
-2. **Detects file type**: Checks file extension to determine formatter
-3. **Runs appropriate formatter**: Executes prettier, black, gofmt, rustfmt, etc.
-4. **Provides feedback**: Reports formatting results to the user
-5. **Handles errors gracefully**: Continues even if formatting fails
+1. **ファイル編集時にトリガー**: WriteまたはEditツールコール後に実行
+2. **ファイル種別を検出**: ファイル拡張子をチェックしてフォーマッターを決定
+3. **適切なフォーマッターを実行**: prettier、black、gofmt、rustfmtなどを実行
+4. **フィードバックを提供**: フォーマット結果をユーザーに報告
+5. **エラーを適切に処理**: フォーマットが失敗しても継続
 
-## Prerequisites
+## 前提条件
 
-Install formatters for your language stack:
+あなたの言語スタックに対応するフォーマッターをインストールしてください：
 
 <CodeGroup>
 
-```bash JavaScript/TypeScript
-npm install -D prettier
-```
+__PRESERVE_0__
 
-```bash Python
-pip install black isort
-```
+__PRESERVE_1__
 
-```bash Go
-# gofmt is included with Go installation
-go version
-```
+__PRESERVE_2__
 
-```bash Rust
-rustup component add rustfmt
-```
+__PRESERVE_3__
 
 </CodeGroup>
 
-## Basic setup
+## 基本セットアップ
 
-### Single language project
+### 単一言語プロジェクト
 
-For a JavaScript/TypeScript project, add this to your `.factory/settings.json`:
+JavaScript/TypeScriptプロジェクトの場合、`.factory/settings.json`に以下を追加してください：
 
 ```json
 {
@@ -66,11 +57,11 @@ For a JavaScript/TypeScript project, add this to your `.factory/settings.json`:
 }
 ```
 
-### Multi-language project
+### 多言語プロジェクト
 
-For projects with multiple languages, use a script to handle different file types.
+複数の言語を使用するプロジェクトでは、異なるファイル種別を処理するスクリプトを使用します。
 
-Create `.factory/hooks/format.sh`:
+`.factory/hooks/format.sh`を作成してください：
 
 ```bash
 #!/bin/bash
@@ -130,13 +121,13 @@ esac
 exit 0
 ```
 
-Make the script executable:
+スクリプトを実行可能にします：
 
 ```bash
 chmod +x .factory/hooks/format.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加してください：
 
 ```json
 {
@@ -157,11 +148,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-## Advanced configurations
+## 高度な設定
 
-### Format with custom config
+### カスタム設定でフォーマット
 
-Use project-specific prettier config:
+プロジェクト固有のprettier設定を使用：
 
 ```json
 {
@@ -182,11 +173,11 @@ Use project-specific prettier config:
 }
 ```
 
-### Format with linting
+### リントとフォーマット
 
-Combine formatting with linting fixes.
+フォーマットとリント修正を組み合わせます。
 
-Create `.factory/hooks/format-and-lint.sh`:
+`.factory/hooks/format-and-lint.sh`を作成してください：
 
 ```bash
 #!/bin/bash
@@ -237,13 +228,13 @@ esac
 exit 0
 ```
 
-Make the script executable:
+スクリプトを実行可能にします：
 
 ```bash
 chmod +x .factory/hooks/format-and-lint.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加してください：
 
 ```json
 {
@@ -264,11 +255,11 @@ Add to `.factory/settings.json`:
 }
 ```
 
-### Conditional formatting
+### 条件付きフォーマット
 
-Only format files in specific directories.
+特定のディレクトリ内のファイルのみをフォーマットします。
 
-Create `.factory/hooks/format-src-only.sh`:
+`.factory/hooks/format-src-only.sh`を作成してください：
 
 ```bash
 #!/bin/bash
@@ -294,13 +285,13 @@ esac
 exit 0
 ```
 
-Make the script executable:
+スクリプトを実行可能にします：
 
 ```bash
 chmod +x .factory/hooks/format-src-only.sh
 ```
 
-Add to `.factory/settings.json`:
+`.factory/settings.json`に追加してください：
 
 ```json
 {
@@ -321,87 +312,35 @@ Add to `.factory/settings.json`:
 }
 ```
 
-## Real-world examples
+## 実例
 
-### Example 1: React component formatting
+### 例1: Reactコンポーネントのフォーマット
 
 <Tabs>
   <Tab title="Before Hook">
-    ```typescript
-    // Droid creates this file
-    import React from 'react';
-    import {useState} from 'react';
-
-    export const Button = ({onClick,label}:{onClick:()=>void;label:string})=>{
-    const [loading,setLoading]=useState(false);
-    return <button onClick={onClick} disabled={loading}>{label}</button>
-    }
-    ```
+    __PRESERVE_15__
   </Tab>
   
   <Tab title="After Hook">
-    ```typescript
-    // Automatically formatted by prettier
-    import React, { useState } from 'react';
-
-    export const Button = ({
-      onClick,
-      label,
-    }: {
-      onClick: () => void;
-      label: string;
-    }) => {
-      const [loading, setLoading] = useState(false);
-      return (
-        <button onClick={onClick} disabled={loading}>
-          {label}
-        </button>
-      );
-    };
-    ```
+    __PRESERVE_16__
     <Note>Imports consolidated, spacing fixed, formatting applied</Note>
   </Tab>
 </Tabs>
 
-### Example 2: Python import sorting
+### 例2: Pythonインポートソート
 
 <Tabs>
   <Tab title="Before Hook">
-    ```python
-    # Droid creates this file
-    from typing import Optional
-    import sys
-    from django.db import models
-    import os
-    from myapp.utils import helper
-
-    def process_data(data: Optional[str]) -> None:
-        if data:
-            helper(data)
-    ```
+    __PRESERVE_17__
   </Tab>
   
   <Tab title="After Hook">
-    ```python
-    # Automatically formatted by black and isort
-    import os
-    import sys
-    from typing import Optional
-
-    from django.db import models
-
-    from myapp.utils import helper
-
-
-    def process_data(data: Optional[str]) -> None:
-        if data:
-            helper(data)
-    ```
+    __PRESERVE_18__
     <Note>Imports sorted into stdlib, third-party, and local groups</Note>
   </Tab>
 </Tabs>
 
-## Best practices
+## ベストプラクティス
 
 <Warning>
   Formatters can sometimes introduce subtle bugs (e.g., changing string formats, line continuations). Always review changes before committing.
@@ -410,59 +349,37 @@ Add to `.factory/settings.json`:
 <Steps>
   <Step title="Start with read-only mode">
     Test your formatter configuration manually first:
-    ```bash
-    # Dry run to see what would change
-    prettier --check src/
-    black --check src/
-    ```
+    __PRESERVE_19__
   </Step>
   
   <Step title="Use consistent config files">
     Ensure formatter configs are committed:
-    ```bash
-    # Add to version control
-    git add .prettierrc .prettierignore
-    git add pyproject.toml  # for black config
-    ```
+    __PRESERVE_20__
   </Step>
   
   <Step title="Set appropriate timeouts">
     Large files may need more time:
-    ```json
-    {
-      "timeout": 60  // Increase for large files
-    }
-    ```
+    __PRESERVE_21__
   </Step>
   
   <Step title="Handle formatter errors gracefully">
     Don't block Droid if formatting fails:
-    ```bash
-    # Use || true to continue on errors
-    prettier --write "$file_path" 2>&1 || true
-    ```
+    __PRESERVE_22__
   </Step>
   
   <Step title="Consider Git hooks integration">
     Combine with pre-commit hooks for consistency:
-    ```yaml
-    # .pre-commit-config.yaml
-    repos:
-      - repo: https://github.com/pre-commit/mirrors-prettier
-        rev: v3.0.0
-        hooks:
-          - id: prettier
-    ```
+    __PRESERVE_23__
   </Step>
 </Steps>
 
-## Troubleshooting
+## トラブルシューティング
 
-### Formatter not found
+### フォーマッターが見つからない
 
-**Problem**: `command not found` error
+**問題**: `command not found`エラー
 
-**Solution**: Install the formatter globally or use npx/project binaries:
+**解決策**: フォーマッターをグローバルにインストールするか、npx/プロジェクトバイナリを使用してください：
 ```bash
 # Install globally
 npm install -g prettier
@@ -471,22 +388,22 @@ npm install -g prettier
 npx prettier --write "$file_path"
 ```
 
-### Formatting breaks code
+### フォーマットによりコードが破損
 
-**Problem**: Formatter introduces syntax errors
+**問題**: フォーマッターが構文エラーを引き起こす
 
-**Solution**: Add file validation after formatting:
+**解決策**: フォーマット後にファイル検証を追加してください：
 ```bash
 # For TypeScript
 prettier --write "$file_path"
 tsc --noEmit "$file_path" || echo "⚠️ Type errors after formatting"
 ```
 
-### Hook runs too slowly
+### フックの実行が遅い
 
-**Problem**: Formatting takes too long
+**問題**: フォーマットに時間がかかりすぎる
 
-**Solution**: Only format changed files, use faster formatters:
+**解決策**: 変更されたファイルのみをフォーマットし、より高速なフォーマッターを使用してください：
 ```bash
 # Skip files that haven't changed
 if git diff --quiet "$file_path"; then
@@ -494,11 +411,11 @@ if git diff --quiet "$file_path"; then
 fi
 ```
 
-### Conflicts with editor formatting
+### エディターのフォーマットと競合
 
-**Problem**: Editor and hook format differently
+**問題**: エディターとフックが異なるフォーマットを行う
 
-**Solution**: Use the same config for both:
+**解決策**: 両方で同じ設定を使用してください：
 ```json
 // .vscode/settings.json
 {
@@ -508,9 +425,9 @@ fi
 }
 ```
 
-## See also
+## 関連情報
 
-- [Hooks reference](/reference/hooks-reference) - Complete hooks API documentation
-- [Get started with hooks](/cli/configuration/hooks-guide) - Basic hooks introduction
-- [Code validation hooks](/guides/hooks/code-validation) - Enforce code standards
-- [Git workflow hooks](/guides/hooks/git-workflows) - Integrate with Git
+- [Hooks reference](/reference/hooks-reference) - 完全なフックAPI文書
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Code validation hooks](/guides/hooks/code-validation) - コード標準の強制
+- [Git workflow hooks](/guides/hooks/git-workflows) - Gitとの統合

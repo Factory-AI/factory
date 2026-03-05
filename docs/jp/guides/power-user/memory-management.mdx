@@ -4,7 +4,7 @@ description: Build persistent memory so Droid remembers your preferences, decisi
 keywords: ['memory', 'context', 'preferences', 'persistent', 'sessions', 'history', 'memories']
 ---
 
-Droid doesn't have built-in memory between sessions, but you can create a powerful memory system using markdown files, AGENTS.md references, and hooks. This guide shows you how to build memory that persists and grows.
+Droidはセッション間で組み込みのメモリを持ちませんが、markdownファイル、AGENTS.mdの参照、およびフックを使用して強力なメモリシステムを作成できます。このガイドでは、永続化され成長するメモリの構築方法を説明します。
 
 <Info>
   **Works with Factory App:** These memory patterns work identically in both CLI and [Factory App](/web/getting-started/overview)—just ensure your working directory is set to your repository root.
@@ -12,9 +12,9 @@ Droid doesn't have built-in memory between sessions, but you can create a powerf
 
 ---
 
-## The Memory System Architecture
+## メモリシステムアーキテクチャ
 
-Your memory system consists of three layers:
+メモリシステムは3つの層で構成されます：
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -37,13 +37,13 @@ Your memory system consists of three layers:
 
 ---
 
-## Setting Up Personal Memory
+## 個人メモリの設定
 
-Personal memory follows you across all projects.
+個人メモリはすべてのプロジェクトで共有されます。
 
-### Step 1: Create the Memory File
+### ステップ1：メモリファイルの作成
 
-Create `~/.factory/memories.md`:
+`~/.factory/memories.md`を作成します：
 
 ```markdown
 # My Development Memory
@@ -82,9 +82,9 @@ Create `~/.factory/memories.md`:
 - [2024-03] Using Supabase for personal projects
 ```
 
-### Step 2: Reference in AGENTS.md
+### ステップ2：AGENTS.mdで参照
 
-Add to your `~/.factory/AGENTS.md` or project `AGENTS.md`:
+`~/.factory/AGENTS.md`またはプロジェクトの`AGENTS.md`に追加します：
 
 ```markdown
 ## Personal Preferences
@@ -94,13 +94,13 @@ Refer to this file when making decisions about code style, architecture, or tool
 
 ---
 
-## Setting Up Project Memory
+## プロジェクトメモリの設定
 
-Project memory captures decisions and context specific to a codebase.
+プロジェクトメモリは、コードベース固有の決定とコンテキストを記録します。
 
-### Step 1: Create Project Memory
+### ステップ1：プロジェクトメモリの作成
 
-Create `.factory/memories.md` in your project root:
+プロジェクトルートに`.factory/memories.md`を作成します：
 
 ```markdown
 # Project Memory
@@ -154,9 +154,9 @@ Create `.factory/memories.md` in your project root:
 - Deploy to production on merge to `main`
 ```
 
-### Step 2: Reference in Project AGENTS.md
+### ステップ2：プロジェクトAGENTS.mdで参照
 
-Update your project's `AGENTS.md`:
+プロジェクトの`AGENTS.md`を更新します：
 
 ```markdown
 ## Project Memory
@@ -166,12 +166,12 @@ Always check this file before making significant architectural or design decisio
 
 ---
 
-## Memory Categories
+## メモリカテゴリ
 
-Organize your memories into useful categories:
+メモリを有用なカテゴリに整理します：
 
-### Preferences (Personal)
-What you like and how you work:
+### 設定（個人）
+あなたの好みと作業方法：
 
 ```markdown
 ## Preferences
@@ -181,8 +181,8 @@ What you like and how you work:
 - Learning style
 ```
 
-### Decisions (Project)
-What was decided and why:
+### 決定（プロジェクト）
+何が決定され、その理由：
 
 ```markdown
 ## Decisions
@@ -192,8 +192,8 @@ What was decided and why:
 - Standards agreed upon
 ```
 
-### Context (Project)
-Background information:
+### コンテキスト（プロジェクト）
+背景情報：
 
 ```markdown
 ## Context
@@ -203,8 +203,8 @@ Background information:
 - Performance requirements
 ```
 
-### History (Both)
-What happened when:
+### 履歴（両方）
+いつ何が起こったか：
 
 ```markdown
 ## History
@@ -216,65 +216,27 @@ What happened when:
 
 ---
 
-## Automatic Memory Capture
+## 自動メモリ取得
 
-Create a hook that helps you capture memories as you work.
+作業中にメモリを取得するのに役立つフックを作成します。
 
-### The "Remember This" Hook
+### 「これを記憶」フック
 
-When you say "remember this:" followed by content, automatically append to memories.
+「remember this:」の後にコンテンツを続けると、自動的にメモリに追加されます。
 
-You can trigger memory capture with either **special characters** or **phrases**. Choose based on your preference:
+メモリキャプチャは**特殊文字**または**フレーズ**のいずれかでトリガーできます。好みに基づいて選択してください：
 
 <Tabs>
   <Tab title="# prefix trigger">
-    Trigger with `#` at the start of your message for quick capture.
+    Trigger with __PRESERVE_23__ at the start of your message for quick capture.
     
     **Usage:**
     - "#we use the repository pattern"
-    - "##I prefer early returns" (double `##` for personal)
+    - "##I prefer early returns" (double __PRESERVE_24__ for personal)
     
-    Create `~/.factory/hooks/memory-capture.py`:
+    Create __PRESERVE_25__:
 
-    ```python
-    #!/usr/bin/env python3
-    """Captures messages starting with # and appends to memories.md"""
-    import json, sys, os
-    from datetime import datetime
-
-    def main():
-        try:
-            data = json.load(sys.stdin)
-            prompt = data.get('prompt', '').strip()
-            
-            if not prompt.startswith('#'):
-                return
-            
-            # ## = personal, # = project
-            if prompt.startswith('##'):
-                content = prompt[2:].strip()
-                mem_file = os.path.expanduser('~/.factory/memories.md')
-            else:
-                content = prompt[1:].strip()
-                project_dir = os.environ.get('FACTORY_PROJECT_DIR', os.getcwd())
-                project_factory = os.path.join(project_dir, '.factory')
-                if os.path.exists(project_factory):
-                    mem_file = os.path.join(project_factory, 'memories.md')
-                else:
-                    mem_file = os.path.expanduser('~/.factory/memories.md')
-            
-            if content:
-                timestamp = datetime.now().strftime('%Y-%m-%d')
-                with open(mem_file, 'a') as f:
-                    f.write(f"\n- [{timestamp}] {content}\n")
-                
-                print(json.dumps({'systemMessage': f'✓ Saved to {mem_file}'}))
-        except:
-            pass
-
-    if __name__ == '__main__':
-        main()
-    ```
+    __PRESERVE_9__
   </Tab>
   
   <Tab title="Phrase trigger">
@@ -284,60 +246,19 @@ You can trigger memory capture with either **special characters** or **phrases**
     - "Remember this: we use the repository pattern"
     - "Note: auth tokens expire after 24 hours"
     
-    Create `~/.factory/hooks/memory-capture.py`:
+    Create __PRESERVE_26__:
 
-    ```python
-    #!/usr/bin/env python3
-    """Captures 'remember this:' statements and appends to memories.md"""
-    import json, sys, os
-    from datetime import datetime
-
-    def main():
-        try:
-            data = json.load(sys.stdin)
-            prompt = data.get('prompt', '')
-            
-            triggers = ['remember this:', 'remember:', 'note:', 'save this:']
-            
-            for trigger in triggers:
-                if trigger in prompt.lower():
-                    idx = prompt.lower().index(trigger)
-                    content = prompt[idx + len(trigger):].strip()
-                    
-                    if content:
-                        # Personal if specified, otherwise project
-                        if 'personal' in prompt.lower():
-                            mem_file = os.path.expanduser('~/.factory/memories.md')
-                        else:
-                            project_dir = os.environ.get('FACTORY_PROJECT_DIR', os.getcwd())
-                            project_factory = os.path.join(project_dir, '.factory')
-                            if os.path.exists(project_factory):
-                                mem_file = os.path.join(project_factory, 'memories.md')
-                            else:
-                                mem_file = os.path.expanduser('~/.factory/memories.md')
-                        
-                        timestamp = datetime.now().strftime('%Y-%m-%d')
-                        with open(mem_file, 'a') as f:
-                            f.write(f"\n- [{timestamp}] {content}\n")
-                        
-                        print(json.dumps({'systemMessage': f'✓ Saved to {mem_file}'}))
-                    break
-        except:
-            pass
-
-    if __name__ == '__main__':
-        main()
-    ```
+    __PRESERVE_10__
   </Tab>
 </Tabs>
 
-Make it executable and configure the hook:
+実行可能にし、フックを設定します：
 
 ```bash
 chmod +x ~/.factory/hooks/memory-capture.py
 ```
 
-Add to your hooks configuration via `/hooks`:
+`/hooks`を使用してフック設定に追加します：
 
 ```json
 {
@@ -357,25 +278,25 @@ Add to your hooks configuration via `/hooks`:
 }
 ```
 
-**With # prefix:**
+**#プレフィックス使用：**
 - "#we decided to use Zustand for state management"
-- "##I prefer early returns" (double `##` saves to personal)
+- "##I prefer early returns" （ダブル`##`は個人用に保存）
 
-**With phrase triggers:**
+**フレーズトリガー使用：**
 - "Remember this: we decided to use Zustand for state management"
 - "Note: the auth module uses JWT with 24-hour expiration"
 
-### Alternative: Memory Capture Skill
+### 代替案：メモリキャプチャスキル
 
-Instead of a hook, you can use a [skill](/cli/configuration/skills) that Droid invokes when you ask to remember something. This gives you more interactive control over categorization.
+フックの代わりに、何かを記憶するように依頼したときにDroidが呼び出す[skill](/cli/configuration/skills)を使用できます。これにより、カテゴリ化をよりインタラクティブに制御できます。
 
-See the [memory-capture skill example](https://github.com/Factory-AI/factory/tree/main/examples/power-user-skills/memory-capture) for a ready-to-use implementation.
+すぐに使用できる実装については、[memory-capture skill example](https://github.com/Factory-AI/factory/tree/main/examples/power-user-skills/memory-capture)を参照してください。
 
-### Alternative: Custom Slash Command
+### 代替案：カスタムスラッシュコマンド
 
-For quick manual capture, create a [custom slash command](/cli/configuration/custom-slash-commands):
+手動での素早い取得には、[custom slash command](/cli/configuration/custom-slash-commands)を作成します：
 
-Create `~/.factory/commands/remember.md`:
+`~/.factory/commands/remember.md`を作成：
 
 ```markdown
 ---
@@ -390,7 +311,7 @@ $ARGUMENTS
 Format it appropriately based on whether it's a preference, decision, or learning. Include today's date.
 ```
 
-Then use `/remember we chose PostgreSQL for better ACID compliance` to capture memories on demand.
+その後、`/remember we chose PostgreSQL for better ACID compliance`を使用してメモリをオンデマンドで取得します。
 
 <Info>
   **Which approach to choose?**
@@ -401,11 +322,11 @@ Then use `/remember we chose PostgreSQL for better ACID compliance` to capture m
 
 ---
 
-## Memory Maintenance
+## メモリメンテナンス
 
-Keep your memories useful with regular maintenance.
+定期的なメンテナンスでメモリを有用に保ちます。
 
-### Monthly Review Checklist
+### 月次レビューチェックリスト
 
 ```markdown
 ## Monthly Memory Review
@@ -423,9 +344,9 @@ Keep your memories useful with regular maintenance.
 - [ ] Document recent major changes
 ```
 
-### Archiving Old Memories
+### 古いメモリのアーカイブ
 
-When memories become stale, move them to an archive:
+メモリが古くなったら、アーカイブに移動します：
 
 ```markdown
 # memories.md
@@ -447,9 +368,9 @@ When memories become stale, move them to an archive:
 
 ---
 
-## Advanced: Memory-Aware Skills
+## 上級：メモリ対応スキル
 
-Create skills that leverage your memory files:
+メモリファイルを活用するスキルを作成します：
 
 ```markdown
 ---
@@ -479,27 +400,27 @@ Then implement following all discovered context.
 
 ---
 
-## Quick Reference
+## クイックリファレンス
 
-### File Locations
+### ファイル場所
 
-| Memory Type | Location | Scope |
-|-------------|----------|-------|
-| Personal preferences | `~/.factory/memories.md` | All projects |
-| Project decisions | `.factory/memories.md` | This project |
-| Team conventions | `.factory/rules/*.md` | This project |
+| メモリタイプ | 場所 | スコープ |
+|-------------|------|---------|
+| 個人設定 | `~/.factory/memories.md` | 全プロジェクト |
+| プロジェクト決定 | `.factory/memories.md` | このプロジェクト |
+| チーム規約 | `.factory/rules/*.md` | このプロジェクト |
 
-### When to Add Memories
+### メモリを追加するタイミング
 
-| Event | What to Record | Where |
-|-------|---------------|-------|
-| Made an architecture decision | Decision + reasoning | Project |
-| Discovered a preference | What you prefer | Personal |
-| Learned domain knowledge | Business rules, entities | Project |
-| Changed your workflow | New tool or pattern | Personal |
-| Resolved a tricky issue | Solution and context | Project |
+| イベント | 記録内容 | 場所 |
+|---------|-----------|-------|
+| アーキテクチャ決定を行った | 決定 + 理由 | プロジェクト |
+| 設定を発見した | 好み | 個人 |
+| ドメイン知識を学んだ | ビジネスルール、エンティティ | プロジェクト |
+| ワークフローを変更した | 新しいツールやパターン | 個人 |
+| 複雑な問題を解決した | 解決策とコンテキスト | プロジェクト |
 
-### Memory Format Template
+### メモリフォーマットテンプレート
 
 ```markdown
 ### [Date]: [Title]
@@ -511,7 +432,7 @@ Then implement following all discovered context.
 
 ---
 
-## Next Steps
+## 次のステップ
 
 <CardGroup cols={2}>
   <Card title="Setup Checklist" href="/guides/power-user/setup-checklist" icon="list-check">

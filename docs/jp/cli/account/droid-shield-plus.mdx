@@ -8,13 +8,13 @@ keywords: ['droid shield plus', 'prisma airs', 'prompt injection', 'secrets dete
   **Enterprise Feature** — Droid Shield Plus is available for enterprise customers. [Contact us](mailto:sales@factory.ai) to enable this feature for your organization.
 </Info>
 
-## What is Droid Shield Plus?
+## Droid Shield Plusとは？
 
-Droid Shield Plus is an advanced AI-powered security layer that provides real-time protection against prompt injection attacks, sensitive data exposure, and other security threats. Unlike the standard [Droid Shield](/cli/account/droid-shield) which uses pattern-based detection, Droid Shield Plus leverages **[Palo Alto Networks Prisma AIRS](https://docs.paloaltonetworks.com/ai-runtime-security)** (AI Runtime Security) to provide intelligent, context-aware security scanning.
+Droid Shield Plusは、プロンプトインジェクション攻撃、機密データの露出、その他のセキュリティ脅威に対するリアルタイム保護を提供する高度なAI搭載セキュリティレイヤーです。パターンベースの検出を使用する標準的な[Droid Shield](/cli/account/droid-shield)とは異なり、Droid Shield Plusは**[Palo Alto Networks Prisma AIRS](https://docs.paloaltonetworks.com/ai-runtime-security)**（AI Runtime Security）を活用して、インテリジェントでコンテキストを認識するセキュリティスキャンを提供します。
 
 ---
 
-## Key Features
+## 主な機能
 
 <CardGroup cols={2}>
   <Card title="Prompt Injection Detection" icon="shield-exclamation">
@@ -33,13 +33,13 @@ Droid Shield Plus is an advanced AI-powered security layer that provides real-ti
 
 ---
 
-## How Droid Shield Plus Works
+## Droid Shield Plusの仕組み
 
-Droid Shield Plus provides two layers of protection:
+Droid Shield Plusは2層の保護を提供します：
 
-### 1. Prompt Security Scanning
+### 1. プロンプトセキュリティスキャン
 
-Every prompt you send to Droid is automatically scanned before processing. If a threat is detected, the prompt is blocked and you're notified:
+Droidに送信するすべてのプロンプトは、処理前に自動的にスキャンされます。脅威が検出された場合、プロンプトはブロックされ、通知されます：
 
 ```
 Droid Shield Plus has blocked this prompt due to detected: prompt injection, sensitive data.
@@ -47,15 +47,15 @@ Droid Shield Plus has blocked this prompt due to detected: prompt injection, sen
 If you believe this is a false positive, you can disable Droid Shield Plus in settings.
 ```
 
-**Detected threat categories:**
-- **Prompt Injection** — Attempts to manipulate AI instructions
-- **Sensitive Data (DLP)** — PII, credentials, or confidential information
-- **Toxic Content** — Harmful or inappropriate content
-- **Malicious Code** — Suspicious code patterns
+**検出される脅威のカテゴリ：**
+- **Prompt Injection** — AIの指示を操作しようとする試み
+- **機密データ (DLP)** — PII、認証情報、または機密情報
+- **有害コンテンツ** — 害のあるまたは不適切なコンテンツ
+- **悪意のあるコード** — 疑わしいコードパターン
 
-### 2. Git Commit Scanning
+### 2. Git コミットスキャン
 
-When you perform `git commit` or `git push` operations through Droid, Droid Shield Plus scans your staged changes using AI-powered analysis:
+Droid経由で`git commit`または`git push`操作を実行する際、Droid Shield PlusはAI搭載分析を使用してステージされた変更をスキャンします：
 
 ```
 Droid Shield Plus has detected potential secrets in your staged changes.
@@ -65,28 +65,28 @@ If you would like to override, you can either:
 2. Disable Droid Shield Plus in settings
 ```
 
-This provides significantly more accurate detection than regex-based scanning, catching:
-- Obfuscated or encoded secrets
-- Context-aware credential detection
-- Custom secret formats
-- Secrets embedded in complex code structures
+これにより正規表現ベースのスキャンよりも大幅に高精度な検出が可能になり、以下をキャッチします：
+- 難読化またはエンコードされたシークレット
+- コンテキストを認識した認証情報の検出
+- カスタムシークレット形式
+- 複雑なコード構造に埋め込まれたシークレット
 
 ---
 
 ## Droid Shield vs Droid Shield Plus
 
-| Feature | Droid Shield | Droid Shield Plus |
+| 機能 | Droid Shield | Droid Shield Plus |
 |---------|--------------|-------------------|
-| **Detection Method** | Pattern/Regex matching | AI-powered analysis |
-| **Prompt Scanning** | No | Yes |
-| **Git Commit Scanning** | Yes | Yes |
-| **Prompt Injection Detection** | No | Yes |
-| **Sensitive Data (DLP)** | Limited | Comprehensive |
-| **Toxic Content Detection** | No | Yes |
-| **Malicious Code Detection** | No | Yes |
-| **False Positive Rate** | Higher | Lower |
-| **Availability** | All users | Enterprise |
-| **Powered By** | Built-in patterns | Palo Alto Networks Prisma AIRS |
+| **検出方法** | パターン/正規表現マッチング | AI搭載分析 |
+| **プロンプトスキャン** | なし | あり |
+| **Git コミットスキャン** | あり | あり |
+| **Prompt Injection 検出** | なし | あり |
+| **機密データ (DLP)** | 限定的 | 包括的 |
+| **有害コンテンツ検出** | なし | あり |
+| **悪意のあるコード検出** | なし | あり |
+| **偽陽性率** | 高い | 低い |
+| **利用可能性** | 全ユーザー | Enterprise |
+| **提供元** | 内蔵パターン | Palo Alto Networks Prisma AIRS |
 
 <Note>
   When Droid Shield Plus is enabled, it replaces the standard Droid Shield for git operations, providing enhanced AI-powered scanning instead of pattern-based detection.
@@ -94,7 +94,7 @@ This provides significantly more accurate detection than regex-based scanning, c
 
 ---
 
-## Enabling Droid Shield Plus
+## Droid Shield Plusの有効化
 
 <Steps>
   <Step title="Contact Factory">
@@ -102,8 +102,8 @@ This provides significantly more accurate detection than regex-based scanning, c
   </Step>
   <Step title="Enable in Settings">
     Once enabled for your organization:
-    1. Run `droid`
-    2. Enter `/settings`
+    1. Run __PRESERVE_4__
+    2. Enter __PRESERVE_5__
     3. Navigate to the **Security** section
     4. Toggle **"Droid Shield Plus (AI-Powered)"** to On
   </Step>
@@ -114,9 +114,9 @@ This provides significantly more accurate detection than regex-based scanning, c
 
 ---
 
-## Handling Blocked Prompts
+## ブロックされたプロンプトの処理
 
-When Droid Shield Plus blocks a prompt or git operation:
+Droid Shield Plusがプロンプトやgit操作をブロックした場合：
 
 <AccordionGroup>
   <Accordion title="Review the detection">
@@ -145,17 +145,17 @@ When Droid Shield Plus blocks a prompt or git operation:
 
 ---
 
-## Security & Privacy
+## セキュリティとプライバシー
 
-Droid Shield Plus is powered by **[Palo Alto Networks Prisma AIRS](https://docs.paloaltonetworks.com/ai-runtime-security)**, a leading AI runtime security platform:
+Droid Shield Plusは業界をリードするAIランタイムセキュリティプラットフォームである**[Palo Alto Networks Prisma AIRS](https://docs.paloaltonetworks.com/ai-runtime-security)**によって駆動されています：
 
-- **Real-time Analysis** — Prompts and code are scanned in real-time with minimal latency
-- **Enterprise-Grade Security** — Built on Palo Alto Networks' industry-leading security infrastructure
-- **Graceful Degradation** — If the security service is temporarily unavailable, Droid continues to function while logging the issue
+- **リアルタイム分析** — プロンプトとコードは最小限のレイテンシでリアルタイムスキャンされます
+- **エンタープライズグレードセキュリティ** — Palo Alto Networksの業界をリードするセキュリティインフラストラクチャ上に構築
+- **グレースフルデグラデーション** — セキュリティサービスが一時的に利用できない場合、Droidは問題をログに記録しながら動作を継続します
 
 ---
 
-## Related Resources
+## 関連リソース
 
 <CardGroup cols={2}>
   <Card title="Droid Shield" icon="shield" href="/cli/account/droid-shield">
@@ -166,7 +166,7 @@ Droid Shield Plus is powered by **[Palo Alto Networks Prisma AIRS](https://docs.
   </Card>
 </CardGroup>
 
-### Prisma AIRS Documentation
+### Prisma AIRS ドキュメント
 
 <CardGroup cols={2}>
   <Card title="Prisma AIRS Overview" icon="book" href="https://docs.paloaltonetworks.com/ai-runtime-security">
@@ -179,7 +179,7 @@ Droid Shield Plus is powered by **[Palo Alto Networks Prisma AIRS](https://docs.
 
 ---
 
-## Get Droid Shield Plus
+## Droid Shield Plusを入手
 
 <Card title="Enable for Your Organization" icon="building" href="mailto:sales@factory.ai">
   Contact our sales team at **sales@factory.ai** to enable Droid Shield Plus for your enterprise organization.

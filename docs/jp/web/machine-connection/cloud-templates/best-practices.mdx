@@ -3,25 +3,25 @@ title: "クラウドテンプレート – ベストプラクティス"
 description: Proven tips and workflows to get the most out of cloud templates in Factory
 ---
 
-Cloud templates let you spin up consistent, production-ready development environments in seconds. Below are field-tested practices that keep templates fast, predictable, and team-friendly.
+クラウドテンプレートを使用すると、一貫性のある本番環境対応の開発環境を数秒で立ち上げることができます。以下は、テンプレートを高速で予測可能、かつチームに優しく保つための実証済みのプラクティスです。
 
-## 1. Smart Setup Script Practices
+## 1. スマートセットアップスクリプトのプラクティス
 
-| Practice                           | Why it matters                                        | How to do it                                                                                          |
+| プラクティス                        | 重要な理由                                           | 実行方法                                                                                          |
 | ---------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Order commands by dependency**   | Later commands may depend on earlier installs.        | Run package installation first: `npm ci && npm run build` or `pip install -r requirements.txt && pytest -q` |
-| **Use exact package managers**     | Consistent lockfiles prevent version drift.           | Use `npm ci` (not `npm install`), `pnpm -w i`, or `pip install -r requirements.txt` for reproducible builds |
-| **Add error handling**             | Stops build on first failure, saves debugging time.   | Start your script with `#!/usr/bin/env bash` and `set -euo pipefail` for proper error handling |
-| **Make scripts executable early**  | Avoid permission errors mid-build.                    | Add `chmod +x ./scripts/setup.sh && bash ./scripts/setup.sh` or use `bash ./scripts/setup.sh` directly |
-| **Keep scripts idempotent**        | Re-running setup shouldn't break things.              | Use flags like `pip install --no-deps` or check for existing files before creating them |
-| **Minimize heavy operations**      | Long builds slow down template creation.              | Focus on essential setup; defer optional tools to manual installation later |
+| **依存関係順にコマンドを配置**       | 後のコマンドは前のインストールに依存する可能性がある。 | パッケージインストールを最初に実行：`npm ci && npm run build` または `pip install -r requirements.txt && pytest -q` |
+| **正確なパッケージマネージャーを使用** | 一貫したロックファイルがバージョンドリフトを防ぐ。    | 再現可能なビルドのために `npm ci`（`npm install` ではない）、`pnpm -w i`、または `pip install -r requirements.txt` を使用 |
+| **エラーハンドリングを追加**         | 最初の失敗でビルドを停止し、デバッグ時間を節約する。   | 適切なエラーハンドリングのためにスクリプトを `#!/usr/bin/env bash` と `set -euo pipefail` で開始 |
+| **スクリプトを早期に実行可能にする**  | ビルド中の権限エラーを回避する。                     | `chmod +x ./scripts/setup.sh && bash ./scripts/setup.sh` を追加するか、`bash ./scripts/setup.sh` を直接使用 |
+| **スクリプトをべき等に保つ**         | セットアップの再実行で問題が発生しないようにする。     | `pip install --no-deps` のようなフラグを使用するか、ファイルを作成する前に既存ファイルをチェック |
+| **重い処理を最小限に抑える**         | 長いビルドはテンプレート作成を遅くする。              | 必要最小限のセットアップに集中し、オプションのツールは後で手動インストールに委ねる |
 
-> **Tip:** Test your setup script locally first. The script runs with `bash` at the repo root, and you can add `set -euo pipefail` for strict error handling.
+> **ヒント：** セットアップスクリプトをまずローカルでテストしましょう。スクリプトはリポジトリルートで `bash` で実行され、厳密なエラーハンドリングのために `set -euo pipefail` を追加できます。
 
 
 ---
 
-## 2. Workflow Patterns That Scale
+## 2. スケールするワークフローパターン
 
 <AccordionGroup>
 
@@ -38,19 +38,19 @@ Cloud templates let you spin up consistent, production-ready development environ
 
 ---
 
-## 3. Team Collaboration Tips
+## 3. チームコラボレーションのヒント
 
-| Tip                         | Details                                                                                                             |
+| ヒント                        | 詳細                                                                                                             |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **Name templates clearly** | Name templates according to the tracked repository, e.g. `factory-mono` to work on the `factory-mono` GitHub repo.  |
-| **Document entry commands** | Add an `AGENTS.md` file with common tasks (`npm run dev`, `pytest`). Droid automatically reads this file.           |
+| **テンプレートを明確に命名**  | 追跡するリポジトリに従ってテンプレートに名前を付ける。例：`factory-mono` GitHub リポで作業するための `factory-mono`  |
+| **エントリーコマンドを文書化** | 一般的なタスク（`npm run dev`、`pytest`）を含む `AGENTS.md` ファイルを追加。Droid がこのファイルを自動的に読み取ります |
 
-## 5. Troubleshooting at a Glance
+## 5. トラブルシューティング一覧
 
-| Symptom                      | Resolution                                                                   |
+| 症状                         | 解決方法                                                                   |
 | ---------------------------- | ---------------------------------------------------------------------------- |
-| **Rebuild is slow**          | Verify `.dockerignore`, cache heavy installs in image, use lighter base.     |
-| **Git asks for credentials** | Ensure repository integration is enabled in **Integrations → Repositories**. |
-| **Out-of-disk errors**       | Prune package caches (`npm cache clean --force`) or rebuild template.        |
+| **リビルドが遅い**           | `.dockerignore` を確認し、重いインストールをイメージにキャッシュし、軽量なベースを使用 |
+| **Git が認証情報を要求**      | **統合 → リポジトリ**でリポジトリ統合が有効になっていることを確認             |
+| **ディスク容量不足エラー**    | パッケージキャッシュをプルーン（`npm cache clean --force`）するかテンプレートを再ビルド |
 
-Following these practices keeps your cloud templates fast, secure, and collaborative—so you can focus on shipping code, not configuring machines.
+これらのプラクティスに従うことで、クラウドテンプレートを高速、安全、協調的に保つことができ、マシンの設定ではなくコードの出荷に集中できます。

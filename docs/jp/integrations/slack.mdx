@@ -3,15 +3,15 @@ title: "Slack"
 description: "Step-by-step guide to connect Factory with your Slack workspace"
 ---
 
-This guide will walk you through the process of integrating Factory with Slack, enabling seamless interaction between Factory and your Slack conversations.
+このガイドでは、FactoryとSlackを統合し、FactoryとあなたのSlack会話間でシームレスなやり取りを可能にするプロセスを説明します。
 
-## Prerequisites 
+## 前提条件
 
-- A Factory account with admin privileges
-- Admin access to your Slack workspace
-- Ability to install apps in your Slack workspace
+- 管理者権限を持つFactoryアカウント
+- SlackワークスペースへのAdmin アクセス
+- Slackワークスペースでアプリをインストールする権限
 
-## Integration Steps
+## 統合手順
 
 <Steps>
   <Step title="Access Factory Integrations">
@@ -30,58 +30,57 @@ This guide will walk you through the process of integrating Factory with Slack, 
     After authorization, you'll be redirected back to Factory. Verify that the integration status shows as "Connected".
   </Step>
   <Step title="Add to Channels">
-    In your Slack workspace, add the Factory app to relevant channels by typing `/invite @Factory` in each channel.
+    In your Slack workspace, add the Factory app to relevant channels by typing __PRESERVE_0__ in each channel.
   </Step>
 </Steps>
 
-## Verification
+## 検証
 
-To ensure the integration is working correctly:
+統合が正しく動作していることを確認するには：
 
-1. Mention `@Factory` in a thread within a channel where the app has been added.
-2. Verify that Factory responds with a link to open the conversation in Factory.
-3. Click the link and confirm that the Slack thread content appears in your new Factory session.
+1. アプリが追加されたチャンネル内のスレッドで `@Factory` をメンションします。
+2. FactoryがFactory内で会話を開くためのリンクで応答することを確認します。
+3. リンクをクリックし、Slackスレッドの内容が新しいFactoryセッションに表示されることを確認します。
 
-
-## Slack Tools
+## Slack ツール
 
 <Warning>
 Before using the tools below, make sure that the Factory app is invited
 to the channels you'd like to interact with by sending <code>/invite&nbsp;@Factory</code> in those channels.
 </Warning>
 
-Factory currently provides one native Slack tool:
+Factoryは現在、1つのネイティブSlackツールを提供しています：
 
-| Tool | What it does |
+| ツール | 機能 |
 | ---- | ------------ |
-| **Post Message** | Sends a message to a channel or replies in an existing thread |
+| **Post Message** | チャンネルにメッセージを送信、または既存のスレッドに返信 |
 
-## Additional Features
+## 追加機能
 
-Besides the tools above, the Slack integration also allows you to: 
+上記のツールに加えて、Slack統合では以下も可能です：
 
-- Mention `@Factory` in any Slack thread to receive a link to continue the conversation in Factory
-- Import Slack thread context into Factory by clicking the provided link
-- Reference Slack threads in Factory by pasting a thread URL into a Factory chat
+- 任意のSlackスレッドで `@Factory` をメンションして、Factoryで会話を続けるためのリンクを受け取る
+- 提供されたリンクをクリックしてSlackスレッドのコンテキストをFactoryにインポート
+- FactoryチャットにスレッドURLを貼り付けて、FactoryでSlackスレッドを参照
 
-When a Slack thread is imported, Factory has access to the entire conversation history, allowing it to provide context-aware assistance.
+Slackスレッドがインポートされると、Factoryは会話履歴全体にアクセスできるため、コンテキストを考慮したアシスタンス機能を提供できます。
 
-## Best Practices
+## ベストプラクティス
 
-- Add the Factory app only to channels where development discussions occur.
-- Use threads rather than channel messages when mentioning Factory.
-- Provide sufficient context in the Slack thread before mentioning Factory.
-- Regularly review the permissions granted to the Factory app in your Slack settings.
+- 開発に関する議論が行われるチャンネルにのみFactoryアプリを追加する。
+- Factoryをメンションする際は、チャンネルメッセージではなくスレッドを使用する。
+- Factoryをメンションする前に、Slackスレッドで十分なコンテキストを提供する。
+- Slack設定でFactoryアプリに付与された権限を定期的に確認する。
 
-## Troubleshooting
+## トラブルシューティング
 
-If you encounter issues during integration:
+統合中に問題が発生した場合：
 
-- Ensure you have admin rights in both Factory and your Slack workspace.
-- Verify that the Factory app has been added to the channel where you're mentioning it.
-- If you see a "not_in_channel" error toast when trying to paste a Slack thread URL, it means the Factory bot needs to be invited to that channel. Use `/invite @Factory` in the channel to resolve this issue.
-- Check that your organization's firewall isn't blocking webhook communications.
-- For persistent issues, contact Factory support with specific error messages.
+- FactoryとSlackワークスペースの両方で管理者権限を持っていることを確認する。
+- メンションしようとしているチャンネルにFactoryアプリが追加されていることを確認する。
+- SlackスレッドURLを貼り付ける際に「not_in_channel」エラートーストが表示される場合、そのチャンネルにFactoryボットを招待する必要があります。この問題を解決するには、チャンネルで `/invite @Factory` を使用してください。
+- 組織のファイアウォールがwebhook通信をブロックしていないか確認する。
+- 問題が解決しない場合は、具体的なエラーメッセージと共にFactoryサポートに連絡する。
 
 <Card title="Security and Compliance" icon="shield-check" href="#">
   Learn about Factory's security measures and how we protect your data

@@ -3,18 +3,18 @@ title: "LLMの安全性とエージェント制御"
 description: How Droids classify risk, enforce allow/deny policies, use Droid Shield, and integrate hooks and sandboxes to keep agents safe.
 ---
 
-Factory treats LLMs as powerful but untrusted components. Droid’s safety model combines **deterministic controls, programmable hooks, and sandboxed runtimes** so that even frontier models can operate safely in high‑security environments.
+Factory は LLM を強力であるが信頼できないコンポーネントとして扱います。Droid のセーフティモデルは**決定論的制御、プログラマブルフック、およびサンドボックスランタイム**を組み合わせることで、最先端のモデルでも高セキュリティ環境で安全に動作できるようにします。
 
 ---
 
-## Two layers of safety
+## 2層のセーフティ
 
-We differentiate between:
+我々は以下を区別しています：
 
-1. **Deterministic controls** – hard boundaries that do not depend on model behavior.
-2. **LLM steering** – prompts and context that guide models toward better behavior without providing guarantees.
+1. **決定論的制御** – モデルの動作に依存しない厳格な境界。
+2. **LLM ステアリング** – 保証を提供することなく、モデルをより良い動作へと導くプロンプトとコンテキスト。
 
-Enterprise security should be built primarily on deterministic controls; steering is a quality‑of‑life improvement.
+エンタープライズセキュリティは主に決定論的制御上に構築されるべきです。ステアリングは利便性向上のためのものです。
 
 <CardGroup cols={2}>
   <Card title="Deterministic controls" icon="shield-check">
@@ -35,88 +35,88 @@ Enterprise security should be built primarily on deterministic controls; steerin
 
 ---
 
-## Command risk classification
+## コマンドリスク分類
 
-Every shell command Droid proposes is classified into a **risk level** based on patterns and context (for example, file deletion, network access, package installation, database access).
+Droid が提案するすべてのシェルコマンドは、パターンとコンテキストに基づいて（例：ファイル削除、ネットワークアクセス、パッケージインストール、データベースアクセス）**リスクレベル**に分類されます。
 
-Typical levels include:
+典型的なレベルには以下が含まれます：
 
-- **Low risk** – read‑only commands and local diagnostics (for example, `ls`, `cat`, `git status`).
-- **Medium risk** – commands that modify code or install dependencies (for example, `npm install`, `go test ./...`).
-- **High risk** – commands that delete data, change system configuration, or interact with sensitive resources (for example, `rm -rf`, `kubectl delete`, `psql` against production).
+- **低リスク** – 読み取り専用コマンドとローカル診断（例：`ls`、`cat`、`git status`）。
+- **中リスク** – コードを変更したり依存関係をインストールするコマンド（例：`npm install`、`go test ./...`）。
+- **高リスク** – データを削除したり、システム設定を変更したり、機密リソースとやり取りするコマンド（例：`rm -rf`、`kubectl delete`、本番環境に対する `psql`）。
 
-Org and project policies can map risk levels to behavior, such as:
+組織およびプロジェクトポリシーは、リスクレベルを動作にマッピングできます：
 
-- Always allow low‑risk commands.
-- Require user approval for medium‑risk commands.
-- Block high‑risk commands entirely or only allow them in specific environments (for example, isolated devcontainers).
+- 低リスクコマンドを常に許可する。
+- 中リスクコマンドにはユーザー承認を要求する。
+- 高リスクコマンドを完全にブロックするか、特定の環境（例：隔離されたdevcontainer）でのみ許可する。
 
-Risk information is also emitted via OTEL so security teams can monitor how often high‑risk commands are proposed or attempted.
-
----
-
-## Command allowlists and denylists
-
-Admins can define **global and project‑specific allow/deny lists** in hierarchical settings:
-
-- **Deny lists** – patterns for commands that are never permitted (for example, `rm -rf`, `sudo *`, `curl *://sensitive-endpoint`).
-- **Allow lists** – specific commands or patterns that can run without additional approval in certain environments.
-
-Because settings are extension‑only:
-
-- Org‑level denies and allows **cannot be removed** by projects or users.
-- Projects can add additional allows or denies within their repos.
-- Users cannot weaken the policy; they can only choose stricter personal defaults.
-
-This keeps command policy consistent across thousands of machines while still allowing local specialization.
+リスク情報はOTEL経由でも出力されるため、セキュリティチームは高リスクコマンドが提案または実行される頻度を監視できます。
 
 ---
 
-## Droid Shield: secret scanning and DLP
+## コマンドの許可リストと拒否リスト
 
-**Droid Shield** adds a dedicated layer of protection for secrets and sensitive content.
+管理者は階層設定で**グローバルおよびプロジェクト固有の許可/拒否リスト**を定義できます：
 
-When enabled, Droid Shield can:
+- **拒否リスト** – 決して許可されないコマンドのパターン（例：`rm -rf`、`sudo *`、`curl *://sensitive-endpoint`）。
+- **許可リスト** – 特定の環境で追加の承認なしに実行できる特定のコマンドまたはパターン。
 
-- Scan **files** before they are read or edited.
-- Scan **prompts** before they are sent to models.
-- Scan **commands** before they are executed.
+設定は拡張のみであるため：
 
-It detects patterns such as:
+- 組織レベルの拒否と許可はプロジェクトやユーザーによって**削除することはできません**。
+- プロジェクトはリポジトリ内で追加の許可や拒否を加えることができます。
+- ユーザーはポリシーを弱めることはできません。より厳格な個人デフォルトを選択するのみです。
 
-- API tokens and access keys.
-- Passwords and database connection strings.
-- Private keys and certificates.
-- Organization‑specific identifiers (configurable patterns).
-
-Based on policy, Droid Shield can:
-
-- Block the operation entirely.
-- Redact the sensitive portions before continuing.
-- Emit OTEL events and logs for security review.
-- Call out to a **customer DLP service** via hooks for deeper analysis.
-
-Org admins configure Droid Shield at the org and project levels; users cannot disable it where it is enforced.
+これにより、数千台のマシン間でコマンドポリシーの一貫性を保ちながら、ローカルな特殊化も可能になります。
 
 ---
 
-## Hooks for enforcement and logging
+## Droid Shield：シークレットスキャンとDLP
 
-Hooks are Droid’s **programmable safety and observability interface**. They allow you to run your own code at key points in the agent loop.
+**Droid Shield** はシークレットと機密コンテンツのための専用保護層を追加します。
 
-Common hook points include:
+有効にした場合、Droid Shield は以下ができます：
 
-- **Before prompt submission** – inspect prompts for secrets, PII, or policy violations.
-- **Before file reads or writes** – block or redact access to sensitive files.
-- **Before command execution** – enforce approval workflows or block dangerous commands.
-- **Before git operations** – prevent unauthorized `git push` or interactions with restricted branches.
-- **After code generation or edits** – run linters, security scanners, or internal compliance checks.
+- ファイルが読み取りまたは編集される前に**ファイル**をスキャンする。
+- モデルに送信される前に**プロンプト**をスキャンする。
+- 実行される前に**コマンド**をスキャンする。
 
-Typical enterprise use cases:
+以下のようなパターンを検出します：
+
+- API トークンとアクセスキー。
+- パスワードとデータベース接続文字列。
+- 秘密鍵と証明書。
+- 組織固有の識別子（設定可能なパターン）。
+
+ポリシーに基づいて、Droid Shield は以下ができます：
+
+- 操作を完全にブロックする。
+- 継続する前に機密部分を編集する。
+- セキュリティレビューのためにOTELイベントとログを出力する。
+- より深い分析のためにフック経由で**顧客DLPサービス**を呼び出す。
+
+組織管理者は組織およびプロジェクトレベルでDroid Shieldを設定します。ユーザーは強制される場所でそれを無効にできません。
+
+---
+
+## 強制とログのためのフック
+
+フックは Droid の**プログラマブルなセーフティと可観測性インターフェース**です。エージェントループの重要なポイントで独自のコードを実行できます。
+
+一般的なフックポイントには以下があります：
+
+- **プロンプト送信前** – シークレット、PII、またはポリシー違反についてプロンプトを検査。
+- **ファイル読み取りまたは書き込み前** – 機密ファイルへのアクセスをブロックまたは編集。
+- **コマンド実行前** – 承認ワークフローを強制または危険なコマンドをブロック。
+- **git操作前** – 未承認の `git push` または制限されたブランチとのやり取りを防止。
+- **コード生成または編集後** – リンター、セキュリティスキャナー、または内部コンプライアンスチェックを実行。
+
+典型的なエンタープライズユースケース：
 
 <AccordionGroup>
   <Accordion title="Block direct git pushes">
-    Require all code changes to flow through your existing tooling by blocking `git push` in Droid sessions and instructing developers to use internal CL/PR tooling instead.
+    Require all code changes to flow through your existing tooling by blocking __PRESERVE_12__ in Droid sessions and instructing developers to use internal CL/PR tooling instead.
   </Accordion>
   <Accordion title="Integrate with DLP and CASB systems">
     Forward prompts and file snippets to your DLP or CASB APIs before they reach LLMs; deny or redact operations that violate policy.
@@ -126,32 +126,32 @@ Typical enterprise use cases:
   </Accordion>
 </AccordionGroup>
 
-See [Hooks Guide](/cli/configuration/hooks-guide) and [Hooks Reference](/reference/hooks-reference) for implementation details and examples.
+実装詳細と例については [Hooks Guide](/cli/configuration/hooks-guide) と [Hooks Reference](/reference/hooks-reference) をご覧ください。
 
 ---
 
-## Sandboxing with containers and VMs
+## コンテナとVMによるサンドボックス化
 
-Running Droid in **sandboxed devcontainers and VMs** lets you safely grant more autonomy where it is useful, without exposing production systems.
+**サンドボックス化されたdevcontainerとVM**でDroidを実行することで、本番システムを公開することなく、有用な場所でより多くの自律性を安全に付与できます。
 
-Recommended patterns:
+推奨パターン：
 
-- Use Docker/Podman devcontainers with restricted filesystem mounts and network egress.
-- Run Droid with higher autonomy only inside containers or VMs that **do not have direct access to production databases or secrets**.
-- Use separate credentials and environment variables for sandboxed versus production‑adjacent environments.
+- 制限されたファイルシステムマウントとネットワーク出力を持つDocker/PodmanのdevcontainerOSを使用する。
+- **本番データベースやシークレットに直接アクセスできない**コンテナやVM内でのみ、より高い自律性でDroidを実行する。
+- サンドボックス環境と本番隣接環境で別々の認証情報と環境変数を使用する。
 
-In OTEL telemetry, you can tag sessions by environment (for example, `environment.type=local|ci|sandbox`) to build environment‑specific dashboards and alerts.
+OTELテレメトリでは、環境別のダッシュボードとアラートを構築するために、環境でセッションにタグ付けできます（例：`environment.type=local|ci|sandbox`）。
 
 ---
 
-## Steering models toward safe behavior
+## モデルを安全な動作に向けてステアリング
 
-While deterministic controls are the foundation, **LLM steering** improves quality and reduces how often dangerous actions are even proposed.
+決定論的制御が基盤である一方、**LLM ステアリング**は品質を向上させ、危険なアクションが提案される頻度を減らします。
 
-Org and project settings can define:
+組織およびプロジェクト設定では以下を定義できます：
 
-- **Rules and instructions** – security guidelines, coding standards, and organization‑specific instructions that apply to every request.
-- **Standardized commands and workflows** – shared commands (for example, `/security-review`, `/migrate-service`) that bake in safe patterns.
-- **Context enrichment** – MCP servers that expose documentation, runbooks, and internal APIs so models have accurate information instead of guessing.
+- **ルールと指示** – すべてのリクエストに適用されるセキュリティガイドライン、コーディング標準、および組織固有の指示。
+- **標準化されたコマンドとワークフロー** – 安全なパターンを組み込んだ共有コマンド（例：`/security-review`、`/migrate-service`）。
+- **コンテキストエンリッチメント** – モデルが推測ではなく正確な情報を持てるように、ドキュメント、ランブック、内部APIを公開するMCPサーバー。
 
-Because these are instructions, not enforcement, they complement rather than replace the hard boundaries described above.
+これらは指示であって強制ではないため、上述の厳格な境界を置き換えるのではなく補完します。

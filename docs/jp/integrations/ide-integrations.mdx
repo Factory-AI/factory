@@ -19,34 +19,34 @@ keywords:
   ]
 ---
 
-Droid works great with any Integrated Development Environment (IDE) that has a terminal. Just run `droid`, and you're ready to go.
+Droidは、ターミナルを備えた統合開発環境（IDE）と優れた連携を提供します。単に`droid`を実行するだけで、すぐに使い始めることができます。
 
-Droid also provides dedicated plugins for Visual Studio Code (including Cursor and Windsurf) and JetBrains IDEs. For JetBrains IDEs such as IntelliJ IDEA, PyCharm, Android Studio, WebStorm, PhpStorm, and GoLand, you can install the official Factory Droid plugin for enhanced integration, or just run `droid` in the integrated terminal.
+Droidは、Visual Studio Code（CursorやWindsurfを含む）およびJetBrains IDEに専用プラグインも提供しています。IntelliJ IDEA、PyCharm、Android Studio、WebStorm、PhpStorm、GoLandなどのJetBrains IDEでは、統合機能を強化するための公式Factory Droidプラグインをインストールするか、統合ターミナルで`droid`を実行することができます。
 
-## Features
+## 機能
 
-- **Quick launch**: Use keyboard shortcuts to open Droid directly from your editor, or click the Droid button in the UI
-- **Diff viewing**: Code changes can be displayed directly in the IDE diff viewer instead of the terminal
-- **Selection context**: The current selection/tab in the IDE is automatically shared with Droid
-- **File reference shortcuts**: Use keyboard shortcuts to insert file references
-- **Diagnostic sharing**: Diagnostic errors (lint, syntax, etc.) from the IDE are automatically shared with Droid as you work
+- **クイック起動**: キーボードショートカットを使用してエディターから直接Droidを開いたり、UIのDroidボタンをクリックしたりできます
+- **差分表示**: コードの変更をターミナルではなくIDE差分ビューアーに直接表示できます
+- **選択コンテキスト**: IDEでの現在の選択/タブが自動的にDroidと共有されます
+- **ファイル参照ショートカット**: キーボードショートカットを使用してファイル参照を挿入できます
+- **診断情報共有**: IDEからの診断エラー（lint、構文など）が作業中に自動的にDroidと共有されます
 
-## Installation
+## インストール
 
 ### VS Code
 
-To install Droid on VS Code and supported forks (Cursor, Windsurf):
+VS Codeおよびサポートされているフォーク（Cursor、Windsurf）にDroidをインストールするには：
 
-1. Open VS Code
-2. Open the integrated terminal
-3. Run `droid` - the extension will auto-install
+1. VS Codeを開く
+2. 統合ターミナルを開く
+3. `droid`を実行 - 拡張機能が自動的にインストールされます
 
 <Note>
   You can install the [VS Code Extension
   here](https://marketplace.visualstudio.com/items?itemName=Factory.factory-vscode-extension).
 </Note>
 
-### Other IDEs
+### その他のIDE
 
 <CardGroup cols={2}>
   <Card
@@ -63,64 +63,64 @@ To install Droid on VS Code and supported forks (Cursor, Windsurf):
   </Card>
 </CardGroup>
 
-## Usage
+## 使用方法
 
-### From your IDE
+### IDEから
 
-Run `droid` from your IDE's integrated terminal, and all features will be active.
+IDEの統合ターミナルから`droid`を実行すると、すべての機能が有効になります。
 
-### The `/ide` Command
+### `/ide`コマンド
 
-Use the `/ide` command within droid to manage your IDE integrations:
+droid内で`/ide`コマンドを使用してIDE統合を管理できます：
 
 ```
 /ide
 ```
 
-This command will:
+このコマンドは以下を実行します：
 
-- Show the current extension version if installed
-- Prompt to install the extension if not yet installed
-- Works with VS Code, Cursor, and Windsurf
+- インストール済みの場合、現在の拡張機能バージョンを表示
+- 未インストールの場合、拡張機能のインストールを促す
+- VS Code、Cursor、Windsurfで動作
 
-## Troubleshooting
+## トラブルシューティング
 
-### VS Code extension not installing
+### VS Code拡張機能がインストールされない場合
 
-- Ensure you're running Droid from VS Code's integrated terminal
-- Ensure that the CLI corresponding to your IDE is installed:
-  - For VS Code: `code` command should be available
-  - For Cursor: `cursor` command should be available
-  - For Windsurf: `windsurf` command should be available
-  - If not installed, use `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux) and search for "Shell Command: Install 'code' command in PATH" (or the equivalent for your IDE)
-- Check that VS Code has permission to install extensions
+- VS Codeの統合ターミナルからDroidを実行していることを確認
+- IDEに対応するCLIがインストールされていることを確認：
+  - VS Code用：`code`コマンドが利用可能である必要があります
+  - Cursor用：`cursor`コマンドが利用可能である必要があります  
+  - Windsurf用：`windsurf`コマンドが利用可能である必要があります
+  - インストールされていない場合は、`Cmd+Shift+P`（Mac）または`Ctrl+Shift+P`（Windows/Linux）を使用し、「Shell Command: Install 'code' command in PATH」（または該当するIDEの同等のもの）を検索してください
+- VS Codeに拡張機能をインストールする権限があるかを確認
 
-### ESC key configuration
+### ESCキーの設定
 
-If the ESC key doesn't interrupt Droid operations in JetBrains terminals:
+JetBrainsターミナルでESCキーがDroid操作を中断しない場合：
 
-1. Go to Settings → Tools → Terminal
-2. Either:
-   - Uncheck "Move focus to the editor with Escape", or
-   - Click "Configure terminal keybindings" and delete the "Switch focus to Editor" shortcut
-3. Apply the changes
+1. Settings → Tools → Terminalに移動
+2. 以下のいずれかを実行：
+   - 「Move focus to the editor with Escape」のチェックを外す、または
+   - 「Configure terminal keybindings」をクリックして「Switch focus to Editor」ショートカットを削除
+3. 変更を適用
 
-This allows the ESC key to properly interrupt Droid operations.
+これにより、ESCキーがDroid操作を適切に中断できるようになります。
 
-### Common issues
+### よくある問題
 
-| Symptom                                   | Fix                                                                                          |
+| 症状                                    | 対処法                                                                                       |
 | ----------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **"Editor integration disabled" message** | Verify the VS Code extension is installed or update `editorIntegration` to match your editor |
-| CLI cannot find Node/Bun                  | Ensure the `droid` binary is on the PATH VS Code/JetBrains uses (restart after install)      |
-| Missing file context                      | Save files; unsaved buffers older than 500 KB are skipped for performance                    |
-| Stale diagnostics                         | Run **↻ Refresh Diagnostics** command (VS Code Command Palette)                              |
-| VS Code terminal closes immediately       | Check your shell's startup scripts: they must not auto-exit                                  |
-| Network blocked in corporate proxy        | Configure proxy variables in settings or set `HTTP_PROXY`/`HTTPS_PROXY` env vars             |
+| **「Editor integration disabled」メッセージ** | VS Code拡張機能がインストールされていることを確認するか、`editorIntegration`をエディターに合わせて更新 |
+| CLIがNode/Bunを見つけられない                  | VS Code/JetBrainsが使用するPATHに`droid`バイナリがあることを確認（インストール後は再起動）      |
+| ファイルコンテキストが不足                      | ファイルを保存してください。500KBを超える未保存バッファはパフォーマンス上の理由でスキップされます                    |
+| 診断情報が古い                         | **↻ Refresh Diagnostics**コマンド（VS Codeコマンドパレット）を実行                              |
+| VS Codeターミナルがすぐに閉じる       | シェルの起動スクリプトを確認してください。自動終了してはいけません                                  |
+| 企業プロキシでネットワークがブロックされる        | 設定でプロキシ変数を設定するか、`HTTP_PROXY`/`HTTPS_PROXY`環境変数を設定             |
 
-For additional help, email support@factory.ai with logs from `~/.factory/logs/`
+追加のヘルプについては、`~/.factory/logs/`からのログとともにsupport@factory.aiまでメールでお問い合わせください
 
-## Next steps
+## 次のステップ
 
 <CardGroup cols={2}>
   <Card title="Settings" icon="sliders" href="/cli/configuration/settings">

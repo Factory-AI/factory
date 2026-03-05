@@ -9,163 +9,163 @@ keywords:
   ]
 ---
 
-Autonomous software organizations build systems that maintain and improve themselves with minimal human intervention. Developers describe what they want built through whatever medium makes sense, and the system executes that vision with quality and precision.
+自律的なソフトウェア組織は、人間の介入を最小限に抑えながら自己保守・自己改善するシステムを構築します。開発者は適切な手段を通じて構築したいものを記述し、システムはそのビジョンを品質と精度を持って実行します。
 
-The **Agent Readiness Model** measures how close your organization is to this state, and helps remediate gaps to get you there faster.
-
----
-
-## Getting Started
-
-There are four ways to interact with Agent Readiness:
-
-1. **CLI:** Run the `/readiness-report` [slash command](/cli/features/readiness-report) to evaluate a repository's readiness level
-2. **Web Dashboard:** View your organization's readiness scores in the [Agent Readiness dashboard](/web/agent-readiness/dashboard)
-3. **API:** Programmatically access readiness reports via the [Readiness Reports API](/reference/readiness-reports-api)
-4. **Remediation (Coming Soon):** Automatically fix failing criteria directly from the CLI or dashboard
+**Agent Readiness Model**は、あなたの組織がこの状態にどれだけ近づいているかを測定し、より迅速にその目標に到達するためのギャップの改善を支援します。
 
 ---
 
-## What Autonomous Development Looks Like
+## はじめに
 
-What does it look like when an organization reaches high agent readiness? Here are concrete examples of workflows that become possible when the technical foundation is in place.
+Agent Readinessと相互作用する方法は4つあります：
 
-### Code from Conversation
-
-A developer describes what they need built, and the system executes through deployment.
-
-**Input:** "Refactor the authentication module to support OAuth2 with PKCE, maintaining backward compatibility."
-
-**The system:**
-
-- Generates idiomatic code following established patterns
-- Validates against linters, type checkers, and test suites
-- Handles the pull request and code review process
-- Updates documentation and notifies stakeholders
-- Deploys and monitors for issues
-
-### Design to Implementation
-
-A designer shares a mockup, and the system implements it without handoffs.
-
-**Input:** Figma mockup of a new dashboard.
-
-**The system:**
-
-- Interprets the visual specification and design system
-- Implements UI components with proper styling and responsiveness
-- Connects to existing APIs or creates new endpoints
-- Adds loading states, error handling, and accessibility
-- Generates tests for user interactions
-- Deploys to staging for design review
-
-### Bug to Deployed Fix
-
-A customer reports an issue, and the system diagnoses, fixes, and deploys autonomously.
-
-**Input:** Bug report through support system.
-
-**The system:**
-
-- Triages based on error logs and impact
-- Creates a ticket with reproduction steps and diagnostic context
-- Identifies the root cause from code analysis
-- Generates a fix and comprehensive tests
-- Opens a PR and assigns a developer for review
-- Notifies support when the fix is deployed
+1. **CLI:** `/readiness-report` [slash command](/cli/features/readiness-report)を実行してリポジトリの準備レベルを評価する
+2. **Web Dashboard:** [Agent Readiness dashboard](/web/agent-readiness/dashboard)で組織の準備状況スコアを表示する
+3. **API:** [Readiness Reports API](/reference/readiness-reports-api)を介してプログラム的に準備状況レポートにアクセスする
+4. **修復（近日公開）:** CLIまたはダッシュボードから直接、失敗した基準を自動的に修正する
 
 ---
 
-## The 5 Readiness Levels
+## 自律的開発の姿
 
-Repositories progress through five distinct levels, each representing a qualitative shift in how autonomous agents can operate within your codebase.
+組織が高いエージェント準備状態に達したときはどのような姿になるのでしょうか？技術基盤が整った際に可能になるワークフローの具体例を示します。
 
-| Level | Name         | Description                                                                                                                            | Example Criteria                                                     |
-| :---- | :----------- | :------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------- |
-| **1** | Functional   | Code runs, but requires manual setup and lacks automated validation. Basic tooling that every repository should have.                  | README, linter, type checker, unit tests                             |
-| **2** | Documented   | Basic documentation and process exist. Workflows are written down and some automation is in place.                                     | AGENTS.md, devcontainer, pre-commit hooks, branch protection         |
-| **3** | Standardized | Clear processes are defined, documented, and enforced through automation. Development is standardized across the organization.         | Integration tests, secret scanning, distributed tracing, metrics     |
-| **4** | Optimized    | Fast feedback loops and data-driven improvement. Systems are designed for productivity and measured continuously.                      | Fast CI feedback, regular deployment frequency, flaky test detection |
-| **5** | Autonomous   | Systems are self-improving with sophisticated orchestration. Complex requirements decompose automatically into parallelized execution. | Self-improving systems                                               |
+### 会話からコードへ
+
+開発者が構築したいものを説明すると、システムがデプロイまでを実行します。
+
+**入力:** 「認証モジュールをリファクタリングして、後方互換性を保ちながらPKCEを使用したOAuth2をサポートするようにしてください。」
+
+**システムの動作:**
+
+- 確立されたパターンに従って慣用的なコードを生成
+- リンター、型チェッカー、テストスイートに対して検証
+- プルリクエストとコードレビュープロセスを処理
+- ドキュメントを更新し、関係者に通知
+- デプロイし、問題を監視
+
+### デザインから実装へ
+
+デザイナーがモックアップを共有すると、システムが引き継ぎなしに実装します。
+
+**入力:** 新しいダッシュボードのFigmaモックアップ。
+
+**システムの動作:**
+
+- 視覚的仕様とデザインシステムを解釈
+- 適切なスタイリングとレスポンシブ性を持つUIコンポーネントを実装
+- 既存のAPIに接続するか新しいエンドポイントを作成
+- ローディング状態、エラーハンドリング、アクセシビリティを追加
+- ユーザーインタラクション用のテストを生成
+- デザインレビュー用にステージング環境へデプロイ
+
+### バグからデプロイされた修正まで
+
+顧客が問題を報告すると、システムが診断、修正、デプロイを自律的に実行します。
+
+**入力:** サポートシステムを通じたバグレポート。
+
+**システムの動作:**
+
+- エラーログと影響に基づいてトリアージ
+- 再現手順と診断コンテキストを含むチケットを作成
+- コード解析から根本原因を特定
+- 修正と包括的なテストを生成
+- PRを開き、レビュー用に開発者をアサイン
+- 修正がデプロイされた際にサポートに通知
 
 ---
 
-## How Scoring Works
+## 5つの準備レベル
 
-### Level Progression
+リポジトリは5つの異なるレベルを通じて進歩し、各レベルはあなたのコードベース内で自律エージェントがどのように動作できるかの質的変化を表します。
 
-To unlock a level, you must pass **80% of the criteria** from the previous level. This creates a gated progression system:
-
-1. All repositories start at Level 1
-2. Pass 80% of Level 1 criteria → Unlock Level 2
-3. Pass 80% of Level 2 criteria → Unlock Level 3
-4. And so on...
-
-### Evaluation Scopes
-
-Criteria are evaluated at two different scopes:
-
-- **Repository Scope:** Evaluated once for the entire repository (e.g., CODEOWNERS file exists, branch protection enabled)
-- **Application Scope:** Evaluated per application in monorepos (e.g., linter configured, unit tests exist for each app)
-
-For monorepos with multiple applications, application-scoped criteria show scores like `3 / 4` (3 out of 4 apps pass).
+| レベル | 名前         | 説明                                                                                                                                    | 基準例                                                               |
+| :----- | :----------- | :-------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------- |
+| **1**  | Functional   | コードは動作するが、手動セットアップが必要で自動検証がない。すべてのリポジトリが持つべき基本的なツール。                               | README、リンター、型チェッカー、単体テスト                           |
+| **2**  | Documented   | 基本的なドキュメントとプロセスが存在する。ワークフローが文書化され、一部の自動化が導入されている。                                     | AGENTS.md、devcontainer、pre-commitフック、ブランチ保護             |
+| **3**  | Standardized | 明確なプロセスが定義、文書化され、自動化を通じて強制されている。開発は組織全体で標準化されている。                                     | 統合テスト、シークレットスキャン、分散トレーシング、メトリクス       |
+| **4**  | Optimized    | 高速なフィードバックループとデータ駆動型の改善。システムは生産性を重視して設計され、継続的に測定されている。                           | 高速なCIフィードバック、定期的なデプロイ頻度、不安定テストの検出     |
+| **5**  | Autonomous   | システムは洗練されたオーケストレーションによって自己改善している。複雑な要件が自動的に並列実行可能な形に分解される。                   | 自己改善システム                                                     |
 
 ---
 
-## The Technical Pillars
+## スコアリングの仕組み
 
-The Agent Readiness Model organizes criteria into nine technical pillars that form the foundation for autonomous operation.
+### レベル進行
+
+レベルを解放するには、前のレベルの基準の**80%をパス**する必要があります。これにより段階的な進行システムが作られます：
+
+1. すべてのリポジトリはレベル1からスタート
+2. レベル1基準の80%をパス → レベル2を解放
+3. レベル2基準の80%をパス → レベル3を解放
+4. 以下同様...
+
+### 評価スコープ
+
+基準は2つの異なるスコープで評価されます：
+
+- **Repository Scope:** リポジトリ全体に対して一度評価される（例：CODEOWNERSファイルが存在する、ブランチ保護が有効）
+- **Application Scope:** モノレポ内のアプリケーションごとに評価される（例：リンターが設定されている、各アプリに単体テストが存在する）
+
+複数のアプリケーションを持つモノレポの場合、アプリケーションスコープの基準は`3 / 4`（4つのアプリのうち3つがパス）のようなスコアを表示します。
+
+---
+
+## 技術的柱
+
+Agent Readiness Modelは、自律運用の基盤を形成する9つの技術的柱に基準を整理します。
 
 ### Style & Validation
 
-Linters, type checkers, and formatters catch obvious errors instantly. Agents avoid wasting cycles on syntax errors, style inconsistencies, and type mismatches.
+リンター、型チェッカー、フォーマッターが明らかなエラーを即座に捕捉します。エージェントは構文エラー、スタイルの不整合、型の不一致でサイクルを無駄にすることを避けます。
 
-- **Example criteria:** Linter configuration, type checker, code formatter, pre-commit hooks
+- **基準例:** リンター設定、型チェッカー、コードフォーマッター、pre-commitフック
 
 ### Build System
 
-Clear, deterministic build commands let agents verify their changes compile and run before committing. No guessing about which commands to run or which flags to pass.
+明確で決定論的なビルドコマンドにより、エージェントは変更内容がコンパイルされ実行されることをコミット前に検証できます。どのコマンドを実行すべきか、どのフラグを渡すべきかを推測する必要がありません。
 
-- **Example criteria:** Build command documented, dependencies pinned, VCS CLI tools
+- **基準例:** ビルドコマンドの文書化、依存関係の固定、VCS CLIツール
 
 ### Testing
 
-Fast unit and integration tests create tight feedback loops. Agents learn whether their changes work correctly by running tests, seeing failures, and iterating.
+高速な単体テストと統合テストが緊密なフィードバックループを作成します。エージェントはテストを実行し、失敗を確認し、反復することで変更が正しく機能するかを学習します。
 
-- **Example criteria:** Unit tests exist, integration tests exist, tests runnable locally
+- **基準例:** 単体テストの存在、統合テストの存在、ローカルでテスト実行可能
 
 ### Documentation
 
-Explicit instructions house the tribal knowledge that "everyone just knows." How to set up the environment, run tests, deploy changes, debug issues. Agents need written instructions that are discoverable, accurate, and maintained.
+明示的な指示により、「みんなが知っている」部族の知識を格納します。環境のセットアップ方法、テストの実行方法、変更のデプロイ方法、問題のデバッグ方法。エージェントは発見可能で正確かつ保守された文書化された指示を必要とします。
 
-- **Example criteria:** AGENTS.md, README, documentation freshness
+- **基準例:** AGENTS.md、README、ドキュメントの新鮮さ
 
 ### Development Environment
 
-Reproducible environments ensure consistency. When developers and agents work in identical environments, entire classes of problems disappear. No more "works on my machine."
+再現可能な環境が一貫性を保証します。開発者とエージェントが同一の環境で作業する際、問題のクラス全体が消失します。「私のマシンでは動作する」問題はもうありません。
 
-- **Example criteria:** Devcontainer, environment template, local services setup
+- **基準例:** Devcontainer、環境テンプレート、ローカルサービス設定
 
 ### Debugging & Observability
 
-Structured logging, tracing, and metrics give agents runtime visibility into what code actually does. Good observability turns "it failed" into "it failed because X was null when calling Y after receiving Z."
+構造化されたログ、トレーシング、メトリクスにより、エージェントはコードが実際に何をするかをランタイムで可視化できます。優れた観測可能性により「失敗した」が「ZをYに受信後に呼び出した際にXがnullだったために失敗した」に変わります。
 
-- **Example criteria:** Structured logging, distributed tracing, metrics collection
+- **基準例:** 構造化ログ、分散トレーシング、メトリクス収集
 
 ### Security
 
-Branch protection, secret scanning, and code owners prevent agents from introducing security issues or bypassing required reviews. Agents move fast—automated guardrails ensure they move fast safely.
+ブランチ保護、シークレットスキャン、コードオーナーにより、エージェントがセキュリティ問題を導入したり必要なレビューをバイパスすることを防ぎます。エージェントは高速に移動しますが、自動ガードレールにより安全に高速移動することを保証します。
 
-- **Example criteria:** Branch protection, secret scanning, CODEOWNERS
+- **基準例:** ブランチ保護、シークレットスキャン、CODEOWNERS
 
 ### Task Discovery
 
-Infrastructure for agents to find and scope work autonomously. Well-structured issues and templates help agents understand what needs to be done.
+エージェントが作業を自律的に発見し範囲を定めるためのインフラストラクチャ。適切に構造化されたイシューとテンプレートにより、エージェントは何をする必要があるかを理解できます。
 
-- **Example criteria:** Issue templates, issue labeling system, PR templates
+- **基準例:** イシューテンプレート、イシューラベリングシステム、PRテンプレート
 
 ### Product & Experimentation
 
-Tools for measuring impact, running experiments, and understanding user behavior. Agents can see whether features are actually used and measure the impact of their changes.
+影響を測定し、実験を実行し、ユーザー行動を理解するためのツール。エージェントは機能が実際に使用されているかを確認し、変更の影響を測定できます。
 
-- **Example criteria:** Product analytics instrumentation, experiment infrastructure
+- **基準例:** プロダクト分析の計装、実験インフラストラクチャ

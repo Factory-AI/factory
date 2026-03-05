@@ -11,51 +11,51 @@ keywords: ['browser', 'automation', 'chrome', 'cdp', 'devtools', 'screenshot', '
   helpers without standing up new services.
 </Note>
 
-The browser skill bundles a handful of executable scripts (`start.js`, `nav.js`, `eval.js`, `screenshot.js`, `pick.js`) plus a concise `SKILL.md`. Together they give Factory Droids a reliable way to spin up Chrome on port `9222`, drive an existing tab, scrape structured data, and capture visual evidence while staying entirely on the developer machine.
+browser skillは、いくつかの実行可能スクリプト（`start.js`、`nav.js`、`eval.js`、`screenshot.js`、`pick.js`）と簡潔な`SKILL.md`をバンドルしています。これらにより、Factory Droidsはポート`9222`でChromeを確実に起動し、既存のタブを操作し、構造化データをスクレイピングし、開発者マシン上で完全に動作しながら視覚的証拠を取得する信頼性の高い方法を提供します。
 
-## When to use this skill
+## このスキルを使用する場合
 
-- You need **real-browser context** (authenticated sessions, production-only behavior, visual regressions) to complete a task.
-- You want to **inspect or extract DOM state** without building a dedicated MCP server.
-- You must **capture screenshots or DOM element metadata** as part of QA notes, bug triage, or documentation.
-- You prefer a **portable, git-tracked bundle** that any teammate can run locally with zero additional infrastructure.
+- タスクを完了するために**実際のブラウザコンテキスト**（認証済みセッション、本番環境でのみ発生する動作、視覚的リグレッション）が必要な場合。
+- 専用のMCPサーバーを構築することなく**DOM状態を検査または抽出**したい場合。
+- QAノート、バグトリアージ、またはドキュメント作成の一環として**スクリーンショットまたはDOM要素メタデータの取得**が必要な場合。
+- チームメンバーが追加インフラストラクチャなしでローカルで実行できる**ポータブルでgit管理されたバンドル**を好む場合。
 
-## What the scripts provide
+## スクリプトが提供する機能
 
-| Script          | Purpose                                                                                       | Typical usage                                                 |
+| スクリプト          | 目的                                                                                       | 典型的な使用方法                                                 |
 | --------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `start.js`      | Launches Chrome with remote debugging on `:9222`, with optional profile sync via `--profile`. | `~/.factory/skills/browser/start.js --profile`                |
-| `nav.js`        | Navigates the active tab or opens a new tab when `--new` is passed.                           | `~/.factory/skills/browser/nav.js https://example.com --new`  |
-| `eval.js`       | Runs arbitrary JavaScript (async supported) in the focused tab and prints structured results. | `~/.factory/skills/browser/eval.js "document.title"`          |
-| `screenshot.js` | Captures the current viewport to a timestamped PNG stored under `$TMPDIR`.                    | `~/.factory/skills/browser/screenshot.js`                     |
-| `pick.js`       | Injects a visual picker so you can click DOM nodes and return tag/id/class/text metadata.     | `~/.factory/skills/browser/pick.js "Click the submit button"` |
+| `start.js`      | `:9222`でリモートデバッグ機能を有効にしてChromeを起動し、`--profile`によるオプションのプロファイル同期を行います。 | `~/.factory/skills/browser/start.js --profile`                |
+| `nav.js`        | アクティブなタブをナビゲートするか、`--new`が渡された際に新しいタブを開きます。                           | `~/.factory/skills/browser/nav.js https://example.com --new`  |
+| `eval.js`       | フォーカスされたタブで任意のJavaScript（async対応）を実行し、構造化された結果を出力します。 | `~/.factory/skills/browser/eval.js "document.title"`          |
+| `screenshot.js` | 現在のビューポートを`$TMPDIR`に保存されるタイムスタンプ付きPNGとしてキャプチャします。                    | `~/.factory/skills/browser/screenshot.js`                     |
+| `pick.js`       | ビジュアルピッカーを注入して、DOM ノードをクリックしてタグ/ID/クラス/テキストメタデータを返すことができます。     | `~/.factory/skills/browser/pick.js "Click the submit button"` |
 
-All scripts rely on `puppeteer-core` and connect to a Chrome instance that you control. Because everything runs locally, existing cookies and auth tokens never leave your machine.
+すべてのスクリプトは`puppeteer-core`に依存し、あなたが制御するChromeインスタンスに接続します。すべてがローカルで実行されるため、既存のクッキーや認証トークンがマシンから外に出ることはありません。
 
-## Setup
+## セットアップ
 
 <Steps>
   <Step title="Create the skill folder">
-    Run `mkdir -p .factory/skills/browser`.
+    Run __PRESERVE_29__.
   </Step>
   <Step title="Copy scripts and package metadata">
-    Copy `start.js`, `nav.js`, `eval.js`, `screenshot.js`, `pick.js`, and
-    `package.json` into `.factory/skills/browser/` (or symlink to a shared
+    Copy __PRESERVE_30__, __PRESERVE_31__, __PRESERVE_32__, __PRESERVE_33__, __PRESERVE_34__, and
+    __PRESERVE_35__ into __PRESERVE_36__ (or symlink to a shared
     dotfiles repo).
   </Step>
   <Step title="Install dependencies">
-    Run `npm install --prefix .factory/skills/browser puppeteer-core`, then
-    `chmod +x .factory/skills/browser/*.js`.
+    Run __PRESERVE_37__, then
+    __PRESERVE_38__.
   </Step>
   <Step title="Restart Droid">
-    Restart `droid` (or your IDE integration) so it rescans workspace skills and
-    discovers `browser`.
+    Restart __PRESERVE_39__ (or your IDE integration) so it rescans workspace skills and
+    discovers __PRESERVE_40__.
   </Step>
 </Steps>
 
-## Skill definition
+## スキル定義
 
-Copy the following into `.factory/skills/browser/SKILL.md`:
+以下を`.factory/skills/browser/SKILL.md`にコピーしてください：
 
 ````md
 ---
@@ -72,8 +72,8 @@ Minimal CDP tools for collaborative site exploration and scraping.
 ## Start Chrome
 
 ```bash
-~/.factory/skills/browser/start.js              # Fresh profile
-~/.factory/skills/browser/start.js --profile    # Copy your profile (cookies, logins)
+~/.factory/skills/browser/start.js              # 新しいプロファイル
+~/.factory/skills/browser/start.js --profile    # あなたのプロファイルをコピー（クッキー、ログイン）
 ```
 
 Start Chrome on `:9222` with remote debugging.
@@ -127,23 +127,23 @@ Interactive element picker. Click to select, Cmd/Ctrl+Click for multi-select, En
 
 ```
 
-## Workflow recipe
+## ワークフローレシピ
 
-1. **Start Chrome** with `start.js --profile` to mirror your authenticated state.
-2. **Drive navigation** via `nav.js https://target.app` or open secondary tabs with `--new`.
-3. **Inspect the DOM** using `eval.js` for quick counts, attribute checks, or extracting JSON payloads.
-4. **Capture artifacts** with `screenshot.js` for visual proof or `pick.js` when you need precise selectors or text snapshots.
-5. **Return the gathered evidence** (file paths, DOM metadata, query outputs) in your session summary or PR description.
+1. **Chromeを開始** - `start.js --profile`で認証状態をミラーリングします。
+2. **ナビゲーション操作** - `nav.js https://target.app`でナビゲートするか、`--new`でセカンダリタブを開きます。
+3. **DOMを検査** - `eval.js`を使用してクイックカウント、属性チェック、またはJSONペイロードの抽出を行います。
+4. **アーティファクトをキャプチャ** - 視覚的証拠のために`screenshot.js`を使用するか、正確なセレクタやテキストスナップショットが必要な場合は`pick.js`を使用します。
+5. **収集した証拠を返す** - セッションサマリーまたはPR説明に、ファイルパス、DOMメタデータ、クエリ出力を含めます。
 
-This workflow keeps the agent focused on the current browsing context and avoids shipping raw credentials or cookies outside your machine.
+このワークフローにより、エージェントは現在のブラウジングコンテキストに集中し、生の認証情報やクッキーをマシンの外に送信することを回避できます。
 
-## Verification
+## 検証
 
-- `~/.factory/skills/browser/start.js --profile` should print `✓ Chrome started on :9222 with your profile`.
-- `~/.factory/skills/browser/nav.js https://example.com` should confirm navigation.
-- `~/.factory/skills/browser/eval.js 'document.title'` should echo the current page title.
-- `~/.factory/skills/browser/screenshot.js` should output a valid PNG path under your system temp directory.
+- `~/.factory/skills/browser/start.js --profile`は`✓ Chrome started on :9222 with your profile`を出力するはずです。
+- `~/.factory/skills/browser/nav.js https://example.com`はナビゲーションを確認するはずです。
+- `~/.factory/skills/browser/eval.js 'document.title'`は現在のページタイトルを表示するはずです。
+- `~/.factory/skills/browser/screenshot.js`はシステム一時ディレクトリ下の有効なPNGパスを出力するはずです。
 
-If any step fails, rerun `start.js`, confirm Chrome is listening on `localhost:9222/json/version`, and ensure `puppeteer-core` is installed.
+いずれかのステップが失敗した場合は、`start.js`を再実行し、Chromeが`localhost:9222/json/version`でリッスンしていることを確認し、`puppeteer-core`がインストールされていることを確認してください。
 ```
 ````

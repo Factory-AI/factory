@@ -3,22 +3,22 @@ title: "Droidによるエンタープライズ"
 description: How to deploy, secure, and operate Droids in the world’s highest‑security environments.
 ---
 
-Factory’s enterprise platform is designed for the **highest‑security customers**—systemically important banks, governments, healthcare, national security, and other regulated organizations.
+Factoryのエンタープライズプラットフォームは、**最高レベルのセキュリティを要求する顧客**—システム上重要な銀行、政府機関、ヘルスケア、国家安全保障、その他の規制対象組織—向けに設計されています。
 
-Instead of forcing you into a single cloud IDE, Droid is a **CLI and agent runtime that runs anywhere**:
+単一のクラウドIDEに縛るのではなく、Droidは**どこでも実行できるCLIおよびエージェントランタイム**です：
 
-- On developer laptops, in any terminal or IDE
-- In CI/CD pipelines (GitHub, GitLab, internal runners)
-- In VMs, Kubernetes clusters, and hardened devcontainers
-- In **fully airgapped environments** with no outbound internet access
+- 開発者のラップトップで、任意のターミナルやIDEで
+- CI/CDパイプライン内で（GitHub、GitLab、内部ランナー）
+- VM、Kubernetesクラスター、強化されたdevcontainer内で
+- アウトバウンドインターネットアクセスのない**完全にエアギャップされた環境**で
 
-This section explains how to deploy Droid safely, govern which models and tools it can use, and observe its behavior at enterprise scale.
+このセクションでは、Droidを安全にデプロイし、使用可能なモデルとツールを管理し、エンタープライズ規模でその動作を観察する方法について説明します。
 
 ---
 
-## What this section covers
+## このセクションでカバーする内容
 
-Use these pages together as your enterprise playbook for Droids:
+これらのページを、Droidsのためのエンタープライズプレイブックとして併用してください：
 
 <CardGroup cols={2}>
   <Card title="Identity & Access" icon="user-shield">
@@ -49,66 +49,66 @@ Use these pages together as your enterprise playbook for Droids:
 
 ---
 
-## Enterprise foundations
+## エンタープライズの基盤
 
-### Multi‑deployment by design
+### 設計によるマルチデプロイメント
 
-Factory supports three deployment patterns for Droid, all built on the same core binary and configuration model:
+Factoryは、すべて同じコアバイナリと設定モデルに基づいて構築された、Droidの3つのデプロイメントパターンをサポートしています：
 
-1. **Cloud‑managed** – Droid runs on developer machines and CI but uses Factory’s cloud for coordination and optional analytics. Models are either Factory‑brokered or brought by you.
-2. **Hybrid enterprise** – Droid runs entirely in your infrastructure (VMs, CI runners, containers), optionally connecting to Factory cloud for UX while all LLMs and telemetry terminate inside your network.
-3. **Fully airgapped** – Droid runs in a network with **no outbound internet access**. Models and OTEL collectors are hosted entirely inside this environment; Factory never receives traffic.
+1. **クラウド管理型** – Droidは開発者マシンとCIで実行されますが、調整とオプションの分析にはFactoryのクラウドを使用します。モデルはFactory仲介型またはお客様持ち込み型のいずれかです。
+2. **ハイブリッドエンタープライズ** – Droidは完全にお客様のインフラストラクチャ（VM、CIランナー、コンテナ）で実行され、UXのためにFactoryクラウドにオプションで接続しますが、すべてのLLMとテレメトリはお客様のネットワーク内で終端されます。
+3. **完全エアギャップ型** – Droidは**アウトバウンドインターネットアクセスのない**ネットワークで実行されます。モデルとOTELコレクターはこの環境内で完全にホストされ、Factoryがトラフィックを受信することはありません。
 
-You can start in cloud‑managed mode, then migrate critical workloads to hybrid or airgapped environments without changing how developers talk to Droid.
+クラウド管理型モードで開始し、開発者がDroidと対話する方法を変更することなく、重要なワークロードをハイブリッドまたはエアギャップ環境に移行できます。
 
-### Hierarchical control, not per‑device drift
+### デバイス単位のドリフトではなく、階層制御
 
-Enterprise policy is expressed through a **hierarchical settings model**:
+エンタープライズポリシーは**階層設定モデル**を通じて表現されます：
 
-- **Org** → global defaults and hard security policies
-- **Project** → repo‑level settings committed to `.factory/`
-- **Folder** → narrower team or subsystem overrides inside a repo
-- **User** → personal preferences only where higher levels are silent
+- **組織** → グローバルデフォルトと厳格なセキュリティポリシー
+- **プロジェクト** → `.factory/`にコミットされたリポジトリレベルの設定
+- **フォルダー** → リポジトリ内のより狭いチームまたはサブシステムの上書き
+- **ユーザー** → 上位レベルが指定されていない場合のみの個人設定
 
-Higher levels **cannot be overridden** by lower ones. Org and project settings extend downward; users can opt into stricter controls but never weaken them. This hierarchy governs models, tools, MCP servers, droids, commands, autonomy levels, and telemetry destinations.
+上位レベルは下位レベルによって**上書きされることはありません**。組織およびプロジェクト設定は下方に拡張されます。ユーザーはより厳格な制御を選択できますが、それらを弱めることはできません。この階層はモデル、ツール、MCPサーバー、droid、コマンド、自律レベル、およびテレメトリ送信先を管理します。
 
-Learn more in [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control).
+詳細は[Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control)をご覧ください。
 
-### Defense‑in‑depth agent safety
+### 多層防御エージェント安全性
 
-LLMs are probabilistic; Factory treats them as powerful but untrusted components. Droid’s safety story combines:
+LLMは確率的であり、Factoryはそれらを強力だが信頼できないコンポーネントとして扱います。Droidの安全性ストーリーは以下を組み合わせています：
 
-- **Deterministic controls** – command risk classification, allow/deny lists, file and repo protections, and sandbox boundaries
-- **Droid Shield** – secret scanning and DLP‑style checks across prompts, files, and commands
-- **Hooks** – programmable enforcement points (pre‑prompt, pre‑tool, pre‑command, pre‑git, post‑edit) to integrate with your own security systems
-- **Sandboxed runtimes** – running Droid inside devcontainers and hardened VMs for high‑risk work
+- **決定論的制御** – コマンドリスク分類、許可/拒否リスト、ファイルとリポジトリ保護、サンドボックス境界
+- **Droid Shield** – プロンプト、ファイル、コマンド全体でのシークレットスキャニングとDLPスタイルのチェック
+- **フック** – お客様独自のセキュリティシステムと統合するためのプログラム可能な実行ポイント（プロンプト前、ツール前、コマンド前、git前、編集後）
+- **サンドボックス化されたランタイム** – 高リスク作業のためのdevcontainerと強化されたVM内でのDroid実行
 
-These layers are independent of which LLM or IDE a developer prefers.
+これらの層は、開発者が好むLLMやIDEとは独立しています。
 
-### OTEL‑native observability
+### OTELネイティブ可観測性
 
-All serious enterprise deployments need to answer: *“What are agents doing, where, and at what cost?”*
+すべての本格的なエンタープライズデプロイメントでは、*「エージェントが何を、どこで、どのようなコストで行っているか？」*に答える必要があります。
 
-Droid emits **OpenTelemetry metrics, traces, and logs** so you can:
+Droidは**OpenTelemetryメトリクス、トレース、ログ**を発出するため、以下が可能です：
 
-- Send telemetry directly to existing collectors (Prometheus, Datadog, Splunk, Jaeger, etc.)
-- Track sessions, LLM usage, code edits, tool invocations, and errors per org/team/user
-- Correlate Droid activity with SDLC metrics you already use
+- 既存のコレクター（Prometheus、Datadog、Splunk、Jaeger等）に直接テレメトリを送信
+- 組織/チーム/ユーザーごとのセッション、LLM使用状況、コード編集、ツール呼び出し、エラーの追跡
+- Droidの活動を既に使用しているSDLCメトリクスと関連付け
 
-Factory’s own cloud analytics are **optional**; high‑security customers can route all telemetry exclusively to their own infrastructure.
+FactoryのクラウドアナリティクスはOptional**です。高セキュリティ顧客は、すべてのテレメトリを独占的に自身のインフラストラクチャにルーティングできます。
 
-See [Usage, Cost & Productivity Analytics](/enterprise/usage-cost-and-analytics) and [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
+[Usage, Cost & Productivity Analytics](/enterprise/usage-cost-and-analytics)と[Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring)をご覧ください。
 
 ---
 
-## Trust & compliance
+## 信頼とコンプライアンス
 
-Factory maintains a security and compliance posture suitable for the most demanding organizations:
+Factoryは、最も要求の厳しい組織に適したセキュリティとコンプライアンス体制を維持しています：
 
 - **SOC 2**
 - **ISO 27001**
 - **ISO 42001**
 
-You can find the latest reports, sub‑processor lists, and security architecture details in our **Trust Center**.
+最新のレポート、サブプロセッサーリスト、セキュリティアーキテクチャの詳細は、**Trust Center**でご確認いただけます。
 
-For a deeper dive into how Droid fits your regulatory and audit requirements, start with [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
+Droidがお客様の規制要件と監査要件にどのように適合するかの詳細については、[Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring)から始めてください。

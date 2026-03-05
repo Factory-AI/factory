@@ -13,80 +13,76 @@ keywords: ['video', 'tutorial', 'walkthrough', 'demo', 'guide', 'learn', 'watch'
   allowFullScreen
 ></iframe>
 
-## Installation & Setup
+## インストール & セットアップ
 
-Get started by installing the Droid CLI in your terminal of choice.
+お好みのターミナルでDroid CLIをインストールして開始しましょう。
 
 <CodeGroup>
 
-```bash macOS/Linux
-curl -fsSL https://app.factory.ai/cli | sh
-```
+__PRESERVE_0__
 
-```powershell Windows
-irm https://app.factory.ai/cli/windows | iex
-```
+__PRESERVE_1__
 
 </CodeGroup>
 
-Verify the installation:
+インストールを確認します：
 
 ```bash
 which droid
 ```
 
-Start the Droid CLI:
+Droid CLIを開始します：
 
 ```bash
 cd /path/to/your/project
 droid
 ```
 
-### First-Time Authentication
+### 初回認証
 
-On your first run, you'll see an onboarding screen:
+初回実行時には、オンボーディング画面が表示されます：
 
-1. Choose to create an account or log in
-2. Confirm the authentication code in your browser
-3. Return to the terminal to start using droid
+1. アカウントの作成またはログインを選択します
+2. ブラウザで認証コードを確認します
+3. ターミナルに戻ってdroidの使用を開始します
 
-## Interface & Shortcuts
+## インターフェース & ショートカット
 
-### Help Menu
+### ヘルプメニュー
 
-Press `Shift + ?` to open the help menu, which shows:
+`Shift + ?`を押してヘルプメニューを開きます。表示される内容：
 
-- How to send messages and create new lines
-- Available keyboard shortcuts
-- Basic navigation commands
-- Autonomy mode options
+- メッセージの送信方法と改行の作成方法
+- 利用可能なキーボードショートカット
+- 基本的なナビゲーションコマンド
+- 自律モードオプション
 
 <Note>
-  **Terminal-specific key bindings**: The default for new lines is `\` + `Enter`, but you can configure this to `Shift + Enter` or other combinations based on your terminal's key bindings. Check `/terminal-setup` in the CLI for configuration options.
+  **Terminal-specific key bindings**: The default for new lines is __PRESERVE_15__ + __PRESERVE_16__, but you can configure this to __PRESERVE_17__ or other combinations based on your terminal's key bindings. Check __PRESERVE_18__ in the CLI for configuration options.
 </Note>
 
-### Essential Keyboard Shortcuts
+### 基本的なキーボードショートカット
 
-| Shortcut | Action |
+| ショートカット | アクション |
 |----------|--------|
-| `Enter` | Send message |
-| `\` + `Enter` (or `Shift + Enter`) | New line in message |
-| `Esc` (double tap) | Clear current input |
-| `Shift + ?` | Open help menu |
-| `Shift + Tab` | Cycle through autonomy modes |
-| `/` | Open command menu |
-| `Cmd + Shift + H` | Show root directory |
-| `Cmd + Shift + .` | Show hidden files/folders |
-| `Ctrl + C` or `exit` | Exit droid |
-| `Ctrl + V` | Paste image |
+| `Enter` | メッセージを送信 |
+| `\` + `Enter` (または `Shift + Enter`) | メッセージ内で改行 |
+| `Esc` (ダブルタップ) | 現在の入力をクリア |
+| `Shift + ?` | ヘルプメニューを開く |
+| `Shift + Tab` | 自律モードを切り替え |
+| `/` | コマンドメニューを開く |
+| `Cmd + Shift + H` | ルートディレクトリを表示 |
+| `Cmd + Shift + .` | 隠しファイル/フォルダを表示 |
+| `Ctrl + C` または `exit` | droidを終了 |
+| `Ctrl + V` | 画像を貼り付け |
 
 <Note>
   The paste image shortcut works across all terminals, though the specific key binding may vary based on your terminal configuration.
 </Note>
 
-## Autonomy Modes
+## 自律モード
 
-Cycle through different autonomy levels by pressing `Shift + Tab`:
+`Shift + Tab`を押して異なる自律レベルを切り替えます：
 
 [Learn more about Specification Mode →](/cli/user-guides/specification-mode)
 
@@ -134,26 +130,26 @@ Cycle through different autonomy levels by pressing `Shift + Tab`:
 
 [Configure autonomy settings →](/cli/configuration/settings)
 
-## Slash Commands
+## スラッシュコマンド
 
-Press `/` to access the command menu with options for:
+`/`を押してコマンドメニューにアクセスします。以下のオプションがあります：
 
-- **Account & Billing** - Manage your Factory account
-- **Model** - Switch between AI models and set reasoning levels
-- **Sessions** - View and navigate previous sessions
-- **Settings** - Configure CLI preferences
-- **Terminal Setup** - Configure key bindings
-- **Custom Commands** - Access your [custom slash commands](/cli/configuration/custom-slash-commands)
-- **Droids** - Manage [custom sub-agents](/cli/configuration/custom-droids)
-- **MCP** - Configure [Model Context Protocol integrations](/cli/configuration/mcp)
+- **Account & Billing** - Factoryアカウントを管理
+- **Model** - AIモデルの切り替えと推論レベルの設定
+- **Sessions** - 過去のセッションの表示とナビゲーション
+- **Settings** - CLI設定の構成
+- **Terminal Setup** - キーバインドの構成
+- **Custom Commands** - [custom slash commands](/cli/configuration/custom-slash-commands)にアクセス
+- **Droids** - [custom sub-agents](/cli/configuration/custom-droids)の管理
+- **MCP** - [Model Context Protocol integrations](/cli/configuration/mcp)の構成
 
-### Switching Models
+### モデルの切り替え
 
-Access the model menu with `/model`:
+`/model`でモデルメニューにアクセス：
 
-1. View available models
-2. Switch between models for different tasks
-3. Set reasoning level where applicable
+1. 利用可能なモデルを表示
+2. 異なるタスクに応じてモデルを切り替え
+3. 該当する場合は推論レベルを設定
 
 <Tip>
   Different models excel at different tasks. Use reasoning models for complex planning and faster models for routine edits.
@@ -161,24 +157,24 @@ Access the model menu with `/model`:
 
 [Learn about choosing your model →](/cli/user-guides/choosing-your-model)
 
-### Sessions Management
+### セッション管理
 
-Access with `/sessions`:
+`/sessions`でアクセス：
 
-- View all previous sessions
-- Navigate to any past session
-- Open sessions in the web interface
-- Continue work from where you left off
+- すべての過去のセッションを表示
+- 任意の過去のセッションにナビゲート
+- Webインターフェースでセッションを開く
+- 中断したところから作業を続行
 
-Cloud sync must be enabled in settings for sessions to appear in the web interface.
+セッションがWebインターフェースに表示されるには、設定でクラウド同期が有効になっている必要があります。
 
-## Settings & Configuration
+## 設定 & 構成
 
-Access settings via `/settings` to customize your experience:
+`/settings`で設定にアクセスし、エクスペリエンスをカスタマイズできます：
 
 [Full settings documentation →](/cli/configuration/settings)
 
-### Core Settings
+### コア設定
 
 <CardGroup cols={2}>
   <Card title="Model & Reasoning">
@@ -198,7 +194,7 @@ Access settings via `/settings` to customize your experience:
   </Card>
 </CardGroup>
 
-### Advanced Settings
+### 詳細設定
 
 <AccordionGroup>
   <Accordion title="Droid Co-Author on PRs">
@@ -228,17 +224,17 @@ Access settings via `/settings` to customize your experience:
   </Accordion>
 </AccordionGroup>
 
-### IDE Integration
+### IDE統合
 
-Install the droid extension for VS Code, Cursor, and other IDEs directly from the settings menu.
+設定メニューから直接VS Code、Cursor、その他のIDEのdroidエクステンションをインストールできます。
 
 [Learn more about IDE integration →](/cli/configuration/ide-integrations)
 
-## Configuration Files
+## 構成ファイル
 
-Access your configuration directory by pressing `Cmd + Shift + H` to show your root directory, then `Cmd + Shift + .` to reveal hidden files. Navigate to the `~/.factory/` folder.
+`Cmd + Shift + H`を押してルートディレクトリを表示し、次に`Cmd + Shift + .`を押して隠しファイルを表示して構成ディレクトリにアクセスします。`~/.factory/`フォルダにナビゲートします。
 
-### Directory Structure
+### ディレクトリ構造
 
 ```
 ~/.factory/
@@ -257,7 +253,7 @@ Access your configuration directory by pressing `Cmd + Shift + H` to show your r
 
 ### config.json - Bring Your Own Key
 
-Configure custom models using your own API keys:
+独自のAPIキーを使用してカスタムモデルを構成：
 
 ```json
 {
@@ -282,19 +278,19 @@ Configure custom models using your own API keys:
   </Step>
   
   <Step title="Add to config.json">
-    Paste the configuration into `~/.factory/config.json` and add your API key
+    Paste the configuration into __PRESERVE_40__ and add your API key
   </Step>
   
   <Step title="Select Model">
-    Use `/model` in the CLI to select your newly added model
+    Use __PRESERVE_41__ in the CLI to select your newly added model
   </Step>
 </Steps>
 
 [See all BYOK providers →](/cli/byok/overview)
 
-### settings.json - Allow & Deny Lists
+### settings.json - 許可 & 拒否リスト
 
-Configure which commands require approval in High autonomy mode:
+高自律モードで承認が必要なコマンドを構成：
 
 ```json
 {
@@ -307,11 +303,11 @@ Configure which commands require approval in High autonomy mode:
 }
 ```
 
-Even in High mode, commands in the `autoModeDeny` list will always require your explicit approval before execution.
+高モードでも、`autoModeDeny`リストのコマンドは常に実行前に明示的な承認が必要です。
 
-### mcp.json - MCP Integrations
+### mcp.json - MCP統合
 
-Enable or disable MCP tools individually:
+MCPツールを個別に有効または無効にします：
 
 ```json
 {
@@ -332,22 +328,22 @@ Enable or disable MCP tools individually:
 }
 ```
 
-Set `"disabled": true` to temporarily disable an MCP without removing its configuration.
+`"disabled": true`を設定して、構成を削除せずに一時的にMCPを無効にできます。
 
 [Learn more about MCP configuration →](/cli/configuration/mcp)
 
-## Custom Droids (Sub-Agents)
+## カスタムDroid（サブエージェント）
 
-Custom droids are specialized AI agents that handle specific tasks. Access the droids menu with `/droids`:
+カスタムdroidは特定のタスクを処理する専門的なAIエージェントです。`/droids`でdroidメニューにアクセス：
 
-### Managing Droids
+### Droidの管理
 
-- **Import** (`i`) - Import pre-built droids from other agents
-- **Create** (`c`) - Create a new custom droid
-- **Edit** - Modify existing droid configurations
-- **Enable/Disable** - Toggle droids on or off
+- **Import** (`i`) - 他のエージェントからビルド済みdroidをインポート
+- **Create** (`c`) - 新しいカスタムdroidを作成
+- **Edit** - 既存のdroid構成を変更
+- **Enable/Disable** - droidのオン/オフを切り替え
 
-### Creating a Custom Droid
+### カスタムDroidの作成
 
 [Learn more about custom droids →](/cli/configuration/custom-droids)
 
@@ -359,9 +355,7 @@ Custom droids are specialized AI agents that handle specific tasks. Access the d
   <Step title="Generation Method">
     Choose to create manually or generate with droid's help:
     
-    ```
-    I want a code review droid that checks for security issues and coding standards
-    ```
+    __PRESERVE_8__
     
     Droid will generate an appropriate description and configuration
   </Step>
@@ -380,46 +374,46 @@ Custom droids are specialized AI agents that handle specific tasks. Access the d
   </Step>
 </Steps>
 
-### Example Use Cases
+### 使用例
 
-- **Code Review Droid** - Automated code reviews for pull requests
-- **Documentation Droid** - Generates and maintains documentation
-- **Test Generation Droid** - Creates comprehensive test suites
-- **Security Audit Droid** - Scans for vulnerabilities and security issues
+- **Code Review Droid** - プルリクエストの自動コードレビュー
+- **Documentation Droid** - ドキュメントの生成と保守
+- **Test Generation Droid** - 包括的なテストスイートの作成
+- **Security Audit Droid** - 脆弱性とセキュリティ問題のスキャン
 
-## MCP Integrations
+## MCP統合
 
-Model Context Protocol (MCP) allows droid to integrate with external tools and data sources.
+Model Context Protocol (MCP)により、droidは外部ツールやデータソースと統合できます。
 
-### Adding MCPs via CLI
+### CLI経由でのMCP追加
 
-Use the `/mcp add` command:
+`/mcp add`コマンドを使用：
 
 ```bash
 /mcp add
 ```
 
-Then provide the MCP details:
-- **Name**: Identifier for the MCP
-- **Command**: Executable command (e.g., `npx`, `python`)
-- **Args**: Command arguments
-- **Environment Variables**: API keys and configuration
+次にMCPの詳細を提供：
+- **Name**: MCPの識別子
+- **Command**: 実行可能コマンド（例：`npx`、`python`）
+- **Args**: コマンド引数
+- **Environment Variables**: APIキーと構成
 
-### Listing Configured MCPs
+### 構成済みMCPのリスト表示
 
 ```bash
 /mcp list
 ```
 
-This shows all configured MCPs and their enabled/disabled status.
+これにより、すべての構成済みMCPとそれらの有効/無効ステータスが表示されます。
 
 <Note>
   After adding or modifying MCPs, you may need to restart the CLI for changes to take effect.
 </Note>
 
-### Adding MCPs via Configuration File
+### 構成ファイル経由でのMCP追加
 
-You can also directly edit `~/.factory/mcp.json`:
+`~/.factory/mcp.json`を直接編集することもできます：
 
 ```json
 {
@@ -439,28 +433,26 @@ You can also directly edit `~/.factory/mcp.json`:
 }
 ```
 
-### Popular MCP Integrations
+### 人気のMCP統合
 
-- **Brave Search** - Web search capabilities
-- **Playwright** - Browser automation
-- **GitHub** - Repository and issue management
-- **Filesystem** - Extended file system access
-- **Postgres** - Database queries
-- **Slack** - Team communication
+- **Brave Search** - Web検索機能
+- **Playwright** - ブラウザ自動化
+- **GitHub** - リポジトリと課題管理
+- **Filesystem** - 拡張ファイルシステムアクセス
+- **Postgres** - データベースクエリ
+- **Slack** - チームコミュニケーション
 
 [Browse all MCP servers →](/cli/configuration/mcp)
 
-## Example Workflow: Spec Mode to Implementation
+## ワークフロー例：Specモードから実装まで
 
-Here's a complete workflow demonstrating droid's capabilities:
+droidの機能を実演する完全なワークフローです：
 
 <Steps>
   <Step title="Start in Spec Mode">
-    Press `Shift + Tab` until you're in Spec mode
+    Press __PRESERVE_51__ until you're in Spec mode
     
-    ```
-    Create an authentication system with GitHub and Google OAuth
-    ```
+    __PRESERVE_12__
   </Step>
   
   <Step title="Review the Plan">
@@ -474,9 +466,7 @@ Here's a complete workflow demonstrating droid's capabilities:
   <Step title="Iterate on the Spec">
     Refine the plan before implementation:
     
-    ```
-    Change the plan to only include Github auth and not Google auth
-    ```
+    __PRESERVE_13__
     
     Droid updates the specification accordingly
   </Step>
@@ -498,20 +488,20 @@ Here's a complete workflow demonstrating droid's capabilities:
 
 [Learn about implementing large features →](/cli/user-guides/implementing-large-features)
 
-## Summary
+## まとめ
 
-You've learned how to:
+以下を学習しました：
 
-- Install and authenticate with the Droid CLI
-- Navigate the interface and use keyboard shortcuts
-- Understand and switch between autonomy modes
-- Configure settings and preferences
-- Add custom models with BYOK
-- Create and manage custom droids (sub-agents)
-- Integrate external tools via MCP
-- Use spec mode for planning before implementation
+- Droid CLIのインストールと認証
+- インターフェースのナビゲーションとキーボードショートカットの使用
+- 自律モードの理解と切り替え
+- 設定と設定の構成
+- BYOKでカスタムモデルの追加
+- カスタムdroid（サブエージェント）の作成と管理
+- MCP経由での外部ツールの統合
+- 実装前の計画のためのspecモードの使用
 
-## Next Steps
+## 次のステップ
 
 <CardGroup cols={2}>
   <Card

@@ -3,21 +3,21 @@ title: "アイデンティティ、ドメイン、SSO、SCIM"
 description: Enterprise identity management with Domain Managment, SSO/SAML authentication, and Directory Sync/SCIM provisioning
 ---
 
-Factory provides comprehensive enterprise identity management through Single Sign-On (SSO) using SAML/OIDC protocols and automated user provisioning via Directory Sync (SCIM). This guide covers how these systems work together to manage user identities, authentication, and access control.
+Factoryは、SAML/OIDCプロトコルを使用したSingle Sign-On（SSO）と、Directory Sync（SCIM）による自動ユーザープロビジョニングを通じて、包括的なエンタープライズアイデンティティ管理を提供します。このガイドでは、これらのシステムがどのように連携してユーザーアイデンティティ、認証、アクセス制御を管理するかについて説明します。
 
-## Overview
+## 概要
 
-Factory uses **WorkOS** to handle enterprise identity management, supporting:
+Factoryは**WorkOS**を使用してエンタープライズアイデンティティ管理を処理し、以下をサポートします：
 
-- **Domain Verification**: Establish ownership of your email domains for identity governance
-- **SSO/SAML**: Authenticate users through your Identity Provider (IdP)
-- **Directory Sync/SCIM**: Automatically provision and manage users from your directory
-- **Just-In-Time (JIT) Provisioning**: Create users on first login via SSO
-- **Group-based Access Control**: Manage permissions through directory groups
+- **ドメイン検証**: アイデンティティガバナンスのためのメールドメインの所有権を確立
+- **SSO/SAML**: Identity Provider（IdP）を通じたユーザー認証
+- **Directory Sync/SCIM**: ディレクトリからのユーザーの自動プロビジョニングと管理
+- **Just-In-Time（JIT）プロビジョニング**: SSO経由の初回ログイン時にユーザーを作成
+- **グループベースアクセス制御**: ディレクトリグループを通じた権限管理
 
-## How It Works
+## 仕組み
 
-### Domain Verification (Required First)
+### ドメイン検証（最初に必要）
 
 ```mermaid
 graph LR
@@ -30,14 +30,14 @@ graph LR
     style D fill:#e1f5fe
 ```
 
-Before enabling SSO or Directory Sync:
+SSOやDirectory Syncを有効にする前に：
 
-1. **Verify ownership** of your email domains through DNS validation
-2. **Claim existing users** - All users with your domain automatically join your organization
-3. **Set policies** - Configure MFA, session management, and access controls
-4. **Enable SSO/SCIM** - Now ready for enterprise identity management
+1. **所有権を検証** - DNS検証を通じてメールドメインの所有権を確認
+2. **既存ユーザーを取得** - あなたのドメインを持つすべてのユーザーが自動的に組織に参加
+3. **ポリシーを設定** - MFA、セッション管理、アクセス制御を構成
+4. **SSO/SCIMを有効化** - エンタープライズアイデンティティ管理の準備完了
 
-### Authentication with SSO
+### SSOを使った認証
 
 ```mermaid
 graph LR
@@ -49,14 +49,14 @@ graph LR
     style D fill:#c8e6c9
 ```
 
-When SSO is enabled:
+SSOが有効な場合：
 
-1. Users click "Sign in with SSO" instead of entering a password
-2. They're redirected to your corporate identity provider (Okta, Azure AD, etc.)
-3. After authenticating with their corporate credentials, they're logged into Factory
-4. First-time users are automatically created if JIT provisioning is enabled
+1. ユーザーはパスワードを入力する代わりに「SSOでサインイン」をクリック
+2. 企業のIdentity Provider（Okta、Azure ADなど）にリダイレクト
+3. 企業の認証情報で認証した後、Factoryにログイン
+4. JITプロビジョニングが有効な場合、初回ユーザーは自動的に作成される
 
-### User Provisioning with Directory Sync
+### Directory Syncを使ったユーザープロビジョニング
 
 ```mermaid
 graph TD
@@ -69,35 +69,35 @@ graph TD
     style E fill:#ffebee
 ```
 
-When Directory Sync (SCIM) is enabled:
+Directory Sync（SCIM）が有効な場合：
 
-- **Adding users** to your directory automatically creates them in Factory
-- **Updating** user information syncs to Factory in real-time
-- **Removing users** from your directory revokes their Factory access
-- **Group changes** automatically update user permissions
+- ディレクトリへの**ユーザー追加**により、Factoryで自動的にユーザーが作成
+- ユーザー情報の**更新**がFactoryにリアルタイムで同期
+- ディレクトリからの**ユーザー削除**により、FactoryのアクセスがRevoke
+- **グループの変更**により、ユーザー権限が自動的に更新
 
-### Data Priority
+### データの優先度
 
-When users exist from multiple sources (SSO, Directory Sync, manual invite), Factory follows this priority:
+ユーザーが複数のソース（SSO、Directory Sync、手動招待）から存在する場合、Factoryは以下の優先度に従います：
 
-1. **Directory Sync data always wins** - Information from your directory overwrites other sources
-2. **Users are matched by email** - We find existing users by email address (case-insensitive)
-3. **Custom data is preserved** - Factory-specific settings that don't exist in your directory are kept
-4. **Soft deletes** - Removed users are deactivated, not deleted, preserving their work history
+1. **Directory Syncデータが常に優先** - ディレクトリからの情報が他のソースを上書き
+2. **ユーザーはメールでマッチング** - メールアドレス（大文字小文字を区別しない）で既存ユーザーを検索
+3. **カスタムデータは保持** - ディレクトリに存在しないFactory固有の設定は維持
+4. **論理削除** - 削除されたユーザーは無効化され、削除されず、作業履歴を保持
 
-## Prerequisites
+## 前提条件
 
-Before setting up Domains, SSO, and SCIM:
+Domains、SSO、SCIMを設定する前に：
 
-- You are on a plan that includes **enterprise SSO support**
-- Your organization's **email domains must be verified** (see Domain Verification below)
-- You have **admin access** to your IdP (or a partner in IT who does)
-- You have a **Factory admin** who can coordinate configuration on the Factory side
-- Contact your Factory representative to initiate the setup process
+- **エンタープライズSSO支援**を含むプランを利用している
+- 組織の**メールドメインが検証済み**である（以下のドメイン検証を参照）
+- IdPへの**管理者アクセス**がある（またはITの協力者がいる）
+- Factory側の設定を調整できる**Factory管理者**がいる
+- 設定プロセスを開始するためにFactoryの担当者に連絡
 
-## Setup Process Overview
+## 設定プロセスの概要
 
-### Initial Setup Flow
+### 初期設定フロー
 
 <Steps>
   <Step title="Contact Factory">
@@ -132,9 +132,9 @@ Before setting up Domains, SSO, and SCIM:
   </Step>
 </Steps>
 
-### Setup Options
+### 設定オプション
 
-During setup, you'll configure:
+設定中に以下を構成します：
 
 <AccordionGroup>
   <Accordion title="Connection Type">
@@ -162,43 +162,43 @@ During setup, you'll configure:
   </Accordion>
 </AccordionGroup>
 
-## Domain Verification
+## ドメイン検証
 
-### Why Domain Verification Matters
+### ドメイン検証が重要な理由
 
-Domain verification is a **mandatory prerequisite** for enabling SSO and establishing your organization's identity governance in Factory. It proves your organization owns and controls specific email domains, creating a secure foundation for enterprise identity management.
+ドメイン検証は、SSOを有効にし、Factoryで組織のアイデンティティガバナンスを確立するための**必須の前提条件**です。これにより、組織が特定のメールドメインを所有・制御していることが証明され、エンタープライズアイデンティティ管理の安全な基盤が作成されます。
 
 <Warning>
   SSO cannot be enabled without verified domains. All users authenticating via
   SSO must have email addresses from verified domains.
 </Warning>
 
-### What Domain Verification Enables
+### ドメイン検証で可能になること
 
-Once your domain is verified, your organization gains powerful administrative controls:
+ドメインが検証されると、組織は強力な管理制御を獲得します：
 
-#### Identity Governance
+#### アイデンティティガバナンス
 
-- **Mandatory SSO enforcement** - Require all users with your domain to authenticate via SSO
-- **Automatic user claiming** - Existing Factory users with your domain automatically join your organization
-- **Email domain restrictions** - Prevent unauthorized accounts from using your domain
-- **Guest user policies** - Define how external collaborators can access your organization
+- **必須SSO実行** - あなたのドメインを持つすべてのユーザーにSSO経由での認証を要求
+- **自動ユーザー取得** - あなたのドメインを持つ既存のFactoryユーザーが自動的に組織に参加
+- **メールドメイン制限** - 未承認のアカウントがあなたのドメインを使用することを防止
+- **ゲストユーザーポリシー** - 外部協力者があなたの組織にアクセスする方法を定義
 
-#### Security Policies
+#### セキュリティポリシー
 
-- **MFA requirements** - Enforce multi-factor authentication for all domain users
-- **Password policies** - Set complexity requirements for non-SSO authentication methods
-- **Session management** - Control session duration and idle timeout settings
-- **IP restrictions** - Limit access to specific IP ranges or VPN endpoints
+- **MFA要件** - すべてのドメインユーザーに多要素認証を強制
+- **パスワードポリシー** - SSO以外の認証方法の複雑さ要件を設定
+- **セッション管理** - セッション期間とアイドルタイムアウト設定を制御
+- **IP制限** - 特定のIP範囲やVPNエンドポイントへのアクセス制限
 
-#### Compliance Controls
+#### コンプライアンス制御
 
-- **Audit logging** - Track all authentication events for domain users
-- **Data residency** - Ensure user data stays within specified geographic regions
-- **Access reviews** - Periodic certification of user access rights
-- **Deprovisioning workflows** - Automated removal of access when users leave
+- **監査ログ** - ドメインユーザーのすべての認証イベントを追跡
+- **データ居住性** - ユーザーデータを指定された地理的地域内に保持
+- **アクセスレビュー** - ユーザーアクセス権の定期的な認定
+- **プロビジョニング解除ワークフロー** - ユーザーが退職時のアクセス自動削除
 
-### Configuring Domain Verification
+### ドメイン検証の構成
 
 <Info>
 **Domain verification is handled automatically through WorkOS.** You have two options:
@@ -208,7 +208,7 @@ Once your domain is verified, your organization gains powerful administrative co
 
 Both options follow the same verification flow:
 
-- Add domains to verify (e.g., `yourcompany.com`)
+- Add domains to verify (e.g., __PRESERVE_3__)
 - Receive a unique TXT record for DNS validation
 - Add the record to your domain's DNS settings
 - WorkOS automatically detects and validates the record
@@ -218,27 +218,27 @@ The process typically completes within 1-24 hours depending on DNS propagation. 
 
 </Info>
 
-#### What Happens After Verification
+#### 検証後に起こること
 
-Once your domain is verified:
+ドメインが検証されると：
 
-- **Immediate effect** - All existing users with your domain email are associated with your organization
-- **Automatic claiming** - New users with your domain join your organization by default
-- **Policy enforcement** - Your configured security policies apply instantly
-- **SSO readiness** - You can proceed with SSO configuration for verified domains
+- **即座の効果** - あなたのドメインメールを持つすべての既存ユーザーが組織に関連付け
+- **自動取得** - あなたのドメインを持つ新しいユーザーがデフォルトで組織に参加
+- **ポリシー実行** - 構成されたセキュリティポリシーが即座に適用
+- **SSO準備完了** - 検証されたドメインでSSO設定を進められる
 
-### Multiple Domain Support
+### 複数ドメインサポート
 
-Organizations often need to verify multiple domains:
+組織では多くの場合、複数のドメインの検証が必要です：
 
-- **Primary domain** - Your main corporate email domain
-- **Subsidiary domains** - Acquired companies or regional offices
-- **Legacy domains** - Historical domains still in use
-- **Alias domains** - Alternative spellings or shortened versions
+- **プライマリドメイン** - メインの企業メールドメイン
+- **子会社ドメイン** - 買収した会社や地域オフィス
+- **レガシードメイン** - まだ使用されている過去のドメイン
+- **エイリアスドメイン** - 代替スペルや短縮版
 
-Each domain requires separate verification but shares the same organizational policies once verified.
+各ドメインは別々の検証が必要ですが、検証後は同じ組織ポリシーを共有します。
 
-### Domain Verification Best Practices
+### ドメイン検証のベストプラクティス
 
 <AccordionGroup>
   <Accordion title="Planning">
@@ -261,35 +261,35 @@ Each domain requires separate verification but shares the same organizational po
   </Accordion>
 </AccordionGroup>
 
-### Common Issues and Solutions
+### 一般的な問題と解決策
 
-| Issue                                 | Cause                           | Solution                                           |
+| 問題                                 | 原因                           | 解決策                                           |
 | ------------------------------------- | ------------------------------- | -------------------------------------------------- |
-| Verification fails after 24 hours     | DNS record not properly added   | Check exact formatting and placement of TXT record |
-| Users can't access after verification | Domain policies too restrictive | Review and adjust enforcement settings             |
-| Subsidiary users not included         | Domain not verified             | Add and verify all subsidiary domains              |
-| External collaborators blocked        | Strict domain enforcement       | Configure guest user exceptions                    |
+| 24時間後に検証が失敗                     | DNSレコードが正しく追加されていない   | TXTレコードの正確なフォーマットと配置を確認 |
+| 検証後にユーザーがアクセスできない                 | ドメインポリシーが過度に制限的 | 実行設定を確認し調整             |
+| 子会社ユーザーが含まれていない         | ドメインが検証されていない             | すべての子会社ドメインを追加し検証              |
+| 外部協力者がブロックされる        | 厳格なドメイン実行       | ゲストユーザー例外を設定                    |
 
 <Info>
   Domain verification is a one-time setup per domain, but the benefits apply to
   all current and future users with email addresses from those domains.
 </Info>
 
-## Single Sign-On (SSO)
+## Single Sign-On（SSO）
 
-### How SSO Works
+### SSOの仕組み
 
-1. User attempts to log in to Factory
-2. Redirected to your Identity Provider (IdP)
-3. User authenticates with corporate credentials
-4. IdP sends SAML assertion back to Factory
-5. User is authenticated and provisioned if needed (see JIT below)
+1. ユーザーがFactoryにログインを試行
+2. Identity Provider（IdP）にリダイレクト
+3. ユーザーが企業認証情報で認証
+4. IdPがFactoryにSAMLアサーションを送信
+5. ユーザーが認証され、必要に応じてプロビジョニング（以下のJITを参照）
 
-### Supported SSO Providers
+### サポートされているSSOプロバイダー
 
-Factory supports integration with all major identity providers through WorkOS. Select your provider during setup:
+FactoryはWorkOSを通じてすべての主要Identity Providerとの統合をサポートします。設定時にプロバイダーを選択してください：
 
-#### Popular SSO Providers
+#### 人気のSSOプロバイダー
 
 <Tabs>
   <Tab title="SAML Providers">
@@ -324,41 +324,41 @@ Factory supports integration with all major identity providers through WorkOS. S
   </Tab>
 </Tabs>
 
-#### Magic Link Alternative
+#### Magic Link代替案
 
-If your organization doesn't use SSO, Factory also supports:
+組織がSSOを使用しない場合、Factoryは以下もサポートします：
 
-- **Magic Link Authentication** - Passwordless email-based login
-- Can be used alongside SSO for external collaborators
+- **Magic Link認証** - メールベースのパスワードレスログイン
+- 外部協力者向けにSSOと併用可能
 
-### Just-In-Time (JIT) Provisioning
+### Just-In-Time（JIT）プロビジョニング
 
-When SSO is enabled with JIT provisioning:
+SSOがJITプロビジョニングで有効な場合：
 
-- Users are automatically created on first successful login
-- User profile is populated from SAML attributes
-- Organization membership is created automatically
-- No manual user invitation required
+- 初回ログイン成功時にユーザーが自動作成
+- ユーザープロファイルがSAML属性から入力
+- 組織メンバーシップが自動作成
+- 手動ユーザー招待不要
 
 <Warning>
   JIT provisioning can conflict with Directory Sync. See [Conflict
   Resolution](#conflict-resolution) for best practices.
 </Warning>
 
-### Configuring SSO
+### SSOの構成
 
-#### What You Need to Prepare
+#### 準備する必要があるもの
 
-Before starting SSO setup:
+SSO設定を開始する前に：
 
-1. **Admin access** to your identity provider
-2. **Test users** - Create a pilot group (e.g., `factory-pilot-users`) to test before organization-wide rollout
-3. **Group strategy** - Decide which IdP groups map to Factory roles:
-   - Admin groups (e.g., `factory-admins`)
-   - Member groups (e.g., `factory-developers`)
-   - Read-only groups (e.g., `factory-viewers`)
+1. Identity Providerへの**管理者アクセス**
+2. **テストユーザー** - 組織全体の展開前にテストするパイロットグループ（例：`factory-pilot-users`）を作成
+3. **グループ戦略** - どのIdPグループがFactoryロールにマップするかを決定：
+   - 管理者グループ（例：`factory-admins`）
+   - メンバーグループ（例：`factory-developers`）
+   - 読み取り専用グループ（例：`factory-viewers`）
 
-#### How Setup Works
+#### 設定の仕組み
 
 <Info>
 **WorkOS handles the technical configuration automatically.** When you receive your setup link from Factory:
@@ -373,50 +373,50 @@ You don't need to manually configure URLs, certificates, or technical parameters
 
 </Info>
 
-#### Group-to-Role Mapping
+#### グループからロールへのマッピング
 
-During setup, you'll configure how your IdP groups map to Factory roles:
+設定中に、IdPグループがFactoryロールにどのようにマップするかを構成します：
 
-| Your IdP Group        | Maps to Factory Role | Permissions                               |
+| あなたのIdPグループ        | Factoryロールにマップ | 権限                               |
 | --------------------- | -------------------- | ----------------------------------------- |
-| `factory-admins`      | Admin                | Full access, manage users and settings    |
-| `factory-developers`  | Member               | Create and edit content, use all features |
-| `factory-viewers`     | Viewer               | Read-only access                          |
-| `factory-contractors` | Member               | Same as developers, but easier to track   |
+| `factory-admins`      | 管理者                | フルアクセス、ユーザーと設定の管理    |
+| `factory-developers`  | メンバー               | コンテンツの作成・編集、全機能の使用 |
+| `factory-viewers`     | ビューアー               | 読み取り専用アクセス                          |
+| `factory-contractors` | メンバー               | 開発者と同様だが、追跡しやすい   |
 
 <Tip>
   Use descriptive group names in your IdP to make management easier. Groups like
-  `factory-frontend-team` or `factory-qa-engineers` help you organize
+  __PRESERVE_12__ or __PRESERVE_13__ help you organize
   permissions by team.
 </Tip>
 
-#### Testing Your Integration
+#### 統合のテスト
 
-After configuration, test with your pilot group:
+設定後、パイロットグループでテスト：
 
-1. Have a test user sign in via SSO from the Factory login page
-2. Initiate login from the Factory sign‑in page using “Sign in with SSO” / your IdP button.
-3. Verify that:
-   - The user is redirected to the IdP, authenticates, and returns to Factory.
-   - The user lands in the correct org/team with the expected role.
+1. テストユーザーにFactoryログインページからSSO経由でサインインしてもらう
+2. Factory サインインページから「SSOでサインイン」/あなたのIdPボタンを使用してログインを開始
+3. 以下を確認：
+   - ユーザーがIdPにリダイレクトされ、認証し、Factoryに戻る
+   - ユーザーが期待されるロールで正しい組織/チームに配置される
 
-If anything fails, check the IdP’s logs and Factory’s error message; most issues are due to mismatched URLs, certificates, or attribute mappings.
+何かが失敗した場合、IdPのログとFactoryのエラーメッセージを確認してください。ほとんどの問題は、URL、証明書、または属性マッピングの不一致が原因です。
 
 ---
 
-## Directory Sync (SCIM) Provisioning
+## Directory Sync（SCIM）プロビジョニング
 
-SSO controls **how users authenticate**; SCIM controls **which users and groups exist** in Factory.
+SSOは**ユーザーの認証方法**を制御し、SCIMは**どのユーザーとグループが存在するか**をFactoryで制御します。
 
-With SCIM enabled:
+SCIMが有効な場合：
 
-- New employees in relevant IdP groups get access to Factory automatically.
-- Users removed from those groups lose access automatically.
-- Group membership changes propagate into Factory without manual updates.
+- 関連するIdPグループの新入社員が自動的にFactoryにアクセス可能になる
+- これらのグループから削除されたユーザーは自動的にアクセスを失う
+- グループメンバーシップの変更が手動更新なしにFactoryに伝播される
 
-### Supported Directory Sync Providers
+### サポートされているDirectory Syncプロバイダー
 
-Factory supports SCIM 2.0 provisioning from these directory providers:
+FactoryはこれらのディレクトリプロバイダーからのSCIM 2.0プロビジョニングをサポートします：
 
 <Tabs>
   <Tab title="Full SCIM Support">
@@ -452,39 +452,39 @@ Factory supports SCIM 2.0 provisioning from these directory providers:
   </Tab>
 </Tabs>
 
-### SCIM Features by Provider
+### プロバイダー別SCIM機能
 
-| Provider            | Users | Groups  | Real-time | Nested Groups | Custom Attributes |
+| プロバイダー            | ユーザー | グループ  | リアルタイム | ネストグループ | カスタム属性 |
 | ------------------- | ----- | ------- | --------- | ------------- | ----------------- |
 | Okta                | ✅    | ✅      | ✅        | ✅            | ✅                |
 | Azure AD / Entra ID | ✅    | ✅      | ✅        | ✅            | ✅                |
-| Google Workspace    | ✅    | ✅      | ✅        | ❌            | Partial           |
+| Google Workspace    | ✅    | ✅      | ✅        | ❌            | 部分的           |
 | OneLogin            | ✅    | ✅      | ✅        | ❌            | ✅                |
 | JumpCloud           | ✅    | ✅      | ✅        | ✅            | ✅                |
-| Rippling            | ✅    | Partial | ✅        | ❌            | Partial           |
-| Generic SCIM        | ✅    | ✅      | Varies    | Varies        | Varies            |
+| Rippling            | ✅    | 部分的 | ✅        | ❌            | 部分的           |
+| 汎用SCIM        | ✅    | ✅      | 可変    | 可変        | 可変            |
 
-### Configuring Directory Sync
+### Directory Syncの構成
 
-#### What You Need to Prepare
+#### 準備する必要があるもの
 
-Before enabling SCIM:
+SCIMを有効にする前に：
 
-1. **Decide which groups to sync** - Not all IdP groups need Factory access
-2. **Plan your group structure** - Consider teams, roles, and access levels
-3. **Identify service accounts** - Separate human users from CI/CD accounts
-4. **Review existing users** - Understand how they'll be affected when SCIM takes over
+1. **同期するグループを決定** - すべてのIdPグループがFactoryアクセスを必要とするわけではない
+2. **グループ構造を計画** - チーム、ロール、アクセスレベルを考慮
+3. **サービスアカウントを特定** - 人間のユーザーとCI/CDアカウントを分離
+4. **既存ユーザーを確認** - SCIMが引き継ぐ際にどう影響されるかを理解
 
-Treat the SCIM token as a secret; store it only in your IdP’s application configuration.
+SCIMトークンは秘密として扱い、IdPのアプリケーション設定にのみ保存してください。
 
-#### How SCIM Setup Works
+#### SCIM設定の仕組み
 
 <Info>
 **WorkOS handles the SCIM configuration automatically.** When you receive your setup link from Factory:
 
 1. WorkOS provides a SCIM endpoint URL and bearer token
 2. You enter these in your IdP's SCIM configuration
-3. Select which groups to sync (e.g., only `factory-*` groups)
+3. Select which groups to sync (e.g., only __PRESERVE_14__ groups)
 4. WorkOS automatically handles:
    - User attribute mapping (email, name, etc.)
    - Group synchronization
@@ -495,96 +495,96 @@ You don't need to configure attribute mappings or technical settings - WorkOS ma
 
 </Info>
 
-#### Configuring SCIM in Your IdP
+#### IdPでのSCIM構成
 
-In your IdP’s SCIM settings for the Factory application:
+FactoryアプリケーションのIdPのSCIM設定で：
 
-1. Enable **automatic provisioning**.
-2. Paste the **SCIM base URL** and **SCIM token** from Factory.
-3. Choose which users and groups to sync (for example, only `factory-*` groups).
-4. Configure attribute mappings if required (for example, `userName` → email, `displayName` → name).
+1. **自動プロビジョニング**を有効化
+2. Factoryからの**SCIM ベースURL**と**SCIMトークン**を貼り付け
+3. 同期するユーザーとグループを選択（例：`factory-*`グループのみ）
+4. 必要に応じて属性マッピングを設定（例：`userName` → email、`displayName` → name）
 
-Once enabled, your IdP will start pushing users and groups to Factory and keep them synchronized.
+有効化すると、IdPはユーザーとグループをFactoryにプッシュし、同期を維持します。
 
-#### What Happens When SCIM is Enabled
+#### SCIMが有効化された時に起こること
 
-With SCIM in place, group management should happen **only in your IdP**.
+SCIMが設定されると、グループ管理は**IdPでのみ**行うべきです。
 
-Use group naming and mapping rules such as:
+以下のようなグループ命名とマッピングルールを使用：
 
-- `factory-org-owners` → Factory org Owners.
-- `factory-org-admins` → Factory org Admins.
-- `factory-users` → Factory Members.
-- `factory-ci-bots` → machine/service accounts with restricted permissions.
+- `factory-org-owners` → Factory組織オーナー
+- `factory-org-admins` → Factory組織管理者
+- `factory-users` → Factoryメンバー
+- `factory-ci-bots` → 制限された権限を持つマシン/サービスアカウント
 
-This keeps RBAC definitions in one place (your IdP) and lets you audit them alongside other enterprise apps.
+これによりRBAC定義を一箇所（IdP）に保ち、他のエンタープライズアプリと一緒に監査できます。
 
-## Data Management and Merging
+## データ管理とマージ
 
-### User Identity Sources
+### ユーザーアイデンティティソース
 
-Factory users can originate from multiple sources:
+Factoryユーザーは複数のソースから生成可能：
 
-- **Directory Sync**: Automatically provisioned via SCIM
-- **SSO JIT**: Created on first SSO login
-- **Manual Invitation**: Added by administrators
-- **API**: Created programmatically
+- **Directory Sync**: SCIMにより自動プロビジョニング
+- **SSO JIT**: 初回SSOログイン時に作成
+- **手動招待**: 管理者により追加
+- **API**: プログラム的に作成
 
-### Merging Strategy
+### マージ戦略
 
-When users exist from multiple sources, Factory follows these rules:
+ユーザーが複数のソースから存在する場合、Factoryは以下のルールに従います：
 
-1. **Directory data takes precedence** - SCIM attributes override all other sources
-2. **Email-based matching** - Users matched by email (case-insensitive)
-3. **Soft deletes only** - Users deactivated, not deleted, preserving audit trails
-4. **Profile preservation** - Non-directory fields retained during updates
+1. **ディレクトリデータが優先** - SCIM属性が他のすべてのソースを上書き
+2. **メールベースマッチング** - メール（大文字小文字を区別しない）でユーザーをマッチ
+3. **論理削除のみ** - ユーザーは無効化され削除されず、監査証跡を保持
+4. **プロファイル保持** - 更新中に非ディレクトリフィールドを保持
 
-## Conflict Resolution
+## 競合解決
 
 ### SSO vs Directory Sync
 
-When both are enabled, potential conflicts include:
+両方が有効な場合、潜在的な競合は以下を含みます：
 
-**Scenario**: User logs in via SSO before directory provisions them  
-**Resolution**: Directory sync merges with SSO user on next sync
+**シナリオ**: ディレクトリがプロビジョニングする前にユーザーがSSO経由でログイン  
+**解決**: 次回同期時にディレクトリ同期がSSOユーザーとマージ
 
-**Best Practice**: Choose one primary method:
+**ベストプラクティス**: 一つの主要な方法を選択：
 
-- **Directory-first**: Disable JIT, require directory provisioning
-- **SSO-first**: Use JIT for creation, directory for updates
+- **ディレクトリファースト**: JITを無効化、ディレクトリプロビジョニングを要求
+- **SSOファースト**: 作成にJITを使用、更新にディレクトリを使用
 
-### Email Case Sensitivity
+### メール大文字小文字の区別
 
-All email matching is case-insensitive:
+すべてのメールマッチングは大文字小文字を区別しません：
 
 - `John.Doe@company.com` = `john.doe@company.com`
-- Prevents duplicate users from case variations
-- Emails normalized to lowercase for comparison
+- 大文字小文字のバリエーションによる重複ユーザーを防止
+- 比較のためメールは小文字に正規化
 
 ---
 
-## Troubleshooting & best practices
+## トラブルシューティングとベストプラクティス
 
-Common issues and recommendations:
+一般的な問題と推奨事項：
 
-- **Login loops or failures**
+- **ログインループまたは失敗**
 
-  - Verify ACS / redirect URLs exactly match what Factory provided.
-  - Confirm certificates or signing keys have not expired or been rotated without updating Factory.
+  - ACS / リダイレクトURLがFactoryが提供したものと正確に一致することを確認
+  - 証明書や署名キーが期限切れまたはFactoryの更新なしにローテーションされていないことを確認
 
-- **User lands in wrong org or role**
+- **ユーザーが間違った組織やロールに配置**
 
-  - Check group memberships and mapping rules.
-  - Ensure the intended groups are included in SAML assertions or ID tokens.
+  - グループメンバーシップとマッピングルールを確認
+  - 意図されたグループがSAMLアサーションまたはIDトークンに含まれていることを確認
 
-- **Provisioning not working**
-  - Confirm SCIM is enabled in both Factory and your IdP.
-  - Check SCIM logs in your IdP for errors (invalid token, URL, or schema).
+- **プロビジョニングが動作しない**
+  - FactoryとIdPの両方でSCIMが有効になっていることを確認
+  - IdPのSCIMログでエラー（無効なトークン、URL、またはスキーマ）を確認
 
-Best practices:
+ベストプラクティス：
 
-- Keep a **small pilot group** for initial rollout and future changes.
-- Use **clear, prefix‑based group names** (for example, `factory-*`) to keep IdP configuration maintainable.
-- Manage all role changes and access reviews in your IdP to leverage existing governance processes.
+- 初期展開と将来の変更に**小さなパイロットグループ**を維持
+- **明確で接頭辞ベースのグループ名**（例：`factory-*`）を使用してIdP設定を保守しやすくする
+- 既存のガバナンスプロセスを活用するために、すべてのロール変更とアクセスレビューをIdPで管理
 
-Once SSO and SCIM are in place, the **Identity & Access Management** overview explains how these identities are enforced at runtime for Droids.
+SSOとSCIMが設定されると、**Identity & Access Management**の概要で、これらのアイデンティティがDroidの実行時にどのように実行されるかを説明します。

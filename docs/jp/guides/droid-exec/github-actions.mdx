@@ -6,14 +6,14 @@ keywords: ['github actions', 'ci/cd', 'workflow', 'automation', 'pr review', 'dr
 
 # GitHub Actions
 
-**Prerequisites:** Add `FACTORY_API_KEY` to repository secrets (Settings → Secrets → Actions)
+**前提条件:** `FACTORY_API_KEY` をリポジトリシークレットに追加してください（Settings → Secrets → Actions）
 
-## Example 1: Automated PR Review and Fix
+## 例1: 自動PR レビューと修正
 
-Automatically reviews PRs, fixes issues, and posts detailed feedback.
+PR を自動的にレビューし、問題を修正して、詳細なフィードバックを投稿します。
 
 <Info>
-For a simpler setup, use the [`/install-github-app`](/cli/features/install-github-app) command which configures the Factory GitHub App with guided steps.
+For a simpler setup, use the [__PRESERVE_4__](/cli/features/install-github-app) command which configures the Factory GitHub App with guided steps.
 </Info>
 
 ```yaml
@@ -97,9 +97,9 @@ jobs:
             });
 ```
 
-## Example 2: Daily Documentation and Test Updates
+## 例2: 日次ドキュメントとテストの更新
 
-Keeps documentation and tests in sync with code changes automatically.
+コードの変更に合わせて、ドキュメントとテストを自動的に同期させます。
 
 ```yaml
 name: Daily Maintenance
@@ -175,9 +175,9 @@ jobs:
           fi
 ```
 
-## Example 3: Security and Dependency Scanner
+## 例3: セキュリティと依存関係スキャナー
 
-Scans for vulnerabilities and outdated dependencies on a schedule.
+脆弱性と古い依存関係をスケジュールに従ってスキャンします。
 
 ```yaml
 name: Security Scanner

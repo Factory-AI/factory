@@ -3,15 +3,15 @@ title: "アイデンティティとアクセス管理"
 description: How Droids use org, project, and user identity to control who can run agents, where, and with which permissions.
 ---
 
-Identity and access management controls **who can run Droid**, in which environments, and under what policies.
+アイデンティティとアクセス管理制御は、**誰がDroidを実行できるか**、どの環境で、どのようなポリシーの下で実行するかを制御します。
 
-This page provides an overview of the identity model, roles, and environments; detailed SSO and SCIM setup instructions live in [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
+このページでは、アイデンティティモデル、ロール、環境の概要を説明します。詳細なSSOとSCIM設定手順は [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim) にあります。
 
 ---
 
-## Identity model
+## アイデンティティモデル
 
-Every Droid run is associated with three dimensions of identity:
+すべてのDroid実行は、3つのアイデンティティ次元に関連付けられます：
 
 <CardGroup cols={2}>
   <Card title="User or machine identity" icon="user">
@@ -20,7 +20,7 @@ Every Droid run is associated with three dimensions of identity:
     **machine identities** with long‑lived tokens or workload identities.
   </Card>
   <Card title="Org / project / folder" icon="folders">
-    The active repo and `.factory/` folders determine the **org, project, and
+    The active repo and __PRESERVE_0__ folders determine the **org, project, and
     folder context**. Policies at these levels decide which models, tools, and
     integrations Droid may use.
   </Card>
@@ -37,55 +37,55 @@ Every Droid run is associated with three dimensions of identity:
 
 ---
 
-## Org identity and SSO (overview)
+## 組織アイデンティティとSSO（概要）
 
-Most enterprises integrate Factory with an identity provider (IdP) such as **Okta, Azure AD, or Google Workspace**.
+ほとんどの企業は、**Okta、Azure AD、またはGoogle Workspace**などのアイデンティティプロバイダー（IdP）とFactoryを統合します。
 
-At a high level:
+高レベルでは：
 
-- **Org membership** is derived from IdP groups mapped to Factory organizations and teams.
-- **SSO sign‑in** gives developers access to both the web platform and Droid using corporate credentials.
-- **Role information** (for example, `Owner`, `Admin`, `User`) flows from IdP groups into Factory roles.
+- **組織メンバーシップ**は、Factory組織とチームにマッピングされたIdPグループから派生します。
+- **SSOサインイン**により、開発者は企業の認証情報を使用してWebプラットフォームとDroidの両方にアクセスできます。
+- **ロール情報**（例：`Owner`、`Admin`、`User`）は、IdPグループからFactoryロールに流れます。
 
-For step‑by‑step SSO and SCIM configuration—including setting up the IdP application, mapping attributes, and enabling provisioning—see [SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim).
-
----
-
-## Role‑based access control (RBAC)
-
-Factory distinguishes between three broad classes of actors:
-
-- **Org administrators**
-
-  - Define org‑level `.factory` configuration, including model policies, global command allow/deny lists, and default telemetry targets.
-  - Decide which deployment patterns (cloud, hybrid, airgapped) are supported and where Droid binaries may run.
-  - Configure security features such as maximum autonomy level and whether user‑supplied BYOK keys are allowed.
-
-- **Project owners / maintainers**
-
-  - Own project‑level `.factory/` folders that live in version control.
-  - Provide team‑specific models, droids, commands, and hooks that extend org policy without weakening it.
-  - Configure project‑specific policies, for example limiting Droid to certain repositories or directories.
-
-- **Developers**
-  - Customize personal preferences in `~/.factory/` (for example, default model choice within the allowed set).
-  - Run Droid locally, in IDEs, or via team‑provided scripts and CI jobs.
-  - Cannot override any setting defined at org or project level.
-
-Role assignment flows from your IdP into Factory; the **hierarchical settings engine** enforces what each role can effectively change. See [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) for the exact precedence rules.
+IdPアプリケーションの設定、属性のマッピング、プロビジョニングの有効化を含む、段階的なSSOとSCIM設定については、[SSO, IdP & SCIM Provisioning](/enterprise/identity-sso-and-scim) を参照してください。
 
 ---
 
-## Devices, environments, and workspace trust
+## ロールベースアクセス制御（RBAC）
 
-Because Droid is a CLI, it can run in many environments:
+Factoryは3つの主要なアクター分類を区別します：
 
-- Developer laptops (macOS, Linux, Windows)
-- Remote dev servers or workspaces
-- CI runners and build agents
-- Hardened VMs and devcontainers
+- **組織管理者**
 
-Enterprise customers typically combine Droid with **endpoint management** and **workspace trust** controls:
+  - モデルポリシー、グローバルコマンドの許可/拒否リスト、デフォルトのテレメトリターゲットを含む、組織レベルの `.factory` 設定を定義します。
+  - どのデプロイメントパターン（クラウド、ハイブリッド、エアギャップ）がサポートされ、Droidバイナリがどこで実行できるかを決定します。
+  - 最大自律性レベルやユーザー提供のBYOKキーが許可されるかどうかなどのセキュリティ機能を設定します。
+
+- **プロジェクトオーナー/メンテナー**
+
+  - バージョン管理に存在するプロジェクトレベルの `.factory/` フォルダーを所有します。
+  - 組織ポリシーを弱めることなく拡張する、チーム固有のモデル、ドロイド、コマンド、フックを提供します。
+  - Droidを特定のリポジトリやディレクトリに制限するなど、プロジェクト固有のポリシーを設定します。
+
+- **開発者**
+  - `~/.factory/` で個人設定をカスタマイズします（例：許可されたセット内でのデフォルトモデル選択）。
+  - ローカル、IDE、またはチーム提供のスクリプトやCIジョブを通じてDroidを実行します。
+  - 組織またはプロジェクトレベルで定義された設定を上書きすることはできません。
+
+ロール割り当てはIdPからFactoryに流れ、**階層設定エンジン**が各ロールが実際に変更できる内容を強制します。正確な優先順位ルールについては [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) を参照してください。
+
+---
+
+## デバイス、環境、ワークスペーストラスト
+
+DroidはCLIであるため、多くの環境で実行できます：
+
+- 開発者のラップトップ（macOS、Linux、Windows）
+- リモート開発サーバーまたはワークスペース
+- CIランナーとビルドエージェント
+- 強化されたVMとdevcontainer
+
+エンタープライズ顧客は通常、Droidを**エンドポイント管理**と**ワークスペーストラスト**制御と組み合わせます：
 
 <AccordionGroup>
   <Accordion title="Endpoint & MDM controls">
@@ -104,7 +104,7 @@ Enterprise customers typically combine Droid with **endpoint management** and **
 
     - Pin Droid to specific paths or repos on developer machines.
     - Require elevated approval or sandboxed environments for untrusted code.
-    - Use project‑level `.factory/` folders to mark which repos are "Droid‑ready" and what policies should apply.
+    - Use project‑level __PRESERVE_7__ folders to mark which repos are "Droid‑ready" and what policies should apply.
 
   </Accordion>
 
@@ -122,11 +122,11 @@ Enterprise customers typically combine Droid with **endpoint management** and **
 
 ---
 
-## How identity flows into policy and telemetry
+## アイデンティティがポリシーとテレメトリにどのように流れるか
 
-Identity and environment information are used in two main ways:
+アイデンティティと環境情報は主に2つの方法で使用されます：
 
-1. **Policy evaluation** – hierarchical settings (org → project → folder → user) use identity to determine which configuration bundle applies to a given run.
-2. **Telemetry and audit** – Droid emits OTEL metrics, traces, and logs with attributes like `user.id`, `team.id`, `session.id`, and environment tags so you can build per‑org and per‑team dashboards.
+1. **ポリシー評価** – 階層設定（組織 → プロジェクト → フォルダー → ユーザー）はアイデンティティを使用して、特定の実行にどの設定バンドルが適用されるかを決定します。
+2. **テレメトリと監査** – Droidは `user.id`、`team.id`、`session.id`、環境タグなどの属性を含むOTELメトリクス、トレース、ログを出力するため、組織別およびチーム別のダッシュボードを構築できます。
 
-For details on how these identities are encoded in telemetry, see [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
+これらのアイデンティティがテレメトリでどのようにエンコードされるかの詳細については、[Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring) を参照してください。

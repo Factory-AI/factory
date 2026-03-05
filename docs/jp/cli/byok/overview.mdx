@@ -5,7 +5,7 @@ description: Connect your own API keys, use open source models, or run local mod
 keywords: ['byok', 'bring your own key', 'own api key', 'api key', 'custom models', 'local models', 'open source', 'self-hosted', 'use own key', 'personal key', 'own key']
 ---
 
-Factory CLI supports custom model configurations through BYOK (Bring Your Own Key). Use your own OpenAI or Anthropic keys, connect to any open source model providers, or run models locally on your hardware. Once configured, switch between models using the `/model` command.
+Factory CLIは、BYOK（Bring Your Own Key）を通じてカスタムモデル設定をサポートしています。独自のOpenAIやAnthropicキーを使用し、任意のオープンソースモデルプロバイダーに接続するか、お使いのハードウェア上でローカルにモデルを実行できます。設定完了後は、`/model`コマンドを使用してモデル間を切り替えることができます。
 
 <Note>
   Your API keys remain local and are not uploaded to Factory servers. Custom models are only available in the CLI and won't appear in Factory's web or mobile platforms.
@@ -17,9 +17,9 @@ Factory CLI supports custom model configurations through BYOK (Bring Your Own Ke
 
 ---
 
-## Configuration Reference
+## 設定リファレンス
 
-Add custom models to `~/.factory/settings.json` under the `customModels` array:
+`~/.factory/settings.json`の`customModels`配列にカスタムモデルを追加してください：
 
 ```json
 {
@@ -37,30 +37,30 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 ```
 
 <Tip>
-  In `settings.json` (and `settings.local.json`), `apiKey` supports environment variable references using `${VAR_NAME}` syntax. For example, `"apiKey": "${PROVIDER_API_KEY}"` reads from the environment variable named `PROVIDER_API_KEY` (for example: `export PROVIDER_API_KEY=your_key_here`).
+  In __PRESERVE_6__ (and __PRESERVE_7__), __PRESERVE_8__ supports environment variable references using __PRESERVE_9__ syntax. For example, __PRESERVE_10__ reads from the environment variable named __PRESERVE_11__ (for example: __PRESERVE_12__).
 </Tip>
 
 <Note>
-  **Legacy support**: Custom models in `~/.factory/config.json` using snake_case field names (`custom_models`, `base_url`, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with `settings.json` taking priority. Env var expansion for `apiKey` applies to `settings.json`/`settings.local.json` and not to legacy `config.json`.
+  **Legacy support**: Custom models in __PRESERVE_13__ using snake_case field names (__PRESERVE_14__, __PRESERVE_15__, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with __PRESERVE_16__ taking priority. Env var expansion for __PRESERVE_17__ applies to __PRESERVE_18__/__PRESERVE_19__ and not to legacy __PRESERVE_20__.
 </Note>
 
-### Supported Fields
+### サポートされているフィールド
 
-| Field | Type | Required | Description |
+| フィールド | タイプ | 必須 | 説明 |
 |-------|------|----------|-------------|
-| `model` | `string` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
-| `displayName` | `string` | | Human-friendly name shown in model selector |
-| `baseUrl` | `string` | ✓ | API endpoint base URL |
-| `apiKey` | `string` | ✓ | Your API key for the provider. Can't be empty. Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g., `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable). |
-| `provider` | `string` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
-| `maxOutputTokens` | `number` | | Maximum output tokens for model responses |
-| `noImageSupport` | `boolean` | | Set to `true` to disable image inputs for this model |
-| `extraArgs` | `object` | | Additional provider-specific arguments to include in API requests |
-| `extraHeaders` | `object` | | Additional HTTP headers to send with requests |
+| `model` | `string` | ✓ | API経由で送信されるモデル識別子（例：`claude-sonnet-4-5-20250929`、`gpt-5-codex`、`qwen3:4b`） |
+| `displayName` | `string` | | モデルセレクターに表示される人間が読みやすい名前 |
+| `baseUrl` | `string` | ✓ | APIエンドポイントのベースURL |
+| `apiKey` | `string` | ✓ | プロバイダー用のAPIキー。空にはできません。`settings.json`/`settings.local.json`での`${VAR_NAME}`をサポートします（例：`${PROVIDER_API_KEY}`は`PROVIDER_API_KEY`環境変数を使用します）。 |
+| `provider` | `string` | ✓ | 次のいずれか：`anthropic`、`openai`、または`generic-chat-completion-api` |
+| `maxOutputTokens` | `number` | | モデルレスポンスの最大出力トークン数 |
+| `noImageSupport` | `boolean` | | このモデルで画像入力を無効にするには`true`に設定 |
+| `extraArgs` | `object` | | APIリクエストに含める追加のプロバイダー固有の引数 |
+| `extraHeaders` | `object` | | リクエストと共に送信する追加のHTTPヘッダー |
 
-### Using extraArgs
+### extraArgsの使用
 
-Pass provider-specific parameters like temperature or top_p:
+temperatureやtop_pなどのプロバイダー固有のパラメータを渡します：
 
 ```json
 {
@@ -80,9 +80,9 @@ Pass provider-specific parameters like temperature or top_p:
 }
 ```
 
-### Using extraHeaders
+### extraHeadersの使用
 
-Add custom HTTP headers to API requests:
+APIリクエストにカスタムHTTPヘッダーを追加します：
 
 ```json
 {
@@ -104,15 +104,15 @@ Add custom HTTP headers to API requests:
 
 ---
 
-## Understanding Providers
+## プロバイダーの理解
 
-Factory supports three provider types that determine API compatibility:
+FactoryはAPI互換性を決定する3つのプロバイダータイプをサポートしています：
 
-| Provider | API Format | Use For | Documentation |
+| プロバイダー | API形式 | 使用目的 | ドキュメント |
 |----------|------------|---------|---------------|
-| `anthropic` | Anthropic Messages API (v1/messages) | Anthropic models on their official API or compatible proxies | [Anthropic Messages API](https://docs.claude.com/en/api/messages) |
-| `openai` | OpenAI Responses API | OpenAI models on their official API or compatible proxies. Required for the newest models like GPT-5 and GPT-5-Codex. | [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) |
-| `generic-chat-completion-api` | OpenAI Chat Completions API | OpenRouter, Fireworks, Together AI, Ollama, vLLM, and most open-source providers | [OpenAI Chat Completions API](https://platform.openai.com/docs/api-reference/chat) |
+| `anthropic` | Anthropic Messages API (v1/messages) | 公式APIまたは互換プロキシ上のAnthropicモデル | [Anthropic Messages API](https://docs.claude.com/en/api/messages) |
+| `openai` | OpenAI Responses API | 公式APIまたは互換プロキシ上のOpenAIモデル。GPT-5やGPT-5-Codexなどの最新モデルに必要。 | [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) |
+| `generic-chat-completion-api` | OpenAI Chat Completions API | OpenRouter、Fireworks、Together AI、Ollama、vLLM、およびほとんどのオープンソースプロバイダー | [OpenAI Chat Completions API](https://platform.openai.com/docs/api-reference/chat) |
 
 <Warning>
   Factory is actively verifying Droid's performance on popular models, but we cannot guarantee that all custom models will work out of the box. Only Anthropic and OpenAI models accessed via their official APIs are fully tested and benchmarked.
@@ -124,81 +124,81 @@ Factory supports three provider types that determine API compatibility:
 
 ---
 
-## Prompt Caching
+## プロンプトキャッシング
 
-Factory CLI automatically uses prompt caching when available to reduce API costs:
+Factory CLIは利用可能な場合にプロンプトキャッシングを自動的に使用してAPIコストを削減します：
 
-- **Official providers (`anthropic`, `openai`)**: Factory attempts to use prompt caching via the official APIs. Caching behavior follows each provider's implementation and requirements.
-- **Generic providers (`generic-chat-completion-api`)**: Prompt caching support varies by provider and cannot be guaranteed. Some providers may support caching, while others may not.
+- **公式プロバイダー（`anthropic`、`openai`）**：Factoryは公式APIを通じてプロンプトキャッシングの使用を試みます。キャッシング動作は各プロバイダーの実装と要件に従います。
+- **汎用プロバイダー（`generic-chat-completion-api`）**：プロンプトキャッシングサポートはプロバイダーによって異なり、保証されません。一部のプロバイダーはキャッシングをサポートする場合もあれば、そうでない場合もあります。
 
-### Verifying Prompt Caching
+### プロンプトキャッシングの確認
 
-To check if prompt caching is working correctly with your custom model:
+カスタムモデルでプロンプトキャッシングが正しく動作しているかを確認するには：
 
-1. Run a conversation with your custom model
-2. Use the `/cost` command in Droid CLI to view cost breakdowns
-3. Look for cache hit rates and savings in the output
+1. カスタムモデルで会話を実行
+2. Droid CLIで`/cost`コマンドを使用してコスト内訳を表示
+3. 出力でキャッシュヒット率と節約額を確認
 
-If you're not seeing expected caching savings, consult your provider's documentation about their prompt caching support and requirements.
-
----
-
-## Quick Start
-
-Choose a provider from the left navigation to see specific configuration examples:
-
-- **[Baseten](/cli/byok/baseten)** - Deploy and serve custom models
-- **[DeepInfra](/cli/byok/deepinfra)** - Cost-effective inference for open-source models
-- **[Fireworks AI](/cli/byok/fireworks)** - High-performance inference for open-source models
-- **[Google Gemini](/cli/byok/google-gemini)** - Access Google's Gemini models
-- **[Groq](/cli/byok/groq)** - Ultra-fast inference with Groq's LPU™ Inference Engine
-- **[Hugging Face](/cli/byok/huggingface)** - Connect to models on HF Inference API
-- **[Ollama](/cli/byok/ollama)** - Run models locally or in the cloud
-- **[OpenAI & Anthropic](/cli/byok/openai-anthropic)** - Use your own API keys for official models
-- **[OpenRouter](/cli/byok/openrouter)** - Access multiple providers through a single interface
+期待されるキャッシング節約が表示されない場合は、プロバイダーのプロンプトキャッシングサポートと要件についてのドキュメントを参照してください。
 
 ---
 
-## Using Custom Models
+## クイックスタート
 
-Once configured, access your custom models in the CLI:
+特定の設定例を表示するには、左ナビゲーションからプロバイダーを選択してください：
 
-1. Use the `/model` command
-2. Your custom models appear in a separate "Custom models" section below Factory-provided models
-3. Select any model to start using it
-
-Custom models display with the name you set in `displayName`, making it easy to identify different providers and configurations.
-
----
-
-## Troubleshooting
-
-### Model not appearing in selector
-- Check JSON syntax in `~/.factory/settings.json` (or `config.json` if using legacy format)
-- Settings changes are detected automatically via file watching
-- Verify all required fields are present
-
-### "Invalid provider" error
-- Provider must be exactly `anthropic`, `openai`, or `generic-chat-completion-api`
-- Check for typos and ensure proper capitalization
-
-### Authentication errors
-- Verify your API key is valid and has available credits
-- Check that the API key has proper permissions
-- Confirm the base URL matches your provider's documentation
-
-### Local model won't connect
-- Ensure your local server is running (e.g., `ollama serve`)
-- Verify the base URL is correct and includes `/v1/` suffix if required
-- Check that the model is pulled/available locally
-
-### Rate limiting or quota errors
-- Check your provider's rate limits and usage quotas
-- Monitor your usage through your provider's dashboard
+- **[Baseten](/cli/byok/baseten)** - カスタムモデルのデプロイと提供
+- **[DeepInfra](/cli/byok/deepinfra)** - オープンソースモデル向けの費用対効果の高い推論
+- **[Fireworks AI](/cli/byok/fireworks)** - オープンソースモデル向けの高性能推論
+- **[Google Gemini](/cli/byok/google-gemini)** - GoogleのGeminiモデルへのアクセス
+- **[Groq](/cli/byok/groq)** - GroqのLPU™ Inference Engineによる超高速推論
+- **[Hugging Face](/cli/byok/huggingface)** - HF Inference API上のモデルへの接続
+- **[Ollama](/cli/byok/ollama)** - ローカルまたはクラウドでのモデル実行
+- **[OpenAI & Anthropic](/cli/byok/openai-anthropic)** - 公式モデル用の独自APIキーの使用
+- **[OpenRouter](/cli/byok/openrouter)** - 単一インターフェース経由での複数プロバイダーへのアクセス
 
 ---
 
-## Billing
+## カスタムモデルの使用
 
-- You pay your provider directly with no Factory markup or usage fees
-- Track costs and usage in your provider's dashboard
+設定完了後、CLIでカスタムモデルにアクセスできます：
+
+1. `/model`コマンドを使用
+2. カスタムモデルはFactory提供モデルの下にある別の「カスタムモデル」セクションに表示されます
+3. 任意のモデルを選択して使用開始
+
+カスタムモデルは`displayName`で設定した名前で表示され、異なるプロバイダーと設定を簡単に識別できます。
+
+---
+
+## トラブルシューティング
+
+### セレクターにモデルが表示されない
+- `~/.factory/settings.json`（レガシー形式を使用している場合は`config.json`）でJSON構文を確認
+- 設定変更はファイル監視により自動的に検出されます
+- すべての必須フィールドが存在することを確認
+
+### 「Invalid provider」エラー
+- プロバイダーは正確に`anthropic`、`openai`、または`generic-chat-completion-api`である必要があります
+- タイプミスを確認し、適切な大文字小文字を確保
+
+### 認証エラー
+- APIキーが有効で利用可能なクレジットがあることを確認
+- APIキーに適切な権限があることを確認
+- ベースURLがプロバイダーのドキュメントと一致することを確認
+
+### ローカルモデルが接続できない
+- ローカルサーバーが実行中であることを確認（例：`ollama serve`）
+- ベースURLが正しく、必要に応じて`/v1/`サフィックスが含まれていることを確認
+- モデルがローカルでプルされ/利用可能であることを確認
+
+### レート制限またはクォータエラー
+- プロバイダーのレート制限と使用クォータを確認
+- プロバイダーのダッシュボードで使用量を監視
+
+---
+
+## 請求
+
+- Factory のマークアップや使用料なしで、プロバイダーに直接お支払いいただきます
+- プロバイダーのダッシュボードでコストと使用量を追跡
