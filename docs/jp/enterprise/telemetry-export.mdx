@@ -71,23 +71,36 @@ export OTEL_TELEMETRY_HEADERS="Authorization=Bearer <your-token>"
 
 <AccordionGroup>
   <Accordion title="Generic OTEL Collector / Grafana Alloy">
-    __PRESERVE_1__
+    ```bash
+    export OTEL_TELEMETRY_ENDPOINT="https://collector.example.com:4318"
+    ```
   </Accordion>
 
   <Accordion title="Datadog (via Agent OTLP ingestion)">
-    __PRESERVE_2__
+    ```bash
+    export OTEL_TELEMETRY_ENDPOINT="http://localhost:4318"
+    ```
   </Accordion>
 
   <Accordion title="Datadog (direct OTLP intake)">
-    __PRESERVE_3__
+    ```bash
+    export OTEL_TELEMETRY_ENDPOINT="https://otlp.datadoghq.com"
+    export OTEL_TELEMETRY_HEADERS="dd-api-key=<your-datadog-api-key>"
+    ```
   </Accordion>
 
   <Accordion title="New Relic">
-    __PRESERVE_4__
+    ```bash
+    export OTEL_TELEMETRY_ENDPOINT="https://otlp.nr-data.net:4318"
+    export OTEL_TELEMETRY_HEADERS="api-key=<your-new-relic-license-key>"
+    ```
   </Accordion>
 
   <Accordion title="Honeycomb">
-    __PRESERVE_5__
+    ```bash
+    export OTEL_TELEMETRY_ENDPOINT="https://api.honeycomb.io"
+    export OTEL_TELEMETRY_HEADERS="x-honeycomb-team=<your-api-key>,x-honeycomb-dataset=droid-metrics"
+    ```
   </Accordion>
 </AccordionGroup>
 

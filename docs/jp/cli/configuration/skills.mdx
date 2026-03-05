@@ -10,7 +10,7 @@ Explore the [skills guides](/guides/skills/frontend-ui-integration) for examples
 </Tip>
 
 <Note>
-**Custom slash commands have been merged into skills.** A file at __PRESERVE_6__ and a skill at __PRESERVE_7__ both create __PRESERVE_8__ and work the same way. Your existing __PRESERVE_9__ files keep working. Skills add optional features: a directory for supporting files, frontmatter to [control who can invoke them](#control-who-invokes-a-skill), and the ability for Droids to load them automatically when relevant.
+**Custom slash commands have been merged into skills.** A file at `.factory/commands/review.md` and a skill at `.factory/skills/review/SKILL.md` both create `/review` and work the same way. Your existing `.factory/commands/` files keep working. Skills add optional features: a directory for supporting files, frontmatter to [control who can invoke them](#control-who-invokes-a-skill), and the ability for Droids to load them automatically when relevant.
 </Note>
 
 **主な特徴:**
@@ -142,21 +142,21 @@ Your skill instructions here...
 
 <Steps>
   <Step title="Create a skill folder">
-    Under your repo, create a directory in __PRESERVE_47__, for example
-    __PRESERVE_48__.
+    Under your repo, create a directory in `.factory/skills/`, for example
+    `.factory/skills/frontend-ui-integration/`.
   </Step>
   <Step title="Add SKILL.md or skill.mdx">
-    Inside the folder, create __PRESERVE_49__ or __PRESERVE_50__ with YAML frontmatter
-    (__PRESERVE_51__, __PRESERVE_52__) and markdown instructions that define the
+    Inside the folder, create `SKILL.md` or `skill.mdx` with YAML frontmatter
+    (`name`, `description`) and markdown instructions that define the
     capability, inputs, and success criteria.
   </Step>
   <Step title="Add supporting files (optional)">
     Co-locate any types, schemas, or checklists the Droid should use when the
-    skill is active (for example __PRESERVE_53__, __PRESERVE_54__, or
-    __PRESERVE_55__).
+    skill is active (for example `types.ts`, `schemas/`, or
+    `rollout-checklist.md`).
   </Step>
   <Step title="Restart and use">
-    Restart __PRESERVE_56__ or your integration so it rescans skills, then describe
+    Restart `droid` or your integration so it rescans skills, then describe
     your task normally. The Droid will automatically invoke matching skills
     when they apply.
   </Step>

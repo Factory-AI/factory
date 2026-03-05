@@ -228,15 +228,53 @@ Always check this file before making significant architectural or design decisio
 
 <Tabs>
   <Tab title="# prefix trigger">
-    Trigger with __PRESERVE_23__ at the start of your message for quick capture.
+    Trigger with `#` at the start of your message for quick capture.
     
     **Usage:**
     - "#we use the repository pattern"
-    - "##I prefer early returns" (double __PRESERVE_24__ for personal)
+    - "##I prefer early returns" (double `##` for personal)
     
-    Create __PRESERVE_25__:
+    Create `~/.factory/hooks/memory-capture.py`:
 
-    __PRESERVE_9__
+    ```python
+    #!/usr/bin/env python3
+    """Captures messages starting with # and appends to memories.md"""
+    import json, sys, os
+    from datetime import datetime
+
+    def main():
+        try:
+            data = json.load(sys.stdin)
+            prompt = data.get('prompt', '').strip()
+            
+            if not prompt.startswith('#'):
+                return
+            
+            # ## = personal, # = project
+            if prompt.startswith('##'):
+                content = prompt[2:].strip()
+                mem_file = os.path.expanduser('~/.factory/memories.md')
+            else:
+                content = prompt[1:].strip()
+                project_dir = os.environ.get('FACTORY_PROJECT_DIR', os.getcwd())
+                project_factory = os.path.join(project_dir, '.factory')
+                if os.path.exists(project_factory):
+                    mem_file = os.path.join(project_factory, 'memories.md')
+                else:
+                    mem_file = os.path.expanduser('~/.factory/memories.md')
+            
+            if content:
+                timestamp = datetime.now().strftime('%Y-%m-%d')
+                with open(mem_file, 'a') as f:
+                    f.write(f"\n- [{timestamp}] {content}\n")
+                
+                print(json.dumps({'systemMessage': f'✓ Saved to {mem_file}'}))
+        except:
+            pass
+
+    if __name__ == '__main__':
+        main()
+    ```
   </Tab>
   
   <Tab title="Phrase trigger">
@@ -246,9 +284,50 @@ Always check this file before making significant architectural or design decisio
     - "Remember this: we use the repository pattern"
     - "Note: auth tokens expire after 24 hours"
     
-    Create __PRESERVE_26__:
+    Create `~/.factory/hooks/memory-capture.py`:
 
-    __PRESERVE_10__
+    ```python
+    #!/usr/bin/env python3
+    """Captures 'remember this:' statements and appends to memories.md"""
+    import json, sys, os
+    from datetime import datetime
+
+    def main():
+        try:
+            data = json.load(sys.stdin)
+            prompt = data.get('prompt', '')
+            
+            triggers = ['remember this:', 'remember:', 'note:', 'save this:']
+            
+            for trigger in triggers:
+                if trigger in prompt.lower():
+                    idx = prompt.lower().index(trigger)
+                    content = prompt[idx + len(trigger):].strip()
+                    
+                    if content:
+                        # Personal if specified, otherwise project
+                        if 'personal' in prompt.lower():
+                            mem_file = os.path.expanduser('~/.factory/memories.md')
+                        else:
+                            project_dir = os.environ.get('FACTORY_PROJECT_DIR', os.getcwd())
+                            project_factory = os.path.join(project_dir, '.factory')
+                            if os.path.exists(project_factory):
+                                mem_file = os.path.join(project_factory, 'memories.md')
+                            else:
+                                mem_file = os.path.expanduser('~/.factory/memories.md')
+                        
+                        timestamp = datetime.now().strftime('%Y-%m-%d')
+                        with open(mem_file, 'a') as f:
+                            f.write(f"\n- [{timestamp}] {content}\n")
+                        
+                        print(json.dumps({'systemMessage': f'✓ Saved to {mem_file}'}))
+                    break
+        except:
+            pass
+
+    if __name__ == '__main__':
+        main()
+    ```
   </Tab>
 </Tabs>
 

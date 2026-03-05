@@ -36,20 +36,20 @@ browser skillは、いくつかの実行可能スクリプト（`start.js`、`na
 
 <Steps>
   <Step title="Create the skill folder">
-    Run __PRESERVE_29__.
+    Run `mkdir -p .factory/skills/browser`.
   </Step>
   <Step title="Copy scripts and package metadata">
-    Copy __PRESERVE_30__, __PRESERVE_31__, __PRESERVE_32__, __PRESERVE_33__, __PRESERVE_34__, and
-    __PRESERVE_35__ into __PRESERVE_36__ (or symlink to a shared
+    Copy `start.js`, `nav.js`, `eval.js`, `screenshot.js`, `pick.js`, and
+    `package.json` into `.factory/skills/browser/` (or symlink to a shared
     dotfiles repo).
   </Step>
   <Step title="Install dependencies">
-    Run __PRESERVE_37__, then
-    __PRESERVE_38__.
+    Run `npm install --prefix .factory/skills/browser puppeteer-core`, then
+    `chmod +x .factory/skills/browser/*.js`.
   </Step>
   <Step title="Restart Droid">
-    Restart __PRESERVE_39__ (or your IDE integration) so it rescans workspace skills and
-    discovers __PRESERVE_40__.
+    Restart `droid` (or your IDE integration) so it rescans workspace skills and
+    discovers `browser`.
   </Step>
 </Steps>
 

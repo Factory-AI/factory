@@ -41,28 +41,28 @@ User        → ~/.factory/
   Session default preferences.
   <Expandable title="properties">
     <ResponseField name="model" type="string">
-      Default model identifier (e.g. __PRESERVE_10__, __PRESERVE_11__).
+      Default model identifier (e.g. `claude-opus-4-6`, `gpt-5.3-codex`).
     </ResponseField>
     <ResponseField name="reasoningEffort" type="string">
-      How much thinking the model does before responding. One of __PRESERVE_12__, __PRESERVE_13__, __PRESERVE_14__, __PRESERVE_15__, __PRESERVE_16__, __PRESERVE_17__, __PRESERVE_18__, __PRESERVE_19__, __PRESERVE_20__.
+      How much thinking the model does before responding. One of `none`, `dynamic`, `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`.
     </ResponseField>
     <ResponseField name="interactionMode" type="string">
-      Droid interaction mode. One of __PRESERVE_21__, __PRESERVE_22__, __PRESERVE_23__.
+      Droid interaction mode. One of `auto`, `spec`, `agi`.
     </ResponseField>
     <ResponseField name="autonomyMode" type="string">
-      Autonomy mode for the session. One of __PRESERVE_24__, __PRESERVE_25__, __PRESERVE_26__, __PRESERVE_27__, __PRESERVE_28__.
+      Autonomy mode for the session. One of `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high`.
     </ResponseField>
     <ResponseField name="specModeModel" type="string">
       Model to use when spec mode is active.
     </ResponseField>
     <ResponseField name="specModeReasoningEffort" type="string">
-      Reasoning effort override for spec mode. Same values as __PRESERVE_29__.
+      Reasoning effort override for spec mode. Same values as `reasoningEffort`.
     </ResponseField>
   </Expandable>
 </ResponseField>
 
 <ResponseField name="maxAutonomyLevel" type="string">
-  Maximum autonomy level any user or project can set. One of __PRESERVE_30__, __PRESERVE_31__, __PRESERVE_32__, __PRESERVE_33__.
+  Maximum autonomy level any user or project can set. One of `off`, `low`, `medium`, `high`.
 </ResponseField>
 
 <ResponseField name="cloudSessionSync" type="boolean">
@@ -70,7 +70,7 @@ User        → ~/.factory/
 </ResponseField>
 
 <ResponseField name="includeCoAuthoredByDroid" type="boolean">
-  Include a __PRESERVE_34__ trailer in git commits.
+  Include a `Co-authored-by: Droid` trailer in git commits.
 </ResponseField>
 
 <ResponseField name="enableDroidShield" type="boolean">
@@ -96,7 +96,7 @@ User        → ~/.factory/
       Model name sent to the provider API.
     </ResponseField>
     <ResponseField name="id" type="string" required>
-      Unique identifier for this custom model entry. Must start with __PRESERVE_35__ (e.g. __PRESERVE_36__).
+      Unique identifier for this custom model entry. Must start with `custom:` (e.g. `custom:my-internal-model-v1`).
     </ResponseField>
     <ResponseField name="index" type="integer" required>
       Display order index.
@@ -108,7 +108,7 @@ User        → ~/.factory/
       API key for authenticating with the provider.
     </ResponseField>
     <ResponseField name="provider" type="string" required>
-      Provider type. One of __PRESERVE_37__, __PRESERVE_38__, __PRESERVE_39__, __PRESERVE_40__, __PRESERVE_41__, __PRESERVE_42__, __PRESERVE_43__.
+      Provider type. One of `anthropic`, `openai`, `generic-chat-completion-api`, `factory`, `google`, `xai`, `voyage`.
     </ResponseField>
     <ResponseField name="displayName" type="string" required>
       Human-readable name shown in the model picker.
@@ -132,7 +132,7 @@ User        → ~/.factory/
       Additional provider-specific arguments passed to the API.
     </ResponseField>
     <ResponseField name="noImageSupport" type="boolean" required>
-      Set to __PRESERVE_44__ if the model does not support image inputs.
+      Set to `true` if the model does not support image inputs.
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -171,25 +171,25 @@ User        → ~/.factory/
 </ResponseField>
 
 <ResponseField name="enabledPlugins" type="object">
-  Map of plugin name in __PRESERVE_45__ format to __PRESERVE_46__ (enabled) or __PRESERVE_47__ (disabled). Plugins set to __PRESERVE_48__ are automatically installed on CLI startup once their marketplace is available.
+  Map of plugin name in `plugin@marketplace` format to `true` (enabled) or `false` (disabled). Plugins set to `true` are automatically installed on CLI startup once their marketplace is available.
 </ResponseField>
 
 <ResponseField name="extraKnownMarketplaces" type="object">
   Additional plugin marketplaces. Map of marketplace name to a source object. Marketplaces listed here are automatically cloned and registered on CLI startup.
   <Expandable title="properties">
     <ResponseField name="source" type="object" required>
-      Marketplace source — one of the following shapes, discriminated by the __PRESERVE_49__ field:
+      Marketplace source — one of the following shapes, discriminated by the `source` field:
       <Expandable title="github">
         <ResponseField name="source" type="string" required>
-          Must be __PRESERVE_50__.
+          Must be `"github"`.
         </ResponseField>
         <ResponseField name="repo" type="string" required>
-          GitHub repository in __PRESERVE_51__ format.
+          GitHub repository in `owner/repo` format.
         </ResponseField>
       </Expandable>
       <Expandable title="url">
         <ResponseField name="source" type="string" required>
-          Must be __PRESERVE_52__.
+          Must be `"url"`.
         </ResponseField>
         <ResponseField name="url" type="string" required>
           URL of the marketplace manifest.
@@ -197,7 +197,7 @@ User        → ~/.factory/
       </Expandable>
       <Expandable title="local">
         <ResponseField name="source" type="string" required>
-          Must be __PRESERVE_53__.
+          Must be `"local"`.
         </ResponseField>
         <ResponseField name="path" type="string" required>
           Local filesystem path to the marketplace.
@@ -208,7 +208,7 @@ User        → ~/.factory/
 </ResponseField>
 
 <ResponseField name="strictKnownMarketplaces" type="object[]">
-  Marketplace sources that are strictly enforced. Each entry is a source object directly (e.g. __PRESERVE_54__), not wrapped in a __PRESERVE_55__ key like __PRESERVE_56__ values.
+  Marketplace sources that are strictly enforced. Each entry is a source object directly (e.g. `{ "source": "github", "repo": "owner/repo" }`), not wrapped in a `source` key like `extraKnownMarketplaces` values.
 </ResponseField>
 
 ### サポートされているモデルID

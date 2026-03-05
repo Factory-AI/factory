@@ -7,7 +7,7 @@ keywords: ['rules', 'conventions', 'standards', 'coding style', 'guidelines', 't
 ルールは、Droidが毎回従う成文化された標準です。（決定と文脈を捉える）メモリーとは異なり、ルールはコードがどのように書かれるべきかを定義します。このガイドでは、個人やチームにおいて効果的にルールを整理する方法を説明します。
 
 <Info>
-  **Works with Factory App:** These conventions work identically in both CLI and [Factory App](/web/getting-started/overview)—Droid reads the same __PRESERVE_35__ files regardless of interface.
+  **Works with Factory App:** These conventions work identically in both CLI and [Factory App](/web/getting-started/overview)—Droid reads the same `.factory/rules/` files regardless of interface.
 </Info>
 
 ---
@@ -265,7 +265,13 @@ export const useUserStore = create<UserState>((set) => ({
   setUser: (user) => set({ currentUser: user }),
   logout: () => set({ currentUser: null }),
 }));
-__PRESERVE_12__typescript
+```
+
+### React Query for server state
+**Applies to**: All data fetched from APIs
+**Rule**: Use React Query. Queries go in `src/queries/`.
+
+```typescript
 // src/queries/useUsers.ts
 import { useQuery } from '@tanstack/react-query';
 
@@ -275,20 +281,42 @@ export function useUsers() {
     queryFn: () => fetch('/api/users').then(r => r.json()),
   });
 }
-__PRESERVE_13__
+```
+```
 
 ### Testing Rules
 
-Create __PRESERVE_43__:
+Create `.factory/rules/testing.md`:
 
-__PRESERVE_14__
+```markdown
+# Testing Rules
+
+## File Organization
+
+### Colocate test files
+**Applies to**: All tests except E2E
+**Rule**: Place test files next to source files.
+
+```
 src/
 └── components/
     └── UserCard/
         ├── UserCard.tsx
         ├── UserCard.test.tsx    # ✅ Colocated
         └── index.ts
-__PRESERVE_15__typescript
+```
+
+### E2E tests in dedicated directory
+**Applies to**: End-to-end tests
+**Rule**: Place E2E tests in `e2e/` at project root.
+
+## Test Structure
+
+### Descriptive test names
+**Applies to**: All test cases
+**Rule**: Format as "should [action] when [condition]".
+
+```typescript
 // ✅ Correct
 it('should display error message when login fails', () => {});
 it('should redirect to dashboard when login succeeds', () => {});
@@ -296,7 +324,13 @@ it('should redirect to dashboard when login succeeds', () => {});
 // ❌ Avoid
 it('login error', () => {});
 it('works', () => {});
-__PRESERVE_16__typescript
+```
+
+### One assertion per test
+**Applies to**: Unit tests
+**Rule**: Test one behavior per test case. Multiple assertions OK if testing same behavior.
+
+```typescript
 // ✅ Correct - testing one behavior
 it('should format user name correctly', () => {
   const result = formatUserName({ first: 'John', last: 'Doe' });
@@ -317,7 +351,15 @@ it('should handle user operations', () => {
   expect(deleteUser('123')).toBe(true);
   expect(listUsers()).toHaveLength(0);
 });
-__PRESERVE_17__typescript
+```
+
+## Mocking
+
+### Mock at boundaries
+**Applies to**: All mocked dependencies
+**Rule**: Mock external APIs and services, not internal functions.
+
+```typescript
 // ✅ Correct - mock external API
 vi.mock('@/lib/api', () => ({
   fetchUser: vi.fn().mockResolvedValue({ id: '1', name: 'John' }),
@@ -327,7 +369,13 @@ vi.mock('@/lib/api', () => ({
 vi.mock('@/utils/formatName', () => ({
   formatName: vi.fn().mockReturnValue('John'),
 }));
-__PRESERVE_18__typescript
+```
+
+### Use MSW for API mocking in integration tests
+**Applies to**: Integration tests that need API responses
+**Rule**: Use Mock Service Worker instead of mocking fetch directly.
+
+```typescript
 // ✅ Correct
 import { http, HttpResponse } from 'msw';
 
@@ -336,19 +384,35 @@ const handlers = [
     return HttpResponse.json([{ id: '1', name: 'John' }]);
   }),
 ];
-__PRESERVE_19__
+```
+```
 
 ### Security Rules
 
-Create __PRESERVE_44__:
+Create `.factory/rules/security.md`:
 
-__PRESERVE_20__typescript
+```markdown
+# Security Rules
+
+## Secrets Management
+
+### Never hardcode secrets
+**Applies to**: All code
+**Rule**: Use environment variables for all secrets. Never commit secrets.
+
+```typescript
 // ✅ Correct
 const apiKey = process.env.API_KEY;
 
 // ❌ Never do this
 const apiKey = 'sk-1234567890abcdef';
-__PRESERVE_21__typescript
+```
+
+### Validate environment variables
+**Applies to**: Application startup
+**Rule**: Validate required env vars exist at startup.
+
+```typescript
 // ✅ Correct
 const config = {
   apiKey: requireEnv('API_KEY'),
@@ -357,10 +421,18 @@ const config = {
 
 function requireEnv(name: string): string {
   const value = process.env[name];
-  if (!value) throw new Error(__PRESERVE_45__);
+  if (!value) throw new Error(`Missing required env var: ${name}`);
   return value;
 }
-__PRESERVE_22__typescript
+```
+
+## Input Validation
+
+### Validate all external input
+**Applies to**: API routes, form handlers
+**Rule**: Use Zod to validate all input from users or external sources.
+
+```typescript
 // ✅ Correct
 import { z } from 'zod';
 
@@ -373,7 +445,15 @@ export async function createUser(input: unknown) {
   const data = CreateUserSchema.parse(input);
   // data is now typed and validated
 }
-__PRESERVE_23__typescript
+```
+
+## Error Handling
+
+### Never expose internal errors
+**Applies to**: API error responses
+**Rule**: Log detailed errors server-side; return generic messages to clients.
+
+```typescript
 // ✅ Correct
 try {
   await processPayment(data);
@@ -381,7 +461,15 @@ try {
   console.error('Payment failed:', error); // Detailed log
   throw new ApiError('Payment processing failed', 500); // Generic message
 }
-__PRESERVE_24__typescript
+```
+
+## Authentication
+
+### Check authentication on every protected route
+**Applies to**: All API routes requiring auth
+**Rule**: Use middleware or guards. Never assume auth from client.
+
+```typescript
 // ✅ Correct
 export async function GET(request: Request) {
   const session = await getSession(request);
@@ -390,7 +478,8 @@ export async function GET(request: Request) {
   }
   // ... handle authenticated request
 }
-__PRESERVE_25__
+```
+```
 
 ---
 
@@ -400,24 +489,52 @@ __PRESERVE_25__
 
 For teams, organize rules in layers:
 
-__PRESERVE_26__
+```
+.factory/rules/
+├── _base/                    # Foundation rules (everyone follows)
+│   ├── typescript.md
+│   └── security.md
+├── frontend/                 # Frontend-specific
+│   ├── react.md
+│   └── styling.md
+├── backend/                  # Backend-specific
+│   ├── api.md
+│   └── database.md
+└── testing/                  # Testing standards
+    ├── unit.md
+    └── integration.md
+```
 
 Reference in AGENTS.md:
 
-__PRESERVE_27__
+```markdown
+## Rules
+- Base rules: `.factory/rules/_base/` - Apply to all code
+- Frontend rules: `.factory/rules/frontend/` - React components
+- Backend rules: `.factory/rules/backend/` - API and services
+- Testing rules: `.factory/rules/testing/` - All tests
+```
 
 ### Rule Ownership
 
 Add ownership to track who maintains each rule set:
 
-__PRESERVE_28__
+```markdown
+# TypeScript Rules
+
+**Owner**: Platform Team
+**Last Updated**: 2024-02-15
+**Review Cycle**: Quarterly
+
+[rules content...]
+```
 
 ---
 
 ## Current Limitation: No Glob Pattern Support
 
 <Warning>
-Currently, Droid doesn't support conditional rule application based on file patterns (e.g., "apply these rules only to __PRESERVE_46__ files"). This is on the roadmap.
+Currently, Droid doesn't support conditional rule application based on file patterns (e.g., "apply these rules only to `*.tsx` files"). This is on the roadmap.
 </Warning>
 
 **回避策：**

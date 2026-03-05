@@ -22,9 +22,17 @@ SessionStartフック:
 
 <CodeGroup>
 
-__PRESERVE_0__
+```bash macOS/Linux
+# jq for JSON processing
+brew install jq  # macOS
+sudo apt-get install jq  # Ubuntu/Debian
+```
 
-__PRESERVE_1__
+```bash Git/GitHub CLI
+# For loading Git context
+git --version
+gh --version  # Optional: GitHub CLI
+```
 
 </CodeGroup>
 
@@ -601,27 +609,55 @@ exit 0
 <Steps>
   <Step title="Keep context concise">
     Only load essential information:
-    __PRESERVE_18__
+    ```bash
+    # Show summary, not full content
+    echo "Found $(wc -l < README.md) lines in README"
+    # Instead of: cat README.md
+    ```
   </Step>
   
   <Step title="Cache expensive operations">
     Avoid repeated expensive checks:
-    __PRESERVE_19__
+    ```bash
+    CACHE_FILE="/tmp/droid-context-$(date +%Y%m%d)"
+    if [ -f "$CACHE_FILE" ]; then
+      cat "$CACHE_FILE"
+      exit 0
+    fi
+    
+    # Generate context...
+    echo "$context" | tee "$CACHE_FILE"
+    ```
   </Step>
   
   <Step title="Use DROID_ENV_FILE for environment">
     Persist environment variables correctly:
-    __PRESERVE_20__
+    ```bash
+    if [ -n "$DROID_ENV_FILE" ]; then
+      echo 'export NODE_ENV=development' >> "$DROID_ENV_FILE"
+      echo 'export API_URL=http://localhost:3000' >> "$DROID_ENV_FILE"
+    fi
+    ```
   </Step>
   
   <Step title="Handle missing tools gracefully">
     Check before using external commands:
-    __PRESERVE_21__
+    ```bash
+    if command -v gh &> /dev/null; then
+      gh issue list
+    else
+      echo "GitHub CLI not installed (skip with: brew install gh)"
+    fi
+    ```
   </Step>
   
   <Step title="Provide actionable suggestions">
     Tell users what to do next:
-    __PRESERVE_22__
+    ```bash
+    echo "⚠️ Dependencies out of date"
+    echo "Action: Run 'npm install' to update"
+    echo "Or: Let me handle this - just ask 'install dependencies'"
+    ```
   </Step>
 </Steps>
 

@@ -5,7 +5,7 @@ rss: true
 ---
 
 <Update label="March 5" rss={{ title: "CLI Updates", description: "VSCode Kitty protocol support and authentication fixes" }}>
-  __PRESERVE_0__
+  `v0.68.1`
 
   ## New features
 
@@ -18,7 +18,7 @@ rss: true
 </Update>
 
 <Update label="March 4" rss={{ title: "CLI Updates", description: "Subagent inactivity timer, token rate limits settings, and streaming stability fixes" }}>
-  __PRESERVE_1__
+  `v0.68.0`
 
   ## New features
 
@@ -43,14 +43,14 @@ rss: true
 </Update>
 
 <Update label="March 3" rss={{ title: "CLI Updates", description: "CLI banners, /stats command, skills search, and configurable image compression" }}>
-  __PRESERVE_2__
+  `v0.67.0`
 
   ## New features
 
   * **CLI banners** - Display customizable banners in the CLI for quick access to important information
-  * **__PRESERVE_3__ command** - The __PRESERVE_4__ command has been renamed to __PRESERVE_5__ with date range filtering support
+  * **`/stats` command** - The `/wrapped` command has been renamed to `/stats` with date range filtering support
   * **Skills search bar** - Added search bar to the skills menu for quickly finding skills
-  * **Configurable image compression** - New __PRESERVE_6__ parameter in the Read tool for controlling image compression quality
+  * **Configurable image compression** - New `image_quality` parameter in the Read tool for controlling image compression quality
   * **Electron app automation** - The agent-browser skill now supports automating Electron desktop applications
 
   ## Improvements
@@ -72,11 +72,11 @@ rss: true
 </Update>
 
 <Update label="March 2" rss={{ title: "CLI Updates", description: "/copy command, marketplace management, and mission worker improvements" }}>
-  __PRESERVE_7__
+  `v0.66.0`
 
   ## New features
 
-  * **__PRESERVE_8__ slash command** - Copy content to your clipboard directly from the CLI
+  * **`/copy` slash command** - Copy content to your clipboard directly from the CLI
   * **Marketplace management** - New UI for managing marketplace plugins under the Plugins section in enterprise controls (app)
   * **App version display** - Desktop app now shows the current version number (app)
   * **Grouped exec sessions** - Droid exec sessions are now grouped under a dedicated tab for cleaner organization (app)
@@ -90,7 +90,7 @@ rss: true
   * **Subagent model and permissions** - Fixed subagent model inheritance and permissions level
   * **BYOK compaction errors** - Upstream error details are now surfaced in BYOK compaction failures
   * **Cross-provider messages** - Fixed message conversion for OpenAI Responses API across providers
-  * **Spec model display** - Corrected spec model display in __PRESERVE_9__ selector and prevented global fallback on clear
+  * **Spec model display** - Corrected spec model display in `/model` selector and prevented global fallback on clear
   * **Session archiving** - Fixed session archive confirmation flow in the app
   * **Chat scrolling** - Fixed scroll-to-last-message behavior in session chat (app)
   * **User limits modal** - Fixed scroll bug in the Individual User Limits modal (app)
@@ -99,11 +99,11 @@ rss: true
 </Update>
 
 <Update label="February 27" rss={{ title: "CLI Updates", description: "Diagnostics command, GitHub comments in diff viewer, and mission mode fixes" }}>
-  __PRESERVE_10__
+  `v0.65.0`
 
   ## New features
 
-  * **/diagnostics command** - New __PRESERVE_11__ command with overlay menu and footer status for troubleshooting CLI issues
+  * **/diagnostics command** - New `/diagnostics` command with overlay menu and footer status for troubleshooting CLI issues
   * **Unstaged changes in diff viewer** - View and manage unstaged changes directly in the diff viewer panel (app)
   * **GitHub comments in diff viewer** - View GitHub PR comments alongside code changes in the diff viewer (app)
   * **Session deep linking** - Share and navigate directly to specific sessions via deep links (app)
@@ -119,7 +119,7 @@ rss: true
 </Update>
 
 <Update label="February 26" rss={{ title: "CLI Updates", description: "Session archiving, inline rename, custom model reasoning effort, and mission mode improvements" }}>
-  __PRESERVE_12__
+  `v0.64.0`
 
   ## New features
 
@@ -128,7 +128,7 @@ rss: true
   * **Custom model reasoning effort** - Added reasoning effort support for custom models
   * **Concurrent mission warnings** - Warns on mission entry and confirms concurrent mission runs
   * **Dry-run validation** - New dry-run validation approach during mission planning
-  * **/model scope clarity** - Clarified __PRESERVE_13__ command scope and added set-as-default action
+  * **/model scope clarity** - Clarified `/model` command scope and added set-as-default action
 
   ## Bug fixes
 
@@ -142,12 +142,12 @@ rss: true
 </Update>
 
 <Update label="February 25" rss={{ title: "CLI Updates", description: "Model selector redesign, session default settings, and Droid Shield improvements" }}>
-  __PRESERVE_14__
+  `v0.63.0`
 
   ## New features
 
   * **Top 5 model selector** - Model selector now shows top 5 models with a "show more" option for cleaner UI
-  * **Session default settings** - All session default settings (model, autonomy, reasoning) now exposed in __PRESERVE_15__ menu
+  * **Session default settings** - All session default settings (model, autonomy, reasoning) now exposed in `/settings` menu
 
 
   ## Bug fixes
@@ -161,13 +161,13 @@ rss: true
 </Update>
 
 <Update label="February 24" rss={{ title: "CLI Updates", description: "Bedrock/Vertex support, session-scoped settings, readiness-fix command, and token rate limits" }}>
-  __PRESERVE_16__
+  `v0.62.0`
 
   ## New features
 
   * **Bedrock/Vertex support** - Added Bedrock and Vertex support for Claude Sonnet 4.6 and Opus 4.6
   * **Session-scoped settings** - Model, autonomy, and reasoning settings are now session-scoped instead of global
-  * **__PRESERVE_17__ command** - New slash command to automatically fix issues found in readiness reports
+  * **`/readiness-fix` command** - New slash command to automatically fix issues found in readiness reports
   * **Token rate limits UI** - Added UI handling for token rate limit notifications
   * **README requirement for missions** - Missions now require README updates before completion
 
@@ -180,7 +180,7 @@ rss: true
 </Update>
 
 <Update label="February 23" rss={{ title: "CLI Updates", description: "Vertex/Bedrock Opus support, mission control polish, and interactive command prevention" }}>
-  __PRESERVE_18__
+  `v0.61.0`
 
   ## New features
 
@@ -192,13 +192,13 @@ rss: true
 
   * **Mission control polish** - Visual improvements to mission control UI
   * **Interactive command prevention** - Prevent interactive command execution that could block the agent
-  * **Mission latency** - Reduced __PRESERVE_19__ latency and improved daemon error UX
+  * **Mission latency** - Reduced `/enter-mission` latency and improved daemon error UX
   * **Spec/autonomy decoupling** - Decoupled spec and autonomy settings and permission outcomes
 
 </Update>
 
 <Update label="February 20" rss={{ title: "CLI Updates", description: "Faster search, mission model selector, and mission validation overhaul" }}>
-  __PRESERVE_20__
+  `v0.60.0`
 
   ## New features
 
@@ -222,11 +222,11 @@ rss: true
 </Update>
 
 <Update label="February 19" rss={{ title: "CLI Updates", description: "Local settings override, environment variable references in custom models, and mission UX improvements" }}>
-  __PRESERVE_21__
+  `v0.58.0`
 
   ## New features
 
-  * **Local settings override** - New __PRESERVE_22__ for local project/folder-level settings overrides
+  * **Local settings override** - New `settings.local.json` for local project/folder-level settings overrides
   * **Environment variable references** - Custom model API keys now support environment variable references
   * **Gemini 3.1 Pro model** - Added Gemini 3.1 Pro model support
   * **Mission planning pausing** - Allow pausing during planning phases with in-context resume in mission control view
@@ -235,7 +235,7 @@ rss: true
 
   * **Anthropic provider reset** - Fixed stale Anthropic provider state on model switch
   * **MCP toggle effects** - MCP toggle changes now apply immediately without restart
-  * **Browser MCP isolation** - Stopped auto-adding __PRESERVE_23__ flag for browser MCP servers
+  * **Browser MCP isolation** - Stopped auto-adding `--isolated` flag for browser MCP servers
   * **Windows PowerShell** - Fixed PowerShell execution issues on Windows
   * **GLM 4.7 routing** - Fixed GLM 4.7 model routing issues
   * **Ctrl+G spam prevention** - Blocked Ctrl+G while the agent is streaming to prevent notification spam
@@ -243,7 +243,7 @@ rss: true
 </Update>
 
 <Update label="February 17" rss={{ title: "CLI Updates", description: "Claude Sonnet 4.6 model support" }}>
-  __PRESERVE_24__
+  `v0.57.16`
 
   ## New features
 
@@ -252,7 +252,7 @@ rss: true
 </Update>
 
 <Update label="February 16" rss={{ title: "CLI Updates", description: "Opus 4.6 Fast Mode pricing update" }}>
-  __PRESERVE_25__
+  `v0.57.15`
 
   ## Improvements
 
@@ -261,11 +261,11 @@ rss: true
 </Update>
 
 <Update label="February 13" rss={{ title: "CLI Updates", description: "Session tags, word-level diffs, new models, and built-in skills" }}>
-  __PRESERVE_26__
+  `v0.57.14`
 
   ## New features
 
-  * **Session tags** - Categorize sessions with custom tags using the new __PRESERVE_27__ CLI flag for better organization
+  * **Session tags** - Categorize sessions with custom tags using the new `--tag` CLI flag for better organization
   * **Word-level diff highlighting** - GitHub diff mode now highlights only changed words within lines instead of entire lines
   * **GPT-5.3-Codex model** - Added GPT-5.3-Codex model with multi-turn phase support
   * **GLM-5 model** - Added GLM-5 model via Fireworks
@@ -277,7 +277,7 @@ rss: true
   ## Bug fixes
 
   * **Stdin character corruption** - Replaced text input component to eliminate character corruption and broken special keys
-  * **NODE_ENV injection** - Stopped injecting __PRESERVE_28__ into shell environment, fixing __PRESERVE_29__ devDependencies issues
+  * **NODE_ENV injection** - Stopped injecting `NODE_ENV=production` into shell environment, fixing `npm` devDependencies issues
   * **MCP SDK alignment** - Updated to MCP SDK 1.26 with proper schema validation
   * **File watcher limits** - More granular file watching to avoid "too many open file descriptors" errors
   * **Desktop connection race** - Fixed daemon connection race condition in desktop app with polling retry logic (app)
@@ -287,7 +287,7 @@ rss: true
 </Update>
 
 <Update label="February 11" rss={{ title: "CLI Updates", description: "Spec approval with comment and input stability" }}>
-  __PRESERVE_30__
+  `v0.57.12`
 
   ## New features
 
@@ -306,7 +306,7 @@ rss: true
 </Update>
 
 <Update label="February 10" rss={{ title: "CLI Updates", description: "Subagent fixes and model switching improvements" }}>
-  __PRESERVE_31__
+  `v0.57.11`
 
   ## Bug fixes
 
@@ -317,21 +317,21 @@ rss: true
 </Update>
 
 <Update label="February 9" rss={{ title: "CLI Updates", description: "Skills UX overhaul, terminal tab titles, desktop notifications, and mobile experience" }}>
-  __PRESERVE_32__
+  `v0.57.10`
 
   ## New features
 
-  * **__PRESERVE_33__ UX overhaul** - Tabbed layout with pagination and a dedicated detail view for browsing and importing skills
+  * **`/skills` UX overhaul** - Tabbed layout with pagination and a dedicated detail view for browsing and importing skills
   * **Terminal tab titles** - Terminal tab now displays the session name so you can identify Droid sessions across multiple tabs
-  * **__PRESERVE_34__ command** - New command to manually update the CLI, plus ability to disable autoupdate via __PRESERVE_35__
-  * **Session end hooks** - Hooks now fire when running __PRESERVE_36__ or __PRESERVE_37__, enabling custom cleanup workflows
+  * **`droid update` command** - New command to manually update the CLI, plus ability to disable autoupdate via `/settings`
+  * **Session end hooks** - Hooks now fire when running `/clear` or `/new`, enabling custom cleanup workflows
   * **Desktop notifications** - Native macOS and Windows notifications when sessions complete, with configurable preferences (app)
   * **Desktop native view redesign** - Refreshed sidebar layout with smooth animations, new terminal editor icons, and keyboard shortcut formatting (app)
   * **Mobile experience** - Overhauled mobile and responsive layout with touch-friendly settings and onboarding flows (app)
 
   ## Bug fixes
 
-  * **__PRESERVE_38__ command memory** - Optimized log loading with streaming I/O to prevent out-of-memory on large log files
+  * **`/bug` command memory** - Optimized log loading with streaming I/O to prevent out-of-memory on large log files
   * **Session persistence** - Thinking and reasoning fields now preserved correctly when saving sessions
   * **MCP settings UI** - Filled toggle style, clickable tool rows, and capitalized server names (app)
   * **Git timeout** - Increased git timeout to 60 seconds to prevent failures on slow connections or large repos
@@ -339,7 +339,7 @@ rss: true
 </Update>
 
 <Update label="February 7" rss={{ title: "CLI Updates", description: "Opus 4.6 Fast Mode and pricing update" }}>
-  __PRESERVE_39__
+  `v0.57.9`
 
   ## Improvements
 
@@ -349,12 +349,12 @@ rss: true
 </Update>
 
 <Update label="February 6" rss={{ title: "CLI Updates", description: "Opus 4.6 Fast, /fork command, session archiving, and org-managed settings" }}>
-  __PRESERVE_40__
+  `v0.57.7`
 
   ## New features
 
   * **Claude Opus 4.6 Fast** - Added Opus 4.6 Fast as a new model option in the model selector
-  * **__PRESERVE_41__ command** - Duplicate your current session with all messages preserved into a new session
+  * **`/fork` command** - Duplicate your current session with all messages preserved into a new session
   * **Org-managed settings** - Local settings that are set by your organization are now locked from editing
   * **Session archiving** - Archive sessions from the web app to keep your sidebar clean (app)
 
@@ -367,16 +367,16 @@ rss: true
 </Update>
 
 <Update label="February 5" rss={{ title: "CLI Updates", description: "Opus 4.6, semantic diffs, npm package, plugin hooks, and startup optimizations" }}>
-  __PRESERVE_42__
+  `v0.57.5`
 
   ## New features
 
   * **Claude Opus 4.6** - Added Claude Opus 4.6 model support
   * **Semantic structured diffs** - Code change diffs now use semantic structure-aware rendering for better readability
   * **Plugin hooks** - Added support for plugin hooks with Claude hooks format compatibility
-  * **npm package** - CLI is now installable via npm: __PRESERVE_43__
+  * **npm package** - CLI is now installable via npm: `npm install -g droid`
   * **User-invocable skills as slash commands** - Custom skills marked as user-invocable are now registered as slash commands
-  * **__PRESERVE_44__ and __PRESERVE_45__ env vars** - New environment variables for log file output and keyring control
+  * **`FACTORY_LOG_FILE` and `FACTORY_DISABLE_KEYRING` env vars** - New environment variables for log file output and keyring control
   * **Enterprise Controls** - New settings page for managing agent behavior, command policy, model access, and security (app)
   * **Skills UI** - Skills button and modal added to the chat input for easy skill access (app)
   * **Ask User tool** - Ask User tool now available in the web and desktop apps (app)
@@ -388,18 +388,18 @@ rss: true
   ## Bug fixes
 
   * **Unicode crash** - Fixed CLI crash when sessions contain certain unicode characters
-  * **Marketplace auto-update** - Auto-update now only runs in interactive mode, not during __PRESERVE_46__
+  * **Marketplace auto-update** - Auto-update now only runs in interactive mode, not during `droid exec`
 
 </Update>
 
 <Update label="February 3" rss={{ title: "CLI Updates", description: "Task tool streaming, image pasting, and skills improvements" }}>
-  __PRESERVE_47__
+  `v0.57.3`
 
   ## New features
 
   * **Task tool live streaming** - Real-time subagent tool progress display and Execute tool output streaming in web and desktop apps (app)
   * **Image pasting** - Paste images directly into the chat composer (app)
-  * **__PRESERVE_48__ skills folders** - Skills can now be loaded from __PRESERVE_49__ folders in your project for custom skill support
+  * **`.agent` skills folders** - Skills can now be loaded from `.agent` folders in your project for custom skill support
 
   ## Improvements
 
@@ -412,7 +412,7 @@ rss: true
 </Update>
 
 <Update label="January 30" rss={{ title: "CLI Updates", description: "Full text search, MiniMax M2.1, and AskUser improvements" }}>
-  __PRESERVE_50__
+  `v0.57.2`
 
   ## New features
 
@@ -426,7 +426,7 @@ rss: true
 </Update>
 
 <Update label="January 29" rss={{ title: "CLI Updates", description: "Plugin hooks and ASCII mermaid diagrams" }}>
-  __PRESERVE_51__
+  `v0.57.0`
 
   ## New features
 
@@ -435,7 +435,7 @@ rss: true
 </Update>
 
 <Update label="January 28" rss={{ title: "CLI Updates", description: "MCP tool management and Read tool fixes" }}>
-  __PRESERVE_52__
+  `v0.56.1`
 
   ## Improvements
 
@@ -449,7 +449,7 @@ rss: true
 </Update>
 
 <Update label="January 27" rss={{ title: "CLI Updates", description: "ACP daemon mode, lazy session loading, and model updates" }}>
-  __PRESERVE_53__
+  `v0.56.0`
 
   ## New features
 
@@ -464,7 +464,7 @@ rss: true
   ## Bug fixes
 
   * **MCP tool schema isolation** - Broken tool schemas in one MCP server no longer affect other MCP servers
-  * **Symlinked skill directories** - Fixed discovery of symlinked skill directories in __PRESERVE_54__
+  * **Symlinked skill directories** - Fixed discovery of symlinked skill directories in `.factory/skills`
   * **Windows spec mode UI** - Fixed spec mode UI and autonomy mode text rendering on Windows
   * **AskUser parallel tool calling** - Fixed parallel tool calling with AskUser tool
   * **Skills menu rendering** - Fixed skills menu to always render correctly
@@ -476,12 +476,12 @@ rss: true
 </Update>
 
 <Update label="January 23" rss={{ title: "CLI Updates", description: "Marketplace auto-updates and background processes flag" }}>
-  __PRESERVE_55__
+  `v0.55.2`
 
   ## New features
 
   * **Marketplace auto-updates** - New management UI with auto-update setting and silent auto-installation of missing marketplaces on startup
-  * **__PRESERVE_56__ flag** - Added flag support for interactive and resumed sessions
+  * **`--allow-background-processes` flag** - Added flag support for interactive and resumed sessions
 
   ## Bug fixes
 
@@ -490,55 +490,55 @@ rss: true
 </Update>
 
 <Update label="January 22" rss={{ title: "CLI Updates", description: "OTEL tracing, bug reporting improvements, and review command fixes" }}>
-  __PRESERVE_57__
+  `v0.55.1`
 
   ## New features
 
   * **OpenTelemetry tracing** - Implemented OTEL tracing for the CLI to improve observability and debugging
-  * **Mandatory bug report titles** - Added title requirement for __PRESERVE_58__ reporting to ensure clearer issue tracking
+  * **Mandatory bug report titles** - Added title requirement for `/bug` reporting to ensure clearer issue tracking
 
   ## Bug fixes
 
-  * **__PRESERVE_59__ default branch** - Fixed the __PRESERVE_60__ command to correctly identify and use the repository's default branch
+  * **`/review` default branch** - Fixed the `/review` command to correctly identify and use the repository's default branch
   * **Authentication** - Fixed several issues around authentication persistence and stability
 
 </Update>
 
 <Update label="January 21" rss={{ title: "CLI Updates", description: "Autonomy mode reskin and agent-browser integration" }}>
-  __PRESERVE_61__
+  `v0.55.0`
 
   ## New features
 
   * **Autonomy mode reskin** - Refreshed UI for autonomy mode indicators and transitions for better clarity
-  * **Agent-browser integration** - CLI now uses the __PRESERVE_62__ CLI for browser automations, providing more reliable and token-efficient interactions
+  * **Agent-browser integration** - CLI now uses the `agent-browser` CLI for browser automations, providing more reliable and token-efficient interactions
 
 </Update>
 
 <Update label="January 20" rss={{ title: "CLI Updates", description: "Readiness report improvements and AskUser fixes" }}>
-  __PRESERVE_63__
+  `v0.54.0`
 
   ## New features
 
-  * **OTEL metrics for hooks and slash commands** - Customer metrics for __PRESERVE_64__ and __PRESERVE_65__
-  * **Optional __PRESERVE_66__ model switching** - Users can now continue with their current model while seeing a recommendation, instead of being forced to switch
+  * **OTEL metrics for hooks and slash commands** - Customer metrics for `droid.hook.invocations` and `droid.slash_command.invocations`
+  * **Optional `/readiness-report` model switching** - Users can now continue with their current model while seeing a recommendation, instead of being forced to switch
 
   ## Improvements
 
-  * **Autonomy indicator format** - Updated format to show __PRESERVE_67__ when spec mode is active; __PRESERVE_68__ shortened to __PRESERVE_69__
+  * **Autonomy indicator format** - Updated format to show `Spec | Auto (X)` when spec mode is active; `Medium` shortened to `Med`
 
   ## Bug fixes
 
-  * **AskUser tool improvements** - Questionnaire parsing now supports bullets/__PRESERVE_70__ numbering, ignores headers/code fences, normalizes multi-word topics. AskUser can now run alongside TodoWrite with other tools deferred properly. Fixed TUI input handling via __PRESERVE_71__ subscription
+  * **AskUser tool improvements** - Questionnaire parsing now supports bullets/`1)` numbering, ignores headers/code fences, normalizes multi-word topics. AskUser can now run alongside TodoWrite with other tools deferred properly. Fixed TUI input handling via `KeypressProvider` subscription
   * **Windows UI** - Improved autonomy/spec mode status text rendering on Windows terminals
 
 </Update>
 
 <Update label="January 16" rss={{ title: "CLI Updates", description: "Readiness report in exec mode and settings stability" }}>
-  __PRESERVE_72__
+  `v0.53.0`
 
   ## New features
 
-  * **__PRESERVE_73__ in exec mode** - Support for __PRESERVE_74__ slash command in droid exec mode with optional custom instructions
+  * **`/readiness-report` in exec mode** - Support for `/readiness-report` slash command in droid exec mode with optional custom instructions
 
   ## Bug fixes
 
@@ -549,11 +549,11 @@ rss: true
 </Update>
 
 <Update label="January 15" rss={{ title: "CLI Updates", description: "Session sharing, ctrl+z suspend, and bug fixes" }}>
-  __PRESERVE_75__
+  `v0.52.0`
 
   ## New features
 
-  * **__PRESERVE_76__ command** - Share your current session with organization members, copies share URL to clipboard
+  * **`/share` command** - Share your current session with organization members, copies share URL to clipboard
 
   ## Improvements
 
@@ -570,7 +570,7 @@ rss: true
 </Update>
 
 <Update label="January 14" rss={{ title: "CLI Updates", description: "CLI Axiom skill, custom model fixes, and bug fixes" }}>
-  __PRESERVE_77__
+  `v0.49.0`
 
   ## New features
 
@@ -592,7 +592,7 @@ rss: true
 </Update>
 
 <Update label="January 13" rss={{ title: "CLI Updates", description: "ACP streaming, Windows autoupdate, and bug fixes" }}>
-  __PRESERVE_78__
+  `v0.48.0`
 
   ## Improvements
 
@@ -608,7 +608,7 @@ rss: true
 </Update>
 
 <Update label="January 12" rss={{ title: "CLI Updates", description: "Bug fixes" }}>
-  __PRESERVE_79__
+  `v0.47.0`
 
   ## Bug fixes
 
@@ -619,13 +619,13 @@ rss: true
 </Update>
 
 <Update label="January 9" rss={{ title: "CLI Updates", description: "Session rename, cloud sync, and bug fixes" }}>
-  __PRESERVE_80__
+  `v0.46.0`
 
   ## New features
 
-  * **__PRESERVE_81__ command** - Create custom skills directly from the CLI with guided flow
-  * **Skills in exec mode** - Skill tool now enabled when running __PRESERVE_82__
-  * **__PRESERVE_83__ command** - Rename sessions with a new slash command, plus auto-generated session names based on conversation content
+  * **`/create-skill` command** - Create custom skills directly from the CLI with guided flow
+  * **Skills in exec mode** - Skill tool now enabled when running `droid exec`
+  * **`/rename` command** - Rename sessions with a new slash command, plus auto-generated session names based on conversation content
 
   ## Improvements
 
@@ -642,7 +642,7 @@ rss: true
 </Update>
 
 <Update label="January 8" rss={{ title: "CLI Updates", description: "Bug fixes and improvements" }}>
-  __PRESERVE_84__
+  `v0.45.0`
 
   ## Bug fixes
 
@@ -654,11 +654,11 @@ rss: true
 </Update>
 
 <Update label="January 7" rss={{ title: "CLI Updates", description: "Custom status line, bulk MCP tool management, and UX improvements" }}>
-  __PRESERVE_85__
+  `v0.44.0`
 
   ## New features
 
-  * **__PRESERVE_86__ command** - Configure custom status line, can import PS1 from shell config
+  * **`/statusline` command** - Configure custom status line, can import PS1 from shell config
   * **Bulk MCP tool management** - Manage multiple MCP tools at once via ToolsOverviewView
   * **Auto-include Skill tool** - Custom droids (subagents) now automatically include the Skill tool
 
@@ -675,19 +675,19 @@ rss: true
 </Update>
 
 <Update label="January 6" rss={{ title: "CLI Updates", description: "Terminal and chat UI fixes, improved spec mode" }}>
-  __PRESERVE_87__
+  `v0.43.0`
 
   ## Bug fixes
 
   * **Terminal panel display** - Fixed terminal being cut off when plan panel is shown
   * **Chat input width** - Chat input now extends to full terminal width
-  * **Spec mode transitions** - __PRESERVE_88__ correctly exits spec mode after __PRESERVE_89__
+  * **Spec mode transitions** - `droid exec --use-spec` correctly exits spec mode after `ExitSpecMode`
   * **Default session settings** - Session defaults properly loaded from settings.json on each new session
 
 </Update>
 
 <Update label="January 5" rss={{ title: "CLI Updates", description: "GLM 4.7 support, Gemini improvements, and bug fixes" }}>
-  __PRESERVE_90__
+  `v0.42.2`
 
   ## Improvements
 
@@ -709,11 +709,11 @@ rss: true
 </Update>
 
 <Update label="December 30" rss={{ title: "CLI Updates", description: "Year-in-review /wrapped command, PDF uploads, and faster model switching" }}>
-  __PRESERVE_91__
+  `v0.41.0`
 
   ## New features
 
-  * **__PRESERVE_92__ command** - Year-in-review stats showing your Droid usage, badges earned, model preferences, and session metrics (cli)
+  * **`/wrapped` command** - Year-in-review stats showing your Droid usage, badges earned, model preferences, and session metrics (cli)
   * **Fast model switching** - Faster provider/model switches without LLM compaction (cli)
   * **Batched tool permissions** - Parallel tool calls now show single permission prompt (cli)
   * **Custom BYOK models** - Custom models now appear in model selector (cli)
@@ -737,7 +737,7 @@ rss: true
 </Update>
 
 <Update label="December 23" rss={{ title: "CLI Updates", description: "Custom models, parallel tool confirmations, and settings file watching" }}>
-  __PRESERVE_93__
+  `v0.40.0`
 
   ## New features
 
@@ -757,7 +757,7 @@ rss: true
 </Update>
 
 <Update label="December 19" rss={{ title: "CLI Updates", description: "Context utilization setting and Custom Droids enabled by default" }}>
-  __PRESERVE_94__
+  `v0.39.0`
 
   ## New features
 
@@ -774,17 +774,17 @@ rss: true
 </Update>
 
 <Update label="December 18" rss={{ title: "CLI Updates", description: "GPT-5.2 improvements and .env loading fix" }}>
-  __PRESERVE_95__
+  `v0.38.0`
 
   ## Bug fixes
 
   * **GPT-5.2 improvements** - Fixed request parameters and reasoning effort options for better model performance
-  * **Prevent .env auto-loading** - CLI no longer automatically loads __PRESERVE_96__ files from the working directory in standalone builds, making behavior more predictable
+  * **Prevent .env auto-loading** - CLI no longer automatically loads `.env` files from the working directory in standalone builds, making behavior more predictable
 
 </Update>
 
 <Update label="December 17" rss={{ title: "CLI Updates", description: "Todo tool improvements, Chrome DevTools MCP, and model cleanup" }}>
-  __PRESERVE_97__
+  `v0.37.0`
 
   ## Improvements
 
@@ -799,7 +799,7 @@ rss: true
 </Update>
 
 <Update label="December 17" rss={{ title: "CLI Updates", description: "Gemini 3 Flash, terminal links, and terminal reliability fixes" }}>
-  __PRESERVE_98__
+  `v0.36.6`
 
   ## New features
 
@@ -811,14 +811,14 @@ rss: true
 
   ## Bug fixes
 
-  * Fixed overly strict filtering by allowing common read-only __PRESERVE_99__ commands
+  * Fixed overly strict filtering by allowing common read-only `git` commands
   * Fixed copy/paste issues on WSL
-  * Fixed repository deduplication in __PRESERVE_100__ reports
+  * Fixed repository deduplication in `/readiness` reports
 
 </Update>
 
 <Update label="December 13" rss={{ title: "CLI Updates", description: "GPT-5.2 model and MCP tool management" }}>
-  __PRESERVE_101__
+  `v0.36.2`
 
   ## New features
 
@@ -828,7 +828,7 @@ rss: true
 </Update>
 
 <Update label="December 10" rss={{ title: "CLI Updates", description: "MCP tools in droid creation and droid management fixes" }}>
-  __PRESERVE_102__
+  `v0.36.0`
 
   ## New features
 
@@ -843,7 +843,7 @@ rss: true
 </Update>
 
 <Update label="December 8" rss={{ title: "CLI Updates", description: "Autonomy mode fixes and file handling improvements" }}>
-  __PRESERVE_103__
+  `v0.33.0`
 
   ## Bug fixes
 
@@ -855,28 +855,28 @@ rss: true
 </Update>
 
 <Update label="December 5" rss={{ title: "CLI Updates", description: "Readiness report command, ESC key improvements, and input fixes" }}>
-  __PRESERVE_104__
+  `v0.32.0`
 
   ## Bug fixes
 
   * Press ESC to close the expanded tool result view
   * Improved input box cursor up/down movement with wrapped lines
   * Fixed Windows pasting issues
-  * Fixed __PRESERVE_105__ conflict with legacy Windows format command in denylist
+  * Fixed `npm run format` conflict with legacy Windows format command in denylist
   * Fixed auth issues with Microsoft MCP servers
-  * __PRESERVE_106__ command is now enabled by default
+  * `/readiness` command is now enabled by default
 
 </Update>
 
 <Update label="December 4" rss={{ title: "CLI Updates", description: "GPT-5.1-Codex-Max model, image compression, IDE auto-connect, and input fixes" }}>
-  __PRESERVE_107__
+  `v0.31.0`
 
   ## New features
 
   * **GPT-5.1-Codex-Max model** - Added support for GPT-5.1-Codex-Max model
   * **Image compression** - Images are now compressed before upload to reduce bandwidth
   * **IDE auto-connect setting** - Added setting to automatically connect to IDE from external terminals
-  * **Disable hooks flag** - Added __PRESERVE_108__ flag to disable hooks execution
+  * **Disable hooks flag** - Added `--no-hooks` flag to disable hooks execution
 
   ## Bug fixes
 
@@ -892,7 +892,7 @@ rss: true
 </Update>
 
 <Update label="December 3" rss={{ title: "CLI Updates", description: "Hidden file search, session search, image indicators, and ESC key fixes" }}>
-  __PRESERVE_109__
+  `v0.30.0`
 
   ## New features
 
@@ -903,13 +903,13 @@ rss: true
   ## Bug fixes
 
   * Fixed EPERM permission errors on certain file operations - Windows file rename retry logic
-  * Fixed ESC key navigation in __PRESERVE_110__ and __PRESERVE_111__ commands for Ghostty terminal 
+  * Fixed ESC key navigation in `/review` and `/bg-process` commands for Ghostty terminal 
   * MCP registry updates
 
 </Update>
 
 <Update label="December 2" rss={{ title: "CLI Updates", description: "Certificate caching, image upload limits, and settings rendering fixes" }}>
-  __PRESERVE_112__
+  `v0.28.1`
 
   ## Improvements
 
@@ -925,7 +925,7 @@ rss: true
 </Update>
 
 <Update label="December 1" rss={{ title: "CLI Updates", description: "Session management, slash command navigation, thinking improvements, and Figma MCP support" }}>
-  __PRESERVE_113__
+  `v0.28.0`
 
   ## New features
 
@@ -939,46 +939,46 @@ rss: true
   * Fixed detection of Cerebras-style context length exceeded errors
   * Fixed duplicate spec modes and double empty line above input
   * Added promo price label for Opus model
-  * Fixed __PRESERVE_114__ command issues
+  * Fixed `/install-github-app` command issues
 
 </Update>
 
 <Update label="November 28" rss={{ title: "CLI Updates", description: "Interleaved thinking support, show thinking setting, and hooks permanently enabled" }}>
-  __PRESERVE_115__
+  `v0.27.4`
 
   ## New features
 
   * **Interleaved thinking support** - Display multiple thinking blocks during streaming, including redacted thinking blocks with safety messages
-  * **Show thinking setting** - Show AI thinking/reasoning on the main view, turn on/off in __PRESERVE_116__
-  * **Hooks always enabled** - The hooks feature is now permanently enabled and available via the __PRESERVE_117__ command
+  * **Show thinking setting** - Show AI thinking/reasoning on the main view, turn on/off in `/settings`
+  * **Hooks always enabled** - The hooks feature is now permanently enabled and available via the `/hooks` command
 
   ## Bug fixes
 
-  * Fixed ESC/Q navigation in __PRESERVE_118__ menus - pressing ESC or Q now properly navigates back to previous menu level instead of closing all menus
+  * Fixed ESC/Q navigation in `/model` menus - pressing ESC or Q now properly navigates back to previous menu level instead of closing all menus
   * Fixed garbage characters appearing in prompt input caused by terminal response bytes leaking into stdin
   * Fixed reasoning effort display in spec mode to correctly reflect the actual reasoning effort being used
   * Fixed OpenAI chat completions streaming for tool calls
   * Improved Gemini's usage of the todo tool with better prompting
   * Fixed model warmup for GLM-4.6
-  * Fixed __PRESERVE_119__ command issues
+  * Fixed `/install-github-app` command issues
 
 </Update>
 
 <Update label="November 25" rss={{ title: "CLI Updates", description: "Project-level MCP configs, IDE command, and custom model improvements" }}>
-  __PRESERVE_120__
+  `v0.27.2`
 
   ## New features
 
-  * **Project-level MCP configs** - Configure MCP servers at the project level using __PRESERVE_121__
-  * **__PRESERVE_122__ command** - New command to manage VS Code, Cursor, and Windsurf IDE integrations. Shows current extension version or prompts to install
+  * **Project-level MCP configs** - Configure MCP servers at the project level using `.factory/mcp.json`
+  * **`/ide` command** - New command to manage VS Code, Cursor, and Windsurf IDE integrations. Shows current extension version or prompts to install
   * **Extra args in custom models** - Pass additional arguments to custom model configurations e.g. service_tier, temperature, top_p, etc
 
   ## Bug fixes
 
   * Fixed task tool infinite wait when running subagents
   * Fixed expanding tilde (~) paths when loading sessions
-  * Improved __PRESERVE_123__ search rankings - exact filename matches now appear at the top with VSCode-style two-column display
-  * Removed automatic creation of __PRESERVE_124__ folders
+  * Improved `@` search rankings - exact filename matches now appear at the top with VSCode-style two-column display
+  * Removed automatic creation of `.factory/skills` folders
   * Show compacting state when triggered 
   * Consolidate markdown rendering (fixes missing character in spec mode)
   * Parallelize loading certificates on Windows
@@ -986,12 +986,12 @@ rss: true
 </Update>
 
 <Update label="November 24" rss={{ title: "CLI Updates", description: "New model support, persistent session settings, and auto-update improvements" }}>
-  __PRESERVE_125__
+  `v0.27.1`
 
   ## New features
 
-  * **Improved rewind functionality** - new __PRESERVE_126__ command, plus speed and UX improvements.
-  * **__PRESERVE_127__ command** - New command to install the Factory GitHub app directly from the CLI.
+  * **Improved rewind functionality** - new `/rewind` command, plus speed and UX improvements.
+  * **`/install-github-app` command** - New command to install the Factory GitHub app directly from the CLI.
   * **Images in MCP tool responses** - MCP tools can now return images that are properly sent to the LLM.
 
   ## Bug fixes
@@ -1009,11 +1009,11 @@ rss: true
 </Update>
 
 <Update label="November 22" rss={{ title: "CLI Updates", description: "Eval tooling upgrades, model catalog refresh, and reliability-focused TUI fixes" }}>
-  __PRESERVE_128__
+  `v0.26.12`
 
   ## New features
 
-  * **__PRESERVE_129__ command** that provides an interactive code review workflow. Review code changes in different ways: comparing against a base branch, reviewing specific commits, examining uncommitted changes, or providing custom review instructions.
+  * **`/review` command** that provides an interactive code review workflow. Review code changes in different ways: comparing against a base branch, reviewing specific commits, examining uncommitted changes, or providing custom review instructions.
 
   ## Bug fixes
   
@@ -1029,7 +1029,7 @@ rss: true
 </Update>
 
 <Update label="November 21" rss={{ title: "CLI Updates", description: "Expanded MCP registry and improved session reliability" }}>
-  __PRESERVE_130__
+  `v0.26.10`
 
   ## New features
 
@@ -1045,12 +1045,12 @@ rss: true
 </Update>
 
 <Update label="November 20" rss={{ title: "CLI Updates", description: "Background processes, MCP search, and TUI stability improvements" }}>
-  __PRESERVE_131__
+  `v0.26.8`
 
   ## New features
 
-  * **Background Processes Support** - Added support for running and managing background processes in the CLI. Includes a new __PRESERVE_132__ command to list, kill, and clean up processes, with persistent process state tracking.
-  * **MCP Registry Search** - Added search functionality to the MCP registry list view (__PRESERVE_133__). Filter available MCP servers by typing directly in the list interface.
+  * **Background Processes Support** - Added support for running and managing background processes in the CLI. Includes a new `bg-process` command to list, kill, and clean up processes, with persistent process state tracking.
+  * **MCP Registry Search** - Added search functionality to the MCP registry list view (`/mcp`). Filter available MCP servers by typing directly in the list interface.
 
   ## Bug fixes
 
@@ -1060,11 +1060,11 @@ rss: true
 </Update>
 
 <Update label="November 19" rss={{ title: "CLI Updates", description: "Directory-specific sessions, MCP image support, and Gemini fixes" }}>
-  __PRESERVE_134__
+  `v0.26.7`
 
   ## New features
 
-  * **Directory-Specific Sessions** - Sessions are now stored per directory and automatically switch to the correct working directory when loaded. The __PRESERVE_135__ command shows only sessions created in your current directory plus favorited sessions
+  * **Directory-Specific Sessions** - Sessions are now stored per directory and automatically switch to the correct working directory when loaded. The `/sessions` command shows only sessions created in your current directory plus favorited sessions
   * **MCP Image Support** - MCP tools can now return images that are sent to the LLM for analysis
   * **Custom Models for Subdroids** - Subdroids can now use custom models instead of inheriting from parent session
 
@@ -1077,12 +1077,12 @@ rss: true
 </Update>
 
 <Update label="November 18" rss={{ title: "CLI Updates", description: "Claude Code hooks migration, improved suggestions, and GLM support" }}>
-  __PRESERVE_136__
+  `v0.26.3`
 
   ## New features
 
   * **Skills Enabled by Default** - Skills command now enabled for all users
-  * **Claude Code Hooks Auto-Migration** - Automatically detects and imports hooks from Claude Code CLI with interactive prompts. Smart translation converts __PRESERVE_137__ to __PRESERVE_138__ and __PRESERVE_139__ to __PRESERVE_140__, preventing duplicates and tracking migration state
+  * **Claude Code Hooks Auto-Migration** - Automatically detects and imports hooks from Claude Code CLI with interactive prompts. Smart translation converts `bash_tool` to `Execute` and `CLAUDE_CWD` to `DROID_CWD`, preventing duplicates and tracking migration state
   * **@ Suggestions Improvements** - Now includes folders in addition to files with better UI and performance
 
   ## Bug fixes
@@ -1094,19 +1094,19 @@ rss: true
 </Update>
 
 <Update label="November 14" rss={{ title: "CLI Updates", description: "Skills system, session favorites, and improved git integration" }}>
-  __PRESERVE_141__
+  `v0.26.0`
 
   ## New features
 
-  * **Skills System** - Claude Code-compatible __PRESERVE_142__ support for modular, prompt-based capabilities. Use the __PRESERVE_143__ command to manage skills and import from __PRESERVE_144__ directories
-  * **Session Favorites** - New __PRESERVE_145__ command to pin/unpin sessions, keeping your active projects at the top of the session list
-  * **Enhanced Bug Reporting** - The __PRESERVE_146__ command now zips session context, uploads it to Factory, and returns a shareable report ID automatically
+  * **Skills System** - Claude Code-compatible `.factory/skills` support for modular, prompt-based capabilities. Use the `/skills` command to manage skills and import from `.claude/skills` directories
+  * **Session Favorites** - New `/favorite` command to pin/unpin sessions, keeping your active projects at the top of the session list
+  * **Enhanced Bug Reporting** - The `/bug` command now zips session context, uploads it to Factory, and returns a shareable report ID automatically
   * **Cleaner Diff Viewer** - Improved UI with horizontal lines instead of borders
 
   ## Bug fixes
 
   * Always prompt to accept or reject generated specs and pass the correct labels to the UI flow
-  * __PRESERVE_147__ now writes files to the expected default path without manual overrides
+  * `droid spec` now writes files to the expected default path without manual overrides
   * Fixed autonomy handling so MCP tools respect the configured confirmation level in every session
   * Better error handling in pre-update logic
   * Added Axiom MCP server to the registry
@@ -1115,7 +1115,7 @@ rss: true
 </Update>
 
 <Update label="November 13" rss={{ title: "CLI Updates", description: "Execute tool streaming, enhanced hooks system, and MCP autonomy controls" }}>
-  __PRESERVE_148__
+  `v0.25.0`
 
   ## New features
 
@@ -1142,7 +1142,7 @@ rss: true
 </Update>
 
 <Update label="November 12" rss={{ title: "CLI Updates", description: "Hooks system, interactive spec editing, and major performance improvements" }}>
-  __PRESERVE_149__
+  `v0.24.0`
 
   ## New features
 
@@ -1164,7 +1164,7 @@ rss: true
 </Update>
 
 <Update label="November 10" rss={{ title: "CLI Updates", description: "Markdown tables, pinned todos, and MCP improvements" }}>
-  __PRESERVE_150__
+  `v0.23.0`
 
   ## New features
 
@@ -1176,13 +1176,13 @@ rss: true
 
   * Fixed thinking block support for chat completion APIs to enable extended reasoning in compatible models
   * Fixed issue with baseline versions reverting back to non-baseline builds on update
-  * Fixed autonomy mode handling in __PRESERVE_151__ command for more reliable execution
+  * Fixed autonomy mode handling in `droid exec` command for more reliable execution
   * Restored Ctrl+T keyboard shortcut functionality on Windows
 
 </Update>
 
 <Update label="November 7-8" rss={{ title: "CLI Updates", description: "Reasoning controls, bash output expansion, and MCP improvements" }}>
-  __PRESERVE_152__
+  `v0.22.14`
 
   ## New features
 
@@ -1202,7 +1202,7 @@ rss: true
 </Update>
 
 <Update label="November 6" rss={{ title: "CLI Updates", description: "Console improvements and enhanced reliability" }}>
-  __PRESERVE_153__
+  `v0.22.12`
 
   ## New features
 
@@ -1218,7 +1218,7 @@ rss: true
 </Update>
 
 <Update label="November 5" rss={{ title: "CLI Updates", description: "Model support, tool permissions, and MCP improvements" }}>
-  __PRESERVE_154__
+  `v0.22.11`
 
   ## New features
 
@@ -1232,7 +1232,7 @@ rss: true
 </Update>
 
 <Update label="November 4" rss={{ title: "CLI Updates", description: "OAuth discovery, interrupt support, and stability improvements" }}>
-  __PRESERVE_155__
+  `v0.22.10`
 
   ## New features
 
@@ -1250,7 +1250,7 @@ rss: true
 </Update>
 
 <Update label="November 1" rss={{ title: "CLI Updates", description: "MCP Registry, tool permissions, session resume, and multiple bug fixes" }}>
-  __PRESERVE_156__
+  `v0.22.9`
 
   ## New features
 
@@ -1259,7 +1259,7 @@ rss: true
     ![MCP Registry interface showing curated MCP servers](/images/mcp-registry-2.gif)
 
   * **Tool Permissions Support** - Implemented request tool permissions flow in stream-jsonrpc mode with support for multiple concurrent tool confirmations
-  * **Session Resume** - Show resume command on exit (Ctrl+C or /quit) with new __PRESERVE_157__ flag to continue sessions
+  * **Session Resume** - Show resume command on exit (Ctrl+C or /quit) with new `-r, --resume` flag to continue sessions
   * **Thinking Traces Display** - Added UI component to show thinking blocks in expanded session view
 
   ## Bug fixes
@@ -1274,7 +1274,7 @@ rss: true
 </Update>
 
 <Update label="October 31" rss={{ title: "CLI Updates", description: "Reasoning field support, Import from Claude, and bug fixes" }}>
-  __PRESERVE_158__
+  `v0.22.7`
 
   ## New features
 
@@ -1292,7 +1292,7 @@ rss: true
 </Update>
 
 <Update label="October 30" rss={{ title: "CLI Updates", description: "MCP Revamp and OpenAI organization field fix" }}>
-  __PRESERVE_159__
+  `v0.22.6`
 
   ## New features
 
@@ -1305,7 +1305,7 @@ rss: true
 </Update>
 
 <Update label="October 29" rss={{ title: "CLI Updates", description: "Default model behavior improvements" }}>
-  __PRESERVE_160__
+  `v0.22.5`
 
   ## Bug fixes
 
@@ -1313,7 +1313,7 @@ rss: true
 </Update>
 
 <Update label="October 28" rss={{ title: "CLI Updates", description: "Report previews and help text fixes" }}>
-  __PRESERVE_161__
+  `v0.22.4`
 
   ## Bug fixes
 
@@ -1322,18 +1322,18 @@ rss: true
 </Update>
 
 <Update label="October 21-25" rss={{ title: "CLI Updates", description: "Detailed transcript view, customizable sounds, terminal setup support, and model upgrades" }}>
-  __PRESERVE_162__
+  `v0.22.3`
 
   ## New features and enhancements
 
   * **Detailed transcript view (Ctrl+O)**: Press Ctrl+O to view comprehensive tool execution details with complete breakdowns for all tool types including Execute, Edit, MultiEdit, Create, and more
   * **Customizable completion sounds**: Configure sound notifications when commands complete, with support for different sounds in focus mode and custom sound file paths
   * **Terminal setup support**: Added automated setup support for Warp, iTerm2, and macOS Terminal with automatic terminal indicators for improved integration
-  * **PowerShell update**: Now uses __PRESERVE_163__ for better PowerShell compatibility and reliability on Windows systems
+  * **PowerShell update**: Now uses `pwsh.exe` for better PowerShell compatibility and reliability on Windows systems
   * **Drag-and-drop image support**: Attach images to CLI sessions via drag-and-drop for easier multimodal interactions
   * **Custom models in subagents**: Added support for using custom models when executing subagents via Task tool
   * **Custom droid descriptions**: Moved custom droid descriptions to Task tool for better organization and usability
-  * **__PRESERVE_164__ custom model support**: Added support for custom models in droid exec sessions
+  * **`droid exec` custom model support**: Added support for custom models in droid exec sessions
 
   ## Bug fixes and stability
 
@@ -1352,7 +1352,7 @@ rss: true
 </Update>
 
 <Update label="October 14-20" rss={{ title: "CLI Updates", description: "MCP OAuth, system certificates, fuzzy search, and session management improvements" }}>
-  __PRESERVE_165__
+  `v0.21.3`
 
   ## New features and enhancements
 
@@ -1380,14 +1380,14 @@ rss: true
 </Update>
 
 <Update label="September 30 - October 13" rss={{ title: "CLI Updates", description: "Droid exec enhancements, custom model support, streaming JSON, and stability improvements" }}>
-  __PRESERVE_166__
+  `v0.19.8`
 
   ## New features and enhancements
 
-  * **__PRESERVE_167__ Slack integration**: Added __PRESERVE_168__ tool to droid exec for posting updates to Slack channels
-  * **__PRESERVE_169__ streaming JSON input mode**: Added streaming JSON input mode for multi-turn exec sessions for better automation workflows
-  * **__PRESERVE_170__ tool configuration**: Added ability to enable/disable specific tools in droid exec sessions
-  * **__PRESERVE_171__ pre-created session IDs**: Added support for pre-created session IDs in droid exec for better session management
+  * **`droid exec` Slack integration**: Added `slack_post_message` tool to droid exec for posting updates to Slack channels
+  * **`droid exec` streaming JSON input mode**: Added streaming JSON input mode for multi-turn exec sessions for better automation workflows
+  * **`droid exec` tool configuration**: Added ability to enable/disable specific tools in droid exec sessions
+  * **`droid exec` pre-created session IDs**: Added support for pre-created session IDs in droid exec for better session management
   * **Initial prompt support**: Added support for launching TUI with an initial prompt via command line
   * **GLM-4.6 support**: Added LLM proxy support for GLM-4.6 with Fireworks, Baseten, and DeepInfra providers
   * **Azure OpenAI for GPT-5**: Added Azure OpenAI support for GPT-5 Codex in TUI
@@ -1398,7 +1398,7 @@ rss: true
 
   ## Bug fixes and stability
 
-  * **__PRESERVE_172__ session continuation fix**: Fixed droid exec to correctly continue an existing session instead of overwriting session data
+  * **`droid exec` session continuation fix**: Fixed droid exec to correctly continue an existing session instead of overwriting session data
   * Dynamic reasoning label for Codex models in UI
   * AGENTS.md source paths now shown in settings for better transparency
   * Better error messages when custom model JSON configuration is broken

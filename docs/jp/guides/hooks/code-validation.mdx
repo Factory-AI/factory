@@ -22,13 +22,26 @@ keywords: ['validation', 'security', 'standards', 'lint', 'code quality', 'polic
 
 <CodeGroup>
 
-__PRESERVE_0__
+```bash JavaScript/TypeScript
+npm install -D eslint typescript @typescript-eslint/parser
+npm install -D semgrep  # For security scanning
+```
 
-__PRESERVE_1__
+```bash Python
+pip install flake8 pylint bandit  # Linting and security
+pip install semgrep  # Multi-language security scanner
+```
 
-__PRESERVE_2__
+```bash Go
+go install golang.org/x/tools/cmd/goimports@latest
+go install honnef.co/go/tools/cmd/staticcheck@latest
+```
 
-__PRESERVE_3__
+```bash Security Tools
+# Gitleaks for secret detection
+brew install gitleaks  # macOS
+# or download from https://github.com/gitleaks/gitleaks
+```
 
 </CodeGroup>
 
@@ -730,27 +743,54 @@ chmod +x .factory/hooks/check-architecture.py
 <Steps>
   <Step title="Provide clear feedback">
     When blocking operations, explain what's wrong and how to fix it:
-    __PRESERVE_28__
+    ```bash
+    echo "❌ Problem: TypeScript errors found" >&2
+    echo "Solution: Fix the type errors shown above" >&2
+    echo "Example: Add proper type annotations to parameters" >&2
+    exit 2
+    ```
   </Step>
   
   <Step title="Use warnings vs. errors appropriately">
     Not everything needs to block Droid:
-    __PRESERVE_29__
+    ```bash
+    # Warning (exit 0) - inform but don't block
+    echo "⚠️ Code complexity is high, consider refactoring" >&2
+    exit 0
+    
+    # Error (exit 2) - block the operation
+    echo "❌ Secret detected, cannot proceed" >&2
+    exit 2
+    ```
   </Step>
   
   <Step title="Performance matters">
     Keep validation fast:
-    __PRESERVE_30__
+    ```bash
+    # Use grep for quick checks before expensive operations
+    if grep -q "password" "$file"; then
+      # Only run expensive scan if simple check passes
+      run_detailed_security_scan "$file"
+    fi
+    ```
   </Step>
   
   <Step title="Make rules configurable">
     Allow teams to customize validation:
-    __PRESERVE_31__
+    ```bash
+    # Read config from project settings
+    MAX_COMPLEXITY="${DROID_MAX_COMPLEXITY:-10}"
+    ENFORCE_TESTS="${DROID_ENFORCE_TESTS:-false}"
+    ```
   </Step>
   
   <Step title="Test your validators">
     Create test files that should pass and fail:
-    __PRESERVE_32__
+    ```bash
+    # Create test cases
+    echo '{"tool_input":{"file_path":"test.ts","content":"..."}}' | \
+      .factory/hooks/validate.sh
+    ```
   </Step>
 </Steps>
 

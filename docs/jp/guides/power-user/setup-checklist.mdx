@@ -25,17 +25,29 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     The IDE plugin provides real-time context—open files, errors, selections—so Droid sees what you see.
     
     **VSCode/Cursor:**
-    1. Open Extensions (__PRESERVE_14__)
+    1. Open Extensions (`Cmd+Shift+X`)
     2. Search "Factory"
     3. Install and reload
     
-    **Verify:** Run __PRESERVE_15__ and check for "IDE connected" in the status bar.
+    **Verify:** Run `droid` and check for "IDE connected" in the status bar.
   </Step>
   
   <Step title="Create your AGENTS.md">
-    Create a basic [__PRESERVE_16__](/cli/configuration/agents-md) at your repository root:
+    Create a basic [`AGENTS.md`](/cli/configuration/agents-md) at your repository root:
     
-    __PRESERVE_0__
+    ```markdown
+    # Project Guidelines
+    
+    ## Build & Test
+    - Build: `npm run build`
+    - Test: `npm test`
+    - Lint: `npm run lint`
+    
+    ## Code Style
+    - Use TypeScript strict mode
+    - Prefer functional components in React
+    - Write tests for new features
+    ```
     
     Start minimal—you'll expand this as you work. See the [AGENTS.md guide](/cli/configuration/agents-md) for more examples.
   </Step>
@@ -44,7 +56,11 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     Set your preferred model in settings:
     
     **CLI:**
-    __PRESERVE_1__
+    ```bash
+    droid
+    > /settings
+    # Navigate to Model and select your default
+    ```
     
     **Factory App:** Use the model selector dropdown in the chat interface.
     
@@ -64,23 +80,53 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
 
 <Steps>
   <Step title="Create a memories file">
-    Create __PRESERVE_17__ for personal preferences:
+    Create `~/.factory/memories.md` for personal preferences:
     
-    __PRESERVE_2__
+    ```markdown
+    # My Development Preferences
+    
+    ## Code Style
+    - I prefer arrow functions over function declarations
+    - I like early returns over nested conditionals
+    - I use 2-space indentation
+    
+    ## Testing
+    - I use React Testing Library, not Enzyme
+    - I prefer integration tests over unit tests for components
+    - Mock external APIs, not internal modules
+    
+    ## Past Decisions
+    - [2024-01] Chose Zustand over Redux for state management
+    - [2024-02] Using Tailwind CSS for styling
+    ```
     
     Update this file whenever you find yourself repeating instructions to Droid.
   </Step>
   
   <Step title="Reference memories in AGENTS.md">
-    Add to your __PRESERVE_18__:
+    Add to your `AGENTS.md`:
     
-    __PRESERVE_3__
+    ```markdown
+    ## Personal Preferences
+    Refer to `~/.factory/memories.md` for my coding preferences and past decisions.
+    ```
   </Step>
   
   <Step title="Create project-specific memories (optional)">
-    For team projects, create __PRESERVE_19__:
+    For team projects, create `.factory/memories.md`:
     
-    __PRESERVE_4__
+    ```markdown
+    # Project Memories
+    
+    ## Architecture Decisions
+    - We use the repository pattern for data access
+    - All API routes go through the /api/v1 prefix
+    - Feature flags are managed via LaunchDarkly
+    
+    ## Known Issues
+    - The auth service has a 5-second timeout issue (#123)
+    - Legacy users table uses snake_case columns
+    ```
   </Step>
 </Steps>
 
@@ -100,27 +146,73 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
 
 <Steps>
   <Step title="Create a rules directory">
-    Create __PRESERVE_20__ in your project:
+    Create `.factory/rules/` in your project:
     
-    __PRESERVE_5__
+    ```
+    .factory/
+    └── rules/
+        ├── typescript.md
+        ├── testing.md
+        └── security.md
+    ```
   </Step>
   
   <Step title="Add TypeScript rules">
-    Create __PRESERVE_21__:
+    Create `.factory/rules/typescript.md`:
     
-    __PRESERVE_6__
+    ```markdown
+    # TypeScript Conventions
+    
+    ## General
+    - Use `interface` for object types, `type` for unions/intersections
+    - Avoid `any` - use `unknown` with type guards instead
+    - Export types alongside their implementations
+    
+    ## React Components
+    - Use functional components with TypeScript FC type
+    - Props interfaces should be named `{ComponentName}Props`
+    - Use `React.ReactNode` for children, not `React.ReactChild`
+    
+    ## Imports
+    - Group imports: React, external libs, internal modules, types
+    - Use absolute imports from `@/` prefix
+    - Avoid barrel files (index.ts re-exports) for performance
+    ```
   </Step>
   
   <Step title="Add testing rules">
-    Create __PRESERVE_22__:
+    Create `.factory/rules/testing.md`:
     
-    __PRESERVE_7__
+    ```markdown
+    # Testing Conventions
+    
+    ## File Organization
+    - Test files live next to source: `Component.tsx` → `Component.test.tsx`
+    - Integration tests go in `__tests__/integration/`
+    - E2E tests go in `e2e/`
+    
+    ## Test Structure
+    - Use descriptive test names: "should [action] when [condition]"
+    - One assertion per test when possible
+    - Use `beforeEach` for common setup, not `beforeAll`
+    
+    ## Mocking
+    - Mock at the boundary (API calls, not internal functions)
+    - Use MSW for API mocking in integration tests
+    - Reset mocks in `afterEach`
+    ```
   </Step>
   
   <Step title="Reference rules in AGENTS.md">
-    Update your __PRESERVE_23__:
+    Update your `AGENTS.md`:
     
-    __PRESERVE_8__
+    ```markdown
+    ## Coding Standards
+    Follow the conventions documented in:
+    - `.factory/rules/typescript.md` - TypeScript and React patterns
+    - `.factory/rules/testing.md` - Testing conventions
+    - `.factory/rules/security.md` - Security requirements
+    ```
   </Step>
 </Steps>
 
@@ -142,20 +234,63 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
   **Three ways to automate:** 
   - **[Skills](/cli/configuration/skills)** — Droid invokes them based on task context
   - **[Hooks](/cli/configuration/hooks-guide)** — Run automatically on specific events
-  - **[Custom Slash Commands](/cli/configuration/custom-slash-commands)** — You invoke with __PRESERVE_24__
+  - **[Custom Slash Commands](/cli/configuration/custom-slash-commands)** — You invoke with `/command-name`
 </Info>
 
 <Steps>
   <Step title="Create a prompt refiner skill">
-    Create __PRESERVE_25__:
+    Create `~/.factory/skills/prompt-refiner/SKILL.md`:
     
-    __PRESERVE_9__
+    ```markdown
+    ---
+    name: prompt-refiner
+    description: Improve prompts before sending them to get better results. Use when you want to refine a task description.
+    ---
+    
+    # Prompt Refiner
+    
+    ## Instructions
+    
+    When the user wants to refine a prompt:
+    
+    1. Ask for their draft prompt or task description
+    2. Analyze it for:
+       - Clarity: Is the goal specific and measurable?
+       - Context: Does it include relevant background?
+       - Constraints: Are requirements and limitations stated?
+       - Examples: Would examples help clarify expectations?
+    3. Suggest an improved version with explanations
+    4. Offer to iterate if needed
+    
+    ## Good Prompt Patterns
+    
+    - Start with the outcome: "Create a..." not "I want you to..."
+    - Include acceptance criteria: "The result should..."
+    - Specify format: "Return as JSON/markdown/code"
+    - Mention constraints: "Must be compatible with...", "Should not modify..."
+    ```
   </Step>
   
   <Step title="Add an auto-formatting hook">
-    Run __PRESERVE_26__ and add a PostToolUse hook for automatic formatting:
+    Run `/hooks` and add a PostToolUse hook for automatic formatting:
     
-    __PRESERVE_10__
+    ```json
+    {
+      "hooks": {
+        "PostToolUse": [
+          {
+            "matcher": "Edit|Create",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "cd \"$FACTORY_PROJECT_DIR\" && npx prettier --write \"$(jq -r '.tool_input.file_path' 2>/dev/null || echo '')\" 2>/dev/null || true"
+              }
+            ]
+          }
+        ]
+      }
+    }
+    ```
     
     This automatically formats files after Droid edits them.
   </Step>
@@ -163,7 +298,23 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
   <Step title="Add a test-on-edit hook (optional)">
     Run related tests after edits:
     
-    __PRESERVE_11__
+    ```json
+    {
+      "hooks": {
+        "PostToolUse": [
+          {
+            "matcher": "Edit",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "cd \"$FACTORY_PROJECT_DIR\" && jq -r '.tool_input.file_path' | xargs -I {} npm test -- --findRelatedTests {} --passWithNoTests 2>/dev/null || true"
+              }
+            ]
+          }
+        ]
+      }
+    }
+    ```
   </Step>
 </Steps>
 
@@ -179,13 +330,17 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
 
 <Steps>
   <Step title="Enable Spec Mode for complex work">
-    Use __PRESERVE_27__ or __PRESERVE_28__ before starting features that touch multiple files. This prevents expensive false starts.
+    Use `Shift+Tab` or `/spec` before starting features that touch multiple files. This prevents expensive false starts.
   </Step>
   
   <Step title="Configure model switching">
     Set up a spec mode model for planning:
     
-    __PRESERVE_12__
+    ```bash
+    droid
+    > /settings
+    # Set Spec Mode Model to a reasoning-heavy model
+    ```
     
     Use Opus 4.5 for planning, then Sonnet or Codex for implementation.
   </Step>
@@ -194,7 +349,10 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     Check your project's AI-readiness:
     
     **CLI:**
-    __PRESERVE_13__
+    ```bash
+    droid
+    > /readiness-report
+    ```
     
     **Factory App:** View your readiness score in the [Agent Readiness Dashboard](/web/agent-readiness/dashboard).
     

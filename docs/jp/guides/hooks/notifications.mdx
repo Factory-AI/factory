@@ -22,11 +22,23 @@ keywords: ['notifications', 'alerts', 'slack', 'desktop', 'sounds', 'webhook', '
 
 <CodeGroup>
 
-__PRESERVE_0__
+```bash macOS
+# Built-in commands (no installation needed)
+which osascript  # For display notifications
+which afplay     # For sounds
+```
 
-__PRESERVE_1__
+```bash Linux
+# Install notify-send
+sudo apt-get install libnotify-bin  # Ubuntu/Debian
+sudo dnf install libnotify           # Fedora
+sudo pacman -S libnotify             # Arch
+```
 
-__PRESERVE_2__
+```bash Windows (PowerShell)
+# BurntToast for Windows notifications
+Install-Module -Name BurntToast -Scope CurrentUser
+```
 
 </CodeGroup>
 
@@ -508,22 +520,37 @@ exit 0
 <Steps>
   <Step title="Keep notification scripts fast">
     Use short timeouts to avoid blocking Droid:
-    __PRESERVE_22__
+    ```json
+    {
+      "timeout": 5  // 5 seconds max for notifications
+    }
+    ```
   </Step>
   
   <Step title="Handle failures gracefully">
     Don't block execution if notifications fail:
-    __PRESERVE_23__
+    ```bash
+    # Continue even if curl fails
+    curl -X POST "$URL" ... || true
+    exit 0
+    ```
   </Step>
   
   <Step title="Respect user preferences">
     Check environment variables for opt-out:
-    __PRESERVE_24__
+    ```bash
+    if [ "$DROID_DISABLE_NOTIFICATIONS" = "true" ]; then
+      exit 0
+    fi
+    ```
   </Step>
   
   <Step title="Test notifications">
     Manually trigger hooks for testing:
-    __PRESERVE_25__
+    ```bash
+    # Test notification script
+    echo '{"hook_event_name":"Notification","message":"Test"}' | .factory/hooks/notify-wait.sh
+    ```
   </Step>
   
   <Step title="Use appropriate notification levels">

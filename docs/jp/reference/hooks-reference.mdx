@@ -50,8 +50,8 @@ Droidフックは[settings files](/cli/configuration/settings)で設定します
 <Warning>
   **Always use absolute paths** for hook commands and scripts, not relative paths. 
   Hooks execute from Droid's current working directory, which may change during execution. 
-  Use __PRESERVE_40__ for project-relative scripts or full paths like 
-  __PRESERVE_41__ or __PRESERVE_42__ for global scripts.
+  Use `"$FACTORY_PROJECT_DIR"/path/to/script.sh` for project-relative scripts or full paths like 
+  `/usr/local/bin/script.sh` or `~/.factory/hooks/script.sh` for global scripts.
 </Warning>
 
 `UserPromptSubmit`、`Notification`、`Stop`、`SubagentStop`などのマッチャーを使用しないイベントについては、matcherフィールドを省略できます：
@@ -129,7 +129,7 @@ Droidフックは[settings files](/cli/configuration/settings)で設定します
 ```
 
 <Note>
-  Plugin hooks use the same format as regular hooks with an optional __PRESERVE_51__ field to explain the hook's purpose.
+  Plugin hooks use the same format as regular hooks with an optional `description` field to explain the hook's purpose.
 </Note>
 
 <Note>
@@ -374,7 +374,7 @@ Droidセッションが終了するときに実行されます。クリーンア
 
 <Warning>
   Reminder: Droid does not see stdout if the exit code is 0, except for
-  the __PRESERVE_93__ hook where stdout is injected as context.
+  the `UserPromptSubmit` hook where stdout is injected as context.
 </Warning>
 
 #### 終了コード2の動作
@@ -446,10 +446,10 @@ Droidセッションが終了するときに実行されます。クリーンア
 ```
 
 <Note>
-  The __PRESERVE_129__ and __PRESERVE_130__ fields are deprecated for PreToolUse hooks.
-  Use __PRESERVE_131__ and
-  __PRESERVE_132__ instead. The deprecated fields
-  __PRESERVE_133__ and __PRESERVE_134__ map to __PRESERVE_135__ and __PRESERVE_136__ respectively.
+  The `decision` and `reason` fields are deprecated for PreToolUse hooks.
+  Use `hookSpecificOutput.permissionDecision` and
+  `hookSpecificOutput.permissionDecisionReason` instead. The deprecated fields
+  `"approve"` and `"block"` map to `"allow"` and `"deny"` respectively.
 </Note>
 
 #### `PostToolUse`決定制御
@@ -579,9 +579,9 @@ if issues:
 #### JSON出力例：コンテキスト追加と検証のためのUserPromptSubmit
 
 <Note>
-  For __PRESERVE_165__ hooks, you can inject context using either method:
+  For `UserPromptSubmit` hooks, you can inject context using either method:
 
-  * Exit code 0 with stdout: Droid sees the context (special case for __PRESERVE_166__)
+  * Exit code 0 with stdout: Droid sees the context (special case for `UserPromptSubmit`)
   * JSON output: Provides more control over the behavior
 </Note>
 

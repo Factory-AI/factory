@@ -15,20 +15,22 @@ keywords: ['github', 'github app', 'install', '/install-github-app', 'slash comm
 <Steps>
   <Step title="Start the installation flow">
     In an interactive droid session, type:
-    __PRESERVE_0__
+    ```bash
+    /install-github-app
+    ```
   </Step>
 
   <Step title="Pass preflight checks">
     Droid verifies that you have:
-    - GitHub CLI (__PRESERVE_11__) installed
-    - Authenticated with GitHub (__PRESERVE_12__)
-    - Required OAuth scopes (__PRESERVE_13__, __PRESERVE_14__, __PRESERVE_15__)
+    - GitHub CLI (`gh`) installed
+    - Authenticated with GitHub (`gh auth login`)
+    - Required OAuth scopes (`repo`, `read:org`, `workflow`)
   </Step>
 
   <Step title="Select a repository">
     Choose from two options:
     - **Use current repository** - Auto-detected from your git remote
-    - **Enter a different repository** - Type __PRESERVE_16__ or a GitHub URL
+    - **Enter a different repository** - Type `owner/repo` or a GitHub URL
   </Step>
 
   <Step title="Install the GitHub App">
@@ -54,19 +56,32 @@ keywords: ['github', 'github app', 'install', '/install-github-app', 'slash comm
 
 <Tabs>
   <Tab title="macOS (Homebrew)">
-    __PRESERVE_1__
+    ```bash
+    brew install gh
+    ```
   </Tab>
 
   <Tab title="macOS (MacPorts)">
-    __PRESERVE_2__
+    ```bash
+    sudo port install gh
+    ```
   </Tab>
 
   <Tab title="Linux/WSL">
-    __PRESERVE_3__
+    ```bash
+    type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+    sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo apt update
+    sudo apt install gh -y
+    ```
   </Tab>
 
   <Tab title="Windows">
-    __PRESERVE_4__
+    ```bash
+    winget install --id GitHub.cli
+    ```
   </Tab>
 </Tabs>
 
@@ -133,7 +148,7 @@ gh auth refresh -s repo,read:org,workflow
 
   <Step title="Add the secret to GitHub">
     In your repository settings, go to **Settings > Secrets and variables > Actions** and add a new repository secret:
-    - **Name:** __PRESERVE_28__
+    - **Name:** `FACTORY_API_KEY`
     - **Value:** Your generated API key
   </Step>
 
@@ -173,10 +188,10 @@ Factory Droid GitHub Appには以下の権限が必要です：
   <Accordion title="Troubleshooting preflight failures">
     | Error | Solution |
     |-------|----------|
-    | GitHub CLI not installed | Install __PRESERVE_30__ using the commands above |
-    | Not logged in | Run __PRESERVE_31__ |
-    | Missing permissions | Run __PRESERVE_32__ |
-    | API access error | Check your internet connection and run __PRESERVE_33__ |
+    | GitHub CLI not installed | Install `gh` using the commands above |
+    | Not logged in | Run `gh auth login` |
+    | Missing permissions | Run `gh auth refresh -s repo,read:org,workflow` |
+    | API access error | Check your internet connection and run `gh auth status` |
   </Accordion>
 
   <Accordion title="Navigating the setup UI">
@@ -188,7 +203,7 @@ Factory Droid GitHub Appには以下の権限が必要です：
   </Accordion>
 
   <Accordion title="Multiple repositories">
-    Run __PRESERVE_34__ separately for each repository you want to configure. The flow automatically detects the current repository from your git remote.
+    Run `/install-github-app` separately for each repository you want to configure. The flow automatically detects the current repository from your git remote.
   </Accordion>
 </AccordionGroup>
 
@@ -204,7 +219,40 @@ droid
 ガイドフローの完了後、Droidはワークフローファイルを含むPRを作成します。生成されたDroid Reviewワークフローは以下のようになります：
 
 <Accordion title="Generated Droid Review Workflow">
-__PRESERVE_8__
+```yaml
+name: Droid Auto Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  droid-review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Run Droid Auto Review
+        uses: Factory-AI/droid-action@v3
+        with:
+          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+          automatic_review: true
+```
 </Accordion>
 
 インストール後にワークフローをカスタマイズするには、[Automated Code Review guide](/guides/droid-exec/code-review#customizing-the-workflow) を参照してください。

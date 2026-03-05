@@ -110,7 +110,7 @@ If you would like to override, you can either:
   <Step title="Remove the secrets">
     - Use environment variables instead of hardcoded credentials
     - Move secrets to secure credential stores
-    - Add sensitive files to __PRESERVE_8__
+    - Add sensitive files to `.gitignore`
     - Use git filter-branch or BFG Repo-Cleaner if secrets were already committed
   </Step>
   <Step title="Retry the operation">
@@ -138,7 +138,13 @@ Droid Shieldは慎重を期すために保守的なパターンを使用しま�
   <Accordion title="Use environment variables">
     Store all secrets in environment variables or secure credential managers, never hardcode them in source files.
     
-    __PRESERVE_1__
+    ```bash
+    # Good - Using environment variable
+    const apiKey = process.env.FACTORY_API_KEY;
+    
+    # Bad - Hardcoded secret
+    const apiKey = "fk-abc123xyz789...";
+    ```
   </Accordion>
   
   <Accordion title="Keep Droid Shield enabled">

@@ -19,9 +19,13 @@ keywords: ['video', 'tutorial', 'walkthrough', 'demo', 'guide', 'learn', 'watch'
 
 <CodeGroup>
 
-__PRESERVE_0__
+```bash macOS/Linux
+curl -fsSL https://app.factory.ai/cli | sh
+```
 
-__PRESERVE_1__
+```powershell Windows
+irm https://app.factory.ai/cli/windows | iex
+```
 
 </CodeGroup>
 
@@ -58,7 +62,7 @@ droid
 - 自律モードオプション
 
 <Note>
-  **Terminal-specific key bindings**: The default for new lines is __PRESERVE_15__ + __PRESERVE_16__, but you can configure this to __PRESERVE_17__ or other combinations based on your terminal's key bindings. Check __PRESERVE_18__ in the CLI for configuration options.
+  **Terminal-specific key bindings**: The default for new lines is `\` + `Enter`, but you can configure this to `Shift + Enter` or other combinations based on your terminal's key bindings. Check `/terminal-setup` in the CLI for configuration options.
 </Note>
 
 ### 基本的なキーボードショートカット
@@ -278,11 +282,11 @@ droid
   </Step>
   
   <Step title="Add to config.json">
-    Paste the configuration into __PRESERVE_40__ and add your API key
+    Paste the configuration into `~/.factory/config.json` and add your API key
   </Step>
   
   <Step title="Select Model">
-    Use __PRESERVE_41__ in the CLI to select your newly added model
+    Use `/model` in the CLI to select your newly added model
   </Step>
 </Steps>
 
@@ -355,7 +359,9 @@ MCPツールを個別に有効または無効にします：
   <Step title="Generation Method">
     Choose to create manually or generate with droid's help:
     
-    __PRESERVE_8__
+    ```
+    I want a code review droid that checks for security issues and coding standards
+    ```
     
     Droid will generate an appropriate description and configuration
   </Step>
@@ -450,9 +456,11 @@ droidの機能を実演する完全なワークフローです：
 
 <Steps>
   <Step title="Start in Spec Mode">
-    Press __PRESERVE_51__ until you're in Spec mode
+    Press `Shift + Tab` until you're in Spec mode
     
-    __PRESERVE_12__
+    ```
+    Create an authentication system with GitHub and Google OAuth
+    ```
   </Step>
   
   <Step title="Review the Plan">
@@ -466,7 +474,9 @@ droidの機能を実演する完全なワークフローです：
   <Step title="Iterate on the Spec">
     Refine the plan before implementation:
     
-    __PRESERVE_13__
+    ```
+    Change the plan to only include Github auth and not Google auth
+    ```
     
     Droid updates the specification accordingly
   </Step>

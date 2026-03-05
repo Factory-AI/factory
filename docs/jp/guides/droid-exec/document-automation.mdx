@@ -174,27 +174,42 @@ This PR was automatically generated after code was merged to main." \
 <Steps>
   <Step title="Scope triggers carefully">
     Only trigger on meaningful code changes:
-    __PRESERVE_1__
+    ```yaml
+    paths:
+      - 'src/**'
+      - '!src/**/*.test.ts'
+      - '!src/**/*.spec.ts'
+    ```
   </Step>
   
   <Step title="Use --auto low for safety">
     Following cookbook patterns:
-    __PRESERVE_2__
+    ```bash
+    droid exec --auto low "..." # File changes only
+    # Workflow handles git operations separately
+    ```
   </Step>
   
   <Step title="Trust autonomous discovery">
     Let droid explore and find relevant docs rather than maintaining manual mappings:
-    __PRESERVE_3__
+    ```bash
+    "Search the docs/ directory for files that reference the changed code"
+    ```
   </Step>
   
   <Step title="Always generate summaries">
     Help reviewers understand changes:
-    __PRESERVE_4__
+    ```bash
+    "Create doc-update-summary.md explaining what was updated and why"
+    ```
   </Step>
   
   <Step title="Consider rate limits">
     For high-frequency repos, use scheduled batch updates:
-    __PRESERVE_5__
+    ```yaml
+    schedule:
+      - cron: '0 9 * * 1'  # Weekly on Monday
+    ```
   </Step>
 </Steps>
 
@@ -239,7 +254,7 @@ on:
 ## トラブルシューティング
 
 <Accordion title="No PR created even though code changed">
-  Droid may have determined no docs needed updates. Check the workflow logs or add more specific search instructions in the prompt. You can also check if __PRESERVE_12__ was created to see what droid analyzed.
+  Droid may have determined no docs needed updates. Check the workflow logs or add more specific search instructions in the prompt. You can also check if `doc-update-summary.md` was created to see what droid analyzed.
 </Accordion>
 
 <Accordion title="Wrong sections get updated">

@@ -54,24 +54,56 @@ Claudeモデルは構造化された明示的な指示に優れ、特定のフ�
   <Step title="Use XML tags for structure">
     Claude responds exceptionally well to XML-style tags for organizing complex prompts:
     
-    __PRESERVE_0__
+    ```
+    <context>
+    This is a React application using TypeScript and Zustand for state management.
+    The auth module handles user sessions and JWT tokens.
+    </context>
+    
+    <task>
+    Add a "remember me" checkbox to the login form that extends session duration to 30 days.
+    </task>
+    
+    <requirements>
+    - Store preference in localStorage
+    - Update JWT expiration accordingly
+    - Add unit tests for the new functionality
+    </requirements>
+    ```
   </Step>
   
   <Step title="Put examples in dedicated sections">
     When you want specific output formats, show examples:
     
-    __PRESERVE_1__
+    ```
+    <example>
+    Input: "user not found"
+    Output: { code: "USER_NOT_FOUND", message: "The specified user does not exist", httpStatus: 404 }
+    </example>
+    
+    Now handle these error cases following the same pattern:
+    - Invalid password
+    - Account locked
+    - Session expired
+    ```
   </Step>
   
   <Step title="Use thinking prompts for complex reasoning">
     For complex decisions, ask Claude to think through options:
     
-    __PRESERVE_2__
+    ```
+    Before implementing, analyze:
+    1. What are the tradeoffs between approach A and B?
+    2. Which approach better fits our existing patterns?
+    3. What edge cases should we consider?
+    
+    Then implement the better approach.
+    ```
   </Step>
 </Steps>
 
 <Tip>
-  Ready-to-use prompt refiner skills are available in the [examples folder](https://github.com/Factory-AI/factory/tree/main/examples/power-user-skills). Copy them to __PRESERVE_13__ to use them. Learn more about skills in the [Skills documentation](/cli/configuration/skills).
+  Ready-to-use prompt refiner skills are available in the [examples folder](https://github.com/Factory-AI/factory/tree/main/examples/power-user-skills). Copy them to `~/.factory/skills/` to use them. Learn more about skills in the [Skills documentation](/cli/configuration/skills).
 </Tip>
 
 ### Claudeプロンプト改良スキル
@@ -172,19 +204,38 @@ GPTモデルは明確なシステムレベルのコンテキストで優れ、�
   <Step title="Frame the role explicitly">
     GPT models respond well to clear role definitions:
     
-    __PRESERVE_5__
+    ```
+    You are a senior TypeScript developer reviewing code for a production e-commerce platform.
+    Focus on: type safety, error handling, and performance.
+    
+    Review this checkout flow implementation...
+    ```
   </Step>
   
   <Step title="Use numbered steps for procedures">
     GPT follows numbered instructions reliably:
     
-    __PRESERVE_6__
+    ```
+    Complete these steps in order:
+    1. Read the current implementation in src/auth/
+    2. Identify all places where tokens are validated
+    3. Create a centralized token validation utility
+    4. Update all call sites to use the new utility
+    5. Add unit tests for the utility
+    6. Run the test suite and fix any failures
+    ```
   </Step>
   
   <Step title="Be explicit about output format">
     Specify exactly what you want:
     
-    __PRESERVE_7__
+    ```
+    Return your analysis as a markdown document with these sections:
+    ## Summary (2-3 sentences)
+    ## Issues Found (bulleted list)
+    ## Recommended Changes (numbered, in priority order)
+    ## Code Examples (if applicable)
+    ```
   </Step>
 </Steps>
 
@@ -292,7 +343,12 @@ Geminiモデルは長いコンテキストをうまく処理し、構造化さ�
   <Step title="Leverage long context">
     Gemini can handle extensive context—don't be afraid to include more background:
     
-    __PRESERVE_10__
+    ```
+    Here's the full module structure for context:
+    [include relevant files]
+    
+    Based on these patterns, implement a new service that...
+    ```
   </Step>
   
   <Step title="Use reasoning levels effectively">

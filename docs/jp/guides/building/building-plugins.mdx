@@ -10,20 +10,37 @@ keywords: ['plugins', 'building', 'development', 'skills', 'commands', 'marketpl
 
 <Steps>
   <Step title="Create the plugin directory">
-    __PRESERVE_0__
+    ```bash
+    mkdir -p my-plugin/.factory-plugin
+    ```
   </Step>
   <Step title="Create the manifest">
-    Create __PRESERVE_23__:
-    __PRESERVE_1__
+    Create `my-plugin/.factory-plugin/plugin.json`:
+    ```json
+    {
+      "name": "my-plugin",
+      "description": "A helpful plugin description",
+      "version": "1.0.0"
+    }
+    ```
   </Step>
   <Step title="Add a command">
-    Create __PRESERVE_24__:
-    __PRESERVE_2__
+    Create `my-plugin/commands/hello.md`:
+    ```markdown
+    ---
+    description: Greet the user with a friendly message
+    ---
+
+    Greet the user warmly and ask how you can help them today.
+    ```
   </Step>
   <Step title="Test your plugin">
     Install from local directory to test:
-    __PRESERVE_3__
-    Then run __PRESERVE_25__ to test.
+    ```bash
+    droid plugin marketplace add ./my-plugin
+    droid plugin install my-plugin@my-plugin
+    ```
+    Then run `/hello` to test.
   </Step>
 </Steps>
 
@@ -218,7 +235,7 @@ my-plugin/
 | `${CLAUDE_PLUGIN_ROOT}` | `${DROID_PLUGIN_ROOT}`のエイリアス（Claude Code互換性） |
 
 <Note>
-Plugin hooks cannot be imported via __PRESERVE_55__. They only function within installed plugins where the plugin root path can be resolved.
+Plugin hooks cannot be imported via `/hooks import`. They only function within installed plugins where the plugin root path can be resolved.
 </Note>
 
 ## MCPサーバーの追加

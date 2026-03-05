@@ -98,9 +98,13 @@ See the [model table](/pricing#pricing-table) for the full list of available mod
 <Steps>
   <Step title="Install Droid CLI">
     <CodeGroup>
-    __PRESERVE_1__
+    ```bash macOS/Linux
+    curl -fsSL https://app.factory.ai/cli | sh
+    ```
 
-    __PRESERVE_2__
+    ```powershell Windows
+    irm https://app.factory.ai/cli/windows | iex
+    ```
     </CodeGroup>
   </Step>
 
@@ -110,7 +114,9 @@ See the [model table](/pricing#pricing-table) for the full list of available mod
 
   <Step title="Set Environment Variable">
     Export your API key as an environment variable:
-    __PRESERVE_3__
+    ```bash
+    export FACTORY_API_KEY=fk-...
+    ```
   </Step>
 </Steps>
 
@@ -278,7 +284,7 @@ $ droid exec "run ls command" --output-format stream-json
 ```
 
 <Note>
-The __PRESERVE_42__ format is a deprecated alias for __PRESERVE_43__ and works identically.
+The `debug` format is a deprecated alias for `stream-json` and works identically.
 </Note>
 
 ### stream-jsonrpc（マルチターン）
@@ -436,7 +442,7 @@ droid exec --model "custom:My-Custom-Model-0" "analyze this codebase"
 インデックスは `customModels` 配列内の位置に対応します（0ベース）。
 
 <Note>
-Reasoning effort (__PRESERVE_59__ / __PRESERVE_60__) is not yet supported for custom models, but coming soon.
+Reasoning effort (`-r` / `--reasoning-effort`) is not yet supported for custom models, but coming soon.
 </Note>
 
 ## バッチと並列パターン

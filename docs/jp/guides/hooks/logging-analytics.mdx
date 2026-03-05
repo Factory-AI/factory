@@ -22,9 +22,25 @@ keywords: ['logging', 'analytics', 'metrics', 'tracking', 'usage', 'reports', 'h
 
 <CodeGroup>
 
-__PRESERVE_0__
+```bash Basic tools
+# jq for JSON processing
+brew install jq  # macOS
+sudo apt-get install jq  # Ubuntu/Debian
 
-__PRESERVE_1__
+# SQLite for local database
+brew install sqlite3  # macOS (usually pre-installed)
+```
+
+```bash Optional analytics
+# ClickHouse for advanced analytics
+brew install clickhouse  # macOS
+docker run -d -p 8123:8123 clickhouse/clickhouse-server
+
+# Or use cloud services
+# - Google Analytics
+# - Mixpanel
+# - PostHog
+```
 
 </CodeGroup>
 
@@ -711,27 +727,56 @@ chmod +x .factory/hooks/weekly-report.py
 <Steps>
   <Step title="Use structured logging">
     Log in JSON or to database for easy querying:
-    __PRESERVE_28__
+    ```bash
+    # JSON logs
+    jq -n --arg cmd "$command" '{timestamp: now, command: $cmd}' >> log.jsonl
+    
+    # SQLite for analytics
+    sqlite3 db.db "INSERT INTO logs VALUES (...)"
+    ```
   </Step>
   
   <Step title="Minimize performance impact">
     Keep logging hooks fast:
-    __PRESERVE_29__
+    ```bash
+    # Async logging
+    (echo "$log_entry" >> log.json) &
+    
+    # Batch writes
+    echo "$entry" >> /tmp/buffer
+    if [ $(wc -l < /tmp/buffer) -gt 100 ]; then
+      cat /tmp/buffer >> permanent.log
+      > /tmp/buffer
+    fi
+    ```
   </Step>
   
   <Step title="Protect sensitive data">
     Don't log secrets or credentials:
-    __PRESERVE_30__
+    ```bash
+    # Redact sensitive info
+    command=$(echo "$command" | sed 's/password=[^ ]*/password=***/g')
+    ```
   </Step>
   
   <Step title="Rotate logs">
     Prevent log files from growing too large:
-    __PRESERVE_31__
+    ```bash
+    # Log rotation
+    if [ $(du -k log.json | cut -f1) -gt 10240 ]; then  # 10MB
+      mv log.json log.json.$(date +%Y%m%d)
+      gzip log.json.*
+    fi
+    ```
   </Step>
   
   <Step title="Make analytics opt-in">
     Respect user privacy:
-    __PRESERVE_32__
+    ```bash
+    if [ "$DROID_ANALYTICS_ENABLED" != "true" ]; then
+      exit 0
+    fi
+    ```
   </Step>
 </Steps>
 

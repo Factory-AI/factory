@@ -15,7 +15,9 @@ keywords: ['code review', 'review', '/review', 'slash command', 'PR review', 'pu
 <Steps>
   <Step title="Start the review flow">
     In an interactive droid session, type:
-    __PRESERVE_0__
+    ```bash
+    /review
+    ```
   </Step>
 
   <Step title="Select a review type">
@@ -28,7 +30,7 @@ keywords: ['code review', 'review', '/review', 'slash command', 'PR review', 'pu
 
   <Step title="Configure parameters">
     Depending on your selection:
-    - For **base branch reviews**: Select the target branch (e.g., __PRESERVE_12__, __PRESERVE_13__)
+    - For **base branch reviews**: Select the target branch (e.g., `main`, `develop`)
     - For **commit reviews**: Choose a commit from the interactive list
     - For **custom reviews**: Enter your review instructions
   </Step>
@@ -200,8 +202,10 @@ AI は以下のすべての基準を満たす場合にのみ、問題をバグ�
   </Accordion>
 
   <Accordion title="Integration with workflows">
-    The __PRESERVE_14__ command is interactive and meant for CLI sessions. For automated reviews in CI/CD, use:
-    __PRESERVE_5__
+    The `/review` command is interactive and meant for CLI sessions. For automated reviews in CI/CD, use:
+    ```bash
+    droid exec "Review the changes in this PR for security issues and performance regressions"
+    ```
     See the [Code Review guide](/guides/droid-exec/code-review) for automation examples.
   </Accordion>
 </AccordionGroup>

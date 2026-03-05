@@ -22,13 +22,22 @@ keywords: ['formatting', 'prettier', 'black', 'gofmt', 'rustfmt', 'auto format',
 
 <CodeGroup>
 
-__PRESERVE_0__
+```bash JavaScript/TypeScript
+npm install -D prettier
+```
 
-__PRESERVE_1__
+```bash Python
+pip install black isort
+```
 
-__PRESERVE_2__
+```bash Go
+# gofmt is included with Go installation
+go version
+```
 
-__PRESERVE_3__
+```bash Rust
+rustup component add rustfmt
+```
 
 </CodeGroup>
 
@@ -318,11 +327,38 @@ chmod +x .factory/hooks/format-src-only.sh
 
 <Tabs>
   <Tab title="Before Hook">
-    __PRESERVE_15__
+    ```typescript
+    // Droid creates this file
+    import React from 'react';
+    import {useState} from 'react';
+
+    export const Button = ({onClick,label}:{onClick:()=>void;label:string})=>{
+    const [loading,setLoading]=useState(false);
+    return <button onClick={onClick} disabled={loading}>{label}</button>
+    }
+    ```
   </Tab>
   
   <Tab title="After Hook">
-    __PRESERVE_16__
+    ```typescript
+    // Automatically formatted by prettier
+    import React, { useState } from 'react';
+
+    export const Button = ({
+      onClick,
+      label,
+    }: {
+      onClick: () => void;
+      label: string;
+    }) => {
+      const [loading, setLoading] = useState(false);
+      return (
+        <button onClick={onClick} disabled={loading}>
+          {label}
+        </button>
+      );
+    };
+    ```
     <Note>Imports consolidated, spacing fixed, formatting applied</Note>
   </Tab>
 </Tabs>
@@ -331,11 +367,36 @@ chmod +x .factory/hooks/format-src-only.sh
 
 <Tabs>
   <Tab title="Before Hook">
-    __PRESERVE_17__
+    ```python
+    # Droid creates this file
+    from typing import Optional
+    import sys
+    from django.db import models
+    import os
+    from myapp.utils import helper
+
+    def process_data(data: Optional[str]) -> None:
+        if data:
+            helper(data)
+    ```
   </Tab>
   
   <Tab title="After Hook">
-    __PRESERVE_18__
+    ```python
+    # Automatically formatted by black and isort
+    import os
+    import sys
+    from typing import Optional
+
+    from django.db import models
+
+    from myapp.utils import helper
+
+
+    def process_data(data: Optional[str]) -> None:
+        if data:
+            helper(data)
+    ```
     <Note>Imports sorted into stdlib, third-party, and local groups</Note>
   </Tab>
 </Tabs>
@@ -349,27 +410,49 @@ chmod +x .factory/hooks/format-src-only.sh
 <Steps>
   <Step title="Start with read-only mode">
     Test your formatter configuration manually first:
-    __PRESERVE_19__
+    ```bash
+    # Dry run to see what would change
+    prettier --check src/
+    black --check src/
+    ```
   </Step>
   
   <Step title="Use consistent config files">
     Ensure formatter configs are committed:
-    __PRESERVE_20__
+    ```bash
+    # Add to version control
+    git add .prettierrc .prettierignore
+    git add pyproject.toml  # for black config
+    ```
   </Step>
   
   <Step title="Set appropriate timeouts">
     Large files may need more time:
-    __PRESERVE_21__
+    ```json
+    {
+      "timeout": 60  // Increase for large files
+    }
+    ```
   </Step>
   
   <Step title="Handle formatter errors gracefully">
     Don't block Droid if formatting fails:
-    __PRESERVE_22__
+    ```bash
+    # Use || true to continue on errors
+    prettier --write "$file_path" 2>&1 || true
+    ```
   </Step>
   
   <Step title="Consider Git hooks integration">
     Combine with pre-commit hooks for consistency:
-    __PRESERVE_23__
+    ```yaml
+    # .pre-commit-config.yaml
+    repos:
+      - repo: https://github.com/pre-commit/mirrors-prettier
+        rev: v3.0.0
+        hooks:
+          - id: prettier
+    ```
   </Step>
 </Steps>
 

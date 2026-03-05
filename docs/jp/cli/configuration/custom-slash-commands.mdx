@@ -7,7 +7,7 @@ keywords: ['slash commands', 'custom commands', 'commands', 'shortcuts', 'prompt
 カスタムスラッシュコマンドは、繰り返し可能なプロンプトやセットアップ手順を`/shortcuts`に変換します。Droidは`.factory/commands`フォルダのペアをスキャンし、各ファイルをコマンドに変換して、結果を会話またはターミナルセッションに直接パイプします。
 
 <Note>
-**Skills are now user-invokable via slash commands.** You can create skills in __PRESERVE_7__ that work as both slash commands (user-invoked) and Droid-invocable capabilities. Your existing __PRESERVE_8__ files continue to work unchanged. For new commands, consider using [skills](/cli/configuration/skills) instead – they offer additional features like supporting files and [invocation control](/cli/configuration/skills#control-who-invokes-a-skill).
+**Skills are now user-invokable via slash commands.** You can create skills in `.factory/skills/` that work as both slash commands (user-invoked) and Droid-invocable capabilities. Your existing `.factory/commands/` files continue to work unchanged. For new commands, consider using [skills](/cli/configuration/skills) instead – they offer additional features like supporting files and [invocation control](/cli/configuration/skills#control-who-invokes-a-skill).
 </Note>
 
 ---
@@ -58,8 +58,8 @@ Please review `$ARGUMENTS` and summarize any merge blockers, test gaps, and risk
 </Tip>
 
 <Note>
-  Positional placeholders like __PRESERVE_26__ or __PRESERVE_27__ are not supported yet—use
-  __PRESERVE_28__ and parse inside the prompt if you need structured input.
+  Positional placeholders like `$1` or `$2` are not supported yet—use
+  `$ARGUMENTS` and parse inside the prompt if you need structured input.
 </Note>
 
 ---

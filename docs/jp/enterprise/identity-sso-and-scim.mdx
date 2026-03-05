@@ -208,7 +208,7 @@ Domains、SSO、SCIMを設定する前に：
 
 Both options follow the same verification flow:
 
-- Add domains to verify (e.g., __PRESERVE_3__)
+- Add domains to verify (e.g., `yourcompany.com`)
 - Receive a unique TXT record for DNS validation
 - Add the record to your domain's DNS settings
 - WorkOS automatically detects and validates the record
@@ -386,7 +386,7 @@ You don't need to manually configure URLs, certificates, or technical parameters
 
 <Tip>
   Use descriptive group names in your IdP to make management easier. Groups like
-  __PRESERVE_12__ or __PRESERVE_13__ help you organize
+  `factory-frontend-team` or `factory-qa-engineers` help you organize
   permissions by team.
 </Tip>
 
@@ -484,7 +484,7 @@ SCIMトークンは秘密として扱い、IdPのアプリケーション設定�
 
 1. WorkOS provides a SCIM endpoint URL and bearer token
 2. You enter these in your IdP's SCIM configuration
-3. Select which groups to sync (e.g., only __PRESERVE_14__ groups)
+3. Select which groups to sync (e.g., only `factory-*` groups)
 4. WorkOS automatically handles:
    - User attribute mapping (email, name, etc.)
    - Group synchronization

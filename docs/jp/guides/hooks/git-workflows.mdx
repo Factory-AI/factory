@@ -22,11 +22,18 @@ Gitワークフローフックでできること：
 
 <CodeGroup>
 
-__PRESERVE_0__
+```bash Git
+git --version
+```
 
-__PRESERVE_1__
+```bash GitHub CLI (optional)
+brew install gh  # macOS
+# or download from https://cli.github.com
+```
 
-__PRESERVE_2__
+```bash Conventional Commits (optional)
+npm install -g commitlint @commitlint/cli @commitlint/config-conventional
+```
 
 </CodeGroup>
 
@@ -637,27 +644,49 @@ exit 0
 <Steps>
   <Step title="Use PreToolUse for prevention">
     Block bad commits before they happen:
-    __PRESERVE_21__
+    ```bash
+    # In PreToolUse hook
+    if invalid_commit; then
+      echo "❌ Cannot proceed" >&2
+      exit 2  # Blocks the git commit
+    fi
+    ```
   </Step>
   
   <Step title="Use PostToolUse for automation">
     Automate followup actions after successful commits:
-    __PRESERVE_22__
+    ```bash
+    # In PostToolUse hook
+    if git_commit_successful; then
+      update_changelog
+      create_pr
+    fi
+    ```
   </Step>
   
   <Step title="Provide clear error messages">
     Tell users exactly what's wrong and how to fix it:
-    __PRESERVE_23__
+    ```bash
+    echo "❌ Commit message must include issue reference" >&2
+    echo "Example: feat(auth): add login FAC-123" >&2
+    ```
   </Step>
   
   <Step title="Make hooks configurable">
     Allow teams to customize behavior:
-    __PRESERVE_24__
+    ```bash
+    PROTECTED_BRANCHES="${DROID_PROTECTED_BRANCHES:-main,master,production}"
+    REQUIRE_ISSUE_REF="${DROID_REQUIRE_ISSUE:-true}"
+    ```
   </Step>
   
   <Step title="Test hooks with dry-run">
     Test without making actual commits:
-    __PRESERVE_25__
+    ```bash
+    # Simulate a commit
+    echo '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"test\""}}' | \
+      .factory/hooks/validate-commit-msg.sh
+    ```
   </Step>
 </Steps>
 

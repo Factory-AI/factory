@@ -22,11 +22,20 @@ keywords: ['testing', 'tests', 'coverage', 'automation', 'test runner', 'tdd', '
 
 <CodeGroup>
 
-__PRESERVE_0__
+```bash JavaScript/TypeScript
+npm install -D jest @testing-library/react vitest
+npm install -D @vitest/coverage-v8  # For coverage
+```
 
-__PRESERVE_1__
+```bash Python
+pip install pytest pytest-cov
+pip install coverage  # For coverage tracking
+```
 
-__PRESERVE_2__
+```bash Go
+# go test is built-in
+go install github.com/gotestyourself/gotestsum@latest  # Better test output
+```
 
 </CodeGroup>
 
@@ -598,27 +607,56 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
 <Steps>
   <Step title="Run tests asynchronously when possible">
     Don't block Droid unnecessarily:
-    __PRESERVE_19__
+    ```bash
+    # Run tests in background, report later
+    (npm test "$file" > /tmp/test-results.txt 2>&1 &)
+    echo "Tests running in background..."
+    ```
   </Step>
   
   <Step title="Set appropriate timeouts">
     Allow enough time for test suites:
-    __PRESERVE_20__
+    ```json
+    {
+      "timeout": 120  // 2 minutes for test suites
+    }
+    ```
   </Step>
   
   <Step title="Use test file conventions">
     Follow standard naming patterns:
-    __PRESERVE_21__
+    ```
+    src/components/Button.tsx
+    src/components/Button.test.tsx  // Co-located
+    
+    Or:
+    
+    src/components/Button.tsx
+    tests/components/Button.test.tsx  // Separate directory
+    ```
   </Step>
   
   <Step title="Make coverage configurable">
     Different files may need different thresholds:
-    __PRESERVE_22__
+    ```bash
+    # .factory/.coverage-config
+    src/critical/*.ts:90
+    src/utils/*.ts:75
+    src/experimental/*.ts:50
+    ```
   </Step>
   
   <Step title="Cache test results">
     Skip tests if code hasn't changed:
-    __PRESERVE_23__
+    ```bash
+    hash=$(md5sum "$file_path")
+    cache_file="/tmp/test-cache-$hash"
+    
+    if [ -f "$cache_file" ]; then
+      echo "✓ Tests passed (cached)"
+      exit 0
+    fi
+    ```
   </Step>
 </Steps>
 

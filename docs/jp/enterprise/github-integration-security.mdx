@@ -144,7 +144,7 @@ permissions:
 - デバッグアーティファクトはデフォルトで7日間のみ保持されます。
 
 <Warning>
-  Enabling __PRESERVE_12__ may expose sensitive information in publicly
+  Enabling `show_full_output` may expose sensitive information in publicly
   visible workflow logs. Only enable for debugging in non‑sensitive
   environments.
 </Warning>
@@ -188,12 +188,12 @@ Factoryのtelemetry機能の詳細については[Compliance, Audit & Monitoring
 
 <AccordionGroup>
   <Accordion title="For security‑conscious organizations">
-    1. **Use repository secrets** – Store __PRESERVE_13__ as a repository or organization secret.
+    1. **Use repository secrets** – Store `FACTORY_API_KEY` as a repository or organization secret.
     2. **Review workflow permissions** – Ensure the workflow file requests only necessary permissions.
-    3. **Restrict bot access** – Keep __PRESERVE_14__ empty unless you have a specific need.
+    3. **Restrict bot access** – Keep `allowed_bots` empty unless you have a specific need.
     4. **Enable branch protection** – Require PR reviews before merging Droid‑assisted changes.
     5. **Monitor workflow runs** – Review Droid activity in your GitHub Actions logs regularly.
-    6. **Consider network restrictions** – Use __PRESERVE_15__ to limit network access.
+    6. **Consider network restrictions** – Use `experimental_allowed_domains` to limit network access.
   </Accordion>
 
   <Accordion title="For regulated environments">

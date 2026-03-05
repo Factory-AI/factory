@@ -13,7 +13,7 @@ keywords: ['custom droids', 'subagents', 'agents', 'specialized agents', 'delega
 カスタムdroids は、プロジェクトの `.factory/droids/` またはあなた個人の `~/.factory/droids/` ディレクトリ配下の `.md` ファイルとして存在します。CLI はこれらのフォルダをスキャンし（トップレベルファイルのみ）、各定義を検証して、**Task** ツール用の `subagent_type` ターゲットとして公開します。これにより、プライマリアシスタントがセッション中に専用のヘルパーを起動できます。
 
 <Note>
-  Custom Droids are enabled by default. You can toggle them off in Settings (__PRESERVE_11__) under the Experimental section if needed.
+  Custom Droids are enabled by default. You can toggle them off in Settings (`/settings`) under the Experimental section if needed.
 </Note>
 
 - **プロジェクトdroids** は `<repo>/.factory/droids/` に配置され、チームメンバーと共有されます。
@@ -114,11 +114,11 @@ Perform deep analysis of the code or problem presented...
 明示的な配列は上記のツール名を使用する必要があります（大文字小文字を区別）。未知の名前は検証エラーを引き起こします。
 
 <Note>
-  __PRESERVE_58__ is automatically included for all droids to enable task tracking. You don't need to add it to your tools list.
+  `TodoWrite` is automatically included for all droids to enable task tracking. You don't need to add it to your tools list.
 </Note>
 
 <Note>
-  When using __PRESERVE_59__ with OpenAI models, __PRESERVE_60__ is automatically included for compatibility. When __PRESERVE_61__ is __PRESERVE_62__, both tools are enabled to ensure coverage across model providers.
+  When using `Edit` with OpenAI models, `ApplyPatch` is automatically included for compatibility. When `model` is `inherit`, both tools are enabled to ensure coverage across model providers.
 </Note>
 
 ---
