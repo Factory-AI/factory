@@ -1,5 +1,5 @@
 ---
-title: Analytics API
+title: "分析API"
 description: REST API for organization-level usage metrics, token consumption, tool usage, and productivity analytics.
 keywords:
   [
@@ -124,7 +124,7 @@ GET /tokens
       "cache_write_tokens": 45000,
       "by_model": [
         {
-          "model_id": "model-name-here",
+          "model_id": "claude-sonnet-4-20250514",
           "model_tier": "standard",
           "billable_tokens": 800000,
           "input_tokens": 620000,
@@ -171,7 +171,7 @@ When `group_by=model`, returns one row per model per day inside `data`:
   "data": [
     {
       "date": "2026-01-15",
-      "group_key": "model-name-here",
+      "group_key": "claude-sonnet-4-20250514",
       "billable_tokens": 800000,
       "input_tokens": 620000,
       "output_tokens": 180000
@@ -507,7 +507,7 @@ GET /users
       "date": "2026-01-15",
       "tool_calls": 1250,
       "billable_tokens": 450000,
-      "primary_model": "model-name-here",
+      "primary_model": "claude-sonnet-4-20250514",
       "primary_model_tier": "standard",
       "files_created": 12,
       "files_edited": 85,
