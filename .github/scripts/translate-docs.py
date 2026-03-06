@@ -9,7 +9,7 @@ Requires ANTHROPIC_API_KEY environment variable.
 
 Usage:
   python translate-docs.py <file1.mdx> [file2.mdx ...]
-  python translate-docs.py --all  # Translate all docs/jp/ files
+  python translate-docs.py --all  # Translate all docs/ja/ files
 """
 
 import sys
@@ -143,9 +143,10 @@ CRITICAL RULES:
    - Line breaks and paragraph structure
 
 4. For links pointing to English docs paths, update them to Japanese paths:
-   - [text](/cli/overview) → [翻訳テキスト](/jp/cli/overview)
-   - [text](/guides/foo) → [翻訳テキスト](/jp/guides/foo)
+   - [text](/cli/overview) → [翻訳テキスト](/ja/cli/overview)
+   - [text](/guides/foo) → [翻訳テキスト](/ja/guides/foo)
    - External URLs (https://...) stay unchanged
+   - IMPORTANT: Always use /ja/ (ISO 639-1 language code), NEVER /jp/ (country code). Using /jp/ breaks Mintlify search indexing.
 
 5. Output ONLY the translated text. No preamble, no explanation, no wrapping.""")
 
@@ -205,7 +206,7 @@ def main():
 
     if sys.argv[1] == '--all':
         files = []
-        for root, dirs, filenames in os.walk('docs/jp'):
+        for root, dirs, filenames in os.walk('docs/ja'):
             for fname in filenames:
                 if fname.endswith('.mdx'):
                     files.append(os.path.join(root, fname))

@@ -7,7 +7,7 @@ on:
     paths:
       - 'docs/**/*.mdx'
       - 'docs/**/*.md'
-      - '!docs/jp/**'
+      - '!docs/ja/**'
   workflow_dispatch:
 
 permissions:
@@ -47,7 +47,7 @@ jobs:
             echo "synced=false" >> $GITHUB_OUTPUT
             exit 0
           fi
-          changed_files=$(git diff --name-only --diff-filter=ACM "$BEFORE" ${{ github.sha }} -- 'docs/**/*.mdx' 'docs/**/*.md' ':!docs/jp/**')
+          changed_files=$(git diff --name-only --diff-filter=ACM "$BEFORE" ${{ github.sha }} -- 'docs/**/*.mdx' 'docs/**/*.md' ':!docs/ja/**')
 
           if [ -z "$changed_files" ]; then
             echo "No English doc changes detected."
@@ -58,7 +58,7 @@ jobs:
           synced=false
           jp_files=""
           while IFS= read -r file; do
-            jp_file="${file/docs\//docs/jp/}"
+            jp_file="${file/docs\//docs/ja/}"
             mkdir -p "$(dirname "$jp_file")"
             cp "$file" "$jp_file"
             jp_files="$jp_files $jp_file"
@@ -87,7 +87,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git checkout -b "$BRANCH"
-          git add docs/jp/
+          git add docs/ja/
           git commit -m "docs: sync and translate English doc changes to Japanese"
           git push origin "$BRANCH"
           gh pr create \
