@@ -1,14 +1,14 @@
 ---
-title: "モデルコンテキストプロトコル（MCP）"
-description: 'Connect your own tools with Model Context Protocol'
+title: 'Model Context Protocol (MCP)'
+description: 独自ツールをModel Context Protocolで接続
 keywords: ['mcp', 'model context protocol', 'tools', 'droid mcp', 'mcp servers', 'mcp tools', 'integrations', 'connect tools', 'extend droid', 'cli mcp', 'add mcp', 'mcp add']
 ---
 
-Model Context Protocol (MCP) サーバーは、追加のツールとコンテキストを提供することでdroidの機能を拡張します。Droidでは、簡単なブラウジングとセットアップのためのインタラクティブUIと、スクリプトや自動化のためのCLIコマンドの2つの管理方法を提供しています。
+Model Context Protocol (MCP) サーバーは、追加のツールとコンテキストを提供することで droid の機能を拡張します。Droid はそれらを管理する 2 つの方法を提供します：簡単なブラウジングとセットアップのためのインタラクティブ UI、またはスクリプトと自動化のための CLI コマンドです。
 
 ## クイックスタート: レジストリから追加
 
-最も簡単に始める方法は、組み込みレジストリを使用することです。droidで`/mcp`と入力し、**「レジストリから追加」**を選択して40以上の事前設定済みサーバーを参照できます：
+始めるための最も簡単な方法は、内蔵のレジストリを使用することです。droid で `/mcp` と入力し、**「レジストリから追加」** を選択して、40以上の事前設定されたサーバーをブラウズできます：
 
 | サーバー | 説明 |
 | :----- | :---------- |
@@ -16,222 +16,133 @@ Model Context Protocol (MCP) サーバーは、追加のツールとコンテキ
 | linear | 課題追跡とプロジェクト管理 |
 | sentry | エラー追跡とパフォーマンス監視 |
 | notion | ノート、ドキュメント、プロジェクト管理 |
-| supabase | Supabaseプロジェクトの作成と管理 |
-| stripe | 決済処理API |
+| supabase | Supabase プロジェクトの作成と管理 |
+| stripe | 決済処理 API |
 | vercel | プロジェクトとデプロイメントの管理 |
-| playwright | エンドツーエンドブラウザーテスト |
-| hubspot | CRMデータ管理 |
+| playwright | エンドツーエンドブラウザテスト |
+| hubspot | CRM データ管理 |
 | mongodb | データベース管理 |
 | ... | その他多数 |
 
-リストからサーバーを選択し、必要に応じて認証を行う（ほとんどのHTTPサーバーはOAuthをサポート—ブラウザーのプロンプトに従ってください）と、サーバーがすぐに使用可能になります。
+リストからサーバーを選択し、必要に応じて認証を行い（ほとんどの HTTP サーバーは OAuth をサポート—ブラウザのプロンプトに従うだけです）、サーバーが使用可能になります。
 
 <Tip>
-  The registry is the fastest way to get started. For custom servers or automation, use the CLI commands below.
+  レジストリは始めるための最も速い方法です。カスタムサーバーや自動化には、以下の CLI コマンドを使用してください。
 </Tip>
 
-## インタラクティブマネージャー（`/mcp`）
+## インタラクティブマネージャー (`/mcp`)
 
-droid内で`/mcp`と入力すると、インタラクティブMCPマネージャーが開きます。ここから以下のことができます：
+droid 内で `/mcp` と入力すると、インタラクティブな MCP マネージャーが開きます。ここから以下のことができます：
 
-- **サーバーの参照** - 設定済みのすべてのサーバーとその接続状況を確認
-- **ツールの表示** - 接続された各サーバーが提供するツールを検査
-- **有効化/無効化** - サーバーを削除せずに一時的に無効化
-- **認証** - ブラウザー経由でOAuth対応サーバーに接続
-- **認証のクリア** - サーバーの保存された認証情報を削除
-- **レジストリから追加** - 人気のあるMCPサーバーをワンクリックセットアップ
-- **サーバーの削除** - ユーザー設定のサーバーを削除
+- **サーバーをブラウズ** - すべての設定済みサーバーとその接続状態を確認
+- **ツールを表示** - 接続された各サーバーが提供するツールを調査
+- **有効/無効化** - サーバーを削除せずに一時的に無効化
+- **認証** - ブラウザ経由で OAuth 対応サーバーに接続
+- **認証をクリア** - サーバーの保存された認証情報を削除
+- **レジストリから追加** - 人気の MCP サーバーのワンクリック設定
+- **サーバーを削除** - ユーザー設定のサーバーを削除
 
-## CLIでサーバーを追加
+## CLI 経由でサーバーを追加
 
-スクリプトや自動化には、`droid mcp add`を使用してください。Droidは2種類のサーバーをサポートしています：**http**（リモートエンドポイント）と**stdio**（ローカルプロセス）。
+スクリプトと自動化には、`droid mcp add` を使用します。Droid は 2 種類のサーバーをサポートします：**http**（リモートエンドポイント）と **stdio**（ローカルプロセス）。
 
-### HTTPサーバーの追加
+### HTTP サーバーの追加
 
-HTTPサーバーはリモートMCPエンドポイントで、クラウドサービスやAPIに接続する推奨方法です。
+HTTP サーバーはリモートの MCP エンドポイントです - クラウドサービスと API に接続する推奨方法です。
 
-**構文：**
-
-```bash
+**構文:**```bash
 droid mcp add <name> <url> --type http [--header "KEY: VALUE"...]
-```
-
-**引数：**
+```**引数:**
 
 - `name` - 一意のサーバー識別子
 - `url` - MCPサーバーのHTTP/HTTPS URL
-- `--type http` - HTTPトランスポートを指定するための必須フラグ
-- `--header "KEY: VALUE"` - 認証用HTTPヘッダー（複数回使用可能）
+- `--type http` - HTTPトランスポートを指定するために必要なフラグ
+- `--header "KEY: VALUE"` - 認証用のHTTPヘッダー（複数回使用可能）
 
 ### 人気のHTTP MCPサーバー
 
-#### 開発とテスト
+#### 開発・テスト
 
-**Sentry** - エラーの監視、本番環境の問題のデバッグ
-
-```bash
+**Sentry** - エラーを監視し、本番環境の問題をデバッグ```bash
 droid mcp add sentry https://mcp.sentry.dev/mcp --type http
-```
-
-**Hugging Face** - Hugging Face HubとGradio AIアプリケーションにアクセス
-
-```bash
+```**Hugging Face** - Hugging Face HubとGradio AIアプリケーションにアクセス```bash
 droid mcp add hugging-face https://huggingface.co/mcp --type http
-```
-
-**Socket** - 依存関係のセキュリティ分析
-
-```bash
+```**Socket** - 依存関係のセキュリティ解析```bash
 droid mcp add socket https://mcp.socket.dev/ --type http
-```
+```#### プロジェクト管理・ドキュメント
 
-#### プロジェクト管理とドキュメント
-
-**Notion** - ドキュメントの読み取り、ページの更新、タスク管理
-
-```bash
+**Notion** - ドキュメントの読み込み、ページの更新、タスク管理```bash
 droid mcp add notion https://mcp.notion.com/mcp --type http
-```
-
-**Linear** - 課題追跡とプロジェクト管理
-
-```bash
+```**Linear** - 課題追跡とプロジェクト管理```bash
 droid mcp add linear https://mcp.linear.app/mcp --type http
-```
-
-**Intercom** - 顧客の会話とチケットへのアクセス
-
-```bash
+```**Intercom** - 顧客の会話とチケットへのアクセス```bash
 droid mcp add intercom https://mcp.intercom.com/mcp --type http
-```
-
-**Monday** - monday.comボードとアイテムの管理
-
-```bash
+```**Monday** - monday.com のボードとアイテムを管理```bash
 droid mcp add monday https://mcp.monday.com/mcp --type http
-```
+```#### 決済・コマース
 
-#### 決済と商取引
-
-**Stripe** - 決済処理とサブスクリプション
-
-```bash
+**Stripe** - 決済処理とサブスクリプション```bash
 droid mcp add stripe https://mcp.stripe.com --type http
-```
-
-**PayPal** - PayPal商取引と決済処理
-
-```bash
+```**PayPal** - PayPal商取引および決済処理```bash
 droid mcp add paypal https://mcp.paypal.com/mcp --type http
-```
+```#### デザイン・メディア
 
-#### デザインとメディア
-
-**Figma** - Figmaコンテキストでコードを生成
-
-```bash
+**Figma** - Figmaコンテキストでコードを生成```bash
 droid mcp add figma https://mcp.figma.com/mcp --type http
-```
-
-**Canva** - Canvaデザインの閲覧、要約、生成
-
-```bash
+```**Canva** - Canvaデザインの閲覧、要約、生成```bash
 droid mcp add canva https://mcp.canva.com/mcp --type http
-```
-
-**TwelveLabs** - 動画分析、検索、AI駆動のインサイト
-
-```bash
+```**TwelveLabs** - 動画分析、検索、そしてAI搭載のインサイト```bash
 droid mcp add twelvelabs-mcp https://mcp.twelvelabs.io --type http \
   --header "x-api-key: YOUR_TWELVELABS_API_KEY"
-```
+```#### インフラストラクチャ & DevOps
 
-#### インフラストラクチャとDevOps
-
-**Netlify** - ウェブサイトの作成、デプロイ、管理
-
-```bash
+**Netlify** - ウェブサイトの作成、デプロイ、管理```bash
 droid mcp add netlify https://netlify-mcp.netlify.app/mcp --type http
-```
-
-**Vercel** - プロジェクト、デプロイメント、ログの管理
-
-```bash
+```**Vercel** - プロジェクト、デプロイメント、ログの管理```bash
 droid mcp add vercel https://mcp.vercel.com/ --type http
-```
-
-**Stytch** - 認証サービスの設定
-
-```bash
+```**Stytch** - 認証サービスの設定```bash
 droid mcp add stytch http://mcp.stytch.dev/mcp --type http
-```
-
-<Tip>
-  Many HTTP servers require OAuth authentication. After adding, use the
-  interactive `/mcp` UI to complete the authentication flow.
+```<Tip>
+  多くのHTTPサーバーはOAuth認証が必要です。追加後、インタラクティブな`/mcp`UIを使用して認証フローを完了してください。
 </Tip>
 
 ### Stdioサーバーの追加
 
-Stdioサーバーはマシン上でローカルプロセスとして実行され、直接システムアクセスが必要なツールに最適です。
+Stdioサーバーはあなたのマシン上でローカルプロセスとして実行されます - 直接的なシステムアクセスが必要なツールに最適です。
 
-**構文：**
-
-```bash
+**構文:**```bash
 droid mcp add <name> "<command>" [--env KEY=VALUE...]
-```
-
-**引数：**
+```**引数:**
 
 - `name` - 一意のサーバー識別子
-- `command` - サーバーを開始するためのコマンド（スペースが含まれる場合は引用符で囲む）
+- `command` - サーバーを起動するコマンド（スペースが含まれる場合は引用符で囲む）
 - `--env KEY=VALUE` - 環境変数（複数回使用可能）
 
 ### 人気のStdio MCPサーバー
 
-**Airtable** - レコードの読み取り/書き込み、ベースとテーブルの管理
-
-```bash
+**Airtable** - レコードの読み書き、ベースとテーブルの管理```bash
 droid mcp add airtable "npx -y airtable-mcp-server" \
   --env AIRTABLE_API_KEY=your_key
-```
-
-**ClickUp** - タスク管理とプロジェクト追跡
-
-```bash
+```**ClickUp** - タスク管理とプロジェクト追跡```bash
 droid mcp add clickup "npx -y @hauptsache.net/clickup-mcp" \
   --env CLICKUP_API_KEY=your_key \
   --env CLICKUP_TEAM_ID=your_team_id
-```
-
-**HubSpot** - CRMデータのアクセスと管理
-
-```bash
+```**HubSpot** - CRMデータへのアクセスと管理```bash
 droid mcp add hubspot "npx -y @hubspot/mcp-server" \
   --env HUBSPOT_ACCESS_TOKEN=your_token
-```
+```## サーバーの削除
 
-## サーバーの削除
-
-設定からサーバーを削除：
-
-```bash
+設定からサーバーを削除します：```bash
 droid mcp remove <name>
-```
-
-**例：**
-
-```bash
+```I don't see any text provided after "Text to translate:" and "**Example:**". Could you please provide the English technical documentation (MDX/Markdown) that you'd like me to translate to Japanese? Once you share the content, I'll translate it following all the critical rules you've outlined.```bash
 droid mcp remove notion
-```
-
-## サーバーの管理
+```## サーバー管理
 
 droid内で`/mcp`と入力すると、MCPサーバーを管理するためのインタラクティブUIが開きます。
-- 設定済みサーバーをステータス付きですべて表示
+- ステータス付きで設定済みのすべてのサーバーを確認
 - 各サーバーが提供するすべてのツールを表示
 - OAuth認証が必要なリモートサーバーの認証
-- サーバーの追加/削除および有効化/無効化
+- サーバーの追加・削除および有効化・無効化
 
 ## 設定
 
@@ -239,46 +150,44 @@ MCPサーバーの設定は2つのレベルで保存できます：
 
 | レベル | 場所 | 目的 |
 | :---- | :------- | :------ |
-| **ユーザー** | `~/.factory/mcp.json` | 個人のサーバー、すべてのプロジェクトで利用可能 |
+| **ユーザー** | `~/.factory/mcp.json` | 個人用サーバー、すべてのプロジェクトで利用可能 |
 | **プロジェクト** | `.factory/mcp.json` | チーム共有サーバー、リポジトリにコミット |
 
-### レイヤー化の仕組み
+### レイヤリングの仕組み
 
 ユーザー設定がプロジェクト設定よりも優先されます。両方のレベルで同じサーバーが定義されている場合、ユーザーレベルの設定が優先されます。
 
-**重要な動作：**
-- プロジェクト定義のサーバーを**有効化/無効化**すると、新しい状態でコピーがユーザー設定に保存されます。元のプロジェクト設定は変更されないため、チームメンバーには影響しません。
-- **プロジェクトサーバーはCLIや`/mcp`UI経由では削除できません**。削除するには、`.factory/mcp.json`を直接編集してください。
-- `droid mcp add`やレジストリ経由で追加したサーバーは、常に**ユーザー設定**に保存されます。
+**主要な動作：**
+- プロジェクトで定義されたサーバーを**有効化・無効化**すると、新しい状態でユーザー設定にコピーが保存されます。元のプロジェクト設定は変更されないため、チームメイトには影響しません。
+- **プロジェクトサーバーはCLIや`/mcp` UIから削除できません**。削除するには、`.factory/mcp.json`を直接編集してください。
+- `droid mcp add`やレジストリから追加したサーバーは、常に**ユーザー設定**に保存されます。
 
 ### OAuthトークン
 
-OAuthトークンはシステムキーリング（またはフォールバックファイル）にグローバルに保存され、**プロジェクトごとではありません**。あるプロジェクトでサーバーに認証すると、そのサーバーが設定されているすべての場所で認証されます。
+OAuthトークンは、プロジェクトごとではなく、システムキーリング（またはフォールバックファイル）にグローバルに保存されます。あるプロジェクトでサーバーの認証を行うと、そのサーバーが設定されているすべての場所で認証済みになります。
 
-サーバーの認証をクリアするには、`/mcp`インタラクティブマネージャーを使用し、「認証のクリア」を選択してください。
+サーバーの認証をクリアするには、`/mcp`インタラクティブマネージャーを使用して「Clear Auth」を選択してください。
 
 ### 設定スキーマ
 
 各サーバーエントリには以下が含まれます：
 
-| フィールド | 型 | 説明 |
+| フィールド | タイプ | 説明 |
 | :---- | :--- | :---------- |
 | `type` | `"stdio" \| "http"` | サーバータイプ |
-| `disabled` | `boolean` | サーバーを一時的に無効化（デフォルト：`false`） |
-| `disabledTools` | `string[]` | このMCPサーバーで無効化するツール名のリスト |
+| `disabled` | `boolean` | サーバーを一時的に無効にする（デフォルト：`false`） |
+| `disabledTools` | `string[]` | このMCPサーバーで無効にするツール名のリスト |
 
-**stdio**サーバーの場合：
+**stdio**サーバー用：
 - **command**: 実行する実行可能ファイル
 - **args**: コマンドライン引数（配列）
 - **env**: 環境変数（オブジェクト）
 
-**http**サーバーの場合：
+**http**サーバー用：
 - **url**: HTTP/HTTPSエンドポイントURL
 - **headers**: 認証用HTTPヘッダー（オブジェクト）
 
-**`mcp.json`の例：**
-
-```json
+**`mcp.json`の例：**```json
 {
   "mcpServers": {
     "linear": {
@@ -294,6 +203,4 @@ OAuthトークンはシステムキーリング（またはフォールバック
     }
   }
 }
-```
-
-Droidは設定ファイルの変更時に自動的にリロードされるため、サーバーを追加した後すぐに利用可能になります。
+```Droidは設定ファイルが変更されると自動的にリロードするため、サーバーを追加した後すぐに利用可能になります。
