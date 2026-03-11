@@ -4,36 +4,33 @@ description: Balance accuracy, speed, and cost by picking the right model and re
 keywords: ['model', 'models', 'llm', 'claude', 'sonnet', 'opus', 'haiku', 'gpt', 'openai', 'anthropic', 'choose model', 'switch model']
 ---
 
-モデル品質は迅速に進化しており、エコシステムが変化するにつれてCLIのデフォルト設定を調整しています。このガイドは、現在の主要なオプションの比較のスナップショットとして活用し、更新版を公開する際には再確認することをお勧めします。本ガイドの最終更新日は2026年2月25日（水曜日）です。
+モデル品質は迅速に進化しており、エコシステムが変化するにつれてCLIのデフォルト設定を調整しています。このガイドは、現在の主要なオプションの比較のスナップショットとして活用し、更新版を公開する際には再確認することをお勧めします。本ガイドの最終更新日は2026年3月11日（水曜日）です。
 
 ---
 
-## 1 · 現在のスタックランキング（2026年2月）
+## 1 · 現在のスタックランキング（2026年3月）
 
 | ランク | モデル                         | 選ぶ理由                                                                                                                               |
 | ---- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1    | **Claude Opus 4.6**           | **Max**推論機能を搭載したAnthropic最新フラッグシップ；複雑な作業における最高の深度と安全性。                                                        |
 | 2    | **Claude Opus 4.6 Fast**      | より高速な応答時間に調整されたOpus 4.6；12倍のマルチプライヤー。                                                                          |
 | 3    | **Claude Opus 4.5**           | 実証された品質と安全性のバランス；TUIとexecの強固なデフォルト。                                                                              |
-| 4    | **GPT-5.1-Codex-Max**         | **Extra High**推論まで対応の高速コーディングループ；重厚な実装とデバッグに最適。                                    |
-| 5    | **Claude Sonnet 4.5**         | コスト/品質のバランスが取れた優秀な日常使いモデル；Opusレベルの深度が不要な場合の優れた汎用選択肢。                              |
-| 6    | **GPT-5.3-Codex**             | **Extra High**推論と冗長性サポート搭載の最新OpenAIコーディングモデル；実装重視のタスクに強力。                          |
-| 7    | **GPT-5.2-Codex**             | **Extra High**推論搭載の実証済みOpenAIコーディングモデル；実装重視のタスクに堅実。                                                 |
-| 8    | **GPT-5.1-Codex**             | より低コストで堅実なコード品質による迅速な反復；より深度が必要な場合は推論を上げる。                                                 |
-| 9    | **GPT-5.1**                   | 優れた汎用モデル、特に柔軟な推論努力でOpenAIの使い心地を求める場合。                                                     |
-| 10   | **GPT-5.2**                   | 冗長性サポートと**Extra High**までの推論を備えた高度なOpenAIモデル。                                                                |
-| 11   | **Claude Haiku 4.5**          | 日常的なタスクと大量自動化のための高速で費用効率の良いモデル。                                                                              |
-| 12   | **Gemini 3.1 Pro**            | 構造化出力に強く、研究重視のタスク用の混合推論制御を持つ新しいGemini Pro世代。                                |
-| 13   | **Gemini 3 Pro**              | Low/High設定での混合推論に強力；構造化出力を持つ研究フローに有用。                                           |
-| 14   | **Gemini 3 Flash**            | 完全な推論サポートを持つ高速・安価（0.2倍マルチプライヤー）；速度が重要な大量タスクに最適。                                     |
-| 15   | **Droid Core (MiniMax M2.5)** | オープンソース、推論サポート（Low/Medium/High）付きの0.12倍マルチプライヤー；利用可能な最安価モデル。画像サポートなし。                             |
-| 16   | **Droid Core (GLM-5)**        | 大量自動化とエアギャップ環境用の更新されたGLM機能を持つオープンソース、0.4倍マルチプライヤー；画像サポートなし。                   |
-| 17   | **Droid Core (GLM-4.7)**      | 大量自動化やエアギャップ環境用のオープンソース、0.25倍マルチプライヤーの安定した選択肢；注：画像サポートなし。                            |
-| 18   | **Droid Core (Kimi K2.5)**    | 画像サポート付きオープンソース、0.25倍マルチプライヤー；コスト重視の作業に適している。                                                                  |
+| 4    | **Claude Sonnet 4.6**         | Sonnet価格帯（1.2倍）で**Max**推論を搭載；計画と実装のための強力な日常使いモデル。                                                      |
+| 5    | **GPT-5.4**                   | 922Kコンテキスト、128K出力、冗長性サポート、**Extra High**推論を搭載した最新OpenAIモデル；大規模コンテキストタスクに最適。                           |
+| 6    | **Claude Sonnet 4.5**         | コスト/品質のバランスが取れた優秀な日常使いモデル；Opusレベルの深度が不要な場合の優れた汎用選択肢。                              |
+| 7    | **GPT-5.3-Codex**             | **Extra High**推論と冗長性サポート搭載の最新OpenAIコーディングモデル；実装重視のタスクに強力。                          |
+| 8    | **GPT-5.2-Codex**             | **Extra High**推論搭載の実証済みOpenAIコーディングモデル；実装重視のタスクに堅実。                                                 |
+| 9    | **GPT-5.2**                   | 冗長性サポートと**Extra High**までの推論を備えたOpenAIモデル。                                                                |
+| 10   | **Claude Haiku 4.5**          | 日常的なタスクと大量自動化のための高速で費用効率の良いモデル。                                                                              |
+| 11   | **Gemini 3.1 Pro**            | 構造化出力に強く、研究重視のタスク用の混合推論制御を持つ新しいGemini Pro世代。                                |
+| 12   | **Gemini 3 Flash**            | 完全な推論サポートを持つ高速・安価（0.2倍マルチプライヤー）；速度が重要な大量タスクに最適。                                     |
+| 13   | **Droid Core (MiniMax M2.5)** | オープンソース、推論サポート（Low/Medium/High）付きの0.12倍マルチプライヤー；利用可能な最安価モデル。画像サポートなし。                             |
+| 14   | **Droid Core (GLM-5)**        | 大量自動化とエアギャップ環境用の更新されたGLM機能を持つオープンソース、0.4倍マルチプライヤー；画像サポートなし。                   |
+| 15   | **Droid Core (GLM-4.7)**      | 大量自動化やエアギャップ環境用のオープンソース、0.25倍マルチプライヤーの安定した選択肢；注：画像サポートなし。                            |
+| 16   | **Droid Core (Kimi K2.5)**    | 画像サポート付きオープンソース、0.25倍マルチプライヤー；コスト重視の作業に適している。                                                                  |
 
 <Note>
-  We ship model updates regularly. When a new release overtakes the list above,
-  we update this page and the CLI defaults.
+  モデルの更新は定期的に行われます。新しいリリースが上記のリストを超えた場合、このページとCLIのデフォルトを更新します。
 </Note>
 
 ---
@@ -42,14 +39,14 @@ keywords: ['model', 'models', 'llm', 'claude', 'sonnet', 'opus', 'haiku', 'gpt',
 
 | シナリオ                                                         | 推奨モデル                                                                                                                          |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| **深い計画、アーキテクチャレビュー、曖昧な製品仕様** | 最高の深度と安全性には**Opus 4.6**、またはより高速なターンアラウンドには**Opus 4.6 Fast**から始める。バランスの取れたコスト/品質には**Sonnet 4.5**、または推論付きの高速反復には**Codex/Codex-Max**を使用。 |
-| **フル機能開発、大規模リファクタリング**                    | 深度と安全性には**Opus 4.6**または**Opus 4.5**。速度と**Extra High**推論が必要な場合は**GPT-5.3-Codex**、**GPT-5.2-Codex**、または**GPT-5.1-Codex-Max**；バランスの取れたループには**Sonnet 4.5**。 |
-| **反復可能な編集、要約、定型文生成**      | 速度とコストのために**Haiku 4.5**または**Droid Core**（0.12倍の**MiniMax M2.5**含む）。より高い品質や構造化出力が必要な場合は**GPT-5.1 / GPT-5.1-Codex**。 |
-| **CI/CDまたは自動化ループ**                                    | 予測可能で低コストなスループットのために**Haiku 4.5**または**Droid Core**を優先。自動化により強い推論が必要な場合は**Codex**または**Codex-Max**を使用。 |
+| **深い計画、アーキテクチャレビュー、曖昧な製品仕様** | 最高の深度と安全性には**Opus 4.6**、またはより高速なターンアラウンドには**Opus 4.6 Fast**から始める。バランスの取れたコスト/品質には**Sonnet 4.6**または**Sonnet 4.5**、大規模コンテキスト推論には**GPT-5.4**を使用。 |
+| **フル機能開発、大規模リファクタリング**                    | 深度と安全性には**Opus 4.6**または**Opus 4.5**。速度と**Extra High**推論が必要な場合は**GPT-5.4**、**GPT-5.3-Codex**、または**GPT-5.2-Codex**；バランスの取れたループには**Sonnet 4.6**または**Sonnet 4.5**。 |
+| **反復可能な編集、要約、定型文生成**      | 速度とコストのために**Haiku 4.5**または**Droid Core**（0.12倍の**MiniMax M2.5**含む）。より高い品質や構造化出力が必要な場合は**GPT-5.2**。 |
+| **CI/CDまたは自動化ループ**                                    | 予測可能で低コストなスループットのために**Haiku 4.5**または**Droid Core**を優先。自動化により強い推論が必要な場合は**GPT-5.3-Codex**または**GPT-5.4**を使用。 |
 | **大量自動化、頻繁な迅速ターン**                 | 迅速なフィードバックには**Haiku 4.5**。コストが重要またはエアギャップ展開が必要な場合は**Droid Core**（特に推論付き0.12倍の**MiniMax M2.5**）。 |
 
 <Tip>
-  **Claude Opus 4.6** is the top-tier option for extremely complex architecture decisions or critical work where you need maximum reasoning capability. **Opus 4.6 Fast** is tuned for faster responses at a higher cost. Most tasks don't require Opus-level power—start with Sonnet 4.5 and escalate only if needed.
+  **Claude Opus 4.6**は、極めて複雑なアーキテクチャの意思決定や、最大限の推論機能が必要な重要な作業に最適なオプションです。**Opus 4.6 Fast**はより高いコストでより高速な応答に調整されています。ほとんどのタスクにOpusレベルのパワーは不要です。Sonnet 4.6またはSonnet 4.5から始め、必要な場合のみエスカレートしてください。
 </Tip>
 
 ヒント：`/model`または設定パネル（`Shift+Tab` → **Settings**）でセッション中にモデルを切り替えることができます。
@@ -68,26 +65,23 @@ keywords: ['model', 'models', 'llm', 'claude', 'sonnet', 'opus', 'haiku', 'gpt',
 ## 4 · 推論努力設定
 
 - **Opus 4.6 / Opus 4.6 Fast**: Off / Low / Medium / High / **Max**（デフォルト：High）
+- **Sonnet 4.6**: Off / Low / Medium / High / **Max**（デフォルト：High）
 - **Opus 4.5 / Sonnet 4.5 / Haiku 4.5**: Off / Low / Medium / High（デフォルト：Off）
-- **GPT-5.1**: None / Low / Medium / High（デフォルト：None）
-- **GPT-5.1-Codex**: Low / Medium / High（デフォルト：Medium）
-- **GPT-5.1-Codex-Max**: Low / Medium / High / **Extra High**（デフォルト：Medium）
+- **GPT-5.4**: None / Low / Medium / High / **Extra High**（デフォルト：Medium）
 - **GPT-5.2**: Off / Low / Medium / High / **Extra High**（デフォルト：Low）
 - **GPT-5.2-Codex**: None / Low / Medium / High / **Extra High**（デフォルト：Medium）
 - **GPT-5.3-Codex**: None / Low / Medium / High / **Extra High**（デフォルト：Medium）
 - **Gemini 3.1 Pro**: Low / Medium / High（デフォルト：High）
-- **Gemini 3 Pro**: None / Low / Medium / High（デフォルト：High）
 - **Gemini 3 Flash**: Minimal / Low / Medium / High（デフォルト：High）
 - **Droid Core (GLM-5)**: Noneのみ（デフォルト：None；画像サポートなし）
 - **Droid Core (GLM-4.7)**: Noneのみ（デフォルト：None；画像サポートなし）
 - **Droid Core (Kimi K2.5)**: Noneのみ（デフォルト：None）
 - **Droid Core (MiniMax M2.5)**: Low / Medium / High（デフォルト：High）
 
-推論努力は遅延とコストを増加させます。単純な作業には低く開始し、必要に応じてエスカレートしてください。**Max**はClaude Opus 4.6で利用可能。**Extra High**はGPT-5.1-Codex-Max、GPT-5.2、GPT-5.2-Codex、GPT-5.3-Codexで利用可能。
+推論努力は遅延とコストを増加させます。単純な作業には低く開始し、必要に応じてエスカレートしてください。**Max**はClaude Opus 4.6とSonnet 4.6で利用可能。**Extra High**はGPT-5.4、GPT-5.2、GPT-5.2-Codex、GPT-5.3-Codexで利用可能。
 
 <Tip>
-  Change reasoning effort from `/model` → **Reasoning effort**, or via the
-  settings menu.
+  `/model` → **Reasoning effort**、または設定メニューから推論努力を変更できます。
 </Tip>
 
 ---

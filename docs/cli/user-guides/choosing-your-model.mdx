@@ -4,32 +4,30 @@ description: Balance accuracy, speed, and cost by picking the right model and re
 keywords: ['model', 'models', 'llm', 'claude', 'sonnet', 'opus', 'haiku', 'gpt', 'openai', 'anthropic', 'choose model', 'switch model']
 ---
 
-Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Wednesday, February 25th 2026.
+Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shifts. Use this guide as a snapshot of how the major options compare today, and expect to revisit it as we publish updates. This guide was last updated on Wednesday, March 11th 2026.
 
 ---
 
-## 1 · Current stack rank (February 2026)
+## 1 · Current stack rank (March 2026)
 
 | Rank | Model                         | Why we reach for it                                                                                                                               |
 | ---- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1    | **Claude Opus 4.6**           | Latest Anthropic flagship with **Max** reasoning; best depth and safety for complex work.                                                        |
 | 2    | **Claude Opus 4.6 Fast**      | Opus 4.6 tuned for faster response times; 12× multiplier.                                                                          |
 | 3    | **Claude Opus 4.5**           | Proven quality-and-safety balance; strong default for TUI and exec.                                                                              |
-| 4    | **GPT-5.1-Codex-Max**         | Fast coding loops with support up to **Extra High** reasoning; great for heavy implementation and debugging.                                    |
-| 5    | **Claude Sonnet 4.5**         | Strong daily driver with balanced cost/quality; great general-purpose choice when you don’t need Opus-level depth.                              |
-| 6    | **GPT-5.3-Codex**             | Newest OpenAI coding model with **Extra High** reasoning and verbosity support; strong for implementation-heavy tasks.                          |
-| 7    | **GPT-5.2-Codex**             | Proven OpenAI coding model with **Extra High** reasoning; solid for implementation-heavy tasks.                                                 |
-| 8    | **GPT-5.1-Codex**             | Quick iteration with solid code quality at lower cost; bump reasoning when you need more depth.                                                 |
-| 9    | **GPT-5.1**                   | Good generalist, especially when you want OpenAI ergonomics with flexible reasoning effort.                                                     |
-| 10   | **GPT-5.2**                   | Advanced OpenAI model with verbosity support and reasoning up to **Extra High**.                                                                |
-| 11   | **Claude Haiku 4.5**          | Fast, cost-efficient for routine tasks and high-volume automation.                                                                              |
-| 12   | **Gemini 3.1 Pro**            | Newer Gemini Pro generation with strong structured outputs and mixed reasoning controls for research-heavy tasks.                                |
-| 13   | **Gemini 3 Pro**              | Strong at mixed reasoning with Low/High settings; helpful for researchy flows with structured outputs.                                           |
-| 14   | **Gemini 3 Flash**            | Fast, cheap (0.2× multiplier) with full reasoning support; great for high-volume tasks where speed matters.                                     |
-| 15   | **Droid Core (MiniMax M2.5)** | Open-source, 0.12× multiplier with reasoning support (Low/Medium/High); cheapest model available. No image support.                             |
-| 16   | **Droid Core (GLM-5)**        | Open-source, 0.4× multiplier with updated GLM capabilities for bulk automation and air-gapped environments; no image support.                   |
-| 17   | **Droid Core (GLM-4.7)**      | Open-source, 0.25× multiplier, stable choice for bulk automation or air-gapped environments; note: no image support.                            |
-| 18   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; good for cost-sensitive work.                                                                  |
+| 4    | **Claude Sonnet 4.6**         | **Max** reasoning at the Sonnet price point (1.2×); strong daily driver for planning and implementation.                                         |
+| 5    | **GPT-5.4**                   | Latest OpenAI model with 922K context, 128K output, verbosity support, and **Extra High** reasoning; excellent for large-context tasks.           |
+| 6    | **Claude Sonnet 4.5**         | Strong daily driver with balanced cost/quality; great general-purpose choice when you don't need Opus-level depth.                              |
+| 7    | **GPT-5.3-Codex**             | Newest OpenAI coding model with **Extra High** reasoning and verbosity support; strong for implementation-heavy tasks.                          |
+| 8    | **GPT-5.2-Codex**             | Proven OpenAI coding model with **Extra High** reasoning; solid for implementation-heavy tasks.                                                 |
+| 9    | **GPT-5.2**                   | OpenAI model with verbosity support and reasoning up to **Extra High**.                                                                |
+| 10   | **Claude Haiku 4.5**          | Fast, cost-efficient for routine tasks and high-volume automation.                                                                              |
+| 11   | **Gemini 3.1 Pro**            | Newer Gemini Pro generation with strong structured outputs and mixed reasoning controls for research-heavy tasks.                                |
+| 12   | **Gemini 3 Flash**            | Fast, cheap (0.2× multiplier) with full reasoning support; great for high-volume tasks where speed matters.                                     |
+| 13   | **Droid Core (MiniMax M2.5)** | Open-source, 0.12× multiplier with reasoning support (Low/Medium/High); cheapest model available. No image support.                             |
+| 14   | **Droid Core (GLM-5)**        | Open-source, 0.4× multiplier with updated GLM capabilities for bulk automation and air-gapped environments; no image support.                   |
+| 15   | **Droid Core (GLM-4.7)**      | Open-source, 0.25× multiplier, stable choice for bulk automation or air-gapped environments; note: no image support.                            |
+| 16   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; good for cost-sensitive work.                                                                  |
 
 <Note>
   We ship model updates regularly. When a new release overtakes the list above,
@@ -42,14 +40,14 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 
 | Scenario                                                         | Recommended model                                                                                                                          |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.6** for best depth and safety, or **Opus 4.6 Fast** for faster turnaround. Use **Sonnet 4.5** when you want balanced cost/quality, or **Codex/Codex-Max** for faster iteration with reasoning. |
-| **Full-feature development, large refactors**                    | **Opus 4.6** or **Opus 4.5** for depth and safety. **GPT-5.3-Codex**, **GPT-5.2-Codex**, or **GPT-5.1-Codex-Max** when you need speed plus **Extra High** reasoning; **Sonnet 4.5** for balanced loops. |
-| **Repeatable edits, summarization, boilerplate generation**      | **Haiku 4.5** or **Droid Core** (including **MiniMax M2.5** at 0.12×) for speed and cost. **GPT-5.1 / GPT-5.1-Codex** when you need higher quality or structured outputs. |
-| **CI/CD or automation loops**                                    | Favor **Haiku 4.5** or **Droid Core** for predictable, low-cost throughput. Use **Codex** or **Codex-Max** when automation needs stronger reasoning. |
+| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.6** for best depth and safety, or **Opus 4.6 Fast** for faster turnaround. Use **Sonnet 4.6** or **Sonnet 4.5** when you want balanced cost/quality, or **GPT-5.4** for large-context reasoning. |
+| **Full-feature development, large refactors**                    | **Opus 4.6** or **Opus 4.5** for depth and safety. **GPT-5.4**, **GPT-5.3-Codex**, or **GPT-5.2-Codex** when you need speed plus **Extra High** reasoning; **Sonnet 4.6** or **Sonnet 4.5** for balanced loops. |
+| **Repeatable edits, summarization, boilerplate generation**      | **Haiku 4.5** or **Droid Core** (including **MiniMax M2.5** at 0.12×) for speed and cost. **GPT-5.2** when you need higher quality or structured outputs. |
+| **CI/CD or automation loops**                                    | Favor **Haiku 4.5** or **Droid Core** for predictable, low-cost throughput. Use **GPT-5.3-Codex** or **GPT-5.4** when automation needs stronger reasoning. |
 | **High-volume automation, frequent quick turns**                 | **Haiku 4.5** for speedy feedback. **Droid Core** (especially **MiniMax M2.5** at 0.12× with reasoning) when cost is critical or you need air-gapped deployment. |
 
 <Tip>
-  **Claude Opus 4.6** is the top-tier option for extremely complex architecture decisions or critical work where you need maximum reasoning capability. **Opus 4.6 Fast** is tuned for faster responses at a higher cost. Most tasks don't require Opus-level power—start with Sonnet 4.5 and escalate only if needed.
+  **Claude Opus 4.6** is the top-tier option for extremely complex architecture decisions or critical work where you need maximum reasoning capability. **Opus 4.6 Fast** is tuned for faster responses at a higher cost. Most tasks don't require Opus-level power—start with Sonnet 4.6 or Sonnet 4.5 and escalate only if needed.
 </Tip>
 
 Tip: you can swap models mid-session with `/model` or by toggling in the settings panel (`Shift+Tab` → **Settings**).
@@ -68,22 +66,20 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 ## 4 · Reasoning effort settings
 
 - **Opus 4.6 / Opus 4.6 Fast**: Off / Low / Medium / High / **Max** (default: High)
+- **Sonnet 4.6**: Off / Low / Medium / High / **Max** (default: High)
 - **Opus 4.5 / Sonnet 4.5 / Haiku 4.5**: Off / Low / Medium / High (default: Off)
-- **GPT-5.1**: None / Low / Medium / High (default: None)
-- **GPT-5.1-Codex**: Low / Medium / High (default: Medium)
-- **GPT-5.1-Codex-Max**: Low / Medium / High / **Extra High** (default: Medium)
+- **GPT-5.4**: None / Low / Medium / High / **Extra High** (default: Medium)
 - **GPT-5.2**: Off / Low / Medium / High / **Extra High** (default: Low)
 - **GPT-5.2-Codex**: None / Low / Medium / High / **Extra High** (default: Medium)
 - **GPT-5.3-Codex**: None / Low / Medium / High / **Extra High** (default: Medium)
 - **Gemini 3.1 Pro**: Low / Medium / High (default: High)
-- **Gemini 3 Pro**: None / Low / Medium / High (default: High)
 - **Gemini 3 Flash**: Minimal / Low / Medium / High (default: High)
 - **Droid Core (GLM-5)**: None only (default: None; no image support)
 - **Droid Core (GLM-4.7)**: None only (default: None; no image support)
 - **Droid Core (Kimi K2.5)**: None only (default: None)
 - **Droid Core (MiniMax M2.5)**: Low / Medium / High (default: High)
 
-Reasoning effort increases latency and cost—start low for simple work and escalate as needed. **Max** is available on Claude Opus 4.6. **Extra High** is available on GPT-5.1-Codex-Max, GPT-5.2, GPT-5.2-Codex, and GPT-5.3-Codex.
+Reasoning effort increases latency and cost—start low for simple work and escalate as needed. **Max** is available on Claude Opus 4.6 and Sonnet 4.6. **Extra High** is available on GPT-5.4, GPT-5.2, GPT-5.2-Codex, and GPT-5.3-Codex.
 
 <Tip>
   Change reasoning effort from `/model` → **Reasoning effort**, or via the
