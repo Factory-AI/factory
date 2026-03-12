@@ -3,22 +3,8 @@ import numpy as np
 import torch
 
 from jeval.epe.core import EPEComputer, EPEResult
+from jeval.epe.weights import RISK_WEIGHTS
 from jeval.strata.classifier import ContentClassifier, ContentType
-
-
-# Risk weights = your theoretical priors about which memory entry
-# types matter most when lost during compression.
-# RQ1 will empirically validate or refute these numbers.
-# FACTUAL = 1.0 because a lost file path or error code is catastrophic.
-# BACKGROUND = 0.20 because losing ambient context is recoverable.
-RISK_WEIGHTS: dict[ContentType, float] = {
-    ContentType.FACTUAL:      1.00,
-    ContentType.CAUSAL:       0.95,
-    ContentType.ENTITY:       0.85,
-    ContentType.TEMPORAL:     0.75,
-    ContentType.CONTRASTIVE:  0.70,
-    ContentType.BACKGROUND:   0.20,
-}
 
 
 @dataclass
@@ -57,10 +43,8 @@ class DecomposedEPE:
     weighted_risk: float
 
     def risk_map(self) -> dict[ContentType, float]:
-        # per-type contribution to overall risk.
-        # used by the budget allocator to assign compression tiers.
         return {
-            ct: s.mean * RISK_WEIGHTS[ct]
+            ct: s.mean * RISK_WEIGHTS[ct.value]
             for ct, s in self.by_type.items()
             if s.n > 0
         }
@@ -108,14 +92,12 @@ class EPEDecomposer:
             "use align_abstractive() for non-1:1 compression"
         )
 
-        # classify and compute in batch — one forward pass each
         clf_results = self.classifier.classify_batch(orig_segs)
         epe_results = self.computer.compute_batch(
             orig_segs, comp_segs,
             seg_ids=[str(i) for i in range(len(orig_segs))]
         )
 
-        # bucket by content type
         by_type = {ct: TypeStats(ct) for ct in ContentType}
         for clf, epe in zip(clf_results, epe_results):
             by_type[clf.content_type].results.append(epe)
@@ -123,7 +105,7 @@ class EPEDecomposer:
         all_epes = [r.epe for r in epe_results]
         global_epe = float(np.mean(all_epes)) if all_epes else 0.0
         weighted_risk = sum(
-            s.mean * RISK_WEIGHTS[ct]
+            s.mean * RISK_WEIGHTS[ct.value]
             for ct, s in by_type.items() if s.n
         )
 
@@ -142,19 +124,17 @@ class EPEDecomposer:
         For abstractive compression: find the best compressed sentence
         match for each original segment via cosine similarity.
 
-        Both sets of embeddings are already L2-normalized so
-        matrix multiply gives cosine similarity directly —
-        no division needed.
+        Both sets of embeddings are L2-normalized so matrix multiply
+        gives cosine similarity directly — no division needed.
         """
         import nltk
         comp_sents = nltk.sent_tokenize(compressed_text)
 
-        orig_embs = self.computer.enc.encode_chunked(orig_segs)   # (N, dim)
-        comp_embs = self.computer.enc.encode_chunked(comp_sents)  # (M, dim)
+        orig_embs = self.computer.enc.encode_chunked(orig_segs)
+        comp_embs = self.computer.enc.encode_chunked(comp_sents)
 
         # sim[i, j] = cosine similarity between orig_segs[i] and comp_sents[j]
-        sim = torch.mm(orig_embs, comp_embs.T)  # (N, M)
+        sim = torch.mm(orig_embs, comp_embs.T)
 
-        # for each original segment, pick the closest compressed sentence
         best = sim.argmax(dim=1).tolist()
         return orig_segs, [comp_sents[i] for i in best]
