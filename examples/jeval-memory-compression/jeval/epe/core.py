@@ -27,44 +27,52 @@ class EPEResult:
 
 class EPEComputer:
     """
-    Computes EPE(original, compressed) = MSE(predictor(enc(C)), enc(T)) / 4
+    Computes EPE(original, compressed) = sum((predictor(enc(C)) - enc(T))^2) / 4.0
+
+    Why sum and not mean?
+      MSELoss(reduction='mean') averages across all 768 embedding dimensions.
+      Two orthogonal unit vectors have total squared distance ~2.0, but
+      averaged across 768 dims that becomes 2.0/768 = 0.0026 — near zero
+      and indistinguishable from verbatim compression.
+      sum() keeps the full signal. /2.0 normalizes to [0, 1] because
+      the maximum sum squared distance between two unit vectors is 2.0
+      (perfectly opposite directions: ||u - (-u)||^2 = ||2u||^2 = 4,
+      but MSE sum on unit sphere max = 2.0 for orthogonal vectors in
+      expectation — we use 2.0 as the practical normalization constant).
 
     Two modes — same class, different methods:
 
     TRAINING MODE — .training_loss()
       Gradients flow through the predictor only.
       Frozen encoder stays inside torch.no_grad().
-      Call loss.backward() after this.
 
     INFERENCE MODE — .compute() or .compute_batch()
-      This is the research contribution.
-      No gradients. No backprop.
-      EPE is purely a measurement instrument here.
-
+      No gradients. EPE is purely a measurement instrument.
       In real deployment you only have enc(C) — the original T
-      is gone. The predictor's output IS your estimate of what
-      the original embedding should have been.
-      We include enc(T) here only because RQ1 needs it to
-      compute the calibration correlation (EPE vs actual task loss).
+      is gone. We include enc(T) here only because RQ1 needs it
+      to compute the calibration correlation.
     """
 
     def __init__(self, encoder: FrozenEncoder, predictor: PredictorHead, device: str = "cpu"):
         self.enc = encoder
         self.pred = predictor
         self.device = device
-        # MSELoss averages across the embedding dimension.
-        # on unit vectors this gives values in [0, 4].
-        # dividing by 4 normalizes to [0, 1].
-        self.mse = nn.MSELoss()
+        # sum reduction keeps the full signal across all embedding dims
+        self.loss_fn = nn.MSELoss(reduction='sum')
+
+    def _epe(self, pred_emb: Tensor, orig_emb: Tensor) -> float:
+        # sum squared distance normalized to [0, 1]
+        # max sum squared distance between unit vectors ≈ 2.0
+        return self.loss_fn(pred_emb, orig_emb).item() / 4.0
 
     def compute(self, original: str, compressed: str) -> EPEResult:
-        orig_emb = self.enc.encode([original]).squeeze(0)   # (dim,)
-        comp_emb = self.enc.encode([compressed]).squeeze(0) # (dim,)
+        orig_emb = self.enc.encode([original]).squeeze(0)
+        comp_emb = self.enc.encode([compressed]).squeeze(0)
 
         with torch.no_grad():
-            pred_emb = self.pred(comp_emb.unsqueeze(0)).squeeze(0) # (dim,)
+            pred_emb = self.pred(comp_emb.unsqueeze(0)).squeeze(0)
 
-        epe = self.mse(pred_emb, orig_emb).item() / 4.0
+        epe   = self._epe(pred_emb, orig_emb)
         ratio = len(compressed.split()) / max(len(original.split()), 1)
 
         return EPEResult(
@@ -81,15 +89,15 @@ class EPEComputer:
         compresseds: list[str],
         seg_ids: list[str] | None = None,
     ) -> list[EPEResult]:
-        orig_embs = self.enc.encode_chunked(originals)   # (N, dim)
-        comp_embs = self.enc.encode_chunked(compresseds) # (N, dim)
+        orig_embs = self.enc.encode_chunked(originals)
+        comp_embs = self.enc.encode_chunked(compresseds)
 
         with torch.no_grad():
-            pred_embs = self.pred(comp_embs)             # (N, dim)
+            pred_embs = self.pred(comp_embs)
 
-        # per-sample MSE: mean across embedding dim, then normalize
-        # shape: (N, dim) → (N,)
-        epes = ((pred_embs - orig_embs) ** 2).mean(dim=-1) / 4.0
+        # per-sample sum across embedding dim, normalized
+        # (pred - orig)^2 shape: (N, dim) → sum → (N,) → /2.0
+        epes = ((pred_embs - orig_embs) ** 2).sum(dim=-1) / 4.0
 
         ratios = [
             len(c.split()) / max(len(o.split()), 1)
@@ -109,15 +117,9 @@ class EPEComputer:
         ]
 
     def training_loss(self, originals: list[str], compresseds: list[str]) -> Tensor:
-        # frozen encoder: no_grad so PyTorch doesn't waste memory
-        # building a computation graph for it
         with torch.no_grad():
             orig_embs = self.enc.encode_chunked(originals)
             comp_embs = self.enc.encode_chunked(compresseds)
-
-        # predictor: gradients ARE tracked here — this is what trains
         pred_embs = self.pred(comp_embs)
-
-        # raw MSE (not /4) for training — the scale doesn't matter
-        # for gradient direction, only for the reported loss value
-        return self.mse(pred_embs, orig_embs)
+        # sum reduction for training too — consistent with inference
+        return self.loss_fn(pred_embs, orig_embs)

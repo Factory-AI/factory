@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from jeval.strata.classifier import ContentType
-from jeval.epe.decomposer import RISK_WEIGHTS
+from jeval.epe.weights import RISK_WEIGHTS
 
 
 @dataclass
@@ -61,7 +61,7 @@ class BudgetAllocator:
     ) -> list[SegmentPlan]:
         plans = []
         for seg, epe_r, clf in zip(segments, epe_results, classifications):
-            w_risk = epe_r.epe * RISK_WEIGHTS.get(clf.content_type, 1.0)
+            w_risk = epe_r.epe * RISK_WEIGHTS.get(clf.content_type.value, 1.0)
 
             if w_risk > self.high:
                 budget = 1.0   # verbatim — too risky to touch
