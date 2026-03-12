@@ -1,17 +1,17 @@
+import re
+import os
+import json
+import urllib.request
 from jeval.epe.core import EPEComputer
 from jeval.strata.classifier import ContentClassifier
 from jeval.strata.budget import BudgetAllocator, SegmentPlan
 
-# entries shorter than this are kept verbatim regardless of budget
-# truncating a 10-word sentence to 7 words destroys meaning
-MIN_WORDS_TO_COMPRESS = 15
+MIN_WORDS_TO_COMPRESS = 8
+NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+NVIDIA_MODEL   = "mistralai/mistral-small-3.1-24b-instruct-2503"
 
 
 def _segment(text: str) -> list[str]:
-    """
-    Split a Droid memories.md into meaningful segments.
-    Each bullet point and section header becomes one segment.
-    """
     segments = []
     for line in text.splitlines():
         line = line.strip()
@@ -27,21 +27,57 @@ def _segment(text: str) -> list[str]:
     return [s for s in segments if len(s.split()) >= 3]
 
 
-def _apply_budget(segment: str, budget: float) -> str:
+def _llm_compress(segment: str, budget: float) -> str:
     """
-    Apply compression budget to one segment.
+    Use Mistral via NVIDIA NIM to compress a segment to the target budget.
+    Falls back to word truncation if API call fails or key is missing.
+    """
+    api_key = os.environ.get("NVIDIA_API_KEY")
+    if not api_key:
+        words = segment.split()
+        keep  = max(1, int(len(words) * budget))
+        return " ".join(words[:keep])
 
-    Short entries (< MIN_WORDS_TO_COMPRESS words) are always kept
-    verbatim — truncating a 10-word sentence to 7 words destroys
-    meaning without saving meaningful tokens.
-    """
+    target_words = max(4, int(len(segment.split()) * budget))
+    prompt = (
+        f"Summarize the following in at most {target_words} words. "
+        f"Preserve any file paths, function names, error codes, and variable names exactly. "
+        f"Return only the summary, no explanation.\n\n{segment}"
+    )
+
+    payload = json.dumps({
+        "model": NVIDIA_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 128,
+        "temperature": 0.0,
+    }).encode()
+
+    req = urllib.request.Request(
+        NVIDIA_API_URL,
+        data=payload,
+        headers={
+            "Content-Type":  "application/json",
+            "Authorization": f"Bearer {api_key}",
+        },
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data    = json.loads(resp.read())
+            summary = data["choices"][0]["message"]["content"].strip()
+            return summary
+    except Exception:
+        words = segment.split()
+        keep  = max(1, int(len(words) * budget))
+        return " ".join(words[:keep])
+
+
+def _apply_budget(segment: str, budget: float) -> str:
     if budget >= 1.0:
         return segment
-    words = segment.split()
-    if len(words) < MIN_WORDS_TO_COMPRESS:
+    if len(segment.split()) < MIN_WORDS_TO_COMPRESS:
         return segment
-    keep = max(1, int(len(words) * budget))
-    return " ".join(words[:keep])
+    return _llm_compress(segment, budget)
 
 
 class AdaptiveCompressor:
@@ -52,8 +88,8 @@ class AdaptiveCompressor:
       1. Segment by bullet points and headers
       2. Classify each segment by content type
       3. Compute EPE vs proxy compression
-      4. Build per-segment budget plan
-      5. Apply budgets — short entries always verbatim
+      4. Build per-segment budget plan (z-score calibrated)
+      5. Apply budgets via LLM summarization
     """
 
     def __init__(
