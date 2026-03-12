@@ -7,8 +7,8 @@ class Encoder(ABC):
     """
     Every encoder in jeval speaks this interface.
     The EPE computer only ever calls .encode() and .dim() —
-    it never knows whether it's talking to the frozen sentence
-    encoder or anything else. That's the point.
+    it never knows whether it is talking to the frozen sentence
+    encoder or anything else. That is the point.
     """
 
     @abstractmethod

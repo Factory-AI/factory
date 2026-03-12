@@ -1,80 +1,73 @@
 from dataclasses import dataclass
-from jeval.strata.classifier import ContentType
+from jeval.strata.classifier import ContentType, Classification
 from jeval.epe.weights import RISK_WEIGHTS
 
 
 @dataclass
 class SegmentPlan:
-    """
-    The compression decision for one memory segment.
-
-    budget is the fraction of tokens to keep:
-      1.0 = keep verbatim, do not compress
-      0.7 = light abstractive compression
-      0.3 = aggressive abstractive compression
-
-    This is what the PreCompact hook reads to decide
-    how to treat each segment before passing it to Droid's
-    native compressor.
-    """
     segment: str
     content_type: ContentType
+    confidence: float
     epe: float
     weighted_risk: float
     budget: float
 
 
+_PROTECT  = {ContentType.ENTITY, ContentType.FACTUAL, ContentType.CAUSAL}
+_COMPRESS = {ContentType.BACKGROUND}
+
+
 class BudgetAllocator:
     """
-    Maps weighted_risk → compression budget per segment.
+    Maps (content_type, EPE, confidence) → compression budget.
 
-    Three tiers:
+    Stage 1 — content type + confidence (works without trained predictor):
+      confidence > 0.70 and PROTECT type → budget = 1.0
+      confidence > 0.70 and BACKGROUND  → budget = 0.3
 
-      weighted_risk > high_thresh  →  1.0  (verbatim — protect this)
-      weighted_risk > low_thresh   →  0.7  (light compression ok)
-      else                         →  0.3  (compress aggressively)
-
-    The thresholds are calibrated from RQ1 results.
-    Default values are conservative priors — err on the side of
-    protecting more until you have empirical data saying otherwise.
-
-    Concrete example for a Droid memory file:
-      '- modified src/auth/refresh.ts to fix 401 on /api/login'
-       → ENTITY, epe=0.42, weighted_risk=0.36 → budget=1.0 (verbatim)
-
-      '- decided to use Zustand because Redux felt too heavy'
-       → CAUSAL, epe=0.28, weighted_risk=0.27 → budget=0.7 (light)
-
-      '- the afternoon was quiet, good time to refactor'
-       → BACKGROUND, epe=0.15, weighted_risk=0.03 → budget=0.3 (aggressive)
+    Stage 2 — EPE weighted risk (dominates after predictor is trained):
+      w_risk > high_thresh → budget = 1.0
+      w_risk < low_thresh  → budget = 0.3
     """
 
-    def __init__(self, high_thresh: float = 0.35, low_thresh: float = 0.10):
-        self.high = high_thresh
-        self.low = low_thresh
+    def __init__(
+        self,
+        high_thresh: float = 0.45,
+        low_thresh: float = 0.35,
+        confidence_threshold: float = 0.70,
+    ):
+        self.high       = high_thresh
+        self.low        = low_thresh
+        self.conf_thresh = confidence_threshold
 
     def plan(
         self,
         segments: list[str],
-        epe_results,      # list[EPEResult]
-        classifications,  # list[Classification]
+        epe_results,
+        classifications,
     ) -> list[SegmentPlan]:
         plans = []
         for seg, epe_r, clf in zip(segments, epe_results, classifications):
             w_risk = epe_r.epe * RISK_WEIGHTS.get(clf.content_type.value, 1.0)
-
-            if w_risk > self.high:
-                budget = 1.0   # verbatim — too risky to touch
-            elif w_risk > self.low:
-                budget = 0.7   # light compression ok
-            else:
-                budget = 0.3   # background noise — compress hard
-
+            budget = self._budget(clf, w_risk)
             plans.append(SegmentPlan(
                 segment=seg,
                 content_type=clf.content_type,
+                confidence=clf.confidence,
                 epe=epe_r.epe,
                 weighted_risk=w_risk,
                 budget=budget,
             ))
         return plans
+
+    def _budget(self, clf: Classification, w_risk: float) -> float:
+        if w_risk > self.high:
+            return 1.0
+        if w_risk < self.low:
+            return 0.3
+        if clf.confidence >= self.conf_thresh:
+            if clf.content_type in _PROTECT:
+                return 1.0
+            if clf.content_type in _COMPRESS:
+                return 0.3
+        return 0.7

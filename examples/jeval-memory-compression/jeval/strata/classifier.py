@@ -13,10 +13,6 @@ class ContentType(str, Enum):
     BACKGROUND   = "background"
 
 
-# Full descriptive strings used as NLI candidate labels.
-# Phrased as sentence completions for "This ___."
-# Tuned specifically for Droid memory entry patterns.
-# Changing these changes classification behavior — treat as a hyperparameter.
 _LABEL_STRINGS = {
     ContentType.FACTUAL:     "is a specific technical fact, file path, error code, or API endpoint",
     ContentType.CAUSAL:      "explains why a decision was made or what caused a problem",
@@ -26,9 +22,11 @@ _LABEL_STRINGS = {
     ContentType.BACKGROUND:  "is a general status update or ambient note with no specific technical detail",
 }
 
-# reverse map: descriptive string → ContentType
-_STRING_TO_TYPE = {v: k for k, v in _LABEL_STRINGS.items()}
+_STRING_TO_TYPE   = {v: k for k, v in _LABEL_STRINGS.items()}
 _CANDIDATE_LABELS = list(_LABEL_STRINGS.values())
+
+FAST_MODEL = "cross-encoder/nli-MiniLM2-L6-H768"
+PROD_MODEL = "cross-encoder/nli-deberta-v3-large"
 
 
 @dataclass
@@ -42,19 +40,19 @@ class ContentClassifier:
     """
     Zero-shot NLI classifier that routes memory segments to content types.
 
-    Uses full descriptive strings as NLI candidate labels rather than
-    short enum names. This is critical — DeBERTa NLI scores the full
-    string against the input, so richer descriptions give dramatically
-    better separation (0.99 vs 0.42 on file path entries).
-
-    Hypotheses are tuned for Droid memory entry patterns:
-    short, terse, markdown-formatted bullet points.
+    Use FAST_MODEL for development on CPU.
+    Use PROD_MODEL for final benchmarks.
     """
 
-    def __init__(self, device: int = -1, batch_size: int = 32):
+    def __init__(
+        self,
+        model: str = PROD_MODEL,
+        device: int = -1,
+        batch_size: int = 32,
+    ):
         self._pipe = pipeline(
             "zero-shot-classification",
-            model="cross-encoder/nli-deberta-v3-large",
+            model=model,
             device=device,
             dtype=torch.float16,
         )
