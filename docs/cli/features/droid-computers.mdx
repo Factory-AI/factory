@@ -4,7 +4,7 @@ description: Persistent, long-lived compute environments for Droid
 ---
 
 <Note>
-**Research Preview** — Droid Computers is currently available only to **Max plan** subscribers. There is a limit of **one computer per user** during the preview.
+**Research Preview** — Droid Computers is currently available only to **Max** and **Enterprise** plan subscribers. There is a limit of **one computer per user**.
 </Note>
 
 Droid Computers are persistent compute environments that Droid can connect to and work on across sessions. Unlike ephemeral cloud templates that are destroyed after each session, computers **retain state** — installed packages, files, running services, and configuration all persist between sessions.
@@ -17,25 +17,36 @@ The fastest way to get started is to create a computer directly from the Factory
 2. Click **Create**.
 3. Give your computer a name.
 
-Factory provisions a cloud machine (4 CPU, 8GB RAM) automatically. Provisioning progress is tracked live in the UI through the following steps:
+Factory provisions a cloud computer (4 CPU, 8GB RAM, 6GB swap) automatically. Provisioning progress is tracked live in the UI through the following steps:
 
-1. **Creating computer** — allocating the cloud machine
+1. **Creating computer** — allocating the cloud computer
 2. **Setting up user** — creating the `factory-user` account with sudo access
 3. **Configuring environment** — writing environment config, SSH keys, and service files
 4. **Installing Droid** — downloading and installing the Droid binary
 5. **Starting services** — launching the SSH and Droid daemon services
 
-Once provisioning completes, the computer status changes to **Active** and it becomes available for use in sessions. Computers auto-pause when idle and auto-resume when a new session targets them.
+If any step fails, the computer status changes to **Error** and the failed step is shown in the UI. You can delete the computer and retry.
+
+Once provisioning completes, the computer status changes to **Active** and it becomes available for use in sessions. Platform-managed computers auto-pause when idle and auto-resume when a new session targets them.
+
+## Managing computers
+
+From the computer detail page in **Settings → Droid Computers**, you can:
+
+- **Rename** a computer
+- **Delete** a computer (this stops and removes it permanently)
+- View live resource metrics and daemon version (see [Monitoring](#monitoring))
 
 ## Bring Your Own Machine (BYOM)
 
-You can register any Linux machine — cloud VM, on-prem server, WSL instance, etc. — as a Droid Computer.
+You can register any machine — VPS, cloud VM, on-prem server, etc. — as a Droid Computer.
 
 ### Prerequisites
 
+- A machine running **Linux** or **macOS**
 - Droid CLI installed on the machine
-- Authenticated with Factory (`droid login`)
-- Network access to Factory APIs (no inbound ports need to be opened)
+- Authenticated with Factory (`/login` in an interactive session)
+- Network access to Factory APIs, specifically relay.factory.ai (no inbound ports need to be opened)
 
 ### Setup
 
@@ -45,28 +56,35 @@ Register the machine:
 droid computer register [name]
 ```
 
-The name defaults to the machine's hostname if omitted. A `computer.json` config file is written to `~/.factory/` upon registration.
+A `computer.json` config file is written to `~/.factory/` upon registration.
 
 Then start the daemon so Factory can connect to the machine:
 
 ```bash
-droid daemon --host 0.0.0.0 --port <port> --remote-access
+droid daemon --remote-access
 ```
 
 The `--remote-access` flag tells the daemon to connect through Factory's secure relay service, so no inbound ports need to be opened on your machine.
 
 <Note>
-Only one computer registration is allowed per machine at a time. Run `droid computer remove` first if you need to re-register.
+Only one computer registration is allowed per machine at a time. Run `droid computer remove` first or delete the machine through the settings page if you need to re-register.
 </Note>
 
 ## CLI commands
 
+### General
+
+| Command | Description |
+|---------|-------------|
+| `droid computer list` | List all computers (shows name, ID, status; marks current machine) |
+| `droid computer ssh <name>` | Open an interactive SSH session to any computer |
+
+### BYOM setup
+
 | Command | Description |
 |---------|-------------|
 | `droid computer register [name]` | Register the current machine as a BYOM computer |
-| `droid computer list` | List all computers (shows name, ID, status; marks current machine) |
 | `droid computer remove` | Unregister the current machine and clean up local config |
-| `droid computer ssh <name>` | Open an interactive SSH session to any computer |
 
 ### SSH options
 
@@ -80,9 +98,9 @@ The `ssh` subcommand supports the following flags:
 
 ### Web app
 
-In the new session modal, select the **Computer** tab, pick an active computer, optionally set a working directory (e.g., `/home/factory-user/projects/my-app`), and start your session.
+In the new session modal, select the **Computer** tab, pick an active computer, set a working directory (e.g., `/home/factory-user/projects/my-app`), and start your session.
 
-Connection status (connecting / connected / error) is shown in real time with retry options.
+Connection status (connecting / connected / error) is shown in real time.
 
 ### Slack
 
@@ -96,15 +114,23 @@ Click on any computer in **Settings → Droid Computers** to open its detail pag
 - **Memory usage** — used vs. total memory
 - **Disk usage** — used vs. total disk space
 
-Metrics refresh every 10 seconds and support configurable time ranges.
+The detail page also shows the current **daemon version** and connection status. Possible computer statuses are:
 
-The detail page also shows the current **daemon version** and connection status.
+- **Provisioning** — initial setup in progress
+- **Active** — ready for sessions
+- **Error** — provisioning or runtime failure
 
 ## Updating the daemon
 
 The computer detail page displays the running daemon version alongside the latest available version. When an update is available, an **Update** button appears. Clicking it triggers a remote update — the daemon downloads the new binary, restarts, and reconnects automatically.
 
 For BYOM machines, you can also update the Droid CLI manually by downloading the latest version and restarting the daemon process.
+
+## Git credentials
+
+Git credentials are configured automatically for authenticated repository access on platform-managed computers. When you add new GitHub App installations or change repository access, git credentials are refreshed automatically on the next session connection.
+
+BYOM computers use whatever git credentials are already configured on the machine.
 
 ## SSH & IDE integration
 
@@ -119,15 +145,20 @@ Host factory-mycomputer
   ProxyCommand droid computer ssh mycomputer --proxy
   User factory-user
   IdentityFile ~/.factory/.ssh/id_ed25519
+  IdentitiesOnly yes
   StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
 ```
 
 This lets you open a full VS Code remote session on your Droid Computer.
 
+<Note>
+The proxy mode automatically strips `factory-` prefixes from the Host name when resolving the computer. For example, a Host entry named `factory-mycomputer` will connect to the computer named `mycomputer`.
+</Note>
+
 ## Security
 
-- **Firewall** — Platform-managed computers restrict inbound traffic to the daemon port only; all other ports are blocked by default.
+- **Firewall** — Platform-managed computers use iptables rules to restrict inbound traffic to the daemon port only; all other ports are blocked by default. Note that `factory-user` has passwordless sudo access and could modify these rules. For a hard network-level boundary, use relay mode, which blocks all public traffic at the infrastructure level.
 - **SSH hardening** — Root login and password authentication are disabled.
-- **Relay mode** — BYOM computers (and optionally platform computers) route all traffic through Factory's relay service, so no public ports are exposed.
-- **API key isolation** — Each computer receives its own Factory API key for daemon authentication, which is automatically revoked when the computer is deleted.
-- **Git credentials** — Configured automatically for authenticated repository access on the computer.
+- **Relay mode** — BYOM computers route all traffic through Factory's relay service, so no public ports are exposed. Platform-managed computers can also be configured to use relay mode at the organization level for stricter network isolation.
+- **Git credentials** — Configured automatically per-user for authenticated repository access on platform-managed computers.
