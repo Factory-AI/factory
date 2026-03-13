@@ -111,7 +111,7 @@ class ProbeScore:
         ) / 6.0
 
 
-# ── LLM calls ─────────────────────────────────────────────────────────────────
+
 
 def call_llm(prompt: str, model: str) -> str:
     """Call Mistral via NVIDIA NIM. Returns the response text."""
@@ -176,7 +176,7 @@ def judge_response(
     )
 
 
-# ── Probe generation ──────────────────────────────────────────────────────────
+
 
 def generate_probes(original_memory: str, model: str) -> dict[ProbeType, str]:
     """
@@ -202,7 +202,7 @@ def generate_probes(original_memory: str, model: str) -> dict[ProbeType, str]:
     return json.loads(raw)
 
 
-# ── Main evaluation ───────────────────────────────────────────────────────────
+
 
 def run_evaluation(
     compressed_memory: str,
@@ -240,9 +240,9 @@ def run_evaluation(
 
 def print_results(scores: list[ProbeScore]):
     """Print results table comparable to Factory's published numbers."""
-    print("\n── jeval Probe Evaluation Results ──────────────────")
+    print("\njeval Probe Evaluation Results")
     print(f"{'probe':<15} {'overall':>8} {'accuracy':>9} {'artifact':>9} {'continuity':>11}")
-    print("─" * 56)
+    print("-" * 56)
 
     for s in scores:
         print(
@@ -253,7 +253,7 @@ def print_results(scores: list[ProbeScore]):
 
     avg_overall  = sum(s.overall for s in scores) / len(scores)
     avg_artifact = sum(s.artifact_trail for s in scores) / len(scores)
-    print("─" * 56)
+    print("-" * 56)
     print(f"{'AVERAGE':<15} {avg_overall:>8.2f} {'':>9} {avg_artifact:>9.2f}")
     print()
     print("Factory baseline — overall: 3.70  artifact: 2.45")
