@@ -179,6 +179,7 @@ def train(args):
     log.info("train=%d  val=%d", len(train_pairs), len(val_pairs))
 
     opt   = AdamW(predictor.parameters(), lr=args.lr, weight_decay=1e-4)
+    
     sched = CosineAnnealingLR(opt, T_max=args.epochs)
 
     best_val  = float("inf")

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Artifact probe scorer — reimplements Factory's probe-based evaluation
+Artifact probe scorer: reimplements Factory's probe-based evaluation
 methodology from their Dec 2025 paper.
 
 Runs four probe types against compressed memory and scores each
@@ -30,8 +30,7 @@ from typing import Literal
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 
-# ── Probe definitions ──────────────────────────────────────────────────────────
-
+#probe definitions — these follow Factory's published methodology and are used to generate prompts for both the agent and the judge.
 ProbeType = Literal["recall", "artifact", "continuation", "decision"]
 
 # these probe templates are constructed from Factory's published methodology.
@@ -60,7 +59,7 @@ PROBE_TEMPLATES: dict[ProbeType, str] = {
     ),
 }
 
-# LLM judge prompt — follows Factory's MT-Bench-style methodology.
+# LLM judge prompt follows Factory's MT-Bench-style methodology.
 # judge is blinded: it does not know which compression method produced the memory.
 JUDGE_PROMPT = """
 You are evaluating the quality of an AI agent's response after context compression.
@@ -115,15 +114,26 @@ class ProbeScore:
 # ── LLM calls ─────────────────────────────────────────────────────────────────
 
 def call_llm(prompt: str, model: str) -> str:
-    """Call OpenAI chat completion. Returns the response text."""
-    from openai import OpenAI
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-    resp = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.0,   # deterministic — same input → same score every run
+    """Call Mistral via NVIDIA NIM. Returns the response text."""
+    import json, urllib.request
+    api_key = os.environ["NVIDIA_API_KEY"]
+    payload = json.dumps({
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 512,
+        "temperature": 0.0,
+    }).encode()
+    req = urllib.request.Request(
+        "https://integrate.api.nvidia.com/v1/chat/completions",
+        data=payload,
+        headers={
+            "Content-Type":  "application/json",
+            "Authorization": f"Bearer {api_key}",
+        },
     )
-    return resp.choices[0].message.content.strip()
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        data = json.loads(resp.read())
+    return data["choices"][0]["message"]["content"].strip()
 
 
 def get_agent_response(probe_type: ProbeType, memory: str, question: str, model: str) -> str:
