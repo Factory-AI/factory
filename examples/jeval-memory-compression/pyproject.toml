@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jeval-memory-compression"
+version = "0.1.0"
+description = "JEPA-based semantic fidelity evaluation for Droid memory compression"
+requires-python = ">=3.11"
+dependencies = [
+    "torch>=2.2.0",
+    "transformers>=4.40.0",
+    "sentence-transformers>=3.0.0",
+    "nltk>=3.8.1",
+    "numpy>=1.26.0",
+    "openai>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "black>=24.0.0",
+    "ruff>=0.4.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["jeval*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I"]
