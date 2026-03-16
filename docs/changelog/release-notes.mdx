@@ -4,6 +4,34 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="March 12" rss={{ title: "CLI Updates", description: "Configurable worktree directory, Grep multiline auto-detection, and mission control improvements" }}>
+  `v0.74.0`
+
+## New features
+
+- **Configurable worktree directory** - New setting to customize the directory used for git worktree operations
+
+## Improvements
+
+- **Grep multiline auto-detection** - Grep tool now automatically enables multiline mode when search patterns contain newlines
+- **npm installation guidance** - CLI now provides clear instructions to add droid to your PATH after npm installation
+- **Retry reliability** - Improved retry handling for transient provider errors with automatic rotation
+- **System info truncation** - Large directory listings and git status output are now truncated to prevent system info overflow
+
+## Bug fixes
+
+- **Thinking block preservation** - Invalid thinking blocks are now preserved as text instead of being silently dropped
+- **Git subdir plugin support** - Fixed support for git subdirectory plugins in project configurations
+- **Mission control UX** - Fixed various mission control UI and interaction issues
+- **Spec mode subagents** - Subagents now correctly use read-only mode when the parent session is in spec mode
+- **MCP OAuth compatibility** - Improved MCP OAuth compatibility across servers
+- **Playwright MCP permissions** - Improved permission handling when using the Playwright MCP server
+- **Terminal tab title on resume** - Terminal tab title now correctly updates when resuming a session
+- **Concurrent session handling** - Improved detection and handling of concurrent CLI instances
+- **Code server connection** - Fixed code server connection issues in the desktop app (app)
+
+</Update>
+
 <Update label="March 11" rss={{ title: "CLI Updates", description: "Emacs keybindings, remote access flag, faster response times, and reliability improvements" }}>
   `v0.73.0`
 
