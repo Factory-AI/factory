@@ -4,6 +4,36 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="March 11" rss={{ title: "CLI Updates", description: "Emacs keybindings, remote access flag, faster response times, and reliability improvements" }}>
+  `v0.73.0`
+
+## New features
+
+- **Additional Emacs keybindings** - Added more Emacs-style keyboard shortcuts for text editing in the CLI
+- **`--remote-access` flag** - Remote session access now requires the explicit `--remote-access` flag for improved security
+
+## Improvements
+
+- **Faster time to first token** - Reduced time to first response by ~8% through lazy loading and caching optimizations
+- **Session reconnection reliability** - Pending requests are now preserved and replayed when reconnecting after a disconnection (app)
+
+## Bug fixes
+
+- **Spec mode model handling** - Fixed spec mode using the wrong model for thinking block processing
+- **Auto-update reliability** - Fixed auto-update failures on read-only directories and Windows updates getting stuck in a pending state
+- **Mission Control layout** - Fixed layout stability issues in Mission Control
+- **Tool confirmation double-click** - Fixed tool confirmation buttons firing twice on a single click
+- **Tool format tolerance** - Improved tolerance for format variations in AskUser and TodoWrite tool responses
+- **Unicode character handling** - Fixed crashes caused by broken Unicode characters in messages
+- **MCP OAuth security** - Improved OAuth state verification for MCP server connections
+- **Multiple CLI instance isolation** - Fixed interference between multiple concurrent CLI instances
+- **Tool filtering in exec mode** - Fixed incorrect tool filtering when running in exec mode
+- **Model provider switching** - Fixed issues when switching between model providers mid-conversation
+- **Worktree branch handling** - Fixed error when using worktrees with an already checked-out branch
+- **Computer connect modal** - Fixed VS Code config display in the computer connect modal (app)
+
+</Update>
+
 <Update label="March 10" rss={{ title: "CLI Updates", description: "GPT-5.4 Fast model, /fast command, chat UI refresh, and MCP OAuth for remote sessions" }}>
   `v0.72.0`
 
