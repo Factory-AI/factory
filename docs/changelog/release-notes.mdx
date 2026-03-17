@@ -4,6 +4,34 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="March 17" rss={{ title: "CLI Updates", description: "GPT-5.4 Mini model, faster @ search indexing, and sub-agent improvements" }}>
+  `v0.77.0`
+
+## New features
+
+- **GPT-5.4 Mini model** - New GPT-5.4 Mini model available in the model selector
+
+## Improvements
+
+- **Faster @ search indexing** - File indexing for @ mentions now runs in a background worker for improved responsiveness
+- **Faster session listing** - The `/sessions` command is now optimized with an index for quicker loading
+- **Faster first prompt** - System info is now prefetched before the first prompt for quicker startup
+- **Sub-agent reliability** - Redesigned sub-agent architecture for improved task delegation reliability
+- **Skills preserved after compaction** - Skills invoked during a session are now preserved when context is compacted
+- **Computer selection UI** - Improved visual design for the computer selection interface (app)
+
+## Bug fixes
+
+- **Slash command arguments** - Fixed slash command arguments being lost when submitting via the suggestion menu
+- **Mission model selection** - Missions now correctly use the session model instead of the global settings model
+- **Worktree error messages** - Worktree setup failures now show descriptive error messages instead of generic errors
+- **Stale mission warnings** - Fixed stale missions incorrectly triggering concurrent run warnings
+- **Mode preservation on /new** - Fixed session mode being reset when creating a new session with `/new`
+- **Permission settings persistence** - Permission settings are now preserved across session respawns
+- **Chat composer undo** - Fixed undo not working after pasting text in the chat composer (app)
+
+</Update>
+
 <Update label="March 16" rss={{ title: "CLI Updates", description: "Configurable LLM timeout, MCP server allowlist for Enterprise Controls, and Mission Control improvements" }}>
   `v0.76.0`
 
