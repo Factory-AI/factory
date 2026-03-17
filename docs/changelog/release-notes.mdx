@@ -4,6 +4,132 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="March 17" rss={{ title: "CLI Updates", description: "GPT-5.4 Mini model, faster @ search indexing, and sub-agent improvements" }}>
+  `v0.77.0`
+
+## New features
+
+- **GPT-5.4 Mini model** - New GPT-5.4 Mini model available in the model selector
+
+## Improvements
+
+- **Faster @ search indexing** - File indexing for @ mentions now runs in a background worker for improved responsiveness
+- **Faster session listing** - The `/sessions` command is now optimized with an index for quicker loading
+- **Faster first prompt** - System info is now prefetched before the first prompt for quicker startup
+- **Sub-agent reliability** - Redesigned sub-agent architecture for improved task delegation reliability
+- **Skills preserved after compaction** - Skills invoked during a session are now preserved when context is compacted
+- **Computer selection UI** - Improved visual design for the computer selection interface (app)
+
+## Bug fixes
+
+- **Slash command arguments** - Fixed slash command arguments being lost when submitting via the suggestion menu
+- **Mission model selection** - Missions now correctly use the session model instead of the global settings model
+- **Worktree error messages** - Worktree setup failures now show descriptive error messages instead of generic errors
+- **Stale mission warnings** - Fixed stale missions incorrectly triggering concurrent run warnings
+- **Mode preservation on /new** - Fixed session mode being reset when creating a new session with `/new`
+- **Permission settings persistence** - Permission settings are now preserved across session respawns
+- **Chat composer undo** - Fixed undo not working after pasting text in the chat composer (app)
+
+</Update>
+
+<Update label="March 16" rss={{ title: "CLI Updates", description: "Configurable LLM timeout, MCP server allowlist for Enterprise Controls, and Mission Control improvements" }}>
+  `v0.76.0`
+
+## New features
+
+- **Configurable LLM timeout** - LLM API timeout is now configurable via settings.json for customizing request timeout behavior
+- **MCP server allowlist** - Enterprise admins can now restrict which MCP servers are allowed via a new allowlist policy in Enterprise Controls (app)
+- **Granola MCP server** - Added Granola to the MCP server registry for meeting notes integration
+
+## Improvements
+
+- **Mission Control shortcut** - Mission Control now toggles with Ctrl+T for quicker access
+- **Token rate limit display** - Improved UI for token rate limit notifications
+- **Droid Computer error messages** - Clearer error messages for Droid Computer commands
+- **Mission Control performance** - Reduced memory usage and latency in Mission Control
+- **Session ID tooltip** - Session ID now visible in the session tooltip for easier reference (app)
+
+## Bug fixes
+
+- **Custom model lookup** - Fixed BYOK custom model lookup failing after settings changes
+- **Model selection text color** - Fixed incorrect text color in the model selection dropdown (app)
+- **Enterprise model defaults** - Cloud sessions now correctly respect enterprise model defaults (app)
+- **Model policy overrides modal** - Fixed display issues in the model policy overrides modal (app)
+- **Automations page layout** - Fixed automations page height on desktop (app)
+- **MCP OAuth connection** - Improved retry handling for MCP OAuth callback connections
+- **Organization settings refresh** - Organization-managed settings now correctly refresh after login
+
+</Update>
+
+<Update label="March 13" rss={{ title: "CLI Updates", description: "Bug report performance fix and connection stability improvements" }}>
+  `v0.75.0`
+
+## Bug fixes
+
+- **Bug report performance** - Fixed bug reports hanging when processing large missions
+- **Disappearing CLI line** - Fixed a line occasionally disappearing from CLI output
+- **Connection stability** - Improved handling of disconnection errors for more stable sessions
+
+</Update>
+
+<Update label="March 12" rss={{ title: "CLI Updates", description: "Configurable worktree directory, Grep multiline auto-detection, and mission control improvements" }}>
+  `v0.74.0`
+
+## New features
+
+- **Configurable worktree directory** - New setting to customize the directory used for git worktree operations
+
+## Improvements
+
+- **Grep multiline auto-detection** - Grep tool now automatically enables multiline mode when search patterns contain newlines
+- **npm installation guidance** - CLI now provides clear instructions to add droid to your PATH after npm installation
+- **Retry reliability** - Improved retry handling for transient provider errors with automatic rotation
+- **System info truncation** - Large directory listings and git status output are now truncated to prevent system info overflow
+
+## Bug fixes
+
+- **Thinking block preservation** - Invalid thinking blocks are now preserved as text instead of being silently dropped
+- **Git subdir plugin support** - Fixed support for git subdirectory plugins in project configurations
+- **Mission control UX** - Fixed various mission control UI and interaction issues
+- **Spec mode subagents** - Subagents now correctly use read-only mode when the parent session is in spec mode
+- **MCP OAuth compatibility** - Improved MCP OAuth compatibility across servers
+- **Playwright MCP permissions** - Improved permission handling when using the Playwright MCP server
+- **Terminal tab title on resume** - Terminal tab title now correctly updates when resuming a session
+- **Concurrent session handling** - Improved detection and handling of concurrent CLI instances
+- **Code server connection** - Fixed code server connection issues in the desktop app (app)
+
+</Update>
+
+<Update label="March 11" rss={{ title: "CLI Updates", description: "Emacs keybindings, remote access flag, faster response times, and reliability improvements" }}>
+  `v0.73.0`
+
+## New features
+
+- **Additional Emacs keybindings** - Added more Emacs-style keyboard shortcuts for text editing in the CLI
+- **`--remote-access` flag** - Remote session access now requires the explicit `--remote-access` flag for improved security
+
+## Improvements
+
+- **Faster time to first token** - Reduced time to first response by ~8% through lazy loading and caching optimizations
+- **Session reconnection reliability** - Pending requests are now preserved and replayed when reconnecting after a disconnection (app)
+
+## Bug fixes
+
+- **Spec mode model handling** - Fixed spec mode using the wrong model for thinking block processing
+- **Auto-update reliability** - Fixed auto-update failures on read-only directories and Windows updates getting stuck in a pending state
+- **Mission Control layout** - Fixed layout stability issues in Mission Control
+- **Tool confirmation double-click** - Fixed tool confirmation buttons firing twice on a single click
+- **Tool format tolerance** - Improved tolerance for format variations in AskUser and TodoWrite tool responses
+- **Unicode character handling** - Fixed crashes caused by broken Unicode characters in messages
+- **MCP OAuth security** - Improved OAuth state verification for MCP server connections
+- **Multiple CLI instance isolation** - Fixed interference between multiple concurrent CLI instances
+- **Tool filtering in exec mode** - Fixed incorrect tool filtering when running in exec mode
+- **Model provider switching** - Fixed issues when switching between model providers mid-conversation
+- **Worktree branch handling** - Fixed error when using worktrees with an already checked-out branch
+- **Computer connect modal** - Fixed VS Code config display in the computer connect modal (app)
+
+</Update>
+
 <Update label="March 10" rss={{ title: "CLI Updates", description: "GPT-5.4 Fast model, /fast command, chat UI refresh, and MCP OAuth for remote sessions" }}>
   `v0.72.0`
 
