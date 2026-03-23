@@ -50,9 +50,32 @@
     background-color: #FFCCCC;
 }
 
-/* Increase main content area width */
-#content-area {
-    max-width: 850px !important;
+/* Restore wider content layout for the current Mintlify Willow theme */
+@media (min-width: 1024px) {
+    #content-area {
+        max-width: none !important;
+        width: 100% !important;
+    }
+
+    #content-area > div:first-child {
+        max-width: none !important;
+        width: 100% !important;
+        background: transparent !important;
+    }
+
+    #content-area > div:first-child > div:first-child {
+        max-width: min(1200px, calc(100vw - 23rem - 19rem)) !important;
+        width: 100% !important;
+    }
+}
+
+/* Restore a flat page background */
+#background-color {
+    background: rgb(var(--background-light)) !important;
+}
+
+.dark #background-color {
+    background: rgb(var(--background-dark)) !important;
 }
 
 /* Use SF Mono for sidebar titles */
