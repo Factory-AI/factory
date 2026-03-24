@@ -4,6 +4,101 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="March 23" rss={{ title: "CLI Updates", description: "Header redesign, Execute tool syntax highlighting, session type tags, and skill execution fixes" }}>
+  `v0.84.0`
+
+## New features
+
+- **Header redesign** - Refreshed CLI header with an updated layout for improved readability
+- **Execute tool syntax highlighting** - Execute tool calls now display with syntax highlighting for better readability
+- **Session type tags** - Sessions now display type tags for missions and subagents for easier identification
+- **Token limits settings UI** - New interface for viewing and managing token limit settings (app)
+
+## Improvements
+
+- **Create tool display** - Improved text wrapping and syntax highlighting for Create tool results
+- **CLI onboarding** - Improved onboarding flow for new CLI users
+
+## Bug fixes
+
+- **Semantic diff rendering** - Fixed a random character appearing at the top of semantic diffs
+- **Skill execution** - Fixed skills not executing properly after being loaded
+- **Gemini BYOK thinking** - Fixed thinking signature preservation for Gemini models with custom API keys
+
+</Update>
+
+<Update label="March 20" rss={{ title: "CLI Updates", description: "Redesigned model selector and session list, active tool call spinner, and skill slash command fixes" }}>
+  `v0.83.0`
+
+## New features
+
+- **Redesigned model selector and session list** - Overhauled model selector and session list with improved navigation and layout
+- **Active tool call spinner** - A spinner now displays during active tool calls for better visibility into CLI activity
+- **Configurable subagent inactivity timeout** - New `subagentInactivityTimeout` setting to customize how long subagents wait before timing out due to inactivity
+
+## Bug fixes
+
+- **Diff syntax highlighting** - Fixed syntax highlighting issues in diff display
+- **Skill slash command arguments** - Fixed user arguments not being passed to skills invoked via slash commands
+- **CLI status orb display** - Fixed random display issues with the CLI status orb
+- **Double loader on new session** - Fixed a duplicate loading indicator appearing when creating a new session (app)
+- **Sidebar button accessibility** - Fixed sidebar buttons being covered by the draggable region (app)
+- **Whitespace in working directory input** - Input for working directory now correctly trims whitespace (app)
+- **Daemon connectivity** - Fixed daemon connection issues that could occur on some systems
+
+</Update>
+
+<Update label="March 19" rss={{ title: "CLI Updates", description: "Syntax highlighting for diffs, theme engine, file uploads, and session settings fixes" }}>
+  `v0.82.0`
+
+## New features
+
+- **Syntax highlighting for diffs** - Diffs displayed by the CLI now include syntax highlighting for improved readability
+- **Theme engine** - New customizable theme engine for personalizing CLI colors
+- **File upload support** - Upload CSV, Excel, and DOCX files directly in conversations (app)
+- **MCP and skills controls in new sessions** - MCP servers and skills can now be configured when creating new sessions
+- **Sidebar redesign** - Revamped sidebar with improved navigation and layout (app)
+- **Computer info in session tooltip** - Session tooltips now display connected computer details (app)
+
+## Bug fixes
+
+- **Session settings preserved on fork** - Forking a session now preserves your session settings instead of resetting to global defaults
+- **Mission Control stability** - Fixed a memory leak in Mission Control
+- **Auto-update rollback** - Fixed rollback failures during CLI auto-updates
+- **Mission Control resize** - Fixed Mission Control display issues when resizing the terminal
+
+</Update>
+
+<Update label="March 18" rss={{ title: "CLI Updates", description: "Couchbase MCP server, wiki upload dashboard links, and sub-agent reliability fixes" }}>
+  `v0.80.0`
+
+## New features
+
+- **Couchbase MCP server** - Added Couchbase to the MCP server registry for database integration
+- **Wiki upload dashboard link** - The CLI now shows a direct link to the dashboard after wiki uploads complete
+- **Touch device controls** - Submit and cancel buttons now appear on touch devices for easier interaction (app)
+- **Computer install commands** - The Connect to Computer modal now shows curl and Windows install commands (app)
+- **Dynamic loading status setting** - New setting to disable dynamic loading status messages (app)
+
+## Improvements
+
+- **SSH error messages** - Improved error messages for the SSH command
+- **BYO Computer setup guidance** - Better user guidance for BYO Computer setup commands
+- **Faster large input editing** - Improved performance when editing large chat inputs
+- **Simplified computer setup** - Streamlined the Droid Computer setup flow
+
+## Bug fixes
+
+- **Sub-agent spawning** - Fixed sub-agents failing to spawn correctly
+- **Esc key during tool execution** - Fixed Esc key during tool execution incorrectly interrupting the next user message
+- **Model error notifications** - Model API errors are now shown as user notifications instead of being hidden
+- **Daemon startup reliability** - Fixed daemon startup failures caused by insufficient timeout on slower connections
+- **Usage limits display** - Fixed usage limits not displaying correctly for users (app)
+- **Computer card navigation** - Fixed click navigation on computer name cards (app)
+- **Debug mode logging** - Fixed debug logs not appearing when running with the --debug flag
+
+</Update>
+
 <Update label="March 17" rss={{ title: "CLI Updates", description: "GPT-5.4 Mini model, faster @ search indexing, and sub-agent improvements" }}>
   `v0.77.0`
 
