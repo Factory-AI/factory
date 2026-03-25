@@ -86,7 +86,7 @@ The Analytics API provides five endpoints, each focused on a specific category o
 
 Several endpoints support a `group_by` parameter. Here's how it works:
 
-- **Without `group_by`**: Returns one row per day with nested breakdowns (e.g., `by_model`, `by_tool`, `daily_active_users_by_client`). Use this when you want all dimensions in a single response.
+- **Without `group_by`**: Returns one row per day with nested breakdowns (e.g., `by_tool`, `daily_active_users_by_client`). Use this when you want all dimensions in a single response.
 
 - **With `group_by`**: Flattens one of those nested arrays into separate rows. Each row has a `group_key` field identifying the dimension value. Use this when piping data into tools that expect flat rows (spreadsheets, BI tools, time-series databases).
 
@@ -110,45 +110,6 @@ GET /tokens
 | `endDate`   | string | Yes      | End date in `YYYY-MM-DD` format                |
 | `group_by`  | string | No       | Set to `model` to group results by model       |
 
-### Response
-
-```json
-{
-  "data": [
-    {
-      "date": "2026-01-15",
-      "billable_tokens": 1250000,
-      "input_tokens": 980000,
-      "output_tokens": 270000,
-      "cache_read_tokens": 150000,
-      "cache_write_tokens": 45000,
-      "by_model": [
-        {
-          "model_id": "claude-sonnet-4-20250514",
-          "model_tier": "standard",
-          "billable_tokens": 800000,
-          "input_tokens": 620000,
-          "output_tokens": 180000
-        }
-      ],
-      "by_user": [
-        {
-          "user_id": "user_01HPMQ7NXKHM7Y7PR3TTZY3JZS",
-          "user_email": "developer@company.com",
-          "billable_tokens": 450000,
-          "by_model": [...]
-        }
-      ]
-    }
-  ],
-  "meta": {
-    "org_id": "org_01HPMQ6ABCDE...",
-    "start_date": "2026-01-15",
-    "end_date": "2026-01-15"
-  }
-}
-```
-
 ### Response Fields
 
 | Field               | Type   | Description                                              |
@@ -161,36 +122,6 @@ GET /tokens
 | `cache_write_tokens`| number | Tokens written to prompt cache                           |
 | `by_model`          | array  | Breakdown per model                                      |
 | `by_user`           | array  | Breakdown per user                                       |
-
-### Grouped Response
-
-When `group_by=model`, returns one row per model per day inside `data`:
-
-```json
-{
-  "data": [
-    {
-      "date": "2026-01-15",
-      "group_key": "claude-sonnet-4-20250514",
-      "billable_tokens": 800000,
-      "input_tokens": 620000,
-      "output_tokens": 180000
-    },
-    {
-      "date": "2026-01-15",
-      "group_key": "claude-opus-4-20250514",
-      "billable_tokens": 450000,
-      "input_tokens": 360000,
-      "output_tokens": 90000
-    }
-  ],
-  "meta": {
-    "org_id": "org_01HPMQ6ABCDE...",
-    "start_date": "2026-01-15",
-    "end_date": "2026-01-15"
-  }
-}
-```
 
 ### Example
 
