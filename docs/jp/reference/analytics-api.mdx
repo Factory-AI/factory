@@ -1,6 +1,6 @@
 ---
-title: "分析API"
-description: REST API for organization-level usage metrics, token consumption, tool usage, and productivity analytics.
+title: Analytics API
+description: 組織レベルの使用量メトリクス、トークン消費量、ツール使用状況、生産性分析のためのREST API。
 keywords:
   [
     "api",
@@ -13,148 +13,87 @@ keywords:
   ]
 ---
 
-Analytics API は、Factory の組織レベルの使用量データへのプログラマティックアクセスを提供します。組織全体のトークン消費量、ツール呼び出し、ユーザーアクティビティ、生産性メトリクスをクエリできます。
+Analytics API は、Factory の組織レベルの使用状況データへのプログラマティックアクセスを提供します。組織全体のトークン消費、ツール呼び出し、ユーザーアクティビティ、生産性メトリクスをクエリできます。
 
 ---
 
-## クイックスタート
-
-```bash
+## クイックスタート```bash
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
-```
-
----
+```---
 
 ## 認証
 
-すべてのリクエストには `Authorization` ヘッダーに Factory API キーが必要です：
-
-```bash
+すべてのリクエストには`Authorization`ヘッダーにFactory API キーが必要です：```bash
 Authorization: Bearer fk-your-api-key
-```
-
-API キーは [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys) で生成してください。
+```[app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)でAPIキーを生成します。
 
 ### 権限
 
-**Manager** または **Owner** ロールを持つユーザーのみが Analytics API にアクセスできます。メンバーとゲストは `403` エラーを受け取ります。
+**Manager**または**Owner**ロールを持つユーザーのみがAnalytics APIにアクセスできます。MemberおよびGuestは`403`エラーを受け取ります。
 
 ---
 
-## ベース URL
-
-```
+## ベースURL```
 https://api.factory.ai/api/v1/analytics
-```
+```## レスポンス形式
 
----
-
-## レスポンス形式
-
-すべてのレスポンスは一貫したエンベロープ構造に従います：
-
-```json
+すべてのレスポンスは一貫したエンベロープ構造に従います：```json
 {
   "data": [ ... ],
   "meta": { ... }
 }
-```
-
-| フィールド  | 型   | 説明                                                    |
+```| フィールド | タイプ | 説明                                                    |
 | :----- | :----- | :------------------------------------------------------------- |
-| `data` | array  | 結果オブジェクトの配列（1日あたり1つ、または `group_by` 使用時はグループごと） |
-| `meta` | object | リクエストメタデータ：`org_id`、`start_date`、`end_date`、および `/users` のページネーション情報 |
+| `data` | array  | 結果オブジェクトの配列（1日ごと、または`group_by`使用時はグループごと） |
+| `meta` | object | リクエストメタデータ：`org_id`、`start_date`、`end_date`、および`/users`のページネーション情報 |
 
 ---
 
 ## エンドポイント
 
-Analytics API は、それぞれ特定のメトリクスカテゴリに焦点を当てた5つのエンドポイントを提供します：
+Analytics APIは5つのエンドポイントを提供し、それぞれが特定のカテゴリのメトリクスに焦点を当てています：
 
 | エンドポイント         | 説明                           |
 | :--------------- | :------------------------------------ |
-| `/tokens`        | モデルとユーザー別のトークン消費量   |
+| `/tokens`        | モデルとユーザー別のトークン使用量   |
 | `/tools`         | ツール呼び出しと自律性メトリクス |
-| `/activity`      | 日次、週次、月次アクティブユーザー |
+| `/activity`      | 日次、週次、月次のアクティブユーザー |
 | `/productivity`  | ファイル操作とgitアクティビティ      |
-| `/users`         | ページネーション付きユーザー別メトリクス      |
+| `/users`         | ページネーション付きのユーザー別メトリクス      |
 
 ---
 
-## `group_by` の理解
+## `group_by`を理解する
 
-複数のエンドポイントが `group_by` パラメーターをサポートしています。動作は以下の通りです：
+複数のエンドポイントで`group_by`パラメータがサポートされています。その動作は以下の通りです：
 
-- **`group_by` なし**: ネストされた内訳（例：`by_model`、`by_tool`、`daily_active_users_by_client`）を含む1日あたり1行を返します。すべての次元を単一のレスポンスで取得したい場合に使用します。
+- **`group_by`なし**: ネストした内訳（例：`by_tool`、`daily_active_users_by_client`）と共に1日ごとに1行を返します。すべての次元を単一のレスポンスで取得したい場合に使用します。
 
-- **`group_by` あり**: それらのネストされた配列の1つを別々の行に平坦化します。各行には次元値を識別する `group_key` フィールドがあります。データを平坦な行を期待するツール（スプレッドシート、BIツール、時系列データベース）にパイプしたい場合に使用します。
+- **`group_by`あり**: ネストした配列の1つを別々の行に平坦化します。各行には次元値を識別する`group_key`フィールドがあります。フラットな行を期待するツール（スプレッドシート、BIツール、時系列データベース）にデータをパイプする場合に使用します。
 
-例えば、`/activity` を `group_by` なしで使用すると、`daily_active_users_by_client` がオブジェクトとして返されます。`group_by=client` を使用すると、`terminal-ui`、`web`、`non-interactive-cli` の別々の行が得られます - これはチャート上で各クライアントタイプを独自の線として描画する際に便利です。
+例えば、`/activity`を`group_by`なしで実行すると、`daily_active_users_by_client`がオブジェクトとして返されます。`group_by=client`を使用すると、`terminal-ui`、`web`、`non-interactive-cli`の別々の行が得られ、チャートで各クライアントタイプを独自の線としてプロットするのに便利です。
 
 ---
 
 ## トークン使用量
 
-組織全体の日次トークン消費量を返します。
-
-```
+組織全体の日次トークン使用量を返します。```
 GET /tokens
-```
+```### クエリパラメータ
 
-### クエリパラメーター
-
-| パラメーター   | 型   | 必須 | 説明                                    |
+| パラメータ   | 型   | 必須 | 説明                                    |
 | :---------- | :----- | :------- | :--------------------------------------------- |
-| `startDate` | string | はい      | `YYYY-MM-DD` 形式の開始日              |
-| `endDate`   | string | はい      | `YYYY-MM-DD` 形式の終了日                |
-| `group_by`  | string | いいえ       | `model` に設定すると結果をモデル別にグループ化       |
-
-### レスポンス
-
-```json
-{
-  "data": [
-    {
-      "date": "2026-01-15",
-      "billable_tokens": 1250000,
-      "input_tokens": 980000,
-      "output_tokens": 270000,
-      "cache_read_tokens": 150000,
-      "cache_write_tokens": 45000,
-      "by_model": [
-        {
-          "model_id": "claude-sonnet-4-20250514",
-          "model_tier": "standard",
-          "billable_tokens": 800000,
-          "input_tokens": 620000,
-          "output_tokens": 180000
-        }
-      ],
-      "by_user": [
-        {
-          "user_id": "user_01HPMQ7NXKHM7Y7PR3TTZY3JZS",
-          "user_email": "developer@company.com",
-          "billable_tokens": 450000,
-          "by_model": [...]
-        }
-      ]
-    }
-  ],
-  "meta": {
-    "org_id": "org_01HPMQ6ABCDE...",
-    "start_date": "2026-01-15",
-    "end_date": "2026-01-15"
-  }
-}
-```
+| `startDate` | string | はい      | `YYYY-MM-DD`形式の開始日              |
+| `endDate`   | string | はい      | `YYYY-MM-DD`形式の終了日                |
+| `group_by`  | string | いいえ       | モデル別に結果をグループ化するには`model`に設定       |
 
 ### レスポンスフィールド
 
 | フィールド               | 型   | 説明                                              |
 | :------------------ | :----- | :------------------------------------------------------- |
-| `date`              | string | `YYYY-MM-DD` 形式の日付                              |
-| `billable_tokens`   | number | 総請求対象トークン（入力+出力、キャッシュ割引適用後） |
+| `date`              | string | `YYYY-MM-DD`形式の日付                              |
+| `billable_tokens`   | number | 請求対象トークンの合計（入力+出力、キャッシュ割引適用済み） |
 | `input_tokens`      | number | モデルに送信された生の入力トークン                           |
 | `output_tokens`     | number | モデルによって生成されたトークン                                |
 | `cache_read_tokens` | number | プロンプトキャッシュから読み取られたトークン                            |
@@ -162,39 +101,7 @@ GET /tokens
 | `by_model`          | array  | モデル別の内訳                                      |
 | `by_user`           | array  | ユーザー別の内訳                                       |
 
-### グループ化されたレスポンス
-
-`group_by=model` の場合、`data` 内で1日1モデルあたり1行を返します：
-
-```json
-{
-  "data": [
-    {
-      "date": "2026-01-15",
-      "group_key": "claude-sonnet-4-20250514",
-      "billable_tokens": 800000,
-      "input_tokens": 620000,
-      "output_tokens": 180000
-    },
-    {
-      "date": "2026-01-15",
-      "group_key": "claude-opus-4-20250514",
-      "billable_tokens": 450000,
-      "input_tokens": 360000,
-      "output_tokens": 90000
-    }
-  ],
-  "meta": {
-    "org_id": "org_01HPMQ6ABCDE...",
-    "start_date": "2026-01-15",
-    "end_date": "2026-01-15"
-  }
-}
-```
-
-### 例
-
-```bash
+### 例```bash
 # Token usage for a date range
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
@@ -202,29 +109,21 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 # Grouped by model
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-15&endDate=2026-01-15&group_by=model"
-```
+```---
 
----
+## ツール使用状況
 
-## ツール使用量
-
-日次ツール呼び出し、MCP使用量、スキル、スラッシュコマンド、自律性メトリクスを返します。
-
-```
+日次のツール呼び出し、MCP使用状況、スキル、スラッシュコマンド、および自律性メトリクスを返します。```
 GET /tools
-```
+```### クエリパラメータ
 
-### クエリパラメーター
-
-| パラメーター   | 型   | 必須 | 説明                                      |
+| パラメータ   | 型   | 必須 | 説明                                      |
 | :---------- | :----- | :------- | :----------------------------------------------- |
-| `startDate` | string | はい      | `YYYY-MM-DD` 形式の開始日                |
-| `endDate`   | string | はい      | `YYYY-MM-DD` 形式の終了日                  |
-| `group_by`  | string | いいえ       | `tool_name` に設定すると結果をツール別にグループ化      |
+| `startDate` | string | はい      | `YYYY-MM-DD`形式の開始日                |
+| `endDate`   | string | はい      | `YYYY-MM-DD`形式の終了日                  |
+| `group_by`  | string | いいえ       | ツール別に結果をグループ化するには`tool_name`に設定      |
 
-### レスポンス
-
-```json
+### レスポンス```json
 {
   "data": [
     {
@@ -274,24 +173,22 @@ GET /tools
     "end_date": "2026-01-15"
   }
 }
-```
+```### レスポンスフィールド
 
-### レスポンスフィールド
-
-| フィールド                        | 型   | 説明                                    |
+| フィールド                        | タイプ   | 説明                                    |
 | :--------------------------- | :----- | :--------------------------------------------- |
-| `date`                       | string | `YYYY-MM-DD` 形式の日付                    |
-| `tool_calls`                 | number | 総ツール呼び出し数                         |
+| `date`                       | string | `YYYY-MM-DD`形式の日付                    |
+| `tool_calls`                 | number | ツール呼び出しの合計数                         |
 | `by_tool`                    | array  | ツール名別の内訳                         |
 | `mcp_users_with_mcp`         | number | MCPサーバーを使用したユーザー数                     |
 | `mcp_by_server`              | array  | MCPサーバー別の呼び出し数                     |
-| `skills_invocations`         | number | 総スキルアクティベーション数                        |
-| `skills_by_name`             | array  | スキル別の内訳             |
-| `slash_commands_invocations` | number | 総スラッシュコマンド使用数                       |
+| `skills_invocations`         | number | スキル実行の合計数                        |
+| `skills_by_name`             | array  | スキル別の内訳                             |
+| `slash_commands_invocations` | number | スラッシュコマンド使用の合計数                       |
 | `slash_commands_by_name`     | array  | コマンド別の内訳                           |
-| `hooks_invocations`          | number | 総フック実行数                          |
+| `hooks_invocations`          | number | フック実行の合計数                          |
 | `hooks_by_event`             | array  | イベントタイプ別の内訳                        |
-| `web_users`                  | number | ウェブ/ワークスペースインターフェースを使用したユーザー数         |
+| `web_users`                  | number | Web/ワークスペースインターフェースを使用したユーザー数         |
 | `autonomy_ratio_avg`         | number | ユーザーターンあたりの平均ツール呼び出し数               |
 | `autonomy_ratio_p50`         | number | 自律性比率の中央値                          |
 | `autonomy_ratio_p90`         | number | 自律性比率の90パーセンタイル                 |
@@ -301,9 +198,7 @@ GET /tools
 
 ### グループ化されたレスポンス
 
-`group_by=tool_name` の場合、`data` 内で1日1ツールあたり1行を返します：
-
-```json
+`group_by=tool_name`の場合、`data`内に1日1ツールあたり1行を返します：```json
 {
   "data": [
     {
@@ -323,29 +218,21 @@ GET /tools
     "end_date": "2026-01-15"
   }
 }
-```
-
----
+```---
 
 ## ユーザーアクティビティ
 
-セッション数と併せて、日次、週次、月次のアクティブユーザーを返します。
-
-```
+日次、週次、月次のアクティブユーザー数とセッション数を返します。```
 GET /activity
-```
+```### クエリパラメータ
 
-### クエリパラメーター
-
-| パラメーター   | 型   | 必須 | 説明                                       |
+| パラメータ   | タイプ   | 必須 | 説明                                       |
 | :---------- | :----- | :------- | :------------------------------------------------ |
-| `startDate` | string | はい      | `YYYY-MM-DD` 形式の開始日                 |
-| `endDate`   | string | はい      | `YYYY-MM-DD` 形式の終了日                   |
-| `group_by`  | string | いいえ       | `client` に設定するとクライアントタイプ別にグループ化           |
+| `startDate` | string | はい      | `YYYY-MM-DD`形式の開始日                 |
+| `endDate`   | string | はい      | `YYYY-MM-DD`形式の終了日                   |
+| `group_by`  | string | いいえ       | クライアントタイプでグループ化するには`client`に設定           |
 
-### レスポンス
-
-```json
+### レスポンス```json
 {
   "data": [
     {
@@ -369,34 +256,30 @@ GET /activity
     "end_date": "2026-01-15"
   }
 }
-```
+```### レスポンスフィールド
 
-### レスポンスフィールド
-
-| フィールド                          | 型   | 説明                           |
+| フィールド                          | タイプ   | 説明                           |
 | :----------------------------- | :----- | :------------------------------------ |
-| `date`                         | string | `YYYY-MM-DD` 形式の日付           |
-| `daily_active_users`           | number | この日のユニークユーザー数              |
+| `date`                         | string | `YYYY-MM-DD`形式の日付           |
+| `daily_active_users`           | number | その日のユニークユーザー数              |
 | `weekly_active_users`          | number | 過去7日間のユニークユーザー数       |
 | `monthly_active_users`         | number | 過去30日間のユニークユーザー数      |
-| `daily_active_users_by_client` | object | クライアントタイプ別のDAU内訳          |
+| `daily_active_users_by_client` | object | クライアントタイプ別DAU内訳          |
 | `sessions`                     | number | 開始されたセッション総数                |
-| `messages`                     | number | 総メッセージ数（ユーザー+アシスタント）     |
-| `user_messages`                | number | ユーザーのみのメッセージ数              |
+| `messages`                     | number | メッセージ総数（ユーザー + アシスタント）     |
+| `user_messages`                | number | ユーザーからのメッセージのみ              |
 
 ### クライアントタイプ
 
 | クライアント               | 説明                              |
 | :------------------- | :--------------------------------------- |
 | `terminal-ui`        | インタラクティブCLIセッション                 |
-| `web`                | Factory ウェブインターフェース                    |
+| `web`                | Factory webインターフェース                    |
 | `non-interactive-cli`| ヘッドレス/自動化CLI（`droid exec`）    |
 
-### グループ化されたレスポンス
+### グループ化レスポンス
 
-`group_by=client` の場合、`data` 内で1日1クライアントタイプあたり1行を返します：
-
-```json
+`group_by=client`の場合、`data`内に日別クライアントタイプごとに1行返します：```json
 {
   "data": [
     {
@@ -416,28 +299,20 @@ GET /activity
     "end_date": "2026-01-15"
   }
 }
-```
-
----
+```---
 
 ## 生産性
 
-日次ファイル操作とgitアクティビティを返します。
-
-```
+日次のファイル操作とgitアクティビティを返します。```
 GET /productivity
-```
+```### クエリパラメータ
 
-### クエリパラメーター
-
-| パラメーター   | 型   | 必須 | 説明                       |
+| パラメータ   | 型   | 必須 | 説明                       |
 | :---------- | :----- | :------- | :-------------------------------- |
-| `startDate` | string | はい      | `YYYY-MM-DD` 形式の開始日 |
-| `endDate`   | string | はい      | `YYYY-MM-DD` 形式の終了日   |
+| `startDate` | string | Yes      | `YYYY-MM-DD` 形式の開始日 |
+| `endDate`   | string | Yes      | `YYYY-MM-DD` 形式の終了日   |
 
-### レスポンス
-
-```json
+### レスポンス```json
 {
   "data": [
     {
@@ -463,42 +338,34 @@ GET /productivity
     "end_date": "2026-01-15"
   }
 }
-```
+```### レスポンスフィールド
 
-### レスポンスフィールド
-
-| フィールド             | 型   | 説明                          |
+| フィールド        | タイプ | 説明                                 |
 | :---------------- | :----- | :----------------------------------- |
-| `date`            | string | `YYYY-MM-DD` 形式の日付          |
-| `files_created`   | number | エージェントによって作成された新規ファイル数           |
-| `files_edited`    | number | エージェントによって変更された既存ファイル数     |
-| `by_extension`    | array  | ファイル拡張子別の操作数        |
-| `by_language`     | array  | プログラミング言語別の操作数  |
-| `git_commits`     | number | エージェント経由で行われたコミット数               |
-| `git_prs_created` | number | エージェント経由で作成されたプルリクエスト数      |
+| `date`            | string | `YYYY-MM-DD`形式の日付               |
+| `files_created`   | number | エージェントによって作成された新規ファイル数 |
+| `files_edited`    | number | エージェントによって変更された既存ファイル数 |
+| `by_extension`    | array  | ファイル拡張子別の操作               |
+| `by_language`     | array  | プログラミング言語別の操作           |
+| `git_commits`     | number | エージェント経由で作成されたコミット数 |
+| `git_prs_created` | number | エージェント経由で作成されたプルリクエスト数 |
 
 ---
 
 ## ユーザー別メトリクス
 
-カーソルベースページネーション付きのユーザー別詳細メトリクスを返します。
-
-```
+カーソルベースのページネーションを使用してユーザー別の詳細なメトリクスを返します。```
 GET /users
-```
+```### クエリパラメータ
 
-### クエリパラメーター
-
-| パラメーター   | 型   | 必須 | 説明                                     |
+| パラメータ   | 型   | 必須 | 説明                                     |
 | :---------- | :----- | :------- | :---------------------------------------------- |
-| `startDate` | string | はい      | `YYYY-MM-DD` 形式の開始日               |
-| `endDate`   | string | はい      | `YYYY-MM-DD` 形式の終了日                 |
-| `limit`     | number | いいえ       | ページあたりのユーザー数、1-100（デフォルト：20）             |
-| `cursor`    | string | いいえ       | ページネーション用のユーザーID（`next_cursor` から）     |
+| `startDate` | string | Yes      | `YYYY-MM-DD`形式の開始日               |
+| `endDate`   | string | Yes      | `YYYY-MM-DD`形式の終了日                 |
+| `limit`     | number | No       | ページあたりのユーザー数、1-100（デフォルト: 20）             |
+| `cursor`    | string | No       | ページネーション用のユーザーID（`next_cursor`から）     |
 
-### レスポンス
-
-```json
+### レスポンス```json
 {
   "data": [
     {
@@ -534,50 +401,46 @@ GET /users
     "next_cursor": "user_01HPMQ8ABCDE7Y7PR3TTZY4KLM"
   }
 }
-```
+```### レスポンスフィールド
 
-### レスポンスフィールド
-
-| フィールド               | 型   | 説明                                |
+| フィールド          | 型     | 説明                                       |
 | :------------------ | :----- | :----------------------------------------- |
-| `user_id`           | string | ユニークユーザー識別子                     |
-| `user_email`        | string \| null | ユーザーメールアドレス                        |
-| `date`              | string | `YYYY-MM-DD` 形式の日付                |
-| `tool_calls`        | number | このユーザーによるツール呼び出し数              |
-| `billable_tokens`   | number | このユーザーによって消費されたトークン数               |
-| `primary_model`     | string | 最も使用されたモデル                            |
-| `primary_model_tier`| string | モデルティア（`standard` または `thinking`）      |
-| `files_created`     | number | 作成されたファイル数                              |
-| `files_edited`      | number | 編集されたファイル数                               |
-| `git_commits`       | number | 行われたコミット数                               |
-| `git_prs_created`   | number | 作成されたプルリクエスト数                      |
-| `mcp_calls`         | number | MCPツール呼び出し数                       |
-| `skill_calls`       | number | スキルアクティベーション数                          |
-| `slash_commands`    | number | スラッシュコマンド使用数                         |
-| `hooks`             | number | フック実行数                            |
-| `sessions`          | number | 開始されたセッション数                           |
+| `user_id`           | string | 一意のユーザー識別子                       |
+| `user_email`        | string \| null | ユーザーメール                    |
+| `date`              | string | `YYYY-MM-DD`形式の日付                     |
+| `tool_calls`        | number | このユーザーによるツール呼び出し           |
+| `billable_tokens`   | number | このユーザーが消費したトークン             |
+| `primary_model`     | string | 最もよく使用されたモデル                   |
+| `primary_model_tier`| string | モデル階層（`standard`または`thinking`）   |
+| `files_created`     | number | 作成されたファイル数                       |
+| `files_edited`      | number | 編集されたファイル数                       |
+| `git_commits`       | number | 作成されたコミット数                       |
+| `git_prs_created`   | number | 作成されたプルリクエスト数                 |
+| `mcp_calls`         | number | MCPツール呼び出し数                        |
+| `skill_calls`       | number | スキル実行数                               |
+| `slash_commands`    | number | スラッシュコマンド使用数                   |
+| `hooks`             | number | フック実行数                               |
+| `sessions`          | number | 開始されたセッション数                     |
 | `messages`          | number | 総メッセージ数                             |
-| `user_messages`     | number | ユーザーメッセージのみ                         |
-| `assistant_messages`| number | アシスタントメッセージ数                         |
-| `autonomy_ratio`    | number | ユーザーターンあたりのツール呼び出し数                   |
-| `delegation_level`  | string | プライマリ自律性モード                      |
-| `languages`         | array  | 作業したプログラミング言語            |
+| `user_messages`     | number | ユーザーメッセージのみ                     |
+| `assistant_messages`| number | アシスタントメッセージ数                   |
+| `autonomy_ratio`    | number | ユーザーターンあたりのツール呼び出し数     |
+| `delegation_level`  | string | 主要な自動化モード                         |
+| `languages`         | array  | 作業で使用されたプログラミング言語         |
 
-### 委譲レベル
+### 委任レベル
 
-| レベル         | 説明                                        |
+| レベル        | 説明                                               |
 | :------------ | :------------------------------------------------- |
-| `auto-high`   | 最大自律性、最小確認            |
-| `auto-medium` | バランス型自律性、一部確認          |
-| `auto-low`    | 制限された自律性、頻繁な確認           |
-| `spec`        | 仕様モード、実行前の計画      |
-| `manual`      | 完全手動制御、各アクションを確認           |
+| `auto-high`   | 最大限の自動化、最小限の確認                       |
+| `auto-medium` | バランスの取れた自動化といくつかの確認             |
+| `auto-low`    | 制限された自動化、頻繁な確認                       |
+| `spec`        | 仕様モード、実行前の計画                           |
+| `manual`      | 完全な手動制御、各アクションの確認                 |
 
 ### ページネーション
 
-カーソルベースページネーションを使用してユーザーを反復処理します：
-
-```bash
+カーソルベースのページネーションを使用してユーザーを反復処理します：```bash
 # First page
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=50"
@@ -585,112 +448,88 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 # Next page
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=50&cursor=user_01HPMQ8ABCDE7Y7PR3TTZY4KLM"
-```
-
----
+```---
 
 ## 重要な制約
 
-### 日付要件
+### 日付の要件
 
-- **形式**: すべての日付は `YYYY-MM-DD` である必要があります
-- **タイムゾーン**: UTCのみ（タイムゾーンパラメーターなし）
-- **データ可用性**: データは昨日まで（UTC）利用可能です。今日の日付をリクエストすると `400` エラーが返されます。
+- **形式**: すべての日付は`YYYY-MM-DD`形式である必要があります
+- **タイムゾーン**: UTCのみ（タイムゾーンパラメータなし）
+- **データの利用可能性**: データは昨日（UTC）まで利用可能です。今日の日付をリクエストすると`400`エラーが返されます。
 - **履歴データ**: 2026年1月14日から利用可能
 
 ### レート制限
 
-レート制限はプランによって異なります。詳細については [Contact us](mailto:support@factory.ai) するか、ダッシュボードや自動化のユースケースでより高い制限が必要な場合はお問い合わせください。
+レート制限はプランによって異なります。詳細については、またはダッシュボードや自動化のユースケースでより高い制限が必要な場合は、[お問い合わせください](mailto:support@factory.ai)。
 
 ---
 
 ## エラーハンドリング
 
-API は標準的なHTTPステータスコードを返します：
+APIは標準的なHTTPステータスコードを返します：
 
 | ステータス | 説明                                          |
 | :----- | :--------------------------------------------------- |
-| `400`  | 無効な日付形式、今日の日付のリクエスト、または制限値が範囲外 |
-| `401`  | APIキーが見つからないか無効                           |
-| `403`  | 不十分な権限（ManagerまたはOwnerロールが必要） |
+| `400`  | 無効な日付形式、今日の日付のリクエスト、または制限範囲外 |
+| `401`  | APIキーが不足または無効                           |
+| `403`  | 権限不足（ManagerまたはOwnerロールが必要） |
 | `500`  | 内部エラー                                       |
 
-### エラーレスポンス形式
-
-```json
+### エラーレスポンス形式```json
 {
   "title": "Bad Request",
   "detail": "Cannot query today's date - analytics data has a 24-hour lag",
   "status": 400,
   "requestId": "req_01HPMQ9WXYZ..."
 }
-```
-
----
+```---
 
 ## データパイプライン
 
-分析データは以下のパイプラインを通って流れます：
-
-```
+アナリティクスデータは以下のパイプラインを通して流れます：```
 CLI/Daemon → OTEL Events → BigQuery (raw) → dbt models → API
-```
-
-- **ソース**: CLIとデーモンからのOpenTelemetryスパン
-- **処理**: dbt経由の日次バッチ集約
+```- **ソース**: CLIとデーモンからのOpenTelemetryスパン
+- **処理**: dbtによる日次バッチ集計
 - **可用性**: データは生成された翌日に利用可能
 
 ---
 
-## データ品質に関する注記
+## データ品質に関する注意事項
 
 <Note>
-A few known data quality considerations:
+既知のデータ品質に関する考慮事項がいくつかあります：
 
-- **MCP server names**: Some duplicates exist due to case sensitivity (e.g., `axiom` vs `Axiom`)
-- **Tool names**: Approximately 0.006% of entries contain parsing artifacts
-- **User counts**: A user active on multiple clients counts once in DAU but appears in each client breakdown
+- **MCPサーバー名**: 大文字小文字の区別により重複が存在します（例：`axiom` vs `Axiom`）
+- **ツール名**: エントリの約0.006%にパースアーティファクトが含まれています
+- **ユーザー数**: 複数のクライアントでアクティブなユーザーはDAUでは1回カウントされますが、各クライアントの内訳には表示されます
 </Note>
 
 ---
 
-## ユースケース
+## 使用例
 
 ### コスト監視ダッシュボード
 
-トークン消費量の傾向を追跡し、コスト要因を特定します：
-
-```bash
+トークン消費トレンドを追跡し、コストドライバーを特定します：```bash
 # Daily token usage for the month
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
-```
+```### 導入状況の追跡
 
-### 採用追跡
-
-DAU/WAU/MAUを監視し、採用パターンを特定します：
-
-```bash
+DAU/WAU/MAUを監視し、導入パターンを特定する：```bash
 # Activity metrics with client breakdown
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/activity?startDate=2026-01-14&endDate=2026-01-28&group_by=client"
-```
+```### チーム生産性レポート
 
-### チーム生産性レポート
-
-出力と効率を測定します：
-
-```bash
+アウトプットと効率性を測定：```bash
 # Productivity metrics
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/productivity?startDate=2026-01-14&endDate=2026-01-28"
-```
+```### 個人パフォーマンス
 
-### 個人パフォーマンス
-
-チームリーダー向けにユーザー別メトリクスをエクスポートします：
-
-```bash
+チームリーダー向けのユーザー別メトリクスをエクスポート：```bash
 # Paginate through all users
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=100"
