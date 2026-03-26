@@ -24,9 +24,9 @@ Our agent, Droid, is top performing in terminal benchmarks.
 
 ## Community & Contributions
 
-- Join the community on [GitHub Discussions](https://github.com/Factory-AI/factory/discussions)
-- Share your workflows by opening a PR against [`community-builds.md`](./community-builds.md)
+- Join our [Discord server](https://discord.gg/zuudFXxg69)
 - Bug/issue/feature request? [Open an issue](https://github.com/Factory-AI/factory/issues) or send a pull request
+- Join the community on [GitHub Discussions](https://github.com/Factory-AI/factory/discussions)
 
 ## Community Builds
 
