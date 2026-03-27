@@ -8,34 +8,64 @@ Our agent, Droid, is top performing in terminal benchmarks.
   <img src="docs/images/droid_ascii.gif" alt="Droid logo" height="220" />
 </p>
 
-<p align="left"><strong>The agent-native development platform built for shipping software faster.</strong></p>
+## Installation
+
+**macOS/Linux:**
+
+```sh
+curl -fsSL https://app.factory.ai/cli | sh
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://app.factory.ai/cli/windows | iex
+```
+
+**npm:**
+
+```sh
+npm -g install droid
+```
+
+Then start a session in any project:
+
+```sh
+cd /path/to/your/project
+droid
+```
 
 ## Getting Started
 
 - [CLI Quickstart](https://docs.factory.ai/cli/getting-started/quickstart)
 - [VS Code Extension](https://marketplace.visualstudio.com/items?itemName=Factory.factory-vscode-extension)
+- ACP support for [JetBrains IDEs](https://docs.factory.ai/integrations/jetbrains) and [Zed](https://docs.factory.ai/integrations/zed)
 
 ## Quick Links
 
 - [Factory Website](https://factory.ai)
 - [Documentation](https://docs.factory.ai)
 - [CLI Overview](https://docs.factory.ai/cli/getting-started/overview)
-- [Community Builds](./community-builds.md)
+
+## SDKs
+
+- [TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript)
+- [Python SDK](https://github.com/Factory-AI/droid-sdk-python)
+
+## GitHub Actions
+
+- [Droid Action](https://github.com/Factory-AI/droid-action) -- Run AI-powered code reviews, security scans, and PR descriptions automatically on your pull requests
+
+## Ecosystem
+
+- [Plugins Marketplace](https://github.com/Factory-AI/factory-plugins)
+- [ESLint Plugin](https://github.com/Factory-AI/eslint-plugin)
 
 ## Community & Contributions
 
 - Join our [Discord server](https://discord.gg/zuudFXxg69)
 - Bug/issue/feature request? [Open an issue](https://github.com/Factory-AI/factory/issues) or send a pull request
-- Join the community on [GitHub Discussions](https://github.com/Factory-AI/factory/discussions)
-
-## Community Builds
-
-- [here-now](https://github.com/fredrivett/here-now) - Minimal webpage hit counter — show how many people are here/now by [fredrivett](https://github.com/fredrivett)
-- [factory-mcp](https://github.com/iannuttall/factory-mcp) - Community-built Factory MCP integration to search our docs by [iannuttall](https://github.com/iannuttall)
-- [Factory CLI with ChatGPT Codex / Claude subscription via CLIProxyAPI](https://gist.github.com/chandika/c4b64c5b8f5e29f6112021d46c159fdd) - Guide to run Factory CLI against Claude Code Max or ChatGPT Codex through CLIProxyAPI by [chandika](https://github.com/chandika)
-- [Factory CLI with Claude subscription via CLIProxyAPI](https://gist.github.com/ben-vargas/9f1a14ac5f78d10eba56be437b7c76e5) - Setup instructions for using Factory CLI with Claude Code Max through CLIProxyAPI by [ben-vargas](https://github.com/ben-vargas)
-- [GrayPane – Flight Search & Alerts](https://github.com/punitarani/flights-tracker) - Check available flights, monitor price trends, plan upcoming trips, and create personalized alerts by [Punit Arani](https://github.com/punitarani)
 
 ## License
 
-Copyright © 2025 Factory AI. All rights reserved.
+Copyright © 2025-2026 Factory AI. All rights reserved.
