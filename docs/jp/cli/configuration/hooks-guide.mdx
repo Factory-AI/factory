@@ -1,59 +1,59 @@
 ---
-title: "フック"
-description: "Learn how to customize and extend Droid's behavior by registering shell commands"
+title: "Hooks"
+description: Droidの動作をカスタマイズ・拡張するためのシェルコマンド登録方法を学ぶ
 keywords: ['hooks', 'lifecycle', 'automation', 'shell commands', 'events', 'triggers', 'customize', 'extend']
 ---
 
-Droidフックは、Droidのライフサイクルの様々な段階で実行されるユーザー定義のシェルコマンドです。フックは、Droidの動作を決定論的に制御し、Droidが選択的に実行するのではなく、特定のアクションが常に実行されることを保証します。
+Droidフックは、Droidのライフサイクルの様々な段階で実行されるユーザー定義のシェルコマンドです。フックはDroidの動作に対する決定論的な制御を提供し、Droidが選択的に実行するのではなく、特定のアクションが常に実行されることを保証します。
 
 <Tip>
-  For reference documentation on hooks, see [Hooks reference](/reference/hooks-reference).
-  Explore the [hook cookbooks](/guides/hooks/auto-formatting).
+  フックのリファレンスドキュメントについては、[Hooks reference](/jp/reference/hooks-reference)を参照してください。
+  [hook cookbooks](/jp/guides/hooks/auto-formatting)も参照してください。
 </Tip>
 
 フックの使用例には以下があります：
 
-* **通知**: Droidがユーザーの入力や実行許可を待機している際の通知方法をカスタマイズします。
-* **自動フォーマット**: ファイル編集後に.tsファイルに対して`prettier`を、.goファイルに対して`gofmt`を実行します。
-* **ログ記録**: コンプライアンスやデバッグのために、実行されたすべてのコマンドを追跡・カウントします。
-* **フィードバック**: Droidがコードベースの規約に従わないコードを生成した際に、自動フィードバックを提供します。
+* **通知**: Droidがあなたの入力や実行許可を待っているときの通知方法をカスタマイズします。
+* **自動フォーマット**: ファイル編集後に.tsファイルに`prettier`、.goファイルに`gofmt`などを実行します。
+* **ログ記録**: コンプライアンスやデバッグのために、実行されたすべてのコマンドを追跡・集計します。
+* **フィードバック**: Droidがコードベース規約に従わないコードを生成した際に自動フィードバックを提供します。
 * **カスタム権限**: 本番ファイルや機密ディレクトリへの変更をブロックします。
 
-これらのルールをプロンプト指示ではなくフックとしてエンコードすることで、提案を実行される度に毎回動作するアプリレベルのコードに変換できます。
+これらのルールをプロンプト指示としてではなくフックとして記述することで、提案をアプリレベルのコードに変換し、期待されるタイミングで毎回実行されるようになります。
 
 <Warning>
-  You must consider the security implication of hooks as you add them, because hooks run automatically during Droid's execution with your current environment's credentials.
-  For example, malicious hooks code can exfiltrate your data. Always review your hooks implementation before registering them.
+  フックはDroidの実行中にあなたの現在の環境の認証情報で自動的に実行されるため、フックを追加する際はセキュリティへの影響を考慮する必要があります。
+  たとえば、悪意のあるフックコードはあなたのデータを漏洩させる可能性があります。フックを登録する前に、必ずフックの実装を確認してください。
 
-  For full security best practices, see [Security Considerations](/reference/hooks-reference#security-considerations) in the hooks reference documentation.
+  完全なセキュリティのベストプラクティスについては、フックリファレンスドキュメントの[Security Considerations](/jp/reference/hooks-reference#security-considerations)を参照してください。
 </Warning>
 
 <Note>
-  **Important**: Always use **absolute paths** when referencing scripts in your hook commands, not relative paths. 
-  Hooks execute from Droid's current working directory, which may not be your project root. 
-  Use `$FACTORY_PROJECT_DIR` for project-relative scripts (e.g., `"$FACTORY_PROJECT_DIR"/.factory/hooks/script.sh`) 
-  or full paths for global scripts (e.g., `/usr/local/bin/my-hook.sh` or `~/.factory/hooks/script.sh`).
+  **重要**: フックコマンドでスクリプトを参照する際は、相対パスではなく**絶対パス**を使用してください。
+  フックはDroidの現在の作業ディレクトリから実行され、これがプロジェクトルートではない場合があります。
+  プロジェクト相対のスクリプトには`$FACTORY_PROJECT_DIR`を使用し（例：`"$FACTORY_PROJECT_DIR"/.factory/hooks/script.sh`）、
+  グローバルスクリプトにはフルパスを使用してください（例：`/usr/local/bin/my-hook.sh`や`~/.factory/hooks/script.sh`）。
 </Note>
 
 ## フックイベント概要
 
-Droidは、ワークフローの異なる段階で実行される複数のフックイベントを提供します：
+Droidはワークフローの異なる段階で実行される複数のフックイベントを提供します：
 
 * **PreToolUse**: ツール呼び出し前に実行（ブロック可能）
 * **PostToolUse**: ツール呼び出し完了後に実行
 * **UserPromptSubmit**: ユーザーがプロンプトを送信し、Droidが処理する前に実行
-* **Notification**: Droid が通知を送信する際に実行
-* **Stop**: Droidが応答を終了する際に実行
-* **SubagentStop**: サブDroidタスクが完了する際に実行
-* **PreCompact**: Droidがコンパクト操作を実行しようとする前に実行
-* **SessionStart**: Droidが新しいセッションを開始するか、既存のセッションを再開する際に実行
-* **SessionEnd**: Droidセッションが終了する際に実行
+* **Notification**: Droidが通知を送信するときに実行
+* **Stop**: Droidが応答を完了したときに実行
+* **SubagentStop**: サブdroidタスクが完了したときに実行
+* **PreCompact**: Droidがコンパクト操作を実行する前に実行
+* **SessionStart**: Droidが新しいセッションを開始するか既存のセッションを再開するときに実行
+* **SessionEnd**: Droidセッションが終了するときに実行
 
-各イベントは異なるデータを受信し、Droidの動作を異なる方法で制御できます。
+各イベントは異なるデータを受信し、異なる方法でDroidの動作を制御できます。
 
 ## クイックスタート
 
-このクイックスタートでは、Droidが実行するシェルコマンドをログ記録するフックを追加します。
+このクイックスタートでは、Droidが実行するシェルコマンドをログに記録するフックを追加します。
 
 ### 前提条件
 
@@ -61,37 +61,31 @@ Droidは、ワークフローの異なる段階で実行される複数のフッ
 
 ### ステップ1: フック設定を開く
 
-`/hooks` [slash command](/cli/configuration/custom-slash-commands)を実行し、`PreToolUse`フックイベントを選択します。
+`/hooks` [スラッシュコマンド](/jp/cli/configuration/custom-slash-commands)を実行し、`PreToolUse`フックイベントを選択します。
 
-`PreToolUse`フックはツール呼び出し前に実行され、異なる対応についてDroidにフィードバックを提供しながらツール呼び出しをブロックできます。
+`PreToolUse`フックはツール呼び出し前に実行され、Droidに異なる処理を指示するフィードバックを提供しながらそれらをブロックできます。
 
 ### ステップ2: マッチャーを追加
 
-`+ Add new matcher…`を選択して、Executeツール呼び出しのみでフックを実行します。
+`+ Add new matcher…`を選択して、Executeツール呼び出しにのみフックを実行するようにします。
 
 マッチャーに`Execute`と入力します。
 
-<Note>You can use `*` to match all tools.</Note>
+<Note>すべてのツールにマッチさせるには`*`を使用できます。</Note>
 
 ### ステップ3: フックを追加
 
-`+ Add new hook…`を選択し、以下のコマンドを入力します：
-
-```bash
+`+ Add new hook…`を選択し、このコマンドを入力します：```bash
 jq -r '.tool_input.command' >> ~/.factory/bash-command-log.txt
-```
+```### ステップ 4: 設定を保存する
 
-### ステップ4: 設定を保存
+保存場所として、ホームディレクトリにログを記録するため `User settings` を選択します。このフックは現在のプロジェクトだけでなく、すべてのプロジェクトに適用されます。
 
-ストレージの場所については、ホームディレクトリにログ記録しているため`User settings`を選択します。これにより、フックは現在のプロジェクトだけでなく、すべてのプロジェクトに適用されます。
+次に、REPLに戻るまでEscキーを押します。これでフックが登録されました！
 
-その後、REPLに戻るまでEscを押します。フックが登録されました！
+### ステップ 5: フックを確認する
 
-### ステップ5: フックを確認
-
-再度`/hooks`を実行するか、`~/.factory/settings.json`をチェックして設定を確認します：
-
-```json
+再度 `/hooks` を実行するか、`~/.factory/settings.json` を確認して設定を見てください：```json
 {
   "hooks": {
     "PreToolUse": [
@@ -107,29 +101,17 @@ jq -r '.tool_input.command' >> ~/.factory/bash-command-log.txt
     ]
   }
 }
-```
+```### ステップ6: フックをテストする
 
-### ステップ6: フックをテスト
-
-Droidに`ls`のような簡単なコマンドを実行するよう依頼し、ログファイルを確認します：
-
-```bash
+Droidに`ls`のような簡単なコマンドを実行してもらい、ログファイルを確認してください：```bash
 cat ~/.factory/bash-command-log.txt
-```
-
-以下のようなエントリが表示されるはずです：
-
-```
+```以下のようなエントリが表示されるはずです：```
 ls
-```
+```## より多くの例
 
-## その他の例
+### コード整形フック
 
-### コードフォーマットフック
-
-編集後にTypeScriptファイルを自動フォーマット：
-
-```json
+編集後にTypeScriptファイルを自動的に整形:```json
 {
   "hooks": {
     "PostToolUse": [
@@ -145,13 +127,9 @@ ls
     ]
   }
 }
-```
+```### Markdown フォーマットフック
 
-### Markdownフォーマットフック
-
-markdownファイルの言語タグの欠落やフォーマットの問題を自動修正：
-
-```json
+markdownファイルの言語タグの不足やフォーマットの問題を自動的に修正します：```json
 {
   "hooks": {
     "PostToolUse": [
@@ -167,11 +145,7 @@ markdownファイルの言語タグの欠落やフォーマットの問題を自
     ]
   }
 }
-```
-
-以下の内容で`.factory/hooks/markdown_formatter.py`を作成：
-
-```python
+````.factory/hooks/markdown_formatter.py` をこの内容で作成してください：```python
 #!/usr/bin/env python3
 """
 Markdown formatter for Droid output.
@@ -225,21 +199,21 @@ def format_markdown(content):
             return f"{indent}```{lang}\n{body}{closing}\n"
         return match.group(0)
     
-    fence_pattern = r'(?ms)^([ \t]{0,3})```([^\n]*)\n(.*?)(\n\1```)\s*$'
+    fence_pattern = r'(?ms)^([ \t]{0,3})```([^\r\n]*)\r?\n(.*?)\r?\n\1```[ \t]*$'```([^\n]*)\n(.*?)(\n\1```)\s*$'
     content = re.sub(fence_pattern, add_lang_to_fence, content)
     
-    # Fix excessive blank lines (only outside code fences)
+    # 過度な空行を修正（コードフェンス外のみ）
     content = re.sub(r'\n{3,}', '\n\n', content)
     
     return content.rstrip() + '\n'
 
-# Main execution
+# メイン実行
 try:
     input_data = json.load(sys.stdin)
     file_path = input_data.get('tool_input', {}).get('file_path', '')
     
     if not file_path.endswith(('.md', '.mdx')):
-        sys.exit(0)  # Not a markdown file
+        sys.exit(0)  # Markdownファイルではない
     
     if os.path.exists(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -250,18 +224,17 @@ try:
         if formatted != content:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(formatted)
-            print(f"✓ Fixed markdown formatting in {file_path}")
+            print(f"✓ {file_path}のMarkdownフォーマットを修正しました")
     
 except Exception as e:
-    print(f"Error formatting markdown: {e}", file=sys.stderr)
-    sys.exit(1)
-```
+    print(f"Markdownフォーマット中にエラーが発生しました: {e}", file=sys.stderr)
+    sys.exit(1)```
 
 Make the script executable:
 
-```bash
+``````bash
 chmod +x .factory/hooks/markdown_formatter.py
-```
+``````
 
 This hook automatically:
 
@@ -274,7 +247,7 @@ This hook automatically:
 
 Get desktop notifications when Droid needs input:
 
-```json
+``````json
 {
   "hooks": {
     "Notification": [
@@ -290,13 +263,13 @@ Get desktop notifications when Droid needs input:
     ]
   }
 }
-```
+``````
 
 ### File Protection Hook
 
 Block edits to sensitive files:
 
-```json
+``````json
 {
   "hooks": {
     "PreToolUse": [
@@ -314,8 +287,8 @@ Block edits to sensitive files:
 }
 ```
 
-## 詳細情報
+## 詳細を学ぶ
 
-* フックのリファレンスドキュメントについては、[Hooks reference](/reference/hooks-reference)を参照してください。
-* 包括的なセキュリティのベストプラクティスと安全ガイドラインについては、フックリファレンスドキュメントの[Security Considerations](/reference/hooks-reference#security-considerations)を参照してください。
-* トラブルシューティング手順とデバッグテクニックについては、フックリファレンスドキュメントの[Debugging](/reference/hooks-reference#debugging)を参照してください。
+* フックのリファレンスドキュメントについては、[フックリファレンス](/jp/reference/hooks-reference)をご覧ください。
+* 包括的なセキュリティのベストプラクティスと安全ガイドラインについては、フックリファレンスドキュメントの[セキュリティに関する考慮事項](/jp/reference/hooks-reference#security-considerations)をご覧ください。
+* トラブルシューティング手順とデバッグ技術については、フックリファレンスドキュメントの[デバッグ](/jp/reference/hooks-reference#debugging)をご覧ください。

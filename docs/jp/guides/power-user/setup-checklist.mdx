@@ -1,39 +1,39 @@
 ---
-title: "パワーユーザーセットアップチェックリスト"
-description: Complete checklist to configure Droid for maximum effectiveness with IDE integration, memory, skills, and automation.
+title: Power User Setup Checklist
+description: DroidをIDE統合、メモリ、スキル、自動化で最大効果を発揮するための完全設定チェックリスト
 keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 'productivity', 'best practices']
 ---
 
-このチェックリストは、基本的なDroidインストールを完全に最適化された開発環境に変換します。各セクションは前のセクションをベースに構築されているため、最良の結果を得るためには順番通りに完了してください。
+このチェックリストは、基本的なDroidインストールを完全に最適化された開発環境に変換します。各セクションは前のセクションの上に構築されています—最良の結果を得るために順番に完了してください。
 
 <Note>
-  Each section can be done independently if you prefer to spread it out.
+  各セクションは、必要に応じて分散して独立して実行できます。
 </Note>
 
 <Info>
-  **Using Factory App?** Most of this guide applies to both CLI and [Factory App](/web/getting-started/overview). Where the experience differs, we've noted the App-specific approach.
+  **Factory Appを使用していますか？** このガイドのほとんどはCLIと[Factory App](/jp/web/getting-started/overview)の両方に適用されます。体験が異なる場合は、App固有のアプローチを記載しています。
 </Info>
 
 ---
 
-## レベル1：基本セットアップ
+## レベル1: 必須セットアップ
 
-これらの基盤となる項目は、最大の即時効果をもたらします。
+これらの基本項目は、最大の即効性をもたらします。
 
 <Steps>
-  <Step title="Install the Factory IDE Plugin">
-    The IDE plugin provides real-time context—open files, errors, selections—so Droid sees what you see.
+  <Step title="Factory IDE Pluginをインストールする">
+    IDEプラグインは、開いているファイル、エラー、選択範囲などのリアルタイムコンテキストを提供し、Droidがあなたが見ているものを見ることができます。
     
     **VSCode/Cursor:**
-    1. Open Extensions (`Cmd+Shift+X`)
-    2. Search "Factory"
-    3. Install and reload
+    1. Extensions (`Cmd+Shift+X`) を開く
+    2. "Factory" を検索
+    3. インストールしてリロード
     
-    **Verify:** Run `droid` and check for "IDE connected" in the status bar.
+    **確認:** `droid` を実行し、ステータスバーで "IDE connected" を確認してください。
   </Step>
   
-  <Step title="Create your AGENTS.md">
-    Create a basic [`AGENTS.md`](/cli/configuration/agents-md) at your repository root:
+  <Step title="AGENTS.mdを作成する">
+    リポジトリルートに基本的な [`AGENTS.md`](/jp/cli/configuration/agents-md) を作成します：
     
     ```markdown
     # Project Guidelines
@@ -47,40 +47,36 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     - Use TypeScript strict mode
     - Prefer functional components in React
     - Write tests for new features
-    ```
-    
-    Start minimal—you'll expand this as you work. See the [AGENTS.md guide](/cli/configuration/agents-md) for more examples.
+    ```最小限から始めて、作業しながら拡張していきます。より多くの例については、[AGENTS.mdガイド](/jp/cli/configuration/agents-md)を参照してください。
   </Step>
   
-  <Step title="Configure your default model">
-    Set your preferred model in settings:
+  <Step title="デフォルトモデルを設定">
+    設定で希望するモデルを設定します：
     
-    **CLI:**
-    ```bash
+    **CLI:**```bash
     droid
     > /settings
     # Navigate to Model and select your default
     ```
+    **Factory App:** チャットインターフェースのモデル選択ドロップダウンを使用します。
     
-    **Factory App:** Use the model selector dropdown in the chat interface.
-    
-    **Recommendation:** Start with Claude Opus 4.5 (default) for complex work, switch to Haiku 4.5 or GPT-5.1-Codex for routine tasks.
+    **推奨事項:** 複雑な作業にはClaude Opus 4.5（デフォルト）から始めて、日常的なタスクにはHaiku 4.5やGPT-5.1-Codexに切り替えてください。
   </Step>
 </Steps>
 
 <Check>
-  **Checkpoint:** You should now have IDE integration, basic project context, and your preferred model configured.
+  **チェックポイント:** IDE統合、基本的なプロジェクトコンテキスト、および優先モデルの設定が完了している必要があります。
 </Check>
 
 ---
 
-## レベル2：メモリ＆コンテキスト
+## レベル2: メモリ＆コンテキスト
 
-永続的なメモリを構築し、Droidがセッション間であなたの設定を記憶できるようにします。
+Droidがセッション間であなたの設定を記憶できるように、永続的なメモリを構築します。
 
 <Steps>
-  <Step title="Create a memories file">
-    Create `~/.factory/memories.md` for personal preferences:
+  <Step title="メモリファイルを作成">
+    個人の設定用に`~/.factory/memories.md`を作成します：
     
     ```markdown
     # My Development Preferences
@@ -99,21 +95,19 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     - [2024-01] Chose Zustand over Redux for state management
     - [2024-02] Using Tailwind CSS for styling
     ```
-    
-    Update this file whenever you find yourself repeating instructions to Droid.
+    Droidに同じ指示を繰り返している場合は、このファイルを更新してください。
   </Step>
   
-  <Step title="Reference memories in AGENTS.md">
-    Add to your `AGENTS.md`:
+  <Step title="AGENTS.mdでメモリを参照する">
+    `AGENTS.md`に以下を追加してください：
     
     ```markdown
     ## Personal Preferences
     Refer to `~/.factory/memories.md` for my coding preferences and past decisions.
-    ```
-  </Step>
+    ```</Step>
   
-  <Step title="Create project-specific memories (optional)">
-    For team projects, create `.factory/memories.md`:
+  <Step title="プロジェクト固有のメモリを作成する（オプション）">
+    チームプロジェクトの場合、`.factory/memories.md`を作成します：
     
     ```markdown
     # Project Memories
@@ -126,27 +120,26 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     ## Known Issues
     - The auth service has a 5-second timeout issue (#123)
     - Legacy users table uses snake_case columns
-    ```
-  </Step>
+    ```</Step>
 </Steps>
 
 <Check>
-  **Checkpoint:** Droid now has access to your preferences and project history without you repeating them.
+  **チェックポイント:** Droidが、あなたが繰り返し説明することなく、あなたの設定とプロジェクト履歴にアクセスできるようになりました。
 </Check>
 
 <Tip>
-  **Want automated memory capture?** Set up a hook to automatically save memories when you say "remember this:". See [Memory Management](/guides/power-user/memory-management#automatic-memory-capture) for setup instructions.
+  **自動メモリキャプチャが欲しいですか？** 「これを覚えて：」と言ったときに自動的にメモリを保存するフックを設定してください。設定手順については[メモリ管理](/jp/guides/power-user/memory-management#automatic-memory-capture)をご覧ください。
 </Tip>
 
 ---
 
-## レベル3：ルール＆規約
+## レベル3: ルールと規約
 
-コーディング標準を整理し、Droidが一貫してそれらに従うようにします。
+Droidが一貫して従うようにコーディング標準を整理します。
 
 <Steps>
-  <Step title="Create a rules directory">
-    Create `.factory/rules/` in your project:
+  <Step title="ルールディレクトリを作成">
+    プロジェクトに `.factory/rules/` を作成します：
     
     ```
     .factory/
@@ -154,11 +147,10 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
         ├── typescript.md
         ├── testing.md
         └── security.md
-    ```
-  </Step>
+    ```</Step>
   
-  <Step title="Add TypeScript rules">
-    Create `.factory/rules/typescript.md`:
+  <Step title="TypeScriptルールを追加">
+    `.factory/rules/typescript.md`を作成：
     
     ```markdown
     # TypeScript Conventions
@@ -177,11 +169,10 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     - Group imports: React, external libs, internal modules, types
     - Use absolute imports from `@/` prefix
     - Avoid barrel files (index.ts re-exports) for performance
-    ```
-  </Step>
+    ```</Step>
   
-  <Step title="Add testing rules">
-    Create `.factory/rules/testing.md`:
+  <Step title="テストルールを追加">
+    `.factory/rules/testing.md`を作成します:
     
     ```markdown
     # Testing Conventions
@@ -200,11 +191,10 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     - Mock at the boundary (API calls, not internal functions)
     - Use MSW for API mocking in integration tests
     - Reset mocks in `afterEach`
-    ```
-  </Step>
+    ```</Step>
   
-  <Step title="Reference rules in AGENTS.md">
-    Update your `AGENTS.md`:
+  <Step title="AGENTS.mdでルールを参照する">
+    `AGENTS.md`を更新してください：
     
     ```markdown
     ## Coding Standards
@@ -212,34 +202,33 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     - `.factory/rules/typescript.md` - TypeScript and React patterns
     - `.factory/rules/testing.md` - Testing conventions
     - `.factory/rules/security.md` - Security requirements
-    ```
-  </Step>
+    ```</Step>
 </Steps>
 
 <Check>
-  **Checkpoint:** Your coding standards are now documented and Droid will follow them consistently.
+  **チェックポイント:** コーディング標準が文書化され、Droidが一貫して従うようになりました。
 </Check>
 
 <Tip>
-  **Enforce rules automatically:** Use [PostToolUse hooks](/cli/configuration/hooks-guide) to run linters after edits. See [Code Validation hooks](/guides/hooks/code-validation) for examples.
+  **ルールを自動的に実行:** 編集後にリンターを実行するには[PostToolUse hooks](/jp/cli/configuration/hooks-guide)を使用してください。例については[Code Validation hooks](/jp/guides/hooks/code-validation)をご覧ください。
 </Tip>
 
 ---
 
-## レベル4：スキル＆自動化
+## レベル4: スキルと自動化
 
 再利用可能なスキルと自動化フックを追加します。
 
 <Info>
-  **Three ways to automate:** 
-  - **[Skills](/cli/configuration/skills)** — Droid invokes them based on task context
-  - **[Hooks](/cli/configuration/hooks-guide)** — Run automatically on specific events
-  - **[Custom Slash Commands](/cli/configuration/custom-slash-commands)** — You invoke with `/command-name`
+  **自動化の3つの方法:** 
+  - **[Skills](/jp/cli/configuration/skills)** — Droidがタスクコンテキストに基づいて呼び出す
+  - **[Hooks](/jp/cli/configuration/hooks-guide)** — 特定のイベントで自動実行
+  - **[Custom Slash Commands](/jp/cli/configuration/custom-slash-commands)** — `/command-name`で自分で呼び出す
 </Info>
 
 <Steps>
-  <Step title="Create a prompt refiner skill">
-    Create `~/.factory/skills/prompt-refiner/SKILL.md`:
+  <Step title="プロンプトリファイナースキルを作成">
+    `~/.factory/skills/prompt-refiner/SKILL.md`を作成:
     
     ```markdown
     ---
@@ -268,11 +257,10 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
     - Include acceptance criteria: "The result should..."
     - Specify format: "Return as JSON/markdown/code"
     - Mention constraints: "Must be compatible with...", "Should not modify..."
-    ```
-  </Step>
+    ```</Step>
   
-  <Step title="Add an auto-formatting hook">
-    Run `/hooks` and add a PostToolUse hook for automatic formatting:
+  <Step title="自動フォーマット用フックを追加">
+    `/hooks`を実行し、自動フォーマット用のPostToolUseフックを追加してください：
     
     ```json
     {
@@ -290,13 +278,11 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
         ]
       }
     }
-    ```
-    
-    This automatically formats files after Droid edits them.
+    ```このステップは、Droidがファイルを編集した後に自動的にフォーマットします。
   </Step>
   
-  <Step title="Add a test-on-edit hook (optional)">
-    Run related tests after edits:
+  <Step title="編集時テストフック（オプション）を追加">
+    編集後に関連するテストを実行：
     
     ```json
     {
@@ -314,57 +300,51 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
         ]
       }
     }
-    ```
-  </Step>
+    ```</Step>
 </Steps>
 
 <Check>
-  **Checkpoint:** You now have reusable skills and automatic formatting/testing.
+  **チェックポイント:** これで再利用可能なスキルと自動フォーマット/テストが設定できました。
 </Check>
 
 ---
 
-## レベル5：トークン最適化
+## レベル 5: トークン最適化
 
-品質を犠牲にすることなく、コスト効率を微調整します。
+品質を犠牲にすることなくコスト効率を向上させましょう。
 
 <Steps>
-  <Step title="Enable Spec Mode for complex work">
-    Use `Shift+Tab` or `/spec` before starting features that touch multiple files. This prevents expensive false starts.
+  <Step title="複雑な作業でSpec Modeを有効化">
+    複数ファイルに影響する機能を開始する前に、`Shift+Tab` または `/spec` を使用してください。これにより高コストな誤ったスタートを防げます。
   </Step>
   
-  <Step title="Configure model switching">
-    Set up a spec mode model for planning:
+  <Step title="モデル切り替えを設定">
+    プランニング用のspec modeモデルを設定します：
     
     ```bash
     droid
     > /settings
     # Set Spec Mode Model to a reasoning-heavy model
-    ```
-    
-    Use Opus 4.5 for planning, then Sonnet or Codex for implementation.
+    ```計画にはOpus 4.5を使用し、実装にはSonnetまたはCodexを使用してください。
   </Step>
   
-  <Step title="Run the readiness report">
-    Check your project's AI-readiness:
+  <Step title="準備状況レポートを実行">
+    プロジェクトのAI対応状況を確認してください：
     
-    **CLI:**
-    ```bash
+    **CLI:**```bash
     droid
     > /readiness-report
-    ```
-    
-    **Factory App:** View your readiness score in the [Agent Readiness Dashboard](/web/agent-readiness/dashboard).
-    
-    Address high-impact items first—linting, type checking, and fast tests dramatically reduce token waste.
+    ```**Factory App:** [Agent Readiness Dashboard](/jp/web/agent-readiness/dashboard)で準備状況スコアを確認してください。
+
+    高影響度の項目から対処してください。リンティング、型チェック、高速テストにより、トークンの無駄を劇的に削減できます。
   </Step>
 </Steps>
 
 ---
 
-## クイックリファレンス：ファイルの場所
+## クイックリファレンス: ファイルの場所
 
-| 目的 | 個人用 | プロジェクト用 |
+| 用途 | 個人 | プロジェクト |
 |---------|----------|---------|
 | **スキル** | `~/.factory/skills/<name>/SKILL.md` | `.factory/skills/<name>/SKILL.md` |
 | **メモリ** | `~/.factory/memories.md` | `.factory/memories.md` |
@@ -372,7 +352,7 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
 | **設定** | `~/.factory/settings.json` | `.factory/settings.json` |
 | **フック** | settings.json内 | settings.json内 |
 | **エージェント指示** | `~/.factory/AGENTS.md` | `./AGENTS.md` |
-| **カスタムdroid** | `~/.factory/droids/<name>.md` | `.factory/droids/<name>.md` |
+| **カスタムドロイド** | `~/.factory/droids/<name>.md` | `.factory/droids/<name>.md` |
 
 ---
 
@@ -380,29 +360,29 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
 
 セットアップを検証するために、このチェックリストを実行してください：
 
-- [ ] Droid実行時にIDEプラグインが「接続済み」を表示する
-- [ ] `AGENTS.md`がbuild/testコマンドと共に存在する
-- [ ] あなたの設定を含むメモリファイルが作成されている
-- [ ] 少なくとも1つのルールファイルがあるルールディレクトリが存在する
-- [ ] 少なくとも1つのカスタムスキルが作成されている
-- [ ] 自動フォーマットフックが設定されている
-- [ ] 準備状況レポートがレベル2以上を表示する
+- [ ] IDEプラグインがDroid実行時に「接続済み」を表示
+- [ ] `AGENTS.md`がビルド/テストコマンドと共に存在
+- [ ] 設定を記載したメモリファイルが作成済み
+- [ ] 少なくとも1つのルールファイルを含むルールディレクトリ
+- [ ] 少なくとも1つのカスタムスキルを作成済み
+- [ ] 自動フォーマットフックが設定済み
+- [ ] 準備状況レポートがレベル2以上を表示
 
 ---
 
 ## 次のステップ
 
 <CardGroup cols={2}>
-  <Card title="Prompt Crafting" href="/guides/power-user/prompt-crafting" icon="wand-magic-sparkles">
-    Learn model-specific prompting techniques
+  <Card title="プロンプト作成" href="/jp/guides/power-user/prompt-crafting" icon="wand-magic-sparkles">
+    モデル固有のプロンプティング技術を学ぶ
   </Card>
-  <Card title="Token Efficiency" href="/guides/power-user/token-efficiency" icon="gauge-high">
-    Strategies for reducing token usage
+  <Card title="トークン効率" href="/jp/guides/power-user/token-efficiency" icon="gauge-high">
+    トークン使用量を削減する戦略
   </Card>
-  <Card title="Memory Management" href="/guides/power-user/memory-management" icon="brain">
-    Advanced memory and context patterns
+  <Card title="メモリ管理" href="/jp/guides/power-user/memory-management" icon="brain">
+    高度なメモリとコンテキストパターン
   </Card>
-  <Card title="Rules Guide" href="/guides/power-user/rules-conventions" icon="scale-balanced">
-    Organizing team conventions effectively
+  <Card title="ルールガイド" href="/jp/guides/power-user/rules-conventions" icon="scale-balanced">
+    チーム規約を効果的に整理する
   </Card>
 </CardGroup>
