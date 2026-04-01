@@ -1,0 +1,154 @@
+---
+title: "Legacy Bench: Can AI Agents Maintain the World's Most Critical Software?"
+description: "The first benchmark designed to measure frontier AI agent capabilities on legacy software engineering tasks spanning COBOL, Fortran, Java 7, and more."
+---
+
+Engineering · Research
+
+The software that processes trillions in daily financial settlements, routes telephone calls across continents, and adjudicates insurance claims was written in COBOL, Fortran, and Java 7. The engineers who understand it are retiring faster than they can be replaced. Every major coding agent benchmark (SWE-bench, Terminal-Bench, SWE-Lancer) evaluates agents on modern Python and JavaScript. None of them reflect the reality of working with some of the world's most critical infrastructure.
+
+Today we're announcing **Legacy Bench**: the first benchmark designed to measure frontier AI agent capabilities on legacy software engineering tasks.
+
+---
+
+## What is Legacy Bench
+
+Legacy Bench consists of 100 tasks spanning six legacy language families and real enterprise domains. The full benchmark is used for evaluation, with ten representative tasks publicly available as open samples.
+
+| Language | % of Benchmark | Domains |
+| --- | --- | --- |
+| **COBOL** | 46% | Financial settlement, payroll processing, insurance claims, telecom billing, VSAM file handling |
+| **Java 7** | 32% | Enterprise middleware, CDR processing, warehouse logistics, binary parsing, EJB patterns |
+| **BASIC** | 6% | Business applications, accounting, data processing |
+| **C89** | 5% | Systems programming, low-level debugging, protocol implementation |
+| **Fortran** | 5% | Scientific computing, numerical methods, physics simulation |
+| **Assembly** | 5% | x86 firmware parsing, protocol decoding, hardware simulation |
+
+Each task consists of a natural language instruction, a containerized environment with source files and data, a reference solution, and hidden verification tests the agent cannot see. Tasks cover fixing bugs in existing code, implementing new functionality, migrating code across languages, and other legacy engineering work. Tasks use the [Harbor](https://github.com/laude-institute/terminal-bench) task format and can be evaluated with any Harbor-compatible agent. The agent must understand the specification, produce working code, and pass verification.
+
+A COBOL task might require traversing an IMS hierarchical database with two-way parent-child links, decoding packed decimal monetary amounts, and producing EBCDIC-encoded fixed-width output with exact field alignment. A Java 7 task might require debugging a CDR billing processor that silently corrupts records due to a byte-order assumption buried in a binary parser. A Fortran task might require migrating a staggered-grid fluid dynamics solver to C++ while preserving numerical equivalence.
+
+Ten sample tasks and the evaluation harness are available now at [GitHub](https://github.com/factory-ai/legacy-bench). We welcome evaluation submissions and contributions of new tasks. Legacy Bench was developed by Factory in collaboration with Parsewave.
+
+---
+
+## Results
+
+Overall pass rates range from 16.9% to 42.5% across the 12 model-agent combinations we evaluated. For context: these same frontier models score >70% on Terminal-Bench 2 and SWE-bench Verified. Performance varies sharply across languages and task types.
+
+<Frame>
+  <img src="/images/legacy-bench-overall-results.png" alt="Overall pass rates across model-agent combinations on Legacy Bench" />
+</Frame>
+
+<Frame>
+  <img src="/images/legacy-bench-language-results.png" alt="Pass rates broken down by language family across models" />
+</Frame>
+
+---
+
+## Agent Iteration Works Only Where Errors Are Visible
+
+Java 7 bug fixing is where agents score highest on the benchmark, because Java gives stack traces and runtime exceptions that tell the agent exactly what went wrong. When a fix attempt fails, the agent sees why, adjusts, and tries again. The feedback loop works.
+
+COBOL bug fixing is where they score lowest, as COBOL bugs are silent. A wrong PIC clause, a miscalculated deduction, an off-by-one in a packed decimal field all produce code that compiles, runs, and generates output that looks correct. In one payroll processing task, the agent calculates a health deduction as $275 instead of $125, and the error cascades into wrong totals. 24 of 29 tests still pass. The agent sees no signal that anything is wrong and moves on.
+
+COBOL is hard across the board. Of the 44 tasks that no model solves, 31 are COBOL, even though COBOL accounts for less than half the benchmark. The language itself is the bottleneck, regardless of whether the task asks the agent to fix, implement, or migrate.
+
+---
+
+## Agents Can Read Legacy Code Better Than They Can Write It
+
+The gap between reading existing legacy code and writing new legacy code is steep, and every model we tested shows the same curve.
+
+<Frame>
+  <img src="/images/legacy-bench-task-type-results.png" alt="Pass rates by task type showing bug fixing outperforming implementation and migration" />
+</Frame>
+
+Bug fixing scores roughly twice as high as implementation, which scores roughly twice as high as migration. The steepness varies across models, but none escape the pattern. In Java 7, agents fix most bugs but struggle to write new code from a specification. In COBOL, both capabilities are near zero.
+
+Migration difficulty depends on the target language rather than the source. Fortran-to-C++ migration succeeds at a reasonable rate because the agent can validate its output in C++, a language it handles well. COBOL migration to Java, Rust, or C++ rarely works. Fortran is the clearest example of this dynamic: agents migrate Fortran code to C++ far more successfully than they implement new Fortran code, because the bottleneck is writing in the legacy language, not understanding it.
+
+---
+
+## No Single Model Wins on Legacy Code
+
+On bug fixing tasks, the top three models perform almost equally well, and model choice is a minor factor. As tasks get harder, model choice matters more: implementation and migration scores diverge sharply across models, with the gap widening at each step.
+
+However, the divergence is not a clean ranking. Each model has a different profile of strengths and weaknesses.
+
+- **GPT-5.3-Codex:** leads overall (42.5%) and leads on COBOL (34.8%), but scores poorly on C.
+- **Gemini-3.1-Pro:** the most balanced profile (38.7%), with no language below 29.7% and the strongest BASIC results (81.0%).
+- **Opus 4.6:** ties GPT on Java 7 (54.2%) and leads on C (34.3%), but scores worst on COBOL (18.1%).
+- **GLM-5:** competitive on Java 7 (40.6%) and ties for best Fortran migration (67%), but scores 0% on Assembly bug fixing.
+
+Every model has at least one categorical failure on an entire language family. On modern benchmarks, model rankings tend to be consistent across categories. On Legacy Bench, they are not.
+
+---
+
+## Where Agents Fail
+
+Agents reliably finish every task. They compile the code, run it, observe the output, and declare success. In 97% of failures, the agent believes it has solved the task. Every failure is the agent producing plausible but incorrect output and not catching it.
+
+Five failure patterns recur across the benchmark, and most involve the agent getting close but not close enough.
+
+**Subtle logic bugs** are the most common pattern. The code is nearly correct and most tests pass, but one wrong calculation cascades through dependent values. The agent has no way to distinguish its output from a correct one.
+
+**Missing feature subsets** appear nearly as often: the agent implements the common path and misses edge cases. A parser handles five of seven HTML entities. An encoder covers ASCII but not extended characters. The output works for the obvious inputs and fails on the rest.
+
+**Output format mismatches** run throughout the benchmark, where the logic is correct but the formatting is wrong. A register name rendered as `0` instead of `Q0`, or a numeric field output as an integer instead of fixed-point. In legacy systems, format is the interface, and a formatting error is functionally equivalent to a logic error.
+
+**Byte-level precision errors** are less common but persistent. The code is functionally correct, but a trailing newline is missing or a field is one byte short, and downstream systems reject the output.
+
+**Spec misinterpretation** is the rarest pattern but the hardest to diagnose. The agent reads the specification and implements something subtly different, like VT100 cursor reset semantics or AAR responsibility assignment rules. The implementation is internally consistent but does not match what the spec requires.
+
+In modern codebases, test suites and CI pipelines catch these errors before deployment. In legacy environments, the agent must catch them itself.
+
+---
+
+## Agent Comparison
+
+On the same underlying model, Droid consistently outperforms the model provider's own agent, and the gap is largest on the hardest tasks, consistent with what we've observed on Terminal-Bench.
+
+Legacy environments reward agents that verify their work systematically, iterate when things go wrong, and handle format-sensitive output precisely. On 3 tasks, Gemini CLI declared success without compiling and testing the code. Droid's scaffolding enforced a compile-run-verify loop that caught those errors before submission. Gemini CLI also lost at least 2 tasks to a heredoc parser bug that rejected valid bash syntax.
+
+The pattern holds against Codex too: wrong compiler flags, ambiguous specs that require trying multiple interpretations, COBOL conventions like COPY statement syntax that fail silently. These are problems that require persistence and systematic replanning.
+
+---
+
+## The Path Forward
+
+Performance on legacy tasks is improving rapidly. The best agent solves fewer than half the tasks today, but the gap between legacy and modern benchmark performance is closing. As models gain better training coverage of legacy languages, as agent architectures develop stronger self-verification capabilities, and as both improve their handling of format-precise output where a single wrong byte breaks the interface, we expect that gap to continue closing. Legacy Bench is designed to track that progress.
+
+If you're responsible for legacy systems and evaluating how AI agents fit into your modernization strategy, we can help you understand what works today for your specific codebase and what's coming next.
+
+[Talk to us →](https://factory.ai/contact)
+
+---
+
+## Benchmark Construction
+
+### What makes legacy code different
+
+Four properties of legacy code make these tasks structurally different from the modern codebases that other benchmarks test.
+
+**Format precision is non-negotiable.** Legacy systems communicate through fixed-width records, packed decimal fields, specific character encodings, and byte-aligned structures. A COBOL program that outputs a financial report must produce exact field widths with correct trailing spaces, numeric fields in DISPLAY format rather than COMP-3, and line lengths matching downstream system expectations. One wrong byte breaks the interface.
+
+Consider task `8e8098-cobol-railcar-settlement-fix`: a multi-module COBOL application calculates per diem charges for railroad car hire settlement. The agent must debug four existing modules, implement a fifth (reclaim processing), read EBCDIC fixed-width input with COMP-3 packed decimal rate fields, apply AAR Circular OT-10 rules for responsibility assignment across 24 hourly position entries, calculate mileage allowances from interline rate tables, route error records with negative totals, and produce three separate output files in 52-byte and 44-byte EBCDIC fixed-width formats with COMP-3 signed decimal fields. All output must be compiled with `-febcdic-table=ebcdic500_latin1` and use CODE-SET for EBCDIC encoding.
+
+**The validation loop is degraded.** On modern codebases, agents iterate: write code, run tests, read errors, fix, repeat. This loop is the backbone of agent performance. Legacy Bench tasks can be compiled and executed in the containerized environment (COBOL tasks use GnuCOBOL), but the feedback quality is much lower. A failing Java test gives a stack trace; a COBOL program that produces wrong output in a packed decimal field gives no obvious signal. In production, the gap is even wider: mainframe environments are accessed through restricted terminals with batch job submission, and most coding agents cannot operate in them at all.
+
+**Business rules are embedded, not documented.** Legacy code is often the only documentation of complex business logic. A COBOL program that calculates insurance claim deductibles encodes rules about copay structures, coordination of benefits, and regulatory thresholds, none of which are written down anywhere else. The agent must understand the business logic from the code itself to modify it correctly.
+
+**Cross-paradigm migration is more than syntax translation.** Converting COBOL to Rust or Fortran to C++ requires mapping between fundamentally different computational models. COBOL's PERFORM VARYING is not a for-loop. Fortran's column-major array layout has numerical implications when translating to C++. COBOL's fixed-point decimal arithmetic has no direct equivalent in most modern languages. The agent must preserve semantic equivalence across paradigms.
+
+### Limitations
+
+Legacy Bench tasks run in containers, not on mainframes. This is a deliberate design choice (no coding agent today can operate on a mainframe) but it means tasks requiring mainframe-specific behavior (JCL job submission, CICS transaction processing, IMS database calls) are approximated rather than replicated. The task set does not yet cover all legacy ecosystems: RPG, PL/I, Ada, and MUMPS are not represented. Evaluation uses a single-pass methodology; multi-attempt and agentic retry strategies may yield different results.
+
+---
+
+## Try Droid
+
+Factory is bringing autonomy to software engineering. Droid supports all major frontier models and is available today.
+
+[Start Building →](https://app.factory.ai)
