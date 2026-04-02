@@ -4,6 +4,50 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 1" rss={{ title: "CLI Updates", description: "Unified missions menu, settings and footer redesign, session forking, TUI charts, and SSH clipboard fixes" }}>
+  `v0.92.0`
+
+## New features
+
+- **Unified /missions menu** - Redesigned `/missions` command with model tabs and improved navigation
+- **/settings redesign** - Refreshed `/settings` menu with an updated layout
+- **CLI footer redesign** - Redesigned CLI footer with a cleaner layout
+- **Per-worker token breakdown** - Mission Control now shows token usage breakdown per worker
+- **Session forking** - New `--fork` flag to create a new session by forking an existing one
+- **TUI chart rendering** - Charts and graphs now render directly in the terminal
+- **Exec mode system prompt flags** - New `--append-system-prompt` and `--append-system-prompt-file` flags for customizing system prompts in exec mode
+- **Cloud-synced read-only sessions** - Cloud-synced sessions are now viewable in read-only mode (app)
+- **Configurable per-model context limits** - New setting to configure context token limits on a per-model basis
+
+## Improvements
+
+- **Session loading performance** - Optimized session loading for faster startup and reduced load times
+- **Faster session search** - Session search is now significantly faster (app)
+- **Faster desktop session loading** - Sessions load directly from disk in the desktop app for improved speed (app)
+- **Tool routing warnings** - Tool routing warnings now suggest model-specific alternatives
+- **Status indicator accuracy** - Status now correctly shows "Thinking" instead of "Executing" when the model is reasoning after tool use
+- **Default model indicator** - `/model` command now highlights which model is the default
+- **SKILL.md support** - Built-in skills can now be loaded from SKILL.md files
+- **Sidebar polish** - Modernized sidebar user profile and dropdown animations (app)
+
+## Bug fixes
+
+- **Clipboard copy over SSH** - Clipboard copy now works reliably over SSH connections
+- **VS Code multiline input** - Fixed multiline input handling in VS Code terminal
+- **MCP authentication** - Restored MCP OAuth authentication flows
+- **PDF page limit error** - Added a clear error message when exceeding the 100-page PDF limit
+- **Terminal cleanup on exit** - Fixed terminal escape sequences persisting after CLI exit
+- **Slash command settings** - Fixed `/fast`, `/enter-mission`, `/exit-mission`, and `/new` commands not applying settings correctly
+- **Parallel tool rendering** - Fixed rendering issues with parallel tool executions
+- **Ghostty and xterm input** - Fixed keyboard input handling in Ghostty and xterm terminals
+- **Terminal multiplexer display** - Fixed screen clearing in terminal multiplexers like tmux and screen
+- **Terminal focus recovery** - Fixed terminal focus not being recovered after window switching
+- **AGENTS.md session loading** - AGENTS.md guidelines now load correctly when resuming existing sessions
+- **Task tool background panel** - Fixed streaming and display issues in Task tool background panels
+- **Fullscreen sidebar layout** - Fixed sidebar layout in fullscreen mode on macOS (app)
+
+</Update>
+
 <Update label="March 30" rss={{ title: "CLI Updates", description: "Light theme readability fix" }}>
   `v0.90.1`
 
