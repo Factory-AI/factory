@@ -26,18 +26,12 @@ If you're using the desktop app, your machine will be registered automatically u
 ## Register with the CLI
 
 ```bash
-droid computer register [name]
-```
-
-After registering the machine, open **Settings → Droid Computers** and enable **Remote Access** for that computer so Droid can use it from the web or other devices.
-
-Then start the daemon so Factory can connect to the machine remotely:
-
-```bash
 droid daemon --remote-access
 ```
 
-The `--remote-access` flag tells the daemon to connect through Factory's secure relay service, so no inbound ports need to be opened on your machine.
+If not registered, this will prompt you for a computer name and register the machine automatically.
+
+If you want to register the machine manually first, you can still run `droid computer register [name]`, then start `droid daemon --remote-access` to connect through Factory's relay service.
 
 <Note>
 Only one computer registration is allowed per machine at a time. Run `droid computer remove` first, or delete the machine through the settings page, if you need to re-register.
