@@ -1,0 +1,63 @@
+---
+title: Bring Your Own Machine (BYOM)
+description: 自分のマシンをDroidコンピューターとして有効化し接続する。
+keywords: ['byom', 'bring your own machine', 'droid computers', 'remote access', 'daemon', 'relay']
+---
+
+Bring Your Own Machine (BYOM) を使用すると、自分の Linux、macOS、または Windows マシンを Droid Computer として登録できます。これは、VPS、クラウド VM、ワークステーション、オンプレミスサーバーなど、既に管理している環境内で Droid を動作させたい場合に便利です。
+
+## 始める前に
+
+以下が必要です：
+
+- **Linux**、**macOS**、または **Windows** を実行しているマシン
+- そのマシンにインストールされた Droid CLI
+- Factory での認証（インタラクティブセッションでの `/login`）
+- Factory API、特に `relay.factory.ai` へのネットワークアクセス
+
+<Note>
+インバウンドポートを開く必要はありません。BYOM マシンは、`--remote-access` でデーモンを開始すると、Factory のリレーサービスを通じて接続します。
+</Note>
+
+## デスクトップアプリで登録する
+
+デスクトップアプリを使用している場合、マシンはシステムのホスト名を使用して自動的に登録されます。リモートコンピューターとして有効にするには、**Settings → Droid Computers** で **Remote Access** トグルをオンにします。これにより、ローカルマシンが自動的にリレーサービスに接続され、他のデバイスからアクセス可能になり、デスクトップアプリが実行されている限り接続が維持されます。
+
+## CLI で登録する```bash
+droid daemon --remote-access
+```登録されていない場合、コンピュータ名の入力を求められ、自動的にマシンが登録されます。
+
+手動でマシンを先に登録したい場合は、`droid computer register [name]`を実行してから、`droid daemon --remote-access`を開始してFactoryのリレーサービス経由で接続できます。
+
+<Note>
+一台のマシンにつき、同時に登録できるコンピュータは一つだけです。再登録が必要な場合は、先に`droid computer remove`を実行するか、設定ページからマシンを削除してください。
+</Note>
+
+## 可用性のトラブルシューティング
+
+マシンがリモート使用可能として表示されない場合：
+
+- **設定 → Droid Computers**でマシンが一覧に表示されているかを確認
+- **設定 → Droid Computers**で、そのマシンの**Remote Access**が有効になっているかを確認
+- `droid daemon --remote-access`でデーモンが動作していることを確認
+
+**Droid Computers**ページが全く表示されない場合は、組織の管理者またはFactoryサポートにお問い合わせください。
+
+## BYOMマシンの管理と更新
+
+- `droid computer list`で登録済みコンピュータを確認
+- `droid computer ssh <name>`でコンピュータへのSSHセッションを開く
+- `droid computer remove`で現在のマシンの登録解除とローカル設定のクリーンアップを実行
+- マシン上でDroid CLIを手動更新し、デーモンプロセスを再起動
+
+BYOMコンピュータは、マシン上に既に設定されているgit認証情報を使用します。
+
+## セキュリティとネットワークに関する注意事項
+
+- **リレーモード** — BYOMマシンはFactoryのリレーサービス経由でトラフィックをルーティングするため、公開ポートは露出しません
+- **認証情報** — BYOMマシンではgit認証情報はFactoryによって管理されません。マシンの既存のgit設定が使用されます
+- **所有権** — 基盤となるマシンの堅牢化と保守は利用者の責任です
+
+## 関連項目
+
+- [Droid Computers](/jp/cli/features/droid-computers) — プラットフォーム管理コンピュータと共通概念の概要
