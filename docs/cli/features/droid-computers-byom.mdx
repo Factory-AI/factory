@@ -19,7 +19,11 @@ Make sure you have:
 No inbound ports need to be opened. BYOM machines connect through Factory's relay service when you start the daemon with `--remote-access`.
 </Note>
 
-## Register your machine
+## Register with the desktop app
+
+If you're setting up BYOM from the desktop experience, open **Settings → Droid Computers** and enable **Remote Access** for that computer so Droid can use it from the web or other devices. This will automatically connect your local machine to our relay service to be reachable from other devices. The connection will remain active for as long as the desktop app is running.
+
+## Register with the CLI
 
 ```bash
 droid computer register [name]
@@ -43,7 +47,7 @@ Only one computer registration is allowed per machine at a time. Run `droid comp
 
 If the machine does not appear as available for remote use:
 
-- Confirm the machine was registered successfully with `droid computer register`
+- Check **Settings → Droid Computers** to confirm the machine is listed
 - In **Settings → Droid Computers**, verify **Remote Access** is enabled for that machine
 - Make sure the daemon is running with `droid daemon --remote-access`
 

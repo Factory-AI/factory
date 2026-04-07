@@ -3,10 +3,6 @@ title: Droid Computers (Research Preview)
 description: Persistent, long-lived compute environments for Droid
 ---
 
-<Note>
-**Research Preview** — Droid Computers is currently available only to select organizations. There is a limit of **one computer per user**.
-</Note>
-
 Droid Computers are persistent compute environments that Droid can connect to and work on across sessions. Unlike ephemeral cloud templates that are destroyed after each session, computers **retain state** — installed packages, files, running services, and configuration all persist between sessions.
 
 ## Computer types
@@ -34,14 +30,27 @@ Computers can also be selected when creating sessions via the Slack integration.
 
 From **Settings → Droid Computers**, you can:
 
+- Configure your own local computer
 - Browse available computers
 - Rename a computer
 - Delete a computer
 - Open the detail page for status and connection information
 
-Platform-managed computers also expose provisioning details, resource metrics, and remote update flows. BYOM machines surface the controls relevant to remote access and local machine registration.
+## Bring Your Own Machine (BYOM)
+
+You can register any machine — VPS, cloud VM, on-prem server, etc. — as a Droid Computer.
+
+- Supported OS: **Linux**, **macOS**, and **Windows**
+- Setup uses `droid computer register [name]` and `droid daemon --remote-access`
+- Traffic is routed through Factory's relay service, so no inbound ports need to be opened
+
+For the full BYOM setup flow, Remote Access guidance, and management notes, see [Bring Your Own Machine (BYOM)](/cli/features/droid-computers-byom).
 
 ## Managed Computers
+
+<Note>
+**Research Preview** — Managed Computers are currently available only to select organizations.
+</Note>
 
 The fastest way to get started is to create a computer directly from the Factory web app.
 
@@ -59,17 +68,7 @@ Factory provisions a cloud computer (4 CPU, 8GB RAM, 6GB swap) automatically. Pr
 
 If any step fails, the computer status changes to **Error** and the failed step is shown in the UI. You can delete the computer and retry.
 
-Once provisioning completes, the computer status changes to **Active** and it becomes available for use in sessions. Platform-managed computers auto-pause when idle and auto-resume when a new session targets them.
-
-## Bring Your Own Machine (BYOM)
-
-You can register any machine — VPS, cloud VM, on-prem server, etc. — as a Droid Computer.
-
-- Supported OS: **Linux**, **macOS**, and **Windows**
-- Setup uses `droid computer register [name]` and `droid daemon --remote-access`
-- Traffic is routed through Factory's relay service, so no inbound ports need to be opened
-
-For the full BYOM setup flow, Remote Access guidance, and management notes, see [Bring Your Own Machine (BYOM)](/cli/features/droid-computers-byom).
+Once provisioning completes, the computer status changes to **Active** and it becomes available for use in sessions. Platform-managed computers auto-pause when idle and auto-resume when a new session targets them. They also expose provisioning details, resource metrics, and remote update flows.
 
 ## CLI commands
 
@@ -117,8 +116,8 @@ For BYOM machines, you can also update the Droid CLI manually by downloading the
 
 ## Git credentials
 
-- **Managed Computers** — Git credentials are configured automatically for authenticated repository access. When you add new GitHub App installations or change repository access, credentials are refreshed automatically on the next session connection.
 - **BYOM** — Droid uses whatever git credentials are already configured on the machine.
+- **Managed Computers** — If you have a personal GitHub integration with Factory, credentials are added automatically for authenticated repository access. When you add new GitHub App installations or change repository access, credentials are refreshed automatically on the next session connection.
 
 ## SSH & IDE integration
 
