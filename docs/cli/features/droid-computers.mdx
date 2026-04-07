@@ -9,7 +9,39 @@ description: Persistent, long-lived compute environments for Droid
 
 Droid Computers are persistent compute environments that Droid can connect to and work on across sessions. Unlike ephemeral cloud templates that are destroyed after each session, computers **retain state** — installed packages, files, running services, and configuration all persist between sessions.
 
-## Platform-managed computers
+## Computer types
+
+Factory supports two ways to use Droid Computers:
+
+- **Managed Computers** — Factory provisions and manages the underlying cloud computer for you
+- **Bring Your Own Machine (BYOM)** — You register a machine you already manage, such as a VPS, workstation, or on-prem server
+
+Both types appear in **Settings → Droid Computers** and can be used as long-lived targets for Droid sessions.
+
+## Using computers in sessions
+
+### Web app
+
+In the new session modal, select the **Computer** tab, pick an active computer, set a working directory (for example, `/home/factory-user/projects/my-app`), and start your session.
+
+Connection status (connecting / connected / error) is shown in real time.
+
+### Slack
+
+Computers can also be selected when creating sessions via the Slack integration.
+
+## Managing computers
+
+From **Settings → Droid Computers**, you can:
+
+- Browse available computers
+- Rename a computer
+- Delete a computer
+- Open the detail page for status and connection information
+
+Platform-managed computers also expose provisioning details, resource metrics, and remote update flows. BYOM machines surface the controls relevant to remote access and local machine registration.
+
+## Managed Computers
 
 The fastest way to get started is to create a computer directly from the Factory web app.
 
@@ -29,14 +61,6 @@ If any step fails, the computer status changes to **Error** and the failed step 
 
 Once provisioning completes, the computer status changes to **Active** and it becomes available for use in sessions. Platform-managed computers auto-pause when idle and auto-resume when a new session targets them.
 
-## Managing computers
-
-From the computer detail page in **Settings → Droid Computers**, you can:
-
-- **Rename** a computer
-- **Delete** a computer (this stops and removes it permanently)
-- View live resource metrics and daemon version (see [Monitoring](#monitoring))
-
 ## Bring Your Own Machine (BYOM)
 
 You can register any machine — VPS, cloud VM, on-prem server, etc. — as a Droid Computer.
@@ -45,7 +69,7 @@ You can register any machine — VPS, cloud VM, on-prem server, etc. — as a Dr
 - Setup uses `droid computer register [name]` and `droid daemon --remote-access`
 - Traffic is routed through Factory's relay service, so no inbound ports need to be opened
 
-For the full BYOM setup flow, prerequisites, and management guidance, see [Bring Your Own Machine (BYOM)](/cli/features/droid-computers-byom).
+For the full BYOM setup flow, Remote Access guidance, and management notes, see [Bring Your Own Machine (BYOM)](/cli/features/droid-computers-byom).
 
 ## CLI commands
 
@@ -71,18 +95,6 @@ The `ssh` subcommand supports the following flags:
 - `--port <port>` — Target port on the remote machine (default: 22)
 - `--debug` — Enable verbose connection logging
 
-## Using computers in sessions
-
-### Web app
-
-In the new session modal, select the **Computer** tab, pick an active computer, set a working directory (e.g., `/home/factory-user/projects/my-app`), and start your session.
-
-Connection status (connecting / connected / error) is shown in real time.
-
-### Slack
-
-Computers can also be selected when creating sessions via the Slack integration.
-
 ## Monitoring
 
 Click on any computer in **Settings → Droid Computers** to open its detail page. For platform-managed computers, the detail page shows live resource metrics:
@@ -105,9 +117,8 @@ For BYOM machines, you can also update the Droid CLI manually by downloading the
 
 ## Git credentials
 
-Git credentials are configured automatically for authenticated repository access on platform-managed computers. When you add new GitHub App installations or change repository access, git credentials are refreshed automatically on the next session connection.
-
-BYOM computers use whatever git credentials are already configured on the machine.
+- **Managed Computers** — Git credentials are configured automatically for authenticated repository access. When you add new GitHub App installations or change repository access, credentials are refreshed automatically on the next session connection.
+- **BYOM** — Droid uses whatever git credentials are already configured on the machine.
 
 ## SSH & IDE integration
 

@@ -19,25 +19,15 @@ Make sure you have:
 No inbound ports need to be opened. BYOM machines connect through Factory's relay service when you start the daemon with `--remote-access`.
 </Note>
 
-## Enable BYOM for your organization
-
-BYOM is controlled at the organization level.
-
-1. Open the Factory app.
-2. Navigate to **Settings → Droid Computers**.
-3. Make sure Droid Computers / BYOM is enabled for your organization.
-
-If you do not see the **Droid Computers** page, or registration is unavailable, contact your organization admin or Factory support.
-
 ## Register your machine
-
-Once BYOM is enabled for your organization, register the machine:
 
 ```bash
 droid computer register [name]
 ```
 
-Then start the daemon so Factory can connect to the machine:
+After registering the machine, open **Settings → Droid Computers** and enable **Remote Access** for that computer so Droid can use it from the web or other devices.
+
+Then start the daemon so Factory can connect to the machine remotely:
 
 ```bash
 droid daemon --remote-access
@@ -49,13 +39,15 @@ The `--remote-access` flag tells the daemon to connect through Factory's secure 
 Only one computer registration is allowed per machine at a time. Run `droid computer remove` first, or delete the machine through the settings page, if you need to re-register.
 </Note>
 
-## What to expect when BYOM is disabled
+## Troubleshooting availability
 
-If BYOM has not been enabled for your organization:
+If the machine does not appear as available for remote use:
 
-- Users will not be able to complete BYOM registration
-- The machine will not appear as an available Droid Computer
-- You should ask an admin to enable Droid Computers / BYOM in **Settings → Droid Computers**
+- Confirm the machine was registered successfully with `droid computer register`
+- In **Settings → Droid Computers**, verify **Remote Access** is enabled for that machine
+- Make sure the daemon is running with `droid daemon --remote-access`
+
+If you do not see the **Droid Computers** page at all, contact your organization admin or Factory support.
 
 ## Managing and updating a BYOM machine
 
