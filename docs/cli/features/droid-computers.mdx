@@ -1,5 +1,5 @@
 ---
-title: Droid Computers (Research Preview)
+title: Overview
 description: Persistent, long-lived compute environments for Droid
 ---
 
@@ -34,17 +34,11 @@ From **Settings → Droid Computers**, you can:
 - Browse available computers
 - Rename a computer
 - Delete a computer
-- Open the detail page for status and connection information
+- Open the detail page for status and connection information (Managed Computers only)
 
 ## Bring Your Own Machine (BYOM)
 
-You can register any machine — VPS, cloud VM, on-prem server, etc. — as a Droid Computer.
-
-- Supported OS: **Linux**, **macOS**, and **Windows**
-- Setup uses `droid computer register [name]` and `droid daemon --remote-access`
-- Traffic is routed through Factory's relay service, so no inbound ports need to be opened
-
-For the full BYOM setup flow, Remote Access guidance, and management notes, see [Bring Your Own Machine (BYOM)](/cli/features/droid-computers-byom).
+You can register any machine you own — VPS, cloud VM, on-prem server, etc. — as a Droid Computer. For the full BYOM setup flow, Remote Access guidance, and management notes, see [Bring Your Own Machine (BYOM)](/cli/features/droid-computers-byom).
 
 ## Managed Computers
 
@@ -65,8 +59,6 @@ Factory provisions a cloud computer (4 CPU, 8GB RAM, 6GB swap) automatically. Pr
 3. **Configuring environment** — writing environment config, SSH keys, and service files
 4. **Installing Droid** — downloading and installing the Droid binary
 5. **Starting services** — launching the SSH and Droid daemon services
-
-If any step fails, the computer status changes to **Error** and the failed step is shown in the UI. You can delete the computer and retry.
 
 Once provisioning completes, the computer status changes to **Active** and it becomes available for use in sessions. Platform-managed computers auto-pause when idle and auto-resume when a new session targets them. They also expose provisioning details, resource metrics, and remote update flows.
 
@@ -112,8 +104,6 @@ The detail page also shows the current **daemon version** and connection status.
 
 The computer detail page displays the running daemon version alongside the latest available version. When an update is available, an **Update** button appears. Clicking it triggers a remote update — the daemon downloads the new binary, restarts, and reconnects automatically.
 
-For BYOM machines, you can also update the Droid CLI manually by downloading the latest version and restarting the daemon process.
-
 ## Git credentials
 
 - **BYOM** — Droid uses whatever git credentials are already configured on the machine.
@@ -138,10 +128,6 @@ Host factory-mycomputer
 ```
 
 This lets you open a full VS Code remote session on your Droid Computer.
-
-<Note>
-The proxy mode automatically strips `factory-` prefixes from the Host name when resolving the computer. For example, a Host entry named `factory-mycomputer` will connect to the computer named `mycomputer`.
-</Note>
 
 ## Security
 
