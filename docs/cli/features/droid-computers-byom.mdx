@@ -1,0 +1,77 @@
+---
+title: Bring Your Own Machine (BYOM)
+description: Enable and connect your own machine as a Droid Computer.
+keywords: ['byom', 'bring your own machine', 'droid computers', 'remote access', 'daemon', 'relay']
+---
+
+Bring Your Own Machine (BYOM) lets you register your own Linux, macOS, or Windows machine as a Droid Computer. This is useful when you want Droid to work inside an environment you already manage, such as a VPS, cloud VM, workstation, or on-prem server.
+
+## Before you start
+
+Make sure you have:
+
+- A machine running **Linux**, **macOS**, or **Windows**
+- Droid CLI installed on that machine
+- Authenticated with Factory (`/login` in an interactive session)
+- Network access to Factory APIs, specifically `relay.factory.ai`
+
+<Note>
+No inbound ports need to be opened. BYOM machines connect through Factory's relay service when you start the daemon with `--remote-access`.
+</Note>
+
+## Enable BYOM for your organization
+
+BYOM is controlled at the organization level.
+
+1. Open the Factory app.
+2. Navigate to **Settings → Droid Computers**.
+3. Make sure Droid Computers / BYOM is enabled for your organization.
+
+If you do not see the **Droid Computers** page, or registration is unavailable, contact your organization admin or Factory support.
+
+## Register your machine
+
+Once BYOM is enabled for your organization, register the machine:
+
+```bash
+droid computer register [name]
+```
+
+Then start the daemon so Factory can connect to the machine:
+
+```bash
+droid daemon --remote-access
+```
+
+The `--remote-access` flag tells the daemon to connect through Factory's secure relay service, so no inbound ports need to be opened on your machine.
+
+<Note>
+Only one computer registration is allowed per machine at a time. Run `droid computer remove` first, or delete the machine through the settings page, if you need to re-register.
+</Note>
+
+## What to expect when BYOM is disabled
+
+If BYOM has not been enabled for your organization:
+
+- Users will not be able to complete BYOM registration
+- The machine will not appear as an available Droid Computer
+- You should ask an admin to enable Droid Computers / BYOM in **Settings → Droid Computers**
+
+## Managing and updating a BYOM machine
+
+- Use `droid computer list` to see registered computers
+- Use `droid computer ssh <name>` to open an SSH session to a computer
+- Use `droid computer remove` to unregister the current machine and clean up local config
+- Update the Droid CLI manually on the machine, then restart the daemon process
+
+BYOM computers use whatever git credentials are already configured on the machine.
+
+## Security and networking notes
+
+- **Relay mode** — BYOM machines route traffic through Factory's relay service, so no public ports are exposed
+- **Credentials** — Git credentials are not managed by Factory on BYOM machines; the machine's existing git configuration is used
+- **Ownership** — You are responsible for hardening and maintaining the underlying machine
+
+## See also
+
+- [Droid Computers](/cli/features/droid-computers) — Overview of platform-managed computers and shared concepts

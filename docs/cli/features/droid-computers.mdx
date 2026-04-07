@@ -41,32 +41,11 @@ From the computer detail page in **Settings → Droid Computers**, you can:
 
 You can register any machine — VPS, cloud VM, on-prem server, etc. — as a Droid Computer.
 
-### Prerequisites
+- Supported OS: **Linux**, **macOS**, and **Windows**
+- Setup uses `droid computer register [name]` and `droid daemon --remote-access`
+- Traffic is routed through Factory's relay service, so no inbound ports need to be opened
 
-- A machine running **Linux**, **macOS**, or **Windows**
-- Droid CLI installed on the machine
-- Authenticated with Factory (`/login` in an interactive session)
-- Network access to Factory APIs, specifically relay.factory.ai (no inbound ports need to be opened)
-
-### Setup
-
-Register the machine:
-
-```bash
-droid computer register [name]
-```
-
-Then start the daemon so Factory can connect to the machine:
-
-```bash
-droid daemon --remote-access
-```
-
-The `--remote-access` flag tells the daemon to connect through Factory's secure relay service, so no inbound ports need to be opened on your machine.
-
-<Note>
-Only one computer registration is allowed per machine at a time. Run `droid computer remove` first or delete the machine through the settings page if you need to re-register.
-</Note>
+For the full BYOM setup flow, prerequisites, and management guidance, see [Bring Your Own Machine (BYOM)](/cli/features/droid-computers-byom).
 
 ## CLI commands
 
