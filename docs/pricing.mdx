@@ -1,47 +1,57 @@
 ---
-title: "Pricing & Models"
-description: "Model pricing in Standard Tokens"
-keywords: ['pricing', 'models', 'model id', 'model pricing', 'tokens', 'standard tokens', 'multiplier', 'cost', 'plans', 'subscription']
+title: "Plans & Models"
+description: "Factory plans and available models"
+keywords: ['pricing', 'plans', 'models', 'model id', 'limits', 'pro', 'max', 'enterprise', 'subscription']
 ---
 
-## Pricing Tiers
+## Plans
 
-Factory measures usage through Standard Tokens. Cached tokens are billed at one-tenth of a Standard Token (10 cached tokens = 1 Standard Token). We offer two subscription plans:
+### Pro -- $20/mo
 
-| Plan     | Standard Tokens / Month                       | Price / Month |
-| -------- | --------------------------------------------- | ------------- |
-| **Free** | BYOK                                          | $0            | 
-| **Pro**  | 20 million                                    | $20           |
-| **Max**  | 200 million                                   | $200          | 
+Complete coding agent workspace for individuals and small teams.
 
-## Model Pricing
+- **Dedicated compute with frontier models** -- fast and direct priority routing, the day the model is available
+- **Agent-native, multi-platform experience** -- Desktop, web, and CLI with cloud & local background agents and expanded first-party integrations
+- **Team collaboration** -- up to 2 team members ($5 per additional seat), analytics, billing, and usage statistics, plus an agent-readiness dashboard
 
-Different models have different multipliers applied to calculate Standard Token usage.
+### Max -- $200/mo
 
-### Pricing Table
+Everything in Pro, plus:
 
-| Model                    | Model ID                     | Multiplier |
-| ------------------------ | ---------------------------- | ---------- |
-| Droid Core (MiniMax M2.5)| `minimax-m2.5`               | 0.12×      |
-| Gemini 3 Flash           | `gemini-3-flash-preview`     | 0.2×       |
-| Droid Core (Kimi K2.5)   | `kimi-k2.5`                  | 0.25×      |
-| GPT-5.4 Mini             | `gpt-5.4-mini`               | 0.3×       |
-| Claude Haiku 4.5         | `claude-haiku-4-5-20251001`  | 0.4×       |
-| Droid Core (GLM-5)       | `glm-5`                      | 0.4×       |
-| Droid Core (GLM-5.1)     | `glm-5.1`                    | 0.55×      |
-| GPT-5.2                  | `gpt-5.2`                    | 0.7×       |
-| GPT-5.2-Codex            | `gpt-5.2-codex`              | 0.7×       |
-| GPT-5.3-Codex            | `gpt-5.3-codex`              | 0.7×       |
-| Gemini 3.1 Pro           | `gemini-3.1-pro-preview`     | 0.8×       |
-| GPT-5.4                  | `gpt-5.4`                    | 1×         |
-| Claude Sonnet 4.5        | `claude-sonnet-4-5-20250929` | 1.2×       |
-| Claude Sonnet 4.6        | `claude-sonnet-4-6`          | 1.2×       |
-| GPT-5.3-Codex Fast       | `gpt-5.3-codex-fast`         | 1.4×       |
-| Claude Opus 4.5          | `claude-opus-4-5-20251101`   | 2×         |
-| Claude Opus 4.6          | `claude-opus-4-6`            | 2×         |
-| GPT-5.4 Fast             | `gpt-5.4-fast`               | 2×         |
-| Claude Opus 4.6 Fast     | `claude-opus-4-6-fast`       | 12×        |
+- **Expanded reserved capacity** -- 10x usage from the Pro plan
+- **Early access** to new features
+- **Team collaboration** -- 5-seat cap ($5 per additional seat)
 
-## Thinking About Tokens
+### Enterprise
 
-As a reference point, using GPT-5.3-Codex at its 0.7× multiplier alongside our typical cache ratio of 4–8× means your effective Standard Token usage goes dramatically further than raw on-demand calls. Switching to very expensive models frequently—or rotating models often enough to invalidate the cache—will lower that benefit, but most workloads see materially higher usage ceilings compared with buying capacity directly from individual model providers. Our aim is for you to run your workloads without worrying about token math; the plans are designed so common usage patterns outperform comparable direct offerings.
+Everything in Max, plus:
+
+- **Enterprise scale** -- unlimited team members, custom messaging and credit limits, advanced repository permissions
+- **Enterprise features** -- enterprise-scale codebase analysis, audit logging & activity trails, Agent-readiness Improvement Program, enterprise-specific automation cookbook, SSO, SAML/SCIM provisioning, compliance reporting, on-premise deployment options
+- **Premium support** -- dedicated Account Manager and Customer Engineer, priority support with SLAs, custom onboarding program
+
+[Contact Sales](https://factory.ai/contact) for Enterprise pricing.
+
+## Available Models
+
+| Model                    | Model ID                     |
+| ------------------------ | ---------------------------- |
+| Droid Core (MiniMax M2.5)| `minimax-m2.5`               |
+| Gemini 3 Flash           | `gemini-3-flash-preview`     |
+| Droid Core (Kimi K2.5)   | `kimi-k2.5`                  |
+| GPT-5.4 Mini             | `gpt-5.4-mini`               |
+| Claude Haiku 4.5         | `claude-haiku-4-5-20251001`  |
+| Droid Core (GLM-5)       | `glm-5`                      |
+| Droid Core (GLM-5.1)     | `glm-5.1`                    |
+| GPT-5.2                  | `gpt-5.2`                    |
+| GPT-5.2-Codex            | `gpt-5.2-codex`              |
+| GPT-5.3-Codex            | `gpt-5.3-codex`              |
+| Gemini 3.1 Pro           | `gemini-3.1-pro-preview`     |
+| GPT-5.4                  | `gpt-5.4`                    |
+| Claude Sonnet 4.5        | `claude-sonnet-4-5-20250929` |
+| Claude Sonnet 4.6        | `claude-sonnet-4-6`          |
+| GPT-5.3-Codex Fast       | `gpt-5.3-codex-fast`         |
+| Claude Opus 4.5          | `claude-opus-4-5-20251101`   |
+| Claude Opus 4.6          | `claude-opus-4-6`            |
+| GPT-5.4 Fast             | `gpt-5.4-fast`               |
+| Claude Opus 4.6 Fast     | `claude-opus-4-6-fast`       |
