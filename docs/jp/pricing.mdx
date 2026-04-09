@@ -1,47 +1,57 @@
 ---
-title: "料金とモデル"
-description: "Model pricing in Standard Tokens"
-keywords: ['pricing', 'models', 'model id', 'model pricing', 'tokens', 'standard tokens', 'multiplier', 'cost', 'plans', 'subscription']
+title: "プランとモデル"
+description: "Factoryのプランと利用可能なモデル"
+keywords: ['pricing', 'plans', 'models', 'model id', 'limits', 'pro', 'max', 'enterprise', 'subscription']
 ---
 
-## 料金プラン
+## プラン
 
-Factoryは、Standard Tokenを通じて使用量を測定しています。キャッシュされたトークンは、Standard Tokenの10分の1の料金で請求されます（キャッシュトークン10個 = Standard Token 1個）。2つのサブスクリプションプランを提供しています：
+### Pro -- $20/月
 
-| プラン     | Standard Tokens / 月                          | 月額料金      |
-| -------- | --------------------------------------------- | ------------- |
-| **Free** | BYOK                                          | $0            | 
-| **Pro**  | 2,000万                                       | $20           |
-| **Max**  | 2億                                           | $200          | 
+個人および小規模チーム向けの完全なコーディングエージェントワークスペース。
 
-## モデル料金
+- **最先端モデルによる専用コンピュート** -- モデルが利用可能になった日から、高速で直接的な優先ルーティング
+- **エージェントネイティブなマルチプラットフォーム体験** -- デスクトップ、ウェブ、CLIに対応。クラウド＆ローカルバックグラウンドエージェントと拡張されたファーストパーティ統合
+- **チームコラボレーション** -- 最大2名のチームメンバー（追加シートあたり$5）、分析、請求、使用統計、エージェント準備状況ダッシュボード
 
-異なるモデルには、Standard Token使用量を計算するために異なる倍率が適用されます。
+### Max -- $200/月
 
-### 料金表
+Proプランのすべてに加えて：
 
-| モデル                    | モデルID                     | 倍率       |
-| ------------------------ | ---------------------------- | ---------- |
-| Droid Core (MiniMax M2.5)| `minimax-m2.5`               | 0.12×      |
-| Gemini 3 Flash           | `gemini-3-flash-preview`     | 0.2×       |
-| Droid Core (Kimi K2.5)   | `kimi-k2.5`                  | 0.25×      |
-| GPT-5.4 Mini             | `gpt-5.4-mini`               | 0.3×       |
-| Claude Haiku 4.5         | `claude-haiku-4-5-20251001`  | 0.4×       |
-| Droid Core (GLM-5)       | `glm-5`                      | 0.4×       |
-| Droid Core (GLM-5.1)     | `glm-5.1`                    | 0.55×      |
-| GPT-5.2                  | `gpt-5.2`                    | 0.7×       |
-| GPT-5.2-Codex            | `gpt-5.2-codex`              | 0.7×       |
-| GPT-5.3-Codex            | `gpt-5.3-codex`              | 0.7×       |
-| Gemini 3.1 Pro           | `gemini-3.1-pro-preview`     | 0.8×       |
-| GPT-5.4                  | `gpt-5.4`                    | 1×         |
-| Claude Sonnet 4.5        | `claude-sonnet-4-5-20250929` | 1.2×       |
-| Claude Sonnet 4.6        | `claude-sonnet-4-6`          | 1.2×       |
-| GPT-5.3-Codex Fast       | `gpt-5.3-codex-fast`         | 1.4×       |
-| Claude Opus 4.5          | `claude-opus-4-5-20251101`   | 2×         |
-| Claude Opus 4.6          | `claude-opus-4-6`            | 2×         |
-| GPT-5.4 Fast             | `gpt-5.4-fast`               | 2×         |
-| Claude Opus 4.6 Fast     | `claude-opus-4-6-fast`       | 12×        |
+- **拡張された予約容量** -- Proプランの10倍の使用量
+- 新機能への**早期アクセス**
+- **チームコラボレーション** -- 5シート上限（追加シートあたり$5）
 
-## トークンについて考える
+### Enterprise
 
-参考として、GPT-5.3-Codexを0.7×の倍率で使用し、一般的なキャッシュ比率である4〜8倍を併用すると、実効的なStandard Token使用量は、オンデマンドでの直接呼び出しよりもはるかに効率的になります。非常に高価なモデルを頻繁に切り替えたり、キャッシュが無効になるほど頻繁にモデルをローテーションしたりすると、その効果は低下しますが、ほとんどのワークロードでは、個別のモデルプロバイダーから直接容量を購入する場合と比較して、大幅に高い使用上限を実現できます。私たちの目標は、トークンの計算を気にすることなくワークロードを実行していただくことです。プランは、一般的な使用パターンが類似の直接提供サービスを上回る性能を発揮するよう設計されています。
+Maxプランのすべてに加えて：
+
+- **エンタープライズスケール** -- 無制限のチームメンバー、カスタムメッセージングおよびクレジット制限、高度なリポジトリ権限
+- **エンタープライズ機能** -- エンタープライズスケールのコードベース分析、監査ログとアクティビティトレイル、エージェント準備状況改善プログラム、エンタープライズ専用オートメーションクックブック、SSO、SAML/SCIMプロビジョニング、コンプライアンスレポート、オンプレミスデプロイオプション
+- **プレミアムサポート** -- 専任アカウントマネージャーおよびカスタマーエンジニア、SLA付き優先サポート、カスタムオンボーディングプログラム
+
+Enterpriseの料金については[営業チームにお問い合わせ](https://factory.ai/contact)ください。
+
+## 利用可能なモデル
+
+| モデル                    | モデルID                     |
+| ------------------------ | ---------------------------- |
+| Droid Core (MiniMax M2.5)| `minimax-m2.5`               |
+| Gemini 3 Flash           | `gemini-3-flash-preview`     |
+| Droid Core (Kimi K2.5)   | `kimi-k2.5`                  |
+| GPT-5.4 Mini             | `gpt-5.4-mini`               |
+| Claude Haiku 4.5         | `claude-haiku-4-5-20251001`  |
+| Droid Core (GLM-5)       | `glm-5`                      |
+| Droid Core (GLM-5.1)     | `glm-5.1`                    |
+| GPT-5.2                  | `gpt-5.2`                    |
+| GPT-5.2-Codex            | `gpt-5.2-codex`              |
+| GPT-5.3-Codex            | `gpt-5.3-codex`              |
+| Gemini 3.1 Pro           | `gemini-3.1-pro-preview`     |
+| GPT-5.4                  | `gpt-5.4`                    |
+| Claude Sonnet 4.5        | `claude-sonnet-4-5-20250929` |
+| Claude Sonnet 4.6        | `claude-sonnet-4-6`          |
+| GPT-5.3-Codex Fast       | `gpt-5.3-codex-fast`         |
+| Claude Opus 4.5          | `claude-opus-4-5-20251101`   |
+| Claude Opus 4.6          | `claude-opus-4-6`            |
+| GPT-5.4 Fast             | `gpt-5.4-fast`               |
+| Claude Opus 4.6 Fast     | `claude-opus-4-6-fast`       |
