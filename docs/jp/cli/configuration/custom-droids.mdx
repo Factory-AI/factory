@@ -1,57 +1,55 @@
 ---
-title: "カスタムDroid（サブエージェント）"
-description: Create specialized subagents with their own prompts, tool access, and models that droid can delegate work to.
+title: Custom Droids (Subagents)
+description: 独自のプロンプト、ツールアクセス、モデルを持つ専門サブエージェントを作成し、ドロイドが作業を委任できるようにします。
 keywords: ['custom droids', 'subagents', 'agents', 'specialized agents', 'delegation', 'task agent', 'custom agent']
 ---
 
-カスタムdroids は Markdown で定義された再利用可能なサブエージェントです。各droid は独自のシステムプロンプト、モデルの設定、ツールポリシーを持っているため、コードレビュー、セキュリティチェック、リサーチなどの集中的なタスクを、指示を再入力することなく委任できます。
+カスタムドロイドは、Markdownで定義された再利用可能なサブエージェントです。各ドロイドは独自のシステムプロンプト、モデル設定、ツールポリシーを持っているため、コードレビュー、セキュリティチェック、リサーチなどの集中したタスクを、指示を再入力することなく委任できます。
 
 ---
 
-## 1 · カスタムdroids とは？
+## 1 · カスタムドロイドとは？
 
-カスタムdroids は、プロジェクトの `.factory/droids/` またはあなた個人の `~/.factory/droids/` ディレクトリ配下の `.md` ファイルとして存在します。CLI はこれらのフォルダをスキャンし（トップレベルファイルのみ）、各定義を検証して、**Task** ツール用の `subagent_type` ターゲットとして公開します。これにより、プライマリアシスタントがセッション中に専用のヘルパーを起動できます。
+カスタムドロイドは、プロジェクトの `.factory/droids/` ディレクトリまたは個人の `~/.factory/droids/` ディレクトリ内の `.md` ファイルとして存在します。CLIはこれらのフォルダ（最上位レベルのファイルのみ）をスキャンし、各定義を検証し、**Task**ツールの `subagent_type` ターゲットとして公開します。これにより、プライマリアシスタントはセッション中に特定目的のヘルパーを起動できます。
 
 <Note>
-  Custom Droids are enabled by default. You can toggle them off in Settings (`/settings`) under the Experimental section if needed.
+  カスタムドロイドはデフォルトで有効になっています。必要に応じて、設定（`/settings`）の実験的機能セクションで無効にできます。
 </Note>
 
-- **プロジェクトdroids** は `<repo>/.factory/droids/` に配置され、チームメンバーと共有されます。
-- **個人droids** は `~/.factory/droids/` に保存され、ワークスペース間で引き継がれます。
+- **プロジェクトドロイド**は `<repo>/.factory/droids/` に配置され、チームメイトと共有されます。
+- **個人ドロイド**は `~/.factory/droids/` に配置され、ワークスペース間で引き継がれます。
 - 名前が一致する場合、プロジェクト定義が個人定義を上書きします。
 
 ---
 
 ## 2 · なぜ使うのか？
 
-- **高速な委任** – 複雑なチェックリストを一度エンコードし、単一のツール呼び出しで再利用。
-- **厳格な安全性** – エージェントを読み取り専用、編集専用、または厳選されたツールセットに制限。
-- **コンテキスト分離** – 各サブエージェントは新しいコンテキストウィンドウで実行され、プロンプトの肥大化を回避。
-- **再現可能なレビュー** – チーム固有のレビュー、テスト、またはリリースゲートをバージョン管理可能なコードとして取得。
+- **高速な委任** – 複雑なチェックリストを一度エンコードし、単一のツール呼び出しで再利用できます。
+- **厳密な安全性** – エージェントを読み取り専用、編集専用、または厳選されたツールセットに制限できます。
+- **コンテキストの分離** – 各サブエージェントは新しいコンテキストウィンドウで実行され、プロンプトの肥大化を回避します。
+- **反復可能なレビュー** – チーム固有のレビュー、テスト、リリースゲートをバージョン管理可能なコードとして記録できます。
 
 ---
 
 ## 3 · クイックスタート
 
-1. `/droids` を実行してDroids メニューを起動します。
-2. **Create a new Droid** を選択し、保存場所（プロジェクトまたは個人）を選んで、ウィザードに従って以下を設定します：
-   - droid が実行すべきことの説明
+1. `/droids` を実行してドロイドメニューを起動します。
+2. **Create a new Droid**を選択し、保存場所（プロジェクトまたは個人）を選択し、ウィザードに従って以下を設定します：
+   - ドロイドが行うべきことの説明
    - システムプロンプト（自動生成または手動編集）
-   - 識別子（droid の名前）
+   - 識別子（ドロイドの名前）
    - モデル（または親セッションから継承）
-   - ツール（ツールIDの明示的なリストまたはカテゴリ）
-3. 保存します。CLI は選択した `droids/` ディレクトリに `<name>.md` を書き込み、ファイル名を正規化します（小文字、ハイフン区切り）。
-4. droid に使用を依頼します。例：「サブエージェント `code-reviewer` でTask ツールを実行してこのdiffをレビューして」、または自動化からトリガーします。
+   - ツール（ツールIDの明示的リストまたはカテゴリ）
+3. 保存します。CLIは選択した `droids/` ディレクトリに `<name>.md` を書き込み、ファイル名を正規化します（小文字、ハイフン区切り）。
+4. ドロイドに使用を指示します。例：「`code-reviewer` サブエージェントでTaskツールを実行してこのdiffをレビューして」や、自動化からのトリガー。
 
-droid ファイルの変更は、次回のメニューオープンまたはTask ツール呼び出し時に反映されます。
+ドロイドファイルの変更は、次回のメニューオープンまたはTaskツール呼び出し時に反映されます。
 
 ---
 
 ## 4 · 設定
 
-各droid ファイルは YAML frontmatter を持つMarkdown です。
-
-```md
+各ドロイドファイルは、YAMLフロントマターを含むMarkdownです。```md
 ---
 name: code-reviewer
 description: Focused reviewer that checks diffs for correctness risks
@@ -71,11 +69,7 @@ Findings:
 
 - <bullet>
 - <bullet>
-```
-
-より細かい制御のため、ツールを配列として指定することもできます：
-
-```md
+```ツールをより細かく制御するために、配列として指定することもできます：```md
 ---
 name: deep-analyzer
 description: Thorough analysis with extended thinking
@@ -85,23 +79,21 @@ tools: ["Read", "Grep", "Glob", "WebSearch"]
 ---
 
 Perform deep analysis of the code or problem presented...
-```
+```主要なメタデータフィールド：
 
-主要なメタデータフィールド：
-
-| フィールド             | 注記                                                                                                                          |
+| フィールド         | 備考                                                                                                                          |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `name`            | 必須。小文字、数字、`-`、`_`。`subagent_type` 値とファイル名を決定します。                                  |
-| `description`     | 任意。UI リストに表示されます。≤500文字に抑えてください。                                                                               |
-| `model`           | `inherit` （親セッションのモデルを使用）、またはモデル識別子を指定します。組み込みモデルの場合、`claude-sonnet-4-5-20250929` のような値を使用します。カスタムモデル（BYOK）の場合、`custom:` + 設定の `model` フィールドを使用します（例：`custom:gpt-4o-mini`）。`model_display_name` では**ありません**。モデルIDについては [plans page](/pricing#available-models) を参照してください。 |
-| `reasoningEffort` | 任意。対応するモデル（例：`low`、`medium`、`high`）の推論努力を設定します。`model` が `inherit` の場合は無視されます。選択したモデルと互換性が必要です。 |
-| `tools`           | ツール選択：すべてのツールを使用する場合は省略、カテゴリ文字列を使用（例：`read-only`）、または `["Read", "Edit", "Execute"]` のようなツールIDの配列を指定します。大文字小文字を区別します。 |
+| `name`            | 必須。小文字、数字、`-`、`_`。`subagent_type`の値とファイル名を決定します。                                  |
+| `description`     | オプション。UIリストに表示されます。500文字以内に収めてください。                                                                               |
+| `model`           | `inherit`（親セッションのモデルを使用）、またはモデル識別子を指定。ビルトインモデルの場合、`claude-sonnet-4-5-20250929`などの値を使用。カスタムモデル（BYOK）の場合、設定の`model`フィールドに`custom:`を付けたもの（例：`custom:gpt-4o-mini`）を使用し、`model_display_name`では**ありません**。モデルIDについては[料金プランページ](/jp/pricing#available-models)を参照してください。 |
+| `reasoningEffort` | オプション。対応するモデルの推論努力レベルを設定（例：`low`、`medium`、`high`）。`model`が`inherit`の場合は無視されます。選択したモデルと互換性がある必要があります。 |
+| `tools`           | ツールの選択：すべてのツールの場合は省略、カテゴリ文字列（例：`read-only`）を使用、または`["Read", "Edit", "Execute"]`のようなツールIDの配列を指定。大文字小文字を区別します。 |
 
-プロンプトは少なくとも `name` を含むYAML frontmatter で始まり、空でない本文を含む必要があります。`DroidValidator` はエラー（無効な名前、未知のモデル、未知のツール）と警告（説明の欠落、重複したツール）を表示します。検証の問題は、ファイルの読み込みに失敗した際にCLI ログに表示されます。
+プロンプトは最低でも`name`を含むYAMLフロントマターで始まり、空でない本文を含む必要があります。`DroidValidator`はエラー（無効な名前、未知のモデル、未知のツール）と警告（説明の欠如、重複するツール）を表面化します。検証問題は、ファイルの読み込みに失敗した際にCLIログに表示されます。
 
 ### ツールカテゴリ → 具体的なツール
 
-`tools` 値としてカテゴリ名を直接使用する（例：`tools: read-only`）か、配列で個別のツールIDを指定できます。
+`tools`値として直接カテゴリ名（例：`tools: read-only`）を使用するか、配列で個別のツールIDを指定できます。
 
 | カテゴリ    | ツールID                         | 目的                            |
 | ----------- | -------------------------------- | ---------------------------------- |
@@ -109,94 +101,92 @@ Perform deep analysis of the code or problem presented...
 | `edit`      | `Create`、`Edit`、`ApplyPatch`   | コード生成と修正  |
 | `execute`   | `Execute`                        | シェルコマンド実行            |
 | `web`       | `WebSearch`、`FetchUrl`          | インターネット調査とコンテンツ      |
-| `mcp`       | 動的に追加（存在する場合）   | Model Context Protocol ツール       |
+| `mcp`       | 動的に追加（存在する場合）   | Model Context Protocolツール       |
 
-明示的な配列は上記のツール名を使用する必要があります（大文字小文字を区別）。未知の名前は検証エラーを引き起こします。
+明示的な配列では、上記のツール名を使用する必要があります（大文字小文字を区別）。未知の名前は検証エラーを引き起こします。
 
 <Note>
-  `TodoWrite` is automatically included for all droids to enable task tracking. You don't need to add it to your tools list.
+  `TodoWrite`はタスク追跡を有効にするため、すべてのドロイドに自動的に含まれます。ツールリストに追加する必要はありません。
 </Note>
 
 <Note>
-  When using `Edit` with OpenAI models, `ApplyPatch` is automatically included for compatibility. When `model` is `inherit`, both tools are enabled to ensure coverage across model providers.
+  OpenAIモデルで`Edit`を使用する場合、互換性のため`ApplyPatch`が自動的に含まれます。`model`が`inherit`の場合、モデルプロバイダー間でのカバレッジを確保するため、両方のツールが有効になります。
 </Note>
 
 ---
 
-## 5 · UI でのdroids 管理
+## 5 · UIでのドロイドの管理
 
-`/droids` でモーダルが開き、以下が表示されます：
+`/droids`でモーダルが開き、以下が表示されます：
 
-- **droids のリスト** – 各droid を以下の情報と共に表示：
-  - 名前とモデル（括弧内）
+- **ドロイドのリスト** – 各ドロイドを以下の情報と共に表示：
+  - 名前と括弧内のモデル
   - 説明のプレビュー
-  - 場所バッジ（Project / Personal）
-  - ツールの概要（例：「All tools」または選択されたツールの数）
-- **Create a new Droid** – ガイド付きウィザードを起動：
-  1. 場所を選択（Project または Personal）
-  2. droid が実行すべきことを説明
+  - 場所のバッジ（Project / Personal）
+  - ツールの概要（例：「すべてのツール」または選択されたツールの数）
+- **新しいドロイドを作成** – ガイド付きウィザードを起動：
+  1. 場所を選択（ProjectまたはPersonal）
+  2. ドロイドに何をさせるかを説明
   3. システムプロンプトを生成または手動編集
   4. 識別子、モデル、ツールを確認
-- **Import from Claude Code** – `~/.claude/agents/` の既存エージェントをカスタムdroids としてインポート
-- **アクション** – droids の表示、編集、削除、またはリロードしてリストを更新
+- **Claude Codeからインポート** – `~/.claude/agents/`から既存のエージェントをカスタムドロイドとしてインポート
+- **アクション** – ドロイドの表示、編集、削除、またはリロードしてリストを更新
 
 ---
 
-## 5.5 · Claude Code サブエージェントのインポート
+## 5.5 · Claude Codeサブエージェントのインポート
 
-Claude Code で作成されたエージェントをカスタムdroids としてインポートできます。これにより、既存のClaude Code エージェントをDroids システムで再利用できます。
+Claude Codeで作成したエージェントをカスタムドロイドとしてインポートできます。これにより、既存のClaude Codeエージェントをドロイドシステムで再利用できます。
 
-### インポート方法
+### インポートの方法
 
-1. `/droids` を実行してDroids メニューを開きます
-2. **I** を押してインポートフローを開始します
-3. CLI がClaude Code エージェントディレクトリをスキャンします：
+1. `/droids`を実行してドロイドメニューを開く
+2. **I**を押してインポートフローを開始
+3. CLIがClaude Codeエージェントディレクトリをスキャン：
    - **プロジェクトスコープ**：`<repo>/.claude/agents/`（ワークスペース固有のエージェント）
-   - **個人スコープ**：`~/.claude/agents/`（個人エージェント）
-4. 利用可能なエージェントのリストを確認します：
-   * `(already exists)` とマークされたエージェントはデフォルトで非選択状態
-   * 事前選択されたエージェントは、まだDroids にインポートされていないもの
-5. **Space** で個別選択を切り替え、**A** ですべてを切り替えます
-6. **Enter** を押して選択されたエージェントをインポートします
+   - **パーソナルスコープ**：`~/.claude/agents/`（個人のエージェント）
+4. 利用可能なエージェントのリストを確認：
+   * `(already exists)`マークのエージェントはデフォルトで非選択状態
+   * まだドロイドにインポートされていないエージェントは事前選択済み
+5. **Space**で個別選択の切り替え、**A**ですべての切り替え
+6. **Enter**で選択されたエージェントをインポート
 
-### インポート中に実行される処理
+### インポート中に起こること
 
-インポートプロセスはClaude Code エージェントをDroids に変換します：
+インポート処理はClaude Codeエージェントをドロイドに変換します：
 
-1. **メタデータの抽出**：
-   - エージェント名 → droid `name`
-   - エージェント説明（例と使用ガイダンスを含む）→ droid `description`
-   - エージェント指示 → droid システムプロンプト（本文）
+1. **メタデータ抽出**：
+   - エージェント名 → ドロイドの`name`
+   - エージェントの説明（例や使用方法を含む） → ドロイドの`description`
+   - エージェントの指示 → ドロイドシステムプロンプト（本文）
 
 2. **設定のマッピング**：
-   - モデル：Claude Code モデルファミリーをFactory モデルにマッピング：
+   - モデル：Claude CodeモデルファミリーをFactoryモデルにマッピング：
      - `inherit` → `inherit`
-     - `sonnet` → 利用可能な最初のSonnet モデル
-     - `haiku` → 利用可能な最初のHaiku モデル
-     - `opus` → 利用可能な最初のOpus モデル
-   - ツール：Claude Code ツール名をFactory ツールにマッピング（ツールがマッピングされない場合は検証警告を表示）
-   - 場所：デフォルトで Personal `~/.factory/droids/` にインポート
+     - `sonnet` → 利用可能な最初のSonnetモデル
+     - `haiku` → 利用可能な最初のHaikuモデル
+     - `opus` → 利用可能な最初のOpusモデル
+   - ツール：Claude CodeツールをFactoryツールにマッピング（ツールがマッピングされない場合は検証警告が表示される可能性）
+   - 場所：デフォルトでPersonal `~/.factory/droids/`にインポート
 
 3. **ツール検証**：
-   - 一部のClaude Code ツールはFactory に相当するものがない場合があります
-   - 無効なツールは警告と共にリスト表示されます：「Invalid tools: [list]」
-   - droid を編集してツールマッピングを修正するか、ツールアクセスを調整できます
+   - 一部のClaude CodeツールはFactoryに相当するものがない場合があります
+   - 無効なツールは警告とともに一覧表示されます：「無効なツール：[一覧]」
+   - ドロイドを編集してツールマッピングを修正したり、ツールアクセスを調整できます
 
 4. **ファイル作成**：
-   - `~/.factory/droids/`（個人場所）に `.md` ファイルを作成
+   - `~/.factory/droids/`（個人の場所）に`.md`ファイルを作成
    - ファイル名は正規化されます（小文字、ハイフン区切り）
-   - ファイル形式：YAML frontmatter + システムプロンプト本文
+   - ファイル形式：YAMLフロントマター + システムプロンプト本文
 
 5. **インポートレポート**：
    - 各エージェントの成功/失敗を表示
-   - インポートされたエージェントはすぐにdroid リストで利用可能
-   - インポートされたdroid を編集してモデル、ツール、プロンプトを調整可能
+   - インポートされたエージェントはドロイドリストですぐに利用可能
+   - インポートされたドロイドを編集してモデル、ツール、またはプロンプトを調整できます
 
 ### インポートフローの例
 
-**選択画面**（インポート前）：
-
-```
+**選択画面**（インポート前）：```
 Import Droids (.claude/agents)
 
 Project (<repo>/.claude/agents/):
@@ -213,11 +203,7 @@ Personal (~/.claude/agents/):
   Security analysis agent...
 
 ↑/↓ navigate • Space select • A toggle all • Enter import • B back
-```
-
-**インポート後**（droid リストに戻る）：
-
-```
+```**インポート後**（Droidリストに戻る）：```
 Custom Droids
 
 > code-reviewer (gpt-5-codex)
@@ -231,48 +217,44 @@ Custom Droids
   code-summarizer (claude-sonnet-4-5-20250929)
   Use this agent when you need to understand what a code fi...
   Location: Personal  •  Tools: All tools
-```
+```### ツール検証エラーの処理
 
-### ツール検証エラーの処理
+インポート後に **"Invalid tools: [リスト]"** が表示された場合、一部のClaude Codeツールに対応するFactoryツールが存在しないことを意味します:
 
-インポート後に **「Invalid tools: [list]」** が表示される場合、一部のClaude Code ツールにFactory 相当品がないことを意味します：
-
-1. **droid を表示**（Enter を押す）して完全なツールリストを確認
-2. **droid を編集**（E を押す）して調整：
+1. **droidを表示** (Enterキーを押す) してツールの全リストを確認
+2. **droidを編集** (Eキーを押す) して調整:
    - リストから無効なツールを削除
-   - 有効なFactory ツールのみを保持
-3. **利用可能なツールを確認** - リストに利用可能なFactory ツールが表示されます
+   - 有効なFactoryツールのみを保持
+3. **利用可能なツールを確認** - リストに利用可能なFactoryツールが表示されます
 
-一般的なマッピングされないツール：
+一般的にマッピングされないツール:
 
-* `Write`、`NotebookEdit`、`BrowseURL` などのClaude Code ツールはFactory には存在しません
-* 相当するFactory ツールに置き換え：
+* `Write`、`NotebookEdit`、`BrowseURL`などのClaude CodeツールはFactoryには存在しません
+* 同等のFactoryツールに置き換えてください:
   * `Write` → `Edit`、`Create`
   * `BrowseURL` → `WebSearch`、`FetchUrl`
-* または `tools` セクション全体を削除してすべてのFactory ツールを有効化
+* または`tools`セクションを完全に削除してすべてのFactoryツールを有効にしてください
 
 ---
 
-## 6 · カスタムdroids の効果的な使用
+## 6 · カスタムdroidを効果的に使用する
 
-- **Task ツール経由で呼び出し** – droid は自動的にカスタムdroids を呼び出すか、直接リクエストできます（「この変更にサブエージェント `security-auditor` を使って」）。
-- **モデルを戦略的に選択** – `inherit` を使用して親セッションとマッチさせるか、専門タスクに異なるモデルを指定：
-  - 単純な分析と要約タスクには小さい/高速なモデル（低コスト）。
-  - 複雑な推論、コードレビュー、多段階分析には大きい/高性能なモデル。
-  - 利用可能なモデルIDについては [plans page](/pricing#available-models) を参照してください。
-- **ツールアクセスを制限** – 明示的なツールリストを使用してサブエージェントができることを制限し、予期しないシェルコマンドや他の危険な操作を防止。
-- **ライブ更新を活用** – Task ツールはライブ進行状況をストリーミングし、サブエージェントの実行中にツール呼び出し、結果、TodoWrite 更新をリアルタイムで表示。
-- **出力を構造化** – `Summary:` や `Findings:` などのセクションを出力するようプロンプトを整理し、Task ツールUI が結果を明確に要約できるようにします。
-- **共有と協力** – チームメンバーが共有droids を使用できるよう `.factory/droids/*.md` をリポジトリにチェックインし、プロンプトの更新をコードのようにバージョン管理。
-- **Claude Code エージェントを活用** – 既存のClaude Code エージェント（セクション5.5を参照）をインポートして、Factory でカスタムdroids として再利用。
+- **Taskツール経由で呼び出し** – droidはカスタムdroidを自動的に呼び出すか、直接リクエストできます（「この変更にサブエージェント`security-auditor`を使用してください」）。
+- **モデルを戦略的に選択** – 親セッションと一致させるために`inherit`を使用するか、専門的なタスクに異なるモデルを指定:
+  - 簡単な分析とサマリータスクには小さい/高速なモデル（低コスト）。
+  - 複雑な推論、コードレビュー、マルチステップ分析には大きい/高機能なモデル。
+  - 利用可能なモデルIDについては[プランページ](/jp/pricing#available-models)を参照してください。
+- **ツールアクセスを制限** – 明示的なツールリストを使用してサブエージェントができることを制限し、予期しないシェルコマンドやその他の危険な操作を防ぎます。
+- **ライブアップデートを活用** – Taskツールはライブプログレスをストリーミングし、サブエージェントの実行中にツール呼び出し、結果、TodoWriteアップデートをリアルタイムで表示します。
+- **出力を構造化** – `Summary:`や`Findings:`などのセクションを出力するようにプロンプトを整理し、TaskツールUIが結果を明確にサマリーできるようにします。
+- **共有と協力** – チームメイトが共有droidを使用できるように`.factory/droids/*.md`をリポジトリにチェックインし、コードと同じようにプロンプトアップデートをバージョン管理します。
+- **Claude Codeエージェントを活用** – 既存のClaude Codeエージェントをインポート（セクション5.5を参照）してFactoryでカスタムdroidとして再利用します。
 
 ---
 
 ## 7 · 例
 
-### コードレビュワー（プロジェクトスコープ）
-
-```md
+### コードレビューア（プロジェクトスコープ）```md
 ---
 name: code-reviewer
 description: Reviews diffs for correctness, tests, and migration fallout
@@ -293,13 +275,9 @@ Findings:
 - <issue or ✅ No blockers>
   Follow-up:
 - <action or leave blank>
-```
+```Use: "ステージングされた差分に対してサブエージェント `code-reviewer` を実行する。"
 
-使用法：「ステージされたdiff で サブエージェント `code-reviewer` を実行して。」
-
-### セキュリティスイーパー（個人スコープ）
-
-```md
+### セキュリティスイーパー（個人スコープ）```md
 ---
 name: security-sweeper
 description: Looks for insecure patterns in recently edited files
@@ -320,11 +298,7 @@ Findings:
 - <file>: <issue>
   Mitigations:
 - <recommendation>
-```
-
-### タスクコーディネーター（ライブ進行状況付き）
-
-```md
+```### タスクコーディネーター（ライブ進捗表示付き）```md
 ---
 name: task-coordinator
 description: Coordinates multi-step tasks with live progress updates
@@ -339,8 +313,6 @@ You are a task coordinator. Break down the goal into actionable steps:
 3. Report progress in real-time using TodoWrite updates
 
 Keep the task list updated with completion status (pending, in_progress, completed).
-```
+```---
 
----
-
-カスタムdroids により、部族の知識をコードとして取得できます。専門的なプロンプトを一度作成し、適切なツールとモデルを割り当て、設計したサブエージェントに重い作業をプライマリアシスタントに委任させましょう。
+カスタムDroidを使用すると、部族知識をコードとして捉えることができます。特化したプロンプトを一度作成し、適切なツールとモデルを割り当て、主要なアシスタントが重い作業をあなたが設計したサブエージェントに委任できるようにします。
