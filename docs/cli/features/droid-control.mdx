@@ -1,0 +1,218 @@
+---
+title: Droid Control
+description: Terminal, browser, and computer automation. Record demos, verify behavior claims, and run QA flows.
+keywords: ['droid-control', 'automation', 'demo', 'verify', 'qa-test', 'terminal', 'browser', 'recording', 'video', 'showcase', 'tuistory', 'remotion', 'tctl']
+---
+
+Droid Control is a plugin that enables Droids to *operate* software: launch apps, type commands, click buttons, record what happens, and produce polished video evidence of it. Built by Droids, for Droids.
+
+<Frame caption="This video was planned, recorded, and rendered entirely by a Droid.">
+  <video autoPlay muted loop playsInline>
+    <source src="/images/features/droid-control-hero.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## Install
+
+<Tabs>
+  <Tab title="UI">
+    Run `/plugins` in a Droid session, go to the Browse tab, find **droid-control**, and install it.
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    # Add the Factory plugins marketplace (if not already registered)
+    droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
+
+    # Install the plugin
+    droid plugin install droid-control@factory-plugins --scope user
+    ```
+  </Tab>
+</Tabs>
+
+For video rendering, Remotion dependencies need a one-time install. After installing the plugin, run `npm install` in its `remotion/` directory:
+
+```bash
+# Find the plugin install path
+droid plugin list --scope user
+
+# Then install Remotion deps (adjust path to match your install)
+cd <plugin-path>/remotion && npm install
+```
+
+## Commands
+
+Droid Control adds three slash commands. Each one handles the full workflow end-to-end: planning, execution, recording, and reporting.
+
+### `/verify`
+
+Test a specific behavior claim and report findings with evidence.
+
+```
+/verify "ESC cancels streaming in bash mode"
+```
+
+Droid launches the app, attempts the claim, and reports what actually happened, with screenshots and text snapshots as evidence.
+
+The droid is framed as an investigator, not an advocate. If the claim is false, that's a valid finding. Anti-fabrication rules prevent staging evidence to match expected outcomes.
+
+### `/qa-test`
+
+Run automated QA against terminal CLIs or web/Electron apps.
+
+```
+/qa-test https://app.example.com -- login, create a project, invite a member
+```
+
+Droid drives the browser (or terminal) through the flow, captures each step, and reports pass/fail with annotated screenshots.
+
+### `/demo`
+
+Record a demo video of a feature or PR.
+
+```
+/demo pr-1847
+```
+
+Droid reads the PR, scripts interactions that prove the change works, records both branches in parallel, and renders a side-by-side comparison video. Add "showcase" for cinematic polish, "keys" for keystroke overlay.
+
+```
+/demo pr-1847 -- showcase, keys
+```
+
+**What it does:**
+
+<Steps>
+  <Step title="Understands the change">
+    Fetches the PR description, diff, and linked ticket. Identifies what needs to be proven and what could be confused with existing behavior.
+  </Step>
+  <Step title="Plans the interaction">
+    Scripts a sequence of actions that produces visible evidence the feature works. For comparison PRs, both branches run identical interactions so only the behavior differs.
+  </Step>
+  <Step title="Captures both branches">
+    Launches recorded sessions on the baseline and candidate branches in parallel using worker subagents.
+  </Step>
+  <Step title="Composes the video">
+    Renders a polished video via Remotion with title cards, window chrome, keystroke overlays, and effects. Six visual presets range from cinematic (factory) to utilitarian (minimal).
+  </Step>
+  <Step title="Verifies the output">
+    Checks the final video against the original commitments before delivering.
+  </Step>
+</Steps>
+
+#### Example output
+
+Every video below was planned, recorded, and rendered entirely by a Droid.
+
+<Tabs>
+  <Tab title="CLI: single-branch">
+    <Frame caption="Demo of the /cwd command. Factory preset, single-branch layout.">
+      <video autoPlay muted loop playsInline>
+        <source src="/images/features/droid-control-demo-single.mp4" type="video/mp4" />
+      </video>
+    </Frame>
+  </Tab>
+  <Tab title="CLI: before/after">
+    <Frame caption="Before/after comparison of a bash mode output redesign. Factory preset, side-by-side layout.">
+      <video autoPlay muted loop playsInline>
+        <source src="/images/features/droid-control-demo-comparison.mp4" type="video/mp4" />
+      </video>
+    </Frame>
+  </Tab>
+  <Tab title="Web app: single-branch">
+    {/* TODO: embed web app single-branch demo here */}
+    *Coming soon.*
+  </Tab>
+  <Tab title="Web app: before/after">
+    {/* TODO: embed web app before/after demo here */}
+    *Coming soon.*
+  </Tab>
+</Tabs>
+
+## Drivers
+
+Droid Control supports three automation backends. The right one is selected automatically based on what you're targeting.
+
+<CardGroup cols={3}>
+  <Card title="tuistory" icon="terminal">
+    Virtual PTY automation. Default for terminal work. Playwright-style CLI with asciinema recording and forced truecolor output.
+  </Card>
+  <Card title="true-input" icon="keyboard">
+    Real terminal emulator automation via headless Wayland compositor (Linux), KVM/QEMU (Windows), or QEMU monitor (macOS). For when you need real rendering evidence.
+  </Card>
+  <Card title="agent-browser" icon="globe">
+    Web and Electron app automation via Playwright-backed CLI with CDP support.
+  </Card>
+</CardGroup>
+
+## Video rendering
+
+Demo and showcase videos are rendered using [Remotion](https://www.remotion.dev/), a React-based video engine. The plugin includes 22 visual components and 6 presets.
+
+**Automatic layers** (always present, intensity varies by preset):
+- Warm radial backgrounds, floating particles, film grain overlay, color grading
+- Motion blur title-to-content transition
+- Animated window chrome with traffic lights and glassmorphic borders
+- Auto-scaled title/subtitle text
+
+**Effect layers** (selected by the droid at compose time):
+- Spotlight overlays to highlight specific regions
+- Directed zoom for small text or details
+- Keystroke pills showing user actions
+- Section headers and transition sweeps
+
+| Preset | Look | Best for |
+|--------|------|----------|
+| `factory` | Warm black, traffic lights, amber glow | Official Factory content |
+| `factory-hero` | Same + gradient background | Landing pages, social |
+| `hero` | Cool gradient, generous margins | Non-Factory marketing |
+| `macos` | Dark, clean frame | General-purpose demos |
+| `presentation` | Black, generous margins | Slide decks, talks |
+| `minimal` | No window bar, tight margins | Docs embeds, inline clips |
+
+## How it works
+
+The plugin uses a composition architecture with three layers:
+
+- **Orchestrator** routes each request through three independent lookups (target, stage, artifact) to determine which skills to load
+- **10 atom skills** are self-contained background knowledge loaded on demand, split into drivers, targets, stages, and polish
+- **3 commands** parse arguments into commitments, then delegate to atoms via hybrid handoffs
+
+Every workflow flows through **capture → compose → verify**. Commands declare *what* to produce; atoms own *how*. Skills chain through explicit handoffs rather than hardcoded pipelines, so the droid follows the flow naturally.
+
+For a deeper look at the design decisions, see [ARCHITECTURE.md](https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/ARCHITECTURE.md) on GitHub.
+
+## Prerequisites
+
+Only install what you need for your use case. Terminal demos need tuistory, asciinema, agg, and ffmpeg. Web/Electron automation just needs agent-browser.
+
+| Component | Platform | Required tools |
+|-----------|----------|----------------|
+| tuistory | All | `tuistory`, `asciinema`, `agg` |
+| true-input | Linux/Wayland | `cage`, `wtype`, Wayland terminal |
+| true-input | Windows (KVM) | `libvirt`, `qemu`, KVM VM with SSH |
+| true-input | macOS (QEMU) | `qemu`, `socat`, macOS VM with SSH |
+| agent-browser | All | `agent-browser` |
+| compose | All | `ffmpeg`, `ffprobe`, `agg` |
+| showcase | All | Node.js (>= 18), Chrome/Chromium |
+
+```bash
+npm install -g tuistory                              # virtual PTY driver
+pip install asciinema                                 # terminal recording
+cargo install --git https://github.com/asciinema/agg   # .cast → .gif converter
+sudo apt-get install -y ffmpeg                        # video processing
+agent-browser install                                 # browser automation (downloads Chromium)
+```
+
+## Learn more
+
+<CardGroup cols={3}>
+  <Card title="Source" href="https://github.com/Factory-AI/factory-plugins/tree/master/plugins/droid-control" icon="github">
+    Full plugin source: skills, commands, scripts, and Remotion components.
+  </Card>
+  <Card title="README" href="https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/README.md" icon="book-open">
+    Quick start, command reference, and prerequisites.
+  </Card>
+  <Card title="Architecture" href="https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/ARCHITECTURE.md" icon="sitemap">
+    Design rationale: UX for droids, waterfall routing, task delegation, hybrid handoffs.
+  </Card>
+</CardGroup>
