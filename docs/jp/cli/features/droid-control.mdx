@@ -1,0 +1,193 @@
+---
+title: Droid Control
+description: ターミナル、ブラウザ、コンピュータの自動化。デモの記録、動作の検証、QAフローの実行。
+keywords: ['droid-control', 'automation', 'demo', 'verify', 'qa-test', 'terminal', 'browser', 'recording', 'video', 'showcase', 'tuistory', 'remotion', 'tctl']
+---
+
+Droid Controlは、Droidがソフトウェアを*操作*することを可能にするプラグインです：アプリの起動、コマンドの入力、ボタンのクリック、起こったことの記録、そして洗練されたビデオ証拠の作成。DroidによってDroidのために構築されています。
+
+<Frame caption="このビデオは、Droidによって完全に計画、記録、レンダリングされました。">
+  <video autoPlay muted loop playsInline>
+    <source src="/images/features/droid-control-hero.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## インストール
+
+<Tabs>
+  <Tab title="UI">
+    Droidセッションで `/plugins` を実行し、Browseタブに移動して**droid-control**を見つけ、インストールしてください。
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    # Add the Factory plugins marketplace (if not already registered)
+    droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
+
+    # Install the plugin
+    droid plugin install droid-control@factory-plugins --scope user
+    ```</Tab>
+</Tabs>
+
+動画レンダリングの場合、Remotionの依存関係を一度インストールする必要があります。プラグインをインストールした後、その`remotion/`ディレクトリで`npm install`を実行してください：```bash
+# Find the plugin install path
+droid plugin list --scope user
+
+# Then install Remotion deps (adjust path to match your install)
+cd <plugin-path>/remotion && npm install
+```## コマンド
+
+Droid Controlは3つのスラッシュコマンドを追加します。各コマンドは計画、実行、記録、レポートまでの全ワークフローをエンドツーエンドで処理します。
+
+### `/verify`
+
+特定の動作要求をテストし、証拠とともに結果をレポートします。```
+/verify "ESC cancels streaming in bash mode"
+```Droidはアプリを起動し、クレームを試行し、実際に何が起こったかをスクリーンショットとテキストスナップショットを証拠として報告します。
+
+droidは支持者ではなく、調査者として位置づけられています。クレームが偽であれば、それは有効な発見です。捏造防止ルールにより、期待される結果に合わせて証拠を演出することを防ぎます。
+
+### `/qa-test`
+
+ターミナルCLIやWeb/ElectronアプリケーションでQAの自動化を実行します。```
+/qa-test https://app.example.com -- login, create a project, invite a member
+```Droidがブラウザ（またはターミナル）を通してフローを実行し、各ステップをキャプチャして、注釈付きスクリーンショットと共に合格/不合格を報告します。
+
+### `/demo`
+
+機能やPRのデモ動画を録画します。```
+/demo pr-1847
+```Droidは、PR を読み、変更が機能することを証明するインタラクションをスクリプト化し、両方のブランチを並行して記録し、サイドバイサイド比較動画をレンダリングします。映画のような洗練された仕上がりには「showcase」、キーストロークオーバーレイには「keys」を追加します。```
+/demo pr-1847 -- showcase, keys
+```**機能説明:**
+
+<Steps>
+  <Step title="変更を理解する">
+    PRの説明、差分、リンクされたチケットを取得します。何を証明する必要があり、既存の動作と混同される可能性があるものを特定します。
+  </Step>
+  <Step title="インタラクションを計画する">
+    機能が動作することを目に見える形で証明する一連のアクションをスクリプト化します。比較PRの場合、両方のブランチで同一のインタラクションを実行するため、動作のみが異なります。
+  </Step>
+  <Step title="両方のブランチを記録する">
+    ワーカーサブエージェントを使用して、ベースラインブランチと候補ブランチで並列に記録セッションを起動します。
+  </Step>
+  <Step title="動画を合成する">
+    Remotionを使用して、タイトルカード、ウィンドウクロム、キーストロークオーバーレイ、エフェクトを含む洗練された動画をレンダリングします。6つのビジュアルプリセットは、シネマティック（factory）から実用的（minimal）まで幅広く対応しています。
+  </Step>
+  <Step title="出力を検証する">
+    配信前に最終的な動画を元のコミットメントと照合してチェックします。
+  </Step>
+</Steps>
+
+#### 出力例
+
+以下の動画はすべて、Droidによって完全に計画、記録、レンダリングされました。
+
+<Tabs>
+  <Tab title="CLI: 単一ブランチ">
+    <Frame caption="/cwdコマンドのデモ。Factoryプリセット、単一ブランチレイアウト。">
+      <video autoPlay muted loop playsInline>
+        <source src="/images/features/droid-control-demo-single.mp4" type="video/mp4" />
+      </video>
+    </Frame>
+  </Tab>
+  <Tab title="CLI: 前後比較">
+    <Frame caption="bashモード出力再設計の前後比較。Factoryプリセット、サイドバイサイドレイアウト。">
+      <video autoPlay muted loop playsInline>
+        <source src="/images/features/droid-control-demo-comparison.mp4" type="video/mp4" />
+      </video>
+    </Frame>
+  </Tab>
+  <Tab title="Webアプリ: 単一ブランチ">
+    {/* TODO: embed web app single-branch demo here */}
+    *近日公開予定。*
+  </Tab>
+  <Tab title="Webアプリ: 前後比較">
+    {/* TODO: embed web app before/after demo here */}
+    *近日公開予定。*
+  </Tab>
+</Tabs>
+
+## ドライバー
+
+Droid Controlは3つの自動化バックエンドをサポートしています。ターゲットに基づいて適切なものが自動的に選択されます。
+
+<CardGroup cols={3}>
+  <Card title="tuistory" icon="terminal">
+    仮想PTY自動化。ターミナル作業のデフォルト。asciinema記録と強制truecolor出力を備えたPlaywright風CLI。
+  </Card>
+  <Card title="true-input" icon="keyboard">
+    ヘッドレスWaylandコンポジター（Linux）、KVM/QEMU（Windows）、またはQEMUモニター（macOS）を介した実際のターミナルエミュレーター自動化。実際のレンダリング証拠が必要な場合に使用。
+  </Card>
+  <Card title="agent-browser" icon="globe">
+    CDPサポートを備えたPlaywright対応CLIによるWebおよびElectronアプリ自動化。
+  </Card>
+</CardGroup>
+
+## 動画レンダリング
+
+デモとショーケース動画は、Reactベースの動画エンジンである[Remotion](https://www.remotion.dev/)を使用してレンダリングされます。このプラグインには22のビジュアルコンポーネントと6つのプリセットが含まれています。
+
+**自動レイヤー**（常に存在、プリセットによって強度が変わります）:
+- 温かみのある放射状背景、浮遊パーティクル、フィルムグレインオーバーレイ、カラーグレーディング
+- モーションブラータイトルからコンテンツへの遷移
+- トラフィックライトとグラスモーフィックボーダー付きアニメーションウィンドウクロム
+- 自動スケールタイトル/サブタイトルテキスト
+
+**エフェクトレイヤー**（合成時にdroidによって選択）:
+- 特定の領域をハイライトするスポットライトオーバーレイ
+- 小さなテキストや詳細のための方向性ズーム
+- ユーザーアクションを表示するキーストロークピル
+- セクションヘッダーと遷移スイープ
+
+| プリセット | 外観 | 適用場面 |
+|--------|------|----------|
+| `factory` | 温かみのある黒、トラフィックライト、アンバーグロー | 公式Factoryコンテンツ |
+| `factory-hero` | 同じ + グラデーション背景 | ランディングページ、ソーシャル |
+| `hero` | クールなグラデーション、余裕のあるマージン | 非Factoryマーケティング |
+| `macos` | ダーク、クリーンなフレーム | 汎用デモ |
+| `presentation` | 黒、余裕のあるマージン | スライドデッキ、講演 |
+| `minimal` | ウィンドウバーなし、タイトなマージン | ドキュメント埋め込み、インラインクリップ |
+
+## 仕組み
+
+このプラグインは3つのレイヤーを持つコンポジションアーキテクチャを使用しています：
+
+- **オーケストレーター**は、3つの独立したルックアップ（ターゲット、ステージ、アーティファクト）を通じて各リクエストをルーティングし、ロードするスキルを決定します
+- **10のアトムスキル**は、オンデマンドでロードされる自己完結型の背景知識で、ドライバー、ターゲット、ステージ、ポリッシュに分割されています
+- **3つのコマンド**は引数をコミットメントに解析し、ハイブリッドハンドオフを通じてアトムに委譲します
+
+すべてのワークフローは**キャプチャ → 合成 → 検証**の流れを辿ります。コマンドは*何を*作成するかを宣言し、アトムは*どのように*作成するかを管理します。スキルはハードコードされたパイプラインではなく明示的なハンドオフを通じて連鎖するため、droidは自然に流れに従います。
+
+設計判断のより詳細な説明については、GitHubの[ARCHITECTURE.md](https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/ARCHITECTURE.md)を参照してください。
+
+## 前提条件
+
+使用ケースに必要なもののみをインストールしてください。ターミナルデモにはtuistory、asciinema、agg、ffmpegが必要です。Web/Electron自動化にはagent-browserのみが必要です。
+
+| コンポーネント | プラットフォーム | 必要なツール |
+|-----------|----------|----------------|
+| tuistory | 全て | `tuistory`, `asciinema`, `agg` |
+| true-input | Linux/Wayland | `cage`, `wtype`, Waylandターミナル |
+| true-input | Windows (KVM) | `libvirt`, `qemu`, SSH付きKVM VM |
+| true-input | macOS (QEMU) | `qemu`, `socat`, SSH付きmacOS VM |
+| agent-browser | 全て | `agent-browser` |
+| compose | 全て | `ffmpeg`, `ffprobe`, `agg` |
+| showcase | 全て | Node.js (>= 18), Chrome/Chromium |```bash
+npm install -g tuistory                              # virtual PTY driver
+pip install asciinema                                 # terminal recording
+cargo install --git https://github.com/asciinema/agg   # .cast → .gif converter
+sudo apt-get install -y ffmpeg                        # video processing
+agent-browser install                                 # browser automation (downloads Chromium)
+```## さらに詳しく
+
+<CardGroup cols={3}>
+  <Card title="ソース" href="https://github.com/Factory-AI/factory-plugins/tree/master/plugins/droid-control" icon="github">
+    プラグインの完全なソース：スキル、コマンド、スクリプト、およびRemotionコンポーネント。
+  </Card>
+  <Card title="README" href="https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/README.md" icon="book-open">
+    クイックスタート、コマンドリファレンス、および前提条件。
+  </Card>
+  <Card title="アーキテクチャ" href="https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/ARCHITECTURE.md" icon="sitemap">
+    設計思想：DroidのUX、ウォーターフォールルーティング、タスクの委任、ハイブリッドハンドオフ。
+  </Card>
+</CardGroup>
