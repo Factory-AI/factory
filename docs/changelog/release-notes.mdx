@@ -17,6 +17,7 @@ rss: true
 
 ## Improvements
 
+- **API key creation for all members** - All organization members can now create API keys, previously limited to managers and owners (app)
 - **Bug reporting** - Improved bug reporting experience in the desktop app (app)
 - **Wiki UI polish** - Visual refinements to the wiki interface (app)
 
@@ -24,6 +25,34 @@ rss: true
 
 - **Desktop session loading** - Fixed user data not loading correctly in the desktop app (app)
 - **Chat placeholder text** - Fixed misleading placeholder text for disabled chats (app)
+
+</Update>
+
+<Update label="April 10" rss={{ title: "CLI Updates", description: "Incremental wiki refreshes, themed mermaid diagrams, Deep Wiki search, and CLI stability fixes" }}>
+  `v0.99.0`
+
+## New features
+
+- **Incremental wiki refreshes** - Wiki refreshes now only update changed pages for faster updates
+- **Themed mermaid diagram colors** - Mermaid diagrams now render with per-element colors that match your current theme
+- **Deep Wiki search and exports** - Wiki now supports keyword search, skill browsing, and page exports (app)
+
+## Bug fixes
+
+- **Theme background override** - Fixed terminal theme background being overridden unexpectedly
+- **BYOK base URL switching** - Fixed client connections not being refreshed after switching custom API base URLs
+- **Context model inheritance** - Fixed context management not using the current session model
+- **Spec editor terminal handoff** - Fixed spec editor not properly completing terminal handoff
+- **MCP auth cancellation** - Fixed pending MCP authentication not being cancelled when closing the MCP panel
+- **Tool result display** - Fixed a crash when tool results contain non-string values
+- **Custom model stability** - Fixed custom model IDs changing unexpectedly between sessions
+- **Directory not found error** - Directory not found errors now appear immediately when confirming a directory (app)
+- **BYOK usage limits** - BYOK users can now continue chatting when platform usage limits are reached (app)
+- **Ghost tool calls** - Fixed phantom tool calls appearing during message processing
+- **Chat input** - Fixed various chat input issues (app)
+- **Computer terminal** - Fixed terminal display issues when using Droid Computers (app)
+- **Machine config modal** - Fixed machine configuration modal not displaying correctly (app)
+- **Reasoning and model selection** - Fixed reasoning level and model selection issues (app)
 
 </Update>
 
