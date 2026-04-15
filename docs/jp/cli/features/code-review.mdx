@@ -1,257 +1,241 @@
 ---
-title: "コードレビュー"
-description: Use the /review command to analyze code changes with AI-powered review workflows
+title: Code Review
+description: /reviewコマンドを使用してAI駆動のレビューワークフローでコード変更を解析する
 keywords: ['code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'security review', 'review workflow', 'AI review', 'code analysis']
 ---
 
 ## 概要
 
-`/review` コマンドは、AI を活用したインサイトでコードの変更を分析するためのインタラクティブなワークフローを提供します。コミットされていない変更のレビューから、完全なブランチや特定のコミットの分析まで、さまざまな開発シナリオに対応する複数のレビューモードを提供しています。
+`/review`コマンドは、AIによる洞察を活用してコードの変更を分析するためのインタラクティブワークフローを提供します。コミット前の変更のレビューから、ブランチ全体や特定のコミットの分析まで、さまざまな開発シナリオに適合する複数のレビューモードを提供します。
 
-`/review` を実行すると、Droid がレビュータイプの選択、パラメータの設定を案内し、業界標準のレビューガイドラインに基づいてコード変更の包括的な分析を実行します。
+`/review`を実行すると、droidがレビュータイプの選択、パラメータの設定をガイドし、業界標準のレビューガイドラインに基づいてコードの変更を包括的に分析します。
 
 ## クイックスタート
 
 <Steps>
-  <Step title="Start the review flow">
-    In an interactive droid session, type:
-    ```bash
+  <Step title="レビューフローを開始する">
+    インタラクティブなdroidセッションで、以下を入力してください：```bash
     /review
-    ```
+    ```</Step>
+
+  <Step title="レビューの種類を選択">
+    4つのレビュープリセットから選択してください：
+    - **ベースブランチと比較したレビュー** - ブランチをベースブランチと比較するPRスタイルのレビュー
+    - **コミットされていない変更のレビュー** - 作業ディレクトリの変更（ステージング済み、未ステージング、未追跡）を分析
+    - **コミットのレビュー** - 履歴から特定のコミットを調査
+    - **カスタムレビュー指示** - 独自のレビュー基準を定義
   </Step>
 
-  <Step title="Select a review type">
-    Choose from four review presets:
-    - **Review against a base branch** - PR-style review comparing your branch to a base branch
-    - **Review uncommitted changes** - Analyze working directory changes (staged, unstaged, and untracked)
-    - **Review a commit** - Examine a specific commit from history
-    - **Custom review instructions** - Define your own review criteria
+  <Step title="パラメータを設定">
+    選択内容に応じて：
+    - **ベースブランチレビュー**の場合：ターゲットブランチを選択（例：`main`、`develop`）
+    - **コミットレビュー**の場合：インタラクティブリストからコミットを選択
+    - **カスタムレビュー**の場合：レビュー指示を入力
   </Step>
 
-  <Step title="Configure parameters">
-    Depending on your selection:
-    - For **base branch reviews**: Select the target branch (e.g., `main`, `develop`)
-    - For **commit reviews**: Choose a commit from the interactive list
-    - For **custom reviews**: Enter your review instructions
-  </Step>
-
-  <Step title="Review the findings">
-    Droid analyzes the code changes and provides:
-    - Prioritized findings with severity levels [P0-P3]
-    - Specific file locations and line numbers
-    - Suggested fixes with code suggestions
-    - Overall assessment of the changes
+  <Step title="調査結果を確認">
+    Droidはコードの変更を分析し、以下を提供します：
+    - 重要度レベル[P0-P3]で優先順位付けされた調査結果
+    - 特定のファイル位置と行番号
+    - コードの提案を含む修正案
+    - 変更の全体的な評価
   </Step>
 </Steps>
 
-## レビュータイプ
+## レビューの種類
 
-### ベースブランチとの比較レビュー
+### ベースブランチと比較したレビュー
 
-現在のブランチをベースブランチと比較します（プルリクエストレビューのように）。PR前のレビューやマージされる変更の確認に最適です。
+現在のブランチをベースブランチと比較します（プルリクエストのレビューのように）。PRレビュー前やマージされる変更の確認に最適です。
 
 **動作方法：**
-1. 「Review against a base branch」を選択
+1. 「ベースブランチと比較したレビュー」を選択
 2. リストからターゲットのベースブランチを選択（ローカルとリモートブランチが表示されます）
-3. Droid がマージベースを見つけて差分をレビューします
+3. Droidがマージベースを見つけて差分をレビューします
 
 **使用例：**
 - コミット前のPRレビュー
 - プルリクエスト作成前のブランチ変更確認
-- main/develop に対するフィーチャーブランチの検証
+- main/developに対するフィーチャーブランチの検証
 
-**ワークフロー例：**
-```bash
+**ワークフローの例：**```bash
 > /review
 # Select: Review against a base branch
 # Choose: origin/main
 # Droid reviews all changes that would be merged
-```
+```### コミット前の変更をレビューする
 
-### コミットされていない変更のレビュー
+現在の作業ディレクトリの変更をすべて分析します—ステージされたファイル、ステージされていない変更、追跡されていないファイル。
 
-現在の作業ディレクトリのすべての変更を分析します—ステージされたファイル、ステージされていない変更、追跡されていないファイルを含みます。
+**使用例:**
+- コミット前の簡単なサニティチェック
+- 進行中の作業のレビュー
+- 開発の早い段階での問題の発見
 
-**使用例：**
-- コミット前のクイックサニティチェック
-- 作業中のコードのレビュー
-- 開発初期段階での問題の早期発見
-
-**ワークフロー例：**
-```bash
+**ワークフローの例:**```bash
 > /review
 # Select: Review uncommitted changes
 # Droid immediately reviews all working directory changes
-```
+```### コミットをレビューする
 
-### コミットのレビュー
+リポジトリ履歴の特定のコミットによって導入された変更を調査します。
 
-リポジトリ履歴内の特定のコミットによって導入された変更を検査します。
-
-**動作方法：**
-1. 「Review a commit」を選択
-2. ハッシュ、メッセージ、作成者、日付でコミットを参照
+**動作方法:**
+1. 「コミットをレビューする」を選択
+2. ハッシュ、メッセージ、作成者、日付でコミットを閲覧
 3. レビューするコミットを選択
 
-**使用例：**
-- 最近のコミットの問題レビュー
-- 特定のコミットの変更理解
+**使用例:**
+- 最近のコミットの問題をレビュー
+- 特定のコミットでの変更を理解
 - チームメイトの作業のマージ後レビュー
 
-**ワークフロー例：**
-```bash
+**ワークフローの例:**```bash
 > /review
 # Select: Review a commit
 # Browse and select: abc1234 - "Add user authentication"
 # Droid reviews that specific commit's changes
-```
+```### カスタムレビュー指示
 
-### カスタムレビュー指示
+専門的な分析のための独自のレビュー基準を定義します。
 
-専門的な分析のために独自のレビュー基準を定義します。
-
-**使用例：**
+**ユースケース:**
 - セキュリティに焦点を当てたレビュー
 - パフォーマンス分析
-- 特定のコーディング標準のチェック
+- 特定のコーディング標準の確認
 - ドメイン固有の検証
 
-**ワークフロー例：**
-```bash
+**ワークフローの例:**```bash
 > /review
 # Select: Custom review instructions
 # Enter: "Check for SQL injection vulnerabilities and ensure all database queries use parameterized statements"
 # Droid performs a targeted security review
-```
+```## レビューガイドライン
 
-## レビューガイドライン
-
-すべてのコードレビューは、実行可能で高品質なフィードバックを提供するように設計された構造化されたルーブリックに従います：
+すべてのコードレビューは、実行可能で高品質なフィードバックを提供するために設計された構造化された評価基準に従います：
 
 ### 重要度レベル
 
-レビューは優先度レベルを使用して発見事項を分類します：
+レビューでは優先度レベルを使用して発見事項を分類します：
 
-- **[P0]** - リリースやオペレーションをブロックする重要な問題
+- **[P0]** - リリースまたは運用を妨げる重大な問題
 - **[P1]** - 次のサイクルで対処すべき緊急の問題
-- **[P2]** - 最終的に修正すべき通常の優先度の問題
-- **[P3]** - あると良い改善の低優先度項目
+- **[P2]** - いずれ修正すべき通常の優先度の問題
+- **[P3]** - 低優先度のあったら良い改善
 
 ### バグ検出基準
 
-AI は以下のすべての基準を満たす場合にのみ、問題をバグとしてフラグ付けします：
+AIは以下の基準をすべて満たす場合のみ、問題をバグとしてフラグを立てます：
 
-1. **有意義な影響** - 正確性、パフォーマンス、セキュリティ、保守性に影響する
-2. **個別で実行可能** - 明確で具体的な問題と明確な修正
-3. **適切な厳密性** - 他のコードベースより多くの厳密性を求めない修正
-4. **変更で導入された** - レビューされた変更で追加されたバグ（既存ではない）
+1. **意味のある影響** - 正確性、パフォーマンス、セキュリティ、または保守性に影響する
+2. **具体的で実行可能** - 明確で具体的な問題と明確な修正方法
+3. **適切な厳密さ** - 修正がコードベースの他の部分より厳密さを要求しない
+4. **変更で導入された** - レビュー対象の変更で追加されたバグ（既存のものではない）
 5. **修正する価値がある** - 作成者が認識すれば修正する可能性が高い
-6. **明記されていない仮定なし** - 推測ではなく検証可能な事実に基づく
-7. **証明可能な影響** - 理論的ではなく、具体的に影響を受けるコードを特定可能
-8. **意図的でない** - 明らかに意図的な設計選択ではない
+6. **根拠のない仮定なし** - 推測ではなく検証可能な事実に基づく
+7. **証明可能な影響** - 理論的ではなく、影響を受ける具体的なコードを特定できる
+8. **意図的ではない** - 明らかに意図的な設計選択ではない
 
 ### コメントスタイル
 
 レビューコメントは以下の原則に従います：
 
-- **明確な理由付け** - なぜそれが問題なのかを説明
+- **明確な理由** - なぜそれが問題なのかを説明する
 - **適切な重要度** - 影響を正確に伝える
-- **簡潔** - 発見事項あたり最大1段落
-- **最小限のコード** - コードチャンクはmarkdownで3行に制限
-- **シナリオ固有** - 影響を受ける環境/条件を記述
-- **事実に基づく口調** - 非難的な言語を避ける
+- **簡潔** - 発見事項ごとに最大1段落
+- **最小限のコード** - マークダウンでのコードチャンクは3行に制限
+- **シナリオ固有** - 影響を受ける環境/条件を説明
+- **事実的なトーン** - 非難する言葉を避ける
 - **すぐに理解可能** - 作成者が理解しやすい
-- **過度な賛辞なし** - 実行可能なフィードバックに焦点を当てる
+- **過度の賛辞なし** - 実行可能なフィードバックに集中
 
 ### 出力形式
 
 各発見事項には以下が含まれます：
 
-- **明確なタイトル**（≤80文字、命令形）
-- なぜこれが問題なのかの**説明**
-- 該当する場合の**ファイルパスと行番号**
+- **明確なタイトル** （≤80文字、命令法）
+- **説明** なぜこれが問題なのか
+- **ファイルパスと行番号** 該当する場合
 - **優先度レベル** [P0-P3]
-- **修正提案**（具体的な置換コードが利用可能な場合）
+- **修正案** （具体的な代替コードが利用可能な場合）
 
-さらに**全体的な評価**：
-- 変更が正しいか間違っているか
-- 1〜3文の要約
+加えて**全体評価**：
+- 変更が正しいか正しくないか
+- 1-3文の要約
 
 ## ヒントとベストプラクティス
 
 <AccordionGroup>
-  <Accordion title="When to use each review type">
-    - **Uncommitted changes**: During active development, before staging commits
-    - **Base branch review**: Before creating PRs, to catch issues early
-    - **Commit review**: After merging, to understand historical changes or review teammate's commits
-    - **Custom instructions**: When you need focused analysis (security, performance, specific patterns)
+  <Accordion title="各レビュータイプの使用タイミング">
+    - **未コミット変更**: アクティブな開発中、コミットをステージングする前
+    - **ベースブランチレビュー**: PRを作成する前、早期に問題をキャッチするため
+    - **コミットレビュー**: マージ後、過去の変更を理解したりチームメイトのコミットをレビューするため
+    - **カスタム指示**: 集中的な分析が必要な場合（セキュリティ、パフォーマンス、特定のパターン）
   </Accordion>
 
-  <Accordion title="Making the most of reviews">
-    - Run reviews frequently during development, not just before commits
-    - Use custom instructions for domain-specific concerns your team cares about
-    - Treat P0/P1 findings seriously—they represent real issues worth addressing
-    - Review the overall assessment for context on whether changes are sound
+  <Accordion title="レビューを最大限活用する">
+    - コミット前だけでなく、開発中に頻繁にレビューを実行する
+    - チームが重視するドメイン固有の懸念事項にはカスタム指示を使用する
+    - P0/P1の発見事項を真剣に扱う—それらは対処する価値のある実際の問題を表している
+    - 変更が健全かどうかの文脈について全体評価をレビューする
   </Accordion>
 
-  <Accordion title="Navigating the review UI">
-    - Press **Esc** to go back at any step in the review flow
-    - From the preset selection, **Esc** closes the review overlay
-    - Use arrow keys to navigate branch/commit lists
-    - Type to filter branches by name in real-time
+  <Accordion title="レビューUIのナビゲーション">
+    - **Esc**を押すとレビューフローのどのステップでも戻ることができます
+    - プリセット選択から、**Esc**はレビューオーバーレイを閉じます
+    - 矢印キーを使用してブランチ/コミットリストをナビゲートします
+    - タイピングでブランチ名をリアルタイムでフィルターできます
   </Accordion>
 
-  <Accordion title="Integration with workflows">
-    The `/review` command is interactive and meant for CLI sessions. For automated reviews in CI/CD, use:
-    ```bash
+  <Accordion title="ワークフローとの統合">
+    `/review`コマンドはインタラクティブで、CLIセッション用です。CI/CDでの自動レビューには以下を使用してください：
+    
+  </Accordion>```bash
     droid exec "Review the changes in this PR for security issues and performance regressions"
-    ```
-    See the [Code Review guide](/guides/droid-exec/code-review) for automation examples.
+    ```コード自動化の例については[Code Reviewガイド](/jp/guides/droid-exec/code-review)を参照してください。
   </Accordion>
 </AccordionGroup>
 
 ## 例
 
-### PR前レビュー
-
-```bash
+### PR前レビュー```bash
 # Before creating a pull request
 > /review
 # Select: Review against a base branch
 # Choose: origin/main
 # Review findings, fix issues, then create PR
-```
-
-### クイック WIP チェック
-
-```bash
+```### クイック WIP チェック```bash
 # Check work in progress
 > /review
 # Select: Review uncommitted changes
 # Get immediate feedback on current changes
-```
-
-### セキュリティに焦点を当てたレビュー
-
-```bash
+```### セキュリティに焦点を当てたレビュー```bash
 # Custom security review
 > /review
 # Select: Custom review instructions
 # Enter: "Check for security vulnerabilities: SQL injection, XSS, CSRF, insecure dependencies, exposed secrets, and authentication bypasses"
-```
-
-### マージ後レビュー
-
-```bash
+```### マージ後レビュー```bash
 # Review a teammate's recent commit
 > /review
 # Select: Review a commit
 # Choose the recent commit to understand changes
-```
+```## CI での自動レビュー
+
+自動 PR レビューには、[自動コードレビュー](/jp/guides/droid-exec/code-review)ワークフローを使用してください。以下をサポートしています：
+
+- **レビューの深度**（`deep`または`shallow`）で徹底性とコストを制御
+- **セキュリティレビュー**：STRIDE ベースの脆弱性スキャン、設定可能な重要度閾値、重大な発見時の PR ブロック機能付き
+- **オンデマンドセキュリティスキャン**：PR での`@droid security`コメント、または`@droid security --full`でリポジトリ全体のスキャン
+- **スケジュール済み全体スキャン**：cron ベースのワークフロートリガー経由
+
+以下で設定します：```bash
+droid
+> /install-code-review
+```完全な設定オプションについては[自動コードレビューガイド](/jp/guides/droid-exec/code-review)をご覧ください。
 
 ## 関連項目
 
-- [CLI Reference](/reference/cli-reference) - `/review` を含む完全なコマンドリファレンス
-- [Code Review automation guide](/guides/droid-exec/code-review) - `droid exec` でレビューを自動化
-- [Common use cases](/cli/getting-started/common-use-cases) - その他のワークフローとパターン
-- [How to talk to a droid](/cli/getting-started/how-to-talk-to-a-droid) - AI レビューからより良い結果を得る
+- [CLIリファレンス](/jp/reference/cli-reference) - `/review`を含む完全なコマンドリファレンス
+- [自動コードレビューガイド](/jp/guides/droid-exec/code-review) - deep/shallowモードとセキュリティスキャンによる自動PRレビューの設定
+- [一般的な使用例](/jp/cli/getting-started/common-use-cases) - その他のワークフローとパターン
+- [Droidとの対話方法](/jp/cli/getting-started/how-to-talk-to-a-droid) - AIレビューからより良い結果を得る方法

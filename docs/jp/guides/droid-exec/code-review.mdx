@@ -1,63 +1,117 @@
 ---
-title: "自動コードレビュー"
-description: Set up automated pull request reviews using the Factory GitHub App
-keywords: ['code review', 'pr review', 'pull request', 'github actions', 'automation', 'droid exec', 'github app']
+title: Automated Code Review
+description: Factory GitHub Appを使用した自動プルリクエストレビューの設定
+keywords: ['code review', 'pr review', 'pull request', 'github actions', 'automation', 'droid exec', 'github app', 'security review', 'deep review', 'shallow review']
 ---
 
-Factory GitHub Appを使用してリポジトリの自動コードレビューを設定します。Droidはプルリクエストを分析し、問題を特定して、インラインコメントとしてフィードバックを投稿します。
+Factory GitHub Appを使用してリポジトリの自動コードレビューを設定します。Droidがプルリクエストを分析し、問題を特定して、インラインコメントとしてフィードバックを投稿します。
 
 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
   <div style={{ flex: '1', minWidth: '300px' }}>
-    <img src="/guides/droid-exec/code-review-picture-1.png" alt="Factory Droid bot posting a code review summary with issues found" />
+    <img src="./code-review-picture-1.png" alt="見つかった問題を含むコードレビューサマリーを投稿するFactory Droidボット" />
   </div>
   <div style={{ flex: '1', minWidth: '300px' }}>
-    <img src="/guides/droid-exec/code-review-picture-2.png" alt="Factory Droid bot posting inline code review comment on specific lines" />
+    <img src="./code-review-picture-2.png" alt="特定の行にインラインコードレビューコメントを投稿するFactory Droidボット" />
   </div>
 </div>
 
 ## セットアップ
 
-`/install-github-app`コマンドを使用してFactory GitHub Appをインストールし、コードレビューワークフローを設定します：
-
-```bash
+GitHubまたはGitLabの自動コードレビューを設定するには、`/install-code-review`コマンドを使用します：```bash
 droid
-> /install-github-app
-```
+> /install-code-review
+```ガイド付きフローでは以下を行います：
+1. SCMプラットフォーム（GitHubまたはGitLab）を検出
+2. 前提条件（CLIツール、権限）を確認
+3. レビュー設定（深度、セキュリティ、トリガー）の設定をガイド
+4. ワークフローファイルとともにPR/MRを作成
 
-ガイド付きフローでは以下を行います：
-1. GitHub CLIの前提条件を確認
-2. リポジトリにFactory GitHub Appをインストール
-3. **Droid Review**ワークフローを選択
-4. ワークフローファイルを含むPRを作成
+GitHub専用のセットアップには `/install-github-app` も使用できます。詳細なセットアップ手順については、[GitHub Appインストールガイド](/jp/cli/features/install-github-app)をご覧ください。
 
-詳細なセットアップ手順については、[GitHub App installation guide](/cli/features/install-github-app)を参照してください。
+## 動作の仕組み
 
-## 動作原理
-
-有効にすると、Droid Reviewワークフローは以下を実行します：
+有効化すると、Droid Reviewワークフローは：
 
 1. プルリクエストイベント（開始、同期、再開、レビュー準備完了）でトリガー
-2. 開発中のノイズを避けるためドラフトPRをスキップ
-3. PR差分と既存コメントを取得
-4. コード変更の問題を分析
+2. 開発中のノイズを避けるため下書きPRをスキップ
+3. PR差分と既存のコメントを取得
+4. バグ、セキュリティ問題、正確性の問題についてコード変更を分析
 5. 問題のある行にインラインコメントを投稿
 6. 問題が見つからない場合は承認を送信
 
-## Droidがレビューする内容
+## レビューの深度
+
+`review_depth` 入力は各レビューの徹底さとコストを制御します。`/install-code-review` セットアップ時に深度を選択するか、ワークフローで直接設定します。
+
+- **`deep`**（デフォルト） — より高い推論努力による徹底的な分析。より微妙なバグを捉えますが、レビューあたりのコストが高くなります。本番コードやセキュリティ重要なリポジトリに最適。
+- **`shallow`** — 表面的な問題をカバーする、より高速でコスト効率の良いレビュー。大量リポジトリ、下書きPR、または支出を監視するチームに適しています。```yaml
+with:
+  automatic_review: true
+  review_depth: deep  # or shallow
+````review_model` と `reasoning_effort` を使用してモデルや推論の強度を直接オーバーライドすることもでき、これらは深度プリセットよりも優先されます。
+
+## セキュリティレビュー
+
+セキュリティレビューは、標準的なコードレビューと並行して（またはその代わりに）STRIDEベースの分析を実行します。専用のセキュリティレビューサブエージェントを使用して、なりすまし、改ざん、否認防止、情報開示、サービス拒否、および権限昇格の脆弱性をスキャンします。
+
+### 自動セキュリティレビューの有効化
+
+ワークフローに `automatic_security_review: true` を追加します。`automatic_review` と `automatic_security_review` の両方が有効な場合、セキュリティレビューアーはコードレビューパス中に並列サブエージェントとして実行されます：```yaml
+with:
+  automatic_review: true
+  automatic_security_review: true
+```セキュリティレビューの調査結果は、同じPRコメント内に含まれ、独自の重要度評価を持つ**セキュリティレビューサマリー**セクションとして追加されます。
+
+### オンデマンドセキュリティレビュー
+
+任意のPRにコメントすることで、セキュリティレビューを手動でトリガーすることもできます：```
+@droid security
+```専用のレポートを作成する完全なリポジトリセキュリティスキャンの場合:```
+@droid security --full
+````--full` スキャンは新しいブランチ（`droid/security-report-{date}`）を作成し、`.factory/security/reports/security-report-{date}.md` にレポートを生成して、発見事項を含むPRを開きます。
+
+### セキュリティ設定
+
+| 入力 | デフォルト | 説明 |
+|-------|---------|-------------|
+| `automatic_security_review` | `false` | 全てのPRで自動的にセキュリティレビューを実行 |
+| `security_model` | （`review_model` から継承） | セキュリティ分析用のモデル |
+| `security_severity_threshold` | `medium` | レポートする最小重要度：`critical`、`high`、`medium`、`low` |
+| `security_block_on_critical` | `true` | 重要な発見事項で `REQUEST_CHANGES` を送信 |
+| `security_block_on_high` | `false` | 重大な発見事項で `REQUEST_CHANGES` を送信 |
+| `security_notify_team` | （空） | 重要な発見事項で@メンションするGitHubチーム（例：`@org/security-team`） |
+
+### スケジュール化されたセキュリティスキャン
+
+ワークフローにcronトリガーを追加して、定期的なリポジトリ全体のスキャンをスケジュール実行：```yaml
+name: Security Scan
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6am
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Factory-AI/droid-action@v3
+        with:
+          security_scan_schedule: true
+          security_scan_days: 7  # Scan commits from the last 7 days
+```## Droidがレビューする内容
 
 自動レビューアーは明確なバグと問題に焦点を当てます：
 
-- デッド/到達不可能なコード
-- 制御フローの破損（break文の欠如、フォールスルーバグ）
+- デッド/到達不能コード
+- 制御フローの破綻（`break`の欠如、フォールスルーバグ）
 - async/awaitの間違い
-- null/undefined参照外し
+- null/undefined参照
 - リソースリーク
 - SQL/XSSインジェクション脆弱性
 - エラーハンドリングの欠如
 - オフバイワンエラー
 - 競合状態
 
-スタイル上の懸念、軽微な最適化、アーキテクチャの意見はスキップします。
+スタイルの問題、軽微な最適化、アーキテクチャの意見はスキップします。
 
 ## ワークフローのカスタマイズ
 
@@ -65,47 +119,33 @@ droid
 
 ### トリガー条件の変更
 
-レビューの実行タイミングを変更：
-
-```yaml
+レビューが実行されるタイミングを変更：```yaml
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'src/**'  # Only review changes in src/
       - '!**/*.test.ts'  # Skip test files
-```
+```### カスタムレビューガイドライン
 
-### カスタムレビューガイドライン
-
-リポジトリの`.factory/skills/review-guidelines/SKILL.md`ファイルを作成して、リポジトリ固有のレビューガイドラインを追加：
-
-```markdown
+リポジトリ固有のレビューガイドラインを追加するには、リポジトリ内に`.factory/skills/review-guidelines/SKILL.md`ファイルを作成します：```markdown
 <!-- .factory/skills/review-guidelines/SKILL.md -->
 
 Additional checks for this codebase:
 - React hooks rules violations
 - Missing TypeScript types on public APIs
 - Prisma query performance issues
-```
+```これらのガイドラインは自動的に取得され、すべてのレビュー実行に注入されます。ワークフローの変更は必要ありません。
 
-これらのガイドラインは自動的に認識され、すべてのレビュー実行に注入されます。ワークフローの変更は不要です。
+### モデルを変更する
 
-### モデルの変更
-
-レビューに異なるモデルを使用：
-
-```yaml
+レビューに異なるモデルを使用する：```yaml
 droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
 # Or use a faster model for quicker feedback:
 droid exec --auto high --model claude-haiku-4-5-20251001 -f prompt.txt
-```
+```### 特定のPRをスキップする
 
-### 特定のPRをスキップ
-
-特定のケースでレビューをスキップする条件を追加：
-
-```yaml
+特定のケースでレビューをスキップするための条件を追加する：```yaml
 jobs:
   code-review:
     # Skip bot PRs and PRs with [skip-review] in title
@@ -113,19 +153,32 @@ jobs:
       github.event.pull_request.draft == false &&
       !contains(github.event.pull_request.user.login, '[bot]') &&
       !contains(github.event.pull_request.title, '[skip-review]')
-```
+```### コメント数を制限する
 
-### コメント数の制限
-
-プロンプト内のコメントの最大数を調整：
-
-```
+プロンプト内のコメントの最大数を調整します：```
 Guidelines:
 - Submit at most 5 comments total, prioritizing the most critical issues
-```
+```## すべてのワークフロー入力
+
+| 入力 | デフォルト | 説明 |
+|-------|---------|-------------|
+| `automatic_review` | `false` | `@droid review`なしでPRを自動的にレビューする |
+| `review_depth` | `deep` | レビュープリセット: `deep`（徹底的） または `shallow`（高速） |
+| `review_model` | (depthから) | コードレビュー用のモデルをオーバーライド |
+| `reasoning_effort` | (depthから) | 推論努力をオーバーライド |
+| `include_suggestions` | `true` | コメントにコード提案ブロックを含める |
+| `automatic_security_review` | `false` | すべてのPRでセキュリティレビューを実行 |
+| `security_model` | (`review_model`から) | セキュリティレビュー用のモデルをオーバーライド |
+| `security_severity_threshold` | `medium` | 報告する最小重要度 |
+| `security_block_on_critical` | `true` | 重大な発見時にPRをブロック |
+| `security_block_on_high` | `false` | 高い発見時にPRをブロック |
+| `security_notify_team` | (空) | 重大な発見時に@mentionするチーム |
+| `security_scan_schedule` | `false` | スケジュールされた全リポジトリスキャンを有効化 |
+| `security_scan_days` | `7` | スキャンするコミットの日数 |
 
 ## 関連項目
 
-- [GitHub App installation](/cli/features/install-github-app) - `/install-github-app`の完全セットアップガイド
-- [GitHub Actions examples](/guides/droid-exec/github-actions) - その他の自動化ワークフロー
-- [Droid Exec](/cli/droid-exec/overview) - CI/CD環境でのDroidの実行
+- [GitHub Appインストール](/jp/cli/features/install-github-app) - `/install-github-app`の完全セットアップガイド
+- [GitHub統合セキュリティ](/jp/enterprise/github-integration-security) - GitHub App統合のセキュリティアーキテクチャ
+- [GitHub Actionsの例](/jp/guides/droid-exec/github-actions) - その他の自動化ワークフロー
+- [Droid Exec](/jp/cli/droid-exec/overview) - CI/CD環境でのDroid実行
