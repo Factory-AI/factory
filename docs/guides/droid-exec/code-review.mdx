@@ -1,7 +1,7 @@
 ---
 title: Automated Code Review
 description: Set up automated pull request reviews using the Factory GitHub App
-keywords: ['code review', 'pr review', 'pull request', 'github actions', 'automation', 'droid exec', 'github app']
+keywords: ['code review', 'pr review', 'pull request', 'github actions', 'automation', 'droid exec', 'github app', 'security review', 'deep review', 'shallow review']
 ---
 
 Set up automated code review for your repository using the Factory GitHub App. Droid will analyze pull requests, identify issues, and post feedback as inline comments.
@@ -17,31 +17,109 @@ Set up automated code review for your repository using the Factory GitHub App. D
 
 ## Setup
 
-Use the `/install-github-app` command to install the Factory GitHub App and configure the code review workflow:
+Use the `/install-code-review` command to set up automated code review for GitHub or GitLab:
 
 ```bash
 droid
-> /install-github-app
+> /install-code-review
 ```
 
 The guided flow will:
-1. Verify GitHub CLI prerequisites
-2. Install the Factory GitHub App on your repository
-3. Let you select the **Droid Review** workflow
-4. Create a PR with the workflow files
+1. Detect your SCM platform (GitHub or GitLab)
+2. Verify prerequisites (CLI tools, permissions)
+3. Walk you through review configuration (depth, security, triggers)
+4. Create a PR/MR with the workflow files
 
-For detailed setup instructions, see the [GitHub App installation guide](/cli/features/install-github-app).
+You can also use `/install-github-app` for GitHub-only setup. For detailed setup instructions, see the [GitHub App installation guide](/cli/features/install-github-app).
 
 ## How it works
 
 Once enabled, the Droid Review workflow:
 
-1. Triggers on pull request events (opened, synchronized, reopened, ready for review)
+1. Triggers on pull request events (opened, synchronize, reopened, ready for review)
 2. Skips draft PRs to avoid noise during development
 3. Fetches the PR diff and existing comments
-4. Analyzes code changes for issues
+4. Analyzes code changes for bugs, security issues, and correctness problems
 5. Posts inline comments on problematic lines
 6. Submits an approval when no issues are found
+
+## Review depth
+
+The `review_depth` input controls the thoroughness and cost of each review. You choose the depth during `/install-code-review` setup, or set it directly in your workflow.
+
+- **`deep`** (default) — Thorough analysis with higher reasoning effort. Catches more subtle bugs but costs more per review. Best for production code and security-sensitive repos.
+- **`shallow`** — Faster, more cost-effective reviews that cover surface-level issues. Good for high-volume repos, draft PRs, or teams watching spend.
+
+```yaml
+with:
+  automatic_review: true
+  review_depth: deep  # or shallow
+```
+
+You can also override the model or reasoning effort directly with `review_model` and `reasoning_effort`, which take precedence over the depth preset.
+
+## Security review
+
+Security review runs a STRIDE-based analysis alongside (or instead of) the standard code review. It uses a dedicated security-reviewer subagent that scans for spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege vulnerabilities.
+
+### Enabling automatic security review
+
+Add `automatic_security_review: true` to your workflow. When both `automatic_review` and `automatic_security_review` are enabled, the security reviewer runs as a parallel subagent during the code review pass:
+
+```yaml
+with:
+  automatic_review: true
+  automatic_security_review: true
+```
+
+The security review findings are included in the same PR comment, appended as a **Security Review Summary** section with its own severity ratings.
+
+### On-demand security review
+
+You can also trigger a security review manually by commenting on any PR:
+
+```
+@droid security
+```
+
+For a full repository security scan that creates a dedicated report:
+
+```
+@droid security --full
+```
+
+The `--full` scan creates a new branch (`droid/security-report-{date}`), generates a report at `.factory/security/reports/security-report-{date}.md`, and opens a PR with the findings.
+
+### Security configuration
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `automatic_security_review` | `false` | Run security review automatically on every PR |
+| `security_model` | (inherits from `review_model`) | Model for security analysis |
+| `security_severity_threshold` | `medium` | Minimum severity to report: `critical`, `high`, `medium`, `low` |
+| `security_block_on_critical` | `true` | Submit `REQUEST_CHANGES` on critical findings |
+| `security_block_on_high` | `false` | Submit `REQUEST_CHANGES` on high findings |
+| `security_notify_team` | (empty) | GitHub team to @mention on critical findings (e.g., `@org/security-team`) |
+
+### Scheduled security scans
+
+Run periodic full-repository scans on a schedule by adding a cron trigger to your workflow:
+
+```yaml
+name: Security Scan
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6am
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Factory-AI/droid-action@v3
+        with:
+          security_scan_schedule: true
+          security_scan_days: 7  # Scan commits from the last 7 days
+```
 
 ## What Droid reviews
 
@@ -124,8 +202,27 @@ Guidelines:
 - Submit at most 5 comments total, prioritizing the most critical issues
 ```
 
+## All workflow inputs
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `automatic_review` | `false` | Automatically review PRs without `@droid review` |
+| `review_depth` | `deep` | Review preset: `deep` (thorough) or `shallow` (fast) |
+| `review_model` | (from depth) | Override model for code review |
+| `reasoning_effort` | (from depth) | Override reasoning effort |
+| `include_suggestions` | `true` | Include code suggestion blocks in comments |
+| `automatic_security_review` | `false` | Run security review on every PR |
+| `security_model` | (from `review_model`) | Override model for security review |
+| `security_severity_threshold` | `medium` | Minimum severity to report |
+| `security_block_on_critical` | `true` | Block PRs on critical findings |
+| `security_block_on_high` | `false` | Block PRs on high findings |
+| `security_notify_team` | (empty) | Team to @mention on critical findings |
+| `security_scan_schedule` | `false` | Enable scheduled full-repo scans |
+| `security_scan_days` | `7` | Days of commits to scan |
+
 ## See also
 
 - [GitHub App installation](/cli/features/install-github-app) - Full setup guide for `/install-github-app`
+- [GitHub Integration Security](/enterprise/github-integration-security) - Security architecture for the GitHub App integration
 - [GitHub Actions examples](/guides/droid-exec/github-actions) - More automation workflows
 - [Droid Exec](/cli/droid-exec/overview) - Running Droid in CI/CD environments
