@@ -249,9 +249,27 @@ Plus an **overall assessment**:
 # Choose the recent commit to understand changes
 ```
 
+## Automated reviews in CI
+
+For automated PR reviews, use the [Automated Code Review](/guides/droid-exec/code-review) workflow. It supports:
+
+- **Review depth** (`deep` or `shallow`) to control thoroughness and cost
+- **Security review** with STRIDE-based vulnerability scanning, configurable severity thresholds, and PR blocking on critical findings
+- **On-demand security scans** via `@droid security` comments on PRs, or `@droid security --full` for a full-repo scan
+- **Scheduled full-repo scans** via cron-based workflow triggers
+
+Set up with:
+
+```bash
+droid
+> /install-code-review
+```
+
+See the [Automated Code Review guide](/guides/droid-exec/code-review) for full configuration options.
+
 ## See also
 
 - [CLI Reference](/reference/cli-reference) - Complete command reference including `/review`
-- [Code Review automation guide](/guides/droid-exec/code-review) - Automate reviews with `droid exec`
+- [Automated Code Review guide](/guides/droid-exec/code-review) - Set up automated PR reviews with deep/shallow modes and security scanning
 - [Common use cases](/cli/getting-started/common-use-cases) - Other workflows and patterns
 - [How to talk to a droid](/cli/getting-started/how-to-talk-to-a-droid) - Getting better results from AI reviews
