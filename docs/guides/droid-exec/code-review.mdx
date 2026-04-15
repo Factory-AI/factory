@@ -36,10 +36,10 @@ You can also use `/install-github-app` for GitHub-only setup. For detailed setup
 
 Once enabled, the Droid Review workflow:
 
-1. Triggers on pull request events (opened, synchronized, reopened, ready for review)
+1. Triggers on pull request events (opened, synchronize, reopened, ready for review)
 2. Skips draft PRs to avoid noise during development
 3. Fetches the PR diff and existing comments
-4. Runs a two-pass review: candidates pass identifies potential issues, validator pass filters false positives
+4. Analyzes code changes for bugs, security issues, and correctness problems
 5. Posts inline comments on problematic lines
 6. Submits an approval when no issues are found
 
@@ -103,16 +103,22 @@ The `--full` scan creates a new branch (`droid/security-report-{date}`), generat
 
 ### Scheduled security scans
 
-Run periodic full-repository scans on a schedule:
+Run periodic full-repository scans on a schedule by adding a cron trigger to your workflow:
 
 ```yaml
+name: Security Scan
 on:
   schedule:
     - cron: '0 6 * * 1'  # Every Monday at 6am
 
-with:
-  security_scan_schedule: true
-  security_scan_days: 7  # Scan commits from the last 7 days
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Factory-AI/droid-action@v3
+        with:
+          security_scan_schedule: true
+          security_scan_days: 7  # Scan commits from the last 7 days
 ```
 
 ## What Droid reviews
@@ -162,6 +168,16 @@ Additional checks for this codebase:
 ```
 
 These guidelines are automatically picked up and injected into every review run. No workflow changes needed.
+
+### Change the model
+
+Use a different model for reviews:
+
+```yaml
+droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
+# Or use a faster model for quicker feedback:
+droid exec --auto high --model claude-haiku-4-5-20251001 -f prompt.txt
+```
 
 ### Skip certain PRs
 
