@@ -1,0 +1,242 @@
+---
+title: Droid Control
+sidebarTitle: ドロイド制御
+description: ターミナル、ブラウザ、デスクトップの自動化。デモの録画、動作検証、QAフローの実行。
+keywords: ['droid-control', 'automation', 'demo', 'verify', 'qa-test', 'terminal', 'browser', 'recording', 'video', 'showcase', 'tuistory', 'remotion', 'tctl', 'plugin']
+---
+
+Droid Control は Droid が*操作*するソフトウェアです：アプリの起動、コマンドの入力、ボタンのクリック、何が起こったかの記録、そして洗練されたビデオ証拠の生成を行います。Droid が開発し、Droid のために作られました。
+
+<Frame caption="このビデオは完全に Droid によって計画、記録、レンダリングされました。">
+  <video autoPlay muted loop playsInline>
+    <source src="/images/features/droid-control-hero.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## 得られるもの
+
+<CardGroup cols={3}>
+  <Card title="主張を検証" icon="magnifying-glass-chart">
+    動作の主張が真実かどうかをテストし、どちらの場合でも証拠を生成します。演出なし、擁護なし -- ただの調査です。
+  </Card>
+  <Card title="QA フローの実行" icon="vial-circle-check">
+    ターミナル CLI、Web アプリ、または Electron アプリをエンドツーエンドフローで駆動します。注釈付きスクリーンショットでパス/フェイルを報告します。
+  </Card>
+  <Card title="デモの記録" icon="clapperboard">
+    タイトルカード、キーストロークオーバーレイ、ウィンドウクロームを含む、PR の洗練されたビフォー/アフター比較ビデオを生成します。
+  </Card>
+</CardGroup>
+
+## 始め方
+
+<Tabs>
+  <Tab title="UI">
+    Droid セッションで `/plugins` を実行し、**Browse** タブに移動し、**droid-control** を見つけてインストールします。
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
+    droid plugin install droid-control@factory-plugins --scope user
+    ```</Tab>
+</Tabs>
+
+動画レンダリングでは、プラグインを追加した後にRemotion依存関係の一度だけのインストールが必要です：```bash
+droid plugin list --scope user
+cd <plugin-path>/remotion && npm install
+```<Note>
+使用ケースに応じたランタイムツール（tuistory、agent-browser、ffmpeg など）も必要です。使用ケース別のインストールコマンドについては、[前提条件](#prerequisites)を参照してください。
+</Note>
+
+## コマンド
+
+Droid Controlは3つのスラッシュコマンドを追加します。それぞれが計画、実行、記録、レポートまでの全ワークフローをエンドツーエンドで処理します。
+
+<Tabs>
+  <Tab title="/verify">
+    特定の動作要求をテストし、証拠とともに結果をレポートします。```
+    /verify "ESC cancels streaming in bash mode"
+    ```Droidはアプリを起動し、主張を試行して、実際に何が起こったかを報告します。証拠としてスクリーンショットとテキストスナップショットが含まれます。
+
+<Tip>
+droidは**調査者**として位置づけられており、支持者ではありません。主張が偽である場合、それは有効な発見です。偽造防止ルールにより、期待される結果に合わせて証拠を演出することは防止されています。
+</Tip>
+</Tab>
+<Tab title="/qa-test">
+ターミナルCLIやウェブ/Electronアプリに対して自動化されたQAを実行します。```
+    /qa-test https://app.example.com -- login, create a project, invite a member
+    ```Droidがブラウザ（またはターミナル）をフロー全体で操作し、各ステップをキャプチャし、注釈付きスクリーンショットと共に成功/失敗を報告します。
+  </Tab>
+  <Tab title="/demo">
+    機能やPRのデモ動画を録画します。```
+    /demo pr-1847
+    ```Droidは、PRを読み取り、変更が機能することを証明するインタラクションをスクリプト化し、両方のブランチを並行して記録し、サイドバイサイドの比較動画を生成します。
+
+さらなる磨きを加えるためのフラグを追加：```
+    /demo pr-1847 -- showcase, keys
+    ```| フラグ | 効果 |
+    |------|--------|
+    | `showcase` | 暖かい背景とフィルムグレインを持つシネマティックプリセット |
+    | `keys` | ユーザーアクションを表示するキーストロークオーバーレイピル |
+  </Tab>
+</Tabs>
+
+## `/demo`の仕組み
+
+<Steps>
+  <Step title="変更を理解する">
+    PRの説明、差分、リンクされたチケットを取得します。何を証明する必要があるか、既存の動作と混同される可能性があることを特定します。
+  </Step>
+  <Step title="インタラクションを計画する">
+    機能が動作することを視覚的に証明する一連のアクションをスクリプト化します。比較PRの場合、両方のブランチで同一のインタラクションを実行し、動作のみが異なるようにします。
+  </Step>
+  <Step title="両方のブランチをキャプチャする">
+    ワーカーサブエージェントを使用して、ベースラインとカンディデートブランチで記録セッションを並行して起動します。
+  </Step>
+  <Step title="ビデオを合成する">
+    Remotionを通じて、タイトルカード、ウィンドウクローム、キーストロークオーバーレイ、エフェクトを含む洗練されたビデオをレンダリングします。6つの視覚プリセットがシネマティックから実用的まで用意されています。
+  </Step>
+  <Step title="出力を検証する">
+    配信前に最終ビデオが元のコミットメントと一致するかチェックします。
+  </Step>
+</Steps>
+
+### 出力例
+
+以下の全てのビデオは、Droidによって完全に計画、記録、レンダリングされました。
+
+<Tabs>
+  <Tab title="CLI: シングルブランチ">
+    <Frame caption="/cwdコマンドのデモ。FactoryプリセットでシングルブランチレイアウトRender。">
+      <video autoPlay muted loop playsInline>
+        <source src="/images/features/droid-control-demo-single.mp4" type="video/mp4" />
+      </video>
+    </Frame>
+  </Tab>
+  <Tab title="CLI: 前後比較">
+    <Frame caption="bashモード出力リデザインの前後比較。Factoryプリセットで横並びレイアウト。">
+      <video autoPlay muted loop playsInline>
+        <source src="/images/features/droid-control-demo-comparison.mp4" type="video/mp4" />
+      </video>
+    </Frame>
+  </Tab>
+  {/*
+  To enable web/Electron demos, drop the videos into docs/images/features/ and uncomment:
+
+  <Tab title="Web: single-branch">
+    <Frame caption="Single-branch web app demo.">
+      <video autoPlay muted loop playsInline>
+        <source src="/images/features/droid-control-web-single.mp4" type="video/mp4" />
+      </video>
+    </Frame>
+  </Tab>
+  <Tab title="Web: before/after">
+    <Frame caption="Before/after comparison of a web app change.">
+      <video autoPlay muted loop playsInline>
+        <source src="/images/features/droid-control-web-comparison.mp4" type="video/mp4" />
+      </video>
+    </Frame>
+  </Tab>
+  */}
+</Tabs>
+
+## 自動化ドライバー
+
+Droid Controlは3つの自動化バックエンドをサポートしています。対象に基づいて自動的に適切なものが選択されます。
+
+<CardGroup cols={3}>
+  <Card title="tuistory" icon="terminal">
+    **仮想PTY自動化。** ターミナル作業のデフォルト。asciinema記録と強制トゥルーカラー出力を持つPlaywright-styleCLI。
+  </Card>
+  <Card title="true-input" icon="keyboard">
+    **実際のターミナルエミュレーター。** ヘッドレスWaylandコンポジター（Linux）、KVM/QEMU（Windows）、またはQEMUモニター（macOS）。実際のレンダリング証拠が必要な場合に使用。
+  </Card>
+  <Card title="agent-browser" icon="globe">
+    **WebおよびElectronアプリ。** Chrome DevTools Protocolサポートを持つPlaywright-backedCLI。ページをナビゲートし、フォームを埋め、ボタンをクリックし、スクリーンショットをキャプチャします。
+  </Card>
+</CardGroup>
+
+## ビデオレンダリング
+
+デモとショーケースビデオは、Reactベースのビデオエンジンである[Remotion](https://www.remotion.dev/)でレンダリングされます。プラグインには22の視覚コンポーネントと6つのプリセットが含まれています。
+
+<AccordionGroup>
+  <Accordion title="視覚プリセット">
+    | プリセット | 外観 | 最適な用途 |
+    |--------|------|----------|
+    | `factory` | 暖かい黒、信号機、アンバーグロー | 公式Factoryコンテンツ |
+    | `factory-hero` | 同上 + グラデーション背景 | ランディングページ、ソーシャル |
+    | `hero` | クールグラデーション、余裕のあるマージン | Factory以外のマーケティング |
+    | `macos` | ダーク、クリーンフレーム | 汎用デモ |
+    | `presentation` | 黒、余裕のあるマージン | スライドデッキ、プレゼンテーション |
+    | `minimal` | ウィンドウバーなし、タイトマージン | ドキュメント埋め込み、インラインクリップ |
+  </Accordion>
+  <Accordion title="自動レイヤー（常に存在）">
+    - 暖かい放射背景、浮遊パーティクル、フィルムグレインオーバーレイ、カラーグレーディング
+    - モーションブラーのタイトルからコンテンツへの遷移
+    - 信号機とガラスモーフィック境界を持つアニメーションウィンドウクローム
+    - 自動スケールされたタイトル/サブタイトルテキスト
+  </Accordion>
+  <Accordion title="エフェクトレイヤー（合成時に選択）">
+    - 特定の領域をハイライトするスポットライトオーバーレイ
+    - 小さなテキストや詳細のための指向性ズーム
+    - ユーザーアクションを表示するキーストロークピル
+    - セクションヘッダーと遷移スイープ
+  </Accordion>
+</AccordionGroup>
+
+## アーキテクチャ
+
+プラグインは3つの層を持つコンポジションアーキテクチャを使用します：
+
+- **オーケストレーター** -- 各リクエストを3つの独立したルックアップ（ターゲット、ステージ、アーティファクト）を通してルーティングし、ロードするスキルを決定します。
+- **10個のアトムスキル** -- オンデマンドでロードされる自己完結型のバックグラウンド知識で、ドライバー、ターゲット、ステージ、ポリッシュに分かれています。
+- **3つのコマンド** -- 引数をコミットメントに解析し、ハイブリッドハンドオフを通じてアトムに委任します。
+
+すべてのワークフローは**キャプチャ → 合成 → 検証**を通ります。コマンドは*何を*生成するかを宣言し、アトムは*どのように*を所有します。スキルはハードコードされたパイプラインではなく明示的なハンドオフを通じて連鎖するため、droidは自然にフローに従います。
+
+<Card title="アーキテクチャ詳細" href="https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/ARCHITECTURE.md" icon="sitemap">
+  設計根拠：droidのためのUX、ウォーターフォールルーティング、タスク委任、ハイブリッドハンドオフ。
+</Card>
+
+## 前提条件
+
+使用ケースに必要なもののみインストールしてください。
+
+<AccordionGroup>
+  <Accordion title="ターミナルデモ（tuistory）">```bash
+    npm install -g tuistory                                # virtual PTY driver
+    pip install asciinema                                   # terminal recording
+    cargo install --git https://github.com/asciinema/agg   # .cast → .gif converter
+    sudo apt-get install -y ffmpeg                          # video processing
+    ```</Accordion>
+<Accordion title="Web/Electronの自動化（agent-browser）">```bash
+    agent-browser install   # downloads Chromium
+    ```</Accordion>
+  <Accordion title="リアルターミナルエミュレーター（true-input）">
+    | プラットフォーム | 必要なツール |
+    |----------|----------------|
+    | Linux/Wayland | `cage`、`wtype`、Wayland対応ターミナル |
+    | Windows (KVM) | `libvirt`、`qemu`、SSH接続可能なKVM VM |
+    | macOS (QEMU) | `qemu`、`socat`、SSH接続可能なmacOS VM |
+  </Accordion>
+  <Accordion title="動画合成（ショーケース）">
+    Node.js >= 18、Chrome/Chromium、`ffmpeg`、`ffprobe`、`agg`が必要です。
+  </Accordion>
+</AccordionGroup>
+
+## 関連情報
+
+<CardGroup cols={2}>
+  <Card title="ソースコード" href="https://github.com/Factory-AI/factory-plugins/tree/master/plugins/droid-control" icon="github">
+    プラグインの完全なソース：スキル、コマンド、スクリプト、Remotionコンポーネント。
+  </Card>
+  <Card title="プラグイン" href="/jp/cli/configuration/plugins" icon="puzzle-piece">
+    プラグインの仕組み、インストール方法、独自プラグインの構築方法を学習。
+  </Card>
+  <Card title="自動QAスキル" href="/jp/guides/skills/automated-qa" icon="vial-circle-check">
+    CI統合、失敗学習、構造化レポートを含むより高度なQA自動化。
+  </Card>
+  <Card title="README" href="https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/README.md" icon="book-open">
+    クイックスタート、コマンドリファレンス、前提条件。
+  </Card>
+</CardGroup>
