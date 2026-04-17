@@ -57,28 +57,6 @@ You also need the runtime tools for your use case (tuistory, agent-browser, ffmp
 Droid Control adds three slash commands. Each handles the full workflow end-to-end: planning, execution, recording, and reporting.
 
 <Tabs>
-  <Tab title="/verify">
-    Test a specific behavior claim and report findings with evidence.
-
-    ```
-    /verify "ESC cancels streaming in bash mode"
-    ```
-
-    Droid launches the app, attempts the claim, and reports what actually happened -- with screenshots and text snapshots as evidence.
-
-    <Tip>
-    The droid is framed as an **investigator**, not an advocate. If the claim is false, that's a valid finding. Anti-fabrication rules prevent staging evidence to match expected outcomes.
-    </Tip>
-  </Tab>
-  <Tab title="/qa-test">
-    Run automated QA against terminal CLIs or web/Electron apps.
-
-    ```
-    /qa-test https://app.example.com -- login, create a project, invite a member
-    ```
-
-    Droid drives the browser (or terminal) through the flow, captures each step, and reports pass/fail with annotated screenshots.
-  </Tab>
   <Tab title="/demo">
     Record a demo video of a feature or PR.
 
@@ -86,7 +64,7 @@ Droid Control adds three slash commands. Each handles the full workflow end-to-e
     /demo pr-1847
     ```
 
-    Droid reads the PR, scripts interactions that prove the change works, records both branches in parallel, and renders a side-by-side comparison video.
+    Accepts a PR number, GitHub URL, or free-text description. Comparison PRs get side-by-side layout by default; new features get single-branch.
 
     Add flags for extra polish:
 
@@ -98,28 +76,84 @@ Droid Control adds three slash commands. Each handles the full workflow end-to-e
     |------|--------|
     | `showcase` | Cinematic preset with warm backgrounds and film grain |
     | `keys` | Keystroke overlay pills showing user actions |
+
+    #### How it works
+
+    <Steps>
+      <Step title="Understands the change">
+        Fetches the PR description, diff, and linked ticket. For each change, identifies what needs to be proven and what a viewer could confuse it with.
+      </Step>
+      <Step title="Plans the interaction">
+        Scripts a sequence of actions that produces visible evidence the feature works. Both branches run identical interactions so only the behavior differs. Presents the plan and waits for your approval before recording.
+      </Step>
+      <Step title="Captures both branches">
+        Launches recorded sessions on the baseline and candidate branches in parallel using worker subagents.
+      </Step>
+      <Step title="Composes the video">
+        Renders a polished video via Remotion with title cards, window chrome, and effects. Six visual presets range from cinematic (`factory`) to utilitarian (`minimal`).
+      </Step>
+      <Step title="Verifies the output">
+        Checks the final video against the original commitments before delivering.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="/verify">
+    Test a specific behavior claim and report findings with evidence.
+
+    ```
+    /verify "ESC cancels streaming in bash mode"
+    ```
+
+    Also accepts a PR reference with an optional claim:
+
+    ```
+    /verify 11386 -- the fork flag creates a new session
+    ```
+
+    If given a PR number alone, Droid fetches the PR and identifies the most important testable claim.
+
+    <Tip>
+    The droid is framed as an **investigator**, not an advocate. If the claim is false, that's a valid finding. Anti-fabrication rules prevent staging evidence to match expected outcomes.
+    </Tip>
+
+    #### How it works
+
+    <Steps>
+      <Step title="Determines what to test">
+        Identifies the specific behavior to observe and what evidence type is needed: text snapshots for functional claims, screenshots for visual claims, or raw byte captures for encoding claims.
+      </Step>
+      <Step title="Captures the evidence">
+        Launches the app, runs the minimal interaction sequence that demonstrates the behavior, and captures the result. If the behavior contradicts the claim, that is evidence -- not an error.
+      </Step>
+      <Step title="Reports the finding">
+        Delivers a structured report with a **CONFIRMED**, **REFUTED**, or **INCONCLUSIVE** conclusion, along with all captured evidence inline.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="/qa-test">
+    Run automated QA against terminal CLIs, web apps, or Electron apps.
+
+    ```
+    /qa-test https://app.example.com -- login, create a project, invite a member
+    ```
+
+    Also accepts a CLI command, Electron app name, PR reference, or free-text description. Test steps after `--` are optional -- Droid designs a reasonable flow if none are provided.
+
+    #### How it works
+
+    <Steps>
+      <Step title="Defines the test plan">
+        Determines the target (web, terminal, or Electron), designs test steps from your instructions or the app's UI, and identifies what evidence to capture at each step.
+      </Step>
+      <Step title="Drives the flow">
+        Launches the app and executes each step, capturing screenshots (browser) or text snapshots (terminal) along the way. If a step fails, it records the failure and continues for maximum coverage.
+      </Step>
+      <Step title="Reports results">
+        Delivers a step-level pass/fail table with inline evidence and a summary of any issues found.
+      </Step>
+    </Steps>
   </Tab>
 </Tabs>
-
-## How `/demo` works
-
-<Steps>
-  <Step title="Understands the change">
-    Fetches the PR description, diff, and linked ticket. Identifies what needs to be proven and what could be confused with existing behavior.
-  </Step>
-  <Step title="Plans the interaction">
-    Scripts a sequence of actions that produces visible evidence the feature works. For comparison PRs, both branches run identical interactions so only the behavior differs.
-  </Step>
-  <Step title="Captures both branches">
-    Launches recorded sessions on the baseline and candidate branches in parallel using worker subagents.
-  </Step>
-  <Step title="Composes the video">
-    Renders a polished video via Remotion with title cards, window chrome, keystroke overlays, and effects. Six visual presets range from cinematic to utilitarian.
-  </Step>
-  <Step title="Verifies the output">
-    Checks the final video against the original commitments before delivering.
-  </Step>
-</Steps>
 
 ### Example output
 
@@ -140,24 +174,20 @@ Every video below was planned, recorded, and rendered entirely by a Droid.
       </video>
     </Frame>
   </Tab>
-  {/*
-  To enable web/Electron demos, drop the videos into docs/images/features/ and uncomment:
-
   <Tab title="Web: single-branch">
-    <Frame caption="Single-branch web app demo.">
+    <Frame caption="Browser automation demo of a web app. Recorded and rendered by a Droid.">
       <video autoPlay muted loop playsInline>
         <source src="/images/features/droid-control-web-single.mp4" type="video/mp4" />
       </video>
     </Frame>
   </Tab>
   <Tab title="Web: before/after">
-    <Frame caption="Before/after comparison of a web app change.">
+    <Frame caption="Before/after comparison of a web app change. Side-by-side layout.">
       <video autoPlay muted loop playsInline>
         <source src="/images/features/droid-control-web-comparison.mp4" type="video/mp4" />
       </video>
     </Frame>
   </Tab>
-  */}
 </Tabs>
 
 ## Automation drivers
