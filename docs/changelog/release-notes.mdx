@@ -4,6 +4,35 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 17" rss={{ title: "CLI Updates", description: "Custom ripgrep path, BYOK config in bug reports, and CLI stability fixes" }}>
+  `v0.104.0`
+
+## New features
+
+- **Custom ripgrep path** - New environment variable to point Factory at a custom ripgrep binary
+- **BYOK config in bug reports** - Bug reports now include resolved BYOK configuration to make troubleshooting easier
+
+## Improvements
+
+- **Full Execute command in approval** - The approval dialog now shows the full command that will run
+- **Selected confirmation option visibility** - The selected option in tool confirmation prompts is now bolded for better visibility
+- **Hidden daemon log output** - Background daemon output no longer appears in the session
+
+## Bug fixes
+
+- **Spec edits in confirmation flow** - Fixed spec edits being dropped during the confirmation flow
+- **Manual spec edits respected** - Fixed manual edits to specs not being preserved during handoff
+- **Spec handoff savings calculation** - Corrected the context savings percentage shown after a spec handoff
+- **Image upload compression** - Fixed image upload compression issues
+- **Assistant active timer** - Fixed the assistant active timer not persisting across unmounts
+- **Org model policy enforcement** - Org model policies are now properly enforced on session resume and default healing
+- **Daemon connection and bug reports** - Fixed daemon connection issues and bug report errors (app)
+- **Local reconnect on machine change** - Local machine reconnect now works reliably when switching connections, with a clearer warning when not connected (app)
+- **Tool rendering parity** - Improved DefaultTool and TaskTool rendering to match the CLI (app)
+- **ApplyPatch diff rendering** - Fixed ApplyPatch tool diff rendering for the CLI input format (app)
+
+</Update>
+
 <Update label="April 16" rss={{ title: "CLI Updates", description: "Sessions page redesign, dead code detection in reviews, and CLI stability fixes" }}>
   `v0.103.0`
 
