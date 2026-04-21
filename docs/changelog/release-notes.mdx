@@ -4,6 +4,50 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 20" rss={{ title: "CLI Updates", description: "Kimi K2.6 support, simplify built-in skill, GitHub wiki sync, and CLI stability fixes" }}>
+  `v0.105.0`
+
+## New features
+
+- **Kimi K2.6 support** - Added support for the Kimi K2.6 model
+- **Simplify built-in skill** - Simplify is now a built-in skill, no installation required
+- **GitHub wiki sync** - Wiki pages can now sync to GitHub, with additional wiki reader fixes
+- **Managed computers enterprise control** - New managed computers toggle in enterprise controls (app)
+- **Missions access policy** - Enterprise admins can now control access to missions
+- **Session title in browser tab** - Web sessions now use the session title as the page title (app)
+- **Revamped computer creation** - Redesigned flow for creating Droid Computers (app)
+- **Nested sidebar** - Sidebar now supports nesting along with other polish improvements (app)
+- **Computer connection status** - Machine selector now shows the connection status for each computer (app)
+
+## Improvements
+
+- **Compaction model for BYOK** - Compaction now defaults to your current model and is used for BYOK
+- **PowerShell syntax warning** - Execute tool now detects PowerShell and warns when Bash syntax is used
+- **Windows path normalization** - Glob tool now returns normalized backslash paths on Windows
+
+## Bug fixes
+
+- **Spec option selection** - Fixed the user-selected spec option not being passed to the model
+- **Execute tool header** - Fixed the last character being clipped in the Execute tool header
+- **Invalid JSON rendering** - JSON renderer now hides output when the JSON is invalid
+- **Review guidelines skill** - CLI now handles a missing review-guidelines skill gracefully
+- **Tool cancel interrupts** - Follow-up prompts now wait for tool-cancel interrupts to settle
+- **TUI daemon session switching** - Previous TUI daemon session now closes only after the next one loads
+- **Session title updates** - Daemon session title updates now reflect in the terminal tab
+- **Mission worker permissions** - Mission worker permission requests are now auto-denied
+- **Thinking traces in web chat** - Thinking traces now appear in session chat on the web
+- **Ripgrep startup** - Fixed intermittent startup errors when initializing the bundled ripgrep binary
+- **Truncated stream handling** - Improved error handling when model response streams are truncated
+- **Stuck "Show more"** - Fixed a stuck "Show more" button after creating a session on a new computer (app)
+- **Slack session-owner picker** - Picker now uses server-side search with infinite scroll (app)
+- **Sidebar hover and selection** - Fixed hover states and highlighting in the sidebar (app)
+- **401 errors when logged out** - Suppressed 401 errors after logging out (app)
+- **Stuck loading state** - Fixed a stuck loading state in the app (app)
+- **Add Project modal directory** - Modal now picks up the current directory from the native browse dialog (app)
+- **Local machine option** - Hidden outside of the desktop app
+
+</Update>
+
 <Update label="April 17" rss={{ title: "CLI Updates", description: "Custom ripgrep path, BYOK config in bug reports, and CLI stability fixes" }}>
   `v0.104.0`
 
