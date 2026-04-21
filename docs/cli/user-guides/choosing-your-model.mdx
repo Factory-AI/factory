@@ -25,11 +25,12 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 | 11   | **Claude Haiku 4.5**          | Fast, cost-efficient for routine tasks and high-volume automation.                                                                              |
 | 12   | **Gemini 3.1 Pro**            | Newer Gemini Pro generation with strong structured outputs and mixed reasoning controls for research-heavy tasks.                                |
 | 13   | **Gemini 3 Flash**            | Fast, cheap (0.2× multiplier) with full reasoning support; great for high-volume tasks where speed matters.                                     |
-| 14   | **Droid Core (MiniMax M2.5)** | Open-source, 0.12× multiplier with reasoning support (Low/Medium/High); cheapest model available. No image support.                             |
-| 15   | **Droid Core (GLM-5)**        | Open-source, 0.4× multiplier with updated GLM capabilities for bulk automation and air-gapped environments; no image support.                   |
-| 16   | **Droid Core (GLM-4.7)**      | Open-source, 0.25× multiplier, stable choice for bulk automation or air-gapped environments; note: no image support.                            |
-| 17   | **Droid Core (Kimi K2.6)**    | Open-source, 0.25× multiplier with image support and optional High reasoning; good for cost-sensitive work when you still want a thinking toggle. |
-| 18   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; older Kimi option for cost-sensitive work.                                                    |
+| 14   | **Droid Core (MiniMax M2.7)** | Newer MiniMax open-source model for cost-sensitive agentic workflows; no image support.                                                          |
+| 15   | **Droid Core (MiniMax M2.5)** | Open-source, 0.12× multiplier with reasoning support (Low/Medium/High); cheapest model available. No image support.                             |
+| 16   | **Droid Core (GLM-5)**        | Open-source, 0.4× multiplier with updated GLM capabilities for bulk automation and air-gapped environments; no image support.                   |
+| 17   | **Droid Core (GLM-4.7)**      | Open-source, 0.25× multiplier, stable choice for bulk automation or air-gapped environments; note: no image support.                            |
+| 18   | **Droid Core (Kimi K2.6)**    | Open-source, 0.25× multiplier with image support and optional High reasoning; good for cost-sensitive work when you still want a thinking toggle. |
+| 19   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; older Kimi option for cost-sensitive work.                                                    |
 
 <Note>
   We ship model updates regularly. When a new release overtakes the list above,
@@ -44,9 +45,9 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.7** for best depth and safety (1× promotional multiplier through April 30), or fall back to **Opus 4.6** / **Opus 4.6 Fast** for faster turnaround. Use **Sonnet 4.6** or **Sonnet 4.5** when you want balanced cost/quality, or **GPT-5.4** for large-context reasoning. |
 | **Full-feature development, large refactors**                    | **Opus 4.7** or **Opus 4.6** for depth and safety. **GPT-5.4**, **GPT-5.3-Codex**, or **GPT-5.2-Codex** when you need speed plus **Extra High** reasoning; **Sonnet 4.6** or **Sonnet 4.5** for balanced loops. |
-| **Repeatable edits, summarization, boilerplate generation**      | **Haiku 4.5** or **Droid Core** (including **MiniMax M2.5** at 0.12×) for speed and cost. **GPT-5.2** when you need higher quality or structured outputs. |
+| **Repeatable edits, summarization, boilerplate generation**      | **Haiku 4.5** or **Droid Core** (including **MiniMax M2.7** for a newer MiniMax option, or **MiniMax M2.5** at 0.12× when price dominates) for speed and cost. **GPT-5.2** when you need higher quality or structured outputs. |
 | **CI/CD or automation loops**                                    | Favor **Haiku 4.5** or **Droid Core** for predictable, low-cost throughput. Use **GPT-5.3-Codex** or **GPT-5.4** when automation needs stronger reasoning. |
-| **High-volume automation, frequent quick turns**                 | **Haiku 4.5** for speedy feedback. **Droid Core** (especially **MiniMax M2.5** at 0.12× with reasoning) when cost is critical or you need air-gapped deployment. |
+| **High-volume automation, frequent quick turns**                 | **Haiku 4.5** for speedy feedback. **Droid Core** (especially **MiniMax M2.7** for a newer MiniMax option, or **MiniMax M2.5** at 0.12× when the absolute lowest cost matters) when cost is critical or you need air-gapped deployment. |
 
 <Tip>
   **Claude Opus 4.7** is the newest top-tier option for extremely complex architecture decisions or critical work where you need maximum reasoning capability—and it runs at a promotional 1× multiplier through April 30 (2× afterward). **Claude Opus 4.6** remains an excellent alternative, and **Opus 4.6 Fast** is tuned for faster responses at a higher cost. Most tasks don't require Opus-level power—start with Sonnet 4.6 or Sonnet 4.5 and escalate only if needed.
@@ -98,14 +99,14 @@ Factory ships with managed Anthropic and OpenAI access. If you prefer to run aga
 
 ### Open-source models
 
-**Droid Core (GLM-5)**, **Droid Core (GLM-4.7)**, **Droid Core (Kimi K2.6)**, **Droid Core (Kimi K2.5)**, and **Droid Core (MiniMax M2.5)** are open-source alternatives available in the CLI. They're useful for:
+**Droid Core (GLM-5)**, **Droid Core (GLM-4.7)**, **Droid Core (Kimi K2.6)**, **Droid Core (Kimi K2.5)**, **Droid Core (MiniMax M2.5)**, and **Droid Core (MiniMax M2.7)** are open-source alternatives available in the CLI. They're useful for:
 
 - **Air-gapped environments** where external API calls aren't allowed
 - **Cost-sensitive projects** needing unlimited local inference
 - **Privacy requirements** where code cannot leave your infrastructure
 - **Experimentation** with open-source model capabilities
 
-**Note:** GLM-5, GLM-4.7, and MiniMax M2.5 do not support image attachments. Kimi K2.5 and Kimi K2.6 do support images. Kimi K2.6 also adds an Off/High reasoning toggle. MiniMax M2.5 is the cheapest model available (0.12× multiplier). For image-based workflows, use Claude, GPT, or Kimi models.
+**Note:** GLM-5, GLM-4.7, MiniMax M2.5, and MiniMax M2.7 do not support image attachments. Kimi K2.5 and Kimi K2.6 do support images. Kimi K2.6 also adds an Off/High reasoning toggle. MiniMax M2.5 remains the cheapest model available (0.12× multiplier), while MiniMax M2.7 is the newer MiniMax option for general open-source agent workflows. For image-based workflows, use Claude, GPT, or Kimi models.
 
 To use open-source models, you'll need to configure them via BYOK with a local inference server (like Ollama) or a hosted provider. See [BYOK documentation](/cli/configuration/byok) for setup instructions.
 
