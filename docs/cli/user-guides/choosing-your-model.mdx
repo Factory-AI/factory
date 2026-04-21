@@ -28,7 +28,8 @@ Model quality evolves quickly, and we tune the CLI defaults as the ecosystem shi
 | 14   | **Droid Core (MiniMax M2.5)** | Open-source, 0.12× multiplier with reasoning support (Low/Medium/High); cheapest model available. No image support.                             |
 | 15   | **Droid Core (GLM-5)**        | Open-source, 0.4× multiplier with updated GLM capabilities for bulk automation and air-gapped environments; no image support.                   |
 | 16   | **Droid Core (GLM-4.7)**      | Open-source, 0.25× multiplier, stable choice for bulk automation or air-gapped environments; note: no image support.                            |
-| 17   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; good for cost-sensitive work.                                                                  |
+| 17   | **Droid Core (Kimi K2.6)**    | Open-source, 0.25× multiplier with image support and optional High reasoning; good for cost-sensitive work when you still want a thinking toggle. |
+| 18   | **Droid Core (Kimi K2.5)**    | Open-source, 0.25× multiplier with image support; older Kimi option for cost-sensitive work.                                                    |
 
 <Note>
   We ship model updates regularly. When a new release overtakes the list above,
@@ -78,6 +79,7 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 - **Gemini 3 Flash**: Minimal / Low / Medium / High (default: High)
 - **Droid Core (GLM-5)**: None only (default: None; no image support)
 - **Droid Core (GLM-4.7)**: None only (default: None; no image support)
+- **Droid Core (Kimi K2.6)**: Off / High (default: High)
 - **Droid Core (Kimi K2.5)**: None only (default: None)
 - **Droid Core (MiniMax M2.5)**: Low / Medium / High (default: High)
 
@@ -96,14 +98,14 @@ Factory ships with managed Anthropic and OpenAI access. If you prefer to run aga
 
 ### Open-source models
 
-**Droid Core (GLM-5)**, **Droid Core (GLM-4.7)**, **Droid Core (Kimi K2.5)**, and **Droid Core (MiniMax M2.5)** are open-source alternatives available in the CLI. They're useful for:
+**Droid Core (GLM-5)**, **Droid Core (GLM-4.7)**, **Droid Core (Kimi K2.6)**, **Droid Core (Kimi K2.5)**, and **Droid Core (MiniMax M2.5)** are open-source alternatives available in the CLI. They're useful for:
 
 - **Air-gapped environments** where external API calls aren't allowed
 - **Cost-sensitive projects** needing unlimited local inference
 - **Privacy requirements** where code cannot leave your infrastructure
 - **Experimentation** with open-source model capabilities
 
-**Note:** GLM-5, GLM-4.7, and MiniMax M2.5 do not support image attachments. Kimi K2.5 does support images. MiniMax M2.5 is the cheapest model available (0.12× multiplier) and uniquely supports reasoning (Low/Medium/High) among Droid Core models. For image-based workflows, use Claude, GPT, or Kimi models.
+**Note:** GLM-5, GLM-4.7, and MiniMax M2.5 do not support image attachments. Kimi K2.5 and Kimi K2.6 do support images. Kimi K2.6 also adds an Off/High reasoning toggle. MiniMax M2.5 is the cheapest model available (0.12× multiplier). For image-based workflows, use Claude, GPT, or Kimi models.
 
 To use open-source models, you'll need to configure them via BYOK with a local inference server (like Ollama) or a hosted provider. See [BYOK documentation](/cli/configuration/byok) for setup instructions.
 
