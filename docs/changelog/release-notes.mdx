@@ -4,6 +4,38 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 21" rss={{ title: "CLI Updates", description: "New /btw command, upgraded /copy selector, full-project security audit, and CLI stability fixes" }}>
+  `v0.106.0`
+
+## New features
+
+- **`/btw` command** - New `/btw` slash command for sending side messages to the current session
+- **Upgraded `/copy` selector** - Improved selector UI for the `/copy` command
+- **Full-project security audit** - New full-project audit mode in the security-review skill
+- **`/copy` slash command** - `/copy` slash command and user message hover actions are now available in the app (app)
+- **Search by session ID** - Search sessions directly by session ID (app)
+- **Member role filter** - Filter the organization members list by role (app)
+
+## Improvements
+
+- **Timeout error handling** - Improved handling of timeout errors with longer retry delays
+- **Corporate network error detection** - Corporate firewall, DNS, and TLS errors are now treated as non-retryable
+- **Context limit classification** - Requests exceeding a model's context window are now classified as context-limit errors with clearer messaging
+
+## Bug fixes
+
+- **Subagent permission requests** - Subagent permission requests are now auto-rejected instead of crashing the session
+- **Auto suggestions after command** - Auto suggestions no longer appear after a command is accepted
+- **Auth error retries** - 401 and 403 authentication errors are no longer retried
+- **Default model preserved** - The user's configured default model is no longer rewritten on reads
+- **Dismissed handoff items** - Dismissed handoff items are now preserved during validation
+- **Bug report fallback** - Bug reports now fall back to local submission when the background daemon is unavailable
+- **Factory API key scoping** - The Factory API key list is now scoped to your current organization (app)
+- **Slack session owner across pages** - The saved Slack Session Owner is now correctly shown across paginated org member lists (app)
+- **Single pinned session** - Fixed an issue that allowed multiple pinned sessions in the sidebar (app)
+
+</Update>
+
 <Update label="April 20" rss={{ title: "CLI Updates", description: "Kimi K2.6 support, simplify built-in skill, GitHub wiki sync, and CLI stability fixes" }}>
   `v0.105.0`
 
