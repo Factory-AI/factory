@@ -1,8 +1,19 @@
 ---
 title: "Plans & Models"
 description: "Factory plans and available models"
-keywords: ['pricing', 'plans', 'models', 'model id', 'limits', 'pro', 'max', 'enterprise', 'subscription']
+keywords: ['pricing', 'plans', 'models', 'model id', 'limits', 'pro', 'pro plus', 'max', 'enterprise', 'subscription', 'rate limits', 'droid core', 'extra usage']
 ---
+
+## Pricing Structure
+
+Factory plans use **rolling rate limits** across three windows: **5-hour**, **weekly**, and **monthly**. Your plan's Standard Usage gives you access to all models and is consumed first. Enterprise plans are not affected by rate limits.
+
+When you hit a Standard Usage limit, you have two options:
+
+- **Droid Core** -- a selection of leading open-weight models with a separate rate limit pool. Free, no additional cost.
+- **Extra Usage** -- prepaid credits that let you keep using any model. Pay-as-you-go, $10 minimum.
+
+Standard Usage is always consumed first. You can monitor your usage in **Settings > Usage** or with the `/limits` command in Droid.
 
 ## Plans
 
@@ -14,11 +25,18 @@ Complete coding agent workspace for individuals and small teams.
 - **Agent-native, multi-platform experience** -- Desktop, web, and CLI with cloud & local background agents and expanded first-party integrations
 - **Team collaboration** -- up to 2 team members ($5 per additional seat), analytics, billing, and usage statistics, plus an agent-readiness dashboard
 
-### Max -- $200/mo
+### Pro Plus -- $100/mo
 
 Everything in Pro, plus:
 
-- **Expanded reserved capacity** -- 10x usage from the Pro plan
+- **Expanded rolling rate limits** -- ~5x the usage of Pro
+- **Team collaboration** -- 5-seat cap ($5 per additional seat)
+
+### Max -- $200/mo
+
+Everything in Pro Plus, plus:
+
+- **Expanded rolling rate limits** -- ~10x the usage of Pro
 - **Droid Computers** -- access to Factory-managed cloud computers for remote Droids
 - **Early access** to new features
 - **Team collaboration** -- 5-seat cap ($5 per additional seat)
@@ -31,7 +49,30 @@ Everything in Max, plus:
 - **Enterprise features** -- enterprise-scale codebase analysis, audit logging & activity trails, Agent-readiness Improvement Program, enterprise-specific automation cookbook, SSO, SAML/SCIM provisioning, compliance reporting, on-premise deployment options
 - **Premium support** -- dedicated Account Manager and Customer Engineer, priority support with SLAs, custom onboarding program
 
-[Contact Sales](https://factory.ai/contact) for Enterprise pricing.
+Enterprise plans are not affected by rate limit changes. [Contact Sales](https://factory.ai/contact) for Enterprise pricing.
+
+## Droid Core
+
+Droid Core is a set of leading open-weight models that Factory has designated as Core. These are typically smaller, cost-efficient models that handle most coding tasks well. When you exhaust your Standard Usage rate limits, Droid Core lets you keep working at no additional cost on its own separate rate limits.
+
+You can see the current list of Core models in **Settings > Models**. The list updates as new models are released.
+
+Droid Core usage counts against your Standard Usage if you still have Standard Usage remaining. Once Standard Usage is exhausted, Droid Core draws from its own separate rate limit pool.
+
+## Extra Usage
+
+Extra Usage is a prepaid, USD-denominated credit balance. It kicks in whenever your Standard Usage runs out (if enabled).
+
+- **Minimum purchase:** $10
+- **Expiration:** credits never expire
+- **Toggle:** enable once, stays on until you turn it off or run out of credits
+- **Priority:** Standard Usage is always consumed first. Extra Usage is never touched while Standard Usage is available.
+
+## Missions
+
+Missions draw from the same rolling rate limits as regular sessions. Running Missions requires Extra Usage to be enabled. If you hit a rate limit mid-Mission, the Mission pauses.
+
+**Tip:** run Missions on Droid Core when possible. Core models often deliver comparable results and stretch your plan further.
 
 ## Available Models
 
