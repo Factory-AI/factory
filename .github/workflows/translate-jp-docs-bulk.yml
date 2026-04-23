@@ -68,11 +68,23 @@ jobs:
           BRANCH="${{ steps.translate.outputs.branch }}"
           TITLE="${{ steps.translate.outputs.title }}"
           BODY="Auto-generated bulk translation of all Japanese docs via Droid Exec. Please review translations for accuracy."
+          REPO_OWNER="${{ github.repository_owner }}"
+
+          find_pr_number() {
+            local state="$1"
+            gh pr list \
+              --base main \
+              --state "$state" \
+              --limit 100 \
+              --json number,headRefName,isCrossRepository,headRepositoryOwner \
+              --jq ".[] | select(.headRefName == \"$BRANCH\" and (.isCrossRepository | not) and .headRepositoryOwner.login == \"$REPO_OWNER\") | .number" \
+              | head -n 1
+          }
 
           git commit -m "$TITLE"
           git push --force-with-lease origin "$BRANCH"
 
-          open_pr="$(gh pr list --base main --head "$BRANCH" --state open --json number --jq '.[0].number')"
+          open_pr="$(find_pr_number open)"
           if [ -n "$open_pr" ] && [ "$open_pr" != "null" ]; then
             gh pr edit "$open_pr" --title "$TITLE" --body "$BODY"
             {
@@ -82,7 +94,7 @@ jobs:
             exit 0
           fi
 
-          closed_pr="$(gh pr list --base main --head "$BRANCH" --state closed --json number --jq '.[0].number')"
+          closed_pr="$(find_pr_number closed)"
           if [ -n "$closed_pr" ] && [ "$closed_pr" != "null" ]; then
             gh pr reopen "$closed_pr"
             gh pr edit "$closed_pr" --title "$TITLE" --body "$BODY"
@@ -99,7 +111,7 @@ jobs:
             --title "$TITLE" \
             --body "$BODY"
 
-          created_pr="$(gh pr list --base main --head "$BRANCH" --state open --json number --jq '.[0].number')"
+          created_pr="$(find_pr_number open)"
           {
             echo "pr_number=$created_pr"
             echo "action=created"
