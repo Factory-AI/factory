@@ -1,17 +1,11 @@
 ---
-title: "スラッシュコマンド"
-description: Evaluate your repository's autonomy maturity with the /readiness-report slash command.
+title: Readiness Report Command
+description: /readiness-report スラッシュコマンドでリポジトリの自律性成熟度を評価します。
 keywords:
-  [
-    "readiness report",
-    "autonomy maturity",
-    "repository evaluation",
-    "slash command",
-    "maturity levels",
-  ]
+  ["readiness report", "autonomy maturity", "repository evaluation", "slash command", "maturity levels"]
 ---
 
-`/readiness-report` スラッシュコマンドは、現在のリポジトリをAutonomy Maturity Modelに対して評価し、5つの成熟度レベルでスコアリングを行い、改善のための実践的な推奨事項を提供します。
+`/readiness-report`スラッシュコマンドは、現在のリポジトリをAutonomy Maturity Modelに対して評価し、5つの成熟度レベルで採点し、改善のための実用的な推奨事項を提供します。
 
 ---
 
@@ -19,33 +13,29 @@ keywords:
 
 このコマンドを使用する前に：
 
-- `/settings` → `Experimental` → `Readiness Report` で機能を有効化してください
+- `/settings` → `Experimental` → `Readiness Report`で機能を有効にしてください
 
 ---
 
 ## 使用方法
 
-コマンドを使用するには、評価したいリポジトリに移動して次を実行します：
-
-```bash
+コマンドを使用するには、評価したいリポジトリに移動して実行してください：```bash
 droid
 > /readiness-report
-```
-
-評価は現在のリポジトリディレクトリに対して実行されます。
+```評価は現在のレポジトリディレクトリに対して実行されます。
 
 ---
 
 ## 実行内容
 
-`/readiness-report` を実行すると、droid はリポジトリの包括的な評価を実行します：
+`/readiness-report`を実行すると、droidはレポジトリの包括的な評価を実行します：
 
-1. **言語検出** — 設定ファイルとソースコードに基づいてリポジトリの言語（JavaScript/TypeScript、Python、Rust、Go、Java、Ruby）を特定
-2. **サブアプリケーション発見** — リポジトリがモノレポか単一のサービス/パッケージ/ライブラリかを判定。モノレポの場合、この手順でリポジトリ内のすべての独立してデプロイ可能なアプリケーションを特定
-3. **基準評価** — 5つすべての成熟度レベルにわたって基準をチェック
-4. **レポート保存** — Factory アプリでの視覚化のため評価結果を永続化
+1. **言語検出** — 設定ファイルとソースコードに基づいてレポジトリの言語（JavaScript/TypeScript、Python、Rust、Go、Java、Ruby）を特定
+2. **サブアプリケーション検出** — レポジトリがモノレポか、単一のサービス/パッケージ/ライブラリかを判断。モノレポの場合、この手順でレポジトリ内の独立してデプロイ可能なすべてのアプリケーションを特定
+3. **基準評価** — 5つの成熟度レベル全体にわたって基準をチェック
+4. **レポート保存** — FactoryアプリでのビジュアライゼーションのためにEvaluationResult結果を保持
 5. **サマリー出力** — 評価結果を含む人間が読みやすいレポートを出力
-6. **修復 _（近日公開）_** — 失敗した基準を選択して自動修正するオプション
+6. **修復 _（近日公開予定）_** — 失敗した基準を選択して自動的に修正するオプション
 
 ---
 
@@ -55,74 +45,61 @@ droid
 
 ### 達成レベル
 
-リポジトリの現在の成熟度レベル（1-5）：
+レポジトリの現在の成熟度レベル（1-5）：
 
-- **レベル1：機能的** — 基本的なツールが整備されている
-- **レベル2：文書化済み** — プロセスと文書化が確立されている
-- **レベル3：標準化済み** — セキュリティと可観測性が設定されている
+- **レベル1：機能的** — 基本的なツールが導入済み
+- **レベル2：文書化済み** — プロセスと文書化が確立
+- **レベル3：標準化済み** — セキュリティとオブザーバビリティが設定済み
 - **レベル4：最適化済み** — 迅速なフィードバックと継続的な測定
 - **レベル5：自律的** — 自己改善システム
 
-### 発見されたアプリケーション
+### 検出されたアプリケーション
 
-モノレポの場合、レポートは発見された各アプリケーションを簡単な説明とともに一覧表示します：
-
-```
+モノレポの場合、レポートは簡潔な説明と共に検出された各アプリケーションをリストします：```
 Example:
 1. apps/web - Main Next.js application for user interface
 2. apps/api - Backend API service
-```
+```### 評価結果
 
-### 基準結果
-
-評価された各基準にはスコアと根拠が割り当てられます：
-
-```
+評価された各基準にはスコアと根拠が割り当てられます：```
 **Style & Validation**
 - Linter Configuration: 2/2 - ESLint configured in both applications
 - Type Checker: 2/2 - TypeScript strict mode enabled
 - Pre-commit Hooks: 0/1 - No husky or lint-staged configuration found
-```
+```各基準のスコアは `分子/分母` の形式で表示されます：
 
-各基準のスコアは `numerator/denominator` の形式で表示され、ここで：
-
-- **分子：** 基準を満たすサブアプリケーションの数
-- **分母：** 評価されたサブアプリケーションの数
+- **分子:** 基準をクリアしたサブアプリケーションの数
+- **分母:** 評価されたサブアプリケーションの数
 
 ### アクションアイテム
 
-レポートは次のレベルに到達するための2-3の最も影響力の高い推奨事項で終了します：
-
-```
+レポートは、次のレベルに到達するための最も影響力の高い2〜3の推奨事項で締めくくられます：```
 Action Items:
 - Add pre-commit hooks with husky to enforce linting and formatting
 - Configure branch protection rules on the main branch
 - Add AGENTS.md with setup and development instructions
-```
-
----
+```---
 
 ## 過去のレポートの表示
 
-すべての準備状況レポートは自動的に保存され、[web dashboard](/web/agent-readiness/dashboard) で表示できます。これにより以下が可能になります：
+すべての準備状況レポートは自動的に保存され、[ウェブダッシュボード](/jp/web/agent-readiness/dashboard)で表示できます。これにより以下のことが可能です：
 
-- 時間の経過とともに準備状況の進歩を追跡
+- 時間の経過に伴う準備状況の進歩を追跡
 - リポジトリ間でスコアを比較
 - チームと結果を共有
 
 <Tip>
-  Run `/readiness-report` periodically (e.g., after major infrastructure
-  changes) to track your organization's progress toward higher readiness levels.
+  `/readiness-report`を定期的に実行し（例：大きなインフラストラクチャ変更の後など）、組織のより高い準備状況レベルに向けた進歩を追跡してください。
 </Tip>
 
 ---
 
-## 修復（近日公開）
+## 修復（近日公開予定）
 
-`/readiness-report` の実行後、CLI から直接失敗した基準を自動的に修正できるようになります：
+`/readiness-report`の実行後、間もなく失敗した基準をCLIから直接自動修正できるようになります：
 
 1. 評価結果をレビュー
 2. 修復したい失敗した基準を選択
-3. droid が修正を実装（例：pre-commit フックの追加、AGENTS.md の作成、ブランチ保護の設定）
+3. Droidが修正を実装（例：pre-commitフックの追加、AGENTS.mdの作成、ブランチ保護の設定）
 
-これにより、レポートは診断ツールから自動化された改善ワークフローに変わります。
+これにより、レポートが診断ツールから自動改善ワークフローへと変わります。
