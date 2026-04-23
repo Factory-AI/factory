@@ -84,6 +84,69 @@ Missions draw from the same rolling rate limits as regular sessions. Running Mis
 
 **Tip:** run Missions on Droid Core when possible. Core models often deliver comparable results and stretch your plan further.
 
+## FAQ
+
+### General
+
+**Is this a price increase?**
+No. You get more total monthly usage on every tier.
+
+**What counts toward each limit?**
+Every input and output token Droid uses against a billable model, totaled across your org. Cached reads count at the cached rate.
+
+**Do the three limits run independently?**
+Yes. Hitting the 5-hour cap doesn't eat into weekly or monthly any faster, and vice versa. You need headroom in all three to send a request.
+
+**When does each window reset?**
+All three are rolling: 5-hour, 7-day, and 30-day. Each starts ticking when you first use Droid and resets after the window elapses.
+
+**Do unused tokens roll over?**
+No, similar to the previous plan they do not roll over month to month.
+
+### Droid Core
+
+**Which models are "Droid Core"?**
+A set of models Factory has designated as Core -- typically smaller, cheaper models that handle most coding tasks well. You can see the current list in Settings > Models. This list changes as new models come out.
+
+**Does enabling Droid Core cost extra?**
+No. Same Standard Usage billing, just restricted to the Core model pool so you can keep working after you've hit premium-model limits.
+
+**If I use Droid Core, does it count against my Standard Usage?**
+Yes, if you have Standard Usage remaining. Standard Usage is consumed first. If you have used up your Standard Usage, then you have a separate set of rate limits for Droid Core.
+
+### Extra Usage
+
+**How does Extra Usage pricing work?**
+Prepaid, USD-denominated credits at Factory's per-token rate. Buy a dollar amount and it gets drawn down as your sessions use models, top up whenever you want.
+
+**What's the minimum purchase?**
+$10.
+
+**Does Extra Usage expire?**
+No. Credits persist until you use them.
+
+**Do I need to re-enable Extra Usage every cycle?**
+No. The toggle is sticky. Enable it once and it stays on until you turn it off or run out of credits.
+
+**Which is consumed first, Standard or Extra Usage?**
+Standard, always. Extra Usage is never touched while you have Standard Usage available.
+
+### Rate Limits
+
+**What happens mid-session when I hit a limit?**
+The current request finishes, then subsequent requests get refused with a rate-limit error in the CLI or Web UI. Run `/limits` to toggle Droid Core or Extra Usage and retry immediately. No need to reopen the session.
+
+**Does a long-running autonomous agent get throttled?**
+Yes. It pauses and surfaces the same limit error. This is intentional. Rate limits prevent a runaway agent from burning a month of quota in an afternoon.
+
+### Other
+
+**Is the limit per-user or per-organization?**
+Per-org, shared across members. Plans scale with seat count to account for team usage.
+
+**What if I'm on Enterprise?**
+Enterprise plans are not affected by this change.
+
 ## Available Models
 
 | Model                    | Model ID                     |
