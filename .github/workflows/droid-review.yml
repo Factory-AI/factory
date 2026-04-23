@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, ready_for_review, reopened]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   droid-review:
     if: github.event.pull_request.draft == false
@@ -21,8 +25,9 @@ jobs:
           fetch-depth: 1
 
       - name: Run Droid Auto Review
-        uses: Factory-AI/droid-action@v4
+        uses: Factory-AI/droid-action@main
         with:
           factory_api_key: ${{ secrets.FACTORY_API_KEY }}
           automatic_review: true
-          allowed_bots: 'dependabot'
+          automatic_security_review: true
+          allowed_bots: "dependabot"
