@@ -5,10 +5,14 @@ on:
     branches:
       - main
     paths:
-      - 'docs/**/*.mdx'
-      - 'docs/**/*.md'
-      - '!docs/jp/**'
+      - "docs/**/*.mdx"
+      - "docs/**/*.md"
+      - "!docs/jp/**"
   workflow_dispatch:
+
+concurrency:
+  group: sync-jp-docs
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -17,6 +21,10 @@ permissions:
 jobs:
   sync-jp-docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+      DROID_VERSION: "0.108.0"
 
     steps:
       - name: Checkout repository
@@ -24,84 +32,264 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.11'
+      - name: Validate API key
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -n "${FACTORY_API_KEY:-}" ] || { echo "FACTORY_API_KEY is missing"; exit 1; }
 
-      - name: Install dependencies
-        run: pip install anthropic
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pinned Droid CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install -g "droid@${DROID_VERSION}"
+          NPM_GLOBAL_BIN="$(npm config get prefix)/bin"
+          echo "$NPM_GLOBAL_BIN" >> "$GITHUB_PATH"
+          "$NPM_GLOBAL_BIN/droid" --version
 
       - name: Sync and translate changed English docs to Japanese
         id: sync
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY_DOCS }}
+        shell: bash
         run: |
+          set -euo pipefail
+
+          BRANCH="docs/auto-sync-jp-docs"
+          TITLE="docs: sync and translate English doc changes to Japanese"
+
+          git fetch origin main
+          git fetch origin "$BRANCH" || true
+
           BEFORE="${{ github.event.before }}"
-          # Handle zero SHA on first push or force push
-          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || [ -z "$BEFORE" ]; then
             BEFORE="$(git rev-parse HEAD~1 2>/dev/null || echo "")"
           fi
           if [ -z "$BEFORE" ]; then
             echo "Cannot determine base commit, skipping."
-            echo "synced=false" >> $GITHUB_OUTPUT
+            echo "synced=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          changed_files=$(git diff --name-only --diff-filter=ACM "$BEFORE" ${{ github.sha }} -- 'docs/**/*.mdx' 'docs/**/*.md' ':!docs/jp/**')
+
+          if [ "${{ github.actor }}" = "github-actions[bot]" ]; then
+            echo "Skipping JP sync for github-actions[bot] push."
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## JP sync"
+              echo "- Skipped: push actor was github-actions[bot]."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          changed_files="$(git diff --name-only --diff-filter=ACM "$BEFORE" "${{ github.sha }}" -- 'docs/**/*.mdx' 'docs/**/*.md' ':!docs/jp/**')"
 
           if [ -z "$changed_files" ]; then
             echo "No English doc changes detected."
-            echo "synced=false" >> $GITHUB_OUTPUT
+            echo "synced=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          synced=false
-          jp_files=""
-          while IFS= read -r file; do
-            jp_file="${file/docs\//docs/jp/}"
-            mkdir -p "$(dirname "$jp_file")"
-            cp "$file" "$jp_file"
-            jp_files="$jp_files $jp_file"
-            echo "Copied: $file -> $jp_file"
-            synced=true
-          done <<< "$changed_files"
-
-          # Translate the copied files if API key is available
-          if [ -n "$ANTHROPIC_API_KEY" ] && [ "$synced" = true ]; then
-            echo "Translating files to Japanese..."
-            python .github/scripts/translate-docs.py $jp_files
-          elif [ "$synced" = true ]; then
-            echo "Warning: ANTHROPIC_API_KEY not set, skipping translation. Files copied in English."
-          fi
-
-          if [ "$synced" = true ]; then
-            echo "synced=true" >> $GITHUB_OUTPUT
-          else
-            echo "synced=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create PR with synced docs
-        if: steps.sync.outputs.synced == 'true'
-        run: |
-          BRANCH="docs/auto-sync-jp-docs-$(date +%Y%m%d-%H%M%S)"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git checkout -b "$BRANCH"
+          git checkout -B "$BRANCH" "origin/main"
+
+          if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
+            mapfile -t existing_jp_files < <(git diff --name-only --diff-filter=ACMR origin/main...origin/"$BRANCH" -- docs/jp)
+            if [ "${#existing_jp_files[@]}" -gt 0 ]; then
+              git checkout "origin/$BRANCH" -- "${existing_jp_files[@]}"
+            fi
+          fi
+
+          changed_files_file="$(mktemp)"
+          manifest_file="$(mktemp)"
+          prompt_file="$(mktemp)"
+          snapshot_root="$(mktemp -d)"
+          cleanup() {
+            rm -f "$changed_files_file" "$manifest_file" "$prompt_file"
+            rm -rf "$snapshot_root"
+          }
+          trap cleanup EXIT
+
+          printf '%s\n' "$changed_files" > "$changed_files_file"
+
+          jp_targets=0
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+            jp_file="${file/docs\//docs/jp/}"
+            snapshot_path="$snapshot_root/$file"
+            mkdir -p "$(dirname "$jp_file")"
+            mkdir -p "$(dirname "$snapshot_path")"
+            git show "${{ github.sha }}:$file" > "$snapshot_path"
+            jp_targets=$((jp_targets + 1))
+          done < "$changed_files_file"
+
+          if [ "$jp_targets" -eq 0 ]; then
+            echo "No Japanese docs targets were generated."
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          BEFORE="$BEFORE" GITHUB_SHA="${{ github.sha }}" CHANGED_FILES_FILE="$changed_files_file" SNAPSHOT_ROOT="$snapshot_root" python3 - <<'PY' > "$manifest_file"
+          from pathlib import Path
+          import os
+          import subprocess
+
+          before = os.environ["BEFORE"]
+          sha = os.environ["GITHUB_SHA"]
+          changed_files_file = Path(os.environ["CHANGED_FILES_FILE"])
+          snapshot_root = Path(os.environ["SNAPSHOT_ROOT"])
+          changed_files = [line.strip() for line in changed_files_file.read_text().splitlines() if line.strip()]
+
+
+          def run(*args: str) -> str:
+              return subprocess.run(args, check=True, capture_output=True, text=True).stdout
+
+
+          print("## Translation manifest")
+          print()
+          print("Use the English diffs below to scope edits, but read the full English source file and current Japanese target file before you edit.")
+          print()
+
+          for index, source in enumerate(changed_files, start=1):
+              snapshot_path = snapshot_root / source
+              target = source.replace("docs/", "docs/jp/", 1)
+              target_exists = Path(target).exists()
+              diff = run("git", "diff", "--unified=2", before, sha, "--", source).rstrip()
+              if not diff:
+                  diff = "(No textual diff was produced; inspect the file pair directly before deciding no change is needed.)"
+
+              print(f"### {index}. `{source}`")
+              print(f"- English source snapshot: `{snapshot_path}`")
+              print(f"- Japanese target file: `{target}`")
+              print(f"- Existing Japanese target before this run: {'yes' if target_exists else 'no'}")
+              print("- Preferred edit scope: only the Japanese sections affected by the English diff below, unless the file is new or the diff forces a broader rewrite.")
+              print()
+              print("```diff")
+              print(diff)
+              print("```")
+              print()
+          PY
+
+          {
+            cat .github/prompts/sync-jp-docs.md
+            echo
+            cat "$manifest_file"
+          } > "$prompt_file"
+
+          "$HOME/.local/bin/droid" exec \
+            --auto medium \
+            --model gpt-5.4 \
+            --reasoning-effort high \
+            --disabled-tools execute-cli \
+            --file "$prompt_file"
+
           git add docs/jp/
-          git commit -m "docs: sync and translate English doc changes to Japanese"
-          git push origin "$BRANCH"
+          if git diff --cached --quiet; then
+            echo "No Japanese docs changes to commit."
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed_count="$(printf '%s\n' "$changed_files" | sed '/^$/d' | wc -l | tr -d ' ')"
+          {
+            echo "## JP sync"
+            echo "- English docs changed: $changed_count"
+            echo "- Japanese targets requested: $jp_targets"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          {
+            echo "branch=$BRANCH"
+            echo "title=$TITLE"
+            echo "synced=true"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upsert PR with synced docs
+        id: pr
+        if: steps.sync.outputs.synced == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BRANCH="${{ steps.sync.outputs.branch }}"
+          TITLE="${{ steps.sync.outputs.title }}"
+          BODY="Auto-generated by the sync-jp-docs Droid Exec workflow. This PR is reused for cumulative JP sync updates, so please review each commit for translation accuracy."
+          REPO_OWNER="${{ github.repository_owner }}"
+
+          find_open_pr_number() {
+            gh pr list \
+              --base main \
+              --head "$BRANCH" \
+              --state open \
+              --json number,isCrossRepository,headRepositoryOwner \
+              --jq ".[] | select((.isCrossRepository | not) and .headRepositoryOwner.login == \"$REPO_OWNER\") | .number" \
+              | head -n 1
+          }
+
+          find_reopenable_pr_number() {
+            gh pr list \
+              --base main \
+              --head "$BRANCH" \
+              --state closed \
+              --json number,isCrossRepository,headRepositoryOwner,isMerged \
+              --jq ".[] | select((.isCrossRepository | not) and .headRepositoryOwner.login == \"$REPO_OWNER\" and (.isMerged | not)) | .number" \
+              | head -n 1
+          }
+
+          git commit -m "$TITLE"
+          git push --force-with-lease origin "$BRANCH"
+
+          open_pr="$(find_open_pr_number)"
+          if [ -n "$open_pr" ] && [ "$open_pr" != "null" ]; then
+            gh pr edit "$open_pr" --title "$TITLE" --body "$BODY"
+            {
+              echo "pr_number=$open_pr"
+              echo "action=updated"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          closed_pr="$(find_reopenable_pr_number)"
+          if [ -n "$closed_pr" ] && [ "$closed_pr" != "null" ]; then
+            gh pr reopen "$closed_pr"
+            gh pr edit "$closed_pr" --title "$TITLE" --body "$BODY"
+            {
+              echo "pr_number=$closed_pr"
+              echo "action=reopened"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           gh pr create \
             --base main \
             --head "$BRANCH" \
-            --title "docs: sync and translate English doc changes to Japanese" \
-            --body "Auto-generated by the sync-jp-docs workflow. English documentation changes have been translated to Japanese and synced to the Japanese docs directory. Please review the translations for accuracy."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            --title "$TITLE" \
+            --body "$BODY"
+
+          created_pr="$(find_open_pr_number)"
+          {
+            echo "pr_number=$created_pr"
+            echo "action=created"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Summary
+        shell: bash
         run: |
-          if [ "${{ steps.sync.outputs.synced }}" == "true" ]; then
-            echo "✅ Japanese docs sync and translation PR created"
-          else
+          if [ "${{ steps.sync.outputs.synced }}" != "true" ]; then
             echo "ℹ️ No English doc changes to sync"
+            echo "## JP sync" >> "$GITHUB_STEP_SUMMARY"
+            echo "- No English documentation changes required translation." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
+
+          {
+            echo "- PR action: ${{ steps.pr.outputs.action }}"
+            echo "- PR number: #${{ steps.pr.outputs.pr_number }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "✅ Japanese docs sync PR ${{ steps.pr.outputs.action }} (#${{ steps.pr.outputs.pr_number }})"
