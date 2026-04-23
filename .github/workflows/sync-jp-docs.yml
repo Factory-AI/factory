@@ -70,13 +70,19 @@ jobs:
           fi
           if [ -z "$BEFORE" ]; then
             echo "Cannot determine base commit, skipping."
-            echo "synced=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "synced=false"
+              echo "reason=no_base_commit"
+            } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [ "${{ github.actor }}" = "github-actions[bot]" ]; then
             echo "Skipping JP sync for github-actions[bot] push."
-            echo "synced=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "synced=false"
+              echo "reason=bot_push"
+            } >> "$GITHUB_OUTPUT"
             {
               echo "## JP sync"
               echo "- Skipped: push actor was github-actions[bot]."
@@ -88,7 +94,10 @@ jobs:
 
           if [ -z "$changed_files" ]; then
             echo "No English doc changes detected."
-            echo "synced=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "synced=false"
+              echo "reason=no_english_changes"
+            } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -128,7 +137,10 @@ jobs:
 
           if [ "$jp_targets" -eq 0 ]; then
             echo "No Japanese docs targets were generated."
-            echo "synced=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "synced=false"
+              echo "reason=no_jp_targets"
+            } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -189,7 +201,10 @@ jobs:
           git add docs/jp/
           if git diff --cached --quiet; then
             echo "No Japanese docs changes to commit."
-            echo "synced=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "synced=false"
+              echo "reason=no_jp_changes"
+            } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -204,6 +219,7 @@ jobs:
             echo "branch=$BRANCH"
             echo "title=$TITLE"
             echo "synced=true"
+            echo "reason=synced"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upsert PR with synced docs
@@ -281,9 +297,30 @@ jobs:
         shell: bash
         run: |
           if [ "${{ steps.sync.outputs.synced }}" != "true" ]; then
-            echo "ℹ️ No English doc changes to sync"
+            reason="${{ steps.sync.outputs.reason }}"
             echo "## JP sync" >> "$GITHUB_STEP_SUMMARY"
-            echo "- No English documentation changes required translation." >> "$GITHUB_STEP_SUMMARY"
+            case "$reason" in
+              bot_push)
+                echo "ℹ️ Skipping JP sync for github-actions[bot] push"
+                echo "- Skipped: push actor was github-actions[bot]." >> "$GITHUB_STEP_SUMMARY"
+                ;;
+              no_jp_changes)
+                echo "ℹ️ English docs changed, but no JP updates were needed"
+                echo "- English docs changed, but Droid produced no Japanese doc edits." >> "$GITHUB_STEP_SUMMARY"
+                ;;
+              no_jp_targets)
+                echo "ℹ️ No JP targets were generated"
+                echo "- English docs changed, but no Japanese target files were derived." >> "$GITHUB_STEP_SUMMARY"
+                ;;
+              no_base_commit)
+                echo "ℹ️ Could not determine base commit for JP sync"
+                echo "- Skipped: could not determine the base commit for diffing English docs." >> "$GITHUB_STEP_SUMMARY"
+                ;;
+              *)
+                echo "ℹ️ No English doc changes to sync"
+                echo "- No English documentation changes required translation." >> "$GITHUB_STEP_SUMMARY"
+                ;;
+            esac
             exit 0
           fi
 
