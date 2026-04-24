@@ -4,6 +4,38 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 23" rss={{ title: "CLI Updates", description: "Fast-mode toggle, Droid Computer improvements, mission artifact validation, and CLI stability fixes" }}>
+  `v0.109.1`
+
+## New features
+
+- **Fast-mode toggle** - Single opt-in toggle to enable fast-mode model variants
+- **Droid Computer registration improvements** - Smoother register/remove flow with better handling of duplicate computer names
+- **Mission artifact validation** - Mission artifacts are now schema-validated on create, edit, and apply-patch
+
+## Improvements
+
+- **Faster Windows worker startup** - Reduced worker startup latency on Windows
+- **Cleaner Ctrl+O transcripts** - Verbose transcript bodies are now hidden for easier reading
+- **Quieter CLI logs** - Reduced noisy log volume during normal use
+- **Mermaid rendering** - Various improvements to Mermaid diagram rendering
+
+## Bug fixes
+
+- **Spec mode approval flow** - Stabilized the approval flow in spec mode
+- **IDE diagnostics on disconnect** - Guarded against errors when the IDE client is disconnected
+- **Background process cleanup** - Background processes are now cleaned up when the CLI exits
+- **Sessions during silent tools** - Sessions are kept alive during silent tool execution
+- **Session tool IDs** - Session `enabledToolIds` are now treated as additive
+- **Secret scanner on large diffs** - Improved secret scanner reliability on large diffs
+- **`/rename` persistence** - `/rename` now persists across daemon sync and refreshes the cloud title (app)
+- **Auto-allow-new toggle** - Toggling auto-allow-new no longer clears every model (app)
+- **Integration modal** - Stabilized the Integration Management modal's height and scrolling (app)
+- **On-demand pagination** - Replaced "Load All" with proper on-demand pagination (app)
+- **GitLab integration reliability** - Fixed an out-of-memory issue in the GitLab integration (app)
+
+</Update>
+
 <Update label="April 22" rss={{ title: "CLI Updates", description: "Consolidated mission files, compute usage on billing pages, and CLI stability fixes" }}>
   `v0.108.0`
 
