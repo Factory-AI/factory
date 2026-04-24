@@ -50,23 +50,13 @@
   background-color: #ffcccc;
 }
 
-/* Restore wider content layout for the current Mintlify Willow theme */
-@media (min-width: 1024px) {
-  #content-area {
-    max-width: none !important;
-    width: 100% !important;
-  }
-
-  #content-area > div:first-child {
-    max-width: none !important;
-    width: 100% !important;
-    background: transparent !important;
-  }
-
-  #content-area > div:first-child > div:first-child {
-    max-width: min(1200px, calc(100vw - 23rem - 19rem)) !important;
-    width: 100% !important;
-  }
+/* Hide Luma's auto-generated top-level tabs nav in favor of explicit navbar.links.
+   Luma renders a <nav> containing <li><a class="link …"> for each tab defined in
+   docs.json. We use navbar.links for the primary header nav, so this suppresses
+   the duplicate row. Identified via the unique `.link` class Luma applies to
+   auto-tab anchors (navbar.links anchors use a `.navbar-link` li wrapper instead). */
+#navbar nav:has(> ul > li > a.link) {
+  display: none !important;
 }
 
 /* Restore a flat page background */
@@ -79,13 +69,16 @@
 }
 
 /* Slightly enlarge and vertically center the Factory logo in the upper-left */
-#sidebar a.select-none {
+#sidebar a.select-none,
+#navbar a.select-none {
   display: inline-flex;
   align-items: center;
 }
 
-#sidebar .nav-logo {
+#sidebar .nav-logo,
+#navbar .nav-logo {
   height: 1.75rem !important;
+  width: auto !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
