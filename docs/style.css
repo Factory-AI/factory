@@ -50,8 +50,17 @@
   background-color: #ffcccc;
 }
 
-/* Restore wider content layout for the current Mintlify Willow theme */
+/* Restore wider content layout for the current Mintlify Luma theme */
 @media (min-width: 1024px) {
+  #sidebar {
+    top: 4rem !important;
+    height: calc(100vh - 4rem) !important;
+  }
+
+  #content-container > div:first-child {
+    padding-top: 1rem !important;
+  }
+
   #content-area {
     max-width: none !important;
     width: 100% !important;
@@ -79,13 +88,55 @@
 }
 
 /* Slightly enlarge and vertically center the Factory logo in the upper-left */
+#navbar a.select-none,
 #sidebar a.select-none {
   display: inline-flex;
   align-items: center;
 }
 
+#navbar a.select-none {
+  height: 100% !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-right: 0 !important;
+}
+
+#navbar button[data-component-part="tabs-dropdown-trigger"] {
+  display: none !important;
+}
+
+#navbar div.h-12:has(> .nav-tabs) {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  #navbar .h-full.relative.flex-1.flex.items-center.gap-x-4.min-w-0 {
+    gap: 0.75rem !important;
+  }
+
+  #navbar div:has(> a.select-none):has(> #localization-select-trigger) {
+    flex: 0 0 auto !important;
+  }
+
+  #navbar div:has(> #search-bar-entry) {
+    flex: 0 0 auto !important;
+    justify-content: flex-start !important;
+  }
+
+  #navbar div:has(> nav.text-sm) {
+    flex: 1 1 auto !important;
+  }
+
+  #search-bar-entry {
+    width: 14rem !important;
+    min-width: 14rem !important;
+  }
+}
+
+#navbar .nav-logo,
 #sidebar .nav-logo {
   height: 1.75rem !important;
+  width: auto !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
