@@ -46,7 +46,3 @@ Use this skill for changes to the public Factory documentation site.
 ## Assets
 
 - [Examples and anti-examples](assets/examples.md)
-
-## Evals
-
-- [Trigger tests](evals/trigger-tests.yaml)
