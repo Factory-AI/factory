@@ -7,8 +7,6 @@ description: >-
   NOT for product-code implementation or private internal source analysis.
 metadata:
   version: '1.0.0'
-user-invocable: true
-disable-model-invocation: false
 ---
 
 # Public docs maintenance
