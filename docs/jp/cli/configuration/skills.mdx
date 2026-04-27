@@ -1,46 +1,45 @@
 ---
-title: "スキル"
-description: Reusable capabilities that your AI agent invokes on demand.
+title: Skills
+description: AIエージェントが必要に応じて呼び出す再利用可能な機能。
 keywords: ['skills', 'capabilities', 'tools', 'workflows', 'expertise', 'reusable', 'invoke', 'skill']
 ---
-スキルは、Droidができることを拡張する**再利用可能な機能**です。指示が書かれた`SKILL.md`ファイルを作成すると、Droidがそれをツールキットに追加します。Droidは関連する場合にスキルを使用するか、`/skill-name`で直接呼び出すことができます。
+Skillsは**再利用可能な機能**で、Droidができることを拡張します。指示を書いた`SKILL.md`ファイルを作成すると、Droidがそれをツールキットに追加します。Droidは関連する場合にスキルを使用するか、`/skill-name`で直接呼び出すこともできます。
 
 <Tip>
-Explore the [skills guides](/guides/skills/frontend-ui-integration) for examples.
+例については[skillsガイド](/jp/guides/skills/frontend-ui-integration)をご覧ください。
 </Tip>
 
 <Note>
-**Custom slash commands have been merged into skills.** A file at `.factory/commands/review.md` and a skill at `.factory/skills/review/SKILL.md` both create `/review` and work the same way. Your existing `.factory/commands/` files keep working. Skills add optional features: a directory for supporting files, frontmatter to [control who can invoke them](#control-who-invokes-a-skill), and the ability for Droids to load them automatically when relevant.
+**カスタムスラッシュコマンドはスキルに統合されました。** `.factory/commands/review.md`のファイルと`.factory/skills/review/SKILL.md`のスキルは、どちらも`/review`を作成し、同じように動作します。既存の`.factory/commands/`ファイルは引き続き機能します。スキルには追加機能があります：サポートファイル用のディレクトリ、[誰が呼び出せるかを制御する](#control-who-invokes-a-skill)フロントマター、そしてDroidが関連する場合に自動的にロードする機能です。
 </Note>
 
-**主な特徴:**
-- **柔軟な呼び出し** – あなたとDroid の両方がスキルを呼び出せます。`/skill-name`と入力するか、Droidに使用するタイミングを決めさせることができます。
-- **組み合わせ可能** – より大きなワークフローの一部として連鎖させることができます
-- **トークン効率** – 軽量で焦点を絞っており、未使用のツールや繰り返しの指示で肥大化していません
+**主要な特性：**
+- **柔軟な呼び出し** – あなたとDroidの両方がスキルを呼び出せます。`/skill-name`と入力するか、Droidがいつ使用するかを決めるかです。
+- **組み合わせ可能** – より大きなワークフローの一部として連携できます
+- **トークン効率的** – 軽量で集中的、未使用のツールや重複した指示で肥大化していません
 
-**スキルの例:**
-- **ワークフロー** – 段階的な指示（例：「URLに移動し、スクリーンショットを取り、データを抽出する」）
-- **専門知識** – ドメインの知識と慣例（例：「デザインシステムでフロントエンド機能を実装する方法」）
+**スキルには以下があります：**
+- **ワークフロー** – 段階的な指示（例：「URLにナビゲート、スクリーンショット撮影、データ抽出」）
+- **専門知識** – ドメイン知識と慣例（例：「デザインシステムを使ったフロントエンド機能の実装方法」）
 - **両方** – 指示 + ツール + ベストプラクティスをまとめたもの
 
-**スキルの例:**
+**スキルの例：**
 - `browser` – CDPツールでChromeを自動化（ナビゲート、スクリーンショット、JS評価）
-- `linear` – CLIツールでLinearの課題を管理（リスト、ステータス更新、チーム移動）
-- `frontend-ui-integration` – チームの慣例に従った型付きReactフローの実装
+- `linear` – CLIツールでLinearの問題を管理（リスト、ステータス更新、チーム移動）
+- `frontend-ui-integration` – チームの慣例に従って型付きReactフローを実装
 
-## スキルとは何か？
+## スキルとは何ですか？
 
-スキルは以下を含む**ディレクトリ**（例：`.factory/skills/frontend-ui-integration/`）です：
+スキルは**ディレクトリ**（例：`.factory/skills/frontend-ui-integration/`）で、以下を含みます：
 
 - YAMLフロントマターとmarkdown指示を含む`SKILL.md`または`skill.mdx`
 - オプションのサポートファイル（スクリプト、スキーマ、チェックリスト）
 
-各スキルは、解決する問題、期待する入力、成功の姿を定義します。Droidは現在のタスクに適用される場合、適合するスキルを自動的に呼び出します。
+各スキルは解決する問題、期待する入力、成功の定義を定義します。Droidは現在のタスクに適用される場合、マッチするスキルを自動的に呼び出します。
 
 ## スキルファイル形式
 
-スキルはYAMLフロントマターを持つMarkdownで定義されます。小さく焦点を絞ったスキルは、短い`SKILL.md`だけで済みます：
-
+スキルはYAMLフロントマター付きのMarkdownで定義されます。小さく集中したスキルは、短い`SKILL.md`だけでも構いません：
 ```md
 ---
 name: summarize-diff
@@ -55,29 +54,27 @@ description: Summarize the staged git diff in 3–5 bullets. Use when the user a
 2. Summarize the changes in 3–5 bullets, focusing on user-visible behavior.
 3. Call out any migrations, risky areas, or tests that should be run.
 ```
+追加のフロントマター項目を含めて動作を制御することもできます。利用可能なすべてのオプションについては、[フロントマターリファレンス](#frontmatter-reference)をご覧ください。
 
-動作を制御するために、追加のフロントマターフィールドを含めることもできます。利用可能なすべてのオプションについては[Frontmatter reference](#frontmatter-reference)を参照してください。
+## スキルが存在する場所
 
-## スキルの保存場所
-
-スキルは、少数の既知の場所から発見されます：
+スキルは、よく知られた少数の場所から検出されます：
 
 | スコープ         | 場所                            | 目的                                                                 |
 | ------------- | ----------------------------------- | ----------------------------------------------------------------------- |
-| **ワークスペース** | `<repo>/.factory/skills/`           | チームメートと共有するプロジェクトスキル；gitにチェックイン。                 |
-| **個人**  | `~/.factory/skills/`                | マシン上でプロジェクト間を移動する個人的なスキル。         |
-| **互換性** | `<repo>/.agent/skills/`         | `.agent`フォルダ慣例との互換性のために発見。          |
+| **ワークスペース** | `<repo>/.factory/skills/`           | チームメイトと共有するプロジェクトスキル；gitにチェックイン。                 |
+| **個人**  | `~/.factory/skills/`                | マシン上のプロジェクト間で共有される個人スキル。         |
+| **互換性** | `<repo>/.agent/skills/`         | `.agent`フォルダ規約との互換性のために検出。          |
 
-各**スキル**は、これらのルートの下の独自のディレクトリに配置されます：
+各**スキル**は、これらのルートのいずれかの下で独自のディレクトリに存在します：
 
-- ワークスペース：`<repo>/.factory/skills/<skill-name>/SKILL.md`
-- 個人：`~/.factory/skills/<skill-name>/SKILL.md`
+- ワークスペース: `<repo>/.factory/skills/<skill-name>/SKILL.md`
+- 個人: `~/.factory/skills/<skill-name>/SKILL.md`
 
-大きなmonorepoでは、以下のどちらかを選択できます：
+大規模なモノレポでは、以下のいずれかを選択できます：
 
 - ルートに**単一の共有**スキルフォルダを保持：
-
-  ```text
+```text
   .factory/skills/
     frontend/
       SKILL.md
@@ -86,10 +83,8 @@ description: Summarize the staged git diff in 3–5 bullets. Use when the user a
     data-warehouse-querying/
       SKILL.md
   ```
-
-- または**プロジェクト毎**の`.factory`フォルダを追加し、スキルを各サブプロジェクトと一緒に配置：
-
-  ```text
+  - または**プロジェクトごとに**`.factory`フォルダを追加して、スキルを各サブプロジェクトと一緒に配置します：
+```text
   services/payments/.factory/skills/
     payments-service/
       SKILL.md
@@ -97,13 +92,13 @@ description: Summarize the staged git diff in 3–5 bullets. Use when the user a
     dashboard-ui/
       SKILL.md
   ```
+  プロジェクトスキルは、エンジニアリング組織内で機能を共有・標準化するための主要な方法です。個人スキルは、個人のワークフローや実験に最適です。
 
-プロジェクトスキルは、エンジニアリング組織内で機能を共有し標準化する主要な方法です；個人スキルは個人のワークフローや実験に理想的です。
+<a id="frontmatter-reference"></a>
 
-## フロントマターリファレンス
+## Frontmatter リファレンス
 
-スキルは`SKILL.md`ファイルの上部で`---`マーカー間のYAMLフロントマターフィールドをサポートします：
-
+スキルは、`SKILL.md` ファイルの先頭にある `---` マーカー間でYAML frontmatter フィールドをサポートします：
 ```yaml
 ---
 name: my-skill
@@ -114,23 +109,24 @@ disable-model-invocation: false
 
 Your skill instructions here...
 ```
-
 | フィールド                      | 必須    | デフォルト | 説明                                                                                                                                           |
 | :------------------------- | :---------- | :------ | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                     | いいえ          | ディレクトリ名 | スキルの表示名。小文字、数字、ハイフンのみ。                    |
-| `description`              | 推奨 | —       | スキルの機能と使用タイミング。Droidがスキルを適用するタイミングを決めるために使用。 |
-| `user-invocable`           | いいえ          | `true`  | `false`に設定すると`/`スラッシュコマンドメニューから隠します。ユーザーが直接呼び出すべきでないバックグラウンド知識に使用。 |
-| `disable-model-invocation` | いいえ          | `false` | `true`に設定するとDroidがこのスキルを自動読み込みしません。`/skill-name`で手動でトリガーしたいワークフローに使用。 |
+| `name`                     | いいえ          | ディレクトリ名 | スキルの表示名。小文字、数字、ハイフンのみ使用可能。                    |
+| `description`              | 推奨 | —       | スキルが何をするか、いつ使用するかの説明。Droidはこれを使ってスキルを適用するタイミングを決定する。 |
+| `user-invocable`           | いいえ          | `true`  | `/`スラッシュコマンドメニューから隠すには`false`に設定。ユーザーが直接呼び出すべきでないバックグラウンド知識に使用。 |
+| `disable-model-invocation` | いいえ          | `false` | Droidがこのスキルを自動的にロードするのを防ぐには`true`に設定。`/skill-name`で手動でトリガーしたいワークフローに使用。 |
 
-## スキルを呼び出せる人の制御
+<a id="control-who-invokes-a-skill"></a>
 
-デフォルトでは、あなたとDroidの両方が任意のスキルを呼び出せます。`/skill-name`と入力して直接呼び出すことができ、Droidは会話に関連する場合に自動的に読み込めます。2つのフロントマターフィールドでこれを制限できます：
+## スキルを呼び出すユーザーの制御
 
-- **`disable-model-invocation: true`**: あなただけがスキルを呼び出せます。`/deploy`や`/send-notification`のような副作用があるワークフローや、タイミングを制御したいワークフローに使用します。コードが準備できて見えるからといって、Droidがデプロイを決定することは望ましくありません。
+デフォルトでは、あなたもDroidも任意のスキルを呼び出すことができます。`/skill-name`と入力して直接呼び出すことができ、Droidは会話に関連する場合に自動的にロードできます。2つのフロントマターフィールドでこれを制限できます：
 
-- **`user-invocable: false`**: Droidだけがスキルを呼び出せます。コマンドとして実行可能でないバックグラウンド知識に使用します。`legacy-system-context`スキルは古いシステムの動作を説明します。Droidは関連する場合にこれを知っているべきですが、`/legacy-system-context`はユーザーが取る意味のあるアクションではありません。
+- **`disable-model-invocation: true`**: あなただけがスキルを呼び出せます。副作用があるワークフローや、`/deploy`や`/send-notification`のようにタイミングを制御したいワークフローに使用します。コードが準備できているように見えるからといってDroidがデプロイを決定するのは望ましくありません。
 
-### 呼び出しサマリー
+- **`user-invocable: false`**: Droidのみがスキルを呼び出せます。コマンドとして実行可能でないバックグラウンド知識に使用します。`legacy-system-context`スキルは古いシステムの動作を説明します。Droidは関連する場合にこれを知っているべきですが、`/legacy-system-context`はユーザーが実行する意味のあるアクションではありません。
+
+### 呼び出しの概要
 
 | フロントマター                      | ユーザーが`/invoke`可能 | Droidが呼び出し可能 |
 | :------------------------------- | :----------------- | :--------------- |
@@ -141,202 +137,188 @@ Your skill instructions here...
 ## クイックスタート
 
 <Steps>
-  <Step title="Create a skill folder">
-    Under your repo, create a directory in `.factory/skills/`, for example
-    `.factory/skills/frontend-ui-integration/`.
+  <Step title="スキルフォルダを作成">
+    リポジトリ内で、`.factory/skills/`にディレクトリを作成します。例：
+    `.factory/skills/frontend-ui-integration/`
   </Step>
-  <Step title="Add SKILL.md or skill.mdx">
-    Inside the folder, create `SKILL.md` or `skill.mdx` with YAML frontmatter
-    (`name`, `description`) and markdown instructions that define the
-    capability, inputs, and success criteria.
+  <Step title="SKILL.mdまたはskill.mdxを追加">
+    フォルダ内に、YAMLフロントマター（`name`、`description`）と
+    機能、入力、成功基準を定義するマークダウン指示を含む
+    `SKILL.md`または`skill.mdx`を作成します。
   </Step>
-  <Step title="Add supporting files (optional)">
-    Co-locate any types, schemas, or checklists the Droid should use when the
-    skill is active (for example `types.ts`, `schemas/`, or
-    `rollout-checklist.md`).
+  <Step title="サポートファイルを追加（オプション）">
+    スキルがアクティブな時にDroidが使用すべき型、スキーマ、
+    またはチェックリストを同じ場所に配置します（例：`types.ts`、
+    `schemas/`、または`rollout-checklist.md`）。
   </Step>
-  <Step title="Restart and use">
-    Restart `droid` or your integration so it rescans skills, then describe
-    your task normally. The Droid will automatically invoke matching skills
-    when they apply.
+  <Step title="再起動して使用">
+    `droid`またはインテグレーションを再起動してスキルを再スキャンし、
+    通常どおりタスクを説明します。Droidは適用可能な場合に
+    マッチングスキルを自動的に呼び出します。
   </Step>
 </Steps>
 
 ## スキルと他の設定の違い
 
-スキルはDroidの動作を形作る他の方法と並行して機能します：
+スキルは、Droidの動作を形成する他の方法と併存します：
 
-- **カスタムDroid** – *どの*モデルとツールを使用し、どの自律レベルで使用するかを定義；これらは完全なエージェント設定です。
-- **レガシースラッシュコマンド**（`.factory/commands/`） – ユーザーが呼び出すマクロで、まだ動作しますがスキルに置き換えられました。スキルは同じ`/command`機能に加えて、オプションのDroid呼び出しとサポートファイルを提供します。
-- **MCPサーバー** – 外部システム（API、データベース、SaaSツール）をツールとして公開；これらはリソースの*接続*に関するもので、ワークフローのエンコーディングではありません。
+- **カスタムドロイド** – *どの*モデルとツールを使用し、どのレベルの自律性で使用するかを定義；完全なエージェント設定です。
+- **レガシースラッシュコマンド**（`.factory/commands/`） – ユーザーが呼び出すマクロで、まだ動作しますが現在はスキルに置き換えられています。スキルは同じ`/command`機能に加え、オプションのDroid呼び出しとサポートファイルを提供します。
+- **MCPサーバー** – 外部システム（API、データベース、SaaSツール）をツールとして公開；リソースの*接続*に関するもので、ワークフローのエンコードではありません。
 
 スキルが異なるのは以下の理由です：
 
-- **作業の実行方法**（エンジニアリングプレイブック）を再利用可能な機能としてパッケージ化
-- **柔軟な呼び出し**をサポート – あなた（`/skill-name`経由）とDroidの両方がトリガーでき、誰が何を呼び出せるかの[fine-grained control](#control-who-invokes-a-skill)
-- **発見可能で組み合わせ可能** – Droidは計画内で複数のスキルを連鎖できます
-- ツール、カスタムDroid、MCPサーバーの上に位置し、それらを安全にオーケストレーション
+- **作業の実行方法**（エンジニアリングプレイブック）を再利用可能な機能としてパッケージ化。
+- **柔軟な呼び出し**をサポート – あなた（`/skill-name`経由）とDroidの両方がトリガーでき、[誰が何を呼び出せるかの細かい制御](#control-who-invokes-a-skill)が可能。
+- **発見可能で組み合わせ可能** – Droidは計画内で複数のスキルを連鎖できる。
+- ツール、カスタムドロイド、MCPサーバーの上に位置して、それらを安全にオーケストレーション可能。
 
 実際には以下のようになります：
 
-- MCPを使用して内部デプロイAPIを公開
-- カスタムDroidを使用してCIで許可されるツール/モデルを定義
-- スキルを使用してそのAPIとDroid設定を使った「カナリアデプロイメントを安全にロールアウトする方法」をエンコード
+- MCPを使用して内部デプロイメントAPIを公開。
+- カスタムドロイドを使用してCI内で許可されるツール/モデルを定義。
+- スキルを使用して「カナリアデプロイメントを安全にロールアウトする方法」をそのAPIとドロイド設定を使ってエンコード。
 
 ## エンタープライズコードベースでスキルが重要な理由
 
-スキルは以下が必要なエンタープライズ環境で特に価値があります：
+スキルは、以下が必要なエンタープライズ環境で特に価値があります：
 
-- Droidが**フロントエンド実装、サービス統合、データクエリ、内部ツール**を実行する方法を標準化
-- **チームの慣例、安全ルール、SLA**を一度エンコードし、プロジェクト間で再利用
-- 自動化を**発見可能、監査可能、共有可能**にする（git経由）、単なる「一つのチャットで起こったこと」ではなく
+- Droidが**フロントエンド実装、サービス統合、データクエリ、内部ツール**をどのように実行するかを標準化。
+- **チーム規約、安全ルール、SLA**を一度エンコードし、プロジェクト間で再利用。
+- 自動化を「一つのチャットで起こったこと」ではなく、gitを介して**発見可能、監査可能、共有可能**にする。
 
-Factoryのためにゼロからスキルを作成するか、他のエージェントのために既に投資した既存のスキルを再利用し、それらをインポートしてDroid設定に配線できます。
+Factoryのためにスキルをゼロから作成したり、他のエージェント用にすでに投資した既存のスキルを再利用して、ドロイド設定にインポートして配線したりできます。
+
 
 # ベストプラクティス
 
 <AccordionGroup>
-  <Accordion title="Keep each skill narrow and outcome-focused">
-    Design skills around a **single responsibility** (e.g., "implement a typed
-    React UI for an existing endpoint"), not "build the whole feature".
-    Define a **crisp success criterion**: what artifacts should exist when the
-    skill finishes (files changed, tests added, docs updated, approvals
-    gathered). Prefer several small skills composed by a Droid over one giant
-    "do everything" skill.
+  <Accordion title="各スキルを狭く結果重視に保つ">
+    **単一責任**を中心にスキルを設計する（例：「既存エンドポイント用の型付きReact UIを実装」）、「機能全体を構築」ではなく。
+    **明確な成功基準**を定義：スキルが完了時にどのような成果物が存在すべきか（変更されたファイル、追加されたテスト、更新されたドキュメント、収集された承認）。
+    一つの巨大な「すべてを実行」スキルよりも、Droidが組み合わせるいくつかの小さなスキルを優先。
   </Accordion>
 
-  <Accordion title="Make inputs explicit and structured">
-    Document required inputs: repo path, services involved, APIs, schemas,
-    feature flag names, etc. Use **structured fields** (JSON snippets, bullet
-    lists, tables) instead of long prose when describing APIs or data models.
-    For security-sensitive workflows, include explicit **"never do"**
-    constraints and escalation conditions.
+  <Accordion title="入力を明示的で構造化されたものにする">
+    必要な入力を文書化：リポジトリパス、関係するサービス、API、スキーマ、機能フラグ名など。
+    APIやデータモデルを説明する際は、長い散文の代わりに**構造化フィールド**（JSONスニペット、箇条書き、表）を使用。
+    セキュリティに敏感なワークフローについては、明示的な**「決して実行しない」**制約とエスカレーション条件を含める。
   </Accordion>
 
-  <Accordion title="Encode team conventions and guardrails">
-    Bake in your **testing, observability, and rollout requirements** so the
-    skill always follows them. Reference your existing **AGENTS.md**, runbooks,
-    and design docs instead of inlining everything. Require **proof
-    artifacts**: tests, screenshots, log queries, or links to dashboards
-    depending on the domain.
+  <Accordion title="チーム規約とガードレールをエンコード">
+    **テスト、観測可能性、ロールアウト要件**を組み込んで、スキルが常にそれらに従うようにする。
+    すべてをインライン化する代わりに、既存の**AGENTS.md**、ランブック、設計ドキュメントを参照。
+    ドメインに応じて**証明成果物**を要求：テスト、スクリーンショット、ログクエリ、またはダッシュボードへのリンク。
   </Accordion>
 
-  <Accordion title="Design for enterprise constraints">
-    Assume **large monorepos, multiple services, and layered approvals**. Be
-    explicit about **which directories** Droids may touch, which
-    languages/frameworks are in-bounds, and which are not. Include guidance for
-    **cross-team dependencies** – when to stub, when to coordinate with
-    another team, and when to stop and ask.
+  <Accordion title="エンタープライズ制約のための設計">
+    **大きなmonorepo、複数のサービス、階層化された承認**を想定。
+    Droidが触れる可能性のある**ディレクトリ**、境界内の言語/フレームワーク、そうでないものを明示。
+    **チーム間依存関係**のガイダンスを含める – いつスタブするか、いつ他のチームと調整するか、いつ停止して質問するか。
   </Accordion>
 
-  <Accordion title="Make skills composable">
-    Prefer **idempotent** skills: safe to rerun on the same branch/PR. Design
-    skills to produce **machine-parseable output** where possible (for example,
-    a short summary block that other skills can consume). Keep skills
-    **stateless** beyond the current branch: no hidden assumptions about prior
-    runs.
+  <Accordion title="スキルを組み合わせ可能にする">
+    **冪等**スキルを優先：同じブランチ/PRで再実行しても安全。
+    可能な限り**機械解析可能な出力**を生成するスキルを設計（例：他のスキルが使用できる短い要約ブロック）。
+    現在のブランチを超えて**ステートレス**なスキルを維持：以前の実行についての隠れた仮定なし。
   </Accordion>
 
-  <Accordion title="Operate with verification and safety">
-    Always include a **"Verification"** section that lists commands Droids
-    must run before completing the skill. Call out **fallbacks** when
-    verification fails (rollback steps, feature flags, or canary paths). For
-    production-adjacent skills, require that Droids **open PRs but never
-    merge** without human review.
+  <Accordion title="検証と安全性を伴う運用">
+    Droidがスキルを完了する前に実行しなければならないコマンドをリストした**「検証」**セクションを常に含める。
+    検証が失敗した場合の**フォールバック**を明記（ロールバック手順、機能フラグ、またはカナリアパス）。
+    本番環境に近いスキルについては、Droidが**PRを開くが人間のレビューなしにマージしない**ことを要求。
   </Accordion>
 </AccordionGroup>
 
+
 ## クックブック
 
-クックブックは、一般的なエンタープライズソフトウェアワークフローを対象とした意見のあるスキルテンプレートを提供します。
+クックブックは、一般的なエンタープライズソフトウェアワークフローを対象とした独断的なスキルテンプレートを提供します。
 
-7つのスキルファミリーに焦点を当てています：
+9つのスキルファミリーに焦点を当てています：
 
-1. **[Frontend implementation skills](/guides/skills/frontend-ui-integration)** – 既存のAPIと統合するUIサーフェスの構築
-2. **[Integration skills for complex codebases](/cli/configuration/skills/service-integration)** – 大きなmonorepoでのサービスの拡張または配線
-3. **[Internal data querying skills](/cli/configuration/skills/data-querying)** – 内部分析またはデータサービスへの安全で監査可能なアクセス
-4. **[Internal tools skills](/cli/configuration/skills/internal-tools)** – 開発者と運用者のワークフローを改善する小さくても堅牢な内部アプリの構築
-5. **[Vibe coding skills](/cli/configuration/skills/vibe-coding)** – 完全なモダンWebアプリケーションをゼロから迅速にプロトタイピングし構築（Lovable/Bolt/v0の代替）
-6. **[AI data analyst skills](/cli/configuration/skills/ai-data-analyst)** – 包括的なデータ分析、可視化、統計モデリング（データアナリストツールの代替）
-7. **[Product management skills](/cli/configuration/skills/product-management)** – PRD、機能分析、PMワークフローの支援（PMツール拡張）
-8. **[Browser automation skills](/cli/configuration/skills/browser)** – CDP経由でChromeを起動し、ライブタブをナビゲートし、DOM状態を評価し、MCPサーバーを実行せずにスクリーンショットまたはセレクターを収集
-
+1. **[フロントエンド実装スキル](/jp/guides/skills/frontend-ui-integration)** – 既存のAPIと統合するUIサーフェスの構築
+2. **[複雑なコードベース用統合スキル](/jp/guides/skills/service-integration)** – 大きなmonorepo内でのサービス拡張や配線
+3. **[内部データクエリスキル](/jp/guides/skills/data-querying)** – 内部分析やデータサービスへの安全で監査可能なアクセス
+4. **[内部ツールスキル](/jp/guides/skills/internal-tools)** – 開発者とオペレーターのワークフローを改善する小さくて堅牢な内部アプリの構築
+5. **[バイブコーディングスキル](/jp/guides/skills/vibe-coding)** – 完全なモダンWebアプリケーションをゼロから迅速にプロトタイピングし構築（Lovable/Bolt/v0の代替）
+6. **[AIデータアナリストスキル](/jp/guides/skills/ai-data-analyst)** – 包括的なデータ分析、視覚化、統計モデリング（データアナリストツールの代替）
+7. **[プロダクトマネジメントスキル](/jp/guides/skills/product-management)** – PRD、機能分析、PMワークフローの支援（PMツールの拡張）
+8. **[ブラウザ自動化スキル](/jp/guides/skills/browser)** – CDP経由でChromeを起動し、ライブタブをナビゲートし、DOM状態を評価し、MCPサーバーを実行せずにスクリーンショットやセレクターを収集
+9. **[自動化QAスキル](/jp/guides/skills/automated-qa)** – 実際のユーザーと同様にアプリケーションをテストするエンドツーエンドの品質保証、視覚的証拠、CI統合、失敗学習付き
 <CardGroup cols={2}>
   <Card
-    title="Frontend UI integration"
-    href="/guides/skills/frontend-ui-integration"
+    title="フロントエンドUI統合"
+    href="/jp/guides/skills/frontend-ui-integration"
     icon="layout"
   >
-    Implement typed, tested frontend flows against existing backend APIs using
-    your design system, routing, and testing conventions.
+    既存のバックエンドAPIに対して、デザインシステム、ルーティング、テスト規約を使用して、型安全でテスト済みのフロントエンドフローを実装します。
   </Card>
   <Card
-    title="Service integration in complex codebases"
-    href="/cli/configuration/skills/service-integration"
+    title="複雑なコードベースでのサービス統合"
+    href="/jp/guides/skills/service-integration"
     icon="layers"
   >
-    Extend or wire backend services in a shared monorepo while respecting
-    ownership boundaries, observability, and rollout requirements.
+    所有権の境界、可観測性、ロールアウト要件を尊重しながら、共有モノレポでバックエンドサービスを拡張または配線します。
   </Card>
   <Card
-    title="Internal data querying"
-    href="/cli/configuration/skills/data-querying"
+    title="内部データクエリ"
+    href="/jp/guides/skills/data-querying"
     icon="database"
   >
-    Safely query internal analytics and data services, producing reproducible
-    queries and shareable analysis artifacts.
+    内部分析およびデータサービスを安全にクエリし、再現可能なクエリと共有可能な分析成果物を生成します。
   </Card>
   <Card
-    title="Internal tools"
-    href="/cli/configuration/skills/internal-tools"
+    title="内部ツール"
+    href="/jp/guides/skills/internal-tools"
     icon="settings"
   >
-    Build or extend internal-facing tools (admin panels, consoles, utilities)
-    with strong RBAC, audit logging, and operational safeguards.
+    強力なRBAC、監査ログ、運用上の安全措置を備えた内部向けツール（管理パネル、コンソール、ユーティリティ）を構築または拡張します。
   </Card>
   <Card
-    title="Vibe coding"
-    href="/cli/configuration/skills/vibe-coding"
+    title="Vibeコーディング"
+    href="/jp/guides/skills/vibe-coding"
     icon="globe"
   >
-    Rapidly prototype and build complete modern web applications from scratch
-    using React, Next.js, Vue, or other frameworks. Local-first alternative to
-    Lovable, Bolt, and v0.
+    React、Next.js、Vue、またはその他のフレームワークを使用して、完全なモダンWebアプリケーションを迅速にプロトタイプ化し、ゼロから構築します。Lovable、Bolt、v0のローカルファースト代替手段。
   </Card>
   <Card
-    title="AI data analyst"
-    href="/cli/configuration/skills/ai-data-analyst"
+    title="AIデータアナリスト"
+    href="/jp/guides/skills/ai-data-analyst"
     icon="chart-line"
   >
-    Perform comprehensive data analysis, statistical modeling, and create
-    publication-quality visualizations using Python and the full data science
-    ecosystem.
+    Pythonと完全なデータサイエンスエコシステムを使用して、包括的なデータ分析、統計モデリングを実行し、出版品質の可視化を作成します。
   </Card>
   <Card
-    title="Product management"
-    href="/cli/configuration/skills/product-management"
+    title="プロダクト管理"
+    href="/jp/guides/skills/product-management"
     icon="clipboard-list"
   >
-    Assist with product management workflows including writing PRDs, analyzing
-    features, synthesizing research, and planning roadmaps.
+    PRD作成、機能分析、調査の統合、ロードマッププランニングを含むプロダクト管理ワークフローを支援します。
   </Card>
   <Card
-    title="Browser automation"
-    href="/cli/configuration/skills/browser"
+    title="ブラウザ自動化"
+    href="/jp/guides/skills/browser"
     icon="browser"
   >
-    Launch Chrome with remote debugging, drive tabs, evaluate DOM state, and
-    capture screenshots or selectors without deploying extra infrastructure.
+    追加のインフラを展開せずに、リモートデバッグでChromeを起動し、タブを駆動し、DOM状態を評価し、スクリーンショットやセレクタを取得します。
+  </Card>
+  <Card
+    title="自動QA"
+    href="/jp/guides/skills/automated-qa"
+    icon="vial"
+  >
+    実際のユーザーと同様にアプリをテストするエンドツーエンド品質保証 -- Web、CLI、APIサーフェス全体で -- 視覚的証拠とCI統合を提供します。
   </Card>
 </CardGroup>
 
-実際には、各スキルフォルダにはエージェントがコアプロンプトテンプレートと一緒に使用する**サポートユーティリティ**も含めることができます。例：
+実際には、各スキルフォルダには、エージェントがコアプロンプトテンプレートと併用する可能性のある**サポートユーティリティ**も含めることができます - 例：
 
 - `SKILL.md`または`skill.mdx` – メインのスキル仕様
-- `references.md` – コードベースに既に存在する型、API、モジュールへのリンクとポインター
-- `schemas/` – スキルによって参照されるJSON/YAMLスキーマまたはOpenAPIスニペット（信頼できるソースのサービスコードではない）
+- `references.md` – あなたのコードベースに既存する型、API、モジュールへのリンクと参照
+- `schemas/` – スキルによって参照されるJSON/YAMLスキーマまたはOpenAPIスニペット（信頼できる情報源のサービスコードではない）
 - `checklists.md` – 再利用可能な検証またはロールアウトチェックリスト
 
-これらの同じ場所に配置されたファイルは、スキルが呼び出されたときに、プロダクションコードを複製または再配置することなく、エージェントが作業する予測可能で構造化されたコンテキストバンドルを提供します。
+これらの併設ファイルにより、プロダクションコードを複製または移転することなく、スキルが呼び出された際にエージェントが作業できる予測可能で構造化されたコンテキストバンドルを提供します。
 
-これらを出発点として使用し、入力、制約、検証手順をあなたのスタックとガバナンス要件に合わせて調整してください。
+これらを出発点として使用し、入力、制約、検証ステップをあなたのスタックとガバナンス要件に合わせて適応させてください。
