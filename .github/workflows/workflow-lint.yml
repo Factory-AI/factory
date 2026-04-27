@@ -21,5 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          cache: false
+
       - name: Run actionlint
-        uses: rhysd/actionlint@v1
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
