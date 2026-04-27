@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup Go
         uses: actions/setup-go@v6
@@ -27,5 +29,19 @@ jobs:
           go-version: stable
           cache: false
 
-      - name: Run actionlint
-        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+      - name: Run actionlint on changed workflows
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          workflow_files=()
+          while IFS= read -r workflow_file; do
+            workflow_files+=("${workflow_file}")
+          done < <(git diff --name-only "${BASE_SHA}" "${HEAD_SHA}" -- '.github/workflows/*.yml' '.github/workflows/*.yaml')
+          if [ "${#workflow_files[@]}" -eq 0 ]; then
+            echo "No workflow files changed."
+            exit 0
+          fi
+          go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 "${workflow_files[@]}"
