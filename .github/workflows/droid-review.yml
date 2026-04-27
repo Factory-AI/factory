@@ -2,7 +2,7 @@ name: Droid Auto Review
 
 on:
   pull_request:
-    types: [opened, ready_for_review, reopened]
+    types: [opened, synchronize, ready_for_review, reopened]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -27,9 +27,32 @@ jobs:
           fetch-depth: 1
 
       - name: Run Droid Auto Review
+        id: droid_review
         uses: Factory-AI/droid-action@main
         with:
           factory_api_key: ${{ secrets.FACTORY_API_KEY }}
           automatic_review: true
           automatic_security_review: true
           allowed_bots: 'dependabot'
+
+      - name: Submit Droid review decision
+        if: steps.droid_review.outcome == 'success'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.droid_review.outputs.github_token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_VALIDATED_PATH: ${{ runner.temp }}/droid-prompts/review_validated.json
+        run: |
+          set -euo pipefail
+          if [ ! -s "${REVIEW_VALIDATED_PATH}" ]; then
+            echo "No validated review artifact found; skipping review decision."
+            exit 0
+          fi
+
+          approved_findings="$(jq '[.results[]? | select(.status == "approved")] | length' "${REVIEW_VALIDATED_PATH}")"
+          if [ "${approved_findings}" -gt 0 ]; then
+            gh pr review "${PR_NUMBER}" --request-changes --body "Droid found ${approved_findings} validated issue(s). See the inline review comments for details." || true
+            exit 0
+          fi
+
+          gh pr review "${PR_NUMBER}" --approve --body "Droid reviewed this diff and found no blocking issues." || true
