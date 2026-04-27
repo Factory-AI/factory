@@ -1,0 +1,36 @@
+name: Docs CI
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'docs/docs.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  mintlify-validate:
+    name: Mintlify validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Validate Mintlify build
+        working-directory: docs
+        run: npx -y mintlify@4.2.529 validate
+
+      - name: Check links and redirects
+        working-directory: docs
+        run: npx -y mintlify@4.2.529 broken-links --check-redirects

@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$FACTORY_PROJECT_DIR\"/.factory/hooks/session_start_context.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Execute",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$FACTORY_PROJECT_DIR\"/.factory/hooks/guard_execute.py",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Execute",
+        "commandRegex": "\\bgh\\s+(?:pr\\s+(?:create|edit|comment|review)|issue\\s+(?:create|edit|comment))\\b",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$FACTORY_PROJECT_DIR\"/.factory/hooks/pr_privacy_guard.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

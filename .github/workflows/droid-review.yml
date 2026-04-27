@@ -12,6 +12,7 @@ jobs:
   droid-review:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write
       pull-requests: write
@@ -30,4 +31,4 @@ jobs:
           factory_api_key: ${{ secrets.FACTORY_API_KEY }}
           automatic_review: true
           automatic_security_review: true
-          allowed_bots: "dependabot"
+          allowed_bots: 'dependabot'
