@@ -66,7 +66,7 @@ def respond(message: str) -> int:
             }
         )
     )
-    return 2
+    return 0
 
 
 def try_shlex(command: str) -> list[str] | None:

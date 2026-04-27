@@ -9,6 +9,11 @@ from pathlib import Path
 
 from _harness_config import load_policy
 
+SHELL_HEREDOC_RE = re.compile(
+    r"(?:^|[;&|]\s*)(?:env\s+(?:\S+=\S+\s+)*)?(?:bash|sh|zsh|fish)\b[^\n]*<<",
+    re.IGNORECASE,
+)
+
 
 def strip_heredocs(command: str) -> str:
     pattern = re.compile(
@@ -24,8 +29,10 @@ def strip_heredocs(command: str) -> str:
 
 
 def sanitize_command(command: str) -> str:
-    without_heredocs = strip_heredocs(command)
-    return re.sub(r"\s+", " ", without_heredocs).strip().lower()
+    command_to_scan = (
+        command if SHELL_HEREDOC_RE.search(command) else strip_heredocs(command)
+    )
+    return re.sub(r"\s+", " ", command_to_scan).strip().lower()
 
 
 def respond(decision: str, reason: str) -> int:
