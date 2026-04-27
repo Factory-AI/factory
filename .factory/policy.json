@@ -1,15 +1,10 @@
 {
-  "repoContext": {
-    "publicRepoNotice": "Treat every committed file as public, including `.factory/**`, `.github/**`, prompts, and docs content.",
-    "previewPolicy": "Do not run `mintlify dev`, `npm run dev`, or preview commands autonomously; previews are human-only.",
-    "statusPolicy": "`mintlify status` depends on local authentication, so avoid it in unattended flows unless the user asked."
-  },
   "executePolicy": {
     "rules": [
       {
         "decision": "deny",
         "patterns": [
-          "\\b(mintlify|mint)\\s+[\\'\\\"]?dev[\\'\\\"]?\\b",
+          "\\b(?:npx\\s+(?:-[\\w-]+\\s+)*|pnpm\\s+dlx\\s+|bunx\\s+)?(?:mintlify|mint)(?:@[^\\s]+)?\\s+[\\'\\\"]?dev[\\'\\\"]?\\b",
           "\\bnpm\\s+run\\s+[\\'\\\"]?(dev|preview)[\\'\\\"]?\\b"
         ],
         "reason": "Mintlify previews are human-only in this repo. Use Mintlify validation or PR previews instead."
@@ -17,7 +12,7 @@
       {
         "decision": "ask",
         "patterns": [
-          "\\b(mintlify|mint)\\s+[\\'\\\"]?login[\\'\\\"]?\\b",
+          "\\b(?:npx\\s+(?:-[\\w-]+\\s+)*|pnpm\\s+dlx\\s+|bunx\\s+)?(?:mintlify|mint)(?:@[^\\s]+)?\\s+[\\'\\\"]?login[\\'\\\"]?\\b",
           "\\bnpm\\s+run\\s+[\\'\\\"]?login[\\'\\\"]?\\b"
         ],
         "reason": "Mintlify login changes local auth state. Only run it when the user explicitly asked for authentication work."
@@ -25,7 +20,7 @@
       {
         "decision": "ask",
         "patterns": [
-          "\\b(mintlify|mint)\\s+[\\'\\\"]?status[\\'\\\"]?\\b",
+          "\\b(?:npx\\s+(?:-[\\w-]+\\s+)*|pnpm\\s+dlx\\s+|bunx\\s+)?(?:mintlify|mint)(?:@[^\\s]+)?\\s+[\\'\\\"]?status[\\'\\\"]?\\b",
           "\\bnpm\\s+run\\s+[\\'\\\"]?status[\\'\\\"]?\\b"
         ],
         "reason": "Mintlify status depends on local authentication. Only run it when the user explicitly asked for status or authentication checks."

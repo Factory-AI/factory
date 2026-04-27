@@ -1,5 +1,5 @@
 ---
-name: factory-public-docs
+name: crud-public-docs
 description: >-
   Maintain the public Factory docs repo. Use when editing docs pages, Mintlify
   docs.json navigation or redirects, changelog pages, docs tooling, shared
@@ -18,10 +18,13 @@ Use this skill for changes to the public Factory documentation site.
 ## Workflow
 
 1. Read `AGENTS.md` and the relevant page or `docs/docs.json` section.
-2. Classify the work as page edit, navigation, redirects, changelog, prompt/workflow automation, JP parity, or tooling.
-3. Make the smallest durable change that fixes the docs problem without inventing product claims.
+2. Classify the work as page edit, navigation, redirects, changelog,
+   prompt/workflow automation, JP parity, or tooling.
+3. Make the smallest durable change that fixes the docs problem without
+   inventing product claims.
 4. Keep public-safety constraints in mind for every committed file and PR body.
-5. Run relevant Mintlify validation or PR-preview checks before handoff when docs content changes.
+5. Run relevant Mintlify validation or PR-preview checks before handoff when
+   docs content changes.
 
 ## Page rules
 

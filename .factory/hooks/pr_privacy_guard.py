@@ -13,9 +13,31 @@ from pathlib import Path
 from _harness_config import load_policy
 
 TRIGGER_RE = re.compile(
-    r"\bgh\s+(?:pr\s+(?:create|edit|comment|review)|issue\s+(?:create|edit|comment))\b",
+    (
+        r"\bgh(?:\s+(?:-[A-Za-z][A-Za-z0-9-]*|--[A-Za-z][A-Za-z0-9-]*)"
+        r"(?:[=\s]+[^\s]+)?)*\s+"
+        r"(?:pr\s+(?:create|edit|comment|review)|issue\s+(?:create|edit|comment))\b"
+    ),
     re.IGNORECASE,
 )
+GH_WRITE_COMMANDS = {
+    ("pr", "create"),
+    ("pr", "edit"),
+    ("pr", "comment"),
+    ("pr", "review"),
+    ("issue", "create"),
+    ("issue", "edit"),
+    ("issue", "comment"),
+}
+GH_GLOBAL_FLAGS_WITH_VALUES = {
+    "--config",
+    "--git-protocol",
+    "--hostname",
+    "--jq",
+    "--repo",
+    "--template",
+    "-R",
+}
 FULL_REPO_RE = re.compile(r"\bFactory-AI/(factory-[A-Za-z0-9._-]+)\b", re.IGNORECASE)
 BARE_REPO_RE = re.compile(
     r"`(factory-[a-z0-9._-]+)`(?=[^`\n]{0,80}\b(?:repo|repository|リポ)\b)",
@@ -67,13 +89,41 @@ def extract_flag(tokens: list[str], names: tuple[str, ...]) -> str | None:
     return None
 
 
-def read_body(tokens: list[str]) -> str:
+def is_gh_write_command(tokens: list[str]) -> bool:
+    if not tokens or tokens[0] != "gh":
+        return False
+
+    index = 1
+    while index < len(tokens):
+        token = tokens[index]
+        if token == "--":
+            index += 1
+            break
+        if token in GH_GLOBAL_FLAGS_WITH_VALUES:
+            index += 2
+            continue
+        if any(token.startswith(f"{flag}=") for flag in GH_GLOBAL_FLAGS_WITH_VALUES):
+            index += 1
+            continue
+        if token.startswith("-"):
+            index += 1
+            continue
+        break
+
+    if index + 1 >= len(tokens):
+        return False
+    return (tokens[index], tokens[index + 1]) in GH_WRITE_COMMANDS
+
+
+def read_body(tokens: list[str]) -> str | None:
     body_file = extract_flag(tokens, ("-F", "--body-file"))
     if body_file:
+        if body_file == "-":
+            return None
         try:
             return Path(body_file).expanduser().read_text()
         except OSError:
-            return ""
+            return None
     return extract_flag(tokens, ("-b", "--body")) or ""
 
 
@@ -125,8 +175,17 @@ def main() -> int:
     tokens = try_shlex(command)
     if tokens is None:
         return 0
+    if not is_gh_write_command(tokens):
+        return 0
 
-    text_to_scan = f"{read_title(tokens)}\n{read_body(tokens)}"
+    body = read_body(tokens)
+    if body is None:
+        return respond(
+            "BLOCKED by pr-privacy-guard: PR/issue body file could not be scanned. "
+            "Use --body or a readable --body-file."
+        )
+
+    text_to_scan = f"{read_title(tokens)}\n{body}"
     if not text_to_scan.strip():
         return 0
 

@@ -3,7 +3,8 @@
 ## Good examples
 
 - `Use MCP servers to connect Droid to tools that expose Model Context Protocol.`
-- `Admins approve models at the organization level; members inherit those model access rules in Droid sessions.`
+- Admins approve models at the organization level; members inherit those model
+  access rules in Droid sessions.
 - Run Mintlify broken-link checks after changing redirects or cross-links.
 
 ## Anti-Examples

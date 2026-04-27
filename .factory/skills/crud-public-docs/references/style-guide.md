@@ -4,7 +4,8 @@
 
 Start with the reader's task or the product mechanism.
 
-- Good: `Use Droid Exec to run Droid from CI, scripts, and other non-interactive automation.`
+- Good: Use Droid Exec to run Droid from CI, scripts, and other non-interactive
+  automation.
 - Bad: `This guide walks you through Droid Exec.`
 
 Avoid these openers unless the document surface itself is the subject:
@@ -17,7 +18,8 @@ Avoid these openers unless the document surface itself is the subject:
 
 ## Product language
 
-- Use exact shipped names: `Droid`, `Droid Exec`, `Desktop App`, `MCP servers`, `Droid Shield`, `Factory API key`.
+- Use exact shipped names: `Droid`, `Droid Exec`, `Desktop App`,
+  `MCP servers`, `Droid Shield`, `Factory API key`.
 - Say what a control changes. Prefer `restrict commands` over `manage policy`.
 - Distinguish admin configuration from end-user behavior.
 - Do not invent roadmap claims, metrics, customer proof, or certifications.

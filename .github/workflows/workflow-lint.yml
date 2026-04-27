@@ -26,7 +26,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version: stable
+          go-version: '1.24.x'
           cache: false
 
       - name: Run actionlint on changed workflows
@@ -39,7 +39,7 @@ jobs:
           workflow_files=()
           while IFS= read -r workflow_file; do
             workflow_files+=("${workflow_file}")
-          done < <(git diff --name-only "${BASE_SHA}" "${HEAD_SHA}" -- '.github/workflows/*.yml' '.github/workflows/*.yaml')
+          done < <(git diff --name-only --diff-filter=ACMR "${BASE_SHA}" "${HEAD_SHA}" -- '.github/workflows/*.yml' '.github/workflows/*.yaml')
           if [ "${#workflow_files[@]}" -eq 0 ]; then
             echo "No workflow files changed."
             exit 0
