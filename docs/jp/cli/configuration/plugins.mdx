@@ -1,61 +1,58 @@
 ---
-title: "プラグイン"
-description: Extend Droid with shareable packages of skills, commands, and tools.
+title: Plugins
+description: Droidをスキル、コマンド、ツールの共有可能なパッケージで拡張する。
 keywords: ['plugins', 'extensions', 'marketplace', 'skills', 'commands', 'mcp', 'shareable']
 ---
 
 プラグインを使用すると、プロジェクトやチーム間で共有できるカスタム機能でDroidを拡張できます。プラグインは、スキル、スラッシュコマンド、エージェント、MCPサーバーを単一の配布可能なパッケージにバンドルします。
 
-## プラグインとは何ですか？
+## プラグインとは？
 
-プラグインは、マニフェストファイル（`.factory-plugin/plugin.json`）と、スキル、コマンド、エージェントなどのオプションコンポーネントを含むディレクトリです。`.factory/` でのスタンドアロン設定とは異なり、プラグインは共有と配布のために設計されています。
+プラグインは、マニフェストファイル（`.factory-plugin/plugin.json`）とスキル、コマンド、エージェントなどのオプションコンポーネントを含むディレクトリです。`.factory/`内のスタンドアロン設定とは異なり、プラグインは共有と配布を目的として設計されています。
 
 **プラグインコンポーネント:**
 
-| コンポーネント | 目的 | 呼び出し方法 |
+| コンポーネント | 目的 | 呼び出し |
 |-----------|---------|------------|
 | **スキル** | 指示とツールを含む再利用可能な機能 | タスクに基づいてモデルが自動的に呼び出し |
-| **コマンド** | 特定のワークフロー用のスラッシュコマンド | `/command-name` を介してユーザーが呼び出し |
+| **コマンド** | 特定のワークフロー用のスラッシュコマンド | `/command-name`でユーザーが呼び出し |
 | **エージェント** | 特殊化されたサブエージェント定義 | Taskツールを介して呼び出し |
-| **フック** | ライフサイクルイベントハンドラー | マッチするイベントで自動実行 |
-| **MCPサーバー** | 外部ツール統合 | プラグインがアクティブな時にツールとして利用可能 |
+| **フック** | ライフサイクルイベントハンドラー | 一致するイベント時に自動 |
+| **MCPサーバー** | 外部ツール統合 | プラグインがアクティブな際にツールとして利用可能 |
 
-## プラグインとスタンドアロン設定をいつ使うか
+## プラグイン vs スタンドアロン設定を使用するタイミング
 
 | アプローチ | 最適な用途 |
 |----------|----------|
-| **スタンドアロン** （`.factory/` ディレクトリ） | 個人的なワークフロー、プロジェクト固有のカスタマイズ、迅速な実験 |
-| **プラグイン** | チームメートとの共有、コミュニティへの配布、バージョン管理されたリリース、プロジェクト間での再利用 |
+| **スタンドアロン**（`.factory/`ディレクトリ） | 個人的なワークフロー、プロジェクト固有のカスタマイズ、クイック実験 |
+| **プラグイン** | チームメイトとの共有、コミュニティへの配布、バージョン管理されたリリース、プロジェクト間での再利用 |
 
-迅速な反復のために `.factory/` でスタンドアロン設定から始め、共有する準備ができたらプラグインに変換してください。
+迅速な反復のためには`.factory/`でのスタンドアロン設定から始め、共有する準備ができたらプラグインに変換してください。
 
-## プラグインの管理
+## プラグイン管理
 
 Droidはプラグインを管理する2つの方法を提供します：
 
-### 対話式UI（推奨）
+### インタラクティブUI（推奨）
 
-`/plugins` スラッシュコマンドを使用してプラグインマネージャーを開きます：
-
+`/plugins`スラッシュコマンドを使用してプラグインマネージャーを開きます：
 ```
 /plugins
 ```
-
-これによりタブ付きインターフェースが開きます：
-- **ブラウズ** - 登録されたマーケットプレイスからプラグインを表示・インストール
-- **インストール済み** - インストール済みプラグインを管理（情報表示、更新、アンインストール）
-- **マーケットプレイス** - マーケットプレイスの追加、更新、削除
+これはタブ形式のインターフェイスが開きます：
+- **Browse** - 登録されたマーケットプレイスからプラグインを表示・インストール
+- **Installed** - インストール済みプラグインを管理（情報表示、更新、アンインストール）
+- **Marketplaces** - マーケットプレイスの追加、更新、削除
 
 **ナビゲーション:**
-- 左/右矢印：タブ間の切り替え
-- 上/下矢印：タブ内でのナビゲート
-- Enter：選択/確認
-- Escape：戻る、または閉じる
+- 左/右矢印: タブ間の切り替え
+- 上/下矢印: タブ内のナビゲーション
+- Enter: 選択/確認
+- Escape: 戻る、または閉じる
 
-### CLIコマンド（スクリプト用）
+### CLI コマンド（スクリプト用）
 
-自動化のために、シェルからCLIコマンドを使用してください（スラッシュコマンドとしてではありません）：
-
+自動化には、シェルからCLI コマンドを使用してください（スラッシュコマンドではありません）：
 ```bash
 # Marketplace management
 droid plugin marketplace add <url>
@@ -69,13 +66,11 @@ droid plugin uninstall <plugin@marketplace> [--scope user|project]
 droid plugin update [plugin@marketplace] [--scope user|project]
 droid plugin list [--scope user|project]
 ```
-
-プラグインIDは `pluginName@marketplaceName` の形式を使用します（例：`security-guidance@claude-plugins-official`）。
+Plugin IDは`pluginName@marketplaceName`の形式を使用します（例：`security-guidance@claude-plugins-official`）。
 
 ## プラグインの構造
 
 すべてのプラグインは以下のディレクトリ構造に従います：
-
 ```
 my-plugin/
 ├── .factory-plugin/
@@ -90,15 +85,13 @@ my-plugin/
 ├── mcp.json                  # MCP server configs (optional)
 └── README.md                 # Documentation
 ```
-
 <Warning>
-Don't put `commands/`, `skills/`, `droids/`, or `hooks/` inside the `.factory-plugin/` directory. Only `plugin.json` goes inside `.factory-plugin/`. All other directories must be at the plugin root level.
+`commands/`、`skills/`、`droids/`、または `hooks/` を `.factory-plugin/` ディレクトリ内に配置しないでください。`.factory-plugin/` 内に配置するのは `plugin.json` のみです。その他のディレクトリはすべてプラグインのルートレベルに配置する必要があります。
 </Warning>
 
 ### プラグインフック
 
-プラグインは特定のライフサイクルイベントで実行されるフックを含むことができます。`hooks.json` ファイルを含む `hooks/` ディレクトリを追加してください：
-
+プラグインは特定のライフサイクルイベントで実行されるフックを含めることができます。`hooks/` ディレクトリを追加し、`hooks.json` ファイルを配置してください：
 ```
 my-plugin/
 ├── .factory-plugin/
@@ -108,9 +101,7 @@ my-plugin/
 │   └── my-script.sh       # Hook scripts
 └── ...
 ```
-
 **hooks/hooks.json の例:**
-
 ```json
 {
   "PostToolUse": [
@@ -126,13 +117,11 @@ my-plugin/
   ]
 }
 ```
-
-`${DROID_PLUGIN_ROOT}` を使用してプラグインディレクトリ内のファイルを参照してください。この変数はフックが実行される際に実際のプラグインパスに展開されます。詳細は [Hooks reference](/reference/hooks-reference#plugin-hooks) を参照してください。
+`${DROID_PLUGIN_ROOT}`を使用して、プラグインディレクトリ内のファイルを参照します。この変数は、フックが実行される際に実際のプラグインパスに展開されます。詳細については[フック リファレンス](/jp/reference/hooks-reference#plugin-hooks)を参照してください。
 
 ### プラグインマニフェスト
 
-`.factory-plugin/plugin.json` のマニフェストはプラグインのアイデンティティを定義します：
-
+`.factory-plugin/plugin.json`のマニフェストは、プラグインのアイデンティティを定義します：
 ```json
 {
   "name": "my-plugin",
@@ -143,13 +132,12 @@ my-plugin/
   }
 }
 ```
-
 | フィールド | 目的 |
 |-------|---------|
-| `name` | プラグインの一意識別子。 |
-| `description` | ブラウズまたはインストール時にプラグインマネージャーで表示される。 |
-| `version` | セマンティックバージョニングを使用してリリースを追跡。 |
-| `author` | オプション。帰属の表示に役立つ。 |
+| `name` | プラグインの一意識別子 |
+| `description` | プラグインマネージャーでの閲覧やインストール時に表示される |
+| `version` | セマンティックバージョニングを使用してリリースを追跡 |
+| `author` | オプション。帰属表示に役立つ |
 
 ## プラグインスコープ
 
@@ -157,33 +145,32 @@ my-plugin/
 
 | スコープ | 場所 | 可視性 |
 |-------|----------|------------|
-| **ユーザー** | `~/.factory/` | すべてのプロジェクトで利用可能 |
-| **プロジェクト** | `<project>/.factory/` | gitを介してチームメートと共有 |
+| **User** | `~/.factory/` | すべてのプロジェクトで利用可能 |
+| **Project** | `<project>/.factory/` | gitを通じてチームメイトと共有 |
 
 <Note>
-**Org scope**: Plugins enabled via organization managed settings are automatically installed with `org` scope. You cannot manually set org scope.
+**Orgスコープ**: 組織管理設定を通じて有効化されたプラグインは、自動的に`org`スコープでインストールされます。手動でorgスコープを設定することはできません。
 </Note>
 
 プラグインは1つのスコープにのみ存在できます。スコープを変更するには、まずアンインストールしてから再インストールしてください。
 
 ## バージョン追跡
 
-プラグインはセマンティックバージョンではなく、Gitコミットハッシュでバージョン管理されます。プラグインを更新すると、Droidはマーケットプレイスリポジトリから最新のコミットを取得します。
+プラグインはセマンティックバージョンではなく、Gitコミットハッシュによってバージョニングされます。プラグインを更新すると、Droidはマーケットプレイスリポジトリから最新のコミットを取得します。
 
 <Note>
-Version pinning is not supported. Updates always fetch the latest version from the marketplace.
+バージョン固定はサポートされていません。更新では常にマーケットプレイスから最新バージョンを取得します。
 </Note>
 
 ## マーケットプレイス
 
-マーケットプレイスは、ブラウズしてインストールできるプラグインのカタログです。
+マーケットプレイスは、閲覧やインストールが可能なプラグインのカタログです。
 
 ### マーケットプレイスの追加
 
 UI経由：`/plugins` → マーケットプレイスタブ → "新しいマーケットプレイスを追加" → URLを入力
 
 CLI経由：
-
 ```bash
 # From GitHub
 droid plugin marketplace add https://github.com/owner/repo
@@ -194,27 +181,23 @@ droid plugin marketplace add https://gitlab.com/company/plugins.git
 # From local path (for development)
 droid plugin marketplace add /path/to/local/marketplace
 ```
+### マーケットプレースの管理
 
-### マーケットプレイスの管理
+UI経由: `/plugins` → マーケットプレースタブ → マーケットプレースを選択 → アクションを選択 (更新、自動更新を無効化、削除)
 
-UI経由：`/plugins` → マーケットプレイスタブ → マーケットプレイスを選択 → アクションを選択（更新、自動更新を無効化、削除）
-
-CLI経由：
-
+CLI経由:
 ```bash
 droid plugin marketplace list
 droid plugin marketplace update [marketplace-name]
 droid plugin marketplace remove <marketplace-name>
 ```
-
 <Note>
-Removing a marketplace does not uninstall plugins from that marketplace. Installed plugins remain functional from cache.
+マーケットプレイスを削除しても、そのマーケットプレイスからのプラグインはアンインストールされません。インストールされたプラグインはキャッシュから機能し続けます。
 </Note>
 
 ### チームマーケットプレイス
 
-`.factory/settings.json` に追加することで、マーケットプレイスとプラグインの自動インストールを設定できます：
-
+`.factory/settings.json`に追加して、自動マーケットプレイスおよびプラグインインストールを設定します：
 ```json
 {
   "extraKnownMarketplaces": {
@@ -230,73 +213,70 @@ Removing a marketplace does not uninstall plugins from that marketplace. Install
   }
 }
 ```
+Droidが起動すると、自動的に以下を実行します：
+1. `extraKnownMarketplaces`から、まだ登録されていないマーケットプレースを登録
+2. `enabledPlugins`から、まだインストールされていないプラグインをインストール
 
-Droidが開始すると、自動的に：
-1. まだ登録されていない `extraKnownMarketplaces` からのマーケットプレイスを登録
-2. まだインストールされていない `enabledPlugins` からのプラグインをインストール
-
-インストールスコープは設定が定義された場所によって決まります：
-- 組織管理設定 → `org` スコープ
-- ユーザー設定 → `user` スコープ
-- プロジェクト設定 → `project` スコープ
+インストールスコープは設定が定義されている場所によって決まります：
+- 組織管理設定 → `org`スコープ
+- ユーザー設定 → `user`スコープ
+- プロジェクト設定 → `project`スコープ
 
 ## プラグインの発見
 
 ### 公式Factoryプラグイン
 
-Factoryは `Factory-AI/factory-plugins` で厳選されたプラグインを含む公式プラグインマーケットプレイスを維持しています。
+Factoryは`Factory-AI/factory-plugins`で厳選されたプラグインを含む公式プラグインマーケットプレースを管理しています。
 
-`/plugins` UIまたはCLI経由で追加：
-
+`/plugins` UIまたはCLIから追加：
 ```bash
 droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
 ```
-
 **利用可能なプラグイン:**
 
 | プラグイン | 説明 |
 |--------|-------------|
-| **droid-evolved** | 継続的学習のためのスキル：セッションナビゲーション、人間的な文章作成、スキル作成、ビジュアルデザイン、フロントエンドデザイン、ブラウザ自動化 |
+| **[droid-control](/jp/cli/features/droid-control)** | ターミナル、ブラウザ、コンピュータの自動化。デモの記録、動作主張の検証、QAフローの実行。 |
+| **droid-evolved** | 継続学習のためのスキル: セッションナビゲーション、人間による執筆、スキル作成、ビジュアルデザイン、フロントエンドデザイン、ブラウザ自動化 |
 | **security-engineer** | セキュリティレビュー、脅威モデリング、コミットスキャン、脆弱性検証 |
 
-`/plugins` UI（ブラウズタブ）またはCLI経由でインストール：
-
+`/plugins` UIの（Browseタブ）またはCLI経由でインストール:
 ```bash
+droid plugin install droid-control@factory-plugins
 droid plugin install droid-evolved@factory-plugins
 droid plugin install security-engineer@factory-plugins
 ```
-
 ### コミュニティプラグイン
 
 | プラグイン | 説明 | ソース |
 |--------|-------------|--------|
-| **superpowers** | ブレインストーミング、計画、サブエージェント駆動開発を含む完全なソフトウェア開発ワークフロー | `obra/superpowers` |
+| **superpowers** | ブレインストーミング、プランニング、サブエージェント駆動の開発を含む完全なソフトウェア開発ワークフロー | `obra/superpowers` |
 
-### Enterprise Plugin Registry
+### エンタープライズプラグインレジストリ
 
-承認されたプラグインに対する集中制御が必要な組織については、[Enterprise Plugin Registry](/enterprise/enterprise-plugin-registry) を参照してください。これにより以下のことが可能になります：
+承認済みプラグインの集中管理が必要な組織については、[エンタープライズプラグインレジストリ](/jp/enterprise/enterprise-plugin-registry)を参照してください。これにより以下が可能になります：
 
-- 承認されたプラグインのプライベートマーケットプレイスを維持
-- すべてのユーザーに対して必須プラグインを事前インストール
-- チーム、役割、または機能別にプラグインを整理
+- 承認済みプラグインのプライベートマーケットプレイスの維持
+- 全ユーザー向けの必須プラグインの事前インストール
+- チーム、役割、または機能によるプラグインの整理
 
 ### Claude Code互換性
 
-DroidはClaude Code用に構築されたプラグインと互換性があります。使用したいClaude Codeプラグインを見つけた場合、直接インストールできます - プラグイン形式は相互運用可能です。詳細は [Claude Code plugins documentation](https://code.claude.com/docs/en/plugins) を参照してください。
+DroidはClaude Code向けに構築されたプラグインと互換性があります。使用したいClaude Codeプラグインを見つけた場合、直接インストールできます - プラグイン形式は相互運用可能です。詳細については[Claude Codeプラグインドキュメント](https://code.claude.com/docs/en/plugins)を参照してください。
 
 ## 次のステップ
 
 <CardGroup cols={2}>
-  <Card title="Building plugins" href="/guides/building/building-plugins" icon="hammer">
-    Learn how to create your own plugins with skills and commands.
+  <Card title="プラグインの構築" href="/jp/guides/building/building-plugins" icon="hammer">
+    スキルとコマンドを使用して独自のプラグインを作成する方法を学習します。
   </Card>
-  <Card title="Skills" href="/cli/configuration/skills" icon="wand-magic-sparkles">
-    Understand how skills work and how to create them.
+  <Card title="スキル" href="/jp/cli/configuration/skills" icon="wand-magic-sparkles">
+    スキルの動作方法と作成方法を理解します。
   </Card>
-  <Card title="Custom commands" href="/cli/configuration/custom-slash-commands" icon="terminal">
-    Create user-invoked slash commands.
+  <Card title="カスタムコマンド" href="/jp/cli/configuration/custom-slash-commands" icon="terminal">
+    ユーザー呼び出し可能なスラッシュコマンドを作成します。
   </Card>
-  <Card title="Custom Droids" href="/cli/configuration/custom-droids" icon="robot">
-    Create specialized subagents for your plugins.
+  <Card title="カスタムDroid" href="/jp/cli/configuration/custom-droids" icon="robot">
+    プラグイン用の専用サブエージェントを作成します。
   </Card>
 </CardGroup>

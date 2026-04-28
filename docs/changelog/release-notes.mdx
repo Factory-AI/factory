@@ -4,6 +4,76 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 26" rss={{ title: "CLI Updates", description: "Auto-fallback to Droid Core, per-tool MCP autonomy overrides, desktop system theming, and CLI stability fixes" }}>
+  `v0.109.3`
+
+## New features
+
+- **Auto-fallback to Droid Core** - Sessions that hit usage limits now automatically fall back to Droid Core when your overage preference is set to Droid Core
+- **Per-tool MCP autonomy overrides** - New `mcpAutonomyOverrides` setting lets you configure autonomy levels for individual MCP tools
+- **System theming** - Desktop app now follows your system theme (app)
+- **New desktop updater** - Improved auto-update flow for the desktop app (app)
+- **Per-channel Slack auto-run model** - Choose which model is used for each Slack auto-run channel (app)
+
+## Improvements
+
+- **Larger Droid Shield buffer** - Increased Droid Shield max buffer from 20MB to 64MB to handle larger outputs
+- **Faster hibernation detection** - Droid Computer hibernation is now detected more quickly
+- **Sorted model list** - CLI model list is now sorted by release date, newest first
+- **Cleaner MCP tool parameters** - MCP tool parameters show truncated JSON instead of `[object Object]`
+
+## Bug fixes
+
+- **Lost subagent output** - Fixed an issue where subagent output could be lost
+- **MCP tool selection refresh** - Tool selection now refreshes after MCP updates
+- **Slash command initialization** - Slash commands now wait for initialization to finish before running
+- **Spec mode approval comments** - Spec approval comments now work in both live and resumed sessions
+- **`--auto` level in exec runs** - `--auto` level is now applied in exec runs even when the session inherits spec mode
+- **Tool confirmation state** - Restored correct tool execution state after a tool-confirmation approval
+- **Settings theme control alignment** - Fixed alignment of the settings theme control
+- **Stray hover glyphs** - Removed unintended active hover glyphs
+- **Windows worker reliability** - Added retries for Windows Job Object spawn failures
+- **Settings folder watcher** - Switched to native recursive watching for the settings folder
+- **Cron schedules in UTC** - Scheduled missions now evaluate cron expressions in UTC
+- **Clearer paywall errors on computer routes** - Computer routes now return a clear error when accessed from a non-paying organization
+- **Slack multi-turn delegation** - Fixed multi-turn delegation when running from Slack
+- **Web auth timeout fallback** - Fixed an auth timeout fallback in the web app (app)
+- **App UI polish** - Fixed various spacing, color, and chevron issues (app)
+
+</Update>
+
+<Update label="April 23" rss={{ title: "CLI Updates", description: "Fast-mode toggle, Droid Computer improvements, mission artifact validation, and CLI stability fixes" }}>
+  `v0.109.1`
+
+## New features
+
+- **Fast-mode toggle** - Single opt-in toggle to enable fast-mode model variants
+- **Droid Computer registration improvements** - Smoother register/remove flow with better handling of duplicate computer names
+- **Mission artifact validation** - Mission artifacts are now schema-validated on create, edit, and apply-patch
+
+## Improvements
+
+- **Faster Windows worker startup** - Reduced worker startup latency on Windows
+- **Cleaner Ctrl+O transcripts** - Verbose transcript bodies are now hidden for easier reading
+- **Quieter CLI logs** - Reduced noisy log volume during normal use
+- **Mermaid rendering** - Various improvements to Mermaid diagram rendering
+
+## Bug fixes
+
+- **Spec mode approval flow** - Stabilized the approval flow in spec mode
+- **IDE diagnostics on disconnect** - Guarded against errors when the IDE client is disconnected
+- **Background process cleanup** - Background processes are now cleaned up when the CLI exits
+- **Sessions during silent tools** - Sessions are kept alive during silent tool execution
+- **Session tool IDs** - Session `enabledToolIds` are now treated as additive
+- **Secret scanner on large diffs** - Improved secret scanner reliability on large diffs
+- **`/rename` persistence** - `/rename` now persists across daemon sync and refreshes the cloud title (app)
+- **Auto-allow-new toggle** - Toggling auto-allow-new no longer clears every model (app)
+- **Integration modal** - Stabilized the Integration Management modal's height and scrolling (app)
+- **On-demand pagination** - Replaced "Load All" with proper on-demand pagination (app)
+- **GitLab integration reliability** - Fixed an out-of-memory issue in the GitLab integration (app)
+
+</Update>
+
 <Update label="April 22" rss={{ title: "CLI Updates", description: "Consolidated mission files, compute usage on billing pages, and CLI stability fixes" }}>
   `v0.108.0`
 

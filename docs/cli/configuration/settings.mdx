@@ -36,7 +36,7 @@ Local overrides merge on top of the corresponding `settings.json` at the same le
 
 | Setting                    | Options                                                                                                                                                                                                                                                                  | Default                       | Description                                                                |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------------------- |
-| `model`                    | `opus`, `opus-4-7`, `opus-4-6`, `opus-4-6-fast`, `sonnet`, `sonnet-4-6`, `gpt-5.4`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex`, `haiku`, `gemini-3.1-pro`, `gemini-3-flash`, `droid-core`, `glm-5`, `glm-5.1`, `kimi-k2.5`, `kimi-k2.6`, `minimax-m2.7`, `custom-model` | `opus`                        | The default AI model used by droid                                         |
+| `model`                    | `opus`, `opus-4-7`, `opus-4-6`, `opus-4-6-fast`, `sonnet`, `sonnet-4-6`, `gpt-5.5`, `gpt-5.5-fast`, `gpt-5.5-pro`, `gpt-5.4`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex`, `haiku`, `gemini-3.1-pro`, `gemini-3-flash`, `droid-core`, `glm-5.1`, `kimi-k2.5`, `kimi-k2.6`, `minimax-m2.7`, `custom-model` | `opus`                        | The default AI model used by droid                                         |
 | `reasoningEffort`          | `off`, `none`, `low`, `medium`, `high` (availability depends on the model)                                                                                                                                                                                               | Model-dependent default       | Controls how much structured thinking the model performs.                  |
 | `autonomyMode`             | `normal`, `spec`, `auto-low`, `auto-medium`, `auto-high`                                                                                                                                                                                                                 | `normal`                      | Sets the default autonomy mode when starting droid.                        |
 | `cloudSessionSync`         | `true`, `false`                                                                                                                                                                                                                                                          | `true`                        | Mirror CLI sessions to Factory web.                                        |
@@ -64,7 +64,10 @@ Choose the default AI model that powers your droid:
 - **`opus-4-6-fast`** - Claude Opus 4.6 Fast, tuned for faster responses
 - **`sonnet`** - Claude Sonnet 4.5, balanced cost and quality
 - **`sonnet-4-6`** - Claude Sonnet 4.6, Max reasoning at the Sonnet price point
-- **`gpt-5.4`** - GPT-5.4, latest OpenAI model with 922K context and Extra High reasoning
+- **`gpt-5.5`** - GPT-5.5, latest OpenAI flagship model with 1M context and Extra High reasoning
+- **`gpt-5.5-fast`** - GPT-5.5 on priority service tier, less susceptible to traffic surge
+- **`gpt-5.5-pro`** - GPT-5.5 Pro, higher-capability variant, ideal for research tasks
+- **`gpt-5.4`** - GPT-5.4, previous OpenAI model with 922K context and Extra High reasoning
 - **`gpt-5.2`** - OpenAI GPT-5.2
 - **`gpt-5.2-codex`** - GPT-5.2-Codex, OpenAI coding model with Extra High reasoning
 - **`gpt-5.3-codex`** - GPT-5.3-Codex, latest OpenAI coding model with Extra High reasoning and verbosity support
@@ -72,7 +75,6 @@ Choose the default AI model that powers your droid:
 - **`gemini-3.1-pro`** - Gemini 3.1 Pro
 - **`gemini-3-flash`** - Gemini 3 Flash, fast and cheap (0.2× multiplier)
 - **`droid-core`** - GLM-5.1 open-source model
-- **`glm-5`** - GLM-5 open-source model
 - **`glm-5.1`** - GLM-5.1 open-source model
 - **`kimi-k2.5`** - Kimi K2.5 open-source model with image support
 - **`kimi-k2.6`** - Kimi K2.6 open-source model with image support and optional High reasoning
