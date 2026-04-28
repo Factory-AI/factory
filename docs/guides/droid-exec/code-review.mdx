@@ -97,9 +97,6 @@ The `--full` scan creates a new branch (`droid/security-report-{date}`), generat
 | `automatic_security_review` | `false` | Run security review automatically on every PR |
 | `security_model` | (inherits from `review_model`) | Model for security analysis |
 | `security_severity_threshold` | `medium` | Minimum severity to report: `critical`, `high`, `medium`, `low` |
-| `security_block_on_critical` | `true` | Submit `REQUEST_CHANGES` on critical findings |
-| `security_block_on_high` | `false` | Submit `REQUEST_CHANGES` on high findings |
-| `security_notify_team` | (empty) | GitHub team to @mention on critical findings (e.g., `@org/security-team`) |
 
 ### Scheduled security scans
 
@@ -115,7 +112,7 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: Factory-AI/droid-action@v3
+      - uses: Factory-AI/droid-action@main
         with:
           security_scan_schedule: true
           security_scan_days: 7  # Scan commits from the last 7 days
@@ -214,9 +211,6 @@ Guidelines:
 | `automatic_security_review` | `false` | Run security review on every PR |
 | `security_model` | (from `review_model`) | Override model for security review |
 | `security_severity_threshold` | `medium` | Minimum severity to report |
-| `security_block_on_critical` | `true` | Block PRs on critical findings |
-| `security_block_on_high` | `false` | Block PRs on high findings |
-| `security_notify_team` | (empty) | Team to @mention on critical findings |
 | `security_scan_schedule` | `false` | Enable scheduled full-repo scans |
 | `security_scan_days` | `7` | Days of commits to scan |
 

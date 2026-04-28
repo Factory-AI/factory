@@ -87,9 +87,6 @@ with:
 | `automatic_security_review` | `false` | 全てのPRで自動的にセキュリティレビューを実行 |
 | `security_model` | （`review_model` から継承） | セキュリティ分析用のモデル |
 | `security_severity_threshold` | `medium` | レポートする最小重要度：`critical`、`high`、`medium`、`low` |
-| `security_block_on_critical` | `true` | 重要な発見事項で `REQUEST_CHANGES` を送信 |
-| `security_block_on_high` | `false` | 重大な発見事項で `REQUEST_CHANGES` を送信 |
-| `security_notify_team` | （空） | 重要な発見事項で@メンションするGitHubチーム（例：`@org/security-team`） |
 
 ### スケジュール化されたセキュリティスキャン
 
@@ -104,7 +101,7 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: Factory-AI/droid-action@v3
+      - uses: Factory-AI/droid-action@main
         with:
           security_scan_schedule: true
           security_scan_days: 7  # Scan commits from the last 7 days
@@ -192,9 +189,6 @@ Guidelines:
 | `automatic_security_review` | `false` | すべてのPRでセキュリティレビューを実行 |
 | `security_model` | (`review_model`から) | セキュリティレビュー用のモデルをオーバーライド |
 | `security_severity_threshold` | `medium` | 報告する最小重要度 |
-| `security_block_on_critical` | `true` | 重大な発見時にPRをブロック |
-| `security_block_on_high` | `false` | 高い発見時にPRをブロック |
-| `security_notify_team` | (空) | 重大な発見時に@mentionするチーム |
 | `security_scan_schedule` | `false` | スケジュールされた全リポジトリスキャンを有効化 |
 | `security_scan_days` | `7` | スキャンするコミットの日数 |
 
