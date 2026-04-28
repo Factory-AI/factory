@@ -1,43 +1,215 @@
 ---
-title: Readiness Reports API
-description: エージェント準備状況レポートへプログラムからアクセスするためのREST APIリファレンス。
-keywords: ["api", "readiness reports", "agent readiness", "rest api", "programmatic access"]
+title: "準備状況レポートAPI"
+description: REST API reference for programmatic access to agent readiness reports.
+keywords:
+  [
+    "api",
+    "readiness reports",
+    "agent readiness",
+    "rest api",
+    "programmatic access",
+  ]
 ---
 
-Readiness Reports APIを使用すると、アクセス権のあるリポジトリのエージェント準備状況レポートを取得できます。
+Readiness Reports APIは、組織のエージェント準備状況評価データへのプログラマティックアクセスを提供します。
 
 ---
 
 ## 認証
 
-すべてのリクエストで、`Authorization`ヘッダーにFactory APIキーが必要です。APIキーは[app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)で生成できます。
+すべてのリクエストには`Authorization`ヘッダーにFactory APIキーが必要です：
 
 ```bash
 Authorization: Bearer fk-your-api-key
 ```
 
+APIキーは[app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)で生成してください。
+
+---
+
 ## ベースURL
 
-```text
+```
 https://app.factory.ai
 ```
 
-## Readiness reportの一覧取得
+---
 
-組織のreadiness reportを、あなたがアクセスできるレポートに絞って取得します。
+## エンドポイント
 
-```http
-GET /api/organization/agent-readiness-reports
+### Readiness Reportsの一覧取得
+
+組織の準備状況レポートを取得します。
+
+```
+GET /api/organization/maturity-level-reports
 ```
 
-レポートは、接続済みのSCMアカウントが対象リポジトリにアクセスできる場合、またはレポートを生成したDroidセッションをあなたが作成した場合に返されます。
+#### クエリパラメータ
 
-| Parameter | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `repoId` | string | いいえ | リポジトリIDでレポートを絞り込みます |
-| `limit` | integer | いいえ | 返すレポート数の上限。無効な値はサービス既定値になります。 |
-| `startAfter` | string | いいえ | ページネーション用のレポートIDカーソル |
+| パラメータ    | 型    | 必須 | 説明                                            |
+| :----------- | :------ | :------- | :----------------------------------------------------- |
+| `repoId`     | string  | No       | リポジトリIDでレポートをフィルタ                        |
+| `limit`      | integer | No       | 返すレポートの最大数（正の値である必要があります） |
+| `startAfter` | string  | No       | ページネーションカーソル用のレポートID                        |
 
-<Note>
-  古い連携では`/api/organization/maturity-level-reports`を参照している場合があります。新しい連携では`/api/organization/agent-readiness-reports`を使用してください。
-</Note>
+#### レスポンス
+
+```json
+{
+  "reports": [
+    {
+      "reportId": "550e8400-e29b-41d4-a716-446655440000",
+      "createdAt": 1701792000000,
+      "repoUrl": "https://github.com/org/repo",
+      "apps": {
+        "apps/web": {
+          "description": "Main Next.js application"
+        },
+        "apps/api": {
+          "description": "Backend API service"
+        }
+      },
+      "report": {
+        "lint_config": {
+          "numerator": 2,
+          "denominator": 2,
+          "rationale": "ESLint configured in both applications"
+        },
+        "type_check": {
+          "numerator": 2,
+          "denominator": 2,
+          "rationale": "TypeScript strict mode enabled"
+        }
+      },
+      "commitHash": "abc123def456",
+      "branch": "main",
+      "hasLocalChanges": false,
+      "hasNonRemoteCommits": false,
+      "modelUsed": {
+        "id": "claude-sonnet-4-5",
+        "reasoningEffort": "high"
+      },
+      "droidVersion": "0.30.0"
+    }
+  ]
+}
+```
+
+#### リクエスト例
+
+```bash
+curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limit=10" \
+  -H "Authorization: Bearer fk-your-api-key"
+```
+
+---
+
+## Readiness Reportスキーマ
+
+### Reportオブジェクト
+
+| フィールド                 | 型     | 説明                                                |
+| :-------------------- | :------- | :--------------------------------------------------------- |
+| `reportId`            | string   | レポートの一意識別子（UUID）                    |
+| `createdAt`           | number   | レポートが作成されたUnixタイムスタンプ（ミリ秒） |
+| `repoUrl`             | string   | 評価されたリポジトリURL                          |
+| `apps`                | object   | アプリケーションパスから説明オブジェクトへのマップ            |
+| `report`              | object   | 基準IDから評価結果へのマップ                 |
+| `commitHash`          | string?  | 評価時のGitコミットハッシュ                      |
+| `branch`              | string?  | 評価時のGitブランチ名                      |
+| `hasLocalChanges`     | boolean? | コミットされていない変更が存在したかどうか                        |
+| `hasNonRemoteCommits` | boolean? | プッシュされていないコミットが存在したかどうか                           |
+| `modelUsed`           | object?  | 評価に使用されたモデル設定                    |
+| `droidVersion`        | string?  | レポートを生成したCLIバージョン                      |
+
+### App Descriptionオブジェクト
+
+| フィールド         | 型   | 説明                                    |
+| :------------ | :----- | :--------------------------------------------- |
+| `description` | string | アプリケーションの機能に関する簡潔な説明 |
+
+### Criterion Evaluationオブジェクト
+
+| フィールド         | 型   | 説明                                                                 |
+| :------------ | :----- | :-------------------------------------------------------------------------- |
+| `numerator`   | number | 基準を満たしたサブアプリケーションの数（0からdenominatorまで）         |
+| `denominator` | number | 基準が評価されたサブアプリケーションの数（最低1） |
+| `rationale`   | string | 評価結果の説明                                        |
+
+### Model Usedオブジェクト
+
+| フィールド             | 型   | 説明                                             |
+| :---------------- | :----- | :------------------------------------------------------ |
+| `id`              | string | モデル識別子                                        |
+| `reasoningEffort` | string | 推論労力レベル（`low`、`medium`、`high`、`off`） |
+
+---
+
+## ページネーション
+
+大きな結果セットに対しては、カーソルベースのページネーションを使用してください：
+
+1. 希望する`limit`で初回リクエストを実行
+2. レスポンスの最後のアイテムの`reportId`を取得
+3. そのIDを次のリクエストで`startAfter`として渡す
+
+```bash
+# First page
+curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10"
+
+# Next page (using last reportId from previous response)
+curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10&startAfter=550e8400-e29b-41d4-a716-446655440000"
+```
+
+---
+
+## 使用例
+
+### CI/CD統合
+
+各評価後にレポートを取得することで、時系列での準備状況スコアを追跡：
+
+```bash
+# Get latest report for a specific repository
+curl "https://app.factory.ai/api/organization/maturity-level-reports?repoId=123&limit=1" \
+  -H "Authorization: Bearer $FACTORY_API_KEY"
+```
+
+### カスタムダッシュボード
+
+すべてのレポートを取得し、集約メトリクスを計算することで内部ダッシュボードを構築：
+
+```javascript
+const response = await fetch(
+  "https://app.factory.ai/api/organization/maturity-level-reports",
+  { headers: { Authorization: `Bearer ${apiKey}` } }
+);
+const { reports } = await response.json();
+
+// Calculate average level
+const avgLevel =
+  reports.reduce((sum, r) => sum + calculateLevel(r), 0) / reports.length;
+```
+
+### 自動アラート
+
+準備状況スコアが閾値を下回った際のアラートを設定：
+
+```bash
+# Fetch recent reports and check for regressions
+reports=$(curl -s "https://app.factory.ai/api/organization/maturity-level-reports?limit=50" \
+  -H "Authorization: Bearer $FACTORY_API_KEY")
+
+# Process and alert on regressions...
+```
+
+---
+
+## エラーレスポンス
+
+| ステータス | 説明                |
+| :----- | :------------------------- |
+| `400`  | 無効なリクエストパラメータ |
+| `401`  | APIキーが欠如または無効 |
+| `500`  | 内部サーバーエラー      |
