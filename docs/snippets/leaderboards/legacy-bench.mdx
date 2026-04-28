@@ -1,0 +1,55 @@
+import { BarChart } from '/snippets/leaderboards/bar-chart.jsx'
+
+export const legacyBenchData = [
+  { name: "Factory Droid (GPT-5.3 Codex)", accuracy: 42.5 },
+  { name: "Factory Droid (GPT-5.4)", accuracy: 40.7 },
+  { name: "Codex CLI (GPT-5.4)", accuracy: 40.1 },
+  { name: "Codex CLI (GPT-5.3 Codex)", accuracy: 39.4 },
+  { name: "Factory Droid (Gemini 3.1 Pro)", accuracy: 38.7 },
+  { name: "Gemini CLI (Gemini 3.1 Pro)", accuracy: 36.0 },
+  { name: "Factory Droid (Claude Opus 4.6)", accuracy: 34.6 },
+  { name: "Claude Code (Claude Opus 4.6)", accuracy: 33.0 },
+  { name: "Factory Droid (GLM-5)", accuracy: 32.2 },
+  { name: "Cursor (Composer 2)", accuracy: 31.0 },
+  { name: "Factory Droid (Gemini 3 Flash)", accuracy: 27.2 },
+  { name: "Factory Droid (Kimi K2.5)", accuracy: 16.9 },
+]
+
+Benchmark from [Factory](https://www.factory.ai/news/legacy-bench) measuring AI agent performance on legacy engineering tasks across COBOL, Java 7, BASIC, C89, Fortran, and Assembly.
+
+### Results — Overall Pass Rate
+
+<BarChart data={legacyBenchData} valueKey="accuracy" valueLabel="%" maxValue={100} />
+
+*Last updated: April 2026*
+
+### Methodology
+
+| Stage | Description |
+|-------|-------------|
+| **Task set** | Hundreds of tasks across six legacy language families, with ten representative open samples |
+| **Task format** | Natural language instruction, containerized source environment, reference solution, and hidden verification tests |
+| **Task types** | Bug fixing, implementation, migration, and other legacy engineering work |
+| **Evaluation** | Harbor-compatible tasks requiring agents to understand the specification, produce working code, and pass verification |
+| **Scoring** | Pass rate across hidden tests for 12 model-agent combinations |
+
+### Benchmark Mix
+
+| Language | Share | Example domains |
+|----------|-------|-----------------|
+| **COBOL** | 46% | Financial settlement, payroll processing, insurance claims, telecom billing, VSAM file handling |
+| **Java 7** | 32% | Enterprise middleware, CDR processing, warehouse logistics, binary parsing, EJB patterns |
+| **BASIC** | 6% | Business applications, accounting, data processing |
+| **C89** | 5% | Systems programming, low-level debugging, protocol implementation |
+| **Fortran** | 5% | Scientific computing, numerical methods, physics simulation |
+| **Assembly** | 5% | x86 firmware parsing, protocol decoding, hardware simulation |
+
+Agents score highest on Java 7 bug fixing, where compiler and runtime feedback expose errors. COBOL remains hardest: 31 of the 44 tasks no model solved are COBOL.
+
+<Card title="Legacy-Bench" icon="server" href="https://github.com/factory-ai/legacy-bench">
+  View sample tasks and the evaluation harness on GitHub
+</Card>
+
+<Card title="Read the writeup" icon="newspaper" href="https://www.factory.ai/news/legacy-bench">
+  Legacy-Bench: Can AI Agents Maintain the World's Most Critical Software?
+</Card>

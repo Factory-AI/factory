@@ -1,0 +1,44 @@
+Open-source benchmark from [droid-code-review-evals](https://github.com/droid-code-review-evals/review-droid-benchmark) measuring how well AI models catch real bugs in code review. Evaluates 13 frontier and open-source models across 50 pull requests from 5 large open-source codebases (Sentry, Grafana, Keycloak, Discourse, Cal.com), scored against a manually curated golden set of 167 validated bugs.
+
+### Cost vs. Quality
+
+| Model | Mean F1 | Cost / PR |
+|-------|---------|-----------|
+| **GPT-5.2** | 60.5% | $1.25 |
+| **Claude Opus 4.6** | 59.8% | $3.11 |
+| Claude Sonnet 4.6 | 57.9% | $1.15 |
+| Claude Opus 4.7 | 56.4% | $4.18 |
+| GLM-5.1 | 56.3% | $1.06 |
+| GPT-5.3 Codex | 56.2% | $1.69 |
+| Gemini 3.1 Pro | 52.6% | $2.04 |
+| GPT-5.4 Mini | 52.0% | $0.68 |
+| Kimi K2.5 | 51.9% | $0.41 |
+| Gemini 3 Flash | 50.0% | $0.34 |
+| GPT-5.5 | 47.9% | $5.63 |
+| GPT-5.4 | 47.5% | $2.01 |
+| MiniMax M2.7 | 45.6% | $0.15 |
+
+*Last updated: April 2026*
+
+GPT-5.2 leads on quality at about 40% of the cost of Claude Opus 4.6. Open-source models like Kimi K2.5 and MiniMax M2.7 deliver ~75–86% of GPT-5.2 quality at ~3–8× lower cost per PR, opening the door to multi-pass and ensemble review strategies.
+
+### Methodology
+
+| Stage | Description |
+|-------|-------------|
+| **Test set** | 50 PRs across 5 repos (Sentry, Grafana, Keycloak, Discourse, Cal.com) covering Python, Go, Java, Ruby, and TypeScript |
+| **Golden set** | 167 manually validated bugs (v3) with exact file/line locations and bug-type classifications |
+| **Model evaluation** | Each model reviews every PR via [Droid Action](https://github.com/Factory-AI/droid-action) using a standardized prompt |
+| **LLM judge** | An independent LLM matches model comments to golden comments by semantic equivalence |
+| **Cross-judge validation** | Matches are spot-checked with a second judge to control for grading bias |
+| **F1 calculation** | F1 combines precision (fraction of comments that are real bugs) and recall (fraction of golden bugs caught) |
+| **Multiple runs** | Each model is evaluated over multiple runs to measure consistency |
+| **Outlier exclusion** | Runs that error out or hit token limits are excluded |
+
+<Card title="Review Droid Benchmark" icon="trophy" href="https://github.com/droid-code-review-evals/review-droid-benchmark">
+  View the full methodology, raw results, and scoring scripts on GitHub
+</Card>
+
+<Card title="Read the writeup" icon="newspaper" href="https://www.factory.ai/news/code-review-benchmark">
+  Which Model Reviews Code Best?
+</Card>
