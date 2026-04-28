@@ -1,0 +1,124 @@
+---
+title: Generate a Wiki
+description: Use the /wiki command to generate comprehensive codebase documentation from the CLI.
+keywords: ['wiki', '/wiki', 'generate', 'documentation', 'codebase docs', 'slash command', 'upload', 'github wiki sync']
+---
+
+The `/wiki` command analyzes your repository and generates structured documentation covering architecture, modules, APIs, and conventions. The resulting wiki is uploaded to Factory cloud and optionally synced to your GitHub wiki tab.
+
+## Quick start
+
+<Steps>
+  <Step title="Open a Droid session in your repo">
+    Navigate to your project directory and start Droid:
+    ```bash
+    cd /path/to/your/project
+    droid
+    ```
+  </Step>
+  <Step title="Run the wiki command">
+    ```
+    > /wiki
+    ```
+    Droid analyzes your codebase and generates markdown files into a local
+    `droid-wiki/` folder in your project directory. Once generation is
+    complete, it uploads the contents to Factory cloud.
+  </Step>
+  <Step title="View the result">
+    After upload completes, Droid prints a link to your wiki:
+    ```
+    Wiki uploaded successfully: https://app.factory.ai/wiki/{wikiRunId}
+    ```
+    Open the link to browse your documentation, or visit
+    [app.factory.ai/wiki](https://app.factory.ai/wiki) to see all your
+    wikis.
+  </Step>
+</Steps>
+
+## What happens during generation
+
+When you run `/wiki`, Droid performs several steps:
+
+1. **Codebase analysis** -- Reads source files, configuration, tests, and documentation to understand the project structure
+2. **Page generation** -- Produces a set of structured markdown files organized by topic (architecture, modules, APIs, setup, etc.)
+3. **Visual screenshots** -- If the repository has a [QA skill](/guides/skills/automated-qa) installed, Droid launches the application and captures screenshots of web UIs and TUIs to include in the wiki. Run `/install-qa` to set one up if your repo doesn't have one yet.
+4. **Image handling** -- Detects and includes images (PNG, JPEG, GIF, WebP) found alongside the wiki content, up to 50MB total
+5. **Upload to Factory cloud** -- Sends the pages, page tree, images, and git metadata (commit hash, branch, dirty state) to Factory's API
+6. **GitHub wiki sync** -- For GitHub repos, automatically flattens pages and pushes to the repo's wiki tab
+
+<Note>
+  Wiki generation uses your current branch and working directory state.
+  For the most accurate documentation, run `/wiki` from a clean checkout
+  of your default branch.
+</Note>
+
+<Tip>
+  The first wiki generation for a repository can take a while -- Droid needs
+  to analyze the entire codebase from scratch. Subsequent runs are
+  significantly faster because they use incremental mode, only updating pages
+  affected by code changes since the last generation.
+</Tip>
+
+## GitHub wiki sync
+
+After uploading to Factory cloud, the CLI automatically syncs the generated wiki to GitHub's built-in wiki tab for GitHub-hosted repositories. The sync:
+
+- Flattens the hierarchical page tree into GitHub's flat wiki format (e.g., `overview/architecture.md` becomes `overview--architecture.md`)
+- Rewrites internal links to use the flat filenames
+- Generates `_Sidebar.md` with a navigable table of contents
+- Generates `Home.md` from your wiki's root page
+- Clones `{repo}.wiki.git`, replaces all content, and pushes
+
+### Prerequisites for GitHub sync
+
+- Your repository must be hosted on GitHub
+- The wiki tab must be initialized -- if you've never used it, create the first page at `https://github.com/{owner}/{repo}/wiki`
+- Your Git credentials must have push access to the wiki repository
+- [Wiki Cloud Sync](/cli/features/wiki/overview#wiki-cloud-sync) must not be disabled for your organization
+
+If the wiki isn't initialized, the CLI prints a message with a link to create the first page and skips the sync without failing.
+
+### Upload targets
+
+By default, `/wiki` uploads to Factory cloud. The underlying `wiki-upload` command supports an `--upload-to` flag to control where content goes:
+
+| Target | Description |
+|--------|-------------|
+| `factory` | Upload to Factory cloud (default) |
+| `github` | Sync to GitHub wiki only |
+| `factory,github` | Upload to both |
+
+## Page ordering
+
+You can control the order pages appear in the sidebar and navigation by creating a `.wiki-meta.json` file in the wiki output directory:
+
+```json
+{
+  "pageOrder": [
+    "index.md",
+    "overview/index.md",
+    "overview/architecture.md",
+    "overview/setup.md",
+    "modules/index.md"
+  ]
+}
+```
+
+Pages listed in `pageOrder` appear first in the specified order. Unlisted pages are appended alphabetically after.
+
+## Versioning
+
+Each wiki generation creates a new **wiki run** with metadata including:
+
+- Commit hash and branch name
+- Whether there were local uncommitted changes
+- Droid CLI version used
+- Timestamp
+
+You can browse previous versions from the [web viewer](/cli/features/wiki/web-viewer) using the version dropdown.
+
+## See also
+
+- [Set up auto-refresh](/cli/features/wiki/auto-refresh) -- Keep your wiki current with a CI action
+- [Browse your wiki](/cli/features/wiki/web-viewer) -- Read, search, and export from the web
+- [Wiki overview](/cli/features/wiki/overview) -- How all the pieces fit together
