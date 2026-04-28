@@ -1,0 +1,249 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Factory Readiness Reports API",
+    "description": "Agent readiness evaluation reports.",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://app.factory.ai",
+      "description": "Factory app"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Readiness Reports",
+      "description": "Agent readiness evaluation reports."
+    }
+  ],
+  "paths": {
+    "/api/organization/maturity-level-reports": {
+      "get": {
+        "tags": ["Readiness Reports"],
+        "summary": "List readiness reports",
+        "description": "Retrieves readiness reports for your organization. Use repoId to filter to one repository and startAfter for cursor-based pagination.",
+        "operationId": "listReadinessReports",
+        "x-mint": {
+          "href": "/api-reference/readiness-reports/list-readiness-reports"
+        },
+        "parameters": [
+          {
+            "name": "repoId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter reports by repository ID.",
+            "example": "repo_123"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Maximum number of reports to return. Must be positive.",
+            "example": 10
+          },
+          {
+            "name": "startAfter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Report ID pagination cursor.",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Readiness reports for the organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListReadinessReportsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://app.factory.ai",
+            "description": "Factory app"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Factory API key or JWT token for authentication",
+        "x-default": "YOUR_API_KEY"
+      }
+    },
+    "schemas": {
+      "AppDescription": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Main web application"
+          }
+        }
+      },
+      "CriterionEvaluation": {
+        "type": "object",
+        "properties": {
+          "numerator": {
+            "type": "number"
+          },
+          "denominator": {
+            "type": "number"
+          },
+          "rationale": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Bad Request"
+          },
+          "detail": {
+            "type": "string",
+            "example": "Cannot query today's date - analytics data has a 24-hour lag"
+          },
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "requestId": {
+            "type": "string",
+            "example": "req_123"
+          }
+        }
+      },
+      "ListReadinessReportsResponse": {
+        "type": "object",
+        "properties": {
+          "reports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadinessReport"
+            }
+          }
+        }
+      },
+      "ModelUsed": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reasoningEffort": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "off"]
+          }
+        }
+      },
+      "ReadinessReport": {
+        "type": "object",
+        "properties": {
+          "reportId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "number"
+          },
+          "repoUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://github.com/example-org/repo-name"
+          },
+          "apps": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AppDescription"
+            }
+          },
+          "report": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CriterionEvaluation"
+            }
+          },
+          "commitHash": {
+            "type": "string",
+            "nullable": true
+          },
+          "branch": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasLocalChanges": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hasNonRemoteCommits": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "modelUsed": {
+            "$ref": "#/components/schemas/ModelUsed"
+          },
+          "droidVersion": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}

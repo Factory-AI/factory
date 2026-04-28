@@ -1,0 +1,972 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Factory Analytics API",
+    "description": "Organization-level usage and productivity analytics.",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.factory.ai",
+      "description": "Factory API"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Analytics",
+      "description": "Organization-level usage and productivity analytics."
+    }
+  ],
+  "paths": {
+    "/api/v1/analytics/tokens": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get token usage",
+        "description": "Returns daily token consumption across your organization. Set group_by=model to flatten model usage into separate rows.",
+        "operationId": "getAnalyticsTokenUsage",
+        "x-mint": {
+          "href": "/api-reference/analytics/token-usage"
+        },
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date in YYYY-MM-DD format. Data is available from 2026-01-14 through yesterday UTC.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-14"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "description": "End date in YYYY-MM-DD format. Requests for today return a 400 error because analytics data has a 24-hour lag.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-28"
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["model"]
+            },
+            "description": "Group results by model.",
+            "example": "model"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get token usage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenUsageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions. Manager or Owner role required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/tools": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get tool usage",
+        "description": "Returns daily tool invocations, MCP usage, skills, slash commands, hooks, and autonomy metrics.",
+        "operationId": "getAnalyticsToolUsage",
+        "x-mint": {
+          "href": "/api-reference/analytics/tool-usage"
+        },
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date in YYYY-MM-DD format. Data is available from 2026-01-14 through yesterday UTC.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-14"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "description": "End date in YYYY-MM-DD format. Requests for today return a 400 error because analytics data has a 24-hour lag.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-28"
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["tool_name"]
+            },
+            "description": "Group results by tool name.",
+            "example": "tool_name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get tool usage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToolUsageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions. Manager or Owner role required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/activity": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get user activity",
+        "description": "Returns daily, weekly, and monthly active users along with session and message counts.",
+        "operationId": "getAnalyticsActivity",
+        "x-mint": {
+          "href": "/api-reference/analytics/user-activity"
+        },
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date in YYYY-MM-DD format. Data is available from 2026-01-14 through yesterday UTC.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-14"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "description": "End date in YYYY-MM-DD format. Requests for today return a 400 error because analytics data has a 24-hour lag.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-28"
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["client"]
+            },
+            "description": "Group results by client type.",
+            "example": "client"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get user activity.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions. Manager or Owner role required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/productivity": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get productivity metrics",
+        "description": "Returns daily file operations and git activity across your organization.",
+        "operationId": "getAnalyticsProductivity",
+        "x-mint": {
+          "href": "/api-reference/analytics/productivity"
+        },
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date in YYYY-MM-DD format. Data is available from 2026-01-14 through yesterday UTC.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-14"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "description": "End date in YYYY-MM-DD format. Requests for today return a 400 error because analytics data has a 24-hour lag.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-28"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get productivity metrics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductivityResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions. Manager or Owner role required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/users": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "List per-user metrics",
+        "description": "Returns detailed per-user metrics with cursor-based pagination.",
+        "operationId": "listAnalyticsUsers",
+        "x-mint": {
+          "href": "/api-reference/analytics/per-user-metrics"
+        },
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date in YYYY-MM-DD format. Data is available from 2026-01-14 through yesterday UTC.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-14"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "description": "End date in YYYY-MM-DD format. Requests for today return a 400 error because analytics data has a 24-hour lag.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-01-28"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Maximum users per page.",
+            "example": 50
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID pagination cursor from next_cursor.",
+            "example": "user_123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List per-user metrics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions. Manager or Owner role required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Factory API key or JWT token for authentication",
+        "x-default": "YOUR_API_KEY"
+      }
+    },
+    "schemas": {
+      "Activity": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "group_key": {
+            "type": "string",
+            "description": "Present when group_by is used."
+          },
+          "daily_active_users": {
+            "type": "number"
+          },
+          "weekly_active_users": {
+            "type": "number"
+          },
+          "monthly_active_users": {
+            "type": "number"
+          },
+          "daily_active_users_by_client": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "sessions": {
+            "type": "number"
+          },
+          "messages": {
+            "type": "number"
+          },
+          "user_messages": {
+            "type": "number"
+          }
+        }
+      },
+      "ActivityResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AnalyticsMeta"
+          }
+        }
+      },
+      "AnalyticsMeta": {
+        "type": "object",
+        "properties": {
+          "org_id": {
+            "type": "string",
+            "example": "org_123"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-01-14"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-01-28"
+          },
+          "has_more": {
+            "type": "boolean",
+            "example": true
+          },
+          "next_cursor": {
+            "type": "string",
+            "nullable": true,
+            "example": "user_123"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Bad Request"
+          },
+          "detail": {
+            "type": "string",
+            "example": "Cannot query today's date - analytics data has a 24-hour lag"
+          },
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "requestId": {
+            "type": "string",
+            "example": "req_123"
+          }
+        }
+      },
+      "ModelBreakdown": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "model_tier": {
+            "type": "string"
+          },
+          "billable_tokens": {
+            "type": "number"
+          },
+          "input_tokens": {
+            "type": "number"
+          },
+          "output_tokens": {
+            "type": "number"
+          }
+        }
+      },
+      "Productivity": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "files_created": {
+            "type": "number"
+          },
+          "files_edited": {
+            "type": "number"
+          },
+          "by_extension": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "by_language": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "git_commits": {
+            "type": "number"
+          },
+          "git_prs_created": {
+            "type": "number"
+          }
+        }
+      },
+      "ProductivityResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Productivity"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AnalyticsMeta"
+          }
+        }
+      },
+      "TokenUsage": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "group_key": {
+            "type": "string",
+            "description": "Present when group_by is used."
+          },
+          "billable_tokens": {
+            "type": "number"
+          },
+          "input_tokens": {
+            "type": "number"
+          },
+          "output_tokens": {
+            "type": "number"
+          },
+          "cache_read_tokens": {
+            "type": "number"
+          },
+          "cache_write_tokens": {
+            "type": "number"
+          },
+          "by_model": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelBreakdown"
+            }
+          },
+          "by_user": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserTokenBreakdown"
+            }
+          }
+        }
+      },
+      "TokenUsageResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TokenUsage"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AnalyticsMeta"
+          }
+        }
+      },
+      "ToolUsage": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "group_key": {
+            "type": "string",
+            "description": "Present when group_by is used."
+          },
+          "tool_calls": {
+            "type": "number"
+          },
+          "by_tool": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tool": {
+                  "type": "string"
+                },
+                "invocations": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "mcp_users_with_mcp": {
+            "type": "number"
+          },
+          "mcp_by_server": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "server": {
+                  "type": "string"
+                },
+                "invocations": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "skills_invocations": {
+            "type": "number"
+          },
+          "skills_by_name": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "slash_commands_invocations": {
+            "type": "number"
+          },
+          "slash_commands_by_name": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "hooks_invocations": {
+            "type": "number"
+          },
+          "hooks_by_event": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "web_users": {
+            "type": "number"
+          },
+          "autonomy_ratio_avg": {
+            "type": "number"
+          },
+          "autonomy_ratio_p50": {
+            "type": "number"
+          },
+          "autonomy_ratio_p90": {
+            "type": "number"
+          },
+          "tool_calls_per_session_avg": {
+            "type": "number"
+          },
+          "user_turns_per_session_avg": {
+            "type": "number"
+          },
+          "tool_autonomy_level_ratio": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "ToolUsageResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ToolUsage"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AnalyticsMeta"
+          }
+        }
+      },
+      "UserMetric": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          },
+          "user_email": {
+            "type": "string",
+            "nullable": true,
+            "example": "user@example.com"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "tool_calls": {
+            "type": "number"
+          },
+          "billable_tokens": {
+            "type": "number"
+          },
+          "primary_model": {
+            "type": "string"
+          },
+          "primary_model_tier": {
+            "type": "string"
+          },
+          "files_created": {
+            "type": "number"
+          },
+          "files_edited": {
+            "type": "number"
+          },
+          "git_commits": {
+            "type": "number"
+          },
+          "git_prs_created": {
+            "type": "number"
+          },
+          "mcp_calls": {
+            "type": "number"
+          },
+          "skill_calls": {
+            "type": "number"
+          },
+          "slash_commands": {
+            "type": "number"
+          },
+          "hooks": {
+            "type": "number"
+          },
+          "sessions": {
+            "type": "number"
+          },
+          "messages": {
+            "type": "number"
+          },
+          "user_messages": {
+            "type": "number"
+          },
+          "assistant_messages": {
+            "type": "number"
+          },
+          "autonomy_ratio": {
+            "type": "number"
+          },
+          "delegation_level": {
+            "type": "string",
+            "enum": ["auto-high", "auto-medium", "auto-low", "spec", "manual"]
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "UserTokenBreakdown": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          },
+          "user_email": {
+            "type": "string",
+            "nullable": true,
+            "example": "user@example.com"
+          },
+          "billable_tokens": {
+            "type": "number"
+          },
+          "by_model": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelBreakdown"
+            }
+          }
+        }
+      },
+      "UsersResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserMetric"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AnalyticsMeta"
+          }
+        }
+      }
+    }
+  }
+}
