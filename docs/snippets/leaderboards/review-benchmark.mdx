@@ -1,30 +1,28 @@
-import { BarChart } from '/snippets/leaderboards/bar-chart.jsx'
-
-export const reviewBenchmarkData = [
-  { name: "Factory Droid (GPT-5.2)", f1: 60.5, cost: "$1.25" },
-  { name: "Factory Droid (Claude Opus 4.6)", f1: 59.8, cost: "$3.11" },
-  { name: "Factory Droid (Claude Sonnet 4.6)", f1: 57.9, cost: "$1.15" },
-  { name: "Factory Droid (Claude Opus 4.7)", f1: 56.4, cost: "$4.18" },
-  { name: "Factory Droid (GLM-5.1)", f1: 56.3, cost: "$1.06" },
-  { name: "Factory Droid (GPT-5.3 Codex)", f1: 56.2, cost: "$1.69" },
-  { name: "Factory Droid (Gemini 3.1 Pro)", f1: 52.6, cost: "$2.04" },
-  { name: "Factory Droid (GPT-5.4 Mini)", f1: 52.0, cost: "$0.68" },
-  { name: "Factory Droid (Kimi K2.5)", f1: 51.9, cost: "$0.41" },
-  { name: "Factory Droid (Gemini 3 Flash)", f1: 50.0, cost: "$0.34" },
-  { name: "Factory Droid (GPT-5.5)", f1: 47.9, cost: "$5.63" },
-  { name: "Factory Droid (GPT-5.4)", f1: 47.5, cost: "$2.01" },
-  { name: "Factory Droid (MiniMax M2.7)", f1: 45.6, cost: "$0.15" },
-]
-
 ## Review Benchmark
 
 Open-source benchmark from [droid-code-review-evals](https://github.com/droid-code-review-evals/review-droid-benchmark) measuring how well AI models catch real bugs in code review. Evaluates 13 frontier and open-source models across 50 pull requests from 5 large open-source codebases (Sentry, Grafana, Keycloak, Discourse, Cal.com), scored against a manually curated golden set of 167 validated bugs.
 
-### Results — Mean F1 Score
+### Cost vs. Quality
 
-<BarChart data={reviewBenchmarkData} valueKey="f1" valueLabel="%" maxValue={100} />
+| Model | Mean F1 | Cost / PR |
+|-------|---------|-----------|
+| **GPT-5.2** | 60.5% | $1.25 |
+| **Claude Opus 4.6** | 59.8% | $3.11 |
+| Claude Sonnet 4.6 | 57.9% | $1.15 |
+| Claude Opus 4.7 | 56.4% | $4.18 |
+| GLM-5.1 | 56.3% | $1.06 |
+| GPT-5.3 Codex | 56.2% | $1.69 |
+| Gemini 3.1 Pro | 52.6% | $2.04 |
+| GPT-5.4 Mini | 52.0% | $0.68 |
+| Kimi K2.5 | 51.9% | $0.41 |
+| Gemini 3 Flash | 50.0% | $0.34 |
+| GPT-5.5 | 47.9% | $5.63 |
+| GPT-5.4 | 47.5% | $2.01 |
+| MiniMax M2.7 | 45.6% | $0.15 |
 
 *Last updated: April 2026*
+
+GPT-5.2 leads on quality at about 40% of the cost of Claude Opus 4.6. Open-source models like Kimi K2.5 and MiniMax M2.7 deliver ~75–86% of GPT-5.2 quality at ~3–8× lower cost per PR, opening the door to multi-pass and ensemble review strategies.
 
 ### Methodology
 
@@ -38,26 +36,6 @@ Open-source benchmark from [droid-code-review-evals](https://github.com/droid-co
 | **F1 calculation** | F1 combines precision (fraction of comments that are real bugs) and recall (fraction of golden bugs caught) |
 | **Multiple runs** | Each model is evaluated over multiple runs to measure consistency |
 | **Outlier exclusion** | Runs that error out or hit token limits are excluded |
-
-### Cost vs. Quality
-
-| Model | Mean F1 | Cost / PR |
-|-------|---------|-----------|
-| **Factory Droid (GPT-5.2)** | 60.5% | $1.25 |
-| **Factory Droid (Claude Opus 4.6)** | 59.8% | $3.11 |
-| Factory Droid (Claude Sonnet 4.6) | 57.9% | $1.15 |
-| Factory Droid (Claude Opus 4.7) | 56.4% | $4.18 |
-| Factory Droid (GLM-5.1) | 56.3% | $1.06 |
-| Factory Droid (GPT-5.3 Codex) | 56.2% | $1.69 |
-| Factory Droid (Gemini 3.1 Pro) | 52.6% | $2.04 |
-| Factory Droid (GPT-5.4 Mini) | 52.0% | $0.68 |
-| Factory Droid (Kimi K2.5) | 51.9% | $0.41 |
-| Factory Droid (Gemini 3 Flash) | 50.0% | $0.34 |
-| Factory Droid (GPT-5.5) | 47.9% | $5.63 |
-| Factory Droid (GPT-5.4) | 47.5% | $2.01 |
-| Factory Droid (MiniMax M2.7) | 45.6% | $0.15 |
-
-GPT-5.2 leads on quality at roughly a third of the cost of Claude Opus 4.6. Open-source models like Kimi K2.5 and MiniMax M2.7 deliver 75–86% of frontier-model quality at 10–30x lower cost, opening the door to multi-pass and ensemble review strategies.
 
 <Card title="Review Droid Benchmark" icon="trophy" href="https://github.com/droid-code-review-evals/review-droid-benchmark">
   View the full methodology, raw results, and scoring scripts on GitHub
