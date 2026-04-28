@@ -20,7 +20,7 @@ Use this skill for public documentation work in this repository.
    CI/workflow, prompt, or harness.
 3. Run only the scripts that match the change.
 4. Load references only when the change needs that detail.
-5. Use the handoff template when summarizing docs or harness work.
+5. Summarize what changed, public-safety review, validation, and any warnings.
 
 ## Scripts
 
@@ -33,7 +33,3 @@ Use this skill for public documentation work in this repository.
 - [Public safety](references/public-safety.md)
 - [Docs style](references/docs-style.md)
 - [Verification](references/docs-verification.md)
-
-## Assets
-
-- [Handoff template](assets/handoff-template.md)
