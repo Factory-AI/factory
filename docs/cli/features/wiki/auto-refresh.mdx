@@ -40,14 +40,14 @@ Droid detects your CI framework and creates the appropriate configuration.
 
 ### GitHub Actions
 
-Creates `.github/workflows/droid-wiki-refresh.yml`:
+Creates `.github/workflows/droid-wiki-refresh.yml` (replace `main` with your default branch if different):
 
 ```yaml
 name: Droid Wiki Refresh
 
 on:
   push:
-    branches: [main]
+    branches: [main] # change to your default branch if not main
 
 jobs:
   wiki-refresh:
@@ -76,7 +76,7 @@ droid-wiki-refresh:
   script:
     - droid exec --auto high "/wiki"
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   variables:
     FACTORY_API_KEY: $FACTORY_API_KEY
 ```
