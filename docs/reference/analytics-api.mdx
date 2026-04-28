@@ -38,7 +38,7 @@ Generate API keys at [app.factory.ai/settings/api-keys](https://app.factory.ai/s
 
 ### Permissions
 
-Only users with **Manager** or **Owner** roles can access the Analytics API. Members and guests will receive a `403` error.
+Only users with **Manager** or **Owner** roles can access the Analytics API. The API must also be enabled for your organization. Members, guests, and organizations without API access receive a `403` error.
 
 ---
 
@@ -528,6 +528,11 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 - **Timezone**: UTC only (no timezone parameter)
 - **Data availability**: Data is available through yesterday (UTC). Requesting today's date returns a `400` error.
 - **Historical data**: Available from January 14, 2026
+- **Range limit**: A single request can cover at most 90 days
+
+### Billable token visibility
+
+Some organizations hide `billable_tokens` in token responses. When this control is enabled, responses still include raw token fields such as `input_tokens`, `output_tokens`, `cache_read_tokens`, and `cache_write_tokens`.
 
 ### Rate Limits
 
@@ -543,7 +548,7 @@ The API returns standard HTTP status codes:
 | :----- | :--------------------------------------------------- |
 | `400`  | Invalid date format, today's date requested, or limit out of range |
 | `401`  | Missing or invalid API key                           |
-| `403`  | Insufficient permissions (requires Manager or Owner role) |
+| `403`  | Insufficient permissions, or Analytics API is not enabled for the organization |
 | `500`  | Internal error                                       |
 
 ### Error Response Format
