@@ -1,0 +1,70 @@
+---
+title: "GitHub Cloud"
+description: "Factory を GitHub Cloud リポジトリに接続するためのステップごとのガイド"
+---
+
+このガイドでは、Factory を GitHub Cloud と統合し、Factory プラットフォームがリポジトリにアクセスして作業できるようにする手順を説明します。
+
+## 前提条件
+
+- 管理者権限を持つ Factory アカウント
+- GitHub 組織への管理者アクセス権
+
+## 統合手順
+
+<Steps>
+  <Step title="Factory プラットフォームにアクセス">
+    Factory アカウントにログインし、Settings の Integrations セクションに移動します。
+  </Step>
+  <Step title="GitHub 統合を開始">
+    GitHub の横にある「Connect」をクリックして統合プロセスを開始します。「Manage GitHub Permissions」を選択します。
+  </Step>
+  <Step title="Factory の GitHub App を認可">
+    GitHub にリダイレクトされます。「Authorize」をクリックして、Factory の安全な OAuth2 GitHub Application が組織にアクセスすることを許可します。
+  </Step>
+  <Step title="リポジトリアクセスを設定">
+    Factory にアクセスさせるリポジトリを選択します。特定のリポジトリを選ぶことも、現在および将来のすべてのリポジトリへのアクセスを許可することもできます。
+  </Step>
+  <Step title="権限を設定">
+    Factory が最適に機能するには、特定の権限が必要です。次の権限を確認し、承認してください。
+
+    - **Actions and Metadata**（読み取り権限）: CI プロセスの理解やテスト失敗の診断のために、GitHub Actions データへアクセスできます。
+    - **Code**（読み取りおよび書き込み権限）: Factory がコードをレビューし、pull request を作成するために必要です。なお、Factory が自律的にコードをマージすることはありません。
+    - **Commit Statuses**（読み取りおよび書き込み権限）: commit status を追跡し、更新できます。
+    - **Discussions**（読み取りおよび書き込み権限）: リポジトリ内のディスカッションを分析し、参加できます。
+    - **Issues**（読み取りおよび書き込み権限）: issue と連携し、自動的なチケット処理を行えます。
+    - **Pull Requests**（読み取りおよび書き込み権限）: コードレビューの分析と支援に必要です。
+    - **Workflows**（読み取りおよび書き込み権限）: 失敗した CI 実行の管理や、必要に応じた修正を行えます。
+  </Step>
+  <Step title="統合を確認">
+    権限を付与すると Factory に戻ります。統合ステータスが「Connected」と表示されていることを確認してください。
+  </Step>
+</Steps>
+
+## 検証
+
+統合が正しく動作していることを確認するには、次の手順を実施します。
+
+1. テスト用リポジトリを作成するか、機密データが最小限の既存リポジトリを使用します。
+2. pull request の作成など、簡単なワークフローを開始します。
+3. Factory が想定どおりにリポジトリへアクセスし、操作できることを確認します。
+
+## ベストプラクティス
+
+- Factory に付与した権限を定期的に見直し、監査する。
+- 機密性の高いプロジェクトでは、リポジトリ単位の設定でアクセスレベルを細かく調整する。
+- GitHub 組織のセキュリティ設定を常に最新に保つ。
+
+## トラブルシューティング
+
+統合時に問題が発生した場合は、次を確認してください。
+
+- Factory と GitHub の両方で必要な管理者権限があること。
+- 権限関連の問題がないか GitHub の監査ログを確認すること。
+- 組織に競合するサードパーティアプリケーション制限がないこと。
+
+問題が解決しない場合は、具体的なエラーメッセージやスクリーンショットを添えて Factory サポートにお問い合わせください。
+
+<Card title="セキュリティとコンプライアンス" icon="shield-check" href="https://trust.factory.ai">
+  Factory の Trust Center で、コンプライアンス資料、認証、セキュリティリソースを確認できます
+</Card>

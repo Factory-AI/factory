@@ -1,0 +1,126 @@
+---
+title: "GitHub Enterprise Server"
+description: "自己ホスト型の GitHub Enterprise Server を Factory に接続するための詳細ガイド"
+---
+
+このガイドでは、Factory を GitHub Enterprise Server（GHES）インスタンスと統合するための包括的な手順を説明します。この統合により、Factory プラットフォームはオンプレミスのリポジトリへ安全にアクセスし、作業できるようになります。
+
+> GitHub Enterprise Server への接続は Enterprise プランでのみサポートされています。
+
+## 前提条件
+
+- GitHub Enterprise Server インスタンスへの管理者アクセス権
+- GHES インスタンスと Factory の AWS VPC 間のネットワーク接続
+- Enterprise プランかつ管理者権限を持つ Factory アカウント
+
+## 統合手順
+
+<Steps>
+  <Step title="初期設定と情報収集">
+    <Steps>
+      <Step title="GitHub App を作成">
+        1. GHES インスタンスの設定に移動します。
+        2. GitHub Apps に進み、「New GitHub App」をクリックします。
+        3. アプリの詳細を入力します。
+           - Name: `Factory Integration`
+           - Homepage URL: `https://factory.ai`
+           - Webhook URL: （Factory が提供）
+        4. 下記の「必要な権限」セクションに従って権限を設定します。
+        5. アプリ用の private key を生成し、安全に保管します。
+      </Step>
+      <Step title="統合情報を収集">
+        次の情報を収集します。
+
+        - GitHub App ID
+        - Client ID
+        - Client Secret
+        - Webhook Secret
+        - Private Key（前の手順で生成）
+        - GHES インスタンスの hostname
+      </Step>
+      <Step title="情報を Factory に提出">
+        収集した情報を、担当の Factory 窓口へ安全な方法で送付します。
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="ネットワークセキュリティを構成">
+    <Steps>
+      <Step title="ネットワークポリシーを評価">
+        現在のネットワークセキュリティポリシーを確認し、Factory の AWS VPC との接続を妨げる可能性がある要因を特定します。
+      </Step>
+      <Step title="接続を確立">
+        次のいずれかの方法を選択します。
+
+        1. VPC Peering（GHES が AWS 上にある場合）
+           - VPC peering リクエストを開始します。
+           - Factory と VPC ID を共有します。
+           - 直接ネットワークルート用の route table を設定します。
+        2. VPN 接続
+           - 自社ネットワークと Factory の間に VPN を確立します。
+           - VPN 設定（例: IPsec）が双方で互換性を持つことを確認します。
+      </Step>
+      <Step title="ファイアウォールを構成">
+        - Factory のサービスへの outbound 接続（HTTPS および SSH トラフィック）を許可します。
+        - GHES インスタンスが、Factory から提供される Lambda function URL と通信できることを確認します。
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="Webhook を設定">
+    GHES 側の webhook を設定し、Factory が提供する cloud function URL にイベントを送信するようにします。
+  </Step>
+  <Step title="必要な権限を設定">
+    GitHub App に次の権限が付与されていることを確認します。
+
+    - Actions and Metadata（Read）
+    - Code（Read & Write）
+    - Commit Statuses（Read & Write）
+    - Discussions（Read & Write）
+    - Issues（Read & Write）
+    - Pull Requests（Read & Write）
+    - Workflows（Read & Write）
+  </Step>
+  <Step title="テストと検証">
+    <Steps>
+      <Step title="初期テスト">
+        Factory と連携して、webhook 接続性とデータ交換の初期テストを実施します。
+      </Step>
+      <Step title="包括的なテスト">
+        Factory 内の Tools をトリガーするすべての GitHub イベントをテストします。これには次が含まれます。
+
+        - pull request の作成
+        - コードの push
+        - issue の作成
+      </Step>
+      <Step title="検証">
+        これらのイベントに対して Factory Tools が正しく応答することを確認します。
+      </Step>
+    </Steps>
+  </Step>
+  <Step title="最終調整と本番運用開始">
+    <Steps>
+      <Step title="フィードバックと調整">
+        テスト中に発生した問題についてフィードバックを提供し、必要な調整を Factory と一緒に行います。
+      </Step>
+      <Step title="本番運用開始">
+        Factory と本番運用開始日を合意します。
+      </Step>
+      <Step title="モニタリング">
+        ローンチ直後の数日間は継続的な監視を実施し、予期しない問題に素早く対応できるようにします。
+      </Step>
+    </Steps>
+  </Step>
+</Steps>
+
+## トラブルシューティング
+
+- webhook イベントを受信できない場合は、ネットワーク構成とファイアウォールルールを確認してください。
+- 権限に関する問題がある場合は、GHES インスタンス内の GitHub App 設定を確認してください。
+- Factory が想定どおりに応答しない場合は、必要なイベントがすべて送信されており、権限が正しく設定されていることを確認してください。
+
+## サポート
+
+個別の問題や詳細なサポートが必要な場合は、指定されたサポートチャネルを通じて Factory チームにお問い合わせください。
+
+<Card title="セキュリティとコンプライアンス" icon="shield-check" href="https://trust.factory.ai">
+  Factory の Trust Center で、コンプライアンス資料、認証、セキュリティリソースを確認できます
+</Card>
