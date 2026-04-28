@@ -42,9 +42,8 @@ When you run `/wiki`, Droid performs several steps:
 1. **Codebase analysis** -- Reads source files, configuration, tests, and documentation to understand the project structure
 2. **Page generation** -- Produces a set of structured markdown files organized by topic (architecture, modules, APIs, setup, etc.)
 3. **Visual screenshots** -- If the repository has a [QA skill](/guides/skills/automated-qa) installed, Droid launches the application and captures screenshots of web UIs and TUIs to include in the wiki. Run `/install-qa` to set one up if your repo doesn't have one yet.
-4. **Image handling** -- Detects and includes images (PNG, JPEG, GIF, WebP) found alongside the wiki content, up to 50MB total
-5. **Upload to Factory cloud** -- Sends the pages, page tree, images, and git metadata (commit hash, branch, dirty state) to Factory's API
-6. **GitHub wiki sync** -- For GitHub repos, automatically flattens pages and pushes to the repo's wiki tab
+4. **Upload to Factory cloud** -- Sends the pages and images to Factory's API
+5. **GitHub wiki sync** -- For GitHub repos, flattens pages and pushes to the repo's wiki tab
 
 <Note>
   Wiki generation uses your current branch and working directory state.
@@ -77,34 +76,6 @@ After uploading to Factory cloud, the CLI automatically syncs the generated wiki
 - [Wiki Cloud Sync](/cli/features/wiki/overview#wiki-cloud-sync) must not be disabled for your organization
 
 If the wiki isn't initialized, the CLI prints a message with a link to create the first page and skips the sync without failing.
-
-### Upload targets
-
-By default, `/wiki` uploads to Factory cloud. The underlying `wiki-upload` command supports an `--upload-to` flag to control where content goes:
-
-| Target | Description |
-|--------|-------------|
-| `factory` | Upload to Factory cloud (default) |
-| `github` | Sync to GitHub wiki only |
-| `factory,github` | Upload to both |
-
-## Page ordering
-
-You can control the order pages appear in the sidebar and navigation by creating a `.wiki-meta.json` file in the wiki output directory:
-
-```json
-{
-  "pageOrder": [
-    "index.md",
-    "overview/index.md",
-    "overview/architecture.md",
-    "overview/setup.md",
-    "modules/index.md"
-  ]
-}
-```
-
-Pages listed in `pageOrder` appear first in the specified order. Unlisted pages are appended alphabetically after.
 
 ## Versioning
 
