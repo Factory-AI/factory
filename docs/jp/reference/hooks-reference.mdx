@@ -50,8 +50,8 @@ Droidフックは[settings files](/cli/configuration/settings)で設定します
 <Warning>
   フックコマンドとスクリプトには相対パスではなく、**必ず絶対パスを使用してください**。
   フックはDroidの現在の作業ディレクトリから実行されます。このディレクトリは実行中に変わる可能性があります。
-  Use `"$FACTORY_PROJECT_DIR"/path/to/script.sh` for project-relative scripts or full paths like
-  `/usr/local/bin/script.sh` or `~/.factory/hooks/script.sh` for global scripts.
+  プロジェクト相対スクリプトには`"$FACTORY_PROJECT_DIR"/path/to/script.sh`を使用し、グローバルスクリプトには次のようなフルパスを使用します:
+  `/usr/local/bin/script.sh`または`~/.factory/hooks/script.sh`。
 </Warning>
 
 `UserPromptSubmit`、`Notification`、`Stop`、`SubagentStop`などのマッチャーを使用しないイベントについては、matcherフィールドを省略できます：

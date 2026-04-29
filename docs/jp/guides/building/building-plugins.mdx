@@ -96,16 +96,16 @@ my-plugin/
 ```markdown
 ---
 name: code-review
-description: Reviews code for best practices and potential issues. Use when reviewing code, checking PRs, or analyzing code quality.
+description: ベストプラクティスと潜在的な問題についてコードをレビューする。コードレビュー、PR確認、コード品質分析で使用します。
 ---
 
-When reviewing code, check for:
-1. Code organization and structure
-2. Error handling
-3. Security concerns
-4. Test coverage
+コードをレビューするときは、以下を確認します:
+1. コードの整理と構造
+2. エラーハンドリング
+3. セキュリティ上の懸念
+4. テストカバレッジ
 
-Provide specific, actionable feedback with line references.
+行参照付きで具体的かつ実行可能なフィードバックを提供します。
 ```
 
 ### スキルのフロントマター
@@ -131,21 +131,21 @@ my-plugin/
 
 ```markdown
 ---
-description: Review the current PR for issues
+description: 現在のPRに問題がないかレビューする
 disable-model-invocation: true
 ---
 
-# Review PR Command
+# PRレビューコマンド
 
-Review the current pull request. Check for:
-1. Code correctness and logic errors
-2. Test coverage
-3. Documentation updates
-4. Breaking changes
+現在のプルリクエストをレビューします。以下を確認します:
+1. コードの正確性とロジックエラー
+2. テストカバレッジ
+3. ドキュメント更新
+4. 破壊的変更
 
-If the user provides arguments: $ARGUMENTS
+ユーザーが引数を指定した場合: $ARGUMENTS
 
-Use them to focus on specific areas of the review.
+引数を使用してレビュー対象を特定の領域に絞ります。
 ```
 
 `commands/review-pr.md`にあるコマンドは`/review-pr`になります。
@@ -357,9 +357,9 @@ DroidはClaude Codeプラグインと完全に互換性があります。Claude 
   <Accordion title="徹底的に文書化する">
     READMEには以下を含めます:
     - プラグインの内容
-    - Installation instructions
+    - インストール手順
     - 利用可能なすべてのコマンドと使い方
-    - Configuration options
+    - 設定オプション
     - 例
   </Accordion>
 
@@ -427,30 +427,30 @@ name: review-patterns
 description: Use when reviewing code to check for common issues and best practices.
 ---
 
-Check code for:
-- Logic errors and edge cases
-- Error handling completeness
-- Security vulnerabilities
-- Performance concerns
-- Test coverage gaps
+以下についてコードを確認します:
+- ロジックエラーとエッジケース
+- エラーハンドリングの完全性
+- セキュリティ脆弱性
+- パフォーマンス上の懸念
+- テストカバレッジの不足
 ```
 
 **`droids/reviewer.md`:**
 ```markdown
 ---
 name: reviewer
-description: Specialized code reviewer subagent
+description: 専門のコードレビュアーサブエージェント
 model: inherit
 tools: read-only
 ---
 
-You are a senior code reviewer. Analyze the provided code and report:
+あなたはシニアコードレビュアーです。提供されたコードを分析して報告します:
 
-Summary: <one-line assessment>
+Summary: <1行の評価>
 Issues:
-- <severity> <description>
+- <重大度> <説明>
 Suggestions:
-- <improvement>
+- <改善案>
 ```
 
 ## 次のステップ
