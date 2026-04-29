@@ -651,7 +651,7 @@ chmod +x .factory/hooks/docs-coverage.py
   <Step title="ドキュメント例をテスト可能に保つ">
     実際のテストから例を抽出します:
     ```bash
-    # Extract example from test file
+    # テストファイルから例を抽出
     sed -n '/Example:/,/End example/p' Button.test.tsx > docs/examples/button.md
     ```
   </Step>
@@ -659,19 +659,19 @@ chmod +x .factory/hooks/docs-coverage.py
   <Step title="ドキュメントをバージョン管理する">
     ドキュメントにバージョン情報をタグ付けします:
     ```markdown
-    # API Reference
+    # APIリファレンス
 
-    > Version: 2.1.0
-    > Last updated: 2024-01-15
+    > バージョン: 2.1.0
+    > 最終更新: 2024-01-15
     ```
   </Step>
 
   <Step title="ドキュメントをコードにリンクする">
     ソースファイル参照を含めます:
     ```markdown
-    ## Button Component
+    ## Buttonコンポーネント
 
-    Source: [`src/components/Button.tsx`](../src/components/Button.tsx)
+    ソース: [`src/components/Button.tsx`](../src/components/Button.tsx)
     ```
   </Step>
 
@@ -747,6 +747,6 @@ chmod +x .factory/hooks/docs-coverage.py
 ## 関連項目
 
 - [フックリファレンス](/jp/reference/hooks-reference) - 完全なフックAPIドキュメント
-- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
-- [Code validation](/guides/hooks/code-validation) - コード標準の強制
-- [Git workflows](/guides/hooks/git-workflows) - Git統合
+- [フックの始め方](/jp/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [コード検証](/jp/guides/hooks/code-validation) - コード標準の強制
+- [Gitワークフロー](/jp/guides/hooks/git-workflows) - Git統合
