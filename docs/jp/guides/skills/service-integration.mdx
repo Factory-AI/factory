@@ -1,6 +1,6 @@
 ---
 title: "サービス連携スキル"
-description: A reusable skill for extending existing services and wiring integrations in complex enterprise codebases.
+description: 複雑なエンタープライズコードベースで既存サービスを拡張し、連携を接続する再利用可能なスキル。
 keywords: ['service', 'backend', 'api', 'integration', 'endpoint', 'skill', 'microservices']
 ---
 
@@ -28,7 +28,7 @@ keywords: ['service', 'backend', 'api', 'integration', 'endpoint', 'skill', 'mic
 2. **以下の skill コンテンツを `.factory/skills/service-integration/SKILL.md`（または `skill.mdx`）にコピー**
 
 <Tip>
-When you ask Factory to extend a backend service or wire an integration, it will automatically invoke this skill based on the task description.
+Factoryにバックエンドサービスの拡張や連携の接続を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
 ## Skill 定義
@@ -72,14 +72,14 @@ Extend or integrate with existing services in our main backend codebase while pr
 - Use existing **configuration, logging, metrics, and tracing** patterns.
 - Reuse established **error handling** and **retry/backoff** utilities.
 
-## Required behavior
+## 必須の動作
 
 1. Introduce new APIs, jobs, or events using existing framework patterns.
 2. Maintain backwards compatibility wherever possible; if breaking changes are required, document migration steps.
 3. Ensure all new behavior is observable via logs, metrics, and/or traces.
 4. Respect existing security and privacy requirements (authN/Z, PII handling, data residency).
 
-## Required artifacts
+## 必須の成果物
 
 - Code changes in the relevant service(s) and domain modules.
 - **Unit tests** for core logic and boundary conditions.

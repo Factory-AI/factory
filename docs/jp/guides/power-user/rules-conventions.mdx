@@ -1,13 +1,13 @@
 ---
 title: "ルールと規約"
-description: Organize coding standards and team conventions so Droid follows them consistently across all work.
+description: Droidがすべての作業で一貫して従えるように、コーディング標準とチーム規約を整理する。
 keywords: ['rules', 'conventions', 'standards', 'coding style', 'guidelines', 'team', 'consistency']
 ---
 
 ルールは、Droidが毎回従う成文化された標準です。（決定と文脈を捉える）メモリーとは異なり、ルールはコードがどのように書かれるべきかを定義します。このガイドでは、個人やチームにおいて効果的にルールを整理する方法を説明します。
 
 <Info>
-  **Works with Factory App:** These conventions work identically in both CLI and [Factory App](/web/getting-started/overview)—Droid reads the same `.factory/rules/` files regardless of interface.
+  **Factory Appでも利用可能:** これらの規約はCLIと[Factory App](/web/getting-started/overview)の両方で同じように機能します。インターフェースに関係なく、Droidは同じ`.factory/rules/`ファイルを読み込みます。
 </Info>
 
 ---
@@ -233,7 +233,7 @@ interface UserListProps {
 // 3. コンポーネント
 export function UserList({ users }: UserListProps) {
   const [selected, setSelected] = useState<string | null>(null);
-  
+
   return (
     <ul>
       {users.map(user => (
@@ -286,7 +286,7 @@ export function useUsers() {
 
 ### Testing Rules
 
-Create `.factory/rules/testing.md`:
+`.factory/rules/testing.md`を作成します:
 
 ```markdown
 # Testing Rules
@@ -389,7 +389,7 @@ const handlers = [
 
 ### Security Rules
 
-Create `.factory/rules/security.md`:
+`.factory/rules/security.md`を作成します:
 
 ```markdown
 # Security Rules
@@ -487,7 +487,7 @@ export async function GET(request: Request) {
 
 ### Layered Rules
 
-For teams, organize rules in layers:
+チームでは、ルールをレイヤーに分けて整理します:
 
 ```
 .factory/rules/
@@ -505,7 +505,7 @@ For teams, organize rules in layers:
     └── integration.md
 ```
 
-Reference in AGENTS.md:
+AGENTS.mdで参照します:
 
 ```markdown
 ## Rules
@@ -517,7 +517,7 @@ Reference in AGENTS.md:
 
 ### Rule Ownership
 
-Add ownership to track who maintains each rule set:
+各ルールセットの管理者を追跡するため、オーナー情報を追加します:
 
 ```markdown
 # TypeScript Rules
@@ -534,7 +534,7 @@ Add ownership to track who maintains each rule set:
 ## Current Limitation: No Glob Pattern Support
 
 <Warning>
-Currently, Droid doesn't support conditional rule application based on file patterns (e.g., "apply these rules only to `*.tsx` files"). This is on the roadmap.
+現在、Droidはファイルパターンに基づく条件付きルール適用（例: 「これらのルールを`*.tsx`ファイルにのみ適用」）をサポートしていません。これはロードマップ上にあります。
 </Warning>
 
 **回避策：**
@@ -641,7 +641,7 @@ Prettierやフォーマッターを自動実行します：
 ```
 
 <Tip>
-  See [Auto-formatting hooks](/guides/hooks/auto-formatting) and [Code Validation hooks](/guides/hooks/code-validation) for more examples.
+  その他の例は[自動整形フック](/guides/hooks/auto-formatting)と[コード検証フック](/guides/hooks/code-validation)を参照してください。
 </Tip>
 
 ---
@@ -681,9 +681,9 @@ Prettierやフォーマッターを自動実行します：
 
 <CardGroup cols={2}>
   <Card title="Setup Checklist" href="/guides/power-user/setup-checklist" icon="list-check">
-    Complete power user configuration
+    パワーユーザー設定を完了する
   </Card>
   <Card title="Memory Management" href="/guides/power-user/memory-management" icon="brain">
-    Capture decisions and context
+    意思決定とコンテキストを記録する
   </Card>
 </CardGroup>

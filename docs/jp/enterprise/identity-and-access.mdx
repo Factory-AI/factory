@@ -1,6 +1,6 @@
 ---
 title: "アイデンティティとアクセス管理"
-description: How Droids use org, project, and user identity to control who can run agents, where, and with which permissions.
+description: Droidが組織、プロジェクト、ユーザーIDを使い、誰がどこでどの権限でエージェントを実行できるかを制御する方法。
 ---
 
 アイデンティティとアクセス管理制御は、**誰がDroidを実行できるか**、どの環境で、どのようなポリシーの下で実行するかを制御します。
@@ -14,24 +14,19 @@ description: How Droids use org, project, and user identity to control who can r
 すべてのDroid実行は、3つのアイデンティティ次元に関連付けられます：
 
 <CardGroup cols={2}>
-  <Card title="User or machine identity" icon="user">
-    Human developers authenticate via SSO (SAML/OIDC), inheriting their
-    directory groups and roles. Automation (CI/CD, scheduled jobs) runs under
-    **machine identities** with long‑lived tokens or workload identities.
+  <Card title="ユーザーまたはマシンID" icon="user">
+    人間の開発者はSSO（SAML/OIDC）で認証し、ディレクトリグループとロールを継承します。自動化（CI/CD、スケジュールジョブ）は、長期トークンまたはワークロードIDを持つ**マシンID**で実行されます。
   </Card>
-  <Card title="Org / project / folder" icon="folders">
-    The active repo and `.factory/` folders determine the **org, project, and
-    folder context**. Policies at these levels decide which models, tools, and
-    integrations Droid may use.
+  <Card title="組織 / プロジェクト / フォルダ" icon="folders">
+    アクティブなリポジトリと`.factory/`フォルダが、**組織、プロジェクト、
+    フォルダコンテキスト**を決定します。これらのレベルのポリシーが、Droidが使用できるモデル、ツール、
+    連携を決定します。
   </Card>
-  <Card title="Runtime environment" icon="server">
-    Whether Droid is running on a laptop, in a CI runner, or in a sandboxed
-    VM/devcontainer is captured as environment attributes. Policies can treat
-    these differently (for example, higher autonomy only in CI or sandboxes).
+  <Card title="ランタイム環境" icon="server">
+    DroidがノートPC、CIランナー、サンドボックス化されたVM/devcontainerのどこで実行されているかが環境属性として取得されます。ポリシーはこれらを異なる扱いにできます（例: CIやサンドボックス内でのみ高い自律性を許可）。
   </Card>
-  <Card title="Session metadata" icon="activity">
-    Each Droid session records metadata such as session ID, CLI version, and git
-    branch, which is available for audit and OTEL telemetry.
+  <Card title="セッションメタデータ" icon="activity">
+    各Droidセッションは、セッションID、CLIバージョン、gitブランチなどのメタデータを記録し、監査とOTELテレメトリで利用できます。
   </Card>
 </CardGroup>
 
@@ -72,7 +67,7 @@ Factoryは3つの主要なアクター分類を区別します：
   - ローカル、IDE、またはチーム提供のスクリプトやCIジョブを通じてDroidを実行します。
   - 組織またはプロジェクトレベルで定義された設定を上書きすることはできません。
 
-ロール割り当てはIdPからFactoryに流れ、**階層設定エンジン**が各ロールが実際に変更できる内容を強制します。正確な優先順位ルールについては [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) を参照してください。
+ロール割り当てはIdPからFactoryに流れ、**階層設定エンジン**が各ロールが実際に変更できる内容を強制します。正確な優先順位ルールについては [階層設定と組織管理](/enterprise/hierarchical-settings-and-org-control) を参照してください。
 
 ---
 
@@ -88,34 +83,34 @@ DroidはCLIであるため、多くの環境で実行できます：
 エンタープライズ顧客は通常、Droidを**エンドポイント管理**と**ワークスペーストラスト**制御と組み合わせます：
 
 <AccordionGroup>
-  <Accordion title="Endpoint & MDM controls">
-    Use tools like **Jamf, Intune, or other MDM solutions** to control where Droid binaries can be installed, which users can run them, and which configuration files they can read.
+  <Accordion title="エンドポイントとMDM制御">
+    **Jamf、Intune、その他のMDMソリューション**などのツールを使用して、Droidバイナリのインストール場所、実行できるユーザー、読み取れる設定ファイルを制御します。
 
-    Common patterns include:
+    一般的なパターンは次のとおりです:
 
-    - Only allowing Droid to run under managed user accounts.
-    - Restricting configuration directories to corporate‑managed volumes.
-    - Enforcing OS‑level disk encryption and screen lock policies.
-
-  </Accordion>
-
-  <Accordion title="Workspace trust">
-    Treat Droid as trusted only in **known repositories and environments**:
-
-    - Pin Droid to specific paths or repos on developer machines.
-    - Require elevated approval or sandboxed environments for untrusted code.
-    - Use project‑level `.factory/` folders to mark which repos are "Droid‑ready" and what policies should apply.
+    - 管理対象ユーザーアカウントでのみDroidの実行を許可する。
+    - 設定ディレクトリを会社管理のボリュームに制限する。
+    - OSレベルのディスク暗号化と画面ロックポリシーを適用する。
 
   </Accordion>
 
-  <Accordion title="Environment‑aware policies">
-    The same developer may run Droid in multiple contexts: on their laptop, in CI, or in an isolated container.
+  <Accordion title="ワークスペースの信頼">
+    Droidを**既知のリポジトリと環境**でのみ信頼済みとして扱います:
 
-    Policies can take these differences into account:
+    - 開発者のマシンでDroidを特定のパスまたはリポジトリに固定する。
+    - 信頼できないコードには、追加承認またはサンドボックス環境を必須にする。
+    - プロジェクトレベルの`.factory/`フォルダを使用し、どのリポジトリが"Droid-ready"か、どのポリシーを適用するかを示す。
 
-    - Allow higher autonomy or more powerful tools **only** inside devcontainers or CI runners.
-    - Restrict network access or command execution when running on laptops.
-    - Tag OTEL telemetry with environment attributes to support environment‑specific alerting.
+  </Accordion>
+
+  <Accordion title="環境を考慮したポリシー">
+    同じ開発者が、ノートPC、CI、分離コンテナなど複数のコンテキストでDroidを実行する場合があります。
+
+    ポリシーはこれらの違いを考慮できます:
+
+    - devcontainerまたはCIランナー内でのみ、より高い自律性や強力なツールを許可する。
+    - ノートPCで実行している場合はネットワークアクセスやコマンド実行を制限する。
+    - 環境固有のアラートをサポートするため、OTELテレメトリに環境属性を付与する。
 
   </Accordion>
 </AccordionGroup>

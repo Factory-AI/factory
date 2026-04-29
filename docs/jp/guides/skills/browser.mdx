@@ -1,14 +1,14 @@
 ---
 title: "ブラウザ自動化スキル"
-description: Minimal Chrome DevTools Protocol helpers that let Droids start Chrome, navigate tabs, evaluate JavaScript, take screenshots, and capture DOM metadata without building a full MCP server.
+description: 完全なMCPサーバーを構築せずに、DroidがChromeの起動、タブ移動、JavaScript評価、スクリーンショット取得、DOMメタデータ取得を行える最小限のChrome DevTools Protocolヘルパー。
 keywords: ['browser', 'automation', 'chrome', 'cdp', 'devtools', 'screenshot', 'scraping', 'skill']
 ---
 
 <Note>
-  This cookbook is inspired by [Mario Zechner's “What if you don't need
+  このクックブックは[Mario Zechnerの“What if you don't need
   MCP?”](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/),
-  adapted into a reusable Factory skill so teams can share lightweight browser
-  helpers without standing up new services.
+  軽量なブラウザヘルパーをチームで共有できるよう、再利用可能なFactoryスキルとして調整されています
+  新しいサービスを立ち上げずに共有できます。
 </Note>
 
 browser skillは、いくつかの実行可能スクリプト（`start.js`、`nav.js`、`eval.js`、`screenshot.js`、`pick.js`）と簡潔な`SKILL.md`をバンドルしています。これらにより、Factory Droidsはポート`9222`でChromeを確実に起動し、既存のタブを操作し、構造化データをスクレイピングし、開発者マシン上で完全に動作しながら視覚的証拠を取得する信頼性の高い方法を提供します。
@@ -35,21 +35,19 @@ browser skillは、いくつかの実行可能スクリプト（`start.js`、`na
 ## セットアップ
 
 <Steps>
-  <Step title="Create the skill folder">
-    Run `mkdir -p .factory/skills/browser`.
+  <Step title="スキルフォルダを作成">
+    `mkdir -p .factory/skills/browser`を実行します。
   </Step>
-  <Step title="Copy scripts and package metadata">
-    Copy `start.js`, `nav.js`, `eval.js`, `screenshot.js`, `pick.js`, and
-    `package.json` into `.factory/skills/browser/` (or symlink to a shared
-    dotfiles repo).
+  <Step title="スクリプトとパッケージメタデータをコピー">
+    `start.js`、`nav.js`、`eval.js`、`screenshot.js`、`pick.js`、および
+    `package.json`を`.factory/skills/browser/`に配置します（または共有dotfilesリポジトリへシンボリックリンクします）。
   </Step>
-  <Step title="Install dependencies">
-    Run `npm install --prefix .factory/skills/browser puppeteer-core`, then
-    `chmod +x .factory/skills/browser/*.js`.
+  <Step title="依存関係をインストール">
+    `npm install --prefix .factory/skills/browser puppeteer-core`を実行し、その後`chmod +x .factory/skills/browser/*.js`を実行します。
   </Step>
-  <Step title="Restart Droid">
-    Restart `droid` (or your IDE integration) so it rescans workspace skills and
-    discovers `browser`.
+  <Step title="Droidを再起動">
+    `droid`（またはIDE連携）を再起動して、ワークスペーススキルを再スキャンし、
+    `browser`を検出できるようにします。
   </Step>
 </Steps>
 

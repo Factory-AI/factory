@@ -1,6 +1,6 @@
 ---
 title: "エンタープライズプラグインレジストリ"
-description: Centralize and distribute approved plugins across your organization with a private plugin marketplace.
+description: プライベートプラグインマーケットプレイスで、承認済みプラグインを組織全体に一元化して配布する。
 ---
 
 **Enterprise Plugin Registry**は、組織が社内全体での配布用に承認されたプラグインを管理する、中央集約型のプライベートリポジトリです。各チームが個別にプラグインを発見し検証する代わりに、レジストリは事前承認済み、保守され、すぐに使用可能な機能のキュレートされたカタログを提供します。
@@ -157,7 +157,7 @@ droid plugin update security-toolkit@acme-corp-plugins
 ```
 plugins/
 ├── security/           # AppSec team
-├── frontend/           # Web/mobile teams  
+├── frontend/           # Web/mobile teams
 ├── backend/            # API/services teams
 ├── data/               # Data engineering/science
 ├── platform/           # DevOps/SRE
@@ -213,7 +213,7 @@ plugins/
 - `dev` - 内部テスト向け
 
 <Note>
-Version pinning via the `version` field is not currently supported. The field is for documentation only.
+`version`フィールドによるバージョン固定は現在サポートされていません。このフィールドはドキュメント用です。
 </Note>
 
 ## プライベートリポジトリアクセス
@@ -290,48 +290,48 @@ droid plugin marketplace add /shared/company-plugins
 ```
 
 <Note>
-When removing a local marketplace from the registry, Droid does **not** delete the source directory. Only Git-cloned marketplaces have their directories removed on deletion.
+ローカルマーケットプレイスをレジストリから削除しても、Droidはソースディレクトリを**削除しません**。削除時にディレクトリが削除されるのは、Gitでクローンされたマーケットプレイスのみです。
 </Note>
 
 ## ベストプラクティス
 
 <AccordionGroup>
-  <Accordion title="Establish a review process">
-    Before adding plugins to the registry:
-    - Security review for any external dependencies
-    - Code review by platform team
+  <Accordion title="レビュープロセスを確立">
+    プラグインをレジストリに追加する前に:
+    - 外部依存関係のセキュリティレビュー
+    - プラットフォームチームによるコードレビュー
     - Testing in isolated environment
     - Documentation requirements
   </Accordion>
 
-  <Accordion title="Document each plugin">
-    Every plugin should have a README covering:
-    - What capabilities it provides
-    - When to use it (and when not to)
-    - Any prerequisites or dependencies
-    - Example usage
+  <Accordion title="各プラグインを文書化">
+    すべてのプラグインには以下を含むREADMEが必要です:
+    - 提供する機能
+    - 使用すべきタイミング（および使用すべきでないタイミング）
+    - 前提条件や依存関係
+    - 使用例
   </Accordion>
 
-  <Accordion title="Version semantically">
-    Use semantic versioning so teams know what to expect:
+  <Accordion title="セマンティックにバージョン管理">
+    チームが変更内容を予測できるようにセマンティックバージョニングを使用します:
     - **Major**: Breaking changes to commands or behavior
     - **Minor**: New capabilities, backward compatible
-    - **Patch**: Bug fixes only
+    - **Patch**: バグ修正のみ
   </Accordion>
 
-  <Accordion title="Monitor adoption">
-    Track which plugins are being used:
+  <Accordion title="導入状況を監視">
+    使用されているプラグインを追跡します:
     - Installation counts
     - Active usage metrics
-    - Feedback from teams
+    - チームからのフィードバック
     - Issues and feature requests
   </Accordion>
 
-  <Accordion title="Plan for deprecation">
-    When retiring plugins:
+  <Accordion title="非推奨化を計画">
+    プラグインを廃止するとき:
     - Announce deprecation timeline
     - Provide migration path to alternatives
-    - Keep deprecated plugins available (read-only) during transition
+    - 移行中は非推奨プラグインを読み取り専用で利用可能にします
   </Accordion>
 </AccordionGroup>
 
@@ -373,6 +373,6 @@ When removing a local marketplace from the registry, Droid does **not** delete t
 
 ## 関連
 
-- [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) - 組織レベル設定の仕組み
+- [階層設定と組織管理](/enterprise/hierarchical-settings-and-org-control) - 組織レベル設定の仕組み
 - [Plugins](/cli/configuration/plugins) - プラグインの基本とインストール
 - [Building Plugins](/guides/building/building-plugins) - 独自プラグインの作成

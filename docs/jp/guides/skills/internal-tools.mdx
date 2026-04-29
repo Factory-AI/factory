@@ -1,6 +1,6 @@
 ---
 title: "内部ツールスキル"
-description: A reusable skill for building and extending internal tools that support engineers, operators, and support teams.
+description: エンジニア、運用担当者、サポートチームを支援する社内ツールを構築・拡張する再利用可能なスキル。
 keywords: ['internal tools', 'admin panel', 'dashboard', 'utilities', 'skill', 'operations']
 ---
 
@@ -28,7 +28,7 @@ DroidがBuildするかによって**内部向けアプリケーション**（管
 2. **下記のスキルコンテンツを `.factory/skills/internal-tools/SKILL.md` （または `skill.mdx`）にコピー**
 
 <Tip>
-When you ask Factory to build or extend internal tools like admin panels or operational dashboards, it will automatically invoke this skill based on the task description.
+Factoryに管理パネルや運用ダッシュボードなどの社内ツールの構築・拡張を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
 ## スキル定義
@@ -61,7 +61,7 @@ Design, implement, or extend internal tools that help employees operate the syst
 
 ## Out of scope
 
-- Tools that require new identity providers or SSO integrations.
+- 新しいアイデンティティプロバイダーやSSO連携を必要とするツール。
 - Changes that bypass existing approval or change-management processes.
 - Direct manual-write tooling for core financial or compliance systems without explicit approval.
 
@@ -71,14 +71,14 @@ Design, implement, or extend internal tools that help employees operate the syst
 - Apply **role-based access control** and logging patterns consistently.
 - Prefer **read-only views and guarded actions** (confirmation dialogs, requiring justification text, etc.) for high-risk operations.
 
-## Required behavior
+## 必須の動作
 
 1. Implement flows that make the happy path fast while making destructive actions clearly intentional.
 2. Ensure all state changes are logged with **who**, **what**, and **when**, and link to existing audit/logging infrastructure.
 3. Provide clear feedback on success, errors, and partial failures.
 4. Design for operational debugging: include ids, timestamps, and links to related systems.
 
-## Required artifacts
+## 必須の成果物
 
 - Frontend and backend changes in the appropriate internal-tools modules.
 - **Automated tests** for critical operations (at least unit tests; integration tests where harnesses exist).

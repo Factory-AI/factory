@@ -1,6 +1,6 @@
 ---
 title: "AIデータアナリストスキル"
-description: A reusable skill for performing comprehensive data analysis, visualization, and statistical modeling using code-interpreter style workflows.
+description: コードインタープリター形式のワークフローで包括的なデータ分析、可視化、統計モデリングを行う再利用可能なスキル。
 keywords: ['data analyst', 'data analysis', 'visualization', 'statistics', 'python', 'skill', 'charts', 'insights']
 ---
 
@@ -28,7 +28,7 @@ keywords: ['data analyst', 'data analysis', 'visualization', 'statistics', 'pyth
 2. **以下のスキルコンテンツを`.factory/skills/ai-data-analyst/SKILL.md`（または`skill.mdx`）にコピーする**
 
 <Tip>
-When you ask Factory to perform data analysis, create visualizations, or build statistical models, it will automatically invoke this skill based on the task description.
+Factoryにデータ分析、可視化作成、統計モデル構築を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
 ## スキル定義
@@ -114,7 +114,7 @@ Unlike point-solution data analysis tools:
 - **Use appropriate corrections** for multiple comparisons.
 - **Explain practical significance** in addition to statistical significance.
 
-## Required behavior
+## 必須の動作
 
 1. **Understand the question**: Clarify what insights or decisions the analysis should support.
 2. **Explore the data**: Check structure, types, missing values, distributions, outliers.
@@ -125,7 +125,7 @@ Unlike point-solution data analysis tools:
 7. **Document thoroughly**: Explain methodology, assumptions, limitations, and conclusions.
 8. **Make reproducible**: Ensure others can re-run the analysis and get the same results.
 
-## Required artifacts
+## 必須の成果物
 
 - **Analysis script(s)**: Well-documented Python code performing the analysis.
 - **Visualizations**: Charts saved as high-quality image files (PNG/SVG).
@@ -260,7 +260,7 @@ df['rolling_std'] = df['value'].rolling(window=7).std()
 plt.figure(figsize=(12, 6))
 plt.plot(df['value'], label='Original')
 plt.plot(df['rolling_mean'], label='7-day Moving Avg', linewidth=2)
-plt.fill_between(df.index, 
+plt.fill_between(df.index,
                  df['rolling_mean'] - df['rolling_std'],
                  df['rolling_mean'] + df['rolling_std'],
                  alpha=0.3)

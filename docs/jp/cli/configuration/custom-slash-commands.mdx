@@ -1,13 +1,13 @@
 ---
 title: "カスタムスラッシュコマンド"
-description: Extend the CLI with reusable Markdown prompts or executable scripts that run from the chat input.
+description: チャット入力から実行できる再利用可能なMarkdownプロンプトや実行可能スクリプトでCLIを拡張する。
 keywords: ['slash commands', 'custom commands', 'commands', 'shortcuts', 'prompts', 'scripts', 'automation', 'templates']
 ---
 
 カスタムスラッシュコマンドは、繰り返し可能なプロンプトやセットアップ手順を`/shortcuts`に変換します。Droidは`.factory/commands`フォルダのペアをスキャンし、各ファイルをコマンドに変換して、結果を会話またはターミナルセッションに直接パイプします。
 
 <Note>
-**Skills are now user-invokable via slash commands.** You can create skills in `.factory/skills/` that work as both slash commands (user-invoked) and Droid-invocable capabilities. Your existing `.factory/commands/` files continue to work unchanged. For new commands, consider using [skills](/cli/configuration/skills) instead – they offer additional features like supporting files and [invocation control](/cli/configuration/skills#control-who-invokes-a-skill).
+**スキルはスラッシュコマンドとしてユーザーから呼び出せるようになりました。** `.factory/skills/`に、スラッシュコマンド（ユーザー起動）としてもDroidが呼び出せる機能としても動作するスキルを作成できます。既存の`.factory/commands/`ファイルはそのまま動作します。新しいコマンドでは、補助ファイルや[呼び出し制御](/cli/configuration/skills#control-who-invokes-a-skill)などの追加機能を備えた[スキル](/cli/configuration/skills)の使用を検討してください。
 </Note>
 
 ---
@@ -53,13 +53,13 @@ Please review `$ARGUMENTS` and summarize any merge blockers, test gaps, and risk
 `$ARGUMENTS`はコマンド名の後に入力されたすべてに展開されます。`$ARGUMENTS`を参照しない場合、本文は変更されずに送信されます。
 
 <Tip>
-  Markdown output is wrapped in a system notification so the next agent turn
-  immediately sees the prompt.
+  Markdown出力はシステム通知にラップされるため、次のエージェントターンで
+  すぐにプロンプトを確認できます。
 </Tip>
 
 <Note>
-  Positional placeholders like `$1` or `$2` are not supported yet—use
-  `$ARGUMENTS` and parse inside the prompt if you need structured input.
+  `$1`や`$2`のような位置プレースホルダーはまだサポートされていません。
+  構造化入力が必要な場合は`$ARGUMENTS`を使用し、プロンプト内で解析してください。
 </Note>
 
 ---

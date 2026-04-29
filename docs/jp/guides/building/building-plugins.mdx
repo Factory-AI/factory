@@ -1,6 +1,6 @@
 ---
 title: "プラグインの構築"
-description: Create shareable plugins with skills, commands, and tools for Droid.
+description: Droid向けにスキル、コマンド、ツールを含む共有可能なプラグインを作成する。
 keywords: ['plugins', 'building', 'development', 'skills', 'commands', 'marketplace', 'distribution']
 ---
 
@@ -9,13 +9,13 @@ keywords: ['plugins', 'building', 'development', 'skills', 'commands', 'marketpl
 ## クイックスタート
 
 <Steps>
-  <Step title="Create the plugin directory">
+  <Step title="プラグインディレクトリを作成">
     ```bash
     mkdir -p my-plugin/.factory-plugin
     ```
   </Step>
-  <Step title="Create the manifest">
-    Create `my-plugin/.factory-plugin/plugin.json`:
+  <Step title="マニフェストを作成">
+    `my-plugin/.factory-plugin/plugin.json`を作成します:
     ```json
     {
       "name": "my-plugin",
@@ -24,8 +24,8 @@ keywords: ['plugins', 'building', 'development', 'skills', 'commands', 'marketpl
     }
     ```
   </Step>
-  <Step title="Add a command">
-    Create `my-plugin/commands/hello.md`:
+  <Step title="コマンドを追加">
+    `my-plugin/commands/hello.md`を作成します:
     ```markdown
     ---
     description: Greet the user with a friendly message
@@ -34,13 +34,13 @@ keywords: ['plugins', 'building', 'development', 'skills', 'commands', 'marketpl
     Greet the user warmly and ask how you can help them today.
     ```
   </Step>
-  <Step title="Test your plugin">
-    Install from local directory to test:
+  <Step title="プラグインをテスト">
+    テストのためローカルディレクトリからインストールします:
     ```bash
     droid plugin marketplace add ./my-plugin
     droid plugin install my-plugin@my-plugin
     ```
-    Then run `/hello` to test.
+    次に`/hello`を実行してテストします。
   </Step>
 </Steps>
 
@@ -235,7 +235,7 @@ my-plugin/
 | `${CLAUDE_PLUGIN_ROOT}` | `${DROID_PLUGIN_ROOT}`のエイリアス（Claude Code互換性） |
 
 <Note>
-Plugin hooks cannot be imported via `/hooks import`. They only function within installed plugins where the plugin root path can be resolved.
+プラグインフックは`/hooks import`ではインポートできません。プラグインのルートパスを解決できるインストール済みプラグイン内でのみ機能します。
 </Note>
 
 ## MCPサーバーの追加
@@ -340,7 +340,7 @@ my-marketplace/
 - **パッチ**（1.0.0 → 1.0.1）：バグ修正
 
 <Note>
-Droid tracks plugin versions by Git commit hash, not semantic version. When users update a plugin, they always get the latest commit from the marketplace. Version pinning is not currently supported.
+DroidはプラグインバージョンをセマンティックバージョンではなくGitコミットハッシュで追跡します。ユーザーがプラグインを更新すると、常にマーケットプレイスの最新コミットを取得します。バージョン固定は現在サポートされていません。
 </Note>
 
 ## Claude Code互換性
@@ -350,33 +350,33 @@ DroidはClaude Codeプラグインと完全に互換性があります。Claude 
 ## ベストプラクティス
 
 <AccordionGroup>
-  <Accordion title="Keep plugins focused">
-    Design plugins around a single purpose or workflow. Prefer several small plugins over one monolithic plugin that does everything.
+  <Accordion title="プラグインの焦点を絞る">
+    プラグインは単一の目的またはワークフローを中心に設計します。すべてを行う巨大なプラグインより、複数の小さなプラグインを優先してください。
   </Accordion>
-  
-  <Accordion title="Document thoroughly">
-    Include a README with:
-    - What the plugin does
+
+  <Accordion title="徹底的に文書化する">
+    READMEには以下を含めます:
+    - プラグインの内容
     - Installation instructions
-    - All available commands and their usage
+    - 利用可能なすべてのコマンドと使い方
     - Configuration options
-    - Examples
+    - 例
   </Accordion>
-  
-  <Accordion title="Use semantic versioning">
-    Follow semver conventions so users know when updates might break their workflows.
+
+  <Accordion title="セマンティックバージョニングを使用">
+    更新がワークフローを壊す可能性があるタイミングをユーザーが把握できるよう、semver規約に従います。
   </Accordion>
-  
-  <Accordion title="Test across environments">
-    Ensure your plugin works on macOS, Linux, and Windows if applicable. Use portable shell commands and avoid platform-specific paths.
+
+  <Accordion title="複数環境でテスト">
+    該当する場合は、プラグインがmacOS、Linux、Windowsで動作することを確認します。移植性のあるシェルコマンドを使用し、プラットフォーム固有のパスを避けます。
   </Accordion>
-  
-  <Accordion title="Handle errors gracefully">
-    Scripts should fail gracefully without blocking the user. Log errors but don't crash sessions.
+
+  <Accordion title="エラーを適切に処理する">
+    スクリプトはユーザーをブロックせず、適切に失敗するべきです。エラーはログに記録し、セッションをクラッシュさせないでください。
   </Accordion>
-  
-  <Accordion title="Respect user privacy">
-    Don't collect telemetry or send data without explicit consent. Document any network requests your plugin makes.
+
+  <Accordion title="ユーザーのプライバシーを尊重する">
+    明示的な同意なしにテレメトリを収集したりデータを送信したりしないでください。プラグインが行うネットワークリクエストは文書化してください。
   </Accordion>
 </AccordionGroup>
 
@@ -456,16 +456,16 @@ Suggestions:
 ## 次のステップ
 
 <CardGroup cols={2}>
-  <Card title="Plugins overview" href="/cli/configuration/plugins" icon="puzzle-piece">
-    Learn about installing and managing plugins.
+  <Card title="プラグイン概要" href="/cli/configuration/plugins" icon="puzzle-piece">
+    プラグインのインストールと管理について学びます。
   </Card>
-  <Card title="Skills" href="/cli/configuration/skills" icon="wand-magic-sparkles">
-    Deep dive into creating powerful skills.
+  <Card title="スキル" href="/cli/configuration/skills" icon="wand-magic-sparkles">
+    強力なスキルの作成を詳しく学びます。
   </Card>
-  <Card title="Custom commands" href="/cli/configuration/custom-slash-commands" icon="terminal">
-    Create user-invoked slash commands.
+  <Card title="カスタムコマンド" href="/cli/configuration/custom-slash-commands" icon="terminal">
+    ユーザー起動のスラッシュコマンドを作成します。
   </Card>
-  <Card title="Custom Droids" href="/cli/configuration/custom-droids" icon="robot">
-    Create specialized subagents for your plugins.
+  <Card title="カスタムDroid" href="/cli/configuration/custom-droids" icon="robot">
+    プラグイン用の専門サブエージェントを作成します。
   </Card>
 </CardGroup>

@@ -1,6 +1,6 @@
 ---
 title: "GitHubアクション"
-description: Ready-to-use GitHub Actions workflows with droid exec.
+description: droid execですぐに使えるGitHub Actionsワークフロー。
 keywords: ['github actions', 'ci/cd', 'workflow', 'automation', 'pr review', 'droid exec']
 ---
 
@@ -13,7 +13,7 @@ keywords: ['github actions', 'ci/cd', 'workflow', 'automation', 'pr review', 'dr
 PR を自動的にレビューし、問題を修正して、詳細なフィードバックを投稿します。
 
 <Info>
-For a simpler setup, use the [`/install-github-app`](/cli/features/install-github-app) command which configures the Factory GitHub App with guided steps.
+より簡単に設定するには、ガイド付き手順でFactory GitHub Appを設定する[`/install-github-app`](/cli/features/install-github-app)コマンドを使用してください。
 </Info>
 
 ```yaml
@@ -28,25 +28,25 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Setup droid CLI
         run: |
           curl -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-      
+
       - name: Analyze and fix code
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
         run: |
           # Get the diff
           git diff origin/${{ github.base_ref }}...HEAD > pr_changes.diff
-          
+
           # Review and fix issues (pipe diff to stdin)
           cat pr_changes.diff | droid exec --auto low "
           Review this PR diff and:
@@ -55,14 +55,14 @@ jobs:
           3. Improve code comments where unclear
           4. DO NOT commit or push changes
           "
-          
+
           # Generate review report (needs --auto to write files)
           droid exec --auto low "Analyze the changes again and write a detailed review to review.md with:
           - Summary of automated fixes made
           - Remaining issues that need human attention
           - Security or performance concerns
           - Test coverage recommendations"
-      
+
       - name: Commit fixes if any
         run: |
           if [ -n "$(git status --porcelain)" ]; then
@@ -70,11 +70,11 @@ jobs:
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add -A
             git commit -m "fix: automated improvements for PR #${{ github.event.pull_request.number }}
-            
+
             Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
             git push
           fi
-      
+
       - name: Post review comment
         if: always()
         uses: actions/github-script@v7
@@ -82,13 +82,13 @@ jobs:
           script: |
             const fs = require('fs');
             let review = '## 🤖 Automated Review\n\n';
-            
+
             if (fs.existsSync('review.md')) {
               review += fs.readFileSync('review.md', 'utf8');
             } else {
               review += 'Review completed successfully.';
             }
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -111,15 +111,15 @@ on:
 jobs:
   update-docs-and-tests:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup droid CLI
         run: |
           curl -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-      
+
       - name: Update documentation
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
@@ -132,7 +132,7 @@ jobs:
           4. Update examples to match current implementation
           Write a summary of changes to docs-updates.md
           "
-      
+
       - name: Generate missing tests
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
@@ -145,7 +145,7 @@ jobs:
           4. Follow existing test patterns in the codebase
           Write a summary to test-updates.md
           "
-      
+
       - name: Create PR if changes exist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -155,19 +155,19 @@ jobs:
             BRANCH="auto-updates-$(date +%Y%m%d)"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            
+
             git checkout -b $BRANCH
             git add -A
             git commit -m "chore: automated documentation and test updates
-            
+
             Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
             git push origin $BRANCH
-            
+
             # Combine summaries for PR body
             PR_BODY="## Automated Updates\n\n"
             [ -f docs-updates.md ] && PR_BODY="${PR_BODY}### Documentation\n$(cat docs-updates.md)\n\n"
             [ -f test-updates.md ] && PR_BODY="${PR_BODY}### Tests\n$(cat test-updates.md)\n\n"
-            
+
             gh pr create \
               --title "🤖 Daily automated updates" \
               --body "$PR_BODY" \
@@ -189,15 +189,15 @@ on:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup droid CLI
         run: |
           curl -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-      
+
       - name: Security audit
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
@@ -211,7 +211,7 @@ jobs:
           5. Check for SQL injection or XSS vulnerabilities
           6. Generate security-report.md with all findings and fixes
           "
-      
+
       - name: Create issue if vulnerabilities found
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -224,7 +224,7 @@ jobs:
               --label "security,high-priority" \
               --assignee "${{ github.repository_owner }}"
           fi
-      
+
       - name: Create PR for fixes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -233,14 +233,14 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            
+
             git checkout -b security-fixes-$(date +%Y%m%d)
             git add -A
             git commit -m "fix: security updates and dependency patches
-            
+
             Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
             git push origin HEAD
-            
+
             gh pr create \
               --title "🔒 Security fixes" \
               --body-file security-report.md \

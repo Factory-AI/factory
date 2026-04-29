@@ -1,6 +1,6 @@
 ---
 title: "インポートの整理"
-description: "Automatically organize imports across your entire codebase using Droid Exec"
+description: "Droid Execを使ってコードベース全体のimportを自動整理する"
 keywords: ['imports', 'organize imports', 'refactor', 'automation', 'codebase', 'droid exec']
 ---
 
@@ -21,7 +21,7 @@ keywords: ['imports', 'organize imports', 'refactor', 'automation', 'codebase', 
 
 ## スクリプトを入手
 
-<Accordion title="View full script source">
+<Accordion title="完全なスクリプトソースを表示">
 ```bash
 #!/bin/bash
 
@@ -57,14 +57,14 @@ trap "rm -rf $TEMP_DIR" EXIT
 process_file() {
     local filepath="$1"
     local filename=$(basename "$filepath")
-    
+
     # Check if file has imports
     if ! grep -qE "^import |^const .* = require\(|^export .* from" "$filepath" 2>/dev/null; then
         return 0
     fi
-    
+
     echo -e "${BLUE}Processing: $filepath${NC}"
-    
+
     # The AI prompt for refactoring imports
     local prompt="Refactor the imports in $filepath:
 
@@ -80,15 +80,15 @@ process_file() {
 
 Only modify imports, preserve all other code exactly.
 Return the complete refactored file."
-    
+
     if [ "$DRY_RUN" = "true" ]; then
         echo -e "${YELLOW}  [DRY RUN] Would refactor imports${NC}"
         return 0
     fi
-    
+
     # Get original file hash for comparison
     local original_hash=$(md5sum "$filepath" 2>/dev/null | cut -d' ' -f1 || md5 -q "$filepath")
-    
+
     # Run droid to refactor the file
     if droid exec --auto low "$prompt" 2>/dev/null; then
         # Check if file was modified
@@ -158,7 +158,7 @@ fi
 ### 変更をプレビュー（ドライラン）
 
 <Warning>
-  Always start with a dry run to preview changes before modifying files. This helps you understand what transformations will be applied.
+  ファイルを変更する前に、変更をプレビューするため必ずドライランから始めます。これにより、適用される変換を把握できます。
 </Warning>
 
 ドライラン機能は`DRY_RUN`環境変数によって制御されます：
@@ -172,9 +172,9 @@ DRY_RUN=true ./droid-refactor-imports.sh src
 # Directory: src
 # Concurrency: 5
 # DRY RUN MODE
-# 
+#
 # Found 25 files to check
-# 
+#
 # Processing: src/components/Button.tsx
 #   [DRY RUN] Would refactor imports
 # Processing: src/utils/api.ts
@@ -222,7 +222,7 @@ Processing: packages/models/src/organization/user/defaultRepositories/handlers.t
 Perfect! I've successfully refactored the imports in the file...
 ## Summary
 
-I've successfully refactored the imports in `packages/models/src/organization/test-utils/fixtures.ts`. 
+I've successfully refactored the imports in `packages/models/src/organization/test-utils/fixtures.ts`.
 The imports are now properly organized with comments separating external packages from relative imports...
 ...
 ```
@@ -232,7 +232,7 @@ The imports are now properly organized with comments separating external package
 ### 例1：CommonJSからES6への変換
 
 <Tabs>
-  <Tab title="Before">
+  <Tab title="変更前">
     ```typescript
     // customers.ts
     const getStripeInstance = require("./instance").getStripeInstance;
@@ -240,8 +240,8 @@ The imports are now properly organized with comments separating external package
     import url from 'url';  // unused import
     ```
   </Tab>
-  
-  <Tab title="After">
+
+  <Tab title="変更後">
     ```typescript
     // customers.ts
     // Relative imports
@@ -254,7 +254,7 @@ The imports are now properly organized with comments separating external package
 ### 例2：重複インポートの統合
 
 <Tabs>
-  <Tab title="Before">
+  <Tab title="変更前">
     ```typescript
     // admin.ts
     const { auth } = require('firebase-admin');
@@ -275,8 +275,8 @@ The imports are now properly organized with comments separating external package
     import express from 'express';  // unused import
     ```
   </Tab>
-  
-  <Tab title="After">
+
+  <Tab title="変更後">
     ```typescript
     // admin.ts
     // External packages
@@ -295,44 +295,44 @@ The imports are now properly organized with comments separating external package
       getFirebaseAuthInstance as getDefaultFirebaseAuthInstance,
     } from './multi-admin';
     ```
-    <Note>Multiple imports from same module consolidated, unused removed, CommonJS converted</Note>
+    <Note>同じモジュールからの複数importを統合し、未使用を削除し、CommonJSを変換</Note>
   </Tab>
 </Tabs>
 
 ## ベストプラクティス
 
 <Note>
-  Follow these best practices for safe and effective import refactoring.
+  安全で効果的なimportリファクタリングのため、これらのベストプラクティスに従ってください。
 </Note>
 
 <Steps>
-  <Step title="Start with a dry run">
-    Always preview changes before modifying files:
+  <Step title="ドライランから始める">
+    ファイルを変更する前に必ず変更をプレビューします:
     ```bash
     # Preview what would happen without making changes
     DRY_RUN=true ./droid-refactor-imports.sh packages/models
     ```
   </Step>
-  
-  <Step title="Test on a small scope first">
-    Start with a specific subdirectory before processing entire codebase:
+
+  <Step title="まず小さな範囲でテストする">
+    コードベース全体を処理する前に、特定のサブディレクトリから始めます:
     ```bash
     # Test on a single module first
     ./droid-refactor-imports.sh packages/models/src/utils
-    
+
     # Then expand to larger directories
     ./droid-refactor-imports.sh packages/models
     ```
   </Step>
-  
-  <Step title="Process incrementally">
-    For large codebases, process directories separately for easier review:
+
+  <Step title="段階的に処理する">
+    大規模なコードベースでは、レビューしやすいようにディレクトリを分けて処理します:
     ```bash
     # Process each package separately
     ./droid-refactor-imports.sh packages/models
     git add -A && git commit -m "refactor: organize imports in models"
-    
-    ./droid-refactor-imports.sh packages/services  
+
+    ./droid-refactor-imports.sh packages/services
     git add -A && git commit -m "refactor: organize imports in services"
     ```
   </Step>

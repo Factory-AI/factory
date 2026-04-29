@@ -75,28 +75,28 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 <AccordionGroup>
   <Accordion title="OpenAI モデル">
     **OpenAI モデルは他の OpenAI モデルとのみペアリング可能**
-    
+
     - メインモデル: GPT-5 → 仕様モデル: GPT-5-Codex ✅
     - メインモデル: GPT-5 → 仕様モデル: Sonnet 4.5 ❌
-    
+
     OpenAI の内部推論フォーマットは暗号化されており、他のモデルプロバイダーと互換性がありません。
   </Accordion>
-  
+
   <Accordion title="推論有効な Anthropic モデル">
     **推論が有効な Anthropic モデルは他の Anthropic モデルとのみペアリング可能**
-    
+
     - メインモデル: Sonnet 4.5（推論オン）→ 仕様モデル: Sonnet 4.5 ✅
     - メインモデル: Sonnet 4.5（推論オン）→ 仕様モデル: GPT-5 ❌
-    
+
     拡張思考が有効な場合、推論トレースは同じプロバイダー内に留まる必要があります。
   </Accordion>
-  
+
   <Accordion title="推論無効な Anthropic モデル">
     **推論がオフの Anthropic モデルは非 OpenAI モデルとペアリング可能**
-    
+
     - メインモデル: Sonnet 4.5（推論オフ）→ 仕様モデル: 任意の非 OpenAI モデル ✅
     - メインモデル: Sonnet 4.5（推論オフ）→ 仕様モデル: DeepSeek ✅
-    
+
     推論が無効な場合、プロバイダー間での互換性が可能です。
   </Accordion>
 </AccordionGroup>
@@ -191,19 +191,19 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
   <Accordion title="同じモデルから開始">
     Specification Modeを初めて使用する場合は、両方のモードでデフォルトモデルを使用することから始めてください。慣れてきたら、異なる仕様モードモデルを試して、計画品質が向上するかどうかを確認してください。
   </Accordion>
-  
+
   <Accordion title="プロジェクトの複雑さを考慮">
     シンプルなプロジェクトでは個別のモデルは不要かもしれません。複雑な依存関係を持つ複雑なシステムでは、より強力な仕様モードモデルを使用することで、実装中の高コストなミスを防ぐことができます。
   </Accordion>
-  
+
   <Accordion title="推論をタスクの重要度に合わせる">
     アーキテクチャの決定には高い推論努力を使用し、定型的な機能追加には低い努力を使用してください。デフォルトと仕様モードの推論を独立して調整してください。
   </Accordion>
-  
+
   <Accordion title="互換性ルールを尊重">
     非互換なモデル組み合わせを強制しようとしないでください。制限は十分な技術的理由があって存在しており、違反はCLIによって防がれます。
   </Accordion>
-  
+
   <Accordion title="使用量を監視">
     より強力なモデルと高い推論努力はコストを増加させます。プレミアム設定を選択的に使用することで、品質ニーズと予算制約のバランスを取ってください。
   </Accordion>
@@ -216,19 +216,19 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 <AccordionGroup>
   <Accordion title="希望のモデルを選択できない">
     **原因:** そのモデルが現在のデフォルトモデルと互換性がありません。
-    
+
     **解決策:** 上記の[モデル互換性](#model-compatibility)ルールを確認してください。最初にデフォルトモデルを変更するか、推論設定を調整して互換性を有効にする必要がある場合があります。
   </Accordion>
-  
+
   <Accordion title="仕様モードモデルが自動的にクリアされた">
     **原因:** 設定されている仕様モードモデルと互換性のないモデルにデフォルトモデルを変更しました。
-    
+
     **解決策:** これは期待される動作です。新しいデフォルトモデルと互換性のある新しい仕様モードモデルを設定するか、両方のモードでデフォルトモデルを使用し続けてください。
   </Accordion>
-  
+
   <Accordion title="推論努力セレクターが表示されない">
     **原因:** 選択されたモデルが推論をサポートしていないか、Anthropic以外のモデル組み合わせを使用しています。
-    
+
     **解決策:** これは正常です。すべてのモデルが推論設定をサポートしているわけではありません。モデルはデフォルトの動作を使用します。
   </Accordion>
 </AccordionGroup>

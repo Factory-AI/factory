@@ -1,6 +1,6 @@
 ---
 title: "テスト自動化"
-description: "Automate test execution, coverage tracking, and test result validation with hooks"
+description: "フックでテスト実行、カバレッジ追跡、テスト結果検証を自動化する"
 keywords: ['testing', 'tests', 'coverage', 'automation', 'test runner', 'tdd', 'hook']
 ---
 
@@ -80,12 +80,12 @@ case "$file_path" in
   *.ts|*.tsx|*.js|*.jsx)
     # Find corresponding test file
     test_file=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.test.\1/')
-    
+
     if [ ! -f "$test_file" ]; then
       # Try alternate naming
       test_file=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.spec.\1/')
     fi
-    
+
     if [ -f "$test_file" ]; then
       # Run specific test file
       if command -v npm &> /dev/null && grep -q '"test"' package.json; then
@@ -101,13 +101,13 @@ case "$file_path" in
       echo "Consider creating: $test_file"
     fi
     ;;
-    
+
   *.py)
     # Run pytest for Python files
     if command -v pytest &> /dev/null; then
       # Find test file
       test_file=$(echo "$file_path" | sed 's/\.py$//' | sed 's|^src/|tests/test_|')_test.py
-      
+
       if [ -f "$test_file" ]; then
         pytest "$test_file" -v 2>&1 || {
           echo "❌ Tests failed" >&2
@@ -119,7 +119,7 @@ case "$file_path" in
       fi
     fi
     ;;
-    
+
   *.go)
     # Run go test
     if command -v go &> /dev/null; then
@@ -194,35 +194,35 @@ case "$file_path" in
     if command -v npm &> /dev/null && grep -q '"test"' package.json; then
       # Run coverage for specific file
       coverage_output=$(npm test -- --coverage --collectCoverageFrom="$file_path" --silent 2>&1 || true)
-      
+
       # Extract coverage percentage
       if echo "$coverage_output" | grep -qE "All files.*[0-9]+(\.[0-9]+)?%"; then
         coverage=$(echo "$coverage_output" | grep "All files" | grep -oE "[0-9]+(\.[0-9]+)?%" | head -1 | tr -d '%')
-        
+
         if (( $(echo "$coverage < $MIN_COVERAGE" | bc -l) )); then
           echo "❌ Coverage too low: ${coverage}% (minimum: ${MIN_COVERAGE}%)" >&2
           echo "Please add tests to improve coverage." >&2
           exit 2
         fi
-        
+
         echo "✓ Coverage: ${coverage}%"
       fi
     fi
     ;;
-    
+
   *.py)
     # Python coverage
     if command -v pytest &> /dev/null; then
       coverage_output=$(pytest --cov="$file_path" --cov-report=term 2>&1 || true)
-      
+
       if echo "$coverage_output" | grep -qE "TOTAL.*[0-9]+%"; then
         coverage=$(echo "$coverage_output" | grep "TOTAL" | grep -oE "[0-9]+%" | tr -d '%')
-        
+
         if [ "$coverage" -lt "$MIN_COVERAGE" ]; then
           echo "❌ Coverage too low: ${coverage}% (minimum: ${MIN_COVERAGE}%)" >&2
           exit 2
         fi
-        
+
         echo "✓ Coverage: ${coverage}%"
       fi
     fi
@@ -280,7 +280,7 @@ case "$file_path" in
     test_file2=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.spec.\1/')
     test_file3=$(echo "$file_path" | sed 's|^src/|tests/|; s/\.(ts|tsx|js|jsx)$/.test.\1/')
     ;;
-    
+
   *.py)
     test_file1=$(echo "$file_path" | sed 's|^src/|tests/|; s/\.py$/_test.py/')
     test_file2=$(echo "$file_path" | sed 's|^src/|tests/test_|')
@@ -306,7 +306,7 @@ if [ "$found_test" = false ]; then
   [ -n "$test_file3" ] && echo "  - $test_file3" >&2
   echo "" >&2
   echo "Or ask me: 'Create tests for $file_path'" >&2
-  
+
   # Warning only, don't block
   # Change to exit 2 to enforce test creation
 fi
@@ -350,7 +350,7 @@ case "$file_path" in
     # Find test files that import this file
     filename=$(basename "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$//')
     module_name=$(echo "$file_path" | sed 's|^src/||; s/\.(ts|tsx|js|jsx)$//')
-    
+
     # Search for imports
     affected_tests=$(grep -rl "from.*['\"].*$module_name['\"]" . \
       --include="*.test.ts" \
@@ -360,12 +360,12 @@ case "$file_path" in
       --include="*.spec.ts" \
       --include="*.spec.tsx" \
       2>/dev/null || true)
-    
+
     if [ -n "$affected_tests" ]; then
       echo "Running affected tests:"
       echo "$affected_tests" | sed 's/^/  - /'
       echo ""
-      
+
       # Run tests
       echo "$affected_tests" | while read -r test_file; do
         npm test -- "$test_file" 2>&1 || {
@@ -373,7 +373,7 @@ case "$file_path" in
           exit 2
         }
       done
-      
+
       echo "✓ All affected tests passed"
     else
       echo "No affected tests found"
@@ -423,7 +423,7 @@ fi
 
 if [ -f "$test_file" ]; then
   echo "Verifying snapshot update..."
-  
+
   if npm test -- "$test_file" -u 2>&1; then
     echo "✓ Snapshot update verified"
     echo ""
@@ -468,7 +468,7 @@ SLOW_TEST_THRESHOLD = 5.0
 def run_tests_with_timing(test_file):
     """Run tests and capture timing information."""
     start_time = time.time()
-    
+
     try:
         result = subprocess.run(
             ['npm', 'test', '--', test_file, '--verbose'],
@@ -476,9 +476,9 @@ def run_tests_with_timing(test_file):
             text=True,
             timeout=60
         )
-        
+
         elapsed = time.time() - start_time
-        
+
         # Parse test output for individual test times
         slow_tests = []
         for line in result.stdout.split('\n'):
@@ -488,29 +488,29 @@ def run_tests_with_timing(test_file):
                 test_name = match.group(1).strip()
                 test_time_ms = int(match.group(2))
                 test_time_s = test_time_ms / 1000.0
-                
+
                 if test_time_s > SLOW_TEST_THRESHOLD:
                     slow_tests.append((test_name, test_time_s))
-        
+
         return elapsed, slow_tests, result.returncode
-        
+
     except subprocess.TimeoutExpired:
         return None, [], 1
 
 try:
     input_data = json.load(sys.stdin)
     file_path = input_data.get('tool_input', {}).get('file_path', '')
-    
+
     if not file_path or not file_path.endswith(('.test.ts', '.test.tsx', '.spec.ts', '.spec.tsx')):
         sys.exit(0)
-    
+
     print(f"⏱️  Monitoring test performance for {file_path}...")
-    
+
     elapsed, slow_tests, returncode = run_tests_with_timing(file_path)
-    
+
     if elapsed is not None:
         print(f"\nTotal test time: {elapsed:.2f}s")
-        
+
         if slow_tests:
             print(f"\n⚠️  Found {len(slow_tests)} slow test(s):")
             for test_name, test_time in slow_tests:
@@ -518,13 +518,13 @@ try:
             print("\nConsider optimizing these tests or mocking expensive operations.")
         else:
             print("✓ All tests running within acceptable time")
-        
+
         # Don't block on slow tests, just warn
         sys.exit(returncode)
     else:
         print("❌ Tests timed out", file=sys.stderr)
         sys.exit(2)
-        
+
 except Exception as e:
     print(f"Error monitoring tests: {e}", file=sys.stderr)
     sys.exit(0)
@@ -567,7 +567,7 @@ failures=0
 
 for i in $(seq 1 $RUNS); do
   echo "Run $i/$RUNS..."
-  
+
   if ! npm test -- "$file_path" --silent 2>&1; then
     ((failures++))
   fi
@@ -584,7 +584,7 @@ if [ $failures -gt 0 ] && [ $failures -lt $RUNS ]; then
   echo "  - Timing dependencies" >&2
   echo "  - Non-deterministic data" >&2
   echo "  - External dependencies" >&2
-  
+
   # Warning only, don't block
   exit 0
 elif [ $failures -eq $RUNS ]; then
@@ -605,7 +605,7 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
 ## ベストプラクティス
 
 <Steps>
-  <Step title="Run tests asynchronously when possible">
+  <Step title="可能な場合はテストを非同期実行">
     Don't block Droid unnecessarily:
     ```bash
     # Run tests in background, report later
@@ -613,31 +613,31 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
     echo "Tests running in background..."
     ```
   </Step>
-  
-  <Step title="Set appropriate timeouts">
-    Allow enough time for test suites:
+
+  <Step title="適切なタイムアウトを設定">
+    テストスイートに十分な時間を確保します:
     ```json
     {
       "timeout": 120  // 2 minutes for test suites
     }
     ```
   </Step>
-  
-  <Step title="Use test file conventions">
-    Follow standard naming patterns:
+
+  <Step title="テストファイル規約を使用">
+    標準の命名パターンに従います:
     ```
     src/components/Button.tsx
     src/components/Button.test.tsx  // Co-located
-    
+
     Or:
-    
+
     src/components/Button.tsx
     tests/components/Button.test.tsx  // Separate directory
     ```
   </Step>
-  
-  <Step title="Make coverage configurable">
-    Different files may need different thresholds:
+
+  <Step title="カバレッジを設定可能にする">
+    ファイルごとに異なるしきい値が必要な場合があります:
     ```bash
     # .factory/.coverage-config
     src/critical/*.ts:90
@@ -645,13 +645,13 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
     src/experimental/*.ts:50
     ```
   </Step>
-  
-  <Step title="Cache test results">
-    Skip tests if code hasn't changed:
+
+  <Step title="テスト結果をキャッシュする">
+    コードが変更されていない場合はテストをスキップします:
     ```bash
     hash=$(md5sum "$file_path")
     cache_file="/tmp/test-cache-$hash"
-    
+
     if [ -f "$cache_file" ]; then
       echo "✓ Tests passed (cached)"
       exit 0
@@ -663,14 +663,14 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
 ## トラブルシューティング
 
 
-  
+
     **問題**: テスト実行がワークフローをブロックする
-    
+
     **解決策**: ユニットテストのみを実行し、統合テストをスキップ：
     ```bash
     # Fast unit tests only
     npm test -- --testPathPattern="unit" "$file"
-    
+
     # Or configure in package.json
     {
       "scripts": {
@@ -678,25 +678,25 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
       }
     }
     ```
-  
-  
-  
+
+
+
     **問題**: フック内でテストが失敗するが、手動実行では成功する
-    
+
     **解決策**: 環境の違いを確認：
     ```bash
     # Ensure same environment
     export NODE_ENV=test
     export CI=true
-    
+
     # Use project test script
     npm test  # Not direct jest call
     ```
-  
-  
-  
+
+
+
     **問題**: カバレッジに生成ファイルが含まれる
-    
+
     **解決策**: カバレッジの除外設定を構成：
     ```json
     // jest.config.js
@@ -709,7 +709,7 @@ chmod +x .factory/hooks/detect-flaky-tests.sh
       ]
     }
     ```
-  
+
 
 
 ## 関連項目
