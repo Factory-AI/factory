@@ -105,7 +105,7 @@ chmod +x .factory/hooks/protect-files.sh
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -175,7 +175,7 @@ PostToolUse検証の場合：
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -274,7 +274,7 @@ chmod +x .factory/hooks/scan-secrets.sh
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -353,7 +353,7 @@ chmod +x .factory/hooks/check-deps.sh
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -445,7 +445,7 @@ chmod +x .factory/hooks/lint-check.sh
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -554,7 +554,7 @@ pip install radon  # For Python complexity checking
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -626,7 +626,7 @@ chmod +x .factory/hooks/validate-business-logic.sh
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -724,7 +724,7 @@ chmod +x .factory/hooks/check-architecture.py
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -847,7 +847,7 @@ npm run lint "$file_path"
 
 ## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - 完全なフックAPIドキュメント
+- [フックリファレンス](/jp/reference/hooks-reference) - 完全なフックAPIドキュメント
 - [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
 - [Auto-formatting](/guides/hooks/auto-formatting) - 自動コードフォーマット
 - [Git workflow hooks](/guides/hooks/git-workflows) - Git統合

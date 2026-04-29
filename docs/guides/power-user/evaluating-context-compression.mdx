@@ -65,11 +65,11 @@ The judge is blinded to which compression method produced the response.
 
 ## Compression approaches compared
 
-| Approach | What it produces | Key trade-off |
-|---|---|---|
-| **Factory** | A **structured, persistent summary** with explicit sections (intent, file modifications, decisions, next steps). Updates by summarizing only the newly-truncated span and **merging** into the existing summary (“anchored iterative summarization”). | Slightly larger summaries than the most aggressive compression, but better retention of task-critical details. |
-| **OpenAI** | `/responses/compact`: an **opaque** compressed representation optimized for reconstruction fidelity. | Highest compression, but low interpretability (you can’t inspect what was preserved). |
-| **Anthropic** | Claude SDK built-in compression: detailed structured summaries (often 7–12k chars), regenerated on each compression. | High-quality summaries, but regenerating the whole summary each time can cause drift across repeated compressions. |
+| Approach      | What it produces                                                                                                                                                                                                                                      | Key trade-off                                                                                                      |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Factory**   | A **structured, persistent summary** with explicit sections (intent, file modifications, decisions, next steps). Updates by summarizing only the newly-truncated span and **merging** into the existing summary (“anchored iterative summarization”). | Slightly larger summaries than the most aggressive compression, but better retention of task-critical details.     |
+| **OpenAI**    | `/responses/compact`: an **opaque** compressed representation optimized for reconstruction fidelity.                                                                                                                                                  | Highest compression, but low interpretability (you can’t inspect what was preserved).                              |
+| **Anthropic** | Claude SDK built-in compression: detailed structured summaries (often 7–12k chars), regenerated on each compression.                                                                                                                                  | High-quality summaries, but regenerating the whole summary each time can cause drift across repeated compressions. |
 
 ---
 
@@ -79,11 +79,11 @@ Factory reports evaluating **36,000+ messages** from production sessions across 
 
 ### Overall scores (0–5)
 
-| Method | Overall | Accuracy | Context | Artifact | Completeness | Continuity | Instruction |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Factory | **3.70** | **4.04** | **4.01** | **2.45** | **4.44** | **3.80** | **4.99** |
-| Anthropic | 3.44 | 3.74 | 3.56 | 2.33 | 4.37 | 3.67 | 4.95 |
-| OpenAI | 3.35 | 3.43 | 3.64 | 2.19 | 4.37 | 3.77 | 4.92 |
+| Method    | Overall  | Accuracy | Context  | Artifact | Completeness | Continuity | Instruction |
+| --------- | --------: | --------: | --------: | --------: | ------------: | ----------: | -----------: |
+| Factory   | **3.70** | **4.04** | **4.01** | **2.45** | **4.44**     | **3.80**   | **4.99**    |
+| Anthropic | 3.44     | 3.74     | 3.56     | 2.33     | 4.37         | 3.67       | 4.95        |
+| OpenAI    | 3.35     | 3.43     | 3.64     | 2.19     | 4.37         | 3.77       | 4.92        |
 
 ### Compression ratio vs. quality
 
