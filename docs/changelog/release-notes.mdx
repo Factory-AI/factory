@@ -4,6 +4,35 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 28" rss={{ title: "CLI Updates", description: "DeepSeek V4 Pro support, MCP elicitation resume, security review on by default, and CLI stability fixes" }}>
+  `v0.112.0`
+
+## New features
+
+- **DeepSeek V4 Pro** - Added support for the DeepSeek V4 Pro model
+- **Resume MCP elicitations** - Elicitation prompts from MCP tools can now be resumed after interruption
+- **Extra-usage payment status** - Failed and succeeded extra-usage payment statuses are now surfaced in the payment modal (app)
+
+## Improvements
+
+- **Security review on by default** - The security-review skill is now enabled by default
+- **Non-retryable 4xx responses** - 4xx responses (other than 429) are no longer retried, so failures surface faster
+- **Persistent Slack loading status** - Slack loading indicators now stay visible past status updates for clearer progress feedback (app)
+
+## Bug fixes
+
+- **ApplyPatch absolute paths** - Absolute paths are now honored verbatim in the ApplyPatch tool
+- **Working directory redraw** - Fixed working directory redraw and fork `cwd` overrides
+- **Mission model settings** - Mission model settings are now snapshotted at launch so they don't drift mid-run
+- **Custom statusline** - Custom statusline now uses session-scoped data instead of leaking across sessions
+- **Model-switch tool history** - Tool history is now sanitized when switching models to prevent rendering issues
+- **Context window error detection** - Recognize additional context-window error phrasings so recovery is more reliable
+- **Spec approval comments** - Spec approval comments now align with conversation messages
+- **Desktop local default** - Desktop now consistently defaults to local connections (app)
+- **Onboarding loading state** - Fixed a stuck loading state during onboarding (app)
+
+</Update>
+
 <Update label="April 28" rss={{ title: "CLI Updates", description: "Italian translations, interval loop command, refreshed hooks UI, faster Grep, and CLI stability fixes" }}>
   `v0.111.0`
 
