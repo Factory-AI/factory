@@ -123,32 +123,18 @@ droid
 
 ### コスト倍率
 
-| モデル                           | 倍率             | 最適用途                                      |
-| ----------------------------- | -------------- | ----------------------------------------- |
-| Droid Core (MiniMax M2.7)     | 0.12×          | 推論サポート付きの最安価オプション                         |
-| Gemini 3 Flash                | 0.2×           | 高頻度タスク向けの高速・安価                            |
-| Droid Core (Kimi K2.5)        | 0.25×          | コスト重視の作業、画像サポート                           |
-| Claude Haiku 4.5              | 0.4×           | クイック編集、日常的な作業                             |
-| Droid Core (Kimi K2.6)        | 0.4×           | コスト重視の作業、画像サポート、High推論オプション               |
-| Droid Core (GLM-5)            | 0.4×           | バルク自動化、シンプルなタスク                           |
-| Droid Core (GLM-5.1)          | 0.55×          | Droid Coreでより強力な品質を求める場合の新しいオープンソースGLMモデル |
-| GPT-5.2-Codex / GPT-5.3-Codex | 0.7×           | Extra High推論による高度なコーディング                  |
-| Gemini 3 Pro                  | 0.8×           | 研究、分析                                     |
-| Gemini 3.1 Pro                | 0.8×           | 新世代Geminiによる研究、分析                         |
-| Claude Sonnet 4.5             | 1.2×           | 品質/コストのバランス                               |
-| Claude Opus 4.5               | 2×             | 複雑な推論、アーキテクチャ                             |
-| Claude Opus 4.6               | 2×             | 前フラッグシップ、Max推論                            |
-| Claude Opus 4.6 Fast          | 12×            | より高速なレスポンス用にチューニングされたOpus 4.6             |
-| Claude Opus 4.7               | 2× (4月30日まで1×) | 最新フラッグシップ、ローンチ期間中は割引                      |
+現在のモデル倍率は[利用可能なモデル](/jp/models)で確認できます。
+
+### タスク別モデル選択
 
 ```
-### タスク別モデル選択
 Simple edit, formatting      → Haiku 4.5 (0.4×)
 Implement feature from spec  → GPT-5.3-Codex (0.7×)
 Debug complex issue          → Sonnet 4.5 (1.2×)
-Architecture planning        → Opus 4.7 (2×, 1× until April 30) or Opus 4.6 (2×)
-Bulk file processing         → Droid Core (GLM-5 at 0.4× or GLM-5.1 at 0.55×)
+Architecture planning        → Opus 4.7 (1x, 2x after 4/30) or Opus 4.6 (2×)
+Bulk file processing         → Droid Core (MiniMax M2.7 at 0.12× or Kimi K2.6 at 0.4×)
 ```
+
 ### 推論努力の影響
 
 推論レベルが高い = より多くの「思考」トークンを使用するが、多くの場合再試行回数は減る。
