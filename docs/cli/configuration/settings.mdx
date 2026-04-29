@@ -58,7 +58,6 @@ Local overrides merge on top of the corresponding `settings.json` at the same le
 | `enableDroidShield`        | `true`, `false`                                                                                                                                                                                                                                                          | `true`                        | Enable secret scanning and git guardrails.                                 |
 | `hooksDisabled`            | `true`, `false`                                                                                                                                                                                                                                                          | `false`                       | Globally disable all hooks execution.                                      |
 | `ideAutoConnect`           | `true`, `false`                                                                                                                                                                                                                                                          | `false`                       | Auto-connect to IDE from external terminals.                               |
-| `todoDisplayMode`          | `inline`, `pinned`                                                                                                                                                                                                                                                       | `pinned`                      | How the todo list is displayed in the UI.                                  |
 | `showThinkingInMainView`   | `true`, `false`                                                                                                                                                                                                                                                          | `false`                       | Display AI thinking/reasoning blocks in the main chat view.                |
 | `customModels`             | Array of model configs                                                                                                                                                                                                                                                   | `[]`                          | Custom model configurations for BYOK. See [BYOK docs](/cli/byok/overview). |
 
@@ -156,12 +155,6 @@ The `ideAutoConnect` setting controls whether droid automatically connects to yo
 - **`false`** – Only auto-connect when running inside IDE terminal (default)
 - **`true`** – Auto-connect to IDE from any terminal
 
-### Todo display mode
-
-The `todoDisplayMode` setting controls how the todo list is displayed in the UI:
-
-- **`pinned`** – Todo list is pinned above the input area (default)
-- **`inline`** – Todo list appears inline within the message flow
 
 ## Command allowlist & denylist
 
@@ -193,8 +186,7 @@ Review and update these arrays periodically to match your workflow and security 
   "cloudSessionSync": true,
   "completionSound": "fx-ok01",
   "awaitingInputSound": "fx-ack01",
-  "soundFocusMode": "always",
-  "todoDisplayMode": "pinned"
+  "soundFocusMode": "always"
 }
 ```
 
@@ -204,5 +196,5 @@ Review and update these arrays periodically to match your workflow and security 
 
 - [CLI Overview](/cli/getting-started/overview) – see the main TUI workflow
 - [CLI Reference](/reference/cli-reference) – command flags & options
-- [IDE Integrations](/cli/configuration/ide-integrations) – editor-specific setup
+- [IDE Integrations](/integrations/ide-integrations) – editor-specific setup
 - [Custom models & BYOK](/cli/byok/overview) - add custom models and API keys
