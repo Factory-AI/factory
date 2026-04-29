@@ -4,6 +4,55 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 28" rss={{ title: "CLI Updates", description: "Italian translations, interval loop command, refreshed hooks UI, faster Grep, and CLI stability fixes" }}>
+  `v0.111.0`
+
+## New features
+
+- **Italian translations** - Factory CLI is now available in Italian
+- **`interval` loop command** - New CLI command for running tasks on an interval
+- **Refreshed hooks UI** - Updated UI for managing hooks
+- **Custom commands in Task prompts** - Task tool prompts now expand resolved custom slash commands
+- **Chat transcript scroll keybinds** - New keyboard shortcuts to jump between turns in the chat view
+- **Mission usage limits** - Missions now gracefully handle usage-limit responses
+- **Mission entry overage gating** - Mission entry now respects your organization's overage preference
+- **Per-run automation viewer** - New visual viewer to inspect each automation run (app)
+- **Model access table** - New UI for managing organization-level model access (app)
+- **Factory Academy certification tiers** - Detect certification tiers and expanded quizzes to 30 questions (app)
+
+## Improvements
+
+- **Faster Grep tool** - Grep tool now uses a hybrid ripgrep engine for better performance
+- **Stronger secret scrubbing** - Expanded secret scrubber patterns and applied scrubbing to Read tool output
+- **Faster `/new` and `/clear`** - Daemon session is now eagerly initialized on `/new` and `/clear`
+- **Centered settings on wide screens** - Settings content is now capped at 1024px and centered on wide displays (app)
+- **Clearer schedule timezones** - Automation schedule timezone and run history timestamps are clearer (app)
+- **Devtools shortcut on desktop** - Re-enabled the devtools keyboard shortcut in production builds (app)
+- **Clearer seat-limit errors** - Clearer error message when inviting members beyond your seat limit (app)
+- **Native Slack loading status** - Slack now uses native loading status indicators (app)
+
+## Bug fixes
+
+- **Subagents during silent tools** - Task subagents are now kept alive during silent execution
+- **Execute preview rendering** - Bounded Execute tool preview rendering to prevent layout issues
+- **Execute approval rendering** - Stabilized rendering during Execute tool approvals
+- **Image paste on Linux/SSH** - Fixed image paste in Ghostty on Linux and over SSH
+- **Skill and droid preview scroll** - Skill and droid previews now scroll with arrow keys
+- **Chat Esc sequence** - Codified Esc key behavior in chat
+- **Spec mode editor flow** - Unblocked the spec edit flow when the editor opens via the system default
+- **Terminal indicator on Windows** - Hidden the terminal indicator on Windows in the footer
+- **Spec confirmation status** - Spec confirmation status is now gated on tool confirmation state
+- **Linux mission wake-lock leaks** - Prevented wake-lock leaks during Linux missions
+- **Skills rendering** - Fixed a parsing issue when rendering skills
+- **Subagent nesting** - Fixed nesting of subagents in the UI (app)
+- **Cloud-synced computer sessions** - Cloud-synced computer sessions now display correctly (app)
+- **Login screen error toast** - Suppressed an `/auth/me` error toast on the login screen (app)
+- **Slack thread replies** - Slack now only forwards thread replies via `app_mention` (app)
+- **Empty GitHub repos** - Added support for empty GitHub repositories (app)
+- **Daemon directory paths** - Directory paths are now normalized in the daemon and render properly in the frontend (app)
+
+</Update>
+
 <Update label="April 26" rss={{ title: "CLI Updates", description: "Auto-fallback to Droid Core, per-tool MCP autonomy overrides, desktop system theming, and CLI stability fixes" }}>
   `v0.109.3`
 
