@@ -1,0 +1,720 @@
+---
+title: "テスト自動化"
+description: "Automate test execution, coverage tracking, and test result validation with hooks"
+keywords: ['testing', 'tests', 'coverage', 'automation', 'test runner', 'tdd', 'hook']
+---
+
+このクックブックでは、Droidがコードを変更した際に自動的にテストを実行し、テストカバレッジを維持し、テスト要件を強制する方法を説明します。
+
+## 仕組み
+
+テストフックでは以下のことができます：
+
+1. **テストの自動実行**: コード変更後にテストを実行
+2. **カバレッジの追跡**: カバレッジの閾値を監視・強制
+3. **テストファイルの検証**: 新しいコードに対応するテストの存在を確認
+4. **特定テストの実行**: 関連するテストスイートのみを実行
+5. **レポートの生成**: テストとカバレッジのレポートを作成
+
+## 前提条件
+
+あなたのスタック用のテストフレームワークをインストールしてください：
+
+<CodeGroup>
+
+```bash JavaScript/TypeScript
+npm install -D jest @testing-library/react vitest
+npm install -D @vitest/coverage-v8  # For coverage
+```
+
+```bash Python
+pip install pytest pytest-cov
+pip install coverage  # For coverage tracking
+```
+
+```bash Go
+# go test is built-in
+go install github.com/gotestyourself/gotestsum@latest  # Better test output
+```
+
+</CodeGroup>
+
+## 基本的なテスト自動化
+
+### コード変更後のテスト実行
+
+Droidがファイルを編集した際に自動的にテストを実行します。
+
+`.factory/hooks/run-tests.sh`を作成：
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only run tests after file write/edit
+if [ "$tool_name" != "Write" ] && [ "$tool_name" != "Edit" ]; then
+  exit 0
+fi
+
+# Skip non-code files
+if ! echo "$file_path" | grep -qE '\.(ts|tsx|js|jsx|py|go)$'; then
+  exit 0
+fi
+
+# Skip test files themselves
+if echo "$file_path" | grep -qE '\.(test|spec)\.(ts|tsx|js|jsx)$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+echo "🧪 Running tests for changed file..."
+
+# Determine test command based on file type
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    # Find corresponding test file
+    test_file=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.test.\1/')
+    
+    if [ ! -f "$test_file" ]; then
+      # Try alternate naming
+      test_file=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.spec.\1/')
+    fi
+    
+    if [ -f "$test_file" ]; then
+      # Run specific test file
+      if command -v npm &> /dev/null && grep -q '"test"' package.json; then
+        npm test -- "$test_file" 2>&1 || {
+          echo "❌ Tests failed for $test_file" >&2
+          echo "Please fix the failing tests." >&2
+          exit 2
+        }
+        echo "✓ Tests passed for $test_file"
+      fi
+    else
+      echo "⚠️ No test file found for $file_path"
+      echo "Consider creating: $test_file"
+    fi
+    ;;
+    
+  *.py)
+    # Run pytest for Python files
+    if command -v pytest &> /dev/null; then
+      # Find test file
+      test_file=$(echo "$file_path" | sed 's/\.py$//' | sed 's|^src/|tests/test_|')_test.py
+      
+      if [ -f "$test_file" ]; then
+        pytest "$test_file" -v 2>&1 || {
+          echo "❌ Tests failed" >&2
+          exit 2
+        }
+        echo "✓ Tests passed"
+      else
+        echo "⚠️ No test file found at $test_file"
+      fi
+    fi
+    ;;
+    
+  *.go)
+    # Run go test
+    if command -v go &> /dev/null; then
+      package=$(dirname "$file_path")
+      go test "./$package" -v 2>&1 || {
+        echo "❌ Tests failed" >&2
+        exit 2
+      }
+      echo "✓ Tests passed"
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/run-tests.sh
+```
+
+`.factory/settings.json`に追加：
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Create|Edit|ApplyPatch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/run-tests.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### テストカバレッジの強制
+
+テストカバレッジを低下させる変更をブロックします。
+
+`.factory/hooks/check-coverage.sh`を作成：
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only check code files
+if ! echo "$file_path" | grep -qE '\.(ts|tsx|js|jsx|py)$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Minimum coverage threshold
+MIN_COVERAGE="${DROID_MIN_COVERAGE:-80}"
+
+echo "📊 Checking test coverage..."
+
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    # Jest coverage
+    if command -v npm &> /dev/null && grep -q '"test"' package.json; then
+      # Run coverage for specific file
+      coverage_output=$(npm test -- --coverage --collectCoverageFrom="$file_path" --silent 2>&1 || true)
+      
+      # Extract coverage percentage
+      if echo "$coverage_output" | grep -qE "All files.*[0-9]+(\.[0-9]+)?%"; then
+        coverage=$(echo "$coverage_output" | grep "All files" | grep -oE "[0-9]+(\.[0-9]+)?%" | head -1 | tr -d '%')
+        
+        if (( $(echo "$coverage < $MIN_COVERAGE" | bc -l) )); then
+          echo "❌ Coverage too low: ${coverage}% (minimum: ${MIN_COVERAGE}%)" >&2
+          echo "Please add tests to improve coverage." >&2
+          exit 2
+        fi
+        
+        echo "✓ Coverage: ${coverage}%"
+      fi
+    fi
+    ;;
+    
+  *.py)
+    # Python coverage
+    if command -v pytest &> /dev/null; then
+      coverage_output=$(pytest --cov="$file_path" --cov-report=term 2>&1 || true)
+      
+      if echo "$coverage_output" | grep -qE "TOTAL.*[0-9]+%"; then
+        coverage=$(echo "$coverage_output" | grep "TOTAL" | grep -oE "[0-9]+%" | tr -d '%')
+        
+        if [ "$coverage" -lt "$MIN_COVERAGE" ]; then
+          echo "❌ Coverage too low: ${coverage}% (minimum: ${MIN_COVERAGE}%)" >&2
+          exit 2
+        fi
+        
+        echo "✓ Coverage: ${coverage}%"
+      fi
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/check-coverage.sh
+```
+
+カバレッジ閾値を設定：
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export DROID_MIN_COVERAGE=75
+```
+
+### 新しいファイルに対するテストの必須化
+
+新しいコードファイルに対応するテストの存在を確認します。
+
+`.factory/hooks/require-tests.sh`を作成：
+
+```bash
+#!/bin/bash
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only check Write operations (new files)
+if [ "$tool_name" != "Write" ]; then
+  exit 0
+fi
+
+# Only check code files in src/
+if ! echo "$file_path" | grep -qE '^src/.*\.(ts|tsx|js|jsx|py)$'; then
+  exit 0
+fi
+
+# Skip if it's already a test file
+if echo "$file_path" | grep -qE '\.(test|spec)\.(ts|tsx|js|jsx)$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+
+# Determine expected test file location
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    test_file1=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.test.\1/')
+    test_file2=$(echo "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$/.spec.\1/')
+    test_file3=$(echo "$file_path" | sed 's|^src/|tests/|; s/\.(ts|tsx|js|jsx)$/.test.\1/')
+    ;;
+    
+  *.py)
+    test_file1=$(echo "$file_path" | sed 's|^src/|tests/|; s/\.py$/_test.py/')
+    test_file2=$(echo "$file_path" | sed 's|^src/|tests/test_|')
+    test_file3=""
+    ;;
+esac
+
+# Check if any test file exists
+found_test=false
+for test_file in "$test_file1" "$test_file2" "$test_file3"; do
+  if [ -n "$test_file" ] && [ -f "$cwd/$test_file" ]; then
+    found_test=true
+    break
+  fi
+done
+
+if [ "$found_test" = false ]; then
+  echo "⚠️ No test file found for $file_path" >&2
+  echo "" >&2
+  echo "Please create a test file at one of:" >&2
+  echo "  - $test_file1" >&2
+  [ -n "$test_file2" ] && echo "  - $test_file2" >&2
+  [ -n "$test_file3" ] && echo "  - $test_file3" >&2
+  echo "" >&2
+  echo "Or ask me: 'Create tests for $file_path'" >&2
+  
+  # Warning only, don't block
+  # Change to exit 2 to enforce test creation
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/require-tests.sh
+```
+
+
+## 高度なテスト自動化
+
+### スマートテスト選択
+
+変更の影響を受けるテストのみを実行します。
+
+`.factory/hooks/run-affected-tests.sh`を作成：
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+if [ "$tool_name" != "Write" ] && [ "$tool_name" != "Edit" ]; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+# Find tests that import this file
+echo "🔍 Finding affected tests..."
+
+case "$file_path" in
+  *.ts|*.tsx|*.js|*.jsx)
+    # Find test files that import this file
+    filename=$(basename "$file_path" | sed -E 's/\.(ts|tsx|js|jsx)$//')
+    module_name=$(echo "$file_path" | sed 's|^src/||; s/\.(ts|tsx|js|jsx)$//')
+    
+    # Search for imports
+    affected_tests=$(grep -rl "from.*['\"].*$module_name['\"]" . \
+      --include="*.test.ts" \
+      --include="*.test.tsx" \
+      --include="*.test.js" \
+      --include="*.test.jsx" \
+      --include="*.spec.ts" \
+      --include="*.spec.tsx" \
+      2>/dev/null || true)
+    
+    if [ -n "$affected_tests" ]; then
+      echo "Running affected tests:"
+      echo "$affected_tests" | sed 's/^/  - /'
+      echo ""
+      
+      # Run tests
+      echo "$affected_tests" | while read -r test_file; do
+        npm test -- "$test_file" 2>&1 || {
+          echo "❌ Test failed: $test_file" >&2
+          exit 2
+        }
+      done
+      
+      echo "✓ All affected tests passed"
+    else
+      echo "No affected tests found"
+    fi
+    ;;
+esac
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/run-affected-tests.sh
+```
+
+
+### スナップショットテストの検証
+
+スナップショットの更新を検出・検証します。
+
+`.factory/hooks/validate-snapshots.sh`を作成：
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Check if snapshot files changed
+if ! echo "$file_path" | grep -qE '__snapshots__/.*\.snap$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+echo "📸 Snapshot file modified: $file_path"
+echo ""
+
+# Run tests in update mode to verify
+test_file=$(echo "$file_path" | sed 's|/__snapshots__/.*\.snap$|.test.ts|')
+
+if [ ! -f "$test_file" ]; then
+  test_file=$(echo "$file_path" | sed 's|/__snapshots__/.*\.snap$|.spec.ts|')
+fi
+
+if [ -f "$test_file" ]; then
+  echo "Verifying snapshot update..."
+  
+  if npm test -- "$test_file" -u 2>&1; then
+    echo "✓ Snapshot update verified"
+    echo ""
+    echo "⚠️ Remember to review snapshot changes before committing:"
+    echo "  git diff $file_path"
+  else
+    echo "❌ Snapshot verification failed" >&2
+    exit 2
+  fi
+else
+  echo "⚠️ Could not find test file for snapshot"
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/validate-snapshots.sh
+```
+
+
+### テストパフォーマンスの監視
+
+テストの実行時間を追跡し、遅いテストに対して警告を出します。
+
+`.factory/hooks/monitor-test-perf.py`を作成：
+
+```python
+#!/usr/bin/env python3
+"""
+Monitor test execution time and report slow tests.
+"""
+import json
+import sys
+import subprocess
+import time
+import re
+
+# Slow test threshold in seconds
+SLOW_TEST_THRESHOLD = 5.0
+
+def run_tests_with_timing(test_file):
+    """Run tests and capture timing information."""
+    start_time = time.time()
+    
+    try:
+        result = subprocess.run(
+            ['npm', 'test', '--', test_file, '--verbose'],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        elapsed = time.time() - start_time
+        
+        # Parse test output for individual test times
+        slow_tests = []
+        for line in result.stdout.split('\n'):
+            # Look for test timing info
+            match = re.search(r'(.*?)\s+\((\d+)ms\)', line)
+            if match:
+                test_name = match.group(1).strip()
+                test_time_ms = int(match.group(2))
+                test_time_s = test_time_ms / 1000.0
+                
+                if test_time_s > SLOW_TEST_THRESHOLD:
+                    slow_tests.append((test_name, test_time_s))
+        
+        return elapsed, slow_tests, result.returncode
+        
+    except subprocess.TimeoutExpired:
+        return None, [], 1
+
+try:
+    input_data = json.load(sys.stdin)
+    file_path = input_data.get('tool_input', {}).get('file_path', '')
+    
+    if not file_path or not file_path.endswith(('.test.ts', '.test.tsx', '.spec.ts', '.spec.tsx')):
+        sys.exit(0)
+    
+    print(f"⏱️  Monitoring test performance for {file_path}...")
+    
+    elapsed, slow_tests, returncode = run_tests_with_timing(file_path)
+    
+    if elapsed is not None:
+        print(f"\nTotal test time: {elapsed:.2f}s")
+        
+        if slow_tests:
+            print(f"\n⚠️  Found {len(slow_tests)} slow test(s):")
+            for test_name, test_time in slow_tests:
+                print(f"  - {test_name}: {test_time:.2f}s")
+            print("\nConsider optimizing these tests or mocking expensive operations.")
+        else:
+            print("✓ All tests running within acceptable time")
+        
+        # Don't block on slow tests, just warn
+        sys.exit(returncode)
+    else:
+        print("❌ Tests timed out", file=sys.stderr)
+        sys.exit(2)
+        
+except Exception as e:
+    print(f"Error monitoring tests: {e}", file=sys.stderr)
+    sys.exit(0)
+```
+
+```bash
+chmod +x .factory/hooks/monitor-test-perf.py
+```
+
+
+### テストの不安定性検出器
+
+不安定なテストを検出・報告します：
+
+
+
+`.factory/hooks/detect-flaky-tests.sh`を作成：
+
+```bash
+#!/bin/bash
+set -e
+
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.tool_name')
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""')
+
+# Only check test files
+if ! echo "$file_path" | grep -qE '\.(test|spec)\.(ts|tsx|js|jsx)$'; then
+  exit 0
+fi
+
+cwd=$(echo "$input" | jq -r '.cwd')
+cd "$cwd"
+
+echo "🎲 Checking for test flakiness..."
+
+# Run tests multiple times
+RUNS=3
+failures=0
+
+for i in $(seq 1 $RUNS); do
+  echo "Run $i/$RUNS..."
+  
+  if ! npm test -- "$file_path" --silent 2>&1; then
+    ((failures++))
+  fi
+done
+
+if [ $failures -gt 0 ] && [ $failures -lt $RUNS ]; then
+  echo "" >&2
+  echo "⚠️ FLAKY TEST DETECTED" >&2
+  echo "Test passed $((RUNS - failures))/$RUNS times" >&2
+  echo "" >&2
+  echo "This test is unreliable and should be fixed." >&2
+  echo "Common causes:" >&2
+  echo "  - Race conditions" >&2
+  echo "  - Timing dependencies" >&2
+  echo "  - Non-deterministic data" >&2
+  echo "  - External dependencies" >&2
+  
+  # Warning only, don't block
+  exit 0
+elif [ $failures -eq $RUNS ]; then
+  echo "❌ Test consistently fails" >&2
+  exit 2
+else
+  echo "✓ Test is stable ($RUNS/$RUNS passed)"
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .factory/hooks/detect-flaky-tests.sh
+```
+
+
+## ベストプラクティス
+
+<Steps>
+  <Step title="Run tests asynchronously when possible">
+    Don't block Droid unnecessarily:
+    ```bash
+    # Run tests in background, report later
+    (npm test "$file" > /tmp/test-results.txt 2>&1 &)
+    echo "Tests running in background..."
+    ```
+  </Step>
+  
+  <Step title="Set appropriate timeouts">
+    Allow enough time for test suites:
+    ```json
+    {
+      "timeout": 120  // 2 minutes for test suites
+    }
+    ```
+  </Step>
+  
+  <Step title="Use test file conventions">
+    Follow standard naming patterns:
+    ```
+    src/components/Button.tsx
+    src/components/Button.test.tsx  // Co-located
+    
+    Or:
+    
+    src/components/Button.tsx
+    tests/components/Button.test.tsx  // Separate directory
+    ```
+  </Step>
+  
+  <Step title="Make coverage configurable">
+    Different files may need different thresholds:
+    ```bash
+    # .factory/.coverage-config
+    src/critical/*.ts:90
+    src/utils/*.ts:75
+    src/experimental/*.ts:50
+    ```
+  </Step>
+  
+  <Step title="Cache test results">
+    Skip tests if code hasn't changed:
+    ```bash
+    hash=$(md5sum "$file_path")
+    cache_file="/tmp/test-cache-$hash"
+    
+    if [ -f "$cache_file" ]; then
+      echo "✓ Tests passed (cached)"
+      exit 0
+    fi
+    ```
+  </Step>
+</Steps>
+
+## トラブルシューティング
+
+
+  
+    **問題**: テスト実行がワークフローをブロックする
+    
+    **解決策**: ユニットテストのみを実行し、統合テストをスキップ：
+    ```bash
+    # Fast unit tests only
+    npm test -- --testPathPattern="unit" "$file"
+    
+    # Or configure in package.json
+    {
+      "scripts": {
+        "test:fast": "jest --testPathIgnorePatterns=integration"
+      }
+    }
+    ```
+  
+  
+  
+    **問題**: フック内でテストが失敗するが、手動実行では成功する
+    
+    **解決策**: 環境の違いを確認：
+    ```bash
+    # Ensure same environment
+    export NODE_ENV=test
+    export CI=true
+    
+    # Use project test script
+    npm test  # Not direct jest call
+    ```
+  
+  
+  
+    **問題**: カバレッジに生成ファイルが含まれる
+    
+    **解決策**: カバレッジの除外設定を構成：
+    ```json
+    // jest.config.js
+    {
+      "coveragePathIgnorePatterns": [
+        "/node_modules/",
+        "/.gen/",
+        "/dist/",
+        "\\.d\\.ts$"
+      ]
+    }
+    ```
+  
+
+
+## 関連項目
+
+- [Hooks reference](/reference/hooks-reference) - 完全なフックAPI文書
+- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Code validation](/guides/hooks/code-validation) - コード品質の検証
+- [Git workflows](/guides/hooks/git-workflows) - Git統合
