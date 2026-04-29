@@ -1,15 +1,15 @@
 ---
 title: "フックリファレンス"
-description: "Reference documentation for implementing hooks in Droid"
+description: "Droidでフックを実装するためのリファレンスドキュメント"
 ---
 
 <Tip>
-  For a quickstart guide with examples, see [Get started with hooks](/cli/configuration/hooks-guide).
+  例付きのクイックスタートガイドは、[フックを始める](/jp/cli/configuration/hooks-guide)を参照してください。
 </Tip>
 
 ## 設定
 
-Droidフックは[settings files](/cli/configuration/settings)で設定します：
+Droidフックは[settings files](/jp/cli/configuration/settings)で設定します：
 
 * `~/.factory/settings.json` - ユーザー設定
 * `.factory/settings.json` - プロジェクト設定
@@ -48,10 +48,10 @@ Droidフックは[settings files](/cli/configuration/settings)で設定します
   * `timeout`：（オプション）その特定のコマンドをキャンセルするまでの実行時間（秒）
 
 <Warning>
-  **Always use absolute paths** for hook commands and scripts, not relative paths. 
-  Hooks execute from Droid's current working directory, which may change during execution. 
-  Use `"$FACTORY_PROJECT_DIR"/path/to/script.sh` for project-relative scripts or full paths like 
-  `/usr/local/bin/script.sh` or `~/.factory/hooks/script.sh` for global scripts.
+  フックコマンドとスクリプトには相対パスではなく、**必ず絶対パスを使用してください**。
+  フックはDroidの現在の作業ディレクトリから実行されます。このディレクトリは実行中に変わる可能性があります。
+  プロジェクト相対スクリプトには`"$FACTORY_PROJECT_DIR"/path/to/script.sh`を使用し、グローバルスクリプトには次のようなフルパスを使用します:
+  `/usr/local/bin/script.sh`または`~/.factory/hooks/script.sh`。
 </Warning>
 
 `UserPromptSubmit`、`Notification`、`Stop`、`SubagentStop`などのマッチャーを使用しないイベントについては、matcherフィールドを省略できます：
@@ -131,11 +131,11 @@ Droidフックは[settings files](/cli/configuration/settings)で設定します
 ```
 
 <Note>
-  Plugin hooks use the same format as regular hooks with an optional `description` field to explain the hook's purpose.
+  プラグインフックは通常のフックと同じ形式を使用し、フックの目的を説明する任意の`description`フィールドを指定できます。
 </Note>
 
 <Note>
-  Plugin hooks run alongside your custom hooks. If multiple hooks match an event, they all execute in parallel.
+  プラグインフックはカスタムフックと並行して実行されます。複数のフックが同じイベントに一致した場合、それらはすべて並列に実行されます。
 </Note>
 
 **プラグインの環境変数**：
@@ -154,7 +154,7 @@ Droidがツールパラメータを作成した後、ツール呼び出しを処
 
 **一般的なマッチャー：**
 
-* `Task` - サブdroidタスク（[subagents documentation](/cli/user-guides/specification-mode)を参照）
+* `Task` - サブdroidタスク（[subagents documentation](/jp/cli/user-guides/specification-mode)を参照）
 * `Execute` - シェルコマンド
 * `Glob` - ファイルパターンマッチング
 * `Grep` - コンテンツ検索
@@ -375,8 +375,8 @@ Droidセッションが終了するときに実行されます。クリーンア
 * **その他の終了コード**：非ブロッキングエラー。`stderr`がユーザーに表示され、実行は継続されます。
 
 <Warning>
-  Reminder: Droid does not see stdout if the exit code is 0, except for
-  the `UserPromptSubmit` hook where stdout is injected as context.
+  注意: 終了コードが0の場合、`UserPromptSubmit`フックを除いてDroidはstdoutを確認しません。
+  `UserPromptSubmit`フックではstdoutがコンテキストとして注入されます。
 </Warning>
 
 #### 終了コード2の動作
@@ -448,10 +448,10 @@ Droidセッションが終了するときに実行されます。クリーンア
 ```
 
 <Note>
-  The `decision` and `reason` fields are deprecated for PreToolUse hooks.
-  Use `hookSpecificOutput.permissionDecision` and
-  `hookSpecificOutput.permissionDecisionReason` instead. The deprecated fields
-  `"approve"` and `"block"` map to `"allow"` and `"deny"` respectively.
+  PreToolUseフックでは`decision`フィールドと`reason`フィールドは非推奨です。
+  `hookSpecificOutput.permissionDecision`と
+  代わりに`hookSpecificOutput.permissionDecisionReason`を使用してください。非推奨フィールド
+  `"approve"`と`"block"`はそれぞれ`"allow"`と`"deny"`にマッピングされます。
 </Note>
 
 #### `PostToolUse`決定制御
@@ -581,10 +581,10 @@ if issues:
 #### JSON出力例：コンテキスト追加と検証のためのUserPromptSubmit
 
 <Note>
-  For `UserPromptSubmit` hooks, you can inject context using either method:
+  `UserPromptSubmit`フックでは、どちらの方法でもコンテキストを注入できます:
 
-  * Exit code 0 with stdout: Droid sees the context (special case for `UserPromptSubmit`)
-  * JSON output: Provides more control over the behavior
+  * stdout付きの終了コード0: Droidがコンテキストを確認します（`UserPromptSubmit`の特別なケース）
+  * JSON出力: 動作をより細かく制御できます
 </Note>
 
 ```python
@@ -672,7 +672,7 @@ sys.exit(0)
 
 ## MCPツールとの連携
 
-Droidフックは[Model Context Protocol (MCP) tools](/cli/configuration/mcp)とシームレスに動作します。MCPサーバーがツールを提供する場合、フックでマッチできる特別な命名パターンで表示されます。
+Droidフックは[Model Context Protocol (MCP) tools](/jp/cli/configuration/mcp)とシームレスに動作します。MCPサーバーがツールを提供する場合、フックでマッチできる特別な命名パターンで表示されます。
 
 ### MCPツールの命名
 
@@ -716,7 +716,7 @@ MCPツールは`mcp__<server>__<tool>`のパターンに従います。例：
 ## 例
 
 <Tip>
-  For practical examples including code formatting, notifications, and file protection, see [More Examples](/cli/configuration/hooks-guide#more-examples) in the get started guide.
+  コード整形、通知、ファイル保護などの実践的な例は、入門ガイドの[その他の例](/jp/cli/configuration/hooks-guide#more-examples)を参照してください。
 </Tip>
 
 ## セキュリティに関する考慮事項

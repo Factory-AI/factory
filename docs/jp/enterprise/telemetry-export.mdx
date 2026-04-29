@@ -1,6 +1,6 @@
 ---
 title: "テレメトリエクスポート（OTEL）"
-description: Export OpenTelemetry metrics from Droid to your own OTLP-compatible collector for full visibility in your existing observability stack.
+description: Droidから独自のOTLP互換コレクターへOpenTelemetryメトリクスをエクスポートし、既存のオブザーバビリティスタックで完全に可視化する。
 ---
 
 Droidは、OpenTelemetry (OTEL) メトリクスをお客様のOTLP対応コレクターにエクスポートすることができ、既存の可観測性スタック内でDroidアクティビティの完全な可視性を提供します。メトリクスは同じエクスポートサイクルでFactoryのコレクターとお客様のコレクター両方に送信されます。お客様のコレクターにアクセスできない場合でも、Factoryのエクスポートは影響を受けません。
@@ -16,7 +16,7 @@ export OTEL_TELEMETRY_ENDPOINT="https://your-collector.example.com:4318"
 export OTEL_TELEMETRY_HEADERS="Authorization=Bearer <your-token>"
 ```
 
-| Variable                  | Required | Description                                                                                                          |
+| Variable                  | 必須 | Description                                                                                                          |
 | :------------------------ | :------- | :------------------------------------------------------------------------------------------------------------------- |
 | `OTEL_TELEMETRY_ENDPOINT` | Yes      | OTLP HTTPコレクターのベースURL。メトリクスは`{endpoint}/v1/metrics`に送信されます。                                   |
 | `OTEL_TELEMETRY_HEADERS`  | No       | すべてのエクスポートでHTTPヘッダーとして送信されるカンマ区切りの`key=value`ペア。値には`=`を含めることができます（例：base64トークン）。 |

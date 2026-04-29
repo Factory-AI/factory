@@ -1,0 +1,37 @@
+import { BarChart } from '/snippets/leaderboards/bar-chart.jsx'
+
+export const nextjsEvalData = [
+  { name: "Factory Droid (GPT-5.2)", accuracy: 66.0 },
+  { name: "Factory Droid (Claude Opus 4.5)", accuracy: 56.0 },
+  { name: "Factory Droid (Claude Sonnet 4.5)", accuracy: 50.0 },
+  { name: "Factory Droid (Gemini 3 Pro)", accuracy: 46.0 },
+  { name: "Claude Code (Claude Opus 4.5)", accuracy: 42.0 },
+  { name: "Cursor (Claude Sonnet 4.5)", accuracy: 38.0 },
+]
+
+[Vercel](https://nextjs.org/evals) の公式ベンチマークは、Next.jsのコード生成と移行タスクにおけるAIモデルの性能を測定します。成功率、実行時間、トークン使用量、品質改善を評価します。
+
+### 結果
+
+<BarChart data={nextjsEvalData} valueKey="accuracy" valueLabel="%" maxValue={100} />
+
+*最終更新: 2025年12月*
+
+### 手法
+
+| カテゴリ | 説明 |
+|----------|-------------|
+| **コード生成** | Next.jsコンポーネント、ページ、APIルートを作成する |
+| **移行** | Pages RouterからApp Routerへアップグレードする |
+| **ベストプラクティス** | Next.jsのパターンと規約に従う |
+| **TypeScript** | 適切な型安全性と推論を適用する |
+
+採点指標:
+- **成功率** - 正しく完了したタスクの割合
+- **実行時間** - タスク完了までの時間
+- **トークン使用量** - モデル応答の効率
+- **品質スコア** - コード品質とベストプラクティス
+
+<Card title="Next.js Evals" icon="trophy" href="https://nextjs.org/evals">
+  ライブ結果と手法を表示する
+</Card>

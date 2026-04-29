@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - "docs/**/*.mdx"
-      - "docs/**/*.md"
-      - "!docs/jp/**"
+      - 'docs/**/*.mdx'
+      - 'docs/**/*.md'
+      - '!docs/jp/**'
   workflow_dispatch:
 
 concurrency:
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      DROID_VERSION: "0.108.0"
+      DROID_VERSION: '0.108.0'
 
     steps:
       - name: Checkout repository
@@ -42,7 +42,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: '22'
 
       - name: Install pinned Droid CLI
         shell: bash

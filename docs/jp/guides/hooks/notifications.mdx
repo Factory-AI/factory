@@ -1,6 +1,6 @@
 ---
 title: "カスタム通知"
-description: "Get notified when Droid needs attention using desktop alerts, sounds, Slack, and more"
+description: "デスクトップ通知、サウンド、SlackなどでDroidが対応を必要とするときに通知を受ける"
 keywords: ['notifications', 'alerts', 'slack', 'desktop', 'sounds', 'webhook', 'hook']
 ---
 
@@ -368,7 +368,7 @@ tell application "System Events"
 end tell
 EOF
     ;;
-    
+
   "Stop")
     # Success notification
     osascript << EOF
@@ -377,7 +377,7 @@ tell application "System Events"
 end tell
 EOF
     ;;
-    
+
   "SessionEnd")
     reason=$(echo "$input" | jq -r '.reason')
     # Different sound based on reason
@@ -385,7 +385,7 @@ EOF
     if [ "$reason" == "error" ]; then
       sound="Basso"
     fi
-    
+
     osascript << EOF
 tell application "System Events"
   display notification "Session ended: $reason" with title "Droid Session" subtitle "$(basename "$PWD")" sound name "$sound"
@@ -457,7 +457,7 @@ input=$(cat)
 # Check if user is idle (macOS)
 if [[ "$OSTYPE" == "darwin"* ]]; then
   idle_time=$(ioreg -c IOHIDSystem | awk '/HIDIdleTime/ {print int($NF/1000000000)}')
-  
+
   # Only notify if idle for more than 60 seconds
   if [ "$idle_time" -lt 60 ]; then
     exit 0
@@ -518,85 +518,85 @@ exit 0
 ## ベストプラクティス
 
 <Steps>
-  <Step title="Keep notification scripts fast">
-    Use short timeouts to avoid blocking Droid:
+  <Step title="通知スクリプトを高速に保つ">
+    Droidをブロックしないよう短いタイムアウトを使用します:
     ```json
     {
       "timeout": 5  // 5 seconds max for notifications
     }
     ```
   </Step>
-  
-  <Step title="Handle failures gracefully">
-    Don't block execution if notifications fail:
+
+  <Step title="失敗を適切に処理する">
+    通知に失敗しても実行をブロックしないでください:
     ```bash
     # Continue even if curl fails
     curl -X POST "$URL" ... || true
     exit 0
     ```
   </Step>
-  
-  <Step title="Respect user preferences">
-    Check environment variables for opt-out:
+
+  <Step title="ユーザー設定を尊重する">
+    オプトアウト用の環境変数を確認します:
     ```bash
     if [ "$DROID_DISABLE_NOTIFICATIONS" = "true" ]; then
       exit 0
     fi
     ```
   </Step>
-  
-  <Step title="Test notifications">
-    Manually trigger hooks for testing:
+
+  <Step title="通知をテストする">
+    テストのために手動でフックをトリガーします:
     ```bash
     # Test notification script
     echo '{"hook_event_name":"Notification","message":"Test"}' | .factory/hooks/notify-wait.sh
     ```
   </Step>
-  
-  <Step title="Use appropriate notification levels">
-    Different events warrant different urgency:
-    - Notification: High urgency (Droid waiting)
-    - Stop: Medium urgency (task complete)
-    - SessionEnd: Low urgency (FYI only)
+
+  <Step title="適切な通知レベルを使用">
+    イベントごとに適切な緊急度は異なります:
+    - Notification: 緊急度高（Droidが待機中）
+    - Stop: 緊急度中（タスク完了）
+    - SessionEnd: 緊急度低（参考情報のみ）
   </Step>
 </Steps>
 
 ## トラブルシューティング
 
 
-  
+
     **問題**: 通知が表示されない
-    
+
     **解決策**: 通知の権限を確認：
     ```bash
     # macOS - check System Settings > Notifications
     # Linux - verify notify-send works
     notify-send "Test" "This is a test"
-    
+
     # Check if hooks are executing
     droid --debug
     ```
-  
-  
-  
+
+
+
     **問題**: Slackメッセージが送信されない
-    
+
     **解決策**: webhookを直接テスト：
     ```bash
     curl -X POST "$SLACK_WEBHOOK_URL" \
       -H 'Content-Type: application/json' \
       -d '{"text":"Test from curl"}'
     ```
-  
-  
-  
+
+
+
     **問題**: アラートスパムを受け取る
-    
+
     **解決策**: レート制限を追加：
     ```bash
     # Only notify once every 5 minutes
     LAST_NOTIFY_FILE="/tmp/droid-last-notify"
-    
+
     if [ -f "$LAST_NOTIFY_FILE" ]; then
       last_time=$(cat "$LAST_NOTIFY_FILE")
       current_time=$(date +%s)
@@ -604,32 +604,32 @@ exit 0
         exit 0
       fi
     fi
-    
+
     date +%s > "$LAST_NOTIFY_FILE"
     # ... send notification
     ```
-  
-  
-  
+
+
+
     **問題**: 音声アラートが鳴らない
-    
+
     **解決策**: 音声システムを確認：
     ```bash
     # macOS - list available sounds
     ls /System/Library/Sounds/
-    
+
     # Test sound
     afplay /System/Library/Sounds/Glass.aiff
-    
+
     # Linux - check audio
     paplay /usr/share/sounds/freedesktop/stereo/complete.oga
     ```
-  
+
 
 
 ## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - 完全なhooks API文書  
-- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なhooksの紹介
-- [Session automation](/guides/hooks/session-automation) - セッション設定の自動化
-- [Logging and analytics](/guides/hooks/logging-analytics) - Droid使用状況の追跡
+- [フックリファレンス](/jp/reference/hooks-reference) - 完全なフックAPI文書
+- [Get started with hooks](/jp/cli/configuration/hooks-guide) - 基本的なhooksの紹介
+- [Session automation](/jp/guides/hooks/session-automation) - セッション設定の自動化
+- [Logging and analytics](/jp/guides/hooks/logging-analytics) - Droid使用状況の追跡

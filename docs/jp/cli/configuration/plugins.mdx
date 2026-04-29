@@ -1,5 +1,5 @@
 ---
-title: Plugins
+title: "プラグイン"
 description: Droidをスキル、コマンド、ツールの共有可能なパッケージで拡張する。
 keywords: ['plugins', 'extensions', 'marketplace', 'skills', 'commands', 'mcp', 'shareable']
 ---
@@ -40,9 +40,9 @@ Droidはプラグインを管理する2つの方法を提供します：
 /plugins
 ```
 これはタブ形式のインターフェイスが開きます：
-- **Browse** - 登録されたマーケットプレイスからプラグインを表示・インストール
-- **Installed** - インストール済みプラグインを管理（情報表示、更新、アンインストール）
-- **Marketplaces** - マーケットプレイスの追加、更新、削除
+- **Browse（閲覧）** - 登録されたマーケットプレイスからプラグインを表示・インストール
+- **Installed（インストール済み）** - インストール済みプラグインを管理（情報表示、更新、アンインストール）
+- **Marketplaces（マーケットプレイス）** - マーケットプレイスの追加、更新、削除
 
 **ナビゲーション:**
 - 左/右矢印: タブ間の切り替え
@@ -54,19 +54,19 @@ Droidはプラグインを管理する2つの方法を提供します：
 
 自動化には、シェルからCLI コマンドを使用してください（スラッシュコマンドではありません）：
 ```bash
-# Marketplace management
+# マーケットプレイス管理
 droid plugin marketplace add <url>
 droid plugin marketplace remove <name>
 droid plugin marketplace list
 droid plugin marketplace update [name]
 
-# Plugin management
+# プラグイン管理
 droid plugin install <plugin@marketplace> [--scope user|project]
 droid plugin uninstall <plugin@marketplace> [--scope user|project]
 droid plugin update [plugin@marketplace] [--scope user|project]
 droid plugin list [--scope user|project]
 ```
-Plugin IDは`pluginName@marketplaceName`の形式を使用します（例：`security-guidance@claude-plugins-official`）。
+プラグインIDは`pluginName@marketplaceName`の形式を使用します（例：`security-guidance@claude-plugins-official`）。
 
 ## プラグインの構造
 
@@ -74,16 +74,16 @@ Plugin IDは`pluginName@marketplaceName`の形式を使用します（例：`sec
 ```
 my-plugin/
 ├── .factory-plugin/
-│   └── plugin.json          # Plugin manifest (required)
-├── commands/                 # Slash commands (optional)
+│   └── plugin.json          # プラグインマニフェスト（必須）
+├── commands/                 # スラッシュコマンド（任意）
 │   └── my-command.md
-├── skills/                   # Agent skills (optional)
+├── skills/                   # エージェントスキル（任意）
 │   └── my-skill/
 │       └── SKILL.md
 ├── droids/                   # Subagent definitions (optional)
 │   └── my-agent.md
 ├── mcp.json                  # MCP server configs (optional)
-└── README.md                 # Documentation
+└── README.md                 # ドキュメント
 ```
 <Warning>
 `commands/`、`skills/`、`droids/`、または `hooks/` を `.factory-plugin/` ディレクトリ内に配置しないでください。`.factory-plugin/` 内に配置するのは `plugin.json` のみです。その他のディレクトリはすべてプラグインのルートレベルに配置する必要があります。
@@ -97,8 +97,8 @@ my-plugin/
 ├── .factory-plugin/
 │   └── plugin.json
 ├── hooks/
-│   ├── hooks.json         # Hook configuration
-│   └── my-script.sh       # Hook scripts
+│   ├── hooks.json         # フック設定
+│   └── my-script.sh       # フックスクリプト
 └── ...
 ```
 **hooks/hooks.json の例:**
@@ -172,13 +172,13 @@ UI経由：`/plugins` → マーケットプレイスタブ → "新しいマー
 
 CLI経由：
 ```bash
-# From GitHub
+# GitHubから
 droid plugin marketplace add https://github.com/owner/repo
 
-# From other Git hosts
+# その他のGitホストから
 droid plugin marketplace add https://gitlab.com/company/plugins.git
 
-# From local path (for development)
+# ローカルパスから（開発用）
 droid plugin marketplace add /path/to/local/marketplace
 ```
 ### マーケットプレースの管理
@@ -240,7 +240,7 @@ droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
 | **droid-evolved** | 継続学習のためのスキル: セッションナビゲーション、人間による執筆、スキル作成、ビジュアルデザイン、フロントエンドデザイン、ブラウザ自動化 |
 | **security-engineer** | セキュリティレビュー、脅威モデリング、コミットスキャン、脆弱性検証 |
 
-`/plugins` UIの（Browseタブ）またはCLI経由でインストール:
+`/plugins` UIの（Browse（閲覧）タブ）またはCLI経由でインストール:
 ```bash
 droid plugin install droid-control@factory-plugins
 droid plugin install droid-evolved@factory-plugins

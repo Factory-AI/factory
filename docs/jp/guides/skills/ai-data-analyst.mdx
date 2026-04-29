@@ -1,6 +1,6 @@
 ---
 title: "AIデータアナリスト"
-description: A reusable skill for performing comprehensive data analysis, visualization, and statistical modeling using code-interpreter style workflows.
+description: コードインタープリター形式のワークフローで包括的なデータ分析、可視化、統計モデリングを行う再利用可能なスキル。
 keywords: ['data analyst', 'data analysis', 'visualization', 'statistics', 'python', 'skill', 'charts', 'insights']
 ---
 
@@ -13,9 +13,9 @@ keywords: ['data analyst', 'data analysis', 'visualization', 'statistics', 'pyth
 ```
 .factory/skills/ai-data-analyst/
 ├── SKILL.md
-├── visualization-templates.md (optional)
-├── statistical-methods.md (optional)
-└── example-analyses.md (optional)
+├── visualization-templates.md (任意)
+├── statistical-methods.md (任意)
+└── example-analyses.md (任意)
 ```
 
 ### クイックスタート
@@ -28,7 +28,7 @@ keywords: ['data analyst', 'data analysis', 'visualization', 'statistics', 'pyth
 2. **以下のスキルコンテンツを`.factory/skills/ai-data-analyst/SKILL.md`（または`skill.mdx`）にコピーする**
 
 <Tip>
-When you ask Factory to perform data analysis, create visualizations, or build statistical models, it will automatically invoke this skill based on the task description.
+Factoryにデータ分析、可視化作成、統計モデル構築を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
 ## スキル定義
@@ -38,153 +38,153 @@ When you ask Factory to perform data analysis, create visualizations, or build s
 ````md
 ---
 name: ai-data-analyst
-description: Perform comprehensive data analysis, statistical modeling, and data visualization by writing and executing self-contained Python scripts. Use when you need to analyze datasets, perform statistical tests, create visualizations, or build predictive models with reproducible, code-based workflows.
+description: 自己完結したPythonスクリプトを書いて実行し、包括的なデータ分析、統計モデリング、データ可視化を行います。データセットの分析、統計検定、可視化作成、再現可能なコードベースのワークフローによる予測モデル構築が必要な場合に使用します。
 ---
-# AI Data Analyst
+# スキル: AIデータアナリスト
 
-## Purpose
+## 目的
 
-Perform comprehensive data analysis, statistical modeling, and data visualization by writing and executing self-contained Python scripts. Generate publication-quality charts, statistical reports, and actionable insights from data files or databases.
+自己完結したPythonスクリプトを書いて実行し、包括的なデータ分析、統計モデリング、データ可視化を行います。データファイルやデータベースから、公開品質のチャート、統計レポート、実行可能な洞察を生成します。
 
-## When to use this skill
+## このスキルを使うタイミング
 
-- You need to **analyze datasets** to understand patterns, trends, or relationships.
-- You want to perform **statistical tests** or build predictive models.
-- You need **data visualizations** (charts, graphs, dashboards) to communicate findings.
-- You're doing **exploratory data analysis** (EDA) to understand data structure and quality.
-- You need to **clean, transform, or merge** datasets for analysis.
-- You want **reproducible analysis** with documented methodology and code.
+- パターン、傾向、関係性を理解するために**データセットを分析**する必要がある。
+- **統計検定**を実行する、または予測モデルを構築したい。
+- 発見事項を伝えるために**データ可視化**（チャート、グラフ、ダッシュボード）が必要。
+- データ構造と品質を理解するために**探索的データ分析**（EDA）を行っている。
+- 分析のためにデータセットを**クリーニング、変換、結合**する必要がある。
+- 手法とコードが文書化された**再現可能な分析**が必要。
 
-## Key capabilities
+## 主な機能
 
-Unlike point-solution data analysis tools:
+単機能のデータ分析ツールとは異なり、以下を提供します:
 
-- **Full Python ecosystem**: Access to pandas, numpy, scikit-learn, statsmodels, matplotlib, seaborn, plotly, and more.
-- **Runs locally**: Your data stays on your machine; no uploads to third-party services.
-- **Reproducible**: All analysis is code-based and version controllable.
-- **Customizable**: Extend with any Python library or custom analysis logic.
-- **Publication-quality output**: Generate professional charts and reports.
-- **Statistical rigor**: Access to comprehensive statistical and ML libraries.
+- **完全なPythonエコシステム**: pandas、numpy、scikit-learn、statsmodels、matplotlib、seaborn、plotlyなどを利用できます。
+- **ローカルで実行**: データは自分のマシンに残り、サードパーティサービスにアップロードされません。
+- **再現可能**: すべての分析はコードベースで、バージョン管理できます。
+- **カスタマイズ可能**: 任意のPythonライブラリやカスタム分析ロジックで拡張できます。
+- **公開品質の出力**: プロフェッショナルなチャートとレポートを生成します。
+- **統計的な厳密さ**: 包括的な統計ライブラリとMLライブラリを利用できます。
 
-## Inputs
+## 入力
 
-- **Data sources**: CSV files, Excel files, JSON, Parquet, or database connections.
-- **Analysis goals**: Questions to answer or hypotheses to test.
-- **Variables of interest**: Specific columns, metrics, or dimensions to focus on.
-- **Output preferences**: Chart types, report format, statistical tests needed.
-- **Context**: Business domain, data dictionary, or known data quality issues.
+- **データソース**: CSVファイル、Excelファイル、JSON、Parquet、またはデータベース接続。
+- **分析目標**: 答えるべき質問、または検証する仮説。
+- **関心のある変数**: 注目する特定の列、メトリクス、ディメンション。
+- **出力の希望**: チャート種別、レポート形式、必要な統計検定。
+- **コンテキスト**: ビジネスドメイン、データディクショナリ、既知のデータ品質問題。
 
-## Out of scope
+## 対象外
 
-- Real-time streaming data analysis (use appropriate streaming tools).
-- Extremely large datasets requiring distributed computing (use Spark/Dask instead).
-- Production ML model deployment (use ML ops tools and infrastructure).
-- Live dashboarding (use BI tools like Tableau/Looker for operational dashboards).
+- リアルタイムストリーミングデータ分析（適切なストリーミングツールを使用）。
+- 分散コンピューティングが必要な非常に大規模なデータセット（代わりにSpark/Daskを使用）。
+- 本番MLモデルのデプロイ（MLOpsツールとインフラを使用）。
+- ライブダッシュボード（運用ダッシュボードにはTableau/LookerなどのBIツールを使用）。
 
-## Conventions and best practices
+## 規約とベストプラクティス
 
-### Python environment
-- Use **virtual environments** to isolate dependencies.
-- Install only necessary packages for the specific analysis.
-- Document all dependencies in `requirements.txt` or `environment.yml`.
+### Python環境
+- 依存関係を分離するために**仮想環境**を使用する。
+- 特定の分析に必要なパッケージのみをインストールする。
+- すべての依存関係を`requirements.txt`または`environment.yml`に記録する。
 
-### Code structure
-- Write **self-contained scripts** that can be re-run by others.
-- Use **clear variable names** and add comments for complex logic.
-- **Separate concerns**: data loading, cleaning, analysis, visualization.
-- Save **intermediate results** to files when analysis is multi-stage.
+### コード構造
+- 他の人が再実行できる**自己完結したスクリプト**を書く。
+- **明確な変数名**を使い、複雑なロジックにはコメントを追加する。
+- **関心を分離**する: データ読み込み、クリーニング、分析、可視化。
+- 分析が複数段階の場合は**中間結果**をファイルに保存する。
 
-### Data handling
-- **Never modify source data files** – work on copies or in-memory dataframes.
-- **Document data transformations** clearly in code comments.
-- **Handle missing values** explicitly and document approach.
-- **Validate data quality** before analysis (check for nulls, outliers, duplicates).
+### データ処理
+- **元データファイルを変更しない** — コピーまたはメモリ上のデータフレームで作業する。
+- **データ変換**をコードコメントで明確に記録する。
+- **欠損値**を明示的に処理し、その方法を記録する。
+- 分析前に**データ品質を検証**する（null、外れ値、重複を確認）。
 
-### Visualization best practices
-- Choose **appropriate chart types** for the data and question.
-- Use **clear labels, titles, and legends** on all charts.
-- Apply **appropriate color schemes** (colorblind-friendly when possible).
-- Include **sample sizes and confidence intervals** where relevant.
-- Save visualizations in **high-resolution formats** (PNG 300 DPI, SVG for vector graphics).
+### 可視化のベストプラクティス
+- データと問いに合った**適切なチャート種別**を選ぶ。
+- すべてのチャートで**明確なラベル、タイトル、凡例**を使用する。
+- **適切な配色**を適用する（可能なら色覚バリアフリー）。
+- 関連する場合は**サンプルサイズと信頼区間**を含める。
+- 可視化を**高解像度形式**で保存する（PNG 300 DPI、ベクターにはSVG）。
 
-### Statistical analysis
-- **State assumptions** for statistical tests clearly.
-- **Check assumptions** before applying tests (normality, homoscedasticity, etc.).
-- **Report effect sizes** not just p-values.
-- **Use appropriate corrections** for multiple comparisons.
-- **Explain practical significance** in addition to statistical significance.
+### 統計分析
+- 統計検定の**前提条件**を明確に述べる。
+- 検定適用前に**前提条件を確認**する（正規性、等分散性など）。
+- p値だけでなく**効果量**を報告する。
+- 多重比較には**適切な補正**を使用する。
+- 統計的有意性に加えて**実務上の重要性**を説明する。
 
-## Required behavior
+## 必須の動作
 
-1. **Understand the question**: Clarify what insights or decisions the analysis should support.
-2. **Explore the data**: Check structure, types, missing values, distributions, outliers.
-3. **Clean and prepare**: Handle missing data, outliers, and transformations appropriately.
-4. **Analyze systematically**: Apply appropriate statistical methods or ML techniques.
-5. **Visualize effectively**: Create clear, informative charts that answer the question.
-6. **Generate insights**: Translate statistical findings into actionable business insights.
-7. **Document thoroughly**: Explain methodology, assumptions, limitations, and conclusions.
-8. **Make reproducible**: Ensure others can re-run the analysis and get the same results.
+1. **問いを理解する**: 分析が支援すべき洞察や意思決定を明確にする。
+2. **データを探索する**: 構造、型、欠損値、分布、外れ値を確認する。
+3. **クリーニングと準備を行う**: 欠損データ、外れ値、変換を適切に処理する。
+4. **体系的に分析する**: 適切な統計手法またはML手法を適用する。
+5. **効果的に可視化する**: 問いに答える明確で有益なチャートを作成する。
+6. **洞察を生成する**: 統計的な発見を実行可能なビジネス洞察に変換する。
+7. **徹底的に文書化する**: 手法、前提、制限、結論を説明する。
+8. **再現可能にする**: 他の人が分析を再実行し、同じ結果を得られるようにする。
 
-## Required artifacts
+## 必須の成果物
 
-- **Analysis script(s)**: Well-documented Python code performing the analysis.
-- **Visualizations**: Charts saved as high-quality image files (PNG/SVG).
-- **Analysis report**: Markdown or text document summarizing:
-  - Research question and methodology
-  - Data description and quality assessment
-  - Key findings with supporting statistics
-  - Visualizations with interpretations
-  - Limitations and caveats
-  - Recommendations or next steps
-- **Requirements file**: `requirements.txt` with all dependencies.
-- **Sample data** (if appropriate and non-sensitive): Small sample for reproducibility.
+- **分析スクリプト**: 分析を実行する、十分に文書化されたPythonコード。
+- **可視化**: 高品質な画像ファイル（PNG/SVG）として保存されたチャート。
+- **分析レポート**: 以下を要約したMarkdownまたはテキスト文書:
+  - リサーチクエスチョンと手法
+  - データ説明と品質評価
+  - 裏付け統計を伴う主要な発見
+  - 解釈付きの可視化
+  - 制限と注意点
+  - 推奨事項または次のステップ
+- **依存関係ファイル**: すべての依存関係を含む`requirements.txt`。
+- **サンプルデータ**（適切かつ非機密の場合）: 再現性のための小さなサンプル。
 
-## Implementation checklist
+## 実装チェックリスト
 
-### 1. Data exploration and preparation
-- [ ] Load data and inspect structure (shape, columns, types)
-- [ ] Check for missing values, duplicates, outliers
-- [ ] Generate summary statistics (mean, median, std, min, max)
-- [ ] Visualize distributions of key variables
-- [ ] Document data quality issues found
+### 1. データ探索と準備
+- [ ] データを読み込み、構造（形状、列、型）を確認する
+- [ ] 欠損値、重複、外れ値を確認する
+- [ ] 要約統計量（平均、中央値、標準偏差、最小、最大）を生成する
+- [ ] 主要変数の分布を可視化する
+- [ ] 見つかったデータ品質問題を記録する
 
-### 2. Data cleaning and transformation
-- [ ] Handle missing values (impute, drop, or flag)
-- [ ] Address outliers if needed (cap, transform, or document)
-- [ ] Create derived variables if needed
-- [ ] Normalize or scale variables for modeling
-- [ ] Split data if doing train/test analysis
+### 2. データクリーニングと変換
+- [ ] 欠損値を処理する（補完、削除、フラグ付け）
+- [ ] 必要に応じて外れ値に対処する（上限設定、変換、記録）
+- [ ] 必要に応じて派生変数を作成する
+- [ ] モデリング用に変数を正規化またはスケーリングする
+- [ ] 学習/テスト分析を行う場合はデータを分割する
 
-### 3. Analysis execution
-- [ ] Choose appropriate analytical methods
-- [ ] Check statistical assumptions
-- [ ] Execute analysis with proper parameters
-- [ ] Calculate confidence intervals and effect sizes
-- [ ] Perform sensitivity analyses if appropriate
+### 3. 分析の実行
+- [ ] 適切な分析手法を選択する
+- [ ] 統計的前提条件を確認する
+- [ ] 適切なパラメータで分析を実行する
+- [ ] 信頼区間と効果量を計算する
+- [ ] 適切な場合は感度分析を実行する
 
-### 4. Visualization
-- [ ] Create exploratory visualizations
-- [ ] Generate publication-quality final charts
-- [ ] Ensure all charts have clear labels and titles
-- [ ] Use appropriate color schemes and styling
-- [ ] Save in high-resolution formats
+### 4. 可視化
+- [ ] 探索的な可視化を作成する
+- [ ] 公開品質の最終チャートを生成する
+- [ ] すべてのチャートに明確なラベルとタイトルを付ける
+- [ ] 適切な配色とスタイルを使用する
+- [ ] 高解像度形式で保存する
 
-### 5. Reporting
-- [ ] Write clear summary of methods used
-- [ ] Present key findings with supporting evidence
-- [ ] Explain practical significance of results
-- [ ] Document limitations and assumptions
-- [ ] Provide actionable recommendations
+### 5. レポート作成
+- [ ] 使用した手法を明確に要約する
+- [ ] 裏付け証拠とともに主要な発見を提示する
+- [ ] 結果の実務上の重要性を説明する
+- [ ] 制限と前提を記録する
+- [ ] 実行可能な推奨事項を提示する
 
-### 6. Reproducibility
-- [ ] Test that script runs from clean environment
-- [ ] Document all dependencies
-- [ ] Add comments explaining non-obvious code
-- [ ] Include instructions for running analysis
+### 6. 再現性
+- [ ] クリーンな環境でスクリプトが実行できることをテストする
+- [ ] すべての依存関係を記録する
+- [ ] 自明でないコードを説明するコメントを追加する
+- [ ] 分析の実行手順を含める
 
-## Verification
+## 検証
 
-Run the following to verify the analysis:
+分析を検証するには以下を実行します:
 
 ```bash
 # 仮想環境を作成
@@ -201,17 +201,17 @@ python analysis.py
 ls -lh outputs/
 ```
 
-The skill is complete when:
+以下を満たしたらスキルは完了です:
 
-- Analysis script runs without errors from clean environment.
-- All required visualizations are generated in high quality.
-- Report clearly explains methodology, findings, and limitations.
-- Results are interpretable and actionable.
-- Code is well-documented and reproducible.
+- 分析スクリプトがクリーンな環境からエラーなく実行できる。
+- 必要な可視化がすべて高品質で生成されている。
+- レポートが手法、発見、制限を明確に説明している。
+- 結果が解釈可能で実行可能である。
+- コードが十分に文書化され、再現可能である。
 
-## Common analysis patterns
+## よくある分析パターン
 
-### Exploratory Data Analysis (EDA)
+### 探索的データ分析（EDA）
 ```python
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -236,7 +236,7 @@ sns.heatmap(corr, annot=True, cmap='coolwarm')
 plt.savefig('correlations.png', dpi=300)
 ```
 
-### Time series analysis
+### 時系列分析
 ```python
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -258,9 +258,9 @@ df['rolling_std'] = df['value'].rolling(window=7).std()
 
 # トレンドを含むプロット
 plt.figure(figsize=(12, 6))
-plt.plot(df['value'], label='Original')
-plt.plot(df['rolling_mean'], label='7-day Moving Avg', linewidth=2)
-plt.fill_between(df.index, 
+plt.plot(df['value'], label='元データ')
+plt.plot(df['rolling_mean'], label='7日移動平均', linewidth=2)
+plt.fill_between(df.index,
                  df['rolling_mean'] - df['rolling_std'],
                  df['rolling_mean'] + df['rolling_std'],
                  alpha=0.3)
@@ -268,7 +268,7 @@ plt.legend()
 plt.savefig('trends.png', dpi=300)
 ```
 
-### Statistical hypothesis testing
+### 統計的仮説検定
 ```python
 from scipy import stats
 import numpy as np
@@ -295,13 +295,13 @@ else:
 pooled_std = np.sqrt((group_a.std()**2 + group_b.std()**2) / 2)
 cohens_d = (group_a.mean() - group_b.mean()) / pooled_std
 
-print(f"Test used: {test_used}")
-print(f"Test statistic: {statistic:.4f}")
-print(f"P-value: {p_value:.4f}")
-print(f"Effect size (Cohen's d): {cohens_d:.4f}")
+print(f"使用した検定: {test_used}")
+print(f"検定統計量: {statistic:.4f}")
+print(f"P値: {p_value:.4f}")
+print(f"効果量（Cohen's d）: {cohens_d:.4f}")
 ```
 
-### Predictive modeling
+### 予測モデリング
 ```python
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
@@ -327,7 +327,7 @@ rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 r2 = r2_score(y_test, y_pred)
 
 print(f"RMSE: {rmse:.4f}")
-print(f"R² Score: {r2:.4f}")
+print(f"R²スコア: {r2:.4f}")
 
 # 特徴量重要度
 importance = pd.DataFrame({
@@ -337,58 +337,58 @@ importance = pd.DataFrame({
 
 plt.figure(figsize=(10, 6))
 plt.barh(importance['feature'][:10], importance['importance'][:10])
-plt.xlabel('Feature Importance')
-plt.title('Top 10 Most Important Features')
+plt.xlabel('特徴量の重要度')
+plt.title('重要度上位10件の特徴量')
 plt.tight_layout()
 plt.savefig('feature_importance.png', dpi=300)
 ```
 
-## Recommended Python libraries
+## 推奨Pythonライブラリ
 
-### Data manipulation
-- **pandas**: Data manipulation and analysis
-- **numpy**: Numerical computing
-- **polars**: High-performance DataFrame library (alternative to pandas)
+### データ操作
+- **pandas**: データ操作と分析
+- **numpy**: 数値計算
+- **polars**: 高性能DataFrameライブラリ（pandasの代替）
 
-### Visualization
-- **matplotlib**: Foundational plotting library
-- **seaborn**: Statistical visualizations
-- **plotly**: Interactive charts
-- **altair**: Declarative statistical visualization
+### 可視化
+- **matplotlib**: 基本的なプロットライブラリ
+- **seaborn**: 統計可視化
+- **plotly**: インタラクティブチャート
+- **altair**: 宣言的な統計可視化
 
-### Statistical analysis
-- **scipy.stats**: Statistical functions and tests
-- **statsmodels**: Statistical modeling
-- **pingouin**: Statistical tests with clear output
+### 統計分析
+- **scipy.stats**: 統計関数と検定
+- **statsmodels**: 統計モデリング
+- **pingouin**: 明確な出力を持つ統計検定
 
-### Machine learning
-- **scikit-learn**: ML algorithms and tools
-- **xgboost**: Gradient boosting
-- **lightgbm**: Fast gradient boosting
+### 機械学習
+- **scikit-learn**: MLアルゴリズムとツール
+- **xgboost**: 勾配ブースティング
+- **lightgbm**: 高速な勾配ブースティング
 
-### Time series
-- **statsmodels.tsa**: Time series analysis
-- **prophet**: Forecasting tool
+### 時系列
+- **statsmodels.tsa**: 時系列分析
+- **prophet**: 予測ツール
 - **pmdarima**: Auto ARIMA
 
-### Specialized
-- **networkx**: Network analysis
-- **geopandas**: Geospatial data analysis
-- **textblob** / **spacy**: Natural language processing
+### 専門用途
+- **networkx**: ネットワーク分析
+- **geopandas**: 地理空間データ分析
+- **textblob** / **spacy**: 自然言語処理
 
-## Safety and escalation
+## 安全性とエスカレーション
 
-- **Data privacy**: Never analyze or share data containing PII without proper authorization.
-- **Statistical validity**: If sample sizes are too small for reliable inference, call this out explicitly.
-- **Causal claims**: Avoid implying causation from correlational analysis; be explicit about limitations.
-- **Model limitations**: Document when models may not generalize or when predictions should not be trusted.
-- **Data quality**: If data quality issues could materially affect conclusions, flag this prominently.
+- **データプライバシー**: 適切な承認なしにPIIを含むデータを分析または共有しない。
+- **統計的妥当性**: 信頼できる推論にはサンプルサイズが小さすぎる場合は明示する。
+- **因果主張**: 相関分析から因果を示唆しない。制限を明確にする。
+- **モデルの制限**: モデルが一般化しない可能性や予測を信頼すべきでない場合を記録する。
+- **データ品質**: データ品質問題が結論に重大な影響を与える可能性がある場合は目立つように示す。
 
-## Integration with other skills
+## 他のスキルとの連携
 
-This skill can be combined with:
+このスキルは以下と組み合わせられます:
 
-- **Internal data querying**: To fetch data from warehouses or databases for analysis.
-- **Web app builder**: To create interactive dashboards displaying analysis results.
-- **Internal tools**: To build analysis tools for non-technical stakeholders.
+- **内部データクエリ**: 分析用にウェアハウスやデータベースからデータを取得する。
+- **Webアプリビルダー**: 分析結果を表示するインタラクティブダッシュボードを作成する。
+- **内部ツール**: 非技術系ステークホルダー向けの分析ツールを構築する。
 ````

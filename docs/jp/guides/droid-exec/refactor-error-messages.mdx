@@ -1,13 +1,13 @@
 ---
 title: "エラーメッセージの改善"
-description: 'Automatically improve Error messages across your entire codebase using Droid Exec'
+description: 'Droid Execを使ってコードベース全体のエラーメッセージを自動改善する'
 keywords: ['error messages', 'refactor', 'automation', 'error handling', 'droid exec']
 ---
 
 このチュートリアルでは、Droid Execを使用して数百のファイル全体でエラーメッセージを同時にリファクタリングする方法を説明します。このスクリプトは、すべてのResponseErrorインスタンス化を賢く見つけ出し、より説明的で実用的、かつユーザーフレンドリーなメッセージに改善します。
 
 <Info>
-`ResponseError` is Factory's internal error handling class used to throw HTTP-style errors with specific status codes. These error classes are used throughout the codebase to handle API errors.
+`ResponseError`は、特定のステータスコードを持つHTTP形式のエラーをthrowするために使用されるFactory内部のエラー処理クラスです。これらのエラークラスは、APIエラーを処理するためにコードベース全体で使用されています。
 </Info>
 
 ## 仕組み
@@ -24,7 +24,7 @@ keywords: ['error messages', 'refactor', 'automation', 'error handling', 'droid 
 
 ## スクリプトの取得
 
-<Accordion title="View full script source">
+<Accordion title="完全なスクリプトソースを表示">
 ```bash
 #!/bin/bash
 
@@ -204,14 +204,14 @@ fi
 
 ## 前提条件
 
-開始する前に、[Droid Exec installation](/cli/droid-exec/overview#installation)を完了してください。
+開始する前に、[Droid Exec installation](/jp/cli/droid-exec/overview#installation)を完了してください。
 
 ## 基本的な使用方法
 
 ### 変更のプレビュー（ドライラン）
 
 <Warning>
-  Always start with a dry run to see how many error messages need improvement before modifying files.
+  ファイルを変更する前に、改善が必要なエラーメッセージ数を確認するため、必ずドライランから始めてください。
 </Warning>
 
 ドライラン機能では、ResponseErrorインスタンス化を含むファイルとその数を正確に表示します：
@@ -286,7 +286,7 @@ I've successfully improved all error messages in the `apps/factory-admin/src/app
 ### 例1：セッション認証
 
 <Tabs>
-  <Tab title="Before">
+  <Tab title="変更前">
     ```typescript
     // middleware.ts
     if (!sessionCookie?.value) {
@@ -298,8 +298,8 @@ I've successfully improved all error messages in the `apps/factory-admin/src/app
     }
     ```
   </Tab>
-  
-  <Tab title="After">
+
+  <Tab title="変更後">
     ```typescript
     // middleware.ts
     if (!sessionCookie?.value) {
@@ -314,14 +314,14 @@ I've successfully improved all error messages in the `apps/factory-admin/src/app
       );
     }
     ```
-    <Note>Clear instructions on what went wrong and how to fix it</Note>
+    <Note>何が問題で、どう修正するかについての明確な指示</Note>
   </Tab>
 </Tabs>
 
 ### 例2：Bearer Token認証
 
 <Tabs>
-  <Tab title="Before">
+  <Tab title="変更前">
     ```typescript
     // middleware.ts
     if (!authHeader) {
@@ -333,8 +333,8 @@ I've successfully improved all error messages in the `apps/factory-admin/src/app
     }
     ```
   </Tab>
-  
-  <Tab title="After">
+
+  <Tab title="変更後">
     ```typescript
     // middleware.ts
     if (!authHeader) {
@@ -349,33 +349,33 @@ I've successfully improved all error messages in the `apps/factory-admin/src/app
       );
     }
     ```
-    <Note>Specific format requirements and troubleshooting hints added</Note>
+    <Note>具体的な形式要件とトラブルシューティングのヒントを追加</Note>
   </Tab>
 </Tabs>
 
 ## ベストプラクティス
 
 <Note>
-  Follow these best practices for safe and effective error message improvement.
+  安全で効果的なエラーメッセージ改善のため、これらのベストプラクティスに従ってください。
 </Note>
 
 <Steps>
-  <Step title="Start with a dry run">
-    Always preview the scope of changes first: 
+  <Step title="ドライランから始める">
+    まず変更範囲を必ずプレビューしてください:
     ```bash
-    # See how many errors need improvement 
+    # See how many errors need improvement
     DRY_RUN=true ./droid-improve-errors.sh packages
     ```
   </Step>
 
-  <Step title="Process incrementally">
-    For large codebases, tackle one module at a time: 
-    ```bash 
-    # Process each app separately for easier review 
+  <Step title="段階的に処理する">
+    大規模なコードベースでは、一度に1つのモジュールに取り組みます:
+    ```bash
+    # Process each app separately for easier review
     ./droid-improve-errors.sh apps/factory-admin
-    git add -A && git commit -m "refactor(factory-admin): improve error messages" 
-    
-    ./droid-improve-errors.sh apps/factory-app 
+    git add -A && git commit -m "refactor(factory-admin): improve error messages"
+
+    ./droid-improve-errors.sh apps/factory-app
     git add -A && git commit -m "refactor(factory-app): improve error messages"
     ```
   </Step>

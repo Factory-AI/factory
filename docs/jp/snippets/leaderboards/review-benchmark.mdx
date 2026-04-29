@@ -1,0 +1,44 @@
+[droid-code-review-evals](https://github.com/droid-code-review-evals/review-droid-benchmark) のオープンソースベンチマークは、AIモデルがコードレビューで実際のバグをどれだけ検出できるかを測定します。Sentry、Grafana、Keycloak、Discourse、Cal.comの5つの大規模オープンソースコードベースから50件のプルリクエストを使い、13のフロンティアモデルとオープンソースモデルを評価します。手動でキュレーションされた167件の検証済みバグのゴールデンセットに対して採点します。
+
+### コスト対品質
+
+| モデル | 平均F1 | PRあたりのコスト |
+|-------|---------|-----------|
+| **GPT-5.2** | 60.5% | $1.25 |
+| **Claude Opus 4.6** | 59.8% | $3.11 |
+| Claude Sonnet 4.6 | 57.9% | $1.15 |
+| Claude Opus 4.7 | 56.4% | $4.18 |
+| GLM-5.1 | 56.3% | $1.06 |
+| GPT-5.3 Codex | 56.2% | $1.69 |
+| Gemini 3.1 Pro | 52.6% | $2.04 |
+| GPT-5.4 Mini | 52.0% | $0.68 |
+| Kimi K2.5 | 51.9% | $0.41 |
+| Gemini 3 Flash | 50.0% | $0.34 |
+| GPT-5.5 | 47.9% | $5.63 |
+| GPT-5.4 | 47.5% | $2.01 |
+| MiniMax M2.7 | 45.6% | $0.15 |
+
+*最終更新: 2026年4月*
+
+GPT-5.2は、Claude Opus 4.6の約40%のコストで品質トップです。Kimi K2.5やMiniMax M2.7のようなオープンソースモデルは、PRあたり約3〜8倍低いコストでGPT-5.2の約75〜86%の品質を実現し、マルチパスやアンサンブルのレビュー戦略を可能にします。
+
+### 手法
+
+| 段階 | 説明 |
+|-------|-------------|
+| **テストセット** | Python、Go、Java、Ruby、TypeScriptを含む5つのリポジトリ（Sentry、Grafana、Keycloak、Discourse、Cal.com）から50件のPR |
+| **ゴールデンセット** | 正確なファイル/行位置とバグ種別分類を持つ、手動検証済みの167件のバグ（v3） |
+| **モデル評価** | 標準化されたプロンプトを使い、[Droid Action](https://github.com/Factory-AI/droid-action)経由で各モデルがすべてのPRをレビュー |
+| **LLMジャッジ** | 独立したLLMが、モデルコメントとゴールデンコメントを意味的同等性で照合 |
+| **クロスジャッジ検証** | 採点バイアスを制御するため、2つ目のジャッジで照合結果をスポットチェック |
+| **F1計算** | F1は適合率（コメントのうち実際のバグである割合）と再現率（検出されたゴールデンバグの割合）を組み合わせます |
+| **複数実行** | 一貫性を測定するため、各モデルを複数回実行して評価 |
+| **外れ値除外** | エラーになった実行やトークン制限に達した実行は除外 |
+
+<Card title="Review Droid Benchmark" icon="trophy" href="https://github.com/droid-code-review-evals/review-droid-benchmark">
+  GitHubで完全な手法、生の結果、採点スクリプトを表示する
+</Card>
+
+<Card title="解説記事を読む" icon="newspaper" href="https://www.factory.ai/news/code-review-benchmark">
+  コードレビューが最も得意なモデルは？
+</Card>

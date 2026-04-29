@@ -1,0 +1,33 @@
+import { BarChart } from '/snippets/leaderboards/bar-chart.jsx'
+
+export const terminalBenchData = [
+  { name: "Factory Droid", model: "Claude Opus 4.5", accuracy: 63.1 },
+  { name: "OpenAI Codex CLI", model: "GPT-5.1-Codex-Max", accuracy: 60.4 },
+  { name: "Warp", model: "Claude Opus 4.5", accuracy: 59.1 },
+  { name: "OpenHands", model: "Gemini 3 Pro", accuracy: 43.8 },
+  { name: "Anthropic Claude Code", model: "Gemini 3 Pro", accuracy: 40.1 },
+]
+
+[tbench.ai](https://www.tbench.ai) のベンチマークは、ターミナルベースのインターフェースを使った実世界のソフトウェアエンジニアリングタスクでAIコーディングエージェントを評価します。エージェントがコードベースを移動し、コマンドを実行し、コマンドライン操作を通じて解決策を実装する能力を測定します。
+
+### 結果
+
+<BarChart data={terminalBenchData} valueKey="accuracy" valueLabel="%" maxValue={100} />
+
+*最終更新: 2025年12月*
+
+### 手法
+
+| カテゴリ | 説明 |
+|----------|-------------|
+| **コードナビゲーション** | 関連するコードを見つけて理解する |
+| **バグ修正** | 問題を特定して解決する |
+| **機能実装** | 新しい機能を追加する |
+| **リファクタリング** | 既存のコード構造を改善する |
+| **テスト** | テストを書いて実行する |
+
+タスクは**正確性**、**効率**、**コード品質**で採点されます。
+
+<Card title="Terminal Bench リーダーボード" icon="trophy" href="https://www.tbench.ai/leaderboard/terminal-bench/2.0">
+  ライブランキングを表示し、エージェントを提出する
+</Card>

@@ -1,0 +1,67 @@
+---
+title: "独自マシンの使用（BYOM）"
+description: 独自のマシンをDroid Computerとして有効化し、接続する。
+keywords: ['byom', 'bring your own machine', 'droid computers', 'remote access', 'daemon', 'relay']
+---
+
+Bring Your Own Machine（BYOM）を使うと、独自のLinux、macOS、WindowsマシンをDroid Computerとして登録できます。VPS、クラウドVM、ワークステーション、オンプレミスサーバーなど、すでに管理している環境内でDroidを動作させたい場合に便利です。
+
+## 始める前に
+
+以下を用意してください：
+
+- **Linux**、**macOS**、または**Windows**で動作するマシン
+- そのマシンにインストール済みのDroid CLI
+- Factoryでの認証済み状態（対話セッションで`/login`）
+- Factory API、特に`relay.factory.ai`へのネットワークアクセス
+
+<Note>
+受信ポートを開く必要はありません。`--remote-access`でデーモンを起動すると、BYOMマシンはFactoryのリレーサービス経由で接続します。
+</Note>
+
+## デスクトップアプリで登録する
+
+デスクトップアプリを使用している場合、マシンはシステムのホスト名を使って自動的に登録されます。リモートコンピューターとして有効化するには、**設定 → Droid Computers**に移動し、**Remote Access**トグルをオンにします。これにより、ローカルマシンがFactoryのリレーサービスに自動接続され、他のデバイスから到達できるようになります。接続はデスクトップアプリが実行されている間維持されます。
+
+## CLIで登録する
+
+```bash
+droid daemon --remote-access
+```
+
+未登録の場合は、コンピューター名の入力を求められ、マシンが自動登録されます。
+
+先に手動でマシンを登録したい場合は、`droid computer register [name]`を実行してから、`droid daemon --remote-access`を開始してFactoryのリレーサービス経由で接続できます。
+
+<Note>
+1台のマシンにつき、同時に許可されるコンピューター登録は1つだけです。再登録が必要な場合は、先に`droid computer remove`を実行するか、設定ページからマシンを削除してください。
+</Note>
+
+## 可用性のトラブルシューティング
+
+リモート利用可能なマシンとして表示されない場合：
+
+- **設定 → Droid Computers**でマシンが一覧に表示されていることを確認する
+- **設定 → Droid Computers**で、そのマシンの**Remote Access**が有効になっていることを確認する
+- デーモンが`droid daemon --remote-access`で実行されていることを確認する
+
+**Droid Computers**ページ自体が表示されない場合は、組織管理者またはFactoryサポートにお問い合わせください。
+
+## BYOMマシンの管理と更新
+
+- 登録済みコンピューターを確認するには`droid computer list`を使用
+- コンピューターへのSSHセッションを開くには`droid computer ssh <name>`を使用
+- 現在のマシンの登録を解除し、ローカル設定をクリーンアップするには`droid computer remove`を使用
+- マシン上でDroid CLIを手動更新してから、デーモンプロセスを再起動
+
+BYOMコンピューターは、そのマシンにすでに設定されているgit認証情報を使用します。
+
+## セキュリティとネットワークに関する注意事項
+
+- **リレーモード** — BYOMマシンのトラフィックはFactoryのリレーサービス経由でルーティングされるため、公開ポートは露出しません
+- **認証情報** — BYOMマシン上のgit認証情報はFactoryでは管理されません。マシン上の既存のgit設定が使用されます
+- **所有権** — 基盤となるマシンの強化と保守は利用者の責任です
+
+## 関連項目
+
+- [Droid Computers](/jp/cli/features/droid-computers) — プラットフォーム管理コンピューターと共通概念の概要

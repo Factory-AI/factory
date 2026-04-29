@@ -1,12 +1,12 @@
 ---
 title: "インストールと使用方法"
-description: Set up, connect to, and use Cloud Templates inside Factory sessions
+description: Factoryセッション内でCloud Templatesを設定、接続、使用する
 ---
 
 **クラウドテンプレート**は、クラウド上に存在する完全に設定された、オンデマンドの開発環境です。クラウドテンプレートは、ローカルで期待するのと同じツールと依存関係を提供するため、Factoryから直接コードのビルド、テスト、実行を行うことができます。
 
 <Note>
-  To get the most out of cloud templates, configure environment variables and a setup script during template creation. The setup script installs dependencies and prepares your development environment automatically, ensuring every team member has an identical setup.
+  クラウドテンプレートを最大限活用するには、テンプレート作成時に環境変数とセットアップスクリプトを設定します。セットアップスクリプトは依存関係をインストールし、開発環境を自動的に準備するため、すべてのチームメンバーが同一のセットアップを利用できます。
 </Note>
 
 ## システム要件
@@ -16,24 +16,24 @@ description: Set up, connect to, and use Cloud Templates inside Factory sessions
 
 <Steps>
 
-  <Step title="Open Cloud Templates Settings">
-    1. In Factory, click the **Settings** icon from the left sidebar.  
-    2. Select **Cloud Templates**.
+  <Step title="Cloud Templates設定を開く">
+    1. Factoryで左サイドバーの**Settings**アイコンをクリックします。
+    2. **Cloud Templates**を選択します。
   </Step>
 
-  <Step title="Create a New Cloud Template">
-    1. Click **Create Template**.  
-    2. Enter the repository you want to use.  
-    3. Give your template a friendly name (e.g., “frontend-template”).  
-    4. (Optional) Configure a setup script to run during template initialization.
-    5. Click **Create**.
+  <Step title="新しいCloud Templateを作成">
+    1. **Create Template**をクリックします。
+    2. 使用するリポジトリを入力します。
+    3. テンプレートにわかりやすい名前（例: “frontend-template”）を付けます。
+    4. （任意）テンプレート初期化時に実行するセットアップスクリプトを設定します。
+    5. **Create**をクリックします。
     <Note>
-      Factory clones your repo and prepares the environment—this can take a minute for large projects.
+      Factoryがリポジトリをクローンして環境を準備します。大規模なプロジェクトでは数分かかる場合があります。
     </Note>
   </Step>
 
-  <Step title="Verify Template Ready">
-    The new template appears in the list with a status indicator. Once it shows **Ready**, you can use it from any session.
+  <Step title="テンプレートの準備完了を確認">
+    新しいテンプレートがステータス表示付きで一覧に表示されます。**Ready**と表示されたら、どのセッションからでも使用できます。
   </Step>
 
 </Steps>
@@ -44,23 +44,23 @@ description: Set up, connect to, and use Cloud Templates inside Factory sessions
 
 <Steps>
 
-  <Step title="Open or Start a Session">
-    Join any Factory session as usual.
+  <Step title="セッションを開く、または開始">
+    通常どおり任意のFactoryセッションに参加します。
   </Step>
 
-  <Step title="Connect to Cloud Machine">
-    1. On the session start page, click the Machine Connection button. 
-    2. Choose **Remote** tab.  
-    3. Select the template you created earlier.  
-    4. Factory attaches the cloud template to your session.
+  <Step title="Cloud Machineに接続">
+    1. セッション開始ページでMachine Connectionボタンをクリックします。
+    2. **Remote**タブを選択します。
+    3. 先ほど作成したテンプレートを選択します。
+    4. Factoryがクラウドテンプレートをセッションに接続します。
 
     <Frame>
     ![Factoryのセッション設定UIでクラウドテンプレートを接続するフロー](/images/web/machine-connection-start.gif)
-    </Frame> 
+    </Frame>
   </Step>
 
-  <Step title="Confirm Connection">
-    A green indicator and remote working directory appear on the top-right next to your profile dropdown menu. You’re now interacting with the cloud template.
+  <Step title="接続を確認">
+    右上のプロフィールドロップダウンの横に、緑色のインジケーターとリモート作業ディレクトリが表示されます。これでクラウドテンプレートを操作しています。
   </Step>
 
 </Steps>
@@ -71,21 +71,21 @@ description: Set up, connect to, and use Cloud Templates inside Factory sessions
 
 <CardGroup cols={2}>
 
-  <Card title="Run CLI Commands" icon="terminal">
-    Use the **Terminal** toolkit to execute commands like:
+  <Card title="CLIコマンドを実行" icon="terminal">
+    **Terminal**ツールキットを使用して、次のようなコマンドを実行します:
     <pre>npm run dev
 pytest
 git status</pre>
-    Output streams live into chat and logs.
+    出力はチャットとログにライブでストリーミングされます。
   </Card>
 
-  <Card title="Edit & Save Files" icon="file-code">
-    Open files from the repo, make changes, and save.  
-    Files persist in the cloud template and can be committed upstream when ready.
+  <Card title="ファイルを編集・保存" icon="file-code">
+    リポジトリのファイルを開き、変更して保存します。
+    ファイルはクラウドテンプレートに保持され、準備ができたら上流にコミットできます。
   </Card>
 
-  <Card title="Auto-Save Controls" icon="save">
-    Auto-save is disabled by default—enable it from the **Session Settings** panel whenever you want live file syncing.
+  <Card title="自動保存の制御" icon="save">
+    自動保存はデフォルトで無効です。ライブファイル同期を使用したい場合は、**Session Settings**パネルから有効にします。
   </Card>
 
 </CardGroup>
@@ -96,10 +96,10 @@ git status</pre>
 
 <AccordionGroup>
 
-  <Accordion title="Can't connect from session">
-    Ensure you:  
-    1. Selected **Remote Machine** (not Local).  
-    2. Refresh the page, or try again in a different session
+  <Accordion title="セッションから接続できない">
+    以下を確認してください:
+    1. **Remote Machine**（Localではなく）を選択していること。
+    2. ページを更新するか、別のセッションでもう一度試すこと。
   </Accordion>
 
 </AccordionGroup>

@@ -1,6 +1,6 @@
 ---
 title: "準備状況レポートAPI"
-description: REST API reference for programmatic access to agent readiness reports.
+description: エージェント準備状況レポートへプログラムからアクセスするためのREST APIリファレンス。
 keywords:
   [
     "api",
@@ -11,7 +11,7 @@ keywords:
   ]
 ---
 
-Readiness Reports APIは、組織のエージェント準備状況評価データへのプログラマティックアクセスを提供します。
+準備状況レポートAPIは、組織のエージェント準備状況評価データへプログラムからアクセスする手段を提供します。
 
 ---
 
@@ -37,7 +37,7 @@ https://app.factory.ai
 
 ## エンドポイント
 
-### Readiness Reportsの一覧取得
+### 準備状況レポートの一覧取得
 
 組織の準備状況レポートを取得します。
 
@@ -49,9 +49,9 @@ GET /api/organization/maturity-level-reports
 
 | パラメータ    | 型    | 必須 | 説明                                            |
 | :----------- | :------ | :------- | :----------------------------------------------------- |
-| `repoId`     | string  | No       | リポジトリIDでレポートをフィルタ                        |
-| `limit`      | integer | No       | 返すレポートの最大数（正の値である必要があります） |
-| `startAfter` | string  | No       | ページネーションカーソル用のレポートID                        |
+| `repoId`     | string  | いいえ       | リポジトリIDでレポートをフィルタ                        |
+| `limit`      | integer | いいえ       | 返すレポートの最大数（正の値である必要があります） |
+| `startAfter` | string  | いいえ       | ページネーションカーソル用のレポートID                        |
 
 #### レスポンス
 
@@ -64,22 +64,22 @@ GET /api/organization/maturity-level-reports
       "repoUrl": "https://github.com/org/repo",
       "apps": {
         "apps/web": {
-          "description": "Main Next.js application"
+          "description": "メインのNext.jsアプリケーション"
         },
         "apps/api": {
-          "description": "Backend API service"
+          "description": "バックエンドAPIサービス"
         }
       },
       "report": {
         "lint_config": {
           "numerator": 2,
           "denominator": 2,
-          "rationale": "ESLint configured in both applications"
+          "rationale": "両方のアプリケーションでESLintが設定済み"
         },
         "type_check": {
           "numerator": 2,
           "denominator": 2,
-          "rationale": "TypeScript strict mode enabled"
+          "rationale": "TypeScriptのstrictモードが有効"
         }
       },
       "commitHash": "abc123def456",
@@ -105,9 +105,9 @@ curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limi
 
 ---
 
-## Readiness Reportスキーマ
+## 準備状況レポートスキーマ
 
-### Reportオブジェクト
+### レポートオブジェクト
 
 | フィールド                 | 型     | 説明                                                |
 | :-------------------- | :------- | :--------------------------------------------------------- |
@@ -123,13 +123,13 @@ curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limi
 | `modelUsed`           | object?  | 評価に使用されたモデル設定                    |
 | `droidVersion`        | string?  | レポートを生成したCLIバージョン                      |
 
-### App Descriptionオブジェクト
+### アプリ説明オブジェクト
 
 | フィールド         | 型   | 説明                                    |
 | :------------ | :----- | :--------------------------------------------- |
 | `description` | string | アプリケーションの機能に関する簡潔な説明 |
 
-### Criterion Evaluationオブジェクト
+### 基準評価オブジェクト
 
 | フィールド         | 型   | 説明                                                                 |
 | :------------ | :----- | :-------------------------------------------------------------------------- |
@@ -137,7 +137,7 @@ curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limi
 | `denominator` | number | 基準が評価されたサブアプリケーションの数（最低1） |
 | `rationale`   | string | 評価結果の説明                                        |
 
-### Model Usedオブジェクト
+### 使用モデルオブジェクト
 
 | フィールド             | 型   | 説明                                             |
 | :---------------- | :----- | :------------------------------------------------------ |
@@ -155,10 +155,10 @@ curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limi
 3. そのIDを次のリクエストで`startAfter`として渡す
 
 ```bash
-# First page
+# 最初のページ
 curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10"
 
-# Next page (using last reportId from previous response)
+# 次のページ（前回レスポンスの最後のreportIdを使用）
 curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10&startAfter=550e8400-e29b-41d4-a716-446655440000"
 ```
 
@@ -171,7 +171,7 @@ curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10&st
 各評価後にレポートを取得することで、時系列での準備状況スコアを追跡：
 
 ```bash
-# Get latest report for a specific repository
+# 特定リポジトリの最新レポートを取得
 curl "https://app.factory.ai/api/organization/maturity-level-reports?repoId=123&limit=1" \
   -H "Authorization: Bearer $FACTORY_API_KEY"
 ```
@@ -187,7 +187,7 @@ const response = await fetch(
 );
 const { reports } = await response.json();
 
-// Calculate average level
+// 平均レベルを計算
 const avgLevel =
   reports.reduce((sum, r) => sum + calculateLevel(r), 0) / reports.length;
 ```
@@ -197,11 +197,11 @@ const avgLevel =
 準備状況スコアが閾値を下回った際のアラートを設定：
 
 ```bash
-# Fetch recent reports and check for regressions
+# 最近のレポートを取得し、後退がないか確認
 reports=$(curl -s "https://app.factory.ai/api/organization/maturity-level-reports?limit=50" \
   -H "Authorization: Bearer $FACTORY_API_KEY")
 
-# Process and alert on regressions...
+# 後退を処理し、アラートを送信...
 ```
 
 ---

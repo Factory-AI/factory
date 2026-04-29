@@ -1,6 +1,6 @@
 ---
 title: "ネットワークとデプロイ設定"
-description: Reference architectures and network requirements for cloud, hybrid, and fully airgapped Droid deployments.
+description: クラウド、ハイブリッド、完全エアギャップDroidデプロイメントのリファレンスアーキテクチャとネットワーク要件。
 ---
 
 Droidはどこでも実行できるよう設計されています：ノートパソコン、CIパイプライン、VMとKubernetesクラスター、完全にエアギャップされた環境で。
@@ -18,15 +18,15 @@ Factoryでは3つの標準的なパターンをサポートしています。チ
 このパターンでは、Droidが開発者マシンとビルドインフラストラクチャで実行され、**Factory cloud**がオーケストレーションとオプションの分析機能を提供します。
 
 <CardGroup cols={2}>
-  <Card title="Where Droid runs" icon="terminal">
-    - Developer laptops and workstations
-    - CI/CD runners (GitHub, GitLab, internal)
-    - Optional devcontainers or remote development environments
+  <Card title="Droidの実行場所" icon="terminal">
+    - 開発者のノートPCとワークステーション
+    - CI/CDランナー（GitHub、GitLab、社内）
+    - 任意のdevcontainerまたはリモート開発環境
   </Card>
-  <Card title="What lives in Factory cloud" icon="cloud">
-    - Control plane and org metadata
-    - Optional usage analytics dashboards
-    - Authentication and access control for the web UI
+  <Card title="Factoryクラウドにあるもの" icon="cloud">
+    - コントロールプレーンと組織メタデータ
+    - 任意の利用分析ダッシュボード
+    - Web UIの認証とアクセス制御
   </Card>
 </CardGroup>
 
@@ -142,7 +142,7 @@ export NO_PROXY="localhost,127.0.0.1,internal.example.com,.corp.example.com"
   - 短命な認証情報と最小限の権限を持つ一時的なCIジョブでDroidを実行。
   - フックとDroid Shieldと組み合わせて、リークを防止し承認ワークフローを強制。
 
-これらの環境で自律性、許可/拒否リスト、Droid Shieldがどのように相互作用するかについては、[LLM Safety & Agent Controls](/enterprise/llm-safety-and-agent-controls)を参照してください。
+これらの環境で自律性、許可/拒否リスト、Droid Shieldがどのように相互作用するかについては、[LLM Safety & Agent Controls](/jp/enterprise/llm-safety-and-agent-controls)を参照してください。
 
 ---
 
@@ -154,4 +154,4 @@ export NO_PROXY="localhost,127.0.0.1,internal.example.com,.corp.example.com"
 - **組織とプロジェクトの`.factory/settings.json`** – Droidが実行できる場所、許可されるモデルとゲートウェイ、デフォルトのテレメトリー送信先に関する階層的ポリシー。
 - **組織設定エンドポイント** – 大組織向けに、中央設定サービスがすべての環境に標準的な`.factory`バンドルを配布可能。
 
-階層と統合動作の詳細については、[Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control)を参照してください。
+階層と統合動作の詳細については、[階層設定と組織管理](/jp/enterprise/hierarchical-settings-and-org-control)を参照してください。

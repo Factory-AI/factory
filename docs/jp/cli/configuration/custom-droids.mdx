@@ -1,6 +1,6 @@
 ---
 title: "カスタムDroid（サブエージェント）"
-description: Create specialized subagents with their own prompts, tool access, and models that droid can delegate work to.
+description: droidが作業を委任できる、独自のプロンプト、ツールアクセス、モデルを持つ専門サブエージェントを作成する。
 keywords: ['custom droids', 'subagents', 'agents', 'specialized agents', 'delegation', 'task agent', 'custom agent']
 ---
 
@@ -13,7 +13,7 @@ keywords: ['custom droids', 'subagents', 'agents', 'specialized agents', 'delega
 カスタムdroids は、プロジェクトの `.factory/droids/` またはあなた個人の `~/.factory/droids/` ディレクトリ配下の `.md` ファイルとして存在します。CLI はこれらのフォルダをスキャンし（トップレベルファイルのみ）、各定義を検証して、**Task** ツール用の `subagent_type` ターゲットとして公開します。これにより、プライマリアシスタントがセッション中に専用のヘルパーを起動できます。
 
 <Note>
-  Custom Droids are enabled by default. You can toggle them off in Settings (`/settings`) under the Experimental section if needed.
+  カスタムDroidはデフォルトで有効です。必要に応じてSettings（`/settings`）のExperimentalセクションでオフにできます。
 </Note>
 
 - **プロジェクトdroids** は `<repo>/.factory/droids/` に配置され、チームメンバーと共有されます。
@@ -93,7 +93,7 @@ Perform deep analysis of the code or problem presented...
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `name`            | 必須。小文字、数字、`-`、`_`。`subagent_type` 値とファイル名を決定します。                                  |
 | `description`     | 任意。UI リストに表示されます。≤500文字に抑えてください。                                                                               |
-| `model`           | `inherit` （親セッションのモデルを使用）、またはモデル識別子を指定します。組み込みモデルの場合、`claude-sonnet-4-5-20250929` のような値を使用します。カスタムモデル（BYOK）の場合、`custom:` + 設定の `model` フィールドを使用します（例：`custom:gpt-4o-mini`）。`model_display_name` では**ありません**。モデルIDについては [plans page](/pricing#available-models) を参照してください。 |
+| `model`           | `inherit` （親セッションのモデルを使用）、またはモデル識別子を指定します。組み込みモデルの場合、`claude-sonnet-4-5-20250929` のような値を使用します。カスタムモデル（BYOK）の場合、`custom:` + 設定の `model` フィールドを使用します（例：`custom:gpt-4o-mini`）。`model_display_name` では**ありません**。モデルIDについては [plans page](/jp/pricing#available-models) を参照してください。 |
 | `reasoningEffort` | 任意。対応するモデル（例：`low`、`medium`、`high`）の推論努力を設定します。`model` が `inherit` の場合は無視されます。選択したモデルと互換性が必要です。 |
 | `tools`           | ツール選択：すべてのツールを使用する場合は省略、カテゴリ文字列を使用（例：`read-only`）、または `["Read", "Edit", "Execute"]` のようなツールIDの配列を指定します。大文字小文字を区別します。 |
 
@@ -114,11 +114,11 @@ Perform deep analysis of the code or problem presented...
 明示的な配列は上記のツール名を使用する必要があります（大文字小文字を区別）。未知の名前は検証エラーを引き起こします。
 
 <Note>
-  `TodoWrite` is automatically included for all droids to enable task tracking. You don't need to add it to your tools list.
+  タスク追跡を有効にするため、`TodoWrite`はすべてのdroidに自動的に含まれます。ツール一覧に追加する必要はありません。
 </Note>
 
 <Note>
-  When using `Edit` with OpenAI models, `ApplyPatch` is automatically included for compatibility. When `model` is `inherit`, both tools are enabled to ensure coverage across model providers.
+  OpenAIモデルで`Edit`を使用する場合、互換性のため`ApplyPatch`が自動的に含まれます。`model`が`inherit`の場合、モデルプロバイダー全体をカバーするため両方のツールが有効になります。
 </Note>
 
 ---
@@ -259,7 +259,7 @@ Custom Droids
 - **モデルを戦略的に選択** – `inherit` を使用して親セッションとマッチさせるか、専門タスクに異なるモデルを指定：
   - 単純な分析と要約タスクには小さい/高速なモデル（低コスト）。
   - 複雑な推論、コードレビュー、多段階分析には大きい/高性能なモデル。
-  - 利用可能なモデルIDについては [plans page](/pricing#available-models) を参照してください。
+  - 利用可能なモデルIDについては [plans page](/jp/pricing#available-models) を参照してください。
 - **ツールアクセスを制限** – 明示的なツールリストを使用してサブエージェントができることを制限し、予期しないシェルコマンドや他の危険な操作を防止。
 - **ライブ更新を活用** – Task ツールはライブ進行状況をストリーミングし、サブエージェントの実行中にツール呼び出し、結果、TodoWrite 更新をリアルタイムで表示。
 - **出力を構造化** – `Summary:` や `Findings:` などのセクションを出力するようプロンプトを整理し、Task ツールUI が結果を明確に要約できるようにします。
