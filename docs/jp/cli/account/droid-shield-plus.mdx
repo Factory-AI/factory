@@ -1,0 +1,174 @@
+---
+title: Droid Shield Plus
+description: エンタープライズ組織向けの、プロンプトインジェクション、シークレット検出、機密データ保護のためのAI搭載セキュリティスキャン。
+keywords: ['droid shield plus', 'prompt injection', 'secrets detection', 'dlp', 'enterprise security', 'ai security']
+---
+
+<Info>
+  **Enterprise Feature** — Droid Shield Plus is available for enterprise customers. [Contact us](mailto:sales@factory.ai) to enable this feature for your organization.
+</Info>
+
+## Droid Shield Plusとは？
+
+Droid Shield Plusは、プロンプトインジェクション攻撃、機密データの露出、その他のセキュリティ脅威に対するリアルタイム保護を提供する高度なAI搭載セキュリティレイヤーです。パターンベースの検出を使用する標準的な[Droid Shield](/cli/account/droid-shield)とは異なり、Droid Shield Plusはエンタープライズ組織向けに、インテリジェントでコンテキストを認識するセキュリティスキャンを提供します。
+
+---
+
+## 主な機能
+
+<CardGroup cols={2}>
+  <Card title="Prompt Injection Detection" icon="shield-exclamation">
+    Identifies and blocks malicious prompt injection attempts designed to manipulate AI behavior or bypass security controls.
+  </Card>
+  <Card title="Advanced Secrets Scanning" icon="key">
+    AI-powered detection of API keys, tokens, passwords, and credentials with higher accuracy and fewer false positives than pattern matching.
+  </Card>
+  <Card title="Sensitive Data Protection (DLP)" icon="user-shield">
+    Detects personally identifiable information (PII), financial data, and other sensitive information before it's exposed in prompts or commits.
+  </Card>
+  <Card title="Malicious Code Detection" icon="bug">
+    Identifies potentially dangerous code patterns and suspicious content that could pose security risks.
+  </Card>
+</CardGroup>
+
+---
+
+## Droid Shield Plusの仕組み
+
+Droid Shield Plusは2層の保護を提供します：
+
+### 1. プロンプトセキュリティスキャン
+
+Droidに送信するすべてのプロンプトは、処理前に自動的にスキャンされます。脅威が検出された場合、プロンプトはブロックされ、通知されます：
+
+```
+Droid Shield Plus has blocked this prompt due to detected: prompt injection, sensitive data.
+
+If you believe this is a false positive, you can disable Droid Shield Plus in settings.
+```
+
+**検出される脅威のカテゴリ：**
+- **Prompt Injection** — AIの指示を操作しようとする試み
+- **機密データ (DLP)** — PII、認証情報、または機密情報
+- **有害コンテンツ** — 害のあるまたは不適切なコンテンツ
+- **悪意のあるコード** — 疑わしいコードパターン
+
+### 2. Git コミットスキャン
+
+Droid経由で`git commit`または`git push`操作を実行する際、Droid Shield PlusはAI搭載分析を使用してステージされた変更をスキャンします：
+
+```
+Droid Shield Plus has detected potential secrets in your staged changes.
+
+If you would like to override, you can either:
+1. Perform the commit/push yourself manually
+2. Disable Droid Shield Plus in settings
+```
+
+これにより正規表現ベースのスキャンよりも大幅に高精度な検出が可能になり、以下をキャッチします：
+- 難読化またはエンコードされたシークレット
+- コンテキストを認識した認証情報の検出
+- カスタムシークレット形式
+- 複雑なコード構造に埋め込まれたシークレット
+
+---
+
+## Droid Shield vs Droid Shield Plus
+
+| 機能 | Droid Shield | Droid Shield Plus |
+|---------|--------------|-------------------|
+| **検出方法** | パターン/正規表現マッチング | AI搭載分析 |
+| **プロンプトスキャン** | なし | あり |
+| **Git コミットスキャン** | あり | あり |
+| **Prompt Injection 検出** | なし | あり |
+| **機密データ (DLP)** | 限定的 | 包括的 |
+| **有害コンテンツ検出** | なし | あり |
+| **悪意のあるコード検出** | なし | あり |
+| **偽陽性率** | 高い | 低い |
+| **利用可能性** | 全ユーザー | Enterprise |
+| **提供形態** | 標準搭載 | エンタープライズアドオン |
+
+<Note>
+  When Droid Shield Plus is enabled, it replaces the standard Droid Shield for git operations, providing enhanced AI-powered scanning instead of pattern-based detection.
+</Note>
+
+---
+
+## Droid Shield Plusの有効化
+
+<Steps>
+  <Step title="Contact Factory">
+    Reach out to [sales@factory.ai](mailto:sales@factory.ai) to enable Droid Shield Plus for your organization.
+  </Step>
+  <Step title="Enable in Settings">
+    Once enabled for your organization:
+    1. Run `droid`
+    2. Enter `/settings`
+    3. Navigate to the **Security** section
+    4. Toggle **"Droid Shield Plus (AI-Powered)"** to On
+  </Step>
+  <Step title="Verify Activation">
+    プロンプトインジェクション、機密データ、有害コンテンツに対するAI搭載セキュリティスキャンが有効であることを確認できます。
+  </Step>
+</Steps>
+
+---
+
+## ブロックされたプロンプトの処理
+
+Droid Shield Plusがプロンプトやgit操作をブロックした場合：
+
+<AccordionGroup>
+  <Accordion title="Review the detection">
+    Carefully examine what was flagged. The error message will indicate the threat category (prompt injection, sensitive data, toxic content, or malicious code).
+  </Accordion>
+  
+  <Accordion title="Remove sensitive content">
+    If sensitive data was detected:
+    - Move secrets to environment variables
+    - Use secure credential stores
+    - Remove PII from prompts
+  </Accordion>
+  
+  <Accordion title="Rephrase if needed">
+    If prompt injection was detected, rephrase your request to avoid patterns that could be misinterpreted as manipulation attempts.
+  </Accordion>
+  
+  <Accordion title="Report false positives">
+    If you believe the detection is incorrect, contact [support@factory.ai](mailto:support@factory.ai) with details about the false positive.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  **Never disable Droid Shield Plus just to bypass security checks.** If content is being blocked, there's likely a legitimate security concern that should be addressed.
+</Warning>
+
+---
+
+## セキュリティとプライバシー
+
+Droid Shield Plusは、組織によって管理されるエンタープライズアドオンです：
+
+- **リアルタイム分析** — プロンプトとコードは最小限のレイテンシでリアルタイムにスキャンされます
+- **エンタープライズ制御** — 有効化された組織では、利用可否とポリシー適用を管理できます
+- **グレースフルデグラデーション** — セキュリティサービスが一時的に利用できない場合、Droidは問題をログに記録しながら動作を継続します
+
+---
+
+## 関連リソース
+
+<CardGroup cols={2}>
+  <Card title="Droid Shield" icon="shield" href="/cli/account/droid-shield">
+    Learn about the standard pattern-based secret detection included with all Droid accounts.
+  </Card>
+  <Card title="Security Overview" icon="lock" href="/cli/account/security">
+    Comprehensive overview of Factory's security features and practices.
+  </Card>
+</CardGroup>
+
+
+## Droid Shield Plusを入手
+
+<Card title="Enable for Your Organization" icon="building" href="mailto:sales@factory.ai">
+  Contact our sales team at **sales@factory.ai** to enable Droid Shield Plus for your enterprise organization.
+</Card>

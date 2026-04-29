@@ -72,6 +72,10 @@ Droidは、ワークフローの異なる段階で実行される複数のフッ
 
 <Note>You can use `*` to match all tools.</Note>
 
+<Tip>
+  Include `ApplyPatch` in file-edit matchers when you want hooks to run for patch-based edits. Hooks that read `tool_input.file_path` should handle an empty value because patch tools can modify multiple files.
+</Tip>
+
 ### ステップ3: フックを追加
 
 `+ Add new hook…`を選択し、以下のコマンドを入力します：
@@ -133,7 +137,7 @@ ls
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -155,7 +159,7 @@ markdownファイルの言語タグの欠落やフォーマットの問題を自
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -300,7 +304,7 @@ Block edits to sensitive files:
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",

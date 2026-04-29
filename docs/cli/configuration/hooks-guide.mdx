@@ -84,6 +84,10 @@ Type `Execute` for the matcher.
 
 <Note>You can use `*` to match all tools.</Note>
 
+<Tip>
+  Include `ApplyPatch` in file-edit matchers when you want hooks to run for patch-based edits. Hooks that read `tool_input.file_path` should handle an empty value because patch tools can modify multiple files.
+</Tip>
+
 ### Step 3: Add the hook
 
 Select `+ Add new hook…` and enter this command:
@@ -147,7 +151,7 @@ Automatically format TypeScript files after editing:
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -169,7 +173,7 @@ Automatically fix missing language tags and formatting issues in markdown files:
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -314,7 +318,7 @@ Block edits to sensitive files:
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",

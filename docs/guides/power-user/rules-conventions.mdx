@@ -14,12 +14,12 @@ Rules are codified standards that Droid follows every time. Unlike memories (whi
 
 ## Rules vs Other Configuration
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| **Rules** | How code should be written | "Use early returns instead of nested conditionals" |
-| **Memory** | What was decided and why | "We chose Zustand because Redux was too verbose" |
-| **AGENTS.md** | How to build/test/run | "Run `npm test` before completing work" |
-| **Skills** | How to do specific tasks | "Steps to implement a new API endpoint" |
+| Type          | Purpose                    | Example                                            |
+| ------------- | -------------------------- | -------------------------------------------------- |
+| **Rules**     | How code should be written | "Use early returns instead of nested conditionals" |
+| **Memory**    | What was decided and why   | "We chose Zustand because Redux was too verbose"   |
+| **AGENTS.md** | How to build/test/run      | "Run `npm test` before completing work"            |
+| **Skills**    | How to do specific tasks   | "Steps to implement a new API endpoint"            |
 
 Rules are **prescriptive**—they tell Droid what to do. Use them for standards that should apply consistently.
 
@@ -605,7 +605,7 @@ Add a PostToolUse hook to run your linter after every file edit:
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -627,7 +627,7 @@ Run Prettier or your formatter automatically:
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -650,10 +650,10 @@ Run Prettier or your formatter automatically:
 
 ### File Locations
 
-| Scope | Location | Use For |
-|-------|----------|---------|
+| Scope    | Location            | Use For                |
+| -------- | ------------------- | ---------------------- |
 | Personal | `~/.factory/rules/` | Your style preferences |
-| Project | `.factory/rules/` | Team standards |
+| Project  | `.factory/rules/`   | Team standards         |
 
 ### Rule Format
 
