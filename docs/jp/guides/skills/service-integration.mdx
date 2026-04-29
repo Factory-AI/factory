@@ -13,9 +13,9 @@ keywords: ['service', 'backend', 'api', 'integration', 'endpoint', 'skill', 'mic
 ```
 .factory/skills/service-integration/
 ├── SKILL.md
-├── schemas/ (optional)
-├── patterns.md (optional)
-└── observability-checklist.md (optional)
+├── schemas/ (任意)
+├── patterns.md (任意)
+└── observability-checklist.md (任意)
 ```
 
 ### クイックスタート
@@ -31,87 +31,87 @@ keywords: ['service', 'backend', 'api', 'integration', 'endpoint', 'skill', 'mic
 Factoryにバックエンドサービスの拡張や連携の接続を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
-## Skill 定義
+## スキル定義
 
 以下のコンテンツを `.factory/skills/service-integration/SKILL.md` にコピーしてください：
 
 ```md
 ---
 name: service-integration
-description: Extend or integrate with existing services in a shared monorepo while preserving ownership boundaries, reliability standards, and observability requirements. Use when changes require adding or modifying backend APIs, jobs, or events in services with clear domain boundaries.
+description: 所有境界、信頼性標準、オブザーバビリティ要件を保ちながら、共有モノレポ内の既存サービスを拡張または連携します。明確なドメイン境界を持つサービスでバックエンドAPI、ジョブ、イベントの追加または変更が必要な場合に使用します。
 ---
-# Skill: Service integration in a complex codebase
+# スキル: 複雑なコードベースでのサービス連携
 
-## Purpose
+## 目的
 
-Extend or integrate with existing services in our main backend codebase while preserving ownership boundaries, reliability standards, and observability requirements.
+所有境界、信頼性標準、オブザーバビリティ要件を保ちながら、メインのバックエンドコードベース内の既存サービスを拡張または連携します。
 
-## When to use this skill
+## このスキルを使うタイミング
 
-- The change requires adding or modifying a backend API, job, or event.
-- The service lives in a **shared monorepo** with clear ownership and domain boundaries.
-- The work may require coordination with other teams, but the main implementation happens in our services.
+- 変更にバックエンドAPI、ジョブ、イベントの追加または変更が必要。
+- サービスが、明確な所有権とドメイン境界を持つ**共有モノレポ**内にある。
+- 作業には他チームとの調整が必要な場合があるが、主な実装は自チームのサービス内で行う。
 
-## Inputs
+## 入力
 
-- **Business requirement**: short description of the user or system behavior change.
-- **Primary service(s)**: names/paths of the services and domains involved.
-- **Existing contracts**: relevant API schemas, events, or message formats.
-- **Non-functional requirements**: latency, error budget, data retention, and throughput expectations.
-- **Change management**: rollout strategy, feature flags, or migration plan.
+- **ビジネス要件**: ユーザーまたはシステム動作変更の短い説明。
+- **主要サービス**: 関連するサービスとドメインの名前/パス。
+- **既存契約**: 関連するAPIスキーマ、イベント、メッセージ形式。
+- **非機能要件**: レイテンシ、エラーバジェット、データ保持、スループットの期待値。
+- **変更管理**: ロールアウト戦略、機能フラグ、移行計画。
 
-## Out of scope
+## 対象外
 
-- Greenfield systems that require new infrastructure or data stores.
-- Cross-region or cross-cloud replication design.
-- Changes that conflict with established ownership boundaries without prior approval.
+- 新しいインフラやデータストアが必要なグリーンフィールドシステム。
+- クロスリージョンまたはクロスクラウドのレプリケーション設計。
+- 事前承認なしに確立された所有境界と衝突する変更。
 
-## Conventions
+## 規約
 
-- Follow the **domain boundaries** and module layout described in `AGENTS.md` and internal architecture docs.
-- Use existing **configuration, logging, metrics, and tracing** patterns.
-- Reuse established **error handling** and **retry/backoff** utilities.
+- `AGENTS.md`と内部アーキテクチャドキュメントに記載された**ドメイン境界**とモジュールレイアウトに従う。
+- 既存の**設定、ロギング、メトリクス、トレーシング**パターンを使用する。
+- 確立された**エラーハンドリング**と**リトライ/バックオフ**ユーティリティを再利用する。
 
 ## 必須の動作
 
-1. Introduce new APIs, jobs, or events using existing framework patterns.
-2. Maintain backwards compatibility wherever possible; if breaking changes are required, document migration steps.
-3. Ensure all new behavior is observable via logs, metrics, and/or traces.
-4. Respect existing security and privacy requirements (authN/Z, PII handling, data residency).
+1. 既存のフレームワークパターンを使って、新しいAPI、ジョブ、イベントを導入する。
+2. 可能な限り後方互換性を維持する。破壊的変更が必要な場合は移行手順を文書化する。
+3. すべての新しい動作をログ、メトリクス、トレースで観測可能にする。
+4. 既存のセキュリティとプライバシー要件（認証/認可、PII処理、データレジデンシー）を尊重する。
 
 ## 必須の成果物
 
-- Code changes in the relevant service(s) and domain modules.
-- **Unit tests** for core logic and boundary conditions.
-- **Integration or contract tests** for new or modified interfaces, where harnesses exist.
-- Updated **runbooks or design docs** only if required by your team's process (link from the PR description instead of duplicating here).
+- 関連するサービスとドメインモジュールでのコード変更。
+- 中核ロジックと境界条件の**単体テスト**。
+- ハーネスが存在する場合、新規または変更されたインターフェースの**統合テストまたは契約テスト**。
+- チームのプロセスで必要な場合のみ、**ランブックまたは設計ドキュメント**を更新する（ここに重複させず、PR説明からリンクする）。
 
-## Implementation checklist
+## 実装チェックリスト
 
-1. Identify ownership and confirm which service(s) should change.
-2. Map the data and control flow across services and dependencies.
-3. Design the integration surface (API, event, or job) and validate it against existing conventions.
-4. Implement the change, keeping related files and modules co-located.
-5. Add or update tests at the appropriate layers (unit, integration, contract).
-6. Ensure logs/metrics/traces make the new behavior debuggable in production.
-7. Wire in feature flags or configuration for safe rollout if necessary.
+1. 所有者を特定し、どのサービスを変更すべきか確認する。
+2. サービスと依存関係をまたぐデータフローと制御フローを整理する。
+3. 連携面（API、イベント、ジョブ）を設計し、既存規約に照らして検証する。
+4. 関連ファイルとモジュールを近接させたまま変更を実装する。
+5. 適切なレイヤー（単体、統合、契約）でテストを追加または更新する。
+6. ログ/メトリクス/トレースにより、本番で新しい動作をデバッグできるようにする。
+7. 必要に応じて、安全なロールアウトのために機能フラグまたは設定を接続する。
 
-## Verification
+## 検証
 
-Run the service-level validation commands, for example:
+サービスレベルの検証コマンドを実行します。例:
 
-- `pnpm test --filter <service>` or `pytest` in the service directory
-- `pnpm lint` or equivalent linter for the language in use
-- Any existing **contract or integration test suites** referenced from `AGENTS.md` or service docs
+- `pnpm test --filter <service>`、またはサービスディレクトリで`pytest`
+- `pnpm lint`、または使用言語に相当するリンター
+- `AGENTS.md`またはサービスドキュメントで参照されている既存の**契約テストまたは統合テストスイート**
 
-The skill is complete when:
+以下を満たしたらスキルは完了です:
 
-- All relevant tests and linters pass.
-- The new integration behaves correctly in local or staging environments.
-- Observability signals (logs, metrics, traces) show the expected behavior without noisy regressions.
+- 関連するすべてのテストとリンターが成功する。
+- 新しい連携がローカルまたはステージング環境で正しく動作する。
+- オブザーバビリティ信号（ログ、メトリクス、トレース）が、ノイズの多い回帰なしに期待される動作を示す。
 
-## Safety and escalation
+## 安全性とエスカレーション
 
-- If the change touches **shared schemas, core auth logic, billing, or compliance-critical data**, stop and request explicit human approval and design review.
-- If dependencies owned by other teams need changes, create or update their tickets and clearly document assumptions and contract expectations in the PR.
+- 変更が**共有スキーマ、中核認証ロジック、請求、コンプライアンス上重要なデータ**に触れる場合は停止し、明示的な人間の承認と設計レビューを依頼する。
+- 他チーム所有の依存関係に変更が必要な場合は、そのチケットを作成または更新し、PRで前提と契約期待値を明確に文書化する。
 ```

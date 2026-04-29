@@ -195,11 +195,11 @@ GET /tokens
 ### 例
 
 ```bash
-# Token usage for a date range
+# 日付範囲のトークン使用量
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
 
-# Grouped by model
+# モデル別にグループ化
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-15&endDate=2026-01-15&group_by=model"
 ```
@@ -578,11 +578,11 @@ GET /users
 カーソルベースページネーションを使用してユーザーを反復処理します：
 
 ```bash
-# First page
+# 最初のページ
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=50"
 
-# Next page
+# 次のページ
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=50&cursor=user_01HPMQ8ABCDE7Y7PR3TTZY4KLM"
 ```
@@ -600,7 +600,7 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 
 ### レート制限
 
-レート制限はプランによって異なります。詳細については [Contact us](mailto:support@factory.ai) するか、ダッシュボードや自動化のユースケースでより高い制限が必要な場合はお問い合わせください。
+レート制限はプランによって異なります。詳細については [お問い合わせ](mailto:support@factory.ai) するか、ダッシュボードや自動化のユースケースでより高い制限が必要な場合はお問い合わせください。
 
 ---
 
@@ -633,7 +633,7 @@ API は標準的なHTTPステータスコードを返します：
 分析データは以下のパイプラインを通って流れます：
 
 ```
-CLI/Daemon → OTEL Events → BigQuery (raw) → dbt models → API
+CLI/Daemon → OTELイベント → BigQuery（raw） → dbtモデル → API
 ```
 
 - **ソース**: CLIとデーモンからのOpenTelemetryスパン
@@ -661,7 +661,7 @@ CLI/Daemon → OTEL Events → BigQuery (raw) → dbt models → API
 トークン消費量の傾向を追跡し、コスト要因を特定します：
 
 ```bash
-# Daily token usage for the month
+# 月次の日次トークン使用量
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
 ```
@@ -671,7 +671,7 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 DAU/WAU/MAUを監視し、採用パターンを特定します：
 
 ```bash
-# Activity metrics with client breakdown
+# クライアント内訳付きのアクティビティメトリクス
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/activity?startDate=2026-01-14&endDate=2026-01-28&group_by=client"
 ```
@@ -681,7 +681,7 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 出力と効率を測定します：
 
 ```bash
-# Productivity metrics
+# 生産性メトリクス
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/productivity?startDate=2026-01-14&endDate=2026-01-28"
 ```
@@ -691,7 +691,7 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 チームリーダー向けにユーザー別メトリクスをエクスポートします：
 
 ```bash
-# Paginate through all users
+# すべてのユーザーをページネーションで取得
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/users?startDate=2026-01-15&endDate=2026-01-15&limit=100"
 ```
