@@ -1,6 +1,6 @@
 ---
 title: "コードの自動フォーマット"
-description: "Automatically format code after every file edit using hooks"
+description: "フックを使ってファイル編集後にコードを自動整形する"
 keywords: ['formatting', 'prettier', 'black', 'gofmt', 'rustfmt', 'auto format', 'code style', 'hook']
 ---
 
@@ -206,7 +206,7 @@ case "$file_path" in
       prettier --write "$file_path" 2>&1
       echo "✓ Formatted: $file_path"
     fi
-    
+
     # Fix lint issues
     if command -v eslint &> /dev/null; then
       eslint --fix "$file_path" 2>&1 || true
@@ -219,13 +219,13 @@ case "$file_path" in
       black "$file_path" 2>&1
       echo "✓ Formatted with Black: $file_path"
     fi
-    
+
     # Sort imports
     if command -v isort &> /dev/null; then
       isort "$file_path" 2>&1
       echo "✓ Sorted imports: $file_path"
     fi
-    
+
     # Run flake8 for style issues
     if command -v flake8 &> /dev/null; then
       flake8 "$file_path" 2>&1 || true
@@ -326,7 +326,7 @@ chmod +x .factory/hooks/format-src-only.sh
 ### 例1: Reactコンポーネントのフォーマット
 
 <Tabs>
-  <Tab title="Before Hook">
+  <Tab title="フック前">
     ```typescript
     // Droid creates this file
     import React from 'react';
@@ -338,8 +338,8 @@ chmod +x .factory/hooks/format-src-only.sh
     }
     ```
   </Tab>
-  
-  <Tab title="After Hook">
+
+  <Tab title="フック後">
     ```typescript
     // Automatically formatted by prettier
     import React, { useState } from 'react';
@@ -366,7 +366,7 @@ chmod +x .factory/hooks/format-src-only.sh
 ### 例2: Pythonインポートソート
 
 <Tabs>
-  <Tab title="Before Hook">
+  <Tab title="フック前">
     ```python
     # Droid creates this file
     from typing import Optional
@@ -380,8 +380,8 @@ chmod +x .factory/hooks/format-src-only.sh
             helper(data)
     ```
   </Tab>
-  
-  <Tab title="After Hook">
+
+  <Tab title="フック後">
     ```python
     # Automatically formatted by black and isort
     import os
@@ -397,54 +397,54 @@ chmod +x .factory/hooks/format-src-only.sh
         if data:
             helper(data)
     ```
-    <Note>Imports sorted into stdlib, third-party, and local groups</Note>
+    <Note>importを標準ライブラリ、サードパーティ、ローカルグループに整理</Note>
   </Tab>
 </Tabs>
 
 ## ベストプラクティス
 
 <Warning>
-  Formatters can sometimes introduce subtle bugs (e.g., changing string formats, line continuations). Always review changes before committing.
+  フォーマッターは、文字列形式や行継続の変更など、微妙なバグを混入させることがあります。コミット前に必ず変更を確認してください。
 </Warning>
 
 <Steps>
-  <Step title="Start with read-only mode">
-    Test your formatter configuration manually first:
+  <Step title="読み取り専用モードから始める">
+    まずフォーマッター設定を手動でテストします:
     ```bash
     # Dry run to see what would change
     prettier --check src/
     black --check src/
     ```
   </Step>
-  
-  <Step title="Use consistent config files">
-    Ensure formatter configs are committed:
+
+  <Step title="一貫した設定ファイルを使用">
+    フォーマッター設定がコミットされていることを確認します:
     ```bash
     # Add to version control
     git add .prettierrc .prettierignore
     git add pyproject.toml  # for black config
     ```
   </Step>
-  
-  <Step title="Set appropriate timeouts">
-    Large files may need more time:
+
+  <Step title="適切なタイムアウトを設定">
+    大きなファイルにはより長い時間が必要な場合があります:
     ```json
     {
       "timeout": 60  // Increase for large files
     }
     ```
   </Step>
-  
-  <Step title="Handle formatter errors gracefully">
-    Don't block Droid if formatting fails:
+
+  <Step title="フォーマッターエラーを適切に処理する">
+    フォーマットに失敗してもDroidをブロックしないようにします:
     ```bash
     # Use || true to continue on errors
     prettier --write "$file_path" 2>&1 || true
     ```
   </Step>
-  
-  <Step title="Consider Git hooks integration">
-    Combine with pre-commit hooks for consistency:
+
+  <Step title="Gitフック連携を検討する">
+    一貫性のためpre-commitフックと組み合わせます:
     ```yaml
     # .pre-commit-config.yaml
     repos:
@@ -510,7 +510,7 @@ fi
 
 ## 関連情報
 
-- [Hooks reference](/reference/hooks-reference) - 完全なフックAPI文書
-- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
-- [Code validation hooks](/guides/hooks/code-validation) - コード標準の強制
-- [Git workflow hooks](/guides/hooks/git-workflows) - Gitとの統合
+- [フックリファレンス](/jp/reference/hooks-reference) - 完全なフックAPI文書
+- [Get started with hooks](/jp/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Code validation hooks](/jp/guides/hooks/code-validation) - コード標準の強制
+- [Git workflow hooks](/jp/guides/hooks/git-workflows) - Gitとの統合

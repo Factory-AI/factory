@@ -1,14 +1,14 @@
 ---
 title: "ブラウザ自動化"
-description: Minimal Chrome DevTools Protocol helpers that let Droids start Chrome, navigate tabs, evaluate JavaScript, take screenshots, and capture DOM metadata without building a full MCP server.
+description: 完全なMCPサーバーを構築せずに、DroidがChromeの起動、タブ移動、JavaScript評価、スクリーンショット取得、DOMメタデータ取得を行える最小限のChrome DevTools Protocolヘルパー。
 keywords: ['browser', 'automation', 'chrome', 'cdp', 'devtools', 'screenshot', 'scraping', 'skill']
 ---
 
 <Note>
-  This cookbook is inspired by [Mario Zechner's “What if you don't need
+  このクックブックは[Mario Zechnerの“What if you don't need
   MCP?”](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/),
-  adapted into a reusable Factory skill so teams can share lightweight browser
-  helpers without standing up new services.
+  軽量なブラウザヘルパーをチームで共有できるよう、再利用可能なFactoryスキルとして調整されています
+  新しいサービスを立ち上げずに共有できます。
 </Note>
 
 browser skillは、いくつかの実行可能スクリプト（`start.js`、`nav.js`、`eval.js`、`screenshot.js`、`pick.js`）と簡潔な`SKILL.md`をバンドルしています。これらにより、Factory Droidsはポート`9222`でChromeを確実に起動し、既存のタブを操作し、構造化データをスクレイピングし、開発者マシン上で完全に動作しながら視覚的証拠を取得する信頼性の高い方法を提供します。
@@ -28,28 +28,26 @@ browser skillは、いくつかの実行可能スクリプト（`start.js`、`na
 | `nav.js`        | アクティブなタブをナビゲートするか、`--new`が渡された際に新しいタブを開きます。                           | `~/.factory/skills/browser/nav.js https://example.com --new`  |
 | `eval.js`       | フォーカスされたタブで任意のJavaScript（async対応）を実行し、構造化された結果を出力します。 | `~/.factory/skills/browser/eval.js "document.title"`          |
 | `screenshot.js` | 現在のビューポートを`$TMPDIR`に保存されるタイムスタンプ付きPNGとしてキャプチャします。                    | `~/.factory/skills/browser/screenshot.js`                     |
-| `pick.js`       | ビジュアルピッカーを注入して、DOM ノードをクリックしてタグ/ID/クラス/テキストメタデータを返すことができます。     | `~/.factory/skills/browser/pick.js "Click the submit button"` |
+| `pick.js`       | ビジュアルピッカーを注入して、DOM ノードをクリックしてタグ/ID/クラス/テキストメタデータを返すことができます。     | `~/.factory/skills/browser/pick.js "送信ボタンをクリック"` |
 
 すべてのスクリプトは`puppeteer-core`に依存し、あなたが制御するChromeインスタンスに接続します。すべてがローカルで実行されるため、既存のクッキーや認証トークンがマシンから外に出ることはありません。
 
 ## セットアップ
 
 <Steps>
-  <Step title="Create the skill folder">
-    Run `mkdir -p .factory/skills/browser`.
+  <Step title="スキルフォルダを作成">
+    `mkdir -p .factory/skills/browser`を実行します。
   </Step>
-  <Step title="Copy scripts and package metadata">
-    Copy `start.js`, `nav.js`, `eval.js`, `screenshot.js`, `pick.js`, and
-    `package.json` into `.factory/skills/browser/` (or symlink to a shared
-    dotfiles repo).
+  <Step title="スクリプトとパッケージメタデータをコピー">
+    `start.js`、`nav.js`、`eval.js`、`screenshot.js`、`pick.js`、および
+    `package.json`を`.factory/skills/browser/`に配置します（または共有dotfilesリポジトリへシンボリックリンクします）。
   </Step>
-  <Step title="Install dependencies">
-    Run `npm install --prefix .factory/skills/browser puppeteer-core`, then
-    `chmod +x .factory/skills/browser/*.js`.
+  <Step title="依存関係をインストール">
+    `npm install --prefix .factory/skills/browser puppeteer-core`を実行し、その後`chmod +x .factory/skills/browser/*.js`を実行します。
   </Step>
-  <Step title="Restart Droid">
-    Restart `droid` (or your IDE integration) so it rescans workspace skills and
-    discovers `browser`.
+  <Step title="Droidを再起動">
+    `droid`（またはIDE連携）を再起動して、ワークスペーススキルを再スキャンし、
+    `browser`を検出できるようにします。
   </Step>
 </Steps>
 
@@ -60,70 +58,70 @@ browser skillは、いくつかの実行可能スクリプト（`start.js`、`na
 ````md
 ---
 name: browser
-description: Minimal Chrome DevTools Protocol tools for browser automation and scraping. Use when you need to start Chrome, navigate pages, execute JavaScript, take screenshots, or interactively pick DOM elements.
+description: ブラウザ自動化とスクレイピングのための最小限のChrome DevTools Protocolツール。Chromeの起動、ページ遷移、JavaScript実行、スクリーンショット取得、DOM要素の対話的選択が必要な場合に使用します。
 ---
 
-# Browser Tools
+# ブラウザツール
 
-Minimal CDP tools for collaborative site exploration and scraping.
+共同でのサイト探索とスクレイピングのための最小限のCDPツールです。
 
-**IMPORTANT**: All scripts are located in `~/.factory/skills/browser/` and must be called with full paths.
+**重要**: すべてのスクリプトは`~/.factory/skills/browser/`にあり、完全パスで呼び出す必要があります。
 
-## Start Chrome
+## Chromeを起動
 
 ```bash
 ~/.factory/skills/browser/start.js              # 新しいプロファイル
 ~/.factory/skills/browser/start.js --profile    # あなたのプロファイルをコピー（クッキー、ログイン）
 ```
 
-Start Chrome on `:9222` with remote debugging.
+リモートデバッグ付きで`:9222`上にChromeを起動します。
 
-## Navigate
+## ナビゲート
 
 ```bash
 ~/.factory/skills/browser/nav.js https://example.com
 ~/.factory/skills/browser/nav.js https://example.com --new
 ```
 
-Navigate current tab or open new tab.
+現在のタブをナビゲートするか、新しいタブを開きます。
 
-## Evaluate JavaScript
+## JavaScriptを評価
 
 ```bash
 ~/.factory/skills/browser/eval.js 'document.title'
 ~/.factory/skills/browser/eval.js 'document.querySelectorAll("a").length'
 ```
 
-Execute JavaScript in active tab (async context).
+アクティブなタブでJavaScriptを実行します（asyncコンテキスト）。
 
-**IMPORTANT**: The code must be a single expression or use IIFE for multiple statements:
+**重要**: コードは単一式にするか、複数文にはIIFEを使用する必要があります:
 
-- Single expression: `'document.title'`
-- Multiple statements: `'(() => { const x = 1; return x + 1; })()'`
-- Avoid newlines in the code string - keep it on one line
+- 単一式: `'document.title'`
+- 複数文: `'(() => { const x = 1; return x + 1; })()'`
+- コード文字列内の改行を避け、1行に保つ
 
-## Screenshot
+## スクリーンショット
 
 ```bash
 ~/.factory/skills/browser/screenshot.js
 ```
 
-Screenshot current viewport, returns temp file path.
+現在のビューポートのスクリーンショットを撮り、一時ファイルパスを返します。
 
-## Pick Elements
+## 要素を選択
 
 ```bash
-~/.factory/skills/browser/pick.js "Click the submit button"
+~/.factory/skills/browser/pick.js "送信ボタンをクリック"
 ```
 
-Interactive element picker. Click to select, Cmd/Ctrl+Click for multi-select, Enter to finish.
+対話的な要素ピッカーです。クリックで選択、Cmd/Ctrl+クリックで複数選択、Enterで完了します。
 
-## Usage Notes
+## 使用上の注意
 
-- Start Chrome first before using other tools
-- The `--profile` flag syncs your actual Chrome profile so you're logged in everywhere
-- JavaScript evaluation runs in an async context in the page
-- Pick tool allows you to visually select DOM elements by clicking on them
+- 他のツールを使用する前に、まずChromeを起動する
+- `--profile`フラグは実際のChromeプロファイルを同期するため、各サイトにログインした状態になります
+- JavaScript評価はページ内のasyncコンテキストで実行されます
+- Pickツールでは、クリックしてDOM要素を視覚的に選択できます
 
 ```
 

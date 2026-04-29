@@ -1,18 +1,18 @@
 ---
-title: Mixed Models
+title: "モデルの使い分け"
 description: 仕様モード計画には、最大限の柔軟性と最適化のために、デフォルトモデルとは異なるAIモデルを使用してください。
 keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple models', 'planning model', 'default model']
 ---
 
-## ミックスモデルとは？
+## モデルの使い分けとは？
 
-ミックスモデルを使用すると、Specification Mode の計画では特定の AI モデルを使用し、通常のコーディングセッションでは別のデフォルトモデルを使用できます。これにより、計画フェーズと実装フェーズを個別に最適化する柔軟性が得られます。
+モデルを使い分けると、仕様モードの計画では特定の AI モデルを使用し、通常のコーディングセッションでは別のデフォルトモデルを使用できます。これにより、計画フェーズと実装フェーズを個別に最適化する柔軟性が得られます。
 
 例えば、包括的な仕様計画にはより強力なモデルを使用し、日常的な実装作業にはより高速なモデルを使用することができます。
 
 ---
 
-## なぜミックスモデルを使用するのか？
+## なぜモデルを使い分けるのか？
 
 異なるモデルは異なるタスクに秀でています。仕様モードのモデルとデフォルトモデルを分離することで、以下が可能になります：
 
@@ -33,28 +33,28 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 
 ---
 
-## ミックスモデルの設定方法
+## モデルの使い分けを設定する方法
 
 ### 設定へのアクセス
 
 1. `droid` を実行して CLI を起動
 2. `/model` を入力してモデルセレクターを開く
-3. **「Configure Spec Mode Model」**（リストの最初のオプション）に移動
+3. **「Configure Spec Mode Model（仕様モードモデルを設定）」**（リストの最初のオプション）に移動
 4. **Enter** を押して設定を開始
 
 ### 設定オプション
 
 設定画面を開くと、3つのオプションが表示されます：
 
-- **Yes, configure spec mode model** - Specification Mode 用に異なるモデルを選択
-- **No, keep using [current configuration/main model]** - 変更せずに終了
-- **Clear spec mode model (use main model)** - 仕様モードモデルを削除し、すべてにデフォルトモデルを使用 *（既に仕様モードモデルが設定されている場合のみ表示）*
+- **Yes, configure spec mode model（仕様モードモデルを設定）** - 仕様モード用に異なるモデルを選択
+- **No, keep using [current configuration/main model]（現在の設定/メインモデルを使い続ける）** - 変更せずに終了
+- **Clear spec mode model (use main model)（仕様モードモデルをクリアし、メインモデルを使用）** - 仕様モードモデルを削除し、すべてにデフォルトモデルを使用 *（既に仕様モードモデルが設定されている場合のみ表示）*
 
 ### モデルの選択
 
-1. **「Yes, configure spec mode model」**を選択
+1. **「Yes, configure spec mode model（仕様モードモデルを設定）」**を選択
 2. 利用可能なモデルのリストを参照
-3. Specification Mode 用に好みのモデルを選択
+3. 仕様モード用に好みのモデルを選択
 4. モデルが推論をサポートしている場合、推論レベルを選択
 5. 設定は自動的に保存されます
 
@@ -75,28 +75,28 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 <AccordionGroup>
   <Accordion title="OpenAI モデル">
     **OpenAI モデルは他の OpenAI モデルとのみペアリング可能**
-    
+
     - メインモデル: GPT-5 → 仕様モデル: GPT-5-Codex ✅
     - メインモデル: GPT-5 → 仕様モデル: Sonnet 4.5 ❌
-    
+
     OpenAI の内部推論フォーマットは暗号化されており、他のモデルプロバイダーと互換性がありません。
   </Accordion>
-  
+
   <Accordion title="推論有効な Anthropic モデル">
     **推論が有効な Anthropic モデルは他の Anthropic モデルとのみペアリング可能**
-    
+
     - メインモデル: Sonnet 4.5（推論オン）→ 仕様モデル: Sonnet 4.5 ✅
     - メインモデル: Sonnet 4.5（推論オン）→ 仕様モデル: GPT-5 ❌
-    
+
     拡張思考が有効な場合、推論トレースは同じプロバイダー内に留まる必要があります。
   </Accordion>
-  
+
   <Accordion title="推論無効な Anthropic モデル">
     **推論がオフの Anthropic モデルは非 OpenAI モデルとペアリング可能**
-    
+
     - メインモデル: Sonnet 4.5（推論オフ）→ 仕様モデル: 任意の非 OpenAI モデル ✅
     - メインモデル: Sonnet 4.5（推論オフ）→ 仕様モデル: DeepSeek ✅
-    
+
     推論が無効な場合、プロバイダー間での互換性が可能です。
   </Accordion>
 </AccordionGroup>
@@ -148,15 +148,15 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 
 ## 動作原理
 
-設定が完了すると、Specification Mode に入るたびに Droid が自動的に仕様モードモデルを使用します：
+設定が完了すると、仕様モードに入るたびに Droid が自動的に仕様モードモデルを使用します：
 
-1. **Shift+Tab** で **Specification Mode を有効化**
+1. **Shift+Tab** で **仕様モードを有効化**
 2. **機能説明を提供**
 3. **Droid が仕様モードモデルを使用**して分析、計画、仕様生成を実行
 4. **生成された仕様をレビューして承認**
 5. **実装ではデフォルトモデルを使用**して実際のコードを記述
 <Note>
-  デフォルトモデルは通常のコーディングセッションと実装作業に常に使用されます。仕様モードモデルは、Specification Modeの計画フェーズでのみアクティブになります。
+  デフォルトモデルは通常のコーディングセッションと実装作業に常に使用されます。仕様モードモデルは、仕様モードの計画フェーズでのみアクティブになります。
 </Note>
 
 ---
@@ -171,17 +171,17 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 
 ---
 
-## 混合モデル設定のクリア
+## モデル使い分け設定のクリア
 
 すべてに単一のモデルを使用する設定に戻したい場合：
 
 1. CLIで`/model`を入力
-2. **「Configure Spec Mode Model」**に移動
+2. **「Configure Spec Mode Model（仕様モードモデルを設定）」**に移動
 3. **Enter**を押す
-4. **「Clear spec mode model (use main model)」**を選択
+4. **「Clear spec mode model (use main model)（仕様モードモデルをクリアし、メインモデルを使用）」**を選択
 5. **Enter**を押して確認
 
-デフォルトモデルが通常のコーディングとSpecification Modeの両方で使用されるようになります。
+デフォルトモデルが通常のコーディングと仕様モードの両方で使用されるようになります。
 
 ---
 
@@ -189,21 +189,21 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 
 <AccordionGroup>
   <Accordion title="同じモデルから開始">
-    Specification Modeを初めて使用する場合は、両方のモードでデフォルトモデルを使用することから始めてください。慣れてきたら、異なる仕様モードモデルを試して、計画品質が向上するかどうかを確認してください。
+    仕様モードを初めて使用する場合は、両方のモードでデフォルトモデルを使用することから始めてください。慣れてきたら、異なる仕様モードモデルを試して、計画品質が向上するかどうかを確認してください。
   </Accordion>
-  
+
   <Accordion title="プロジェクトの複雑さを考慮">
     シンプルなプロジェクトでは個別のモデルは不要かもしれません。複雑な依存関係を持つ複雑なシステムでは、より強力な仕様モードモデルを使用することで、実装中の高コストなミスを防ぐことができます。
   </Accordion>
-  
+
   <Accordion title="推論をタスクの重要度に合わせる">
     アーキテクチャの決定には高い推論努力を使用し、定型的な機能追加には低い努力を使用してください。デフォルトと仕様モードの推論を独立して調整してください。
   </Accordion>
-  
+
   <Accordion title="互換性ルールを尊重">
     非互換なモデル組み合わせを強制しようとしないでください。制限は十分な技術的理由があって存在しており、違反はCLIによって防がれます。
   </Accordion>
-  
+
   <Accordion title="使用量を監視">
     より強力なモデルと高い推論努力はコストを増加させます。プレミアム設定を選択的に使用することで、品質ニーズと予算制約のバランスを取ってください。
   </Accordion>
@@ -216,19 +216,19 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 <AccordionGroup>
   <Accordion title="希望のモデルを選択できない">
     **原因:** そのモデルが現在のデフォルトモデルと互換性がありません。
-    
+
     **解決策:** 上記の[モデル互換性](#model-compatibility)ルールを確認してください。最初にデフォルトモデルを変更するか、推論設定を調整して互換性を有効にする必要がある場合があります。
   </Accordion>
-  
+
   <Accordion title="仕様モードモデルが自動的にクリアされた">
     **原因:** 設定されている仕様モードモデルと互換性のないモデルにデフォルトモデルを変更しました。
-    
+
     **解決策:** これは期待される動作です。新しいデフォルトモデルと互換性のある新しい仕様モードモデルを設定するか、両方のモードでデフォルトモデルを使用し続けてください。
   </Accordion>
-  
+
   <Accordion title="推論努力セレクターが表示されない">
     **原因:** 選択されたモデルが推論をサポートしていないか、Anthropic以外のモデル組み合わせを使用しています。
-    
+
     **解決策:** これは正常です。すべてのモデルが推論設定をサポートしているわけではありません。モデルはデフォルトの動作を使用します。
   </Accordion>
 </AccordionGroup>
@@ -238,8 +238,8 @@ keywords: ['mixed models', 'spec mode model', 'model configuration', 'multiple m
 ## 関連リソース
 
 <CardGroup cols={2}>
-  <Card title="Specification Mode" icon="file-contract" href="/jp/cli/user-guides/specification-mode">
-    機能の計画と実装のためのSpecification Modeの使用方法を学ぶ。
+  <Card title="仕様モード" icon="file-contract" href="/jp/cli/user-guides/specification-mode">
+    機能の計画と実装のための仕様モードの使用方法を学ぶ。
   </Card>
   <Card title="設定" icon="gear" href="/jp/cli/configuration/settings">
     Droidの動作とワークフローとの統合の他の側面を設定する。

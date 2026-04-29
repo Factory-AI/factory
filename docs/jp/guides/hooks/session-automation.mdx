@@ -1,6 +1,6 @@
 ---
 title: "セッション自動化"
-description: "Automate session setup with context loading, environment configuration, and dependency management"
+description: "コンテキスト読み込み、環境設定、依存関係管理でセッションセットアップを自動化する"
 keywords: ['session', 'automation', 'setup', 'environment', 'context', 'dependencies', 'hook']
 ---
 
@@ -77,7 +77,7 @@ if [ -d ".git" ]; then
   echo "Latest commits:"
   git log --oneline -5
   echo ""
-  
+
   echo "Current branch: $(git branch --show-current)"
   echo "Uncommitted changes: $(git status --short | wc -l | tr -d ' ') files"
   echo ""
@@ -90,7 +90,7 @@ if [ -f "package.json" ]; then
   echo "Name: $(jq -r '.name' package.json)"
   echo "Version: $(jq -r '.version' package.json)"
   echo ""
-  
+
   echo "Scripts available:"
   jq -r '.scripts | keys[]' package.json | head -n 10 | sed 's/^/  - /'
   echo ""
@@ -149,21 +149,21 @@ echo "🔧 Setting up development environment..."
 if [ -f ".nvmrc" ] && command -v nvm &> /dev/null; then
   NODE_VERSION=$(cat .nvmrc)
   echo "📦 Switching to Node.js $NODE_VERSION"
-  
+
   # Persist environment changes using DROID_ENV_FILE
   if [ -n "$DROID_ENV_FILE" ]; then
     # Capture environment before nvm
     ENV_BEFORE=$(export -p | sort)
-    
+
     # Source nvm and switch version
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
     nvm use
-    
+
     # Capture changes and persist them
     ENV_AFTER=$(export -p | sort)
     comm -13 <(echo "$ENV_BEFORE") <(echo "$ENV_AFTER") >> "$DROID_ENV_FILE"
-    
+
     echo "✓ Node.js environment configured"
   fi
 fi
@@ -175,7 +175,7 @@ if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
     echo "   python -m venv venv"
   else
     echo "🐍 Python virtual environment detected"
-    
+
     if [ -n "$DROID_ENV_FILE" ]; then
       # Activate venv for session
       echo "source \"$cwd/venv/bin/activate\"" >> "$DROID_ENV_FILE"
@@ -236,7 +236,7 @@ echo ""
 if command -v gh &> /dev/null; then
   echo "## Recent GitHub Issues"
   echo ""
-  
+
   # Get assigned issues
   gh issue list --assignee @me --limit 5 --json number,title,state | \
     jq -r '.[] | "  - #\(.number): \(.title) [\(.state)]"'
@@ -247,7 +247,7 @@ fi
 if command -v linear &> /dev/null; then
   echo "## Recent Linear Issues"
   echo ""
-  
+
   # Get assigned issues
   linear issue list --assignee @me --limit 5 2>/dev/null | head -n 10
   echo ""
@@ -455,7 +455,7 @@ case "$branch" in
     echo "⚠️ Working on production branch!"
     echo "Extra care needed - changes go to production"
     echo ""
-    
+
     # Show recent production issues
     if command -v gh &> /dev/null; then
       echo "Recent production issues:"
@@ -464,30 +464,30 @@ case "$branch" in
       echo ""
     fi
     ;;
-    
+
   dev|develop)
     echo "📦 Working on development branch"
     echo "Standard development workflow applies"
     echo ""
     ;;
-    
+
   feature/*)
     feature_name="${branch#feature/}"
     echo "🔨 Feature branch: $feature_name"
     echo ""
-    
+
     # Try to find related issue
     if [[ $feature_name =~ FAC-[0-9]+ ]]; then
       issue_id="${BASH_REMATCH[0]}"
       echo "Related Linear issue: $issue_id"
-      
+
       # Fetch issue details if linear CLI available
       if command -v linear &> /dev/null; then
         linear issue view "$issue_id" 2>/dev/null || true
         echo ""
       fi
     fi
-    
+
     # Show uncommitted changes
     if [ -n "$(git status --short)" ]; then
       echo "Uncommitted changes:"
@@ -495,7 +495,7 @@ case "$branch" in
       echo ""
     fi
     ;;
-    
+
   hotfix/*)
     echo "🚨 HOTFIX BRANCH"
     echo "Critical bug fix - expedite review and deployment"
@@ -588,7 +588,7 @@ echo ""
 # Check for docker-compose.yml
 if [ -f "docker-compose.yml" ] || [ -f "docker-compose.yaml" ]; then
   echo "Docker Compose configuration found"
-  
+
   # Check if services are running
   if docker-compose ps &>/dev/null; then
     echo ""
@@ -607,31 +607,31 @@ exit 0
 ## ベストプラクティス
 
 <Steps>
-  <Step title="Keep context concise">
-    Only load essential information:
+  <Step title="コンテキストを簡潔に保つ">
+    重要な情報のみを読み込みます:
     ```bash
     # Show summary, not full content
     echo "Found $(wc -l < README.md) lines in README"
     # Instead of: cat README.md
     ```
   </Step>
-  
-  <Step title="Cache expensive operations">
-    Avoid repeated expensive checks:
+
+  <Step title="高コストな処理をキャッシュする">
+    高コストなチェックの繰り返しを避けます:
     ```bash
     CACHE_FILE="/tmp/droid-context-$(date +%Y%m%d)"
     if [ -f "$CACHE_FILE" ]; then
       cat "$CACHE_FILE"
       exit 0
     fi
-    
+
     # Generate context...
     echo "$context" | tee "$CACHE_FILE"
     ```
   </Step>
-  
-  <Step title="Use DROID_ENV_FILE for environment">
-    Persist environment variables correctly:
+
+  <Step title="環境にはDROID_ENV_FILEを使用">
+    環境変数を正しく永続化します:
     ```bash
     if [ -n "$DROID_ENV_FILE" ]; then
       echo 'export NODE_ENV=development' >> "$DROID_ENV_FILE"
@@ -639,9 +639,9 @@ exit 0
     fi
     ```
   </Step>
-  
-  <Step title="Handle missing tools gracefully">
-    Check before using external commands:
+
+  <Step title="不足しているツールを適切に処理する">
+    外部コマンドを使用する前に確認します:
     ```bash
     if command -v gh &> /dev/null; then
       gh issue list
@@ -650,9 +650,9 @@ exit 0
     fi
     ```
   </Step>
-  
-  <Step title="Provide actionable suggestions">
-    Tell users what to do next:
+
+  <Step title="実行可能な提案を提供する">
+    次に何をすべきかをユーザーに伝えます:
     ```bash
     echo "⚠️ Dependencies out of date"
     echo "Action: Run 'npm install' to update"
@@ -664,34 +664,34 @@ exit 0
 ## トラブルシューティング
 
 
-  
+
     **問題**: 読み込まれる情報が多すぎる
-    
+
     **解決策**: 要約して詳細にリンクします:
     ```bash
     echo "README.md exists ($(wc -l < README.md) lines)"
     echo "Run 'cat README.md' to view full content"
     ```
-  
-  
-  
+
+
+
     **問題**: Bashコマンドで変数が利用できない
-    
+
     **解決策**: DROID_ENV_FILEの使用方法を確認します:
     ```bash
     if [ -z "$DROID_ENV_FILE" ]; then
       echo "DROID_ENV_FILE not available" >&2
       exit 1
     fi
-    
+
     # Append, don't overwrite
     echo 'export VAR=value' >> "$DROID_ENV_FILE"
     ```
-  
-  
-  
+
+
+
     **問題**: セッション開始に時間がかかりすぎる
-    
+
     **解決策**: 負荷の高い操作を非同期で実行します:
     ```bash
     # Start background job for slow operations
@@ -699,16 +699,16 @@ exit 0
       sleep 1  # Let Droid start first
       expensive_operation > /tmp/droid-context.txt
     ) &
-    
+
     # Return immediately with basic context
     echo "Loading detailed context in background..."
     ```
-  
+
 
 
 ## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - 完全なフックAPI文書
-- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
-- [Custom notifications](/guides/hooks/notifications) - イベントに関する通知を受け取る
-- [Logging and analytics](/guides/hooks/logging-analytics) - セッションメトリクスを追跡する
+- [フックリファレンス](/jp/reference/hooks-reference) - 完全なフックAPI文書
+- [Get started with hooks](/jp/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Custom notifications](/jp/guides/hooks/notifications) - イベントに関する通知を受け取る
+- [Logging and analytics](/jp/guides/hooks/logging-analytics) - セッションメトリクスを追跡する

@@ -1,13 +1,13 @@
 ---
 title: "メモリとコンテキスト管理"
-description: Build persistent memory so Droid remembers your preferences, decisions, and project history across sessions.
+description: Droidがセッションをまたいで好み、判断、プロジェクト履歴を記憶できる永続メモリを構築する。
 keywords: ['memory', 'context', 'preferences', 'persistent', 'sessions', 'history', 'memories']
 ---
 
 Droidはセッション間で組み込みのメモリを持ちませんが、markdownファイル、AGENTS.mdの参照、およびフックを使用して強力なメモリシステムを作成できます。このガイドでは、永続化され成長するメモリの構築方法を説明します。
 
 <Info>
-  **Works with Factory App:** These memory patterns work identically in both CLI and [Factory App](/web/getting-started/overview)—just ensure your working directory is set to your repository root.
+  **Factory Appでも利用可能:** これらのメモリパターンはCLIと[Factory App](/jp/web/getting-started/overview)の両方で同じように機能します。作業ディレクトリがリポジトリルートに設定されていることだけ確認してください。
 </Info>
 
 ---
@@ -176,7 +176,7 @@ Always check this file before making significant architectural or design decisio
 ```markdown
 ## Preferences
 - Code style choices
-- Tool preferences  
+- Tool preferences
 - Communication style
 - Learning style
 ```
@@ -228,13 +228,13 @@ Always check this file before making significant architectural or design decisio
 
 <Tabs>
   <Tab title="# prefix trigger">
-    Trigger with `#` at the start of your message for quick capture.
-    
-    **Usage:**
-    - "#we use the repository pattern"
-    - "##I prefer early returns" (double `##` for personal)
-    
-    Create `~/.factory/hooks/memory-capture.py`:
+    すばやく記録するには、メッセージの先頭に`#`を付けてトリガーします。
+
+    **使用例:**
+    - "#リポジトリパターンを使う"
+    - "##早期リターンを好む"（ダブル`##`は個人用）
+
+    `~/.factory/hooks/memory-capture.py`を作成します:
 
     ```python
     #!/usr/bin/env python3
@@ -246,10 +246,10 @@ Always check this file before making significant architectural or design decisio
         try:
             data = json.load(sys.stdin)
             prompt = data.get('prompt', '').strip()
-            
+
             if not prompt.startswith('#'):
                 return
-            
+
             # ## = personal, # = project
             if prompt.startswith('##'):
                 content = prompt[2:].strip()
@@ -262,12 +262,12 @@ Always check this file before making significant architectural or design decisio
                     mem_file = os.path.join(project_factory, 'memories.md')
                 else:
                     mem_file = os.path.expanduser('~/.factory/memories.md')
-            
+
             if content:
                 timestamp = datetime.now().strftime('%Y-%m-%d')
                 with open(mem_file, 'a') as f:
                     f.write(f"\n- [{timestamp}] {content}\n")
-                
+
                 print(json.dumps({'systemMessage': f'✓ Saved to {mem_file}'}))
         except:
             pass
@@ -276,15 +276,15 @@ Always check this file before making significant architectural or design decisio
         main()
     ```
   </Tab>
-  
+
   <Tab title="Phrase trigger">
-    Trigger with phrases like "remember this:", "note:", etc.
-    
-    **Usage:**
-    - "Remember this: we use the repository pattern"
-    - "Note: auth tokens expire after 24 hours"
-    
-    Create `~/.factory/hooks/memory-capture.py`:
+    "remember this:"や"note:"などのフレーズでトリガーします。
+
+    **使用例:**
+    - "remember this: リポジトリパターンを使う"
+    - "note: 認証トークンは24時間で期限切れになる"
+
+    `~/.factory/hooks/memory-capture.py`を作成します:
 
     ```python
     #!/usr/bin/env python3
@@ -296,14 +296,14 @@ Always check this file before making significant architectural or design decisio
         try:
             data = json.load(sys.stdin)
             prompt = data.get('prompt', '')
-            
+
             triggers = ['remember this:', 'remember:', 'note:', 'save this:']
-            
+
             for trigger in triggers:
                 if trigger in prompt.lower():
                     idx = prompt.lower().index(trigger)
                     content = prompt[idx + len(trigger):].strip()
-                    
+
                     if content:
                         # Personal if specified, otherwise project
                         if 'personal' in prompt.lower():
@@ -315,11 +315,11 @@ Always check this file before making significant architectural or design decisio
                                 mem_file = os.path.join(project_factory, 'memories.md')
                             else:
                                 mem_file = os.path.expanduser('~/.factory/memories.md')
-                        
+
                         timestamp = datetime.now().strftime('%Y-%m-%d')
                         with open(mem_file, 'a') as f:
                             f.write(f"\n- [{timestamp}] {content}\n")
-                        
+
                         print(json.dumps({'systemMessage': f'✓ Saved to {mem_file}'}))
                     break
         except:
@@ -358,20 +358,20 @@ chmod +x ~/.factory/hooks/memory-capture.py
 ```
 
 **#プレフィックス使用：**
-- "#we decided to use Zustand for state management"
-- "##I prefer early returns" （ダブル`##`は個人用に保存）
+- "#状態管理にはZustandを使うことに決めた"
+- "##早期リターンを好む"（ダブル`##`は個人用に保存）
 
 **フレーズトリガー使用：**
-- "Remember this: we decided to use Zustand for state management"
-- "Note: the auth module uses JWT with 24-hour expiration"
+- "remember this: 状態管理にはZustandを使うことに決めた"
+- "note: authモジュールは24時間有効なJWTを使う"
 
 ### 代替案：メモリキャプチャスキル
 
-フックの代わりに、何かを記憶するように依頼したときにDroidが呼び出す[skill](/cli/configuration/skills)を使用できます。これにより、カテゴリ化をよりインタラクティブに制御できます。
+フックの代わりに、何かを記憶するように依頼したときにDroidが呼び出す[skill](/jp/cli/configuration/skills)を使用できます。これにより、カテゴリ化をよりインタラクティブに制御できます。
 
 ### 代替案：カスタムスラッシュコマンド
 
-手動での素早い取得には、[custom slash command](/cli/configuration/custom-slash-commands)を作成します：
+手動での素早い取得には、[custom slash command](/jp/cli/configuration/custom-slash-commands)を作成します：
 
 `~/.factory/commands/remember.md`を作成：
 
@@ -391,10 +391,10 @@ Format it appropriately based on whether it's a preference, decision, or learnin
 その後、`/remember we chose PostgreSQL for better ACID compliance`を使用してメモリをオンデマンドで取得します。
 
 <Info>
-  **Which approach to choose?**
-  - **Hook** — Best for automatic capture without extra steps
-  - **Skill** — Best when you want Droid to help categorize and format
-  - **Slash Command** — Best for quick manual capture with consistent formatting
+  **どの方法を選ぶべきか？**
+  - **フック** — 追加手順なしで自動記録したい場合に最適
+  - **スキル** — Droidに分類や整形を手伝わせたい場合に最適
+  - **スラッシュコマンド** — 一貫した形式ですばやく手動記録したい場合に最適
 </Info>
 
 ---
@@ -512,10 +512,10 @@ Then implement following all discovered context.
 ## 次のステップ
 
 <CardGroup cols={2}>
-  <Card title="Setup Checklist" href="/guides/power-user/setup-checklist" icon="list-check">
-    Complete power user configuration
+  <Card title="Setup Checklist" href="/jp/guides/power-user/setup-checklist" icon="list-check">
+    パワーユーザー設定を完了する
   </Card>
-  <Card title="Rules Guide" href="/guides/power-user/rules-conventions" icon="scale-balanced">
-    Organize team conventions
+  <Card title="ルールガイド" href="/jp/guides/power-user/rules-conventions" icon="scale-balanced">
+    チーム規約を整理する
   </Card>
 </CardGroup>

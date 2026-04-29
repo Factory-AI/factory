@@ -1,6 +1,6 @@
 ---
 title: "GitHubアプリ"
-description: Use the /install-github-app command to set up Droid integration with your GitHub repositories
+description: /install-github-appコマンドを使用してGitHubリポジトリとのDroid連携を設定する
 keywords: ['github', 'github app', 'install', '/install-github-app', 'slash command', 'github actions', 'workflow', 'droid action', '@droid', 'automated review', 'CI/CD', 'pull request']
 ---
 
@@ -13,38 +13,38 @@ keywords: ['github', 'github app', 'install', '/install-github-app', 'slash comm
 ## クイックスタート
 
 <Steps>
-  <Step title="Start the installation flow">
-    In an interactive droid session, type:
+  <Step title="インストールフローを開始">
+    インタラクティブなDroidセッションで次を入力します:
     ```bash
     /install-github-app
     ```
   </Step>
 
-  <Step title="Pass preflight checks">
-    Droid verifies that you have:
-    - GitHub CLI (`gh`) installed
-    - Authenticated with GitHub (`gh auth login`)
-    - Required OAuth scopes (`repo`, `read:org`, `workflow`)
+  <Step title="事前チェックに合格">
+    Droidは以下を確認します:
+    - GitHub CLI（`gh`）がインストールされている
+    - GitHubで認証済み（`gh auth login`）
+    - 必要なOAuthスコープ（`repo`、`read:org`、`workflow`）
   </Step>
 
-  <Step title="Select a repository">
-    Choose from two options:
-    - **Use current repository** - Auto-detected from your git remote
-    - **Enter a different repository** - Type `owner/repo` or a GitHub URL
+  <Step title="リポジトリを選択">
+    2つのオプションから選択します:
+    - **現在のリポジトリを使用** - git remoteから自動検出されます
+    - **別のリポジトリを入力** - `owner/repo`またはGitHub URLを入力します
   </Step>
 
-  <Step title="Install the GitHub App">
-    Your browser opens to install the Factory Droid GitHub App. Grant access to the selected repository.
+  <Step title="GitHub Appをインストール">
+    ブラウザが開き、Factory Droid GitHub Appをインストールします。選択したリポジトリへのアクセスを許可します。
   </Step>
 
-  <Step title="Select workflows">
-    Choose which workflows to enable:
-    - **@Droid** - Respond to @droid mentions in issues and PR comments
-    - **Droid Review** - Automated code review on new PRs
+  <Step title="ワークフローを選択">
+    有効にするワークフローを選択します:
+    - **@Droid** - IssueやPRコメント内の@droidメンションに応答
+    - **Droid Review** - 新しいPRの自動コードレビュー
   </Step>
 
-  <Step title="Create the PR">
-    Droid creates a branch with workflow files and opens a pull request for you to review and merge.
+  <Step title="PRを作成">
+    Droidはワークフローファイルを含むブランチを作成し、レビューしてマージするためのプルリクエストを開きます。
   </Step>
 </Steps>
 
@@ -138,22 +138,22 @@ gh auth refresh -s repo,read:org,workflow
 `/install-github-app` ワークフローの完了後、以下を行う必要があります：
 
 <Steps>
-  <Step title="Review the pull request">
-    A PR has been created in your repository with the workflow files. Review the changes.
+  <Step title="プルリクエストを確認">
+    ワークフローファイルを含むPRがリポジトリに作成されています。変更内容を確認してください。
   </Step>
 
-  <Step title="Generate a Factory API key">
-    Go to [https://app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys) and create a new API key.
+  <Step title="Factory APIキーを生成">
+    [https://app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)に移動し、新しいAPIキーを作成します。
   </Step>
 
-  <Step title="Add the secret to GitHub">
-    In your repository settings, go to **Settings > Secrets and variables > Actions** and add a new repository secret:
+  <Step title="シークレットをGitHubに追加">
+    リポジトリ設定で**Settings > Secrets and variables > Actions**に移動し、新しいリポジトリシークレットを追加します:
     - **Name:** `FACTORY_API_KEY`
-    - **Value:** Your generated API key
+    - **Value:** 生成したAPIキー
   </Step>
 
-  <Step title="Merge the PR">
-    Once the secret is configured, merge the workflow PR to enable Droid.
+  <Step title="PRをマージ">
+    シークレットを設定したら、ワークフローPRをマージしてDroidを有効化します。
   </Step>
 </Steps>
 
@@ -179,31 +179,31 @@ Factory Droid GitHub Appには以下の権限が必要です：
 ## ヒントとベストプラクティス
 
 <AccordionGroup>
-  <Accordion title="Which workflows should I enable?">
-    - **Start with @Droid only** if you want manual control over when Droid participates
-    - **Enable both** for full automation with code review on every PR
-    - **Droid Review alone** if you only want automated reviews without @droid mentions
+  <Accordion title="どのワークフローを有効にするべきですか？">
+    - Droidが参加するタイミングを手動で制御したい場合は、**@Droidのみ**から始めます
+    - すべてのPRでコードレビューを自動化したい場合は、**両方を有効化**します
+    - @droidメンションなしで自動レビューだけを使いたい場合は、**Droid Reviewのみ**を選択します
   </Accordion>
 
-  <Accordion title="Troubleshooting preflight failures">
+  <Accordion title="事前チェック失敗のトラブルシューティング">
     | Error | Solution |
     |-------|----------|
-    | GitHub CLI not installed | Install `gh` using the commands above |
-    | Not logged in | Run `gh auth login` |
-    | Missing permissions | Run `gh auth refresh -s repo,read:org,workflow` |
-    | API access error | Check your internet connection and run `gh auth status` |
+    | GitHub CLIがインストールされていない | 上記のコマンドで`gh`をインストールします |
+    | ログインしていない | `gh auth login`を実行します |
+    | 権限が不足している | `gh auth refresh -s repo,read:org,workflow`を実行します |
+    | APIアクセスエラー | インターネット接続を確認し、`gh auth status`を実行します |
   </Accordion>
 
-  <Accordion title="Navigating the setup UI">
-    - Press **Esc** to go back at any step
-    - Press **Ctrl+C** to exit the entire flow
-    - Use **arrow keys** to navigate options
-    - Press **Space** to toggle workflow selection
-    - Press **Enter** to confirm and continue
+  <Accordion title="セットアップUIの操作">
+    - 任意の手順で戻るには**Esc**を押します
+    - フロー全体を終了するには**Ctrl+C**を押します
+    - オプションの移動には**矢印キー**を使用します
+    - ワークフロー選択を切り替えるには**Space**を押します
+    - 確定して続行するには**Enter**を押します
   </Accordion>
 
   <Accordion title="Multiple repositories">
-    Run `/install-github-app` separately for each repository you want to configure. The flow automatically detects the current repository from your git remote.
+    設定したいリポジトリごとに`/install-github-app`を個別に実行します。このフローはgit remoteから現在のリポジトリを自動検出します。
   </Accordion>
 </AccordionGroup>
 
@@ -218,7 +218,7 @@ droid
 
 ガイドフローの完了後、Droidはワークフローファイルを含むPRを作成します。生成されたDroid Reviewワークフローは以下のようになります：
 
-<Accordion title="Generated Droid Review Workflow">
+<Accordion title="生成されたDroid Reviewワークフロー">
 ```yaml
 name: Droid Auto Review
 
@@ -255,12 +255,12 @@ jobs:
 ```
 </Accordion>
 
-インストール後にワークフローをカスタマイズするには、[Automated Code Review guide](/guides/droid-exec/code-review#customizing-the-workflow) を参照してください。
+インストール後にワークフローをカスタマイズするには、[自動コードレビュー guide](/jp/guides/droid-exec/code-review#customizing-the-workflow) を参照してください。
 
 ## 関連項目
 
-- [Automated Code Review](/guides/droid-exec/code-review) - コードレビューワークフローのカスタマイズ
+- [自動コードレビュー](/jp/guides/droid-exec/code-review) - コードレビューワークフローのカスタマイズ
 - [Factory GitHub App](https://github.com/apps/factory-droid) - アプリをインストールする直接リンク
-- [API keys](https://app.factory.ai/settings/api-keys) - Factory APIキーの生成
-- [Code Review](/cli/features/code-review) - `/review` コマンドによるローカルコードレビュー
+- [APIキー](https://app.factory.ai/settings/api-keys) - Factory APIキーの生成
+- [コードレビュー](/jp/cli/features/code-review) - `/review` コマンドによるローカルコードレビュー
 - [Droid Exec GitHub Actions](/jp/guides/droid-exec/github-actions) - その他のGitHub Actionsオートメーション例

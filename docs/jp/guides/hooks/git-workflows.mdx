@@ -1,6 +1,6 @@
 ---
 title: "Gitワークフローフック"
-description: "Integrate hooks with Git for commit validation, branch protection, and automated workflows"
+description: "コミット検証、ブランチ保護、自動ワークフローのためにフックをGitと連携する"
 keywords: ['git', 'commit', 'branch', 'workflow', 'validation', 'pre-commit', 'hook']
 ---
 
@@ -259,7 +259,7 @@ last_commit=$(git log -1 --pretty=format:"%s")
 if echo "$last_commit" | grep -qE "^(feat|fix)(\(.+\))?:"; then
   commit_type=$(echo "$last_commit" | sed -E 's/^([^:(]+).*/\1/')
   commit_msg=$(echo "$last_commit" | sed -E 's/^[^:]+: (.+)/\1/')
-  
+
   # Determine changelog section
   if [ "$commit_type" = "feat" ]; then
     section="### Features"
@@ -268,7 +268,7 @@ if echo "$last_commit" | grep -qE "^(feat|fix)(\(.+\))?:"; then
   else
     exit 0
   fi
-  
+
   # Create/update CHANGELOG.md
   if [ ! -f "CHANGELOG.md" ]; then
     cat > CHANGELOG.md << EOF
@@ -304,7 +304,7 @@ $section\\
       rm CHANGELOG.md.bak 2>/dev/null || true
     fi
   fi
-  
+
   echo "✓ Updated CHANGELOG.md"
 fi
 
@@ -625,10 +625,10 @@ fi
 if git diff HEAD~1 HEAD -- package.json | grep -q "^+.*\"version\""; then
   # Get new version
   new_version=$(jq -r '.version' package.json)
-  
+
   echo "📦 Version bump detected: v$new_version"
   echo "Creating git tag..."
-  
+
   # Create and push tag
   if git tag "v$new_version" && git push origin "v$new_version"; then
     echo "✓ Created and pushed tag v$new_version"
@@ -642,8 +642,8 @@ exit 0
 ## ベストプラクティス
 
 <Steps>
-  <Step title="Use PreToolUse for prevention">
-    Block bad commits before they happen:
+  <Step title="防止にはPreToolUseを使用">
+    悪いコミットが行われる前にブロックします:
     ```bash
     # In PreToolUse hook
     if invalid_commit; then
@@ -652,9 +652,9 @@ exit 0
     fi
     ```
   </Step>
-  
-  <Step title="Use PostToolUse for automation">
-    Automate followup actions after successful commits:
+
+  <Step title="自動化にはPostToolUseを使用">
+    成功したコミット後のフォローアップアクションを自動化します:
     ```bash
     # In PostToolUse hook
     if git_commit_successful; then
@@ -663,25 +663,25 @@ exit 0
     fi
     ```
   </Step>
-  
-  <Step title="Provide clear error messages">
-    Tell users exactly what's wrong and how to fix it:
+
+  <Step title="明確なエラーメッセージを提供">
+    何が問題でどう修正するかをユーザーに正確に伝えます:
     ```bash
     echo "❌ Commit message must include issue reference" >&2
     echo "Example: feat(auth): add login FAC-123" >&2
     ```
   </Step>
-  
-  <Step title="Make hooks configurable">
-    Allow teams to customize behavior:
+
+  <Step title="フックを設定可能にする">
+    チームが動作をカスタマイズできるようにします:
     ```bash
     PROTECTED_BRANCHES="${DROID_PROTECTED_BRANCHES:-main,master,production}"
     REQUIRE_ISSUE_REF="${DROID_REQUIRE_ISSUE:-true}"
     ```
   </Step>
-  
-  <Step title="Test hooks with dry-run">
-    Test without making actual commits:
+
+  <Step title="ドライランでフックをテスト">
+    実際にコミットせずにテストします:
     ```bash
     # Simulate a commit
     echo '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"test\""}}' | \
@@ -693,9 +693,9 @@ exit 0
 ## トラブルシューティング
 
 
-  
+
     **問題**: 検証が厳しすぎる
-    
+
     **解決策**: エスケープハッチを追加：
     ```bash
     # Allow bypass with special prefix
@@ -704,11 +704,11 @@ exit 0
       exit 0
     fi
     ```
-  
-  
-  
+
+
+
     **問題**: DroidフックとGit/hooksの両方が実行される
-    
+
     **解決策**: 調整するかどちらかを選択：
     ```bash
     # In .git/hooks/pre-commit
@@ -716,26 +716,26 @@ exit 0
       exit 0  # Let Droid hooks handle it
     fi
     ```
-  
-  
-  
+
+
+
     **問題**: テストに時間がかかりすぎる
-    
+
     **解決策**: 高速チェックのみ実行：
     ```bash
     # Run fast subset of tests
     npm run test:unit  # Skip slow integration tests
-    
+
     # Or run in parallel with push
     npm test &
     git push
     ```
-  
+
 
 
 ## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - 完全なフック API ドキュメント
-- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフック入門
-- [Code validation](/guides/hooks/code-validation) - コード品質の検証
-- [Testing automation](/guides/hooks/testing-automation) - テストの自動化
+- [フックリファレンス](/jp/reference/hooks-reference) - 完全なフック API ドキュメント
+- [Get started with hooks](/jp/cli/configuration/hooks-guide) - 基本的なフック入門
+- [Code validation](/jp/guides/hooks/code-validation) - コード品質の検証
+- [Testing automation](/jp/guides/hooks/testing-automation) - テストの自動化

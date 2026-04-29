@@ -1,6 +1,6 @@
 ---
 title: "データクエリ"
-description: A reusable skill for safely querying internal analytics and data services and producing shareable, reproducible artifacts.
+description: 社内分析やデータサービスを安全にクエリし、共有可能で再現可能な成果物を生成する再利用可能なスキル。
 keywords: ['data', 'query', 'sql', 'analytics', 'database', 'skill', 'reporting']
 ---
 
@@ -13,9 +13,9 @@ keywords: ['data', 'query', 'sql', 'analytics', 'database', 'skill', 'reporting'
 ```
 .factory/skills/data-querying/
 ├── SKILL.md
-├── metrics.md (optional)
-├── examples.sql (optional)
-└── data-governance.md (optional)
+├── metrics.md (任意)
+├── examples.sql (任意)
+└── data-governance.md (任意)
 ```
 
 ### クイックスタート
@@ -28,7 +28,7 @@ keywords: ['data', 'query', 'sql', 'analytics', 'database', 'skill', 'reporting'
 2. **以下のスキルコンテンツを `.factory/skills/data-querying/SKILL.md`（または `skill.mdx`）にコピー**
 
 <Tip>
-When you ask Factory to query internal data or analyze metrics, it will automatically invoke this skill based on the task description.
+Factoryに社内データのクエリやメトリクス分析を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
 ## スキル定義
@@ -38,77 +38,77 @@ When you ask Factory to query internal data or analyze metrics, it will automati
 ```md
 ---
 name: data-querying
-description: Query internal data services to answer well-scoped questions, producing results and artifacts that are safe to share and easy to re-run. Use when stakeholders need metrics, trends, or data slices from internal warehouses, marts, or reporting APIs.
+description: 明確に範囲設定された質問に答えるため内部データサービスをクエリし、共有しても安全で再実行しやすい結果と成果物を生成します。ステークホルダーが内部ウェアハウス、マート、レポートAPIからメトリクス、傾向、データスライスを必要とする場合に使用します。
 ---
-# Data Querying
+# スキル: 内部データクエリ
 
-## Purpose
+## 目的
 
-Query internal data services to answer well-scoped questions, producing results and artifacts that are safe to share and easy to re-run.
+明確に範囲設定された質問に答えるため内部データサービスをクエリし、共有しても安全で再実行しやすい結果と成果物を生成します。
 
-## When to use this skill
+## このスキルを使うタイミング
 
-- A stakeholder asks for **metrics, trends, or slices** that rely on internal data.
-- The answers can be derived from existing **warehouses, marts, or reporting APIs**.
-- The request needs a **reproducible query** and not an ad-hoc manual export.
+- ステークホルダーが内部データに基づく**メトリクス、傾向、スライス**を求めている。
+- 既存の**ウェアハウス、マート、レポートAPI**から答えを導出できる。
+- アドホックな手動エクスポートではなく、**再現可能なクエリ**が必要。
 
-## Inputs
+## 入力
 
-- **Business question**: one or two sentences describing what we want to know.
-- **Time range and filters**: date boundaries, customer segments, environments, etc.
-- **Source systems**: names of warehouses, schemas, or APIs to use.
-- **Data sensitivity notes**: whether PII, financial data, or regulated data is involved.
+- **ビジネス上の質問**: 知りたいことを1〜2文で説明する。
+- **期間とフィルター**: 日付範囲、顧客セグメント、環境など。
+- **ソースシステム**: 使用するウェアハウス、スキーマ、APIの名前。
+- **データ機密性メモ**: PII、財務データ、規制対象データが含まれるかどうか。
 
-## Out of scope
+## 対象外
 
-- Direct queries against production OLTP databases unless explicitly allowed.
-- Creating new pipelines or ingestion jobs.
-- Sharing raw PII or secrets outside approved destinations.
+- 明示的に許可されていない本番OLTPデータベースへの直接クエリ。
+- 新しいパイプラインや取り込みジョブの作成。
+- 承認済みの場所の外部に生PIIやシークレットを共有すること。
 
-## Conventions
+## 規約
 
-- Use the **preferred query layer** (e.g., dbt models, semantic layer, analytics API) instead of raw tables when available.
-- Follow established **naming and folder conventions** for saved queries or analysis notebooks.
-- Respect internal **data classification and access control** policies.
+- 利用可能な場合は、生テーブルではなく**推奨クエリレイヤー**（例: dbtモデル、セマンティックレイヤー、分析API）を使用する。
+- 保存済みクエリや分析ノートブックには、確立された**命名規約とフォルダー規約**に従う。
+- 内部の**データ分類とアクセス制御**ポリシーを尊重する。
 
-## Required behavior
+## 必須の動作
 
-1. Translate the business question into a precise query spec (metrics, dimensions, filters).
-2. Choose appropriate sources and explain tradeoffs if multiple options exist.
-3. Write queries that are performant and cost-conscious for the target system.
-4. Produce both **results** and a **re-runnable query artifact** (SQL, API call, notebook, or dashboard link).
+1. ビジネス上の質問を正確なクエリ仕様（メトリクス、ディメンション、フィルター）に変換する。
+2. 適切なソースを選び、複数の選択肢がある場合はトレードオフを説明する。
+3. 対象システムに対して高性能でコストを意識したクエリを書く。
+4. **結果**と**再実行可能なクエリ成果物**（SQL、API呼び出し、ノートブック、ダッシュボードリンク）の両方を生成する。
 
-## Required artifacts
+## 必須の成果物
 
-- Query text (SQL, DSL, or API request) checked into the appropriate repo or folder.
-- A short **analysis summary** capturing methodology, assumptions, and caveats.
-- Links to any **dashboards, notebooks, or reports** created.
+- 適切なリポジトリまたはフォルダーにチェックインされたクエリ本文（SQL、DSL、APIリクエスト）。
+- 手法、前提、注意点をまとめた短い**分析サマリー**。
+- 作成した**ダッシュボード、ノートブック、レポート**へのリンク。
 
-## Implementation checklist
+## 実装チェックリスト
 
-1. Clarify the business question, time range, and filters.
-2. Identify the best data source(s) based on freshness, completeness, and governance.
-3. Draft the query, validate it on a limited time window or sample.
-4. Check for joins, filters, and aggregations that could distort the answer; fix as needed.
-5. Save the query in the approved location with a descriptive name.
-6. Capture results and summarize key findings and limitations.
+1. ビジネス上の質問、期間、フィルターを明確にする。
+2. 鮮度、完全性、ガバナンスに基づいて最適なデータソースを特定する。
+3. クエリを作成し、限定された期間またはサンプルで検証する。
+4. 回答を歪める可能性がある結合、フィルター、集計を確認し、必要に応じて修正する。
+5. 承認済みの場所に、内容が分かる名前でクエリを保存する。
+6. 結果を取得し、主要な発見と制限を要約する。
 
-## Verification
+## 検証
 
-Use whatever validation mechanisms exist for your data stack, for example:
+データスタックに存在する検証メカニズムを使用します。例:
 
-- `dbt test` in the relevant project
-- Unit or regression tests for custom metrics or transformations
-- Manual spot checks against known benchmarks or historical reports
+- 関連プロジェクトで`dbt test`
+- カスタムメトリクスまたは変換の単体テストや回帰テスト
+- 既知のベンチマークまたは過去レポートとの手動スポットチェック
 
-The skill is complete when:
+以下を満たしたらスキルは完了です:
 
-- The query runs successfully within acceptable time and cost bounds.
-- Results match expectations or known reference points (within reasonable tolerance).
-- The query and results are documented enough for another engineer or analyst to reuse.
+- クエリが許容される時間とコストの範囲内で正常に実行される。
+- 結果が期待値または既知の参照値と一致する（妥当な許容範囲内）。
+- 別のエンジニアまたはアナリストが再利用できる程度に、クエリと結果が文書化されている。
 
-## Safety and escalation
+## 安全性とエスカレーション
 
-- If the query touches **sensitive or regulated data**, confirm that the destination (PR, doc, ticket) is an approved location before including any sample rows.
-- If you identify data quality issues, file or update a data-quality ticket and call them out prominently in the analysis summary.
+- クエリが**機密データまたは規制対象データ**に触れる場合、サンプル行を含める前に、送信先（PR、ドキュメント、チケット）が承認済みの場所であることを確認する。
+- データ品質問題を特定した場合は、データ品質チケットを作成または更新し、分析サマリーで目立つように明記する。
 ```

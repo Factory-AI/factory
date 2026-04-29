@@ -1,6 +1,6 @@
 ---
 title: "プロダクトマネジメント"
-description: A reusable skill for assisting with product management workflows including PRDs, feature analysis, roadmap planning, and user research synthesis.
+description: PRD、機能分析、ロードマップ計画、ユーザーリサーチ統合などのプロダクト管理ワークフローを支援する再利用可能なスキル。
 keywords: ['product management', 'pm', 'prd', 'roadmap', 'features', 'skill', 'user research', 'planning']
 ---
 
@@ -13,9 +13,9 @@ keywords: ['product management', 'pm', 'prd', 'roadmap', 'features', 'skill', 'u
 ```
 .factory/skills/product-management/
 ├── SKILL.md
-├── prd-template.md (optional)
-├── feature-analysis-framework.md (optional)
-└── user-research-templates.md (optional)
+├── prd-template.md (任意)
+├── feature-analysis-framework.md (任意)
+└── user-research-templates.md (任意)
 ```
 
 ### クイックスタート
@@ -28,7 +28,7 @@ keywords: ['product management', 'pm', 'prd', 'roadmap', 'features', 'skill', 'u
 2. **以下のスキルコンテンツを`.factory/skills/product-management/SKILL.md`（または`skill.mdx`）にコピー**
 
 <Tip>
-When you ask Factory to help with PRDs, feature analysis, roadmap planning, or research synthesis, it will automatically invoke this skill based on the task description.
+FactoryにPRD、機能分析、ロードマップ計画、リサーチ統合の支援を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
 ## スキル定義
@@ -38,165 +38,165 @@ When you ask Factory to help with PRDs, feature analysis, roadmap planning, or r
 ````md
 ---
 name: product-management
-description: Assist with core product management activities including writing PRDs, analyzing features, synthesizing user research, planning roadmaps, and communicating product decisions. Use when you need help with PM documentation, analysis, or planning workflows that integrate with your codebase.
+description: PRD作成、機能分析、ユーザーリサーチの統合、ロードマップ計画、プロダクト意思決定の伝達など、中核的なプロダクトマネジメント活動を支援します。コードベースと連携するPMドキュメント、分析、計画ワークフローの支援が必要な場合に使用します。
 ---
-# Product Management
+# スキル: プロダクトマネジメントAI
 
-## Purpose
+## 目的
 
-Assist with core product management activities including writing product requirements documents (PRDs), analyzing feature requests, synthesizing user research, planning roadmaps, and communicating product decisions to stakeholders and engineering teams.
+プロダクト要求仕様書（PRD）の作成、機能リクエストの分析、ユーザーリサーチの統合、ロードマップ計画、ステークホルダーやエンジニアリングチームへのプロダクト意思決定の伝達など、中核的なプロダクトマネジメント活動を支援します。
 
-## When to use this skill
+## このスキルを使うタイミング
 
-- You need to **write or update PRDs** with clear requirements, success metrics, and technical considerations.
-- You're **evaluating feature requests** and need structured analysis of impact, effort, and priority.
-- You need to **synthesize user research** findings into actionable insights.
-- You're **planning roadmaps** and need to organize, prioritize, and communicate plans.
-- You need to **communicate product decisions** clearly to engineering, design, and business stakeholders.
-- You're doing **competitive analysis** or market research synthesis.
-- You need to **track and analyze product metrics** to inform decisions.
+- 明確な要件、成功指標、技術的考慮事項を含む**PRDの作成または更新**が必要。
+- **機能リクエストを評価**しており、影響、工数、優先度の構造化分析が必要。
+- **ユーザーリサーチ**の結果を実行可能な洞察に統合する必要がある。
+- **ロードマップを計画**しており、計画の整理、優先順位付け、伝達が必要。
+- エンジニアリング、デザイン、ビジネスのステークホルダーに**プロダクト意思決定を明確に伝える**必要がある。
+- **競合分析**または市場調査の統合を行っている。
+- 意思決定のために**プロダクト指標を追跡・分析**する必要がある。
 
-## Key capabilities
+## 主な機能
 
-Unlike point-solution PM tools:
+単機能のPMツールとは異なり、以下を提供します:
 
-- **Integrated with codebase**: Can reference actual code, APIs, and technical constraints.
-- **Context-aware**: Understands your specific product, architecture, and technical debt.
-- **Flexible templates**: Adapt documentation to your organization's needs.
-- **Version controlled**: All artifacts live in git alongside code.
-- **Collaborative**: Works within existing dev workflows (PRs, issues, docs).
+- **コードベースと統合**: 実際のコード、API、技術的制約を参照できます。
+- **コンテキスト認識**: 特定のプロダクト、アーキテクチャ、技術的負債を理解します。
+- **柔軟なテンプレート**: 組織のニーズに合わせてドキュメントを調整できます。
+- **バージョン管理**: すべての成果物がコードと一緒にgitで管理されます。
+- **コラボレーション対応**: 既存の開発ワークフロー（PR、Issue、ドキュメント）内で機能します。
 
-## Inputs
+## 入力
 
-- **Product context**: Current state, key stakeholders, strategic goals.
-- **Feature requests**: User feedback, business needs, or strategic initiatives.
-- **Technical constraints**: Known limitations, dependencies, or technical debt.
-- **User research**: Interview notes, survey results, analytics data.
-- **Business goals**: Metrics, OKRs, or success criteria to optimize for.
+- **プロダクトコンテキスト**: 現状、主要ステークホルダー、戦略目標。
+- **機能リクエスト**: ユーザーフィードバック、ビジネスニーズ、戦略的取り組み。
+- **技術的制約**: 既知の制限、依存関係、技術的負債。
+- **ユーザーリサーチ**: インタビューメモ、アンケート結果、分析データ。
+- **ビジネス目標**: 最適化対象の指標、OKR、成功基準。
 
-## Out of scope
+## 対象外
 
-- Making final product decisions (this is the PM's job; the skill assists).
-- Managing stakeholder relationships and politics.
-- Detailed UI/UX design work (use design tools and collaborate with designers).
-- Project management and sprint planning (use project management tools).
+- 最終的なプロダクト意思決定（これはPMの仕事であり、スキルは支援します）。
+- ステークホルダー関係や社内調整の管理。
+- 詳細なUI/UXデザイン作業（デザインツールを使用し、デザイナーと協力）。
+- プロジェクト管理とスプリント計画（プロジェクト管理ツールを使用）。
 
-## Conventions and best practices
+## 規約とベストプラクティス
 
-### PRD structure
-A good PRD should include:
+### PRD構成
+良いPRDには以下を含めます:
 
-1. **Problem statement**: What user pain point or business need are we addressing?
-2. **Goals and success metrics**: What does success look like quantitatively?
-3. **User stories and use cases**: Who will use this and how?
-4. **Requirements**: Functional and non-functional requirements, prioritized.
-5. **Technical considerations**: Architecture implications, dependencies, constraints.
-6. **Design and UX notes**: Key interaction patterns or design requirements.
-7. **Risks and mitigations**: What could go wrong and how to address it.
-8. **Launch plan**: Rollout strategy, feature flags, monitoring.
-9. **Open questions**: What still needs to be decided or researched.
+1. **問題定義**: どのユーザー課題またはビジネスニーズに対応するのか。
+2. **目標と成功指標**: 成功を定量的にどう定義するのか。
+3. **ユーザーストーリーとユースケース**: 誰がどのように使うのか。
+4. **要件**: 優先順位付けされた機能要件と非機能要件。
+5. **技術的考慮事項**: アーキテクチャへの影響、依存関係、制約。
+6. **デザインとUXメモ**: 主要なインタラクションパターンやデザイン要件。
+7. **リスクと緩和策**: 何が問題になり得るか、どう対処するか。
+8. **ローンチ計画**: 展開戦略、機能フラグ、モニタリング。
+9. **未解決の質問**: まだ決定または調査が必要なこと。
 
-### Feature prioritization
-Use structured frameworks to evaluate features:
+### 機能の優先順位付け
+構造化されたフレームワークを使って機能を評価します:
 
-- **RICE**: Reach × Impact × Confidence / Effort
-- **ICE**: Impact × Confidence × Ease
-- **Value vs. Effort**: 2×2 matrix plotting value against implementation cost
-- **Kano Model**: Categorize features into basic, performance, and delighters
+- **RICE**: Reach（リーチ） × Impact（影響） × Confidence（信頼度） / Effort（工数）
+- **ICE**: Impact（影響） × Confidence（信頼度） × Ease（容易さ）
+- **Value vs. Effort**: 価値と実装コストを2×2マトリクスで比較
+- **Kano Model**: 機能を基本品質、性能品質、魅力品質に分類
 
-### User research synthesis
-When synthesizing research:
+### ユーザーリサーチの統合
+リサーチを統合するときは:
 
-1. **Identify patterns**: What themes emerge across participants?
-2. **Quote verbatim**: Include actual user quotes to illustrate points.
-3. **Quantify when possible**: "7 out of 10 participants said..."
-4. **Segment findings**: Different user types may have different needs.
-5. **Connect to metrics**: How do qualitative findings explain quantitative data?
+1. **パターンを特定**: 参加者全体でどのテーマが現れるか。
+2. **逐語引用**: 論点を示す実際のユーザー発言を含める。
+3. **可能な場合は定量化**: 「10人中7人の参加者が…と回答」。
+4. **発見をセグメント化**: ユーザータイプごとに異なるニーズがある場合があります。
+5. **指標に接続**: 定性的な発見が定量データをどう説明するか。
 
-### Roadmap planning
-Effective roadmaps should:
+### ロードマップ計画
+効果的なロードマップは以下を満たすべきです:
 
-- **Theme-based**: Group work into strategic themes, not just feature lists.
-- **Time-horizoned**: Now / Next / Later or Quarterly structure.
-- **Outcome-focused**: Emphasize goals and outcomes, not just outputs.
-- **Flexible**: Leave room for learning and adjustment.
-- **Communicated clearly**: Different views for different audiences.
+- **テーマベース**: 単なる機能リストではなく、戦略テーマごとに作業をまとめる。
+- **時間軸あり**: Now / Next / Laterまたは四半期単位の構成にする。
+- **成果重視**: アウトプットだけでなく、目標と成果を強調する。
+- **柔軟**: 学習と調整の余地を残す。
+- **明確に伝達**: 対象読者ごとに異なるビューを用意する。
 
-## Required behavior
+## 必須の動作
 
-1. **Understand context deeply**: Review existing docs, code, and prior discussions before proposing changes.
-2. **Ask clarifying questions**: Don't assume; clarify ambiguous requirements or goals.
-3. **Be specific and actionable**: Avoid vague language; provide concrete, testable requirements.
-4. **Consider tradeoffs**: Explicitly discuss pros/cons of different approaches.
-5. **Connect to strategy**: Tie features and decisions back to higher-level goals.
-6. **Involve stakeholders**: Identify who needs to review or approve.
-7. **Think through edge cases**: Don't just focus on happy paths.
-8. **Make it measurable**: Propose concrete metrics to track success.
+1. **コンテキストを深く理解する**: 変更提案の前に既存ドキュメント、コード、過去の議論を確認する。
+2. **確認質問をする**: 推測せず、曖昧な要件や目標を明確にする。
+3. **具体的で実行可能にする**: 曖昧な表現を避け、具体的でテスト可能な要件を提示する。
+4. **トレードオフを考慮する**: 異なるアプローチの長所と短所を明示的に議論する。
+5. **戦略に接続する**: 機能や意思決定を上位目標に結び付ける。
+6. **ステークホルダーを巻き込む**: レビューや承認が必要な人を特定する。
+7. **エッジケースを考える**: ハッピーパスだけに注目しない。
+8. **測定可能にする**: 成功を追跡する具体的な指標を提案する。
 
-## Required artifacts
+## 必須の成果物
 
-Depending on the task, generate:
+タスクに応じて以下を生成します:
 
-- **PRD document**: Comprehensive product requirements in markdown format.
-- **Feature analysis**: Structured evaluation of a feature request.
-- **Research synthesis**: Summary of user research findings with insights.
-- **Roadmap document**: Organized view of planned work with themes and timelines.
-- **Decision document**: Record of key product decisions and rationale.
-- **Competitive analysis**: Comparison of competitor features and approaches.
-- **Metric definitions**: Clear definitions of success metrics and how to measure them.
+- **PRDドキュメント**: Markdown形式の包括的なプロダクト要件。
+- **機能分析**: 機能リクエストの構造化評価。
+- **リサーチ統合**: 洞察を含むユーザーリサーチ結果の要約。
+- **ロードマップドキュメント**: テーマとタイムラインを含む計画作業の整理ビュー。
+- **意思決定ドキュメント**: 主要なプロダクト意思決定と根拠の記録。
+- **競合分析**: 競合の機能とアプローチの比較。
+- **指標定義**: 成功指標と測定方法の明確な定義。
 
-## Implementation checklist
+## 実装チェックリスト
 
-### Writing a PRD
-- [ ] Understand the problem space and strategic context
-- [ ] Review related code, APIs, and technical constraints
-- [ ] Interview key stakeholders (engineering, design, business)
-- [ ] Research user needs and competitive landscape
-- [ ] Draft problem statement and goals
-- [ ] Define user stories and use cases
-- [ ] Specify functional and non-functional requirements
-- [ ] Document technical considerations and dependencies
-- [ ] Define success metrics and measurement approach
-- [ ] Identify risks and mitigation strategies
-- [ ] Plan rollout and launch approach
-- [ ] Review with stakeholders and iterate
+### PRDを書く
+- [ ] 問題領域と戦略的コンテキストを理解する
+- [ ] 関連するコード、API、技術的制約を確認する
+- [ ] 主要ステークホルダー（エンジニアリング、デザイン、ビジネス）にヒアリングする
+- [ ] ユーザーニーズと競合環境を調査する
+- [ ] 問題定義と目標を下書きする
+- [ ] ユーザーストーリーとユースケースを定義する
+- [ ] 機能要件と非機能要件を明記する
+- [ ] 技術的考慮事項と依存関係を記録する
+- [ ] 成功指標と測定方法を定義する
+- [ ] リスクと緩和戦略を特定する
+- [ ] 展開とローンチ方法を計画する
+- [ ] ステークホルダーとレビューし、反復する
 
-### Analyzing a feature request
-- [ ] Clarify the user problem or business need
-- [ ] Identify target users and use cases
-- [ ] Estimate impact (users affected, business value)
-- [ ] Assess implementation effort and complexity
-- [ ] Identify dependencies and risks
-- [ ] Check alignment with product strategy
-- [ ] Compare against alternatives
-- [ ] Calculate prioritization score (RICE, ICE, etc.)
-- [ ] Make recommendation with clear reasoning
+### 機能リクエストを分析する
+- [ ] ユーザー課題またはビジネスニーズを明確にする
+- [ ] 対象ユーザーとユースケースを特定する
+- [ ] 影響を見積もる（影響を受けるユーザー、ビジネス価値）
+- [ ] 実装工数と複雑さを評価する
+- [ ] 依存関係とリスクを特定する
+- [ ] プロダクト戦略との整合性を確認する
+- [ ] 代替案と比較する
+- [ ] 優先順位スコア（RICE、ICEなど）を計算する
+- [ ] 明確な理由付きで推奨案を提示する
 
-### Synthesizing user research
-- [ ] Review all research materials (transcripts, notes, data)
-- [ ] Identify key themes and patterns
-- [ ] Extract representative quotes
-- [ ] Segment findings by user type if relevant
-- [ ] Connect qualitative findings to quantitative data
-- [ ] Formulate insights and implications
-- [ ] Generate actionable recommendations
-- [ ] Prioritize recommendations by impact
+### ユーザーリサーチを統合する
+- [ ] すべてのリサーチ資料（書き起こし、メモ、データ）を確認する
+- [ ] 主要テーマとパターンを特定する
+- [ ] 代表的な引用を抽出する
+- [ ] 関連する場合はユーザータイプ別に発見を分ける
+- [ ] 定性的な発見を定量データに結び付ける
+- [ ] 洞察と示唆をまとめる
+- [ ] 実行可能な推奨事項を生成する
+- [ ] 影響度で推奨事項を優先順位付けする
 
-### Planning a roadmap
-- [ ] Review strategic goals and OKRs
-- [ ] Collect input from stakeholders
-- [ ] Assess current state and technical debt
-- [ ] Group potential work into strategic themes
-- [ ] Prioritize themes and initiatives
-- [ ] Estimate sizing and dependencies
-- [ ] Organize into time horizons (Now/Next/Later)
-- [ ] Define success criteria for each initiative
-- [ ] Create views for different audiences
-- [ ] Review and socialize with stakeholders
+### ロードマップを計画する
+- [ ] 戦略目標とOKRを確認する
+- [ ] ステークホルダーからインプットを集める
+- [ ] 現状と技術的負債を評価する
+- [ ] 可能性のある作業を戦略テーマにまとめる
+- [ ] テーマと取り組みを優先順位付けする
+- [ ] 規模と依存関係を見積もる
+- [ ] 時間軸（Now/Next/Later）で整理する
+- [ ] 各取り組みの成功基準を定義する
+- [ ] 対象読者ごとのビューを作成する
+- [ ] ステークホルダーとレビューし、共有する
 
-## Example workflows
+## ワークフロー例
 
-### Example 1: Writing a PRD for a new feature
+### 例1: 新機能のPRDを書く
 
 ```markdown
 # PRD: 高度検索機能
@@ -218,19 +218,19 @@ Depending on the task, generate:
 
 ## ユーザーストーリー
 
-### Must Have
+### 必須
 1. 購入者として、予算内のアイテムを見つけられるよう価格帯でフィルタリングしたい
 2. 購入者として、近くのアイテムを見つけられるよう場所でフィルタリングしたい
 3. 購入者として、アイテムタイプを絞り込むためにカテゴリでフィルタリングしたい
 4. 購入者として、必要なものを正確に見つけるために複数のフィルターを組み合わせたい
 5. 購入者として、適用前にマッチするアイテム数を知るためにフィルター件数を見たい
 
-### Should Have
+### あるとよい
 6. 購入者として、再適用の必要がないようフィルター設定を保存したい
 7. 購入者として、検索クエリに基づく推奨フィルターを見たい
 8. 購入者として、フィルタリングされた結果を関連度、価格、または日付で並び替えたい
 
-### Nice to Have
+### あるとよいもの
 9. 購入者として、新しいマッチを通知する保存検索を作成したい
 10. 購入者として、フィルタリングされた検索URLを他の人と共有したい
 
@@ -293,8 +293,8 @@ Depending on the task, generate:
 interface SearchFilters {
   price?: { min: number; max: number };
   location?: { lat: number; lng: number; radius: number };
-  categories?: string[]; // Category IDs
-  attributes?: Record<string, string[]>; // Dynamic attributes
+  categories?: string[]; // カテゴリID
+  attributes?: Record<string, string[]>; // 動的属性
 }
 
 interface SearchResponse {
@@ -391,7 +391,7 @@ interface SearchResponse {
 *ステータス*: 下書き → レビュー → 承認 → 進行中
 ```
 
-### Example 2: Feature request analysis
+### 例2: 機能リクエスト分析
 
 ```markdown
 # 機能分析: ダークモードサポート
@@ -520,66 +520,66 @@ RICEフレームワークを使用：
 *日付*: 2025-11-19
 ```
 
-## Common PM artifacts
+## よく使うPM成果物
 
-### PRD (Product Requirements Document)
-Comprehensive specification of what to build and why. Include problem statement, goals, user stories, requirements, technical considerations, risks, and launch plan.
+### PRD（プロダクト要求仕様書）
+何をなぜ作るかを示す包括的な仕様。問題定義、目標、ユーザーストーリー、要件、技術的考慮事項、リスク、ローンチ計画を含めます。
 
-### Feature Brief
-Lighter-weight than PRD; quick summary of a feature idea with key details. Use for early-stage exploration before committing to full PRD.
+### 機能ブリーフ
+PRDより軽量な、主要詳細を含む機能アイデアの簡単な要約。完全なPRDに進む前の初期探索に使用します。
 
-### User Research Synthesis
-Summary of user research findings (interviews, surveys, usability tests) with patterns, insights, and recommendations.
+### ユーザーリサーチ統合
+ユーザーリサーチ結果（インタビュー、アンケート、ユーザビリティテスト）を、パターン、洞察、推奨事項とともに要約します。
 
-### Roadmap
-Strategic plan of what to build over time. Organize by themes and time horizons; focus on outcomes not just outputs.
+### ロードマップ
+時間をかけて何を作るかを示す戦略計画。テーマと時間軸で整理し、アウトプットだけでなく成果に焦点を当てます。
 
-### Decision Document
-Record of important product decisions, the options considered, the decision made, and the reasoning. Critical for institutional memory.
+### 意思決定ドキュメント
+重要なプロダクト意思決定、検討した選択肢、決定内容、理由の記録。組織の記憶として重要です。
 
-### Launch Plan
-Detailed plan for rolling out a feature including phases, feature flags, metrics, monitoring, and rollback procedures.
+### ローンチ計画
+フェーズ、機能フラグ、指標、モニタリング、ロールバック手順を含む機能展開の詳細計画。
 
-### Competitive Analysis
-Comparison of competitors' features, approaches, and positioning. Inform product strategy and feature prioritization.
+### 競合分析
+競合の機能、アプローチ、ポジショニングの比較。プロダクト戦略と機能優先順位付けに活用します。
 
-### One-Pager
-Executive summary of a product initiative. Use to communicate to leadership and get alignment.
+### 1ページ資料
+プロダクト施策のエグゼクティブサマリー。リーダーシップへの共有と合意形成に使用します。
 
-## Best practices for AI-assisted PM work
+## AI支援PM作業のベストプラクティス
 
-### When using AI to write PRDs
-- Provide comprehensive context about the product, users, and technical constraints.
-- Review and edit generated content carefully; AI may miss nuances or make wrong assumptions.
-- Use AI for structure and first drafts; refine with human judgment and stakeholder input.
-- Validate technical details with engineering; don't assume AI knows your architecture.
+### AIでPRDを書く場合
+- プロダクト、ユーザー、技術的制約に関する包括的なコンテキストを提供する。
+- 生成内容を慎重にレビュー・編集する。AIはニュアンスを見落としたり誤った前提を置いたりすることがある。
+- 構成と初稿にAIを使い、人間の判断とステークホルダーの入力で磨き込む。
+- 技術詳細はエンジニアリングと検証する。AIが自分たちのアーキテクチャを知っていると仮定しない。
 
-### When using AI for feature analysis
-- Provide quantitative data when possible (usage numbers, customer feedback counts).
-- Use structured frameworks (RICE, ICE) to make analysis consistent and defensible.
-- Don't let AI make the final decision; use it to organize thinking and surface considerations.
-- Supplement AI analysis with qualitative stakeholder input and strategic context.
+### AIで機能分析を行う場合
+- 可能な場合は定量データ（利用数、顧客フィードバック件数）を提供する。
+- 分析を一貫性があり説明可能にするため、構造化フレームワーク（RICE、ICE）を使用する。
+- 最終判断をAIに任せない。思考の整理と考慮事項の洗い出しに使う。
+- AI分析に定性的なステークホルダー入力と戦略的コンテキストを補足する。
 
-### When using AI for research synthesis
-- Provide full transcripts or detailed notes for best results.
-- Ask AI to identify patterns but validate with your own reading of the data.
-- Use AI to extract quotes and organize themes; add your own interpretation and implications.
-- Don't let AI over-summarize; sometimes important details are in the nuances.
+### AIでリサーチを統合する場合
+- 最良の結果のため、完全な書き起こしまたは詳細なメモを提供する。
+- AIにパターンを特定させるが、自分でデータを読んで検証する。
+- 引用の抽出とテーマ整理にAIを使い、自分の解釈と示唆を追加する。
+- AIに要約させすぎない。重要な詳細がニュアンスに含まれることがある。
 
-## Safety and escalation
+## 安全性とエスカレーション
 
-- **Strategic decisions**: AI should inform, not make, key product decisions. Involve human PMs and stakeholders.
-- **User data**: Don't feed PII or sensitive user data to AI without proper data handling procedures.
-- **Technical feasibility**: Always validate technical assumptions and effort estimates with engineering.
-- **Competitive intelligence**: Be cautious about including confidential competitive info in prompts.
-- **Tone and voice**: Review and adjust tone for your audience; AI may be too formal or informal.
+- **戦略的意思決定**: AIは主要なプロダクト意思決定を支援するもので、決定するものではありません。人間のPMとステークホルダーを巻き込みます。
+- **ユーザーデータ**: 適切なデータ取扱手順なしにPIIや機密ユーザーデータをAIに入力しない。
+- **技術的実現可能性**: 技術的前提と工数見積もりは必ずエンジニアリングと検証する。
+- **競合情報**: 機密性の高い競合情報をプロンプトに含める場合は慎重に扱う。
+- **トーンと声**: 対象読者に合わせてトーンをレビュー・調整する。AIは過度に形式的またはカジュアルになることがある。
 
-## Integration with other skills
+## 他のスキルとの連携
 
-This skill can be combined with:
+このスキルは以下と組み合わせられます:
 
-- **Data querying**: To analyze product metrics and user behavior data.
-- **AI data analyst**: To perform deeper quantitative analysis for feature decisions.
-- **Frontend UI integration**: To implement features designed in PRDs.
-- **Internal tools**: To build PM tools like feature flag dashboards or metrics viewers.
+- **データクエリ**: プロダクト指標とユーザー行動データを分析する。
+- **AIデータアナリスト**: 機能判断のためのより深い定量分析を行う。
+- **フロントエンドUI連携**: PRDで設計された機能を実装する。
+- **内部ツール**: 機能フラグダッシュボードやメトリクスビューアなどのPMツールを構築する。
 ````

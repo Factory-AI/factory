@@ -1,6 +1,6 @@
 ---
 title: AGENTS.md
-description: Teach agents everything they need to know about your project with a single Markdown file.
+description: 単一のMarkdownファイルで、プロジェクトについてエージェントが知るべきことをすべて教える。
 keywords: ['agents.md', 'project context', 'instructions', 'conventions', 'guidelines', 'project setup', 'configuration file']
 ---
 
@@ -59,8 +59,7 @@ keywords: ['agents.md', 'project context', 'instructions', 'conventions', 'guide
 4. 個人の上書き設定：`~/.factory/AGENTS.md`
 
 <Note>
-  Multiple files can coexist. The closer one to the file being edited takes
-  precedence.
+  複数のファイルを併用できます。編集対象のファイルに近いものが優先されます。
 </Note>
 
 ---
@@ -94,8 +93,8 @@ AGENTS.mdはプレーンなMarkdownです；見出しはセマンティックな
 
 | セクション                  | 目的                                                           |
 | -------------------------- | ------------------------------------------------------------- |
-| **Build & Test**           | コンパイルとテストスイート実行のための正確なコマンド。            |
-| **Architecture Overview**  | 主要なモジュールとデータフローの一段落要約。                      |
+| **ビルドとテスト**           | コンパイルとテストスイート実行のための正確なコマンド。            |
+| **アーキテクチャ概要**  | 主要なモジュールとデータフローの一段落要約。                      |
 | **Security**               | APIキー、エンドポイント、認証フロー、レート制限、機密データ。      |
 | **Git Workflows**          | ブランチ戦略、コミット規約、PR要件。                            |
 | **Conventions & Patterns** | フォルダ構造、命名パターン、コードスタイル、lintルール。          |
@@ -222,38 +221,36 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
 ## 7 · ベストプラクティス
 
 <AccordionGroup>
-  <Accordion title="Keep it short">
-    Aim for **≤ 150 lines**. Long files slow the agent and bury signal.
+  <Accordion title="短く保つ">
+    **150行以下**を目安にします。長いファイルはエージェントを遅くし、重要な情報を埋もれさせます。
   </Accordion>
 
 {" "}
 
-<Accordion title="Use concrete commands">
-  Wrap commands in back-ticks so agents can copy-paste without guessing.
+<Accordion title="具体的なコマンドを使う">
+  エージェントが推測せずにコピー&ペーストできるよう、コマンドはバッククォートで囲みます。
 </Accordion>
 
 {" "}
 
-<Accordion title="Update alongside code">
-  Treat AGENTS.md like code—PR reviewers should nudge updates when build steps
-  change.
+<Accordion title="コードと一緒に更新する">
+  AGENTS.mdはコードのように扱い、ビルド手順が変わったらPRレビューで更新を促します。
 </Accordion>
 
 {" "}
 
-<Accordion title="One source of truth">
-  Avoid duplicate docs; link to READMEs or design docs instead of pasting them.
+<Accordion title="信頼できる唯一の情報源にする">
+  重複するドキュメントを避け、貼り付ける代わりにREADMEや設計ドキュメントへリンクします。
 </Accordion>
 
 {" "}
 
-<Accordion title="Make requests precise">
-  The more precise your guidance for the task at hand, the more likely the agent
-  is to accomplish that task to your liking.
+<Accordion title="リクエストを具体的にする">
+  目の前のタスクに対するガイダンスが具体的であるほど、エージェントは期待どおりに遂行しやすくなります。
 </Accordion>
 
-  <Accordion title="Verify before merging">
-    Require objective proof: tests, lint, type check, and a diff confined to agreed paths.
+  <Accordion title="マージ前に確認">
+    テスト、lint、型チェック、合意したパス内に収まるdiffなど、客観的な証拠を求めます。
   </Accordion>
 </AccordionGroup>
 
@@ -262,19 +259,17 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
 ## 8 · エージェントがAGENTS.mdを使用する方法
 
 <Steps>
-  <Step title="Ingestion">
-    On task start, agents load the nearest AGENTS.md into their context window.
+  <Step title="取り込み">
+    タスク開始時、エージェントは最も近いAGENTS.mdをコンテキストウィンドウに読み込みます。
   </Step>
-  <Step title="Planning">
-    Build/test commands are used to form the execution plan (e.g. run tests
-    after edits).
+  <Step title="計画">
+    ビルド/テストコマンドは実行計画の作成に使われます（例: 編集後にテストを実行）。
   </Step>
-  <Step title="Tool selection">
-    Folder and naming conventions steer tools like `edit_file` and
-    `create_file`.
+  <Step title="ツール選択">
+    フォルダと命名規則は、`edit_file`や`create_file`などのツールの使い方を導きます。
   </Step>
-  <Step title="Validation">
-    Gotchas and domain vocabulary improve reasoning and reduce hallucinations.
+  <Step title="検証">
+    注意点とドメイン語彙は推論を改善し、ハルシネーションを減らします。
   </Step>
 </Steps>
 
@@ -306,16 +301,16 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
   <Card
     title="Specification Mode"
     icon="list-check"
-    href="/cli/user-guides/specification-mode"
+    href="/jp/cli/user-guides/specification-mode"
   >
-    Specs + AGENTS.md = instant context for new features.
+    仕様 + AGENTS.md = 新機能の即時コンテキスト。
   </Card>
   <Card
-    title="Auto-Run"
+    title="自動実行"
     icon="forward"
-    href="/cli/user-guides/auto-run"
+    href="/jp/cli/user-guides/auto-run"
   >
-    Reliable automation depends on accurate build & test commands.
+    信頼できる自動化は、正確なビルド/テストコマンドに依存します。
   </Card>
 </CardGroup>
 

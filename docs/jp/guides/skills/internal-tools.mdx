@@ -1,6 +1,6 @@
 ---
 title: "内部ツール"
-description: A reusable skill for building and extending internal tools that support engineers, operators, and support teams.
+description: エンジニア、運用担当者、サポートチームを支援する社内ツールを構築・拡張する再利用可能なスキル。
 keywords: ['internal tools', 'admin panel', 'dashboard', 'utilities', 'skill', 'operations']
 ---
 
@@ -13,9 +13,9 @@ DroidがBuildするかによって**内部向けアプリケーション**（管
 ```
 .factory/skills/internal-tools/
 ├── SKILL.md
-├── rbac.md (optional)
-├── audit-patterns.md (optional)
-└── operations-checklist.md (optional)
+├── rbac.md (任意)
+├── audit-patterns.md (任意)
+└── operations-checklist.md (任意)
 ```
 
 ### クイックスタート
@@ -28,7 +28,7 @@ DroidがBuildするかによって**内部向けアプリケーション**（管
 2. **下記のスキルコンテンツを `.factory/skills/internal-tools/SKILL.md` （または `skill.mdx`）にコピー**
 
 <Tip>
-When you ask Factory to build or extend internal tools like admin panels or operational dashboards, it will automatically invoke this skill based on the task description.
+Factoryに管理パネルや運用ダッシュボードなどの社内ツールの構築・拡張を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
 ## スキル定義
@@ -38,76 +38,76 @@ When you ask Factory to build or extend internal tools like admin panels or oper
 ```md
 ---
 name: internal-tools
-description: Design, implement, or extend internal tools that help employees operate the system safely and efficiently, while respecting access controls and audit requirements. Use when building for internal staff interacting with production-adjacent systems.
+description: アクセス制御と監査要件を尊重しながら、従業員がシステムを安全かつ効率的に運用するための内部ツールを設計、実装、拡張します。本番環境に近いシステムを扱う社内スタッフ向けに構築する場合に使用します。
 ---
-# Internal Tools
+# スキル: 内部ツール開発
 
-## Purpose
+## 目的
 
-Design, implement, or extend internal tools that help employees operate the system safely and efficiently, while respecting access controls and audit requirements.
+アクセス制御と監査要件を尊重しながら、従業員がシステムを安全かつ効率的に運用するための内部ツールを設計、実装、拡張します。
 
-## When to use this skill
+## このスキルを使うタイミング
 
-- The audience is **internal staff** (engineers, SREs, support, operations, finance, etc.).
-- The tool interacts with **production-adjacent systems** (feature flags, incidents, customer data, billing, etc.).
-- The change is scoped to internal workflows and does not directly alter customer-facing UX.
+- 対象読者が**社内スタッフ**（エンジニア、SRE、サポート、運用、財務など）である。
+- ツールが**本番環境に近いシステム**（機能フラグ、インシデント、顧客データ、請求など）とやり取りする。
+- 変更範囲が内部ワークフローに限定され、顧客向けUXを直接変更しない。
 
-## Inputs
+## 入力
 
-- **User personas** and teams who will use the tool.
-- **Workflows** to support (create/update actions, approvals, review flows).
-- **Systems touched**: services, queues, flags, and data stores.
-- **Risk classification**: what can go wrong if the tool misbehaves or is misused.
+- ツールを使用する**ユーザーペルソナ**とチーム。
+- サポートする**ワークフロー**（作成/更新アクション、承認、レビューフロー）。
+- **影響するシステム**: サービス、キュー、フラグ、データストア。
+- **リスク分類**: ツールが誤動作または誤用された場合に何が起こり得るか。
 
-## Out of scope
+## 対象外
 
-- Tools that require new identity providers or SSO integrations.
-- Changes that bypass existing approval or change-management processes.
-- Direct manual-write tooling for core financial or compliance systems without explicit approval.
+- 新しいアイデンティティプロバイダーやSSO連携を必要とするツール。
+- 既存の承認または変更管理プロセスを迂回する変更。
+- 明示的な承認なしに、主要な財務またはコンプライアンスシステムへ手動書き込みするツール。
 
-## Conventions
+## 規約
 
-- Use the **standard stack** for internal tools (framework, component library, backend pattern) already used in the repo.
-- Apply **role-based access control** and logging patterns consistently.
-- Prefer **read-only views and guarded actions** (confirmation dialogs, requiring justification text, etc.) for high-risk operations.
+- リポジトリですでに使われている内部ツール向けの**標準スタック**（フレームワーク、コンポーネントライブラリ、バックエンドパターン）を使用する。
+- **ロールベースのアクセス制御**とロギングパターンを一貫して適用する。
+- 高リスク操作には**読み取り専用ビューと保護付きアクション**（確認ダイアログ、理由入力の必須化など）を優先する。
 
-## Required behavior
+## 必須の動作
 
-1. Implement flows that make the happy path fast while making destructive actions clearly intentional.
-2. Ensure all state changes are logged with **who**, **what**, and **when**, and link to existing audit/logging infrastructure.
-3. Provide clear feedback on success, errors, and partial failures.
-4. Design for operational debugging: include ids, timestamps, and links to related systems.
+1. ハッピーパスを高速にしつつ、破壊的アクションが明確に意図されたものになるフローを実装する。
+2. すべての状態変更について**誰が**、**何を**、**いつ**行ったかをログに記録し、既存の監査/ロギング基盤へリンクする。
+3. 成功、エラー、部分的な失敗について明確なフィードバックを提供する。
+4. 運用デバッグを考慮して設計し、ID、タイムスタンプ、関連システムへのリンクを含める。
 
-## Required artifacts
+## 必須の成果物
 
-- Frontend and backend changes in the appropriate internal-tools modules.
-- **Automated tests** for critical operations (at least unit tests; integration tests where harnesses exist).
-- Baseline **operational runbook entry** or link explaining how to use the tool and what to do when it fails, if required by your team.
+- 適切な内部ツールモジュールでのフロントエンドとバックエンドの変更。
+- 重要な操作に対する**自動テスト**（少なくとも単体テスト、ハーネスがある場合は統合テスト）。
+- チームで必要な場合、ツールの使い方と失敗時の対応を説明する基本的な**運用ランブック項目**またはリンク。
 
-## Implementation checklist
+## 実装チェックリスト
 
-1. Clarify workflow boundaries and risk level with stakeholders.
-2. Identify existing components, endpoints, and patterns to reuse.
-3. Implement the UI, backend handlers, and data access using established abstractions.
-4. Add safeguards: confirmations, rate limiting, or approvals depending on risk.
-5. Wire up logging and metrics so usage and failures are visible.
-6. Add or update tests and any required runbook entries.
+1. ステークホルダーとワークフロー境界とリスクレベルを明確にする。
+2. 再利用する既存コンポーネント、エンドポイント、パターンを特定する。
+3. 確立された抽象化を使ってUI、バックエンドハンドラー、データアクセスを実装する。
+4. リスクに応じて確認、レート制限、承認などの保護策を追加する。
+5. 利用状況と失敗が可視化されるようにロギングとメトリクスを接続する。
+6. テストと必要なランブック項目を追加または更新する。
 
-## Verification
+## 検証
 
-Run the standard validation commands for the relevant apps/services (tests, lint, type checks). In addition:
+関連するアプリ/サービスの標準検証コマンド（テスト、lint、型チェック）を実行します。加えて:
 
-- Exercise both **happy paths and failure modes** in a safe environment.
-- Confirm that audit logs and metrics reflect actions accurately.
+- 安全な環境で**ハッピーパスと失敗モード**の両方を確認する。
+- 監査ログとメトリクスがアクションを正確に反映していることを確認する。
 
-The skill is complete when:
+以下を満たしたらスキルは完了です:
 
-- Validation commands pass.
-- Flows behave correctly in staging or an equivalent environment.
-- Stakeholders can perform their target workflows without manual DB access or unsafe workarounds.
+- 検証コマンドが成功する。
+- ステージングまたは同等の環境でフローが正しく動作する。
+- ステークホルダーが手動DBアクセスや安全でない回避策なしに対象ワークフローを実行できる。
 
-## Safety and escalation
+## 安全性とエスカレーション
 
-- If an operation could cause **irreversible data loss or external customer impact**, require higher-level approvals and consider additional controls (dual control, time-boxed access, or break-glass procedures).
-- If you discover that existing internal tools bypass critical controls, document this clearly and escalate through the appropriate risk or security channel.
+- 操作が**不可逆的なデータ損失または外部顧客への影響**を引き起こす可能性がある場合は、より高いレベルの承認を必須にし、追加制御（二重承認、時間制限付きアクセス、緊急手順など）を検討する。
+- 既存の内部ツールが重要な制御を迂回していることを発見した場合は、明確に文書化し、適切なリスクまたはセキュリティチャネルへエスカレーションする。
 ```

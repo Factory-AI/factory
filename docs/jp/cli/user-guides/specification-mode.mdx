@@ -1,44 +1,41 @@
 ---
 title: "仕様モード"
-description: Turn plain-English specifications into production-ready code with automatic planning and review.
+description: 平易な仕様を、自動計画とレビューで本番対応コードに変換する。
 keywords: ['spec mode', 'specification', 'planning', 'plan', 'spec', 'feature planning', 'implementation plan', 'automatic planning']
 ---
 
 Specification Modeは、シンプルな機能説明を自動計画と安全性チェックを備えた動作するコードに変換します。実現したい内容の簡単な説明を提供すると、droidが変更を加える前に詳細な仕様と実装計画を作成します。
 
 <CardGroup cols={2}>
-  <Card title="Simple Input" icon="message">
-    Just 4-6 sentences describing what you want built
+  <Card title="シンプルな入力" icon="message">
+    作りたいものを4〜6文で説明するだけ
   </Card>
-  <Card title="Automatic Planning" icon="list-check">
-    Droid creates detailed specs and implementation plans
+  <Card title="自動計画" icon="list-check">
+    Droidが詳細な仕様と実装計画を作成します
   </Card>
-  <Card title="Safe Execution" icon="shield-check">
-    No code changes until you approve the complete plan
+  <Card title="安全な実行" icon="shield-check">
+    完全な計画を承認するまでコード変更は行われません
   </Card>
-  <Card title="Enterprise Ready" icon="building">
-    Built-in security, compliance, and team standards
+  <Card title="エンタープライズ対応" icon="building">
+    組み込みのセキュリティ、コンプライアンス、チーム標準
   </Card>
 </CardGroup>
 
 ## 仕組み
 
 <Steps>
-  <Step title="Describe your feature">
-    Provide a simple description in 4-6 sentences. No need to write formal
-    specifications.
+  <Step title="機能を説明">
+    4〜6文で簡単な説明を提供します。正式な仕様を書く必要はありません。
   </Step>
-  <Step title="Droid creates the spec">
-    Droid analyzes your request and generates a complete specification with
-    acceptance criteria, implementation plan, and technical details. You can optionally use [mixed models](/cli/configuration/mixed-models) to configure a different model for planning.
+  <Step title="Droidが仕様を作成">
+    Droidがリクエストを分析し、完全な仕様を生成します。
+    受け入れ基準、実装計画、技術詳細を含みます。必要に応じて[混合モデル](/jp/cli/configuration/mixed-models)を使い、計画用に別のモデルを設定できます。
   </Step>
-  <Step title="Review and approve">
-    You review the generated specification and implementation plan. Request
-    changes or approve as-is.
+  <Step title="確認して承認">
+    生成された仕様と実装計画を確認します。必要に応じて修正を依頼するか、そのまま承認できます。
   </Step>
-  <Step title="Implementation">
-    Only after approval does droid begin making actual code changes, showing
-    each modification for review.
+  <Step title="実装">
+    承認後にのみdroidが実際のコード変更を開始し、各変更をレビュー用に表示します。
   </Step>
 </Steps>
 
@@ -64,8 +61,8 @@ The export should work for accounts up to 2GB of data.
 **承認後、droidが実装**各変更をレビュー用に表示しながら完全なソリューションを実装します。
 
 <Note>
-  Specification Mode must be manually activated using **Shift+Tab** in the CLI.
-  It does not automatically activate.
+  仕様モードはCLIで**Shift+Tab**を使って手動で有効化する必要があります。
+  自動では有効化されません。
 </Note>
 
 ## Specification Modeの有効化方法
@@ -145,26 +142,23 @@ FactoryのダッシュボードからプラットフォームをSCIM統合して
 ## メリット
 
 <CardGroup cols={2}>
-  <Card title="Safety First" icon="shield-check">
-    No accidental changes during exploration. See the complete plan before any
-    modifications.
+  <Card title="安全第一" icon="shield-check">
+    調査中に意図しない変更は行われません。コード変更前に完全な計画を確認できます。
   </Card>
-  <Card title="Thorough Planning" icon="brain">
-    Comprehensive analysis leads to better architecture decisions and fewer
-    surprises.
+  <Card title="徹底した計画" icon="brain">
+    包括的な分析により、より良いアーキテクチャ判断ができ、予期しない問題を減らせます。
   </Card>
-  <Card title="Full Control" icon="eye">
-    Complete visibility into what will be done before any code changes happen.
+  <Card title="完全な制御" icon="eye">
+    コード変更が行われる前に、何が実行されるかを完全に把握できます。
   </Card>
-  <Card title="Better Outcomes" icon="trophy">
-    Well-planned implementations are more likely to be correct, complete, and
-    maintainable.
+  <Card title="より良い成果" icon="trophy">
+    十分に計画された実装は、正確で完全かつ保守しやすくなる可能性が高まります。
   </Card>
 </CardGroup>
 
 ## AGENTS.md統合
 
-Specification Modeの計画を強化するため、プロジェクトの規約を文書化してください。詳細については[AGENTS.md](/cli/configuration/agents-md)を参照してください。
+Specification Modeの計画を強化するため、プロジェクトの規約を文書化してください。詳細については[AGENTS.md](/jp/cli/configuration/agents-md)を参照してください。
 
 Specification Modeはこれらの規約を自動的に組み込み、チームの基準との一貫性を保証します。
 

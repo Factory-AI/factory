@@ -1,0 +1,55 @@
+import { BarChart } from '/snippets/leaderboards/bar-chart.jsx'
+
+export const legacyBenchData = [
+  { name: "Factory Droid (GPT-5.3 Codex)", accuracy: 42.5 },
+  { name: "Factory Droid (GPT-5.4)", accuracy: 40.7 },
+  { name: "Codex CLI (GPT-5.4)", accuracy: 40.1 },
+  { name: "Codex CLI (GPT-5.3 Codex)", accuracy: 39.4 },
+  { name: "Factory Droid (Gemini 3.1 Pro)", accuracy: 38.7 },
+  { name: "Gemini CLI (Gemini 3.1 Pro)", accuracy: 36.0 },
+  { name: "Factory Droid (Claude Opus 4.6)", accuracy: 34.6 },
+  { name: "Claude Code (Claude Opus 4.6)", accuracy: 33.0 },
+  { name: "Factory Droid (GLM-5)", accuracy: 32.2 },
+  { name: "Cursor (Composer 2)", accuracy: 31.0 },
+  { name: "Factory Droid (Gemini 3 Flash)", accuracy: 27.2 },
+  { name: "Factory Droid (Kimi K2.5)", accuracy: 16.9 },
+]
+
+[Factory](https://www.factory.ai/news/legacy-bench) のベンチマークは、COBOL、Java 7、BASIC、C89、Fortran、AssemblyにまたがるレガシーエンジニアリングタスクでAIエージェントの性能を測定します。
+
+### 結果 — 全体合格率
+
+<BarChart data={legacyBenchData} valueKey="accuracy" valueLabel="%" maxValue={100} />
+
+*最終更新: 2026年4月*
+
+### 手法
+
+| 段階 | 説明 |
+|-------|-------------|
+| **タスクセット** | 6つのレガシー言語ファミリーにまたがる数百件のタスクと、10件の代表的な公開サンプル |
+| **タスク形式** | 自然言語の指示、コンテナ化されたソース環境、参照解、非公開の検証テスト |
+| **タスク種別** | バグ修正、実装、移行、その他のレガシーエンジニアリング作業 |
+| **評価** | エージェントが仕様を理解し、動作するコードを生成し、検証を通過する必要があるHarbor互換タスク |
+| **採点** | 12のモデル/エージェント組み合わせについて、非公開テストの合格率で採点 |
+
+### ベンチマーク構成
+
+| 言語 | 割合 | 例のドメイン |
+|----------|-------|-----------------|
+| **COBOL** | 46% | 金融決済、給与処理、保険請求、通信課金、VSAMファイル処理 |
+| **Java 7** | 32% | エンタープライズミドルウェア、CDR処理、倉庫物流、バイナリ解析、EJBパターン |
+| **BASIC** | 6% | ビジネスアプリケーション、会計、データ処理 |
+| **C89** | 5% | システムプログラミング、低レベルデバッグ、プロトコル実装 |
+| **Fortran** | 5% | 科学技術計算、数値手法、物理シミュレーション |
+| **Assembly** | 5% | x86ファームウェア解析、プロトコルデコード、ハードウェアシミュレーション |
+
+エージェントはJava 7のバグ修正で最も高いスコアを出します。コンパイラとランタイムのフィードバックがエラーを明らかにするためです。COBOLは依然として最も難しく、どのモデルも解けなかった44件のタスクのうち31件がCOBOLでした。
+
+<Card title="Legacy-Bench" icon="server" href="https://github.com/factory-ai/legacy-bench">
+  GitHubでサンプルタスクと評価ハーネスを表示する
+</Card>
+
+<Card title="解説記事を読む" icon="newspaper" href="https://www.factory.ai/news/legacy-bench">
+  Legacy-Bench: AIエージェントは世界で最も重要なソフトウェアを保守できるのか？
+</Card>

@@ -1,6 +1,6 @@
 ---
 title: "コード検証フック"
-description: "Enforce code standards, security policies, and best practices automatically"
+description: "コード標準、セキュリティポリシー、ベストプラクティスを自動適用する"
 keywords: ['validation', 'security', 'standards', 'lint', 'code quality', 'policies', 'hook']
 ---
 
@@ -141,11 +141,11 @@ fi
 # For Write operations, validate the content directly
 if [ "$tool_name" = "Write" ]; then
   content=$(echo "$input" | jq -r '.tool_input.content')
-  
+
   # Write to temp file for validation
   temp_file=$(mktemp --suffix=.ts)
   echo "$content" > "$temp_file"
-  
+
   # Run TypeScript compiler on temp file
   if ! npx tsc --noEmit "$temp_file" 2>&1; then
     rm "$temp_file"
@@ -153,7 +153,7 @@ if [ "$tool_name" = "Write" ]; then
     echo "The code contains type errors. Please fix them before proceeding." >&2
     exit 2
   fi
-  
+
   rm "$temp_file"
 fi
 
@@ -319,7 +319,7 @@ case "$file_path" in
       fi
     fi
     ;;
-    
+
   *requirements.txt)
     if command -v pip-audit &> /dev/null; then
       if ! pip-audit -r "$file_path" 2>&1; then
@@ -328,7 +328,7 @@ case "$file_path" in
       fi
     fi
     ;;
-    
+
   *Cargo.toml)
     if command -v cargo-audit &> /dev/null; then
       if ! cargo audit 2>&1; then
@@ -399,7 +399,7 @@ case "$file_path" in
       echo "✓ ESLint passed for $file_path"
     fi
     ;;
-    
+
   *.py)
     if command -v flake8 &> /dev/null; then
       if ! flake8 "$file_path" 2>&1; then
@@ -410,7 +410,7 @@ case "$file_path" in
       echo "✓ Flake8 passed for $file_path"
     fi
     ;;
-    
+
   *.go)
     if command -v golint &> /dev/null; then
       if ! golint "$file_path" 2>&1; then
@@ -420,7 +420,7 @@ case "$file_path" in
       fi
     fi
     ;;
-    
+
   *.rs)
     if command -v clippy &> /dev/null; then
       if ! cargo clippy -- -D warnings 2>&1; then
@@ -485,7 +485,7 @@ def check_python_complexity(file_path):
             text=True,
             timeout=10
         )
-        
+
         if result.returncode == 0 and result.stdout:
             print(f"❌ Code complexity too high in {file_path}", file=sys.stderr)
             print(result.stdout, file=sys.stderr)
@@ -494,49 +494,49 @@ def check_python_complexity(file_path):
             print("- Reducing nesting levels", file=sys.stderr)
             print("- Extracting helper functions", file=sys.stderr)
             return False
-            
+
     except (subprocess.SubprocessError, FileNotFoundError):
         pass
-    
+
     return True
 
 def check_js_complexity(file_path):
     """Basic complexity check for JavaScript/TypeScript."""
     with open(file_path, 'r') as f:
         content = f.read()
-    
+
     # Count nesting level (very basic check)
     max_nesting = 0
     current_nesting = 0
-    
+
     for char in content:
         if char == '{':
             current_nesting += 1
             max_nesting = max(max_nesting, current_nesting)
         elif char == '}':
             current_nesting -= 1
-    
+
     if max_nesting > 5:
         print(f"⚠️ High nesting level ({max_nesting}) in {file_path}", file=sys.stderr)
         print("Consider refactoring to reduce nesting.", file=sys.stderr)
         # Warning only, don't block
-    
+
     return True
 
 try:
     input_data = json.load(sys.stdin)
     file_path = input_data.get('tool_input', {}).get('file_path', '')
-    
+
     if not file_path:
         sys.exit(0)
-    
+
     if file_path.endswith('.py'):
         if not check_python_complexity(file_path):
             sys.exit(2)
     elif file_path.endswith(('.js', '.jsx', '.ts', '.tsx')):
         if not check_js_complexity(file_path):
             sys.exit(2)
-    
+
 except Exception as e:
     print(f"Error checking complexity: {e}", file=sys.stderr)
     sys.exit(0)  # Don't block on errors
@@ -662,13 +662,13 @@ ARCHITECTURE_RULES = {
         'forbidden_imports': [r'src/backend/', r'../backend/'],
         'message': 'Frontend code cannot import from backend'
     },
-    
+
     # Domain layer shouldn't import from infrastructure
     r'src/domain/.*\.ts$': {
         'forbidden_imports': [r'src/infrastructure/', r'express', r'axios'],
         'message': 'Domain layer must be framework-agnostic'
     },
-    
+
     # Tests shouldn't import from src
     r'tests/.*\.test\.ts$': {
         'forbidden_imports': [r'src/(?!test-utils)'],
@@ -683,10 +683,10 @@ def check_imports(file_path, content):
             # Extract all imports from the file
             import_pattern = r'from [\'"](.+?)[\'"]|import .+ from [\'"](.+?)[\'"]'
             imports = re.findall(import_pattern, content)
-            
+
             for imp in imports:
                 import_path = imp[0] or imp[1]
-                
+
                 # Check against forbidden patterns
                 for forbidden in rule['forbidden_imports']:
                     if re.search(forbidden, import_path):
@@ -694,20 +694,20 @@ def check_imports(file_path, content):
                         print(f"   {rule['message']}", file=sys.stderr)
                         print(f"   Forbidden import: {import_path}", file=sys.stderr)
                         return False
-    
+
     return True
 
 try:
     input_data = json.load(sys.stdin)
     file_path = input_data.get('tool_input', {}).get('file_path', '')
     content = input_data.get('tool_input', {}).get('content', '')
-    
+
     if not file_path or not content:
         sys.exit(0)
-    
+
     if not check_imports(file_path, content):
         sys.exit(2)
-    
+
 except Exception as e:
     print(f"Error: {e}", file=sys.stderr)
     sys.exit(0)
@@ -741,8 +741,8 @@ chmod +x .factory/hooks/check-architecture.py
 ## ベストプラクティス
 
 <Steps>
-  <Step title="Provide clear feedback">
-    When blocking operations, explain what's wrong and how to fix it:
+  <Step title="明確なフィードバックを提供する">
+    操作をブロックするときは、何が問題でどう修正するかを説明します:
     ```bash
     echo "❌ Problem: TypeScript errors found" >&2
     echo "Solution: Fix the type errors shown above" >&2
@@ -750,22 +750,22 @@ chmod +x .factory/hooks/check-architecture.py
     exit 2
     ```
   </Step>
-  
-  <Step title="Use warnings vs. errors appropriately">
-    Not everything needs to block Droid:
+
+  <Step title="警告とエラーを適切に使い分ける">
+    すべてがDroidをブロックする必要はありません:
     ```bash
     # Warning (exit 0) - inform but don't block
     echo "⚠️ Code complexity is high, consider refactoring" >&2
     exit 0
-    
+
     # Error (exit 2) - block the operation
     echo "❌ Secret detected, cannot proceed" >&2
     exit 2
     ```
   </Step>
-  
-  <Step title="Performance matters">
-    Keep validation fast:
+
+  <Step title="パフォーマンスを重視する">
+    検証を高速に保ちます:
     ```bash
     # Use grep for quick checks before expensive operations
     if grep -q "password" "$file"; then
@@ -774,18 +774,18 @@ chmod +x .factory/hooks/check-architecture.py
     fi
     ```
   </Step>
-  
-  <Step title="Make rules configurable">
-    Allow teams to customize validation:
+
+  <Step title="ルールを設定可能にする">
+    チームが検証をカスタマイズできるようにします:
     ```bash
     # Read config from project settings
     MAX_COMPLEXITY="${DROID_MAX_COMPLEXITY:-10}"
     ENFORCE_TESTS="${DROID_ENFORCE_TESTS:-false}"
     ```
   </Step>
-  
-  <Step title="Test your validators">
-    Create test files that should pass and fail:
+
+  <Step title="バリデーターをテスト">
+    成功すべきテストファイルと失敗すべきテストファイルを作成します:
     ```bash
     # Create test cases
     echo '{"tool_input":{"file_path":"test.ts","content":"..."}}' | \
@@ -847,7 +847,7 @@ npm run lint "$file_path"
 
 ## 関連項目
 
-- [Hooks reference](/reference/hooks-reference) - 完全なフックAPIドキュメント
-- [Get started with hooks](/cli/configuration/hooks-guide) - 基本的なフックの紹介
-- [Auto-formatting](/guides/hooks/auto-formatting) - 自動コードフォーマット
-- [Git workflow hooks](/guides/hooks/git-workflows) - Git統合
+- [フックリファレンス](/jp/reference/hooks-reference) - 完全なフックAPIドキュメント
+- [Get started with hooks](/jp/cli/configuration/hooks-guide) - 基本的なフックの紹介
+- [Auto-formatting](/jp/guides/hooks/auto-formatting) - 自動コードフォーマット
+- [Git workflow hooks](/jp/guides/hooks/git-workflows) - Git統合

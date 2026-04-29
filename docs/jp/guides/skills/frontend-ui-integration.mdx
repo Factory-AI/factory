@@ -1,6 +1,6 @@
 ---
 title: "フロントエンドUI連携"
-description: A reusable skill for implementing typed, tested frontend workflows against existing backend APIs in enterprise codebases.
+description: エンタープライズコードベースで既存バックエンドAPIに対して型付き・テスト済みのフロントエンドワークフローを実装する再利用可能なスキル。
 keywords: ['frontend', 'ui', 'react', 'typescript', 'nextjs', 'skill', 'integration', 'components']
 ---
 
@@ -13,9 +13,9 @@ keywords: ['frontend', 'ui', 'react', 'typescript', 'nextjs', 'skill', 'integrat
 ```
 .factory/skills/frontend-ui-integration/
 ├── SKILL.md
-├── references.md (optional)
-├── design-system.md (optional)
-└── accessibility-checklist.md (optional)
+├── references.md (任意)
+├── design-system.md (任意)
+└── accessibility-checklist.md (任意)
 ```
 
 ### クイックスタート
@@ -28,7 +28,7 @@ keywords: ['frontend', 'ui', 'react', 'typescript', 'nextjs', 'skill', 'integrat
 2. **以下のスキルコンテンツを`.factory/skills/frontend-ui-integration/SKILL.md`（または`skill.mdx`）にコピー**
 
 <Tip>
-When you ask Factory to implement a UI feature, it will automatically invoke this skill based on the task description.
+FactoryにUI機能の実装を依頼すると、タスク説明に基づいてこのスキルが自動的に呼び出されます。
 </Tip>
 
 ## スキル定義
@@ -38,79 +38,79 @@ When you ask Factory to implement a UI feature, it will automatically invoke thi
 ```md
 ---
 name: frontend-ui-integration
-description: Implement or extend a user-facing workflow in a web application, integrating with existing backend APIs. Use when the feature is primarily a UI/UX change backed by existing APIs, affects only the web frontend, and requires following design system, routing, and testing conventions.
+description: 既存のバックエンドAPIと連携して、Webアプリケーションのユーザー向けワークフローを実装または拡張します。機能が主に既存APIに支えられたUI/UX変更で、Webフロントエンドのみに影響し、デザインシステム、ルーティング、テスト規約に従う必要がある場合に使用します。
 ---
-# Frontend UI Integration
+# スキル: フロントエンドUI連携
 
-## Purpose
+## 目的
 
-Implement or extend a user-facing workflow in our primary web application, integrating with **existing backend APIs** and following our **design system, routing, and testing conventions**.
+主要なWebアプリケーションでユーザー向けワークフローを実装または拡張し、**既存のバックエンドAPI**と連携しながら、**デザインシステム、ルーティング、テスト規約**に従います。
 
-## When to use this skill
+## このスキルを使うタイミング
 
-- The feature is primarily a **UI/UX change** backed by one or more existing APIs.
-- The backend contracts, auth model, and core business rules **already exist**.
-- The change affects **only** the web frontend (no schema or service ownership changes).
+- 機能が主に、1つ以上の既存APIに支えられた**UI/UX変更**である。
+- バックエンド契約、認証モデル、中核ビジネスルールが**すでに存在**する。
+- 変更がWebフロントエンド**のみ**に影響する（スキーマやサービス所有権の変更なし）。
 
-## Inputs
+## 入力
 
-- **Feature description**: short narrative of the user flow and outcomes.
-- **Relevant APIs**: endpoints, request/response types, and links to source definitions.
-- **Target routes/components**: paths, component names, or feature modules.
-- **Design references**: Figma links or existing screens to mirror.
-- **Guardrails**: performance limits, accessibility requirements, and any security constraints.
+- **機能説明**: ユーザーフローと結果を短く説明する。
+- **関連API**: エンドポイント、リクエスト/レスポンス型、ソース定義へのリンク。
+- **対象ルート/コンポーネント**: パス、コンポーネント名、機能モジュール。
+- **デザイン参照**: Figmaリンク、または合わせるべき既存画面。
+- **ガードレール**: パフォーマンス上限、アクセシビリティ要件、セキュリティ制約。
 
-## Out of scope
+## 対象外
 
-- Creating new backend services or changing persistent data models.
-- Modifying authentication/authorization flows.
-- Introducing new frontend frameworks or design systems.
+- 新しいバックエンドサービスの作成、または永続データモデルの変更。
+- 認証/認可フローの変更。
+- 新しいフロントエンドフレームワークまたはデザインシステムの導入。
 
-## Conventions
+## 規約
 
-- **Framework**: React with TypeScript.
-- **Routing**: use the existing router and route layout patterns.
-- **Styling**: use the in-house design system components (Buttons, Inputs, Modals, Toasts, etc.).
-- **State management**: prefer the existing state libraries (e.g., React Query, Redux, Zustand) and follow established patterns.
+- **フレームワーク**: React with TypeScript。
+- **ルーティング**: 既存のルーターとルートレイアウトパターンを使用する。
+- **スタイリング**: 社内デザインシステムコンポーネント（Buttons、Inputs、Modals、Toastsなど）を使用する。
+- **状態管理**: 既存の状態管理ライブラリ（例: React Query、Redux、Zustand）を優先し、確立されたパターンに従う。
 
-## Required behavior
+## 必須の動作
 
-1. Implement the UI changes with **strong typing** for all props and API responses.
-2. Handle loading, empty, error, and success states using existing primitives.
-3. Ensure the UI is **keyboard accessible** and screen-reader friendly.
-4. Respect feature flags and rollout mechanisms where applicable.
+1. すべてのpropsとAPIレスポンスに**強い型付け**を適用してUI変更を実装する。
+2. 既存のプリミティブを使って、読み込み、空、エラー、成功の状態を処理する。
+3. UIが**キーボードアクセシブル**でスクリーンリーダーに対応していることを確認する。
+4. 該当する場合は機能フラグとロールアウトメカニズムを尊重する。
 
-## Required artifacts
+## 必須の成果物
 
-- Updated components and hooks in the appropriate feature module.
-- **Unit tests** for core presentation logic.
-- **Integration or component tests** for the new flow (e.g., React Testing Library, Cypress, Playwright) where the repo already uses them.
-- Minimal **CHANGELOG or PR description text** summarizing the behavior change (to be placed in the PR, not this file).
+- 適切な機能モジュール内の更新済みコンポーネントとフック。
+- 中核的な表示ロジックの**単体テスト**。
+- リポジトリで使用されている場合、新しいフローの**統合テストまたはコンポーネントテスト**（例: React Testing Library、Cypress、Playwright）。
+- 動作変更を要約する最小限の**CHANGELOGまたはPR説明文**（このファイルではなくPRに記載）。
 
-## Implementation checklist
+## 実装チェックリスト
 
-1. Locate the relevant feature module and existing components.
-2. Confirm the backend APIs and types, updating shared TypeScript types if needed.
-3. Implement the UI, wiring in API calls via the existing data layer.
-4. Add or update tests to cover the new behavior and edge cases.
-5. Run the required validation commands (see below).
+1. 関連する機能モジュールと既存コンポーネントを見つける。
+2. バックエンドAPIと型を確認し、必要に応じて共有TypeScript型を更新する。
+3. 既存のデータレイヤー経由でAPI呼び出しを接続し、UIを実装する。
+4. 新しい動作とエッジケースをカバーするテストを追加または更新する。
+5. 必要な検証コマンドを実行する（下記参照）。
 
-## Verification
+## 検証
 
-Run the following (adjust commands to match the project):
+以下を実行します（プロジェクトに合わせてコマンドを調整）:
 
 - `pnpm lint`
 - `pnpm test -- --runInBand --watch=false`
-- `pnpm typecheck` (if configured separately)
+- `pnpm typecheck`（個別に設定されている場合）
 
-The skill is complete when:
+以下を満たしたらスキルは完了です:
 
-- All tests, linters, and type checks pass.
-- The new UI behaves as specified across normal, error, and boundary cases.
-- No unrelated files or modules are modified.
+- すべてのテスト、リンター、型チェックが成功する。
+- 新しいUIが通常、エラー、境界ケースで仕様通りに動作する。
+- 無関係なファイルやモジュールが変更されていない。
 
-## Safety and escalation
+## 安全性とエスカレーション
 
-- If the requested change requires backend contract changes, **stop** and request a backend-focused task instead.
-- If design references conflict with existing accessibility standards, favor accessibility and highlight the discrepancy in the PR description.
+- 要求された変更にバックエンド契約変更が必要な場合は**停止**し、バックエンド向けタスクを依頼する。
+- デザイン参照が既存のアクセシビリティ標準と矛盾する場合は、アクセシビリティを優先し、PR説明で差異を強調する。
 ```
