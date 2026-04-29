@@ -293,8 +293,8 @@ jobs:
               --base main \
               --head "$BRANCH" \
               --state closed \
-              --json number,isCrossRepository,headRepositoryOwner,isMerged \
-              --jq ".[] | select((.isCrossRepository | not) and .headRepositoryOwner.login == \"$REPO_OWNER\" and (.isMerged | not)) | .number" \
+              --json number,isCrossRepository,headRepositoryOwner,mergedAt \
+              --jq ".[] | select((.isCrossRepository | not) and .headRepositoryOwner.login == \"$REPO_OWNER\" and (.mergedAt == null)) | .number" \
               | head -n 1
           }
 
