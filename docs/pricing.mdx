@@ -10,7 +10,7 @@ Factory plans use rolling rate limits across three windows: 5-hour, weekly, and 
 
 When you hit a Standard Usage limit, you have two options:
 
-- **Droid Core** -- a selection of leading open-weight models with a separate rate limit pool. Free, no additional cost.
+- **Droid Core** -- a selection of leading open-weight models with a separate token rate limit pool. Free, no additional cost.
 - **Extra Usage** -- prepaid credits that let you keep using any model. Pay-as-you-go, $10 minimum.
 
 Standard Usage is always consumed first. You can monitor your usage in **Settings > Usage** or with the `/limits` command in Droid.
@@ -136,7 +136,7 @@ Missions draw from the same rolling rate limits as regular sessions. Running Mis
 ### General
 
 **What counts toward each limit?**
-Every input and output token Droid uses against a billable model, totaled across your org. Cached reads count at the cached rate.
+Every input and output token Droid uses, along with compute usage for Droid Computers.
 
 **Do the three limits run independently?**
 Yes. Hitting the 5-hour cap doesn't eat into weekly or monthly any faster, and vice versa. You need headroom in all three to send a request.
