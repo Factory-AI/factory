@@ -10,7 +10,6 @@ Droid to choose to run them.
 
 <Tip>
   For reference documentation on hooks, see [Hooks reference](/reference/hooks-reference).
-  Explore the [hook cookbooks](/guides/hooks/auto-formatting).
 </Tip>
 
 Example use cases for hooks include:
@@ -85,6 +84,7 @@ Type `Execute` for the matcher.
 
 <Note>You can use `*` to match all tools.</Note>
 
+
 ### Step 3: Add the hook
 
 Select `+ Add new hook…` and enter this command:
@@ -148,7 +148,7 @@ Automatically format TypeScript files after editing:
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -170,7 +170,7 @@ Automatically fix missing language tags and formatting issues in markdown files:
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
@@ -315,7 +315,7 @@ Block edits to sensitive files:
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Edit|Create",
+        "matcher": "Create|Edit|ApplyPatch",
         "hooks": [
           {
             "type": "command",
