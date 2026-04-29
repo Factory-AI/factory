@@ -6,7 +6,7 @@ keywords: ['pricing', 'plans', 'models', 'model id', 'limits', 'pro', 'pro plus'
 
 ## Pricing Structure
 
-Factory plans use **rolling rate limits** across three windows: **5-hour**, **weekly**, and **monthly**. Your plan's Standard Usage gives you access to all models and is consumed first. Growth and Enterprise plans are not affected by rate limit changes.
+Factory plans use **rolling rate limits** across three windows: **5-hour**, **weekly**, and **monthly**. Your plan's Standard Usage gives you access to all models and is consumed first. Business and Enterprise plans are not affected by rate limit changes.
 
 When you hit a Standard Usage limit, you have two options:
 
@@ -41,7 +41,7 @@ Everything in Pro Plus, plus:
 - **Early access** to new features
 - **Team collaboration** -- 5-seat cap ($5 per additional seat)
 
-### Growth
+### Business
 
 For growing teams that need tailored plans.
 
@@ -49,7 +49,7 @@ For growing teams that need tailored plans.
 - Dedicated onboarding and support
 - Advanced repository permissions
 
-Growth plans are not affected by rate limit changes. [Contact Sales](https://factory.ai/contact) for Growth pricing.
+Business plans are not affected by rate limit changes. [Contact Sales](https://factory.ai/contact) for Business pricing.
 
 ### Enterprise
 
@@ -123,7 +123,7 @@ Yes. Hitting the 5-hour cap doesn't eat into weekly or monthly any faster, and v
 All three are rolling: 5-hour, 7-day, and 30-day. Each starts ticking when you first use Droid and resets after the window elapses.
 
 **Do unused tokens roll over?**
-No, they do not roll over month to month.
+No, similar to the previous plan Standard Usage does not rollover month to month. Extra Usage that you purchase does roll over.
 
 ### Droid Core
 
@@ -134,7 +134,7 @@ A set of models Factory has designated as Core -- typically smaller, cheaper mod
 No. Same Standard Usage billing, just restricted to the Core model pool so you can keep working after you've hit premium-model limits.
 
 **If I use Droid Core, does it count against my Standard Usage?**
-Yes, if you have Standard Usage remaining. Standard Usage is consumed first. If you have used up your Standard Usage, then you have a separate set of rate limits for Droid Core.
+Yes, if you have Standard Usage remaining. Standard Usage is consumed first. If you have used up your Standard Usage, then you have a separate set of token rate limits for Droid Core.
 
 ### Extra Usage
 
@@ -151,20 +151,20 @@ No. Credits persist until you use them.
 No. The toggle is sticky. Enable it once and it stays on until you turn it off or run out of credits.
 
 **Which is consumed first, Standard or Extra Usage?**
-Standard, always. Extra Usage is never touched while you have Standard Usage available.
+Standard, always. After that it depends on which fallback you picked in settings. Extra Usage is never touched while you have Standard Usage available.
 
-### Rate Limits
+### Token Rate Limits
 
 **What happens mid-session when I hit a limit?**
-The current request finishes, then subsequent requests get refused with a rate-limit error in the CLI or Web UI. Run `/limits` to toggle Droid Core or Extra Usage and retry immediately. No need to reopen the session.
+The current request finishes, then subsequent requests get refused with a token rate-limit error in the CLI or Web UI. Run `/limits` to toggle Droid Core or Extra Usage and retry immediately. No need to reopen the session.
 
 **Does a long-running autonomous agent get throttled?**
-Yes. It pauses and surfaces the same limit error. This is intentional. Rate limits prevent a runaway agent from burning a month of quota in an afternoon.
+Yes. It pauses and surfaces the same limit error. This is intentional. Token rate limits prevent a runaway agent from burning a month of quota in an afternoon.
 
 ### Other
 
 **Is the limit per-user or per-organization?**
 Per-org, shared across members. Plans scale with seat count to account for team usage.
 
-**What if I'm on Growth or Enterprise?**
-Growth and Enterprise plans are not affected by this change.
+**What if I'm on Business or Enterprise?**
+Business and Enterprise plans are not affected by this change.
