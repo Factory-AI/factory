@@ -1,195 +1,212 @@
 /* Fix for welcome page paragraph FOUC */
 .text-primary-light[style*="color: #ffffff"] {
-    color: #ffffff !important;
-    max-width: 42rem !important;
-    margin-top: 1rem !important;
+  color: #ffffff !important;
+  max-width: 42rem !important;
+  margin-top: 1rem !important;
 }
 
 .hero {
-    background-color: #FF0000;
-    /* Red background */
-    width: 100%;
-    padding: 60px 0;
-    color: white;
-    text-align: center;
+  background-color: #ff0000;
+  /* Red background */
+  width: 100%;
+  padding: 60px 0;
+  color: white;
+  text-align: center;
 }
 
 .hero-content {
-    max-width: 800px;
-    margin: 0 auto;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .hero h1 {
-    font-size: 48px;
-    margin-bottom: 20px;
+  font-size: 48px;
+  margin-bottom: 20px;
 }
 
 .hero p {
-    font-size: 24px;
-    margin-bottom: 30px;
+  font-size: 24px;
+  margin-bottom: 30px;
 }
 
 .hero-image {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 30px;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 30px;
 }
 
 .cta-button {
-    display: inline-block;
-    padding: 12px 24px;
-    background-color: white;
-    color: #FF0000;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: white;
+  color: #ff0000;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
 .cta-button:hover {
-    background-color: #FFCCCC;
+  background-color: #ffcccc;
 }
 
 /* Restore wider content layout for the current Mintlify Willow theme */
 @media (min-width: 1024px) {
-    #content-area {
-        max-width: none !important;
-        width: 100% !important;
-    }
+  #content-area {
+    max-width: none !important;
+    width: 100% !important;
+  }
 
-    #content-area > div:first-child {
-        max-width: none !important;
-        width: 100% !important;
-        background: transparent !important;
-    }
+  #content-area > div:first-child {
+    max-width: none !important;
+    width: 100% !important;
+    background: transparent !important;
+  }
 
-    #content-area > div:first-child > div:first-child {
-        max-width: min(1200px, calc(100vw - 23rem - 19rem)) !important;
-        width: 100% !important;
-    }
+  #content-area > div:first-child > div:first-child {
+    max-width: min(1200px, calc(100vw - 23rem - 19rem)) !important;
+    width: 100% !important;
+  }
 }
 
 /* Restore a flat page background */
 #background-color {
-    background: rgb(var(--background-light)) !important;
+  background: rgb(var(--background-light)) !important;
 }
 
 .dark #background-color {
-    background: rgb(var(--background-dark)) !important;
+  background: rgb(var(--background-dark)) !important;
+}
+
+/* Slightly enlarge and vertically center the Factory logo in the upper-left */
+#sidebar a.select-none {
+  display: inline-flex;
+  align-items: center;
+}
+
+#sidebar .nav-logo {
+  height: 1.75rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* Use SF Mono for sidebar titles */
 #sidebar-title {
-    font-family: "SF Mono", monospace !important;
+  font-family: "SF Mono", monospace !important;
 }
 
 /* Unfocused sidebar navigation link color - soft gray */
 a.text-gray-700:not(.text-primary),
 button.text-gray-700.border-l:not(.text-primary) {
-    color: #999999 !important;
+  color: #999999 !important;
 }
 
 a.text-gray-700:not(.text-primary):hover,
 button.text-gray-700.border-l:not(.text-primary):hover,
 a.text-gray-700.hover\:text-gray-900:not(.text-primary):hover,
 button.text-gray-700.hover\:text-gray-900.border-l:not(.text-primary):hover {
-    color: #333333 !important;
-    border-left-color: #333333 !important;
+  color: #333333 !important;
+  border-left-color: #333333 !important;
 }
 
 .dark a.dark\:text-gray-400:not(.text-primary),
 .dark button.dark\:text-gray-400.border-l:not(.text-primary),
 a.text-gray-700.dark\:text-gray-400:not(.text-primary),
 button.text-gray-700.dark\:text-gray-400.border-l:not(.text-primary) {
-    color: #888888 !important;
+  color: #888888 !important;
 }
 
 .dark a.dark\:text-gray-400:not(.text-primary):hover,
 .dark button.dark\:text-gray-400.border-l:not(.text-primary):hover,
 .dark a.dark\:hover\:text-gray-300:not(.text-primary):hover,
 .dark button.dark\:hover\:text-gray-300.border-l:not(.text-primary):hover {
-    color: #CCCCCC !important;
-    border-left-color: #CCCCCC !important;
+  color: #cccccc !important;
+  border-left-color: #cccccc !important;
 }
 
 /* Prose font size and color */
 .prose {
-    font-size: 15px !important;
-    color: #5c5855 !important;
+  font-size: 15px !important;
+  color: #5c5855 !important;
 }
 
 .dark .prose {
-    color: #d1d1d1 !important;
+  color: #d1d1d1 !important;
 }
 
 /* Headers use Geist Mono */
-h1, h2, h3, h4, h5, h6 {
-    font-family: "Geist Mono", monospace !important;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Geist Mono", monospace !important;
 }
 
 /* Eyebrow section label in orange */
 .eyebrow {
-    color: #F27B2F !important;
+  color: #f27b2f !important;
 }
 
 /* All card icons in orange */
 .card .bg-primary,
 .card svg.bg-primary {
-    background-color: #F27B2F !important;
+  background-color: #f27b2f !important;
 }
 
 .dark .card .bg-primary,
 .dark .card .dark\:bg-primary-light,
 .dark .card svg.dark\:bg-primary-light {
-    background-color: #F27B2F !important;
+  background-color: #f27b2f !important;
 }
 
 /* Active sidebar navigation link color */
 a.text-primary.border-primary {
-    color: #F27B2F !important;
-    border-left-color: #F27B2F !important;
-    font-weight: 400 !important;
+  color: #f27b2f !important;
+  border-left-color: #f27b2f !important;
+  font-weight: 400 !important;
 }
 
 .dark a.text-primary.border-primary {
-    color: #F27B2F !important;
-    border-left-color: #F27B2F !important;
-    font-weight: 400 !important;
+  color: #f27b2f !important;
+  border-left-color: #f27b2f !important;
+  font-weight: 400 !important;
 }
 
 /* Table of contents default softer color */
 #table-of-contents-content a {
-    color: #999999 !important;
+  color: #999999 !important;
 }
 
 #table-of-contents-content a:hover {
-    color: #333333 !important;
+  color: #333333 !important;
 }
 
 .dark #table-of-contents-content a {
-    color: #888888 !important;
+  color: #888888 !important;
 }
 
 .dark #table-of-contents-content a:hover {
-    color: #f5f5f5 !important;
+  color: #f5f5f5 !important;
 }
 
 /* Maintain font-weight for TOC items across light/dark modes */
 .toc-item a.font-medium {
-    font-weight: 500 !important;
+  font-weight: 500 !important;
 }
 
 /* Active/focused table of contents link color */
 #table-of-contents-content a.text-primary,
 #table-of-contents-content a.border-primary {
-    color: #F27B2F !important;
-    border-color: #F27B2F !important;
+  color: #f27b2f !important;
+  border-color: #f27b2f !important;
 }
 
 .dark #table-of-contents-content a.text-primary,
 .dark #table-of-contents-content a.border-primary {
-    color: #F27B2F !important;
-    border-color: #F27B2F !important;
+  color: #f27b2f !important;
+  border-color: #f27b2f !important;
 }
 
 /* Hyperlinks in prose text content - orange underline in dark mode */
@@ -198,15 +215,15 @@ a.text-primary.border-primary {
 .dark .prose li a:not(.card a),
 .dark .prose td a:not(.card a),
 .dark .prose dd a:not(.card a) {
-    color: #F27B2F !important;
-    text-decoration: underline !important;
-    text-decoration-color: #F27B2F !important;
+  color: #f27b2f !important;
+  text-decoration: underline !important;
+  text-decoration-color: #f27b2f !important;
 }
 
 .dark .prose p a:not(.card a):hover,
 .dark .prose li a:not(.card a):hover,
 .dark .prose td a:not(.card a):hover,
 .dark .prose dd a:not(.card a):hover {
-    color: #FF9C6E !important;
-    text-decoration-color: #FF9C6E !important;
+  color: #ff9c6e !important;
+  text-decoration-color: #ff9c6e !important;
 }

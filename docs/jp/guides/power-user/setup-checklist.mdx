@@ -221,7 +221,7 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
 </Check>
 
 <Tip>
-  **Enforce rules automatically:** Use [PostToolUse hooks](/cli/configuration/hooks-guide) to run linters after edits. See [Code Validation hooks](/guides/hooks/code-validation) for examples.
+  **Enforce rules automatically:** Use [PostToolUse hooks](/jp/cli/configuration/hooks-guide) to run linters after edits. See [Hooks reference](/jp/reference/hooks-reference) for examples.
 </Tip>
 
 ---
@@ -279,7 +279,7 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
       "hooks": {
         "PostToolUse": [
           {
-            "matcher": "Edit|Create",
+            "matcher": "Create|Edit|ApplyPatch",
             "hooks": [
               {
                 "type": "command",
@@ -303,7 +303,7 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
       "hooks": {
         "PostToolUse": [
           {
-            "matcher": "Edit",
+            "matcher": "Edit|ApplyPatch",
             "hooks": [
               {
                 "type": "command",
@@ -364,15 +364,15 @@ keywords: ['power user', 'setup', 'checklist', 'configuration', 'optimization', 
 
 ## クイックリファレンス：ファイルの場所
 
-| 目的 | 個人用 | プロジェクト用 |
-|---------|----------|---------|
-| **スキル** | `~/.factory/skills/<name>/SKILL.md` | `.factory/skills/<name>/SKILL.md` |
-| **メモリ** | `~/.factory/memories.md` | `.factory/memories.md` |
-| **ルール** | `~/.factory/rules/*.md` | `.factory/rules/*.md` |
-| **設定** | `~/.factory/settings.json` | `.factory/settings.json` |
-| **フック** | settings.json内 | settings.json内 |
-| **エージェント指示** | `~/.factory/AGENTS.md` | `./AGENTS.md` |
-| **カスタムdroid** | `~/.factory/droids/<name>.md` | `.factory/droids/<name>.md` |
+| 目的            | 個人用                                 | プロジェクト用                           |
+| ------------- | ----------------------------------- | --------------------------------- |
+| **スキル**       | `~/.factory/skills/<name>/SKILL.md` | `.factory/skills/<name>/SKILL.md` |
+| **メモリ**       | `~/.factory/memories.md`            | `.factory/memories.md`            |
+| **ルール**       | `~/.factory/rules/*.md`             | `.factory/rules/*.md`             |
+| **設定**        | `~/.factory/settings.json`          | `.factory/settings.json`          |
+| **フック**       | settings.json内                      | settings.json内                    |
+| **エージェント指示**  | `~/.factory/AGENTS.md`              | `./AGENTS.md`                     |
+| **カスタムdroid** | `~/.factory/droids/<name>.md`       | `.factory/droids/<name>.md`       |
 
 ---
 

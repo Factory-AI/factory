@@ -1,7 +1,19 @@
 ---
-title: Automated QA skill
+title: Automated QA
+sidebarTitle: Automated QA
 description: Set up end-to-end automated quality assurance that tests your application as a real user would -- across web, CLI, and API surfaces -- with visual evidence, CI integration, and failure learning built in.
-keywords: ['qa', 'testing', 'automated testing', 'quality assurance', 'agent-browser', 'tuistory', 'CI', 'github actions', 'skill']
+keywords:
+  [
+    "qa",
+    "testing",
+    "automated testing",
+    "quality assurance",
+    "agent-browser",
+    "tuistory",
+    "CI",
+    "github actions",
+    "skill",
+  ]
 ---
 
 Automated testing of your changes is one of the most important things you can do before shipping code. Unit tests and linters catch syntax-level issues, but they can't tell you whether your login flow actually works, whether your CLI renders correctly after a refactor, or whether a new API endpoint returns the right data. The QA skill fills that gap: it tests your application the way a real user would and produces a structured report with visual evidence.
@@ -9,10 +21,12 @@ Automated testing of your changes is one of the most important things you can do
 Factory ships two built-in skills that work together:
 
 - **`/install-qa`** -- A one-time setup skill that analyzes your codebase, asks targeted questions, and generates a complete QA skill tailored to your project.
-- **`qa`** -- The generated skill that runs on every PR. It reads the git diff, identifies affected apps, and executes only the relevant test flows.
+- **`/qa`** -- The generated skill that runs on every PR. It reads the git diff, identifies affected apps, and executes only the relevant test flows.
 
 <Note>
-The install-qa process is thorough and interactive. It performs deep codebase analysis, runs a multi-phase questionnaire, and generates multiple files. Expect it to take some time and to prompt you with questions -- quality assurance is foundational, and we take the time to get it right.
+  The install-qa process is thorough and interactive. It performs deep codebase analysis, runs a multi-phase
+  questionnaire, and generates multiple files. Expect it to take some time and to prompt you with questions --
+  quality assurance is foundational, and we take the time to get it right.
 </Note>
 
 ## Quick start
@@ -127,18 +141,19 @@ If your project has a `.github/` directory, install-qa will offer to generate a 
 - Can be configured as a **required** or **optional** check
 
 <Warning>
-The generated workflow needs GitHub secrets for credentials referenced in `config.yaml`. The install-qa skill will list exactly which secrets to add.
+  The generated workflow needs GitHub secrets for credentials referenced in `config.yaml`. The install-qa
+  skill will list exactly which secrets to add.
 </Warning>
 
 ## Failure learning
 
 When QA encounters new failure patterns, it can feed that knowledge back:
 
-| Strategy | Behavior |
-| --- | --- |
-| **Suggest in report** (default) | Includes copy-paste snippets in the report for manual review. |
-| **Auto-commit** | Automatically commits updates to sub-skill files after each run. |
-| **Open a PR** | Opens a draft PR with failure catalog updates. |
+| Strategy                        | Behavior                                                         |
+| ------------------------------- | ---------------------------------------------------------------- |
+| **Suggest in report** (default) | Includes copy-paste snippets in the report for manual review.    |
+| **Auto-commit**                 | Automatically commits updates to sub-skill files after each run. |
+| **Open a PR**                   | Opens a draft PR with failure catalog updates.                   |
 
 ## Real-world examples
 
@@ -146,15 +161,15 @@ When QA encounters new failure patterns, it can feed that knowledge back:
 
 A PR updating help text and flag descriptions in a terminal markdown renderer. QA built the Go binary and tested it with tuistory:
 
-| # | Test Case | Result | Notes |
-|---|-----------|--------|-------|
-| 1 | Help text shows updated description | :white_check_mark: PASS | `--help` includes new text |
-| 2 | Line-numbers flag description updated | :white_check_mark: PASS | Shows "rendered output" instead of "TUI-mode only" |
-| 3 | CLI renders markdown correctly | :white_check_mark: PASS | Headers, lists, code blocks render |
-| 4 | Width flag wraps at specified column | :white_check_mark: PASS | `-w 40` wraps correctly |
-| 5 | Stdin pipe rendering | :white_check_mark: PASS | Piped markdown renders |
-| 6 | Error on nonexistent file | :white_check_mark: PASS | Exits code 1 with clear message |
-| 7 | TUI browser launch | :no_entry: BLOCKED | CI PTY environment inconsistent |
+| #   | Test Case                             | Result                  | Notes                                              |
+| --- | ------------------------------------- | ----------------------- | -------------------------------------------------- |
+| 1   | Help text shows updated description   | :white_check_mark: PASS | `--help` includes new text                         |
+| 2   | Line-numbers flag description updated | :white_check_mark: PASS | Shows "rendered output" instead of "TUI-mode only" |
+| 3   | CLI renders markdown correctly        | :white_check_mark: PASS | Headers, lists, code blocks render                 |
+| 4   | Width flag wraps at specified column  | :white_check_mark: PASS | `-w 40` wraps correctly                            |
+| 5   | Stdin pipe rendering                  | :white_check_mark: PASS | Piped markdown renders                             |
+| 6   | Error on nonexistent file             | :white_check_mark: PASS | Exits code 1 with clear message                    |
+| 7   | TUI browser launch                    | :no_entry: BLOCKED      | CI PTY environment inconsistent                    |
 
 Evidence included inline terminal snapshots:
 
@@ -168,13 +183,13 @@ $ ./glow --help
 
 A PR adding a "Remember me" checkbox and footer version badge. QA spun up PostgreSQL, Mailcatcher, FastAPI backend, and React frontend in CI, then drove the UI with agent-browser:
 
-| # | Test Case | Result | Notes |
-|---|-----------|--------|-------|
-| 1 | Login page shows Remember Me checkbox | :white_check_mark: PASS | Form has Email, Password, checkbox, Log In button |
-| 2 | Login with Remember Me checked | :white_check_mark: PASS | Redirected to dashboard |
-| 3 | Login without Remember Me | :white_check_mark: PASS | Also works unchecked |
-| 4 | Invalid credentials (negative test) | :white_check_mark: PASS | Toast error, stays on login |
-| 5 | Footer shows v2.0 | :white_check_mark: PASS | Version badge visible on all pages |
+| #   | Test Case                             | Result                  | Notes                                             |
+| --- | ------------------------------------- | ----------------------- | ------------------------------------------------- |
+| 1   | Login page shows Remember Me checkbox | :white_check_mark: PASS | Form has Email, Password, checkbox, Log In button |
+| 2   | Login with Remember Me checked        | :white_check_mark: PASS | Redirected to dashboard                           |
+| 3   | Login without Remember Me             | :white_check_mark: PASS | Also works unchecked                              |
+| 4   | Invalid credentials (negative test)   | :white_check_mark: PASS | Toast error, stays on login                       |
+| 5   | Footer shows v2.0                     | :white_check_mark: PASS | Version badge visible on all pages                |
 
 Here are actual screenshots captured by agent-browser during the QA run:
 

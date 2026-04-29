@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "willow",
+  "theme": "aspen",
   "name": "Factory Documentation",
   "description": "Factory is an AI-native software development platform. Delegate complete tasks like refactors, incident response, and migrations to Droids without changing your tools, models, or workflow.",
   "colors": {
@@ -23,20 +23,6 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "global": {
-      "anchors": [
-        {
-          "anchor": "GitHub",
-          "icon": "github",
-          "href": "https://github.com/factory-ai/factory"
-        },
-        {
-          "anchor": "Discord",
-          "icon": "discord",
-          "href": "https://discord.gg/zuudFXxg69"
-        }
-      ]
-    },
     "languages": [
       {
         "language": "en",
@@ -45,64 +31,100 @@
             "tab": "Docs",
             "groups": [
               {
-                "group": "Welcome",
+                "group": "Start Here",
+                "pages": ["welcome/index", "pricing", "support"]
+              },
+              {
+                "group": "Platform",
                 "pages": [
-                  "welcome/index",
                   {
                     "group": "CLI",
                     "pages": [
                       "cli/getting-started/overview",
-                      "cli/getting-started/quickstart",
-                      {
-                        "group": "Configuration",
-                        "pages": [
-                          "cli/configuration/agents-md",
-                          "cli/configuration/settings",
-                          {
-                            "group": "Bring Your Own Key",
-                            "pages": [
-                              "cli/byok/overview",
-                              "cli/byok/baseten",
-                              "cli/byok/deepinfra",
-                              "cli/byok/fireworks",
-                              "cli/byok/google-gemini",
-                              "cli/byok/groq",
-                              "cli/byok/huggingface",
-                              "cli/byok/ollama",
-                              "cli/byok/openai-anthropic",
-                              "cli/byok/openrouter"
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "group": "Account",
-                        "pages": [
-                          "cli/account/security",
-                          "cli/account/droid-shield",
-                          "cli/account/droid-shield-plus"
-                        ]
-                      }
+                      "cli/getting-started/quickstart"
                     ]
                   },
                   {
-                    "group": "App",
+                    "group": "Desktop",
                     "pages": [
                       "web/getting-started/overview",
-                      "web/getting-started/quickstart",
-                      {
-                        "group": "Cloud Templates",
-                        "pages": [
-                          "web/machine-connection/cloud-templates/index",
-                          "web/machine-connection/cloud-templates/installation-and-usage",
-                          "web/machine-connection/cloud-templates/setup-script",
-                          "web/machine-connection/cloud-templates/best-practices",
-                          "web/machine-connection/cloud-templates/troubleshooting"
-                        ]
-                      }
+                      "web/getting-started/quickstart"
                     ]
                   },
-                  "pricing"
+                  "cli/droid-exec/overview",
+                  {
+                    "group": "Cloud Templates",
+                    "pages": [
+                      "web/machine-connection/cloud-templates/index",
+                      "web/machine-connection/cloud-templates/installation-and-usage",
+                      "web/machine-connection/cloud-templates/setup-script",
+                      "web/machine-connection/cloud-templates/best-practices",
+                      "web/machine-connection/cloud-templates/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "Droid Computers",
+                    "pages": [
+                      "cli/features/droid-computers",
+                      "cli/features/droid-computers-byom"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Capabilities",
+                "pages": [
+                  {
+                    "group": "Agent Readiness",
+                    "pages": [
+                      "web/agent-readiness/overview",
+                      "cli/features/readiness-report",
+                      "web/agent-readiness/dashboard"
+                    ]
+                  },
+                  "cli/features/missions",
+                  {
+                    "group": "Wiki",
+                    "pages": [
+                      "cli/features/wiki/overview",
+                      "cli/features/wiki/generate",
+                      "cli/features/wiki/web-viewer",
+                      "cli/features/wiki/auto-refresh"
+                    ]
+                  },
+                  "cli/features/code-review",
+                  "cli/features/droid-control",
+                  "guides/skills/automated-qa",
+                  "cli/account/droid-shield"
+                ]
+              },
+              {
+                "group": "Configure & Extend",
+                "pages": [
+                  "cli/configuration/settings",
+                  "cli/configuration/agents-md",
+                  "cli/configuration/skills",
+                  "cli/configuration/mcp",
+                  "cli/configuration/custom-droids",
+                  "cli/configuration/hooks-guide",
+                  "cli/configuration/custom-slash-commands",
+                  "cli/configuration/plugins",
+                  "cli/configuration/mixed-models",
+                  {
+                    "group": "Bring Your Own Key",
+                    "pages": [
+                      "cli/byok/overview",
+                      "cli/byok/baseten",
+                      "cli/byok/deepinfra",
+                      "cli/byok/fireworks",
+                      "cli/byok/google-gemini",
+                      "cli/byok/groq",
+                      "cli/byok/huggingface",
+                      "cli/byok/ollama",
+                      "cli/byok/openai-anthropic",
+                      "cli/byok/openrouter"
+                    ]
+                  }
                 ]
               },
               {
@@ -117,34 +139,59 @@
                 ]
               },
               {
-                "group": "Features",
+                "group": "Enterprise",
                 "pages": [
+                  "enterprise/index",
                   {
-                    "group": "Agent Readiness",
+                    "group": "Security",
                     "pages": [
-                      "web/agent-readiness/overview",
-                      "cli/features/readiness-report",
-                      "web/agent-readiness/dashboard",
-                      "reference/readiness-reports-api"
+                      "cli/account/security",
+                      "cli/account/droid-shield-plus",
+                      "enterprise/privacy-and-data-flows",
+                      "enterprise/llm-safety-and-agent-controls"
                     ]
                   },
-                  "cli/features/missions",
-                  "cli/features/code-review",
-                  "cli/features/droid-control",
-                  "guides/skills/automated-qa",
-                  "cli/configuration/plugins",
-                  "cli/configuration/custom-slash-commands",
-                  "cli/configuration/custom-droids",
-                  "cli/configuration/skills",
-                  "cli/configuration/mixed-models",
-                  "cli/configuration/mcp",
-                  "cli/configuration/hooks-guide",
-                  "cli/droid-exec/overview",
                   {
-                    "group": "Droid Computers",
+                    "group": "Identity & Governance",
                     "pages": [
-                      "cli/features/droid-computers",
-                      "cli/features/droid-computers-byom"
+                      "enterprise/identity-and-access",
+                      "enterprise/identity-sso-and-scim",
+                      "enterprise/hierarchical-settings-and-org-control"
+                    ]
+                  },
+                  {
+                    "group": "Architecture & Deployment",
+                    "pages": [
+                      "enterprise/network-and-deployment",
+                      "enterprise/models-llm-gateways-and-integrations",
+                      "enterprise/enterprise-plugin-registry",
+                      "enterprise/github-integration-security"
+                    ]
+                  },
+                  {
+                    "group": "Analytics & Compliance",
+                    "pages": [
+                      "enterprise/usage-cost-and-analytics",
+                      "enterprise/telemetry-export",
+                      "enterprise/compliance-audit-and-monitoring"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Using Droid",
+                "pages": [
+                  "cli/getting-started/common-use-cases",
+                  "cli/getting-started/how-to-talk-to-a-droid",
+                  "cli/getting-started/video-walkthrough",
+                  {
+                    "group": "Advanced Usage",
+                    "pages": [
+                      "cli/user-guides/become-a-power-user",
+                      "cli/user-guides/specification-mode",
+                      "cli/user-guides/auto-run",
+                      "cli/user-guides/choosing-your-model",
+                      "cli/user-guides/implementing-large-features"
                     ]
                   }
                 ]
@@ -153,65 +200,9 @@
                 "group": "Reference",
                 "pages": [
                   "reference/cli-reference",
-                  "reference/hooks-reference"
-                ]
-              },
-              {
-                "group": "Enterprise",
-                "pages": [
-                  "enterprise/index",
-                  {
-                    "group": "Architecture & Deployment",
-                    "pages": [
-                      "enterprise/network-and-deployment",
-                      "enterprise/models-llm-gateways-and-integrations"
-                    ]
-                  },
-                  {
-                    "group": "Security & Governance",
-                    "pages": [
-                      "enterprise/identity-and-access",
-                      "enterprise/identity-sso-and-scim",
-                      "enterprise/privacy-and-data-flows",
-                      "enterprise/llm-safety-and-agent-controls",
-                      "enterprise/hierarchical-settings-and-org-control",
-                      "enterprise/enterprise-plugin-registry",
-                      "enterprise/compliance-audit-and-monitoring",
-                      "enterprise/github-integration-security"
-                    ]
-                  },
-                  {
-                    "group": "Analytics & Operations",
-                    "pages": [
-                      "enterprise/usage-cost-and-analytics",
-                      "enterprise/telemetry-export",
-                      "reference/analytics-api"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Resources",
-                "pages": [
-                  {
-                    "group": "Resources",
-                    "pages": [
-                      "cli/getting-started/video-walkthrough",
-                      "cli/getting-started/how-to-talk-to-a-droid",
-                      "cli/getting-started/common-use-cases"
-                    ]
-                  },
-                  {
-                    "group": "User Guides",
-                    "pages": [
-                      "cli/user-guides/become-a-power-user",
-                      "cli/user-guides/specification-mode",
-                      "cli/user-guides/auto-run",
-                      "cli/user-guides/choosing-your-model",
-                      "cli/user-guides/implementing-large-features"
-                    ]
-                  },
-                  "support"
+                  "reference/hooks-reference",
+                  "reference/analytics-api",
+                  "reference/readiness-reports-api"
                 ]
               }
             ]
@@ -234,8 +225,7 @@
                 "group": "Building",
                 "pages": [
                   "guides/building/building-plugins",
-                  "guides/building/droid-exec-tutorial",
-                  "guides/building/droid-vps-setup"
+                  "guides/building/droid-exec-tutorial"
                 ]
               },
               {
@@ -248,8 +238,7 @@
                   "guides/skills/vibe-coding",
                   "guides/skills/ai-data-analyst",
                   "guides/skills/product-management",
-                  "guides/skills/browser",
-                  "guides/skills/automated-qa"
+                  "guides/skills/browser"
                 ]
               },
               {
@@ -273,7 +262,8 @@
                   "guides/droid-exec/refactor-error-messages",
                   "guides/droid-exec/refactor-fix-lint",
                   "guides/droid-exec/document-automation",
-                  "guides/droid-exec/github-actions"
+                  "guides/droid-exec/github-actions",
+                  "guides/building/droid-vps-setup"
                 ]
               }
             ]
@@ -293,14 +283,13 @@
             ]
           },
           {
-            "tab": "Leaderboards",
-            "groups": [
-              {
-                "group": "Benchmarks",
-                "pages": [
-                  "leaderboards/index"
-                ]
-              }
+            "tab": "Benchmarks",
+            "pages": [
+              "benchmarks/terminal-bench",
+              "benchmarks/nextjs-eval",
+              "benchmarks/agent-arena",
+              "benchmarks/review-benchmark",
+              "benchmarks/legacy-bench"
             ]
           },
           {
@@ -401,6 +390,8 @@
                   },
                   "jp/cli/features/missions",
                   "jp/cli/features/code-review",
+                  "jp/cli/features/droid-control",
+                  "jp/cli/features/droid-computers",
                   "jp/guides/skills/automated-qa",
                   "jp/cli/configuration/plugins",
                   "jp/cli/configuration/custom-slash-commands",
@@ -511,8 +502,7 @@
                   "jp/guides/skills/vibe-coding",
                   "jp/guides/skills/ai-data-analyst",
                   "jp/guides/skills/product-management",
-                  "jp/guides/skills/browser",
-                  "jp/guides/skills/automated-qa"
+                  "jp/guides/skills/browser"
                 ]
               },
               {
@@ -556,14 +546,13 @@
             ]
           },
           {
-            "tab": "リーダーボード",
-            "groups": [
-              {
-                "group": "ベンチマーク",
-                "pages": [
-                  "jp/leaderboards/index"
-                ]
-              }
+            "tab": "ベンチマーク",
+            "pages": [
+              "jp/benchmarks/terminal-bench",
+              "jp/benchmarks/nextjs-eval",
+              "jp/benchmarks/agent-arena",
+              "jp/benchmarks/review-benchmark",
+              "jp/benchmarks/legacy-bench"
             ]
           },
           {
@@ -580,16 +569,16 @@
   },
   "topbarLinks": [
     {
-      "name": "Guides",
-      "url": "/guides/building/droid-exec-tutorial"
+      "name": "Plans & Models",
+      "url": "/pricing"
     },
     {
-      "name": "Leaderboards",
-      "url": "/leaderboards/index"
+      "name": "Enterprise",
+      "url": "/enterprise"
     },
     {
-      "name": "Release notes",
-      "url": "/changelog/release-notes"
+      "name": "Support",
+      "url": "/support"
     }
   ],
   "navbar": {
@@ -604,12 +593,7 @@
     }
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude"]
   },
   "seo": {
     "metatags": {
@@ -656,15 +640,15 @@
     },
     {
       "source": "/release-notes/jun-11-factory-1-1",
-      "destination": "/changelog/1-1"
+      "destination": "/changelog/release-notes"
     },
     {
       "source": "/release-notes/jun-24-factory-1-2",
-      "destination": "/changelog/1-2"
+      "destination": "/changelog/release-notes"
     },
     {
       "source": "/droids/review_droid/guidelines",
-      "destination": "/onboarding/configuring-your-review-droid/review-droid-guidelines"
+      "destination": "/cli/features/code-review#review-guidelines"
     },
     {
       "source": "/factory-cli/getting-started/overview",
@@ -744,7 +728,7 @@
     },
     {
       "source": "/user-guides/build-with-factory/engineer-system-integrations",
-      "destination": "/onboarding/creating-your-factory/basic-integrations"
+      "destination": "/cli/configuration/mcp"
     },
     {
       "source": "/user-guides/build-with-factory/security-compliance",
@@ -1049,6 +1033,114 @@
     {
       "source": "/cli/droid-exec/cookbook/github-actions",
       "destination": "/guides/droid-exec/github-actions"
+    },
+    {
+      "source": "/features/byok",
+      "destination": "/cli/byok/overview"
+    },
+    {
+      "source": "/guides/product/coming-soon",
+      "destination": "/welcome"
+    },
+    {
+      "source": "/onboarding",
+      "destination": "/welcome"
+    },
+    {
+      "source": "/onboarding/index",
+      "destination": "/welcome"
+    },
+    {
+      "source": "/onboarding/creating-your-factory/signup",
+      "destination": "/cli/getting-started/quickstart"
+    },
+    {
+      "source": "/onboarding/creating-your-factory/sso-setup",
+      "destination": "/enterprise/identity-sso-and-scim"
+    },
+    {
+      "source": "/onboarding/creating-your-factory/user-permissions",
+      "destination": "/enterprise/identity-and-access"
+    },
+    {
+      "source": "/onboarding/creating-your-factory/basic-integrations",
+      "destination": "/cli/configuration/mcp"
+    },
+    {
+      "source": "/onboarding/configuring-your-factory/droid-yaml-configuration",
+      "destination": "/cli/configuration/settings#legacy-droid-yaml-configuration"
+    },
+    {
+      "source": "/onboarding/configuring-your-review-droid/droid-yaml-configuration",
+      "destination": "/guides/droid-exec/code-review#customizing-the-workflow"
+    },
+    {
+      "source": "/onboarding/configuring-your-review-droid/review-droid-guidelines",
+      "destination": "/cli/features/code-review#review-guidelines"
+    },
+    {
+      "source": "/onboarding/integrating-with-your-engineering-system/github-cloud",
+      "destination": "/integrations/github-app"
+    },
+    {
+      "source": "/onboarding/integrating-with-your-engineering-system/github-enterprise-server",
+      "destination": "/integrations/github-app"
+    },
+    {
+      "source": "/onboarding/integrating-with-your-engineering-system/gitlab-cloud",
+      "destination": "/cli/configuration/mcp"
+    },
+    {
+      "source": "/onboarding/integrating-with-your-engineering-system/gitlab-self-hosted",
+      "destination": "/cli/configuration/mcp"
+    },
+    {
+      "source": "/onboarding/integrating-with-your-engineering-system/jira",
+      "destination": "/cli/configuration/mcp"
+    },
+    {
+      "source": "/onboarding/integrating-with-your-engineering-system/notion",
+      "destination": "/cli/configuration/mcp"
+    },
+    {
+      "source": "/onboarding/integrating-with-your-engineering-system/pagerduty",
+      "destination": "/cli/configuration/mcp"
+    },
+    {
+      "source": "/onboarding/integrating-with-your-engineering-system/sentry",
+      "destination": "/cli/configuration/mcp"
+    },
+    {
+      "source": "/jp/onboarding/creating-your-factory/basic-integrations",
+      "destination": "/jp/cli/configuration/mcp"
+    },
+    {
+      "source": "/jp/onboarding/integrating-with-your-engineering-system/github-cloud",
+      "destination": "/jp/integrations/github-app"
+    },
+    {
+      "source": "/jp/onboarding/integrating-with-your-engineering-system/github-enterprise-server",
+      "destination": "/jp/integrations/github-app"
+    },
+    {
+      "source": "/jp/onboarding/integrating-with-your-engineering-system/gitlab-cloud",
+      "destination": "/jp/cli/configuration/mcp"
+    },
+    {
+      "source": "/jp/onboarding/integrating-with-your-engineering-system/gitlab-self-hosted",
+      "destination": "/jp/cli/configuration/mcp"
+    },
+    {
+      "source": "/jp/onboarding/integrating-with-your-engineering-system/jira",
+      "destination": "/jp/cli/configuration/mcp"
+    },
+    {
+      "source": "/jp/onboarding/integrating-with-your-engineering-system/notion",
+      "destination": "/jp/cli/configuration/mcp"
+    },
+    {
+      "source": "/jp/onboarding/integrating-with-your-engineering-system/sentry",
+      "destination": "/jp/cli/configuration/mcp"
     }
   ]
 }

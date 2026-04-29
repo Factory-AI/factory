@@ -47,12 +47,12 @@ The biggest token savings come from project configuration that prevents wasted c
   Slow or flaky tests are the #1 cause of wasted tokens. Each retry costs a full response cycle.
 </Warning>
 
-| Test Characteristic | Impact on Tokens |
-|---------------------|------------------|
-| Fast tests (< 30s) | Droid verifies changes immediately |
+| Test Characteristic | Impact on Tokens                                     |
+| ------------------- | ---------------------------------------------------- |
+| Fast tests (< 30s)  | Droid verifies changes immediately                   |
 | Slow tests (> 2min) | Droid may skip verification or waste context waiting |
-| Flaky tests | False failures cause debugging cycles |
-| No tests | Droid can't verify changes, more back-and-forth |
+| Flaky tests         | False failures cause debugging cycles                |
+| No tests            | Droid can't verify changes, more back-and-forth      |
 
 **Action items:**
 ```markdown
@@ -107,15 +107,15 @@ The [Agent Readiness Report](/cli/features/readiness-report) evaluates your proj
 
 ### High-Impact Criteria
 
-| Criterion | Token Impact | Why It Matters |
-|-----------|--------------|----------------|
-| **Linter Configuration** | 🟢 High | Catches errors immediately, no debugging cycles |
-| **Type Checker** | 🟢 High | Prevents runtime errors, clearer code |
-| **Unit Tests Runnable** | 🟢 High | Verification in same turn |
-| **AGENTS.md** | 🟢 High | Context upfront, less exploration |
-| **Build Command Documentation** | 🟡 Medium | No guessing, fewer failed attempts |
-| **Dependencies Pinned** | 🟡 Medium | Reproducible builds |
-| **Pre-commit Hooks** | 🟡 Medium | Automatic quality enforcement |
+| Criterion                       | Token Impact | Why It Matters                                  |
+| ------------------------------- | ------------ | ----------------------------------------------- |
+| **Linter Configuration**        | 🟢 High       | Catches errors immediately, no debugging cycles |
+| **Type Checker**                | 🟢 High       | Prevents runtime errors, clearer code           |
+| **Unit Tests Runnable**         | 🟢 High       | Verification in same turn                       |
+| **AGENTS.md**                   | 🟢 High       | Context upfront, less exploration               |
+| **Build Command Documentation** | 🟡 Medium     | No guessing, fewer failed attempts              |
+| **Dependencies Pinned**         | 🟡 Medium     | Reproducible builds                             |
+| **Pre-commit Hooks**            | 🟡 Medium     | Automatic quality enforcement                   |
 
 Run the readiness report to identify gaps:
 
@@ -132,44 +132,44 @@ Different models have different cost multipliers and capabilities. Match the mod
 
 ### Cost Multipliers
 
-| Model | Multiplier | Best For |
-|-------|------------|----------|
-| Droid Core (MiniMax M2.5) | 0.12× | Cheapest option with reasoning support |
-| Gemini 3 Flash | 0.2× | Fast, cheap for high-volume tasks |
-| Droid Core (GLM-4.7) | 0.25× | Bulk automation, simple tasks |
-| Droid Core (Kimi K2.5) | 0.25× | Cost-sensitive work, supports images |
-| Claude Haiku 4.5 | 0.4× | Quick edits, routine work |
-| Droid Core (GLM-5) | 0.4× | Newer open-source GLM model when you want stronger quality in Droid Core |
-| GPT-5.1 / GPT-5.1-Codex | 0.5× | Implementation, debugging |
-| GPT-5.2-Codex / GPT-5.3-Codex | 0.7× | Advanced coding with Extra High reasoning |
-| Gemini 3 Pro | 0.8× | Research, analysis |
-| Gemini 3.1 Pro | 0.8× | Research, analysis with newer Gemini generation |
-| Claude Sonnet 4.5 | 1.2× | Balanced quality/cost |
-| Claude Opus 4.5 | 2× | Complex reasoning, architecture |
-| Claude Opus 4.6 | 2× | Previous flagship, Max reasoning |
-| Claude Opus 4.6 Fast | 12× | Opus 4.6 tuned for faster responses |
-| Claude Opus 4.7 | 2× (1× until April 30) | Newest flagship, discounted during launch window |
+| Model                         | Multiplier             | Best For                                                                 |
+| ----------------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| Droid Core (MiniMax M2.7)     | 0.12×                  | Cheapest option with reasoning support                                   |
+| Gemini 3 Flash                | 0.2×                   | Fast, cheap for high-volume tasks                                        |
+| Droid Core (Kimi K2.5)        | 0.25×                  | Cost-sensitive work, supports images                                     |
+| Claude Haiku 4.5              | 0.4×                   | Quick edits, routine work                                                |
+| Droid Core (Kimi K2.6)        | 0.4×                   | Cost-sensitive work, supports images, optional High reasoning            |
+| Droid Core (GLM-5)            | 0.4×                   | Bulk automation, simple tasks                                            |
+| Droid Core (GLM-5.1)          | 0.55×                  | Newer open-source GLM model when you want stronger quality in Droid Core |
+| GPT-5.2-Codex / GPT-5.3-Codex | 0.7×                   | Advanced coding with Extra High reasoning                                |
+| Gemini 3 Pro                  | 0.8×                   | Research, analysis                                                       |
+| Gemini 3.1 Pro                | 0.8×                   | Research, analysis with newer Gemini generation                          |
+| Claude Sonnet 4.5             | 1.2×                   | Balanced quality/cost                                                    |
+| Claude Opus 4.5               | 2×                     | Complex reasoning, architecture                                          |
+| Claude Opus 4.6               | 2×                     | Previous flagship, Max reasoning                                         |
+| Claude Opus 4.6 Fast          | 12×                    | Opus 4.6 tuned for faster responses                                      |
+| Claude Opus 4.7               | 2× (1× until April 30) | Newest flagship, discounted during launch window                         |
 
 ### Task-Based Model Selection
 
 ```
 Simple edit, formatting      → Haiku 4.5 (0.4×)
-Implement feature from spec  → GPT-5.1-Codex (0.5×)
+Implement feature from spec  → GPT-5.3-Codex (0.7×)
 Debug complex issue          → Sonnet 4.5 (1.2×)
 Architecture planning        → Opus 4.7 (2×, 1× until April 30) or Opus 4.6 (2×)
-Bulk file processing         → Droid Core (GLM-4.7 at 0.25× or GLM-5 at 0.4×)
+Bulk file processing         → Droid Core (GLM-5 at 0.4× or GLM-5.1 at 0.55×)
 ```
 
 ### Reasoning Effort Impact
 
 Higher reasoning = more "thinking" tokens but often fewer retries.
 
-| Reasoning | When to Use | Token Trade-off |
-|-----------|-------------|-----------------|
-| Off/None | Simple, clear tasks | Lowest per-turn, may need more turns |
-| Low | Standard implementation | Good balance |
-| Medium | Complex logic, debugging | Higher per-turn, fewer retries |
-| High | Architecture, analysis | Highest per-turn, best first-attempt |
+| Reasoning | When to Use              | Token Trade-off                      |
+| --------- | ------------------------ | ------------------------------------ |
+| Off/None  | Simple, clear tasks      | Lowest per-turn, may need more turns |
+| Low       | Standard implementation  | Good balance                         |
+| Medium    | Complex logic, debugging | Higher per-turn, fewer retries       |
+| High      | Architecture, analysis   | Highest per-turn, best first-attempt |
 
 **Rule of thumb:** Use higher reasoning for tasks where a wrong first attempt would be expensive to fix.
 
@@ -260,13 +260,13 @@ Turn 1: "Add structured logging to all services in src/services/. Use the patter
 
 ### Common Waste Patterns
 
-| Pattern | Cause | Fix |
-|---------|-------|-----|
-| Multiple exploration cycles | Unclear requirements | Be specific upfront |
-| Repeated file reads | Missing IDE context | Install IDE plugin |
-| Failed attempts | No tests/linting | Add validation tools |
-| Verbose explanations | No format constraint | Ask for concise output |
-| Wrong architecture | Missing context | Use Spec Mode |
+| Pattern                     | Cause                | Fix                    |
+| --------------------------- | -------------------- | ---------------------- |
+| Multiple exploration cycles | Unclear requirements | Be specific upfront    |
+| Repeated file reads         | Missing IDE context  | Install IDE plugin     |
+| Failed attempts             | No tests/linting     | Add validation tools   |
+| Verbose explanations        | No format constraint | Ask for concise output |
+| Wrong architecture          | Missing context      | Use Spec Mode          |
 
 ### Format Constraints
 
@@ -334,14 +334,14 @@ Implement these for immediate token savings:
 
 Rough guidelines for common tasks:
 
-| Task Type | Typical Token Range | Notes |
-|-----------|---------------------|-------|
-| Quick edit | 5k-15k | Simple, specific changes |
-| Feature implementation | 30k-80k | With Spec Mode planning |
-| Complex debugging | 50k-150k | May need multiple attempts |
-| Architecture planning | 20k-50k | High-reasoning model |
-| Code review | 30k-60k | Depends on PR size |
-| Bulk refactoring | 50k-200k | Many files, use efficient model |
+| Task Type              | Typical Token Range | Notes                           |
+| ---------------------- | ------------------- | ------------------------------- |
+| Quick edit             | 5k-15k              | Simple, specific changes        |
+| Feature implementation | 30k-80k             | With Spec Mode planning         |
+| Complex debugging      | 50k-150k            | May need multiple attempts      |
+| Architecture planning  | 20k-50k             | High-reasoning model            |
+| Code review            | 30k-60k             | Depends on PR size              |
+| Bulk refactoring       | 50k-200k            | Many files, use efficient model |
 
 If you're significantly exceeding these ranges, review the waste patterns above.
 

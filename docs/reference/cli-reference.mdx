@@ -24,58 +24,59 @@ The CLI operates in two modes:
 
 ## CLI commands
 
-| Command                          | Description                                 | Example                                         |
-| :------------------------------- | :------------------------------------------ | :---------------------------------------------- |
-| `droid`                          | Start interactive REPL                      | `droid`                                         |
-| `droid "query"`                  | Start REPL with initial prompt              | `droid "explain this project"`                  |
-| `droid exec "query"`             | Execute task without interactive mode       | `droid exec "summarize src/auth"`               |
-| `droid exec -f prompt.md`        | Load prompt from file                       | `droid exec -f .factory/prompts/review.md`      |
-| `cat file \| droid exec`         | Process piped content                       | `git diff \| droid exec "draft release notes"` |
-| `droid exec -s <id> "query"`     | Resume existing session in exec mode        | `droid exec -s session-123 "continue"`          |
-| `droid exec --list-tools`        | List available tools, then exit             | `droid exec --list-tools`                       |
-| `droid update`                   | Manually update the CLI to latest version   | `droid update`                                  |
+| Command                      | Description                               | Example                                        |
+| :--------------------------- | :---------------------------------------- | :--------------------------------------------- |
+| `droid`                      | Start interactive REPL                    | `droid`                                        |
+| `droid "query"`              | Start REPL with initial prompt            | `droid "explain this project"`                 |
+| `droid exec "query"`         | Execute task without interactive mode     | `droid exec "summarize src/auth"`              |
+| `droid exec -f prompt.md`    | Load prompt from file                     | `droid exec -f .factory/prompts/review.md`     |
+| `cat file \| droid exec`     | Process piped content                     | `git diff \| droid exec "draft release notes"` |
+| `droid exec -s <id> "query"` | Resume existing session in exec mode      | `droid exec -s session-123 "continue"`         |
+| `droid exec --list-tools`    | List available tools, then exit           | `droid exec --list-tools`                      |
+| `droid update`               | Manually update the CLI to latest version | `droid update`                                 |
 
 ## CLI flags
 
 Customize droid's behavior with command-line flags:
 
-| Flag                                 | Description                                                                                                  | Example                                                    |
-| :----------------------------------- | :----------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------- |
-| `-f, --file <path>`                  | Read prompt from a file                                                                                      | `droid exec -f plan.md`                                    |
-| `-m, --model <id>`                   | Select a specific model (see [model IDs](#available-models))                                                 | `droid exec -m claude-opus-4-6`                            |
-| `-s, --session-id <id>`              | Continue an existing session                                                                                 | `droid exec -s session-abc123`                             |
-| `--auto <level>`                     | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)                                             | `droid exec --auto medium "run tests"`                     |
-| `--enabled-tools <ids>`              | Force-enable specific tools (comma or space separated)                                                       | `droid exec --enabled-tools ApplyPatch,Bash`               |
-| `--disabled-tools <ids>`             | Disable specific tools for this run                                                                          | `droid exec --disabled-tools execute-cli`                  |
-| `--list-tools`                       | Print available tools and exit                                                                               | `droid exec --list-tools`                                  |
-| `-o, --output-format <format>`       | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)                                              | `droid exec -o json "document API"`                        |
-| `--input-format <format>`            | Input format (`stream-json`, `stream-jsonrpc` for multi-turn)                                                | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
-| `-r, --reasoning-effort <level>`     | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`)                                           | `droid exec -r high "debug flaky test"`                    |
-| `--spec-model <id>`                  | Use a different model for specification planning                                                             | `droid exec --spec-model claude-sonnet-4-5-20250929`       |
-| `--spec-reasoning-effort <level>`    | Override reasoning effort for spec mode                                                                      | `droid exec --use-spec --spec-reasoning-effort high`       |
-| `--use-spec`                         | Start in specification mode (plan before executing)                                                          | `droid exec --use-spec "add user profiles"`                |
-| `--skip-permissions-unsafe`          | Skip all permission prompts (⚠️ use with extreme caution)                                                    | `droid exec --skip-permissions-unsafe`                     |
-| `--cwd <path>`                       | Execute from a specific working directory                                                                    | `droid exec --cwd ../service "run tests"`                  |
-| `--tag <spec>`                       | Session tag (name or JSON, repeatable)                                                                       | `droid exec --tag code-review`                             |
-| `--log-group-id <id>`                | Log group ID for filtering logs                                                                              | `droid exec --log-group-id grp-123`                        |
-| `-v, --version`                      | Display CLI version                                                                                          | `droid -v`                                                 |
-| `-h, --help`                         | Show help information                                                                                        | `droid --help`                                             |
+| Flag                              | Description                                                        | Example                                                      |
+| :-------------------------------- | :----------------------------------------------------------------- | :----------------------------------------------------------- |
+| `-f, --file <path>`               | Read prompt from a file                                            | `droid exec -f plan.md`                                      |
+| `-m, --model <id>`                | Select a specific model (see [model IDs](#available-models))       | `droid exec -m claude-opus-4-6`                              |
+| `-s, --session-id <id>`           | Continue an existing session                                       | `droid exec -s session-abc123`                               |
+| `--auto <level>`                  | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)   | `droid exec --auto medium "run tests"`                       |
+| `--enabled-tools <ids>`           | Force-enable specific tools (comma or space separated)             | `droid exec --enabled-tools ApplyPatch,Bash`                 |
+| `--disabled-tools <ids>`          | Disable specific tools for this run                                | `droid exec --disabled-tools execute-cli`                    |
+| `--list-tools`                    | Print available tools and exit                                     | `droid exec --list-tools`                                    |
+| `-o, --output-format <format>`    | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)    | `droid exec -o json "document API"`                          |
+| `--input-format <format>`         | Input format (`stream-json`, `stream-jsonrpc` for multi-turn)      | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
+| `-r, --reasoning-effort <level>`  | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`) | `droid exec -r high "debug flaky test"`                      |
+| `--spec-model <id>`               | Use a different model for specification planning                   | `droid exec --spec-model claude-sonnet-4-5-20250929`         |
+| `--spec-reasoning-effort <level>` | Override reasoning effort for spec mode                            | `droid exec --use-spec --spec-reasoning-effort high`         |
+| `--use-spec`                      | Start in specification mode (plan before executing)                | `droid exec --use-spec "add user profiles"`                  |
+| `--skip-permissions-unsafe`       | Skip all permission prompts (⚠️ use with extreme caution)          | `droid exec --skip-permissions-unsafe`                       |
+| `--cwd <path>`                    | Execute from a specific working directory                          | `droid exec --cwd ../service "run tests"`                    |
+| `--tag <spec>`                    | Session tag (name or JSON, repeatable)                             | `droid exec --tag code-review`                               |
+| `--log-group-id <id>`             | Log group ID for filtering logs                                    | `droid exec --log-group-id grp-123`                          |
+| `-v, --version`                   | Display CLI version                                                | `droid -v`                                                   |
+| `-h, --help`                      | Show help information                                              | `droid --help`                                               |
 
 <Tip>
-  Use `--output-format json` for scripting and automation, allowing you to parse droid's responses programmatically.
+  Use `--output-format json` for scripting and automation, allowing you to parse droid's responses
+  programmatically.
 </Tip>
 
 ## Autonomy levels
 
 `droid exec` uses tiered autonomy to control what operations the agent can perform. Only raise access when the environment is safe.
 
-| Level                         | Intended for             | Notable allowances                                                                 |
-| :---------------------------- | :----------------------- | :--------------------------------------------------------------------------------- |
-| *(default)*                   | Read-only reconnaissance | File reads, git diffs, environment inspection                                      |
-| `--auto low`                  | Safe edits               | Create/edit files, run formatters, non-destructive commands                        |
-| `--auto medium`               | Local development        | Install dependencies, build/test, local git commits                                |
-| `--auto high`                 | CI/CD & orchestration    | Git push, deploy scripts, long-running operations                                  |
-| `--skip-permissions-unsafe`   | Isolated sandboxes only  | Removes all guardrails (⚠️ use only in disposable containers)                      |
+| Level                       | Intended for             | Notable allowances                                            |
+| :-------------------------- | :----------------------- | :------------------------------------------------------------ |
+| _(default)_                 | Read-only reconnaissance | File reads, git diffs, environment inspection                 |
+| `--auto low`                | Safe edits               | Create/edit files, run formatters, non-destructive commands   |
+| `--auto medium`             | Local development        | Install dependencies, build/test, local git commits           |
+| `--auto high`               | CI/CD & orchestration    | Git push, deploy scripts, long-running operations             |
+| `--skip-permissions-unsafe` | Isolated sandboxes only  | Removes all guardrails (⚠️ use only in disposable containers) |
 
 **Examples:**
 
@@ -94,32 +95,36 @@ droid exec --auto high "Run tests, commit, and push changes"
 ```
 
 <Warning>
-  `--skip-permissions-unsafe` removes all safety checks. Use **only** in isolated environments like Docker containers.
+  `--skip-permissions-unsafe` removes all safety checks. Use **only** in isolated environments like Docker
+  containers.
 </Warning>
 
 ## Available models
 
-| Model ID                      | Name                         | Reasoning support                        | Default reasoning |
-| :---------------------------- | :--------------------------- | :--------------------------------------- | :---------------- |
-| `claude-opus-4-7`             | Claude Opus 4.7              | Yes (Off/Low/Medium/High/Max)            | high              |
-| `claude-opus-4-6`             | Claude Opus 4.6              | Yes (Off/Low/Medium/High/Max)            | high              |
-| `claude-opus-4-6-fast`        | Claude Opus 4.6 Fast         | Yes (Off/Low/Medium/High/Max)            | high              |
-| `claude-opus-4-5-20251101`    | Claude Opus 4.5              | Yes (Off/Low/Medium/High)                | off               |
-| `claude-sonnet-4-6`           | Claude Sonnet 4.6            | Yes (Off/Low/Medium/High/Max)            | high              |
-| `claude-sonnet-4-5-20250929`  | Claude Sonnet 4.5            | Yes (Off/Low/Medium/High)                | off               |
-| `claude-haiku-4-5-20251001`   | Claude Haiku 4.5             | Yes (Off/Low/Medium/High)                | off               |
-| `gpt-5.4`                     | GPT-5.4                      | Yes (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.3-codex`               | GPT-5.3-Codex                | Yes (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.2-codex`               | GPT-5.2-Codex                | Yes (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.2`                     | GPT-5.2                      | Yes (Off/Low/Medium/High/Extra High)     | low               |
-| `gemini-3.1-pro-preview`      | Gemini 3.1 Pro               | Yes (Low/Medium/High)                    | high              |
-| `gemini-3-flash-preview`      | Gemini 3 Flash               | Yes (Minimal/Low/Medium/High)            | high              |
-| `glm-4.7`                     | Droid Core (GLM-4.7)         | None only                                | none              |
-| `glm-5`                       | Droid Core (GLM-5)           | None only                                | none              |
-| `kimi-k2.5`                   | Droid Core (Kimi K2.5)       | None only                                | none              |
-| `minimax-m2.5`                | Droid Core (MiniMax M2.5)    | Yes (Low/Medium/High)                    | high              |
+| Model ID                     | Name                      | Reasoning support                     | Default reasoning |
+| :--------------------------- | :------------------------ | :------------------------------------ | :---------------- |
+| `claude-opus-4-7`            | Claude Opus 4.7           | Yes (Off/Low/Medium/High/Max)         | high              |
+| `claude-opus-4-6`            | Claude Opus 4.6           | Yes (Off/Low/Medium/High/Max)         | high              |
+| `claude-opus-4-6-fast`       | Claude Opus 4.6 Fast      | Yes (Off/Low/Medium/High/Max)         | high              |
+| `claude-opus-4-5-20251101`   | Claude Opus 4.5           | Yes (Off/Low/Medium/High)             | off               |
+| `claude-sonnet-4-6`          | Claude Sonnet 4.6         | Yes (Off/Low/Medium/High/Max)         | high              |
+| `claude-sonnet-4-5-20250929` | Claude Sonnet 4.5         | Yes (Off/Low/Medium/High)             | off               |
+| `claude-haiku-4-5-20251001`  | Claude Haiku 4.5          | Yes (Off/Low/Medium/High)             | off               |
+| `gpt-5.5`                    | GPT-5.5                   | Yes (None/Low/Medium/High/Extra High) | medium            |
+| `gpt-5.5-fast`               | GPT-5.5 Fast              | Yes (None/Low/Medium/High/Extra High) | medium            |
+| `gpt-5.5-pro`                | GPT-5.5 Pro               | Yes (None/Low/Medium/High/Extra High) | medium            |
+| `gpt-5.4`                    | GPT-5.4                   | Yes (None/Low/Medium/High/Extra High) | medium            |
+| `gpt-5.3-codex`              | GPT-5.3-Codex             | Yes (None/Low/Medium/High/Extra High) | medium            |
+| `gpt-5.2-codex`              | GPT-5.2-Codex             | Yes (None/Low/Medium/High/Extra High) | medium            |
+| `gpt-5.2`                    | GPT-5.2                   | Yes (Off/Low/Medium/High/Extra High)  | low               |
+| `gemini-3.1-pro-preview`     | Gemini 3.1 Pro            | Yes (Low/Medium/High)                 | high              |
+| `gemini-3-flash-preview`     | Gemini 3 Flash            | Yes (Minimal/Low/Medium/High)         | high              |
+| `glm-5.1`                    | Droid Core (GLM-5.1)      | None only                             | none              |
+| `kimi-k2.5`                  | Droid Core (Kimi K2.5)    | None only                             | none              |
+| `kimi-k2.6`                  | Droid Core (Kimi K2.6)    | Yes (Off/High)                        | high              |
+| `minimax-m2.7`               | Droid Core (MiniMax M2.7) | Yes (Low/Medium/High)                 | high              |
 
-Custom models configured via [BYOK](/cli/configuration/byok) use the format: `custom:<alias>`
+Custom models configured via [BYOK](/cli/byok/overview) use the format: `custom:<alias>`
 
 See [Choosing Your Model](/cli/user-guides/choosing-your-model) for detailed guidance on which model to use for different tasks.
 
@@ -139,47 +144,47 @@ The prompt changes from `>` to `$` when bash mode is active.
 
 Available when running `droid` in interactive mode. Type the command at the prompt:
 
-| Command                  | Description                                           |
-| :----------------------- | :---------------------------------------------------- |
-| `/account`               | Open Factory account settings in browser              |
-| `/billing`               | View and manage billing settings                      |
-| `/bg-process`            | Manage background processes                           |
-| `/bug [title]`           | Create a bug report with session data and logs        |
-| `/clear`                 | Start a new session (alias for `/new`)                |
-| `/commands`              | Manage custom slash commands                          |
-| `/compress [prompt]`     | Compress session and move to new one with summary     |
-| `/cost`                  | Show token usage statistics                           |
-| `/create-skill`          | Create a reusable skill from current session          |
-| `/droids`                | Manage custom droids                                  |
-| `/enter-mission`         | Enter Mission mode                                    |
-| `/favorite`              | Mark current session as a favorite                    |
-| `/fork`                  | Duplicate current session with all messages into a new session |
-| `/generate_blog`         | Generate semantic diff blog post                      |
-| `/help`                  | Show available slash commands                         |
-| `/hooks`                 | Manage lifecycle hooks                                |
-| `/ide`                   | Configure IDE integrations                            |
-| `/install-github-app`    | Install Factory GitHub App                            |
-| `/login`                 | Sign in to Factory                                    |
-| `/logout`                | Sign out of Factory                                   |
-| `/mcp`                   | Manage Model Context Protocol servers                 |
-| `/mission`               | Open Mission Control                                  |
-| `/missions`              | List and select missions to resume                    |
-| `/model`                 | Switch AI model mid-session                           |
-| `/new`                   | Start a new session                                   |
-| `/plugins`               | Manage plugins and marketplaces                       |
-| `/quit`                  | Exit droid (alias: `exit`, or press Ctrl+C)           |
-| `/readiness-report`      | Generate readiness report                             |
-| `/rename`                | Rename current session                                |
-| `/review`                | Start AI-powered code review workflow                 |
-| `/rewind-conversation`   | Undo recent changes in the session                    |
-| `/sessions`              | List and select previous sessions                     |
-| `/settings`              | Configure application settings                        |
-| `/share`                 | Share session with organization                       |
-| `/skills`                | Manage and invoke skills                              |
-| `/status`                | Show current droid status and configuration           |
-| `/statusline`            | Configure custom status line                          |
-| `/terminal-setup`        | Configure terminal keybindings for Shift+Enter        |
-| `/wrapped`               | Show Droid usage statistics                           |
+| Command                | Description                                                    |
+| :--------------------- | :------------------------------------------------------------- |
+| `/account`             | Open Factory account settings in browser                       |
+| `/billing`             | View and manage billing settings                               |
+| `/bg-process`          | Manage background processes                                    |
+| `/bug [title]`         | Create a bug report with session data and logs                 |
+| `/clear`               | Start a new session (alias for `/new`)                         |
+| `/commands`            | Manage custom slash commands                                   |
+| `/compress [prompt]`   | Compress session and move to new one with summary              |
+| `/cost`                | Show token usage statistics                                    |
+| `/create-skill`        | Create a reusable skill from current session                   |
+| `/droids`              | Manage custom droids                                           |
+| `/missions`       | Enter Mission mode                                             |
+| `/favorite`            | Mark current session as a favorite                             |
+| `/fork`                | Duplicate current session with all messages into a new session |
+| `/generate_blog`       | Generate semantic diff blog post                               |
+| `/help`                | Show available slash commands                                  |
+| `/hooks`               | Manage lifecycle hooks                                         |
+| `/ide`                 | Configure IDE integrations                                     |
+| `/install-github-app`  | Install Factory GitHub App                                     |
+| `/login`               | Sign in to Factory                                             |
+| `/logout`              | Sign out of Factory                                            |
+| `/mcp`                 | Manage Model Context Protocol servers                          |
+| `/mission`             | Open Mission Control                                           |
+| `/missions`            | List and select missions to resume                             |
+| `/model`               | Switch AI model mid-session                                    |
+| `/new`                 | Start a new session                                            |
+| `/plugins`             | Manage plugins and marketplaces                                |
+| `/quit`                | Exit droid (alias: `exit`, or press Ctrl+C)                    |
+| `/readiness-report`    | Generate readiness report                                      |
+| `/rename`              | Rename current session                                         |
+| `/review`              | Start AI-powered code review workflow                          |
+| `/rewind-conversation` | Undo recent changes in the session                             |
+| `/sessions`            | List and select previous sessions                              |
+| `/settings`            | Configure application settings                                 |
+| `/share`               | Share session with organization                                |
+| `/skills`              | Manage and invoke skills                                       |
+| `/status`              | Show current droid status and configuration                    |
+| `/statusline`          | Configure custom status line                                   |
+| `/terminal-setup`      | Configure terminal keybindings for Shift+Enter                 |
+| `/wrapped`             | Show Droid usage statistics                                    |
 
 For detailed information on slash commands, see the [interactive mode documentation](/cli/getting-started/quickstart#useful-slash-commands).
 
@@ -228,11 +233,11 @@ set FACTORY_API_KEY=fk-...
 
 ## Exit codes
 
-| Code | Meaning                        |
-| :--- | :----------------------------- |
-| `0`  | Success                        |
-| `1`  | General runtime error          |
-| `2`  | Invalid CLI arguments/options  |
+| Code | Meaning                       |
+| :--- | :---------------------------- |
+| `0`  | Success                       |
+| `1`  | General runtime error         |
+| `2`  | Invalid CLI arguments/options |
 
 ## Common workflows
 

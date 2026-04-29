@@ -4,6 +4,142 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="April 28" rss={{ title: "CLI Updates", description: "Italian translations, interval loop command, refreshed hooks UI, faster Grep, and CLI stability fixes" }}>
+  `v0.111.0`
+
+## New features
+
+- **Italian translations** - Factory CLI is now available in Italian
+- **`interval` loop command** - New CLI command for running tasks on an interval
+- **Refreshed hooks UI** - Updated UI for managing hooks
+- **Custom commands in Task prompts** - Task tool prompts now expand resolved custom slash commands
+- **Chat transcript scroll keybinds** - New keyboard shortcuts to jump between turns in the chat view
+- **Mission usage limits** - Missions now gracefully handle usage-limit responses
+- **Mission entry overage gating** - Mission entry now respects your organization's overage preference
+- **Per-run automation viewer** - New visual viewer to inspect each automation run (app)
+- **Model access table** - New UI for managing organization-level model access (app)
+- **Factory Academy certification tiers** - Detect certification tiers and expanded quizzes to 30 questions (app)
+
+## Improvements
+
+- **Faster Grep tool** - Grep tool now uses a hybrid ripgrep engine for better performance
+- **Stronger secret scrubbing** - Expanded secret scrubber patterns and applied scrubbing to Read tool output
+- **Faster `/new` and `/clear`** - Daemon session is now eagerly initialized on `/new` and `/clear`
+- **Centered settings on wide screens** - Settings content is now capped at 1024px and centered on wide displays (app)
+- **Clearer schedule timezones** - Automation schedule timezone and run history timestamps are clearer (app)
+- **Devtools shortcut on desktop** - Re-enabled the devtools keyboard shortcut in production builds (app)
+- **Clearer seat-limit errors** - Clearer error message when inviting members beyond your seat limit (app)
+- **Native Slack loading status** - Slack now uses native loading status indicators (app)
+
+## Bug fixes
+
+- **Subagents during silent tools** - Task subagents are now kept alive during silent execution
+- **Execute preview rendering** - Bounded Execute tool preview rendering to prevent layout issues
+- **Execute approval rendering** - Stabilized rendering during Execute tool approvals
+- **Image paste on Linux/SSH** - Fixed image paste in Ghostty on Linux and over SSH
+- **Skill and droid preview scroll** - Skill and droid previews now scroll with arrow keys
+- **Chat Esc sequence** - Codified Esc key behavior in chat
+- **Spec mode editor flow** - Unblocked the spec edit flow when the editor opens via the system default
+- **Terminal indicator on Windows** - Hidden the terminal indicator on Windows in the footer
+- **Spec confirmation status** - Spec confirmation status is now gated on tool confirmation state
+- **Linux mission wake-lock leaks** - Prevented wake-lock leaks during Linux missions
+- **Skills rendering** - Fixed a parsing issue when rendering skills
+- **Subagent nesting** - Fixed nesting of subagents in the UI (app)
+- **Cloud-synced computer sessions** - Cloud-synced computer sessions now display correctly (app)
+- **Login screen error toast** - Suppressed an `/auth/me` error toast on the login screen (app)
+- **Slack thread replies** - Slack now only forwards thread replies via `app_mention` (app)
+- **Empty GitHub repos** - Added support for empty GitHub repositories (app)
+- **Daemon directory paths** - Directory paths are now normalized in the daemon and render properly in the frontend (app)
+
+</Update>
+
+<Update label="April 26" rss={{ title: "CLI Updates", description: "Auto-fallback to Droid Core, per-tool MCP autonomy overrides, desktop system theming, and CLI stability fixes" }}>
+  `v0.109.3`
+
+## New features
+
+- **Auto-fallback to Droid Core** - Sessions that hit usage limits now automatically fall back to Droid Core when your overage preference is set to Droid Core
+- **Per-tool MCP autonomy overrides** - New `mcpAutonomyOverrides` setting lets you configure autonomy levels for individual MCP tools
+- **System theming** - Desktop app now follows your system theme (app)
+- **New desktop updater** - Improved auto-update flow for the desktop app (app)
+- **Per-channel Slack auto-run model** - Choose which model is used for each Slack auto-run channel (app)
+
+## Improvements
+
+- **Larger Droid Shield buffer** - Increased Droid Shield max buffer from 20MB to 64MB to handle larger outputs
+- **Faster hibernation detection** - Droid Computer hibernation is now detected more quickly
+- **Sorted model list** - CLI model list is now sorted by release date, newest first
+- **Cleaner MCP tool parameters** - MCP tool parameters show truncated JSON instead of `[object Object]`
+
+## Bug fixes
+
+- **Lost subagent output** - Fixed an issue where subagent output could be lost
+- **MCP tool selection refresh** - Tool selection now refreshes after MCP updates
+- **Slash command initialization** - Slash commands now wait for initialization to finish before running
+- **Spec mode approval comments** - Spec approval comments now work in both live and resumed sessions
+- **`--auto` level in exec runs** - `--auto` level is now applied in exec runs even when the session inherits spec mode
+- **Tool confirmation state** - Restored correct tool execution state after a tool-confirmation approval
+- **Settings theme control alignment** - Fixed alignment of the settings theme control
+- **Stray hover glyphs** - Removed unintended active hover glyphs
+- **Windows worker reliability** - Added retries for Windows Job Object spawn failures
+- **Settings folder watcher** - Switched to native recursive watching for the settings folder
+- **Cron schedules in UTC** - Scheduled missions now evaluate cron expressions in UTC
+- **Clearer paywall errors on computer routes** - Computer routes now return a clear error when accessed from a non-paying organization
+- **Slack multi-turn delegation** - Fixed multi-turn delegation when running from Slack
+- **Web auth timeout fallback** - Fixed an auth timeout fallback in the web app (app)
+- **App UI polish** - Fixed various spacing, color, and chevron issues (app)
+
+</Update>
+
+<Update label="April 23" rss={{ title: "CLI Updates", description: "Fast-mode toggle, Droid Computer improvements, mission artifact validation, and CLI stability fixes" }}>
+  `v0.109.1`
+
+## New features
+
+- **Fast-mode toggle** - Single opt-in toggle to enable fast-mode model variants
+- **Droid Computer registration improvements** - Smoother register/remove flow with better handling of duplicate computer names
+- **Mission artifact validation** - Mission artifacts are now schema-validated on create, edit, and apply-patch
+
+## Improvements
+
+- **Faster Windows worker startup** - Reduced worker startup latency on Windows
+- **Cleaner Ctrl+O transcripts** - Verbose transcript bodies are now hidden for easier reading
+- **Quieter CLI logs** - Reduced noisy log volume during normal use
+- **Mermaid rendering** - Various improvements to Mermaid diagram rendering
+
+## Bug fixes
+
+- **Spec mode approval flow** - Stabilized the approval flow in spec mode
+- **IDE diagnostics on disconnect** - Guarded against errors when the IDE client is disconnected
+- **Background process cleanup** - Background processes are now cleaned up when the CLI exits
+- **Sessions during silent tools** - Sessions are kept alive during silent tool execution
+- **Session tool IDs** - Session `enabledToolIds` are now treated as additive
+- **Secret scanner on large diffs** - Improved secret scanner reliability on large diffs
+- **`/rename` persistence** - `/rename` now persists across daemon sync and refreshes the cloud title (app)
+- **Auto-allow-new toggle** - Toggling auto-allow-new no longer clears every model (app)
+- **Integration modal** - Stabilized the Integration Management modal's height and scrolling (app)
+- **On-demand pagination** - Replaced "Load All" with proper on-demand pagination (app)
+- **GitLab integration reliability** - Fixed an out-of-memory issue in the GitLab integration (app)
+
+</Update>
+
+<Update label="April 22" rss={{ title: "CLI Updates", description: "Consolidated mission files, compute usage on billing pages, and CLI stability fixes" }}>
+  `v0.108.0`
+
+## New features
+
+- **Consolidated mission files** - Mission-related files now live together under `~/.factory` for easier discoverability
+- **Compute usage on billing pages** - Billing and usage pages now surface compute usage alongside other usage data (app)
+
+## Bug fixes
+
+- **Linux mission wake-lock** - Linux mission wake-lock now also blocks idle and lid-switch suspend so long-running missions aren't interrupted
+- **Terminal focus feedback loop** - Fixed a terminal focus-in feedback loop in the TUI
+- **JSON-RPC error handling** - Improved error handling for JSON-RPC communication
+- **Subagents in sidebar** - Restored subagents in the sidebar (app)
+
+</Update>
+
 <Update label="April 21" rss={{ title: "CLI Updates", description: "New /btw command, upgraded /copy selector, full-project security audit, and CLI stability fixes" }}>
   `v0.106.0`
 
@@ -33,6 +169,28 @@ rss: true
 - **Factory API key scoping** - The Factory API key list is now scoped to your current organization (app)
 - **Slack session owner across pages** - The saved Slack Session Owner is now correctly shown across paginated org member lists (app)
 - **Single pinned session** - Fixed an issue that allowed multiple pinned sessions in the sidebar (app)
+
+</Update>
+
+<Update label="April 21" rss={{ title: "CLI Updates", description: "Spec mode option picker refinements and CLI stability fixes" }}>
+  `v0.105.1`
+
+## Improvements
+
+- **Spec mode option selection** - Simplified the flow for choosing between multiple proposal options in spec mode
+- **`droid computer list` output** - Hides the default "active" status column for cleaner output
+
+## Bug fixes
+
+- **Kimi tool call handling** - Fixed an issue with Kimi tool calls that could cause stream errors
+- **Auto-update on exit** - CLI now waits for in-flight auto-updates to finish before exiting to avoid interrupted installs
+- **Computer connection reliability** - Better detection and recovery when a computer connection stalls
+- **Desktop app stability** - Improved crash reporting and shutdown handling in the desktop app (app)
+- **Onboarding wizard display** - Fixed display issues in the onboarding wizard (app)
+- **Computer connection warning** - Suppressed a spurious "Failed to get computer connection state" warning (app)
+- **Send button when disconnected** - Send button is now properly disabled in disconnected sessions (app)
+- **Banner import error** - Fixed a banner import error (app)
+- **Sidebar grouping collapse** - Fixed unrelated groups collapsing together in the sidebar (app)
 
 </Update>
 
