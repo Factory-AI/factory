@@ -50,7 +50,6 @@ droidの設定を行うには：
 | `enableDroidShield` | `true`, `false` | `true` | シークレットスキャンとgitガードレールを有効にします。 |
 | `hooksDisabled` | `true`, `false` | `false` | 全てのフックの実行をグローバルに無効にします。 |
 | `ideAutoConnect` | `true`, `false` | `false` | 外部ターミナルからIDEへの自動接続。 |
-| `todoDisplayMode` | `inline`, `pinned` | `pinned` | UIでのtodoリストの表示方法。 |
 | `showThinkingInMainView` | `true`, `false` | `false` | メインチャット画面にAIの思考/推論ブロックを表示します。 |
 | `customModels` | モデル設定の配列 | `[]` | BYOK用のカスタムモデル設定。[BYOKドキュメント](/jp/cli/byok/overview)を参照。 |
 
@@ -148,12 +147,6 @@ droidイベントの音声フィードバックを設定します：
 - **`false`** – IDEターミナル内での実行時のみ自動接続（デフォルト）
 - **`true`** – 任意のターミナルからIDEに自動接続
 
-### Todo表示モード
-
-`todoDisplayMode`設定は、UIでのtodoリストの表示方法を制御します：
-
-- **`pinned`** – todoリストが入力エリア上に固定表示（デフォルト）
-- **`inline`** – todoリストがメッセージフロー内にインライン表示
 
 ## コマンド許可リストと拒否リスト
 
@@ -190,8 +183,7 @@ droidイベントの音声フィードバックを設定します：
   "cloudSessionSync": true,
   "completionSound": "fx-ok01",
   "awaitingInputSound": "fx-ack01",
-  "soundFocusMode": "always",
-  "todoDisplayMode": "pinned"
+  "soundFocusMode": "always"
 }
 ```
 ---
