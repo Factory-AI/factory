@@ -1,12 +1,12 @@
 ---
-title: コードレビュー
-description: /reviewコマンドを使用してAI駆動のレビューワークフローでコード変更を解析する
-keywords: ['code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'security review', 'review workflow', 'AI review', 'code analysis']
+title: ローカルコードレビュー
+description: /reviewコマンドを使用してAI駆動レビューでローカルのコード変更を解析する
+keywords: ['local code review', 'code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'security review', 'review workflow', 'AI review', 'code analysis']
 ---
 
 ## 概要
 
-`/review`コマンドは、AIによる洞察を活用してコードの変更を分析するためのインタラクティブワークフローを提供します。コミット前の変更のレビューから、ブランチ全体や特定のコミットの分析まで、さまざまな開発シナリオに適合する複数のレビューモードを提供します。
+`/review`コマンドは、AIによる洞察を活用してローカルのコード変更を分析するためのワークフローを提供します。コミット前の変更のレビューから、ブランチ全体や特定のコミットの分析まで、さまざまな開発シナリオに適合する複数のレビューモードを提供します。
 
 `/review`を実行すると、droidがレビュータイプの選択、パラメータの設定をガイドし、業界標準のレビューガイドラインに基づいてコードの変更を包括的に分析します。
 
@@ -14,7 +14,7 @@ keywords: ['code review', 'review', '/review', 'slash command', 'PR review', 'pu
 
 <Steps>
   <Step title="レビューフローを開始する">
-    インタラクティブなdroidセッションで、以下を入力してください：
+    ローカルのdroidセッションで、以下を入力してください：
     ```bash
     /review
     ```
@@ -198,12 +198,12 @@ AIは以下の基準をすべて満たす場合のみ、問題をバグとして
   </Accordion>
 
   <Accordion title="ワークフローとの統合">
-    `/review`コマンドはインタラクティブで、CLIセッション用です。CI/CDでの自動レビューには以下を使用してください：
+    `/review`コマンドはローカルのCLIセッション用です。CI/CDでの自動レビューには以下を使用してください：
 
 ```bash
     droid exec "Review the changes in this PR for security issues and performance regressions"
 ```
-    コード自動化の例については[コードレビューガイド](/jp/guides/droid-exec/code-review)を参照してください。
+    自動レビューの設定については[自動コードレビューガイド](/jp/guides/droid-exec/code-review)を参照してください。
   </Accordion>
 </AccordionGroup>
 
