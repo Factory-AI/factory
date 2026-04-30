@@ -438,6 +438,17 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
 ```
 ---
 
+## 機能別のエンタープライズ制御
+
+一般的な階層に加えて、いくつかの機能には下位レベルをすべて上書きする専用の組織レベル切り替えがあります：
+
+- **Wiki Cloud Sync** (`wikiCloudSync`) – wiki コンテンツを Factory cloud で生成・保存できるかどうかを制御します。無効にすると、すべての wiki API エンドポイントがブロックされ、CLI は cloud へのアップロードと GitHub wiki 同期をスキップします。デフォルトで有効です。詳しくは [Wiki](/jp/cli/features/wiki/overview#wiki-cloud-sync) を参照してください。
+- **Cloud Session Sync** (`cloudSessionSync`) – セッションデータを Factory cloud に同期するかどうかを制御します。
+
+これらの制御は、[app.factory.ai](https://app.factory.ai) の **Enterprise Controls** セクションで組織管理者が管理します。
+
+---
+
 ## すべてをまとめる
 
 階層設定システムは、他のエンタープライズページで説明されているすべての基盤となります：

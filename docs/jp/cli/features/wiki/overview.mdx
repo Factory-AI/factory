@@ -1,0 +1,80 @@
+---
+title: Wiki
+sidebarTitle: 概要
+description: リポジトリ、Web、GitHub 全体で最新状態を保てるコードベースドキュメント。
+keywords: ['wiki', 'documentation', 'codebase', '/wiki', '/install-wiki', 'github wiki', 'auto-refresh', 'generate docs']
+---
+
+Factory Wiki は、リポジトリ向けの包括的で構造化されたドキュメントを生成します。コードベースを解析し、アーキテクチャの概要、モジュールの内訳、相互リンクされたページを備えた閲覧可能な wiki を作成し、コードの変更に合わせてその内容を最新に保ちます。
+
+<CardGroup cols={3}>
+  <Card title="生成" icon="terminal" href="/jp/cli/features/wiki/generate">
+    CLI で `/wiki` を実行して、任意のリポジトリから wiki を生成します
+  </Card>
+  <Card title="自動更新" icon="rotate" href="/jp/cli/features/wiki/auto-refresh">
+    `/install-wiki` を実行して、push ごとに wiki を更新します
+  </Card>
+  <Card title="閲覧" icon="book-open" href="/jp/cli/features/wiki/web-viewer">
+    Factory アプリで wiki を読んだり、検索したり、エクスポートしたりできます
+  </Card>
+</CardGroup>
+
+## 仕組み
+
+<Steps>
+  <Step title="CLI から生成する">
+    Droid セッション内で `/wiki` を実行します。Droid はコードベースを解析し、アーキテクチャ、モジュール、API、規約をカバーする構造化された Markdown ページ群を生成します。
+  </Step>
+  <Step title="Factory cloud にアップロードする">
+    生成された wiki は Factory cloud にアップロードされ、
+    [app.factory.ai/wiki](https://app.factory.ai/wiki) で閲覧できるようになります。各アップロードにはバージョンが付き、時間の経過とともに変更を比較できます。
+  </Step>
+  <Step title="GitHub wiki に同期する">
+    GitHub でホストされているリポジトリでは、wiki はリポジトリの組み込み wiki タブへ自動的に push されます。内部リンクは書き換えられ、サイドバーが生成され、内容が `{repo}.wiki.git` に push されます。
+  </Step>
+  <Step title="最新状態を保つ">
+    `/install-wiki` を実行すると、デフォルトブランチへの push ごとに wiki を再生成する CI ワークフロー（GitHub Actions または GitLab CI）が作成されます。必要に応じて Web UI からいつでも更新をトリガーすることもできます。
+  </Step>
+</Steps>
+
+## GitHub wiki sync
+
+GitHub でホストされているリポジトリで wiki を生成すると、Factory は必要に応じてその内容を GitHub の組み込み wiki タブにも同期します。これにより、チームは Factory アプリを開かなくてもリポジトリページから直接 wiki を閲覧できます。同期の仕組みの詳細は [Wikiを生成する](/jp/cli/features/wiki/generate#github-wiki-sync) を参照してください。
+
+<Note>
+  Factory が同期する前に、GitHub 側で wiki を初期化しておく必要があります。まだ wiki タブを使ったことがない場合は、`https://github.com/{owner}/{repo}/wiki` で最初のページを手動で作成し、その後 `/wiki` を再実行してください。
+</Note>
+
+## エンタープライズ制御
+
+### Wiki Cloud Sync
+
+wiki コンテンツを Factory cloud に保存させたくない組織は、**Wiki Cloud Sync** を無効化できます。これは [app.factory.ai](https://app.factory.ai) の **Settings > Enterprise Controls > Wiki** で利用できる組織レベルのエンタープライズ制御です。
+
+**Wiki Cloud Sync** が **無効** の場合：
+
+- すべての wiki API エンドポイントが組織に対して 403 を返します
+- `/wiki` コマンドはコンテンツを Factory cloud にアップロードしません
+- CLI からの GitHub wiki 同期もスキップされます
+- `app.factory.ai/wiki` の Webビューアにはコンテンツが表示されません
+
+**Wiki Cloud Sync** は **デフォルトで有効** です。この設定を切り替えられるのは org manager のみです。
+
+エンタープライズ制御の動作全体については、[階層設定と組織制御](/jp/enterprise/hierarchical-settings-and-org-control) を参照してください。
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="Wikiを生成する" icon="terminal" href="/jp/cli/features/wiki/generate">
+    初めての wiki を生成するためのステップバイステップガイド
+  </Card>
+  <Card title="自動更新を設定する" icon="rotate" href="/jp/cli/features/wiki/auto-refresh">
+    wiki を最新状態に保つ CI アクションをインストールします
+  </Card>
+  <Card title="Web アプリで閲覧する" icon="book-open" href="/jp/cli/features/wiki/web-viewer">
+    wiki ドキュメントを検索、閲覧、エクスポートします
+  </Card>
+  <Card title="エンタープライズ設定" icon="building" href="/jp/enterprise/hierarchical-settings-and-org-control">
+    組織レベルの制御が wiki や他の機能をどう統制するかを学びます
+  </Card>
+</CardGroup>
