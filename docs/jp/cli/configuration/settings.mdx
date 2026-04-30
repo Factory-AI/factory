@@ -32,6 +32,14 @@ droidの設定を行うには：
 
 ローカル上書きは、同一レベルの対応する`settings.json`の上に統合され、同じ階層の優先順位に従います。マシン固有の設定をバージョン管理から除外したい場合は、`settings.local.json`を`.gitignore`に追加してください。
 
+## 従来のDroid YAML設定
+
+`.droid.yaml`は以前のプロジェクト設定インターフェースです。代わりに現在の`.factory/`ファイルを使用してください：
+
+- Droidの設定とローカル上書きには`settings.json`と`settings.local.json`を使用します。
+- リポジトリの指示、規約、検証コマンドには[AGENTS.md](/jp/cli/configuration/agents-md)を使用します。
+- 連携、自動化、再利用可能なワークフローには[MCPサーバー](/jp/cli/configuration/mcp)、[フック](/jp/cli/configuration/hooks-guide)、[スキル](/jp/cli/configuration/skills)を使用します。
+
 ## 利用可能な設定
 
 | 設定 | オプション | デフォルト | 説明 |
@@ -146,7 +154,6 @@ droidイベントの音声フィードバックを設定します：
 
 - **`false`** – IDEターミナル内での実行時のみ自動接続（デフォルト）
 - **`true`** – 任意のターミナルからIDEに自動接続
-
 
 ## コマンド許可リストと拒否リスト
 
