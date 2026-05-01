@@ -1,199 +1,121 @@
 ---
 title: Bring Your Own Key (BYOK)
-sidebarTitle: Overview
-description: Connect your own API keys, use open source models, or run local models
-keywords: ['byok', 'bring your own key', 'own api key', 'api key', 'custom models', 'local models', 'open source', 'self-hosted', 'use own key', 'personal key', 'own key']
+sidebarTitle: Bring Your Own Key
+description: Configure custom models and provider API keys in Factory CLI.
+keywords:
+  [
+    'byok',
+    'bring your own key',
+    'own api key',
+    'api key',
+    'custom models',
+    'local models',
+    'open source',
+    'self-hosted',
+    'use own key',
+    'personal key',
+    'own key',
+  ]
 ---
 
-Factory CLI supports custom model configurations through BYOK (Bring Your Own Key). Use your own OpenAI or Anthropic keys, connect to any open source model providers, or run models locally on your hardware. Once configured, switch between models using the `/model` command.
+Bring Your Own Key (BYOK) uses the Factory CLI `customModels` setting to add models that Factory does not manage for you. Configure the model ID, provider format, base URL, API key, and optional token or reasoning fields once, then choose the custom model from `/model` in the Factory CLI.
 
-For Factory-managed models and multipliers, see [Available Models](/models).
+For Factory-managed models and usage multipliers, see [Available Models](/models).
 
 <Note>
-  Your API keys remain local and are not uploaded to Factory servers. Custom models are only available in the CLI and won't appear in Factory's web or mobile platforms.
+  Store real API keys in environment variables and reference them with
+  <code>{'${VAR_NAME}'}</code>. Do not commit API keys to project files.
 </Note>
 
-<img src="/images/custom_models.png" alt="Model selector showing custom models" />
+## Configure a custom model
 
-[Install the CLI with the 5-minute quickstart →](/cli/getting-started/quickstart)
-
----
-
-## Configuration Reference
-
-Add custom models to `~/.factory/settings.json` under the `customModels` array:
+Add custom models to `~/.factory/settings.json` or `~/.factory/settings.local.json` under the `customModels` array:
 
 ```json
 {
   "customModels": [
     {
-      "model": "your-model-id",
-      "displayName": "My Custom Model",
-      "baseUrl": "https://api.provider.com/v1",
+      "model": "provider-model-id",
+      "baseUrl": "https://api.example.com/v1",
       "apiKey": "${PROVIDER_API_KEY}",
-      "provider": "generic-chat-completion-api",
-      "maxOutputTokens": 16384
+      "provider": "generic-chat-completion-api"
     }
   ]
 }
 ```
 
-<Tip>
-  In `settings.json` (and `settings.local.json`), `apiKey` supports environment variable references using `${VAR_NAME}` syntax. For example, `"apiKey": "${PROVIDER_API_KEY}"` reads from the environment variable named `PROVIDER_API_KEY` (for example: `export PROVIDER_API_KEY=your_key_here`).
-</Tip>
+Set the environment variable in the shell where you launch Droid:
+
+```bash
+export PROVIDER_API_KEY="YOUR_API_KEY"
+```
+
+Then run `/model` and select the entry from **Custom models**. Settings changes usually reload automatically; if the model does not appear, restart Droid and validate the settings JSON.
 
 <Note>
-  **Legacy support**: Custom models in `~/.factory/config.json` using snake_case field names (`custom_models`, `base_url`, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with `settings.json` taking priority. Env var expansion for `apiKey` applies to `settings.json`/`settings.local.json` and not to legacy `config.json`.
+  Legacy `~/.factory/config.json` custom model entries are still loaded for
+  backwards compatibility. Use `settings.json` or `settings.local.json` for new
+  BYOK configurations. Environment variable interpolation applies to settings
+  files, not legacy `config.json` entries.
 </Note>
 
-### Supported Fields
+## Provider matrix
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `model` | `string` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
-| `displayName` | `string` | | Human-friendly name shown in model selector |
-| `baseUrl` | `string` | ✓ | API endpoint base URL |
-| `apiKey` | `string` | ✓ | Your API key for the provider. Can't be empty. Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g., `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable). |
-| `provider` | `string` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
-| `maxOutputTokens` | `number` | | Maximum output tokens for model responses |
-| `noImageSupport` | `boolean` | | Set to `true` to disable image inputs for this model |
-| `extraArgs` | `object` | | Additional provider-specific arguments to include in API requests |
-| `extraHeaders` | `object` | | Additional HTTP headers to send with requests |
+Choose the `provider` value based on the API format exposed by your endpoint, not just the company name.
 
-### Using extraArgs
-
-Pass provider-specific parameters like temperature or top_p:
-
-```json
-{
-  "customModels": [
-    {
-      "model": "your-model",
-      "displayName": "Custom Model",
-      "baseUrl": "https://your-provider.com/v1",
-      "apiKey": "YOUR_API_KEY",
-      "provider": "generic-chat-completion-api",
-      "extraArgs": {
-        "temperature": 0.7,
-        "top_p": 0.9
-      }
-    }
-  ]
-}
-```
-
-### Using extraHeaders
-
-Add custom HTTP headers to API requests:
-
-```json
-{
-  "customModels": [
-    {
-      "model": "your-model",
-      "displayName": "Custom Model",
-      "baseUrl": "https://your-provider.com/v1",
-      "apiKey": "YOUR_API_KEY",
-      "provider": "generic-chat-completion-api",
-      "extraHeaders": {
-        "X-Custom-Header": "value",
-        "Authorization": "Bearer YOUR_TOKEN"
-      }
-    }
-  ]
-}
-```
-
----
-
-## Understanding Providers
-
-Factory supports three provider types that determine API compatibility:
-
-| Provider | API Format | Use For | Documentation |
-|----------|------------|---------|---------------|
-| `anthropic` | Anthropic Messages API (v1/messages) | Anthropic models on their official API or compatible proxies | [Anthropic Messages API](https://docs.claude.com/en/api/messages) |
-| `openai` | OpenAI Responses API | OpenAI models on their official API or compatible proxies. Required for the newest models like GPT-5 and GPT-5-Codex. | [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) |
-| `generic-chat-completion-api` | OpenAI Chat Completions API | OpenRouter, Fireworks, Together AI, Ollama, vLLM, and most open-source providers | [OpenAI Chat Completions API](https://platform.openai.com/docs/api-reference/chat) |
+| Endpoint                  | `provider`                    | Base URL                                                  | Use/notes                                                                 |
+| ------------------------- | ----------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Anthropic API             | `anthropic`                   | `https://api.anthropic.com`                               | Anthropic Messages API.                                                   |
+| OpenAI API                | `openai`                      | `https://api.openai.com/v1`                               | OpenAI Responses API.                                                     |
+| Baseten                   | `generic-chat-completion-api` | `https://inference.baseten.co/v1`                         | Use the deployment model ID.                                              |
+| DeepInfra                 | `generic-chat-completion-api` | `https://api.deepinfra.com/v1/openai`                     | Repository-style model IDs are common.                                    |
+| Fireworks AI              | `generic-chat-completion-api` | `https://api.fireworks.ai/inference/v1`                   | Model IDs may include an account path.                                    |
+| Groq                      | `generic-chat-completion-api` | `https://api.groq.com/openai/v1`                          | Use the Groq console model ID.                                            |
+| Hugging Face Router       | `generic-chat-completion-api` | `https://router.huggingface.co/v1`                        | Accept required provider or model terms first.                            |
+| OpenRouter                | `generic-chat-completion-api` | `https://openrouter.ai/api/v1`                            | Add required headers with `extraHeaders`.                                 |
+| Google Gemini             | `generic-chat-completion-api` | `https://generativelanguage.googleapis.com/v1beta/openai` | OpenAI-compatible Gemini endpoint; Vertex or gateway URLs can also apply. |
+| Local/self-hosted servers | `generic-chat-completion-api` | `http://localhost:11434/v1` or `https://example.com/v1`   | Ollama, vLLM, or self-hosted `/v1` servers. Start the server first.       |
 
 <Warning>
-  Factory is actively verifying Droid's performance on popular models, but we cannot guarantee that all custom models will work out of the box. Only Anthropic and OpenAI models accessed via their official APIs are fully tested and benchmarked.
+  Custom model quality, latency, image support, prompt caching, and reasoning
+  support depend on the provider and model you choose. Validate the model on
+  your repository before relying on it for production engineering work.
 </Warning>
 
-<Note>
-  **Model Size Consideration**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While these smaller models can be useful for experimentation and learning, they are generally not recommended for production coding work or complex software engineering tasks.
-</Note>
+## Supported fields
 
----
+### Required fields
 
-## Prompt Caching
+| Field      | Description                                                          |
+| ---------- | -------------------------------------------------------------------- |
+| `model`    | Model identifier sent to the provider.                               |
+| `baseUrl`  | Provider API base URL.                                               |
+| `apiKey`   | API key string or `${VAR_NAME}` environment variable reference.      |
+| `provider` | API format: `anthropic`, `openai`, or `generic-chat-completion-api`. |
 
-Factory CLI automatically uses prompt caching when available to reduce API costs:
+### Optional fields
 
-- **Official providers (`anthropic`, `openai`)**: Factory attempts to use prompt caching via the official APIs. Caching behavior follows each provider's implementation and requirements.
-- **Generic providers (`generic-chat-completion-api`)**: Prompt caching support varies by provider and cannot be guaranteed. Some providers may support caching, while others may not.
-
-### Verifying Prompt Caching
-
-To check if prompt caching is working correctly with your custom model:
-
-1. Run a conversation with your custom model
-2. Use the `/cost` command in Droid CLI to view cost breakdowns
-3. Look for cache hit rates and savings in the output
-
-If you're not seeing expected caching savings, consult your provider's documentation about their prompt caching support and requirements.
-
----
-
-## Quick Start
-
-Choose a provider from the left navigation to see specific configuration examples:
-
-- **[Baseten](/cli/byok/baseten)** - Deploy and serve custom models
-- **[DeepInfra](/cli/byok/deepinfra)** - Cost-effective inference for open-source models
-- **[Fireworks AI](/cli/byok/fireworks)** - High-performance inference for open-source models
-- **[Google Gemini](/cli/byok/google-gemini)** - Access Google's Gemini models
-- **[Groq](/cli/byok/groq)** - Ultra-fast inference with Groq's LPU™ Inference Engine
-- **[Hugging Face](/cli/byok/huggingface)** - Connect to models on HF Inference API
-- **[Ollama](/cli/byok/ollama)** - Run models locally or in the cloud
-- **[OpenAI & Anthropic](/cli/byok/openai-anthropic)** - Use your own API keys for official models
-- **[OpenRouter](/cli/byok/openrouter)** - Access multiple providers through a single interface
-
----
-
-## Using Custom Models
-
-Once configured, access your custom models in the CLI:
-
-1. Use the `/model` command
-2. Your custom models appear in a separate "Custom models" section below Factory-provided models
-3. Select any model to start using it
-
-Custom models display with the name you set in `displayName`, making it easy to identify different providers and configurations.
-
----
+| Field               | Description                                                                                                                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `displayName`       | Human-readable label shown in the model selector. Defaults to `model`.                                                                                                             |
+| `id`                | Stable custom model ID. Droid generates one when omitted.                                                                                                                          |
+| `index`             | Numeric ordering/index for the custom model. Droid assigns one when omitted.                                                                                                       |
+| `maxOutputTokens`   | Maximum output tokens to request from the provider.                                                                                                                                |
+| `enableThinking`    | Enables provider thinking/reasoning configuration when supported by the selected API format.                                                                                       |
+| `thinkingMaxTokens` | Maximum thinking tokens when thinking is enabled.                                                                                                                                  |
+| `reasoningEffort`   | Reasoning effort hint such as `low`, `medium`, or `high` when supported.                                                                                                           |
+| `extraHeaders`      | Additional HTTP headers sent with each request.                                                                                                                                    |
+| `extraArgs`         | Additional provider-specific request arguments.                                                                                                                                    |
+| `noImageSupport`    | Set to `true` to disable image inputs. For non-OpenAI and non-Anthropic formats, Droid defaults this to `true` when omitted; set it to `false` only after verifying image support. |
 
 ## Troubleshooting
 
-### Model not appearing in selector
-- Check JSON syntax in `~/.factory/settings.json` (or `config.json` if using legacy format)
-- Settings changes are detected automatically via file watching
-- Verify all required fields are present
-
-### "Invalid provider" error
-- Provider must be exactly `anthropic`, `openai`, or `generic-chat-completion-api`
-- Check for typos and ensure proper capitalization
-
-### Authentication errors
-- Verify your API key is valid and has available credits
-- Check that the API key has proper permissions
-- Confirm the base URL matches your provider's documentation
-
-### Local model won't connect
-- Ensure your local server is running (e.g., `ollama serve`)
-- Verify the base URL is correct and includes `/v1/` suffix if required
-- Check that the model is pulled/available locally
-
-### Rate limiting or quota errors
-- Check your provider's rate limits and usage quotas
-- Monitor your usage through your provider's dashboard
+| Problem                   | Check                                                                                                                                                                     |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Model does not appear     | Confirm `customModels` is valid JSON and includes `model`, `baseUrl`, `apiKey`, and `provider`.                                                                           |
+| Invalid provider          | Use exactly `anthropic`, `openai`, or `generic-chat-completion-api`.                                                                                                      |
+| Authentication fails      | Verify the environment variable is set in the shell where you launched Droid and that the provider account has available quota.                                           |
+| Requests fail immediately | Confirm the `baseUrl` matches the API format selected by `provider`.                                                                                                      |
+| Local model fails         | Start the local server, confirm the model is pulled, and test the `/v1` endpoint from the same machine.                                                                   |
+| Optional fields fail      | Remove unsupported `enableThinking`, `thinkingMaxTokens`, `reasoningEffort`, `extraHeaders`, or `extraArgs`, then add them back only when the provider documents support. |
+| Images fail               | Set `noImageSupport` to `true` unless you have verified image input support for that endpoint.                                                                            |
