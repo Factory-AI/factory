@@ -4,6 +4,39 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="May 1" rss={{ title: "CLI Updates", description: "PDF support for Gemini 3.1 Pro, GLM-5.1 reasoning, bulk image drag-and-drop, PDF uploads in app, and CLI stability fixes" }}>
+  `v0.115.0`
+
+## New features
+
+- **PDF support for Gemini 3.1 Pro** - Gemini 3.1 Pro now accepts PDF inputs
+- **GLM-5.1 reasoning** - Added reasoning support for GLM-5.1
+- **Bulk image drag-and-drop** - Drop multiple images into the CLI at once
+- **PDF uploads** - Upload PDF files directly in chat (app)
+- **No-computer state on new session** - The new session page now handles cases when no computers are available (app)
+
+## Improvements
+
+- **Resilient session resume** - Resuming a session that references a retired model now triggers a clean model migration
+- **Cloud sync stability** - Hardened cloud sync against session race conditions
+
+## Bug fixes
+
+- **Terminal tab title** - Terminal tab title now updates when the active session changes
+- **Phantom lines in narrow terminals** - Fixed phantom lines that could appear in narrow terminals
+- **Mermaid terminal rendering** - Guarded Mermaid diagram rendering in the terminal against crashes
+- **Clearer auth errors** - Improved authentication error messages
+- **ACP session cancellation** - You can now cancel ACP sessions, and the correct auth code is shown
+- **Spinner rendering** - Fixed a spinner rendering issue
+- **Linear delegation matching** - Relaxed matching in the Linear delegation picker (app)
+- **Session timeout messages** - Cleaner timeout messages and fixed a working directory error (app)
+- **Connection failure toasts** - Removed noisy connection failure toasts (app)
+- **Free trial onboarding** - Fixed a free trial onboarding issue (app)
+- **Subagent collapse** - Subagents now collapse correctly even when the parent is selected (app)
+- **Wiki export validation** - Hardened filename validation when exporting wikis (app)
+
+</Update>
+
 <Update label="April 30" rss={{ title: "CLI Updates", description: "BYOM admin toggle, Droid Shield push-scan refinement, Windows Python execution fix, and CLI stability fixes" }}>
   `v0.114.0`
 
