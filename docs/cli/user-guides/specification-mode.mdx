@@ -6,21 +6,6 @@ keywords: ['spec mode', 'specification', 'planning', 'plan', 'spec', 'feature pl
 
 Spec Mode turns a high-level request into a reviewed specification and implementation plan before Droid edits files or runs modifying commands. Use it for multi-file changes, migrations, high-risk work, or any task where you want to shape the approach before implementation starts.
 
-<CardGroup cols={2}>
-  <Card title="Simple Input" icon="message">
-    Describe the outcome you want in a few sentences.
-  </Card>
-  <Card title="Source-backed Planning" icon="list-check">
-    Droid researches the codebase and proposes an implementation plan.
-  </Card>
-  <Card title="Safe Execution" icon="shield-check">
-    No code changes happen until you approve the plan.
-  </Card>
-  <Card title="Separate Autonomy" icon="sliders">
-    Spec Mode handles planning; Autonomy Level controls implementation approvals.
-  </Card>
-</CardGroup>
-
 ## How it works
 
 <Steps>
@@ -45,27 +30,6 @@ Spec Mode turns a high-level request into a reviewed specification and implement
   </Step>
 </Steps>
 
-## Example workflow
-
-**Your input:**
-
-```
-Add a feature for users to export their personal data.
-It should create a ZIP file with their profile, posts, and uploaded files.
-Send them an email when it's ready. Make sure it follows GDPR requirements.
-The export should work for accounts up to 2GB of data.
-```
-
-**Droid generates:**
-
-- Complete specification with detailed acceptance criteria
-- Technical implementation plan covering backend, frontend, and email
-- File-by-file breakdown of changes needed
-- Testing strategy and verification steps
-- Security and compliance considerations
-
-**You approve, then Droid implements** the complete solution while surfacing changes according to the current or selected Autonomy Level.
-
 <Note>
   Spec Mode must be activated before the request you want planned. It does not
   automatically activate for every complex prompt.
@@ -73,7 +37,7 @@ The export should work for accounts up to 2GB of data.
 
 ## How to activate Spec Mode
 
-In the interactive Factory CLI, press **Shift+Tab** until the status banner shows Spec Mode. Send your request after Spec Mode is active.
+In the CLI, press **Shift+Tab** until the status banner shows Spec Mode. Send your request after Spec Mode is active.
 
 Use **Ctrl+L** separately to change [Autonomy Level](/cli/user-guides/auto-run). Spec Mode and Autonomy Level are independent controls.
 
@@ -122,49 +86,13 @@ For small, well-understood edits, Auto can proceed directly while still using yo
 ## Writing effective requests
 
 **Focus on outcomes:** Describe what the software should accomplish, not how to build it.
-
-```
-Users need to be able to reset their passwords using email verification.
-The reset link should expire after 24 hours for security.
-Include rate limiting to prevent abuse.
-```
-
 **Include important constraints:**
-
-```
-Add user data export functionality that works for accounts up to 5GB.
-Must comply with GDPR and include audit logging.
-Should complete within 10 minutes and not impact application performance.
-```
-
 **Reference existing patterns:**
-
-```
-Add a notification system similar to how we handle email confirmations.
-Use the same background job pattern as our existing report generation.
-Follow the authentication patterns we use for other sensitive operations.
-```
-
 **Be specific about verification:** Tell Droid how to confirm the implementation works correctly.
-
 **Consider the full user journey:** Describe the complete experience, not just technical requirements.
-
 **Include error scenarios:** Specify how failures should be handled and communicated to users.
-
 **Think about scale:** Mention performance requirements and expected usage patterns.
 
-## Enterprise integration
-
-Reference external requirements by pasting links:
-
-```
-Implement the user management features described in this Jira ticket:
-https://company.atlassian.net/browse/PROJ-123
-
-Follow our security standards and include comprehensive error handling.
-```
-
-If you've integrated platforms through Factory's dashboard, Droid can read context from tickets, documents, and specs during analysis.
 
 ## Benefits
 
@@ -186,63 +114,17 @@ If you've integrated platforms through Factory's dashboard, Droid can read conte
   </Card>
 </CardGroup>
 
-## AGENTS.md integration
-
-Document your project conventions to improve Spec Mode planning. See [AGENTS.md](/cli/configuration/agents-md) for more information.
-
-Spec Mode incorporates these conventions so plans align with your team's standards.
-
 ## Using mixed models
 
 Open `/model` and configure a dedicated Spec Mode model when planning should use a different model than implementation. A stronger model can produce higher-quality specs for complex work, while a faster or lower-cost default model can handle implementation once the plan is approved.
 
 If no Spec Mode model is configured, Spec Mode uses the main session model. See [Mixed Models](/cli/configuration/mixed-models) for setup details.
 
-## Breaking down large features
-
-For complex features spanning multiple components, break them into focused phases:
-
-**Phase 1:**
-
-```
-Implement user data export backend API and job processing.
-Focus only on the server-side functionality, not the UI yet.
-```
-
-**Phase 2:**
-
-```
-Add the frontend UI for data export using the API from Phase 1.
-Include progress indicators and download management.
-```
-
-This approach lets you validate each phase before proceeding to the next.
-
-## Approval options
-
-After Droid presents the plan, choose how to continue:
-
-1. **Proceed with implementation** – Approve the plan, exit Spec Mode, and keep manual execution controls.
-2. **Proceed, and allow file edits and read-only commands (Low)** – Approve the plan and use Autonomy Level Low for implementation.
-3. **Proceed, and allow reversible commands (Medium)** – Approve the plan and use Autonomy Level Medium for implementation.
-4. **Proceed, and allow all commands (High)** – Approve the plan and use Autonomy Level High for implementation.
-5. **No, keep iterating on spec** – Stay in Spec Mode to refine the plan before implementation.
-
-Organization Maximum Autonomy Level can hide higher approval options. Choosing an Autonomy Level option sets that level for implementation; choosing to keep iterating leaves Spec Mode active.
-
 ## Saving your specifications as Markdown
 
-Spec Mode can automatically write the approved plan to disk. Open the Factory CLI settings and enable **Save spec as Markdown** to turn this on.
+Spec Mode can automatically write the approved plan to disk. Open Settings and enable **Save spec as Markdown** to turn this on.
 
-- By default, plans are saved to `.factory/docs` inside the nearest project-level `.factory` directory. If none exists, the Factory CLI falls back to `~/.factory/docs` in your home directory.
+- By default, plans are saved to `.factory/docs` inside the nearest project-level `.factory` directory. If none exists, the Droid falls back to `~/.factory/docs` in your home directory.
 - Use the **Spec save directory** setting to pick between the project directory, your home directory, or a custom path. Custom values support absolute paths, `~` expansion, `.factory/...` shortcuts, and relative paths from the current workspace.
-- The Factory CLI creates the target directory if it does not exist and writes the Markdown exactly as shown in the approval dialog.
+- Droid creates the target directory if it does not exist and writes the Markdown exactly as shown in the approval dialog.
 - Files are named `YYYY-MM-DD-slug.md`, where the slug comes from the spec title or first heading, and a counter is appended if a file with the same name already exists.
-
-## What happens after approval
-
-Once you approve a plan, Droid systematically implements the changes according to the current or selected Autonomy Level. You can keep manual approval on, raise autonomy for safe automation, or interrupt if the work needs a course correction.
-
-For simpler changes that don't need comprehensive planning, Droid can proceed directly while still showing changes according to your selected controls.
-
-Ready to try Spec Mode? Activate it, describe what you want to build, and approve the plan before Droid starts implementation.
