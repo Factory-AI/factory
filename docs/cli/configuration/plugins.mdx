@@ -220,9 +220,18 @@ my-plugin/
 
 Use `${DROID_PLUGIN_ROOT}` to reference files inside the installed plugin directory. See the [Hooks reference](/reference/hooks-reference#plugin-hooks) for hook event schemas and security considerations.
 
-## Claude Code compatibility
+## External plugin marketplaces
 
-Droid can install plugins built for Claude Code when the plugin follows the compatible plugin structure. This lets teams reuse existing plugin investments while moving workflows into Droid.
+Droid can add external Git-backed marketplaces when they use a compatible marketplace and plugin structure. This includes marketplaces originally built for Claude Code, private team marketplaces, and local marketplace folders used during plugin development.
+
+Add an external marketplace with the same marketplace commands, then install plugins by ID:
+
+```bash
+droid plugin marketplace add https://github.com/owner/external-plugins
+droid plugin install plugin-name@external-plugins
+```
+
+This lets teams reuse external plugin ecosystems without copying plugin files into each repository. Review external plugin code before installing it, because plugins can include hooks and MCP server configuration that run in your local environment.
 
 ## Next steps
 
