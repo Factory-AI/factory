@@ -1,149 +1,203 @@
 ---
 title: Settings
-description: Configure Droid defaults, model routing, hooks, MCP servers, and local overrides with .factory settings.
-keywords:
-  ["settings", "configuration", "config", "preferences", "settings.json", "session defaults"]
+description: Configure how droid behaves and integrates with your workflow.
+keywords: ["settings", "configuration", "config", "preferences", "options", "customize", "settings.json"]
 ---
 
-Configure Droid with `/settings` for interactive changes or `.factory` JSON files for repeatable team configuration. The current settings surface is schema-backed JSON under `.factory`.
+## Accessing settings
 
-## Open settings in Droid
+To configure droid settings:
 
-1. Run `droid` in a terminal.
-2. Enter `/settings`.
-3. Change the setting you want.
+1. Run `droid`
+2. Enter `/settings`
+3. Adjust your preferences interactively
 
-Droid saves interactive changes to your user settings file and applies them to new sessions. Some changes, such as model selection, can also apply to the active session immediately.
+Changes take effect immediately and are saved to your settings file.
 
-## Settings file locations
+## Where settings live
 
-| Scope | Path | Use |
-| :---- | :--- | :-- |
-| User | `~/.factory/settings.json` | Personal defaults across projects. |
-| User local override | `~/.factory/settings.local.json` | Machine-specific personal overrides. |
-| Project | `<project>/.factory/settings.json` | Shared project defaults committed with the repository. |
-| Project local override | `<project>/.factory/settings.local.json` | Machine-specific project overrides. |
-| Nested folder | `<folder>/.factory/settings.json` | Defaults for a subtree inside a larger repository. |
+| OS            | Location                               |
+| ------------- | -------------------------------------- |
+| macOS / Linux | `~/.factory/settings.json`             |
+| Windows       | `%USERPROFILE%\.factory\settings.json` |
 
-Settings files accept JSON with comments. Add `settings.local.json` to `.gitignore` if it contains machine-specific values.
+If the file doesn't exist, it's created with defaults the first time you run **droid**.
 
-## How settings are resolved
+### Local overrides
 
-Droid resolves settings from organization controls, runtime/session options, folder and project `.factory` files, user settings, dynamic defaults, and built-in defaults. More specific local session defaults can override broader defaults, while organization controls can still restrict or cap choices such as model access, MCP tools, command policy, and maximum Autonomy Level.
+You can create a `settings.local.json` alongside `settings.json` in any `.factory/` folder:
 
-Use `/settings-debug` when you need to see which source supplied a resolved setting.
+- `~/.factory/settings.local.json` (user-level)
+- `<project>/.factory/settings.local.json` (project-level)
 
-## Configure session defaults
+Local overrides merge on top of the corresponding `settings.json` at the same level and follow the same hierarchy precedence. Add `settings.local.json` to `.gitignore` if you want to keep machine-specific preferences out of version control.
 
-Use `sessionDefaultSettings` to set the model, reasoning effort, interaction mode, Autonomy Level, and Spec Mode defaults for new sessions.
+## Legacy Droid YAML configuration
+
+`.droid.yaml` was an older project configuration surface. Use the current `.factory/` files instead:
+
+- Use `settings.json` and `settings.local.json` for Droid preferences and local overrides.
+- Use [AGENTS.md](/cli/configuration/agents-md) for repository instructions, conventions, and validation commands.
+- Use [MCP servers](/cli/configuration/mcp), [hooks](/cli/configuration/hooks-guide), and [skills](/cli/configuration/skills) for integrations, automation, and reusable workflows.
+
+## Available settings
+
+| Setting                    | Options                                                                                                                                                                                                                                                                  | Default                       | Description                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------------------- |
+| `model`                    | `opus`, `opus-4-7`, `opus-4-6`, `opus-4-6-fast`, `sonnet`, `sonnet-4-6`, `gpt-5.5`, `gpt-5.5-fast`, `gpt-5.5-pro`, `gpt-5.4`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex`, `haiku`, `gemini-3.1-pro`, `gemini-3-flash`, `droid-core`, `glm-5.1`, `kimi-k2.5`, `kimi-k2.6`, `minimax-m2.7`, `custom-model` | `opus`                        | The default AI model used by droid                                         |
+| `reasoningEffort`          | `off`, `none`, `low`, `medium`, `high` (availability depends on the model)                                                                                                                                                                                               | Model-dependent default       | Controls how much structured thinking the model performs.                  |
+| `sessionDefaultSettings.interactionMode` | `auto`, `spec`                                                                                                                                                                                                                                                           | `auto`                        | Sets whether new sessions start in Auto or Spec Mode.                      |
+| `sessionDefaultSettings.autonomyLevel`   | `off`, `low`, `medium`, `high`                                                                                                                                                                                                                                           | `off`                         | Sets the default [Autonomy Level](/cli/user-guides/auto-run) for new sessions. |
+| `cloudSessionSync`         | `true`, `false`                                                                                                                                                                                                                                                          | `true`                        | Mirror CLI sessions to Factory web.                                        |
+| `diffMode`                 | `github`, `unified`                                                                                                                                                                                                                                                      | `github`                      | Choose between split GitHub-style diffs and a single-column view.          |
+| `completionSound`          | `off`, `bell`, `fx-ok01`, `fx-ack01`, or custom file path                                                                                                                                                                                                                | `fx-ok01`                     | Audio cue when a response finishes.                                        |
+| `awaitingInputSound`       | `off`, `bell`, `fx-ok01`, `fx-ack01`, or custom file path                                                                                                                                                                                                                | `fx-ack01`                    | Audio cue when droid is waiting for user input.                            |
+| `soundFocusMode`           | `always`, `focused`, `unfocused`                                                                                                                                                                                                                                         | `always`                      | When to play sound notifications.                                          |
+| `commandAllowlist`         | Array of commands                                                                                                                                                                                                                                                        | Safe defaults provided        | Commands that run without extra confirmation.                              |
+| `commandDenylist`          | Array of commands                                                                                                                                                                                                                                                        | Restrictive defaults provided | Commands that always require confirmation.                                 |
+| `includeCoAuthoredByDroid` | `true`, `false`                                                                                                                                                                                                                                                          | `true`                        | Automatically append the Droid co-author trailer to commits.               |
+| `enableDroidShield`        | `true`, `false`                                                                                                                                                                                                                                                          | `true`                        | Enable secret scanning and git guardrails.                                 |
+| `hooksDisabled`            | `true`, `false`                                                                                                                                                                                                                                                          | `false`                       | Globally disable all hooks execution.                                      |
+| `ideAutoConnect`           | `true`, `false`                                                                                                                                                                                                                                                          | `false`                       | Auto-connect to IDE from external terminals.                               |
+| `showThinkingInMainView`   | `true`, `false`                                                                                                                                                                                                                                                          | `false`                       | Display AI thinking/reasoning blocks in the main chat view.                |
+| `customModels`             | Array of model configs                                                                                                                                                                                                                                                   | `[]`                          | Custom model configurations for BYOK. See [BYOK docs](/cli/byok/overview). |
+
+### Model
+
+Choose the default AI model that powers your droid:
+
+- **`opus`** - Claude Opus 4.5 (current default)
+- **`opus-4-7`** - Claude Opus 4.7, newest flagship with Max reasoning (2×; 1× promotional until April 30)
+- **`opus-4-6`** - Claude Opus 4.6, previous flagship with Max reasoning
+- **`opus-4-6-fast`** - Claude Opus 4.6 Fast, tuned for faster responses
+- **`sonnet`** - Claude Sonnet 4.5, balanced cost and quality
+- **`sonnet-4-6`** - Claude Sonnet 4.6, Max reasoning at the Sonnet price point
+- **`gpt-5.5`** - GPT-5.5, latest OpenAI flagship model with 1M context and Extra High reasoning
+- **`gpt-5.5-fast`** - GPT-5.5 on priority service tier, less susceptible to traffic surge
+- **`gpt-5.5-pro`** - GPT-5.5 Pro, higher-capability variant, ideal for research tasks
+- **`gpt-5.4`** - GPT-5.4, previous OpenAI model with 922K context and Extra High reasoning
+- **`gpt-5.2`** - OpenAI GPT-5.2
+- **`gpt-5.2-codex`** - GPT-5.2-Codex, OpenAI coding model with Extra High reasoning
+- **`gpt-5.3-codex`** - GPT-5.3-Codex, latest OpenAI coding model with Extra High reasoning and verbosity support
+- **`haiku`** - Claude Haiku 4.5, fast and cost-effective
+- **`gemini-3.1-pro`** - Gemini 3.1 Pro
+- **`gemini-3-flash`** - Gemini 3 Flash, fast and cheap (0.2× multiplier)
+- **`droid-core`** - GLM-5.1 open-source model
+- **`glm-5.1`** - GLM-5.1 open-source model
+- **`kimi-k2.5`** - Kimi K2.5 open-source model with image support
+- **`kimi-k2.6`** - Kimi K2.6 open-source model with image support and optional High reasoning
+- **`minimax-m2.7`** - MiniMax M2.7 open-source model with reasoning support for cost-sensitive agentic workflows
+- **`custom-model`** - Your own configured model via BYOK
+
+[You can also add custom models and BYOK.](/cli/byok/overview)
+
+### Reasoning effort
+
+`reasoningEffort` adjusts how much structured thinking the model performs before replying. Available values depend on the model, but typically include:
+
+- **`off` / `none`** – disable structured reasoning (fastest).
+- **`low`**, **`medium`**, **`high`** – progressively increase deliberation time for more complex reasoning.
+
+Anthropic models default to `off`, while GPT-5 starts on `medium`.
+
+### Autonomy level
+
+Use `sessionDefaultSettings.interactionMode` to choose whether new sessions start in Auto or Spec Mode, and `sessionDefaultSettings.autonomyLevel` to set the default [Autonomy Level](/cli/user-guides/auto-run). `off` keeps manual approvals; `low`, `medium`, and `high` pre-authorize work at or below that risk level.
+
+`sessionDefaultSettings.autonomyMode` is deprecated and retained for older configurations.
+
+### Diff mode
+
+Control how droid displays code changes:
+
+- **`github`** – Side-by-side, higher fidelity render (recommended).
+- **`unified`** – Traditional single-column diff format.
+
+### Cloud session sync
+
+When this switch is on, every CLI session is mirrored to Factory web so you can revisit conversations in the browser:
+
+- **`true`** – Sync sessions to the web app.
+- **`false`** – Keep sessions local only.
+
+### Sound notifications
+
+Configure audio feedback for droid events:
+
+**Completion sound** (`completionSound`) - plays when a response finishes:
+
+- **`fx-ok01`** – Built-in completion sound (default) - soft success bloop
+- **`fx-ack01`** – Alternative built-in sound effect - tactile ripple feedback
+- **`bell`** – Use the system terminal bell
+- **`off`** – No sound notifications
+- **Custom path** – Provide a file path to your own sound file (e.g., `"/path/to/sound.wav"`)
+
+**Awaiting input sound** (`awaitingInputSound`) - plays when droid is waiting for user input. Same options as completion sound, defaults to `fx-ack01`.
+
+**Sound focus mode** (`soundFocusMode`) - controls when sounds play:
+
+- **`always`** – Play sounds regardless of window focus (default)
+- **`focused`** – Only play sounds when the terminal is focused
+- **`unfocused`** – Only play sounds when the terminal is not focused
+
+<Note>Access sound settings via `/settings` or `Shift+Tab` → **Settings** in the TUI.</Note>
+
+### Hooks
+
+The `hooksDisabled` setting provides a global toggle to disable all hooks execution without removing your hook configurations:
+
+- **`false`** – Hooks are enabled and will execute normally (default)
+- **`true`** – All hooks are disabled globally
+
+You can also toggle this from the `/hooks` menu or `/settings`.
+
+### IDE auto-connect
+
+The `ideAutoConnect` setting controls whether droid automatically connects to your IDE when running from external terminals (outside the IDE's built-in terminal):
+
+- **`false`** – Only auto-connect when running inside IDE terminal (default)
+- **`true`** – Auto-connect to IDE from any terminal
+
+
+## Command allowlist & denylist
+
+Use these settings to control which commands droid can execute automatically and which it must never run:
+
+- **`commandAllowlist`** – Commands in this array are treated as safe and run without additional confirmation, regardless of autonomy prompts. Include only low-risk utilities you rely on frequently (for example `ls`, `pwd`, `dir`).
+- **`commandDenylist`** – Commands in this array always require confirmation and are typically blocked because they are destructive or unsafe (for example recursive `rm`, `mkfs`, or privileged system operations).
+
+Commands that appear in both lists default to the denylist behavior. Any command that is in neither list falls back to the autonomy level you selected for the session.
+
+### Example allow/deny configuration
 
 ```json
 {
-  "sessionDefaultSettings": {
-    "model": "MODEL_ID",
-    "reasoningEffort": "medium",
-    "interactionMode": "auto",
-    "autonomyLevel": "low"
-  }
-}
-```
-
-| Key | Values | Description |
-| :-- | :----- | :---------- |
-| `model` | Any available model ID | Default model for new sessions. Use `/model` or [Available Models](/models) to choose a current ID. |
-| `reasoningEffort` | `off`, `none`, `low`, `medium`, `high` | Default reasoning effort. Droid clamps or defaults this value when the selected model does not support it. |
-| `interactionMode` | `auto`, `spec` | Start in Auto or Spec Mode. |
-| `autonomyLevel` | `off`, `low`, `medium`, `high` | Controls [what Droid can do without asking first](/cli/user-guides/auto-run). |
-| `specModeModel` | Any available model ID | Optional model for Spec Mode planning. Falls back to `model` when unset. |
-| `specModeReasoningEffort` | `off`, `none`, `low`, `medium`, `high` | Optional reasoning effort for the Spec Mode model. |
-
-<Note>
-  `sessionDefaultSettings.autonomyMode` is deprecated and kept only for older configurations. Use `interactionMode` plus `autonomyLevel` for new settings.
-</Note>
-
-## Configure Spec Mode defaults
-
-Set a dedicated Spec Mode model when you want planning and implementation to use different model settings.
-
-```json
-{
-  "sessionDefaultSettings": {
-    "model": "MODEL_ID",
-    "reasoningEffort": "medium",
-    "specModeModel": "SPEC_MODEL_ID",
-    "specModeReasoningEffort": "high"
-  }
-}
-```
-
-If `specModeModel` is missing, Spec Mode uses the main session model. If `specModeReasoningEffort` is missing, Droid uses the reasoning default for the effective Spec Mode model.
-
-## Configure command policy
-
-Use command policy to define commands that should run without extra confirmation and commands that should always require confirmation or be blocked by policy.
-
-```json
-{
-  "commandAllowlist": ["ls", "pwd", "git status"],
+  "commandAllowlist": ["ls", "pwd", "dir"],
   "commandDenylist": ["rm -rf /", "mkfs", "shutdown"]
 }
 ```
 
-| Key | Description |
-| :-- | :---------- |
-| `commandAllowlist` | Commands treated as low-risk for your workflow. |
-| `commandDenylist` | Commands that should not run automatically. Denylist entries take precedence over allowlist entries. |
+Review and update these arrays periodically to match your workflow and security posture, especially when sharing configurations across teams.
 
-Any command not covered by these lists falls back to the active Autonomy Level and command restrictions.
-
-## Configure custom models and BYOK
-
-Add custom models with `customModels`. Each entry describes the model ID, provider, endpoint, API key, display name, limits, reasoning/thinking settings, optional headers, optional provider arguments, and image-support behavior.
+## Example configuration
 
 ```json
 {
-  "customModels": [
-    {
-      "model": "provider/model-name",
-      "baseUrl": "https://api.example.com/v1",
-      "apiKey": "YOUR_API_KEY",
-      "provider": "generic-chat-completion-api",
-      "displayName": "Example Custom Model",
-      "maxContextLimit": 200000,
-      "maxOutputTokens": 16000,
-      "extraHeaders": {
-        "X-Example-Header": "example-value"
-      }
-    }
-  ]
+  "model": "opus",
+  "reasoningEffort": "low",
+  "diffMode": "github",
+  "cloudSessionSync": true,
+  "completionSound": "fx-ok01",
+  "awaitingInputSound": "fx-ack01",
+  "soundFocusMode": "always"
 }
 ```
 
-See [Bring Your Own Key](/cli/byok/overview) for provider setup details.
+---
 
-## Configure hooks, MCP, commands, skills, and droids
+### Need more?
 
-`.factory` can also hold reusable automation and extension files:
-
-| Surface | File or directory | Configure |
-| :------ | :---------------- | :-------- |
-| Hooks | `hooks/hooks.json` or `settings.json` `hooks` | Hook events, commands, `hooksDisabled`, and `showHookOutput`. See [Hooks](/cli/configuration/hooks-guide). |
-| MCP servers | `mcp.json` | MCP server definitions, disabled state, and disabled tools. See [MCP](/cli/configuration/mcp). |
-| Custom slash commands | `commands/` | Project or user slash commands. |
-| Skills | `skills/` | Reusable workflows and context. |
-| Custom droids | `droids/` | Subagent definitions. |
-| Plugins | plugin registry files under `.factory` | Installed plugin bundles and marketplaces. |
-
-## Configure display, audio, timeouts, and compaction
-
-Common personal preferences live at the root of `settings.json`.
-
-| Key | Description |
-| :-- | :---------- |
-| `diffMode` | Diff rendering mode, such as `github` or `unified`. |
-| `theme`, `logoAnimation`, `overrideTerminalColors` | Terminal display preferences. |
-| `completionSound`, `awaitingInputSound`, `soundFocusMode` | Audio cues and when they play. |
-| `showThinkingInMainView` | Whether reasoning blocks appear in the main chat view. |
-| `statusLine` | Custom status line command. |
-| `compactionTokenLimit` | Context compaction controls. |
-| `cloudSessionSync`, `includeCoAuthoredByDroid`, `enableDroidShield`, `ideAutoConnect` | Session sync, commit attribution, Droid Shield, and IDE connection defaults. |
+- [CLI Overview](/cli/getting-started/overview) – see the main TUI workflow
+- [CLI Reference](/reference/cli-reference) – command flags & options
+- [IDE Integrations](/integrations/ide-integrations) – editor-specific setup
+- [Custom models & BYOK](/cli/byok/overview) - add custom models and API keys

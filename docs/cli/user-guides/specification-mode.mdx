@@ -1,53 +1,76 @@
 ---
-title: Spec Mode
-description: Plan, review, and approve a task before Droid makes code changes.
+title: Specification Mode
+description: Turn plain-English specifications into production-ready code with automatic planning and review.
 keywords: ['spec mode', 'specification', 'planning', 'plan', 'spec', 'feature planning', 'implementation plan', 'automatic planning']
 ---
 
-Spec Mode turns a high-level request into a reviewed specification and implementation plan before Droid edits files or runs modifying commands. Use it for multi-file changes, migrations, high-risk work, or any task where you want to shape the approach before implementation starts.
+Specification Mode transforms simple feature descriptions into working code with automatic planning and safety checks. You provide a brief description of what you want, and droid creates a detailed specification and implementation plan before making any changes.
+
+<CardGroup cols={2}>
+  <Card title="Simple Input" icon="message">
+    Just 4-6 sentences describing what you want built
+  </Card>
+  <Card title="Automatic Planning" icon="list-check">
+    Droid creates detailed specs and implementation plans
+  </Card>
+  <Card title="Safe Execution" icon="shield-check">
+    No code changes until you approve the complete plan
+  </Card>
+  <Card title="Enterprise Ready" icon="building">
+    Built-in security, compliance, and team standards
+  </Card>
+</CardGroup>
 
 ## How it works
 
 <Steps>
   <Step title="Describe your feature">
-    Provide a simple description in 4-6 sentences. Focus on the outcome,
-    constraints, and success criteria.
+    Provide a simple description in 4-6 sentences. No need to write formal
+    specifications.
   </Step>
   <Step title="Droid creates the spec">
     Droid analyzes your request and generates a complete specification with
-    acceptance criteria, implementation plan, and technical details. If the
-    request is ambiguous, Droid can ask clarifying questions before finalizing
-    the plan.
+    acceptance criteria, implementation plan, and technical details. You can optionally use [mixed models](/cli/configuration/mixed-models) to configure a different model for planning.
   </Step>
   <Step title="Review and approve">
     You review the generated specification and implementation plan. Request
     changes or approve as-is.
   </Step>
   <Step title="Implementation">
-    After approval, Droid exits Spec Mode and begins making code changes
-    according to the plan. The current or selected Autonomy Level controls
-    implementation approvals.
+    Only after approval does droid begin making actual code changes, showing
+    each modification for review.
   </Step>
 </Steps>
 
+## Example workflow
+
+**Your input:**
+
+```
+Add a feature for users to export their personal data.
+It should create a ZIP file with their profile, posts, and uploaded files.
+Send them an email when it's ready. Make sure it follows GDPR requirements.
+The export should work for accounts up to 2GB of data.
+```
+
+**Droid generates:**
+
+- Complete specification with detailed acceptance criteria
+- Technical implementation plan covering backend, frontend, and email
+- File-by-file breakdown of changes needed
+- Testing strategy and verification steps
+- Security and compliance considerations
+
+**You approve, then droid implements** the complete solution while showing each change for review.
+
 <Note>
-  Spec Mode must be activated before the request you want planned. It does not
-  automatically activate for every complex prompt.
+  Specification Mode must be manually activated using **Shift+Tab** in the CLI.
+  It does not automatically activate.
 </Note>
 
-## How to activate Spec Mode
+## How to activate Specification Mode
 
-In the CLI, press **Shift+Tab** until the status banner shows Spec Mode. Send your request after Spec Mode is active.
-
-Use **Ctrl+L** separately to change [Autonomy Level](/cli/user-guides/auto-run). Spec Mode and Autonomy Level are independent controls.
-
-In the Desktop App, select **Spec Mode** from the mode or model controls before sending your request.
-
-In Droid Exec, pass `--use-spec`:
-
-```bash
-droid exec --use-spec "add user profiles"
-```
+To enter Specification Mode, press **Shift+Tab** while in the CLI. This will enable the specification planning workflow for your next request.
 
 ## What happens during planning
 
@@ -56,42 +79,68 @@ droid exec --use-spec "add user profiles"
 - Examines your existing codebase and patterns
 - Reviews related files and dependencies
 - Studies your AGENTS.md conventions
-- Gathers context from external sources you provide
+- Gathers context from external sources
 
 **Planning phase:**
 
-- Develops a comprehensive implementation strategy
-- Identifies files that need changes
-- Plans the sequence of modifications
-- Defines testing and verification steps
+- Develops comprehensive implementation strategy
+- Identifies all files that need changes
+- Plans sequence of modifications
+- Considers testing and verification steps
 
 **Safety guarantees:**
 
 - Cannot edit files during analysis
 - Cannot run commands that modify anything
 - Cannot create, delete, or move files
-- Exploration stays read-only until you approve
-
-## When to use Spec Mode
-
-Use Spec Mode when the change is larger than a quick edit or when you want Droid to reason through the implementation before touching code.
-
-- Plan new features or large refactors.
-- Turn a high-level request into a detailed specification.
-- Add safety and correctness checks for complex changes.
-- Get a clear implementation roadmap before any files are modified.
-
-For small, well-understood edits, Auto can proceed directly while still using your current Autonomy Level and approval prompts.
+- All exploration is read-only until you approve
 
 ## Writing effective requests
 
-- Focus on outcomes. Describe what the software should accomplish, not how to build it.
-- Include important constraints
-- Reference existing patterns.
-- Be specific about verification. Tell Droid how to confirm the implementation works correctly.
-- Consider the full user journey. Describe the complete experience, not just technical requirements.
-- Include error scenarios. Specify how failures should be handled and communicated to users.
-- Think about scale. Mention performance requirements and expected usage patterns.
+**Focus on outcomes:** Describe what the software should accomplish, not how to build it.
+
+```
+Users need to be able to reset their passwords using email verification.
+The reset link should expire after 24 hours for security.
+Include rate limiting to prevent abuse.
+```
+
+**Include important constraints:**
+
+```
+Add user data export functionality that works for accounts up to 5GB.
+Must comply with GDPR and include audit logging.
+Should complete within 10 minutes and not impact application performance.
+```
+
+**Reference existing patterns:**
+
+```
+Add a notification system similar to how we handle email confirmations.
+Use the same background job pattern as our existing report generation.
+Follow the authentication patterns we use for other sensitive operations.
+```
+
+**Be specific about verification:** Tell droid how to confirm the implementation works correctly.
+
+**Consider the full user journey:** Describe the complete experience, not just technical requirements.
+
+**Include error scenarios:** Specify how failures should be handled and communicated to users.
+
+**Think about scale:** Mention performance requirements and expected usage patterns.
+
+## Enterprise integration
+
+Reference external requirements by pasting links:
+
+```
+Implement the user management features described in this Jira ticket:
+https://company.atlassian.net/browse/PROJ-123
+
+Follow our security standards and include comprehensive error handling.
+```
+
+If you've integrated platforms through Factory's dashboard, droid can read context from tickets, documents, and specs during analysis.
 
 ## Benefits
 
@@ -113,17 +162,57 @@ For small, well-understood edits, Auto can proceed directly while still using yo
   </Card>
 </CardGroup>
 
-## Using mixed models
+## AGENTS.md integration
 
-Open `/model` and configure a dedicated Spec Mode model when planning should use a different model than implementation. A stronger model can produce higher-quality specs for complex work, while a faster or lower-cost default model can handle implementation once the plan is approved.
+Document your project conventions to enhance Specification Mode's planning. See [AGENTS.md](/cli/configuration/agents-md) for more information.
 
-If no Spec Mode model is configured, Spec Mode uses the main session model. See [Mixed Models](/cli/configuration/mixed-models) for setup details.
+Specification Mode automatically incorporates these conventions, ensuring consistency with your team's standards.
+
+## Breaking down large features
+
+For complex features spanning multiple components, break them into focused phases:
+
+**Phase 1:**
+
+```
+Implement user data export backend API and job processing.
+Focus only on the server-side functionality, not the UI yet.
+```
+
+**Phase 2:**
+
+```
+Add the frontend UI for data export using the API from Phase 1.
+Include progress indicators and download management.
+```
+
+This approach allows you to validate each phase before proceeding to the next.
+
+## Specification approval options
+
+After droid presents the specification, choose how to continue:
+
+1. **Proceed with implementation** – Approve the plan and keep normal (manual) execution controls.
+2. **Proceed, and allow file edits and read-only commands (Low)** – Set Autonomy Level to Low so droid can edit files and run safe read-only commands automatically.
+3. **Proceed, and allow reversible commands (Medium)** – Set Autonomy Level to Medium so droid can also run reversible commands without additional prompts.
+4. **Proceed, and allow all commands (High)** – Set Autonomy Level to High for fully automated execution, including commands that are not easily reversible.
+5. **No, keep iterating on spec** – Stay in Specification Mode to refine the plan before implementation.
+
+Selecting any Autonomy Level option sets that level for the rest of the session. Choosing to keep iterating leaves Specification Mode active so you can continue shaping the plan.
 
 ## Saving your specifications as Markdown
 
-Spec Mode can automatically write the approved plan to disk. Open Settings and enable **Save spec as Markdown** to turn this on.
+Specification Mode can automatically write the approved plan to disk. Open the CLI settings and enable **Save spec as Markdown** to turn this on.
 
-- By default, plans are saved to `.factory/docs` inside the nearest project-level `.factory` directory. If none exists, the Droid falls back to `~/.factory/docs` in your home directory.
+- By default, plans are saved to `.factory/docs` inside the nearest project-level `.factory` directory. If none exists, the CLI falls back to `~/.factory/docs` in your home directory.
 - Use the **Spec save directory** setting to pick between the project directory, your home directory, or a custom path. Custom values support absolute paths, `~` expansion, `.factory/...` shortcuts, and relative paths from the current workspace.
-- Droid creates the target directory if it does not exist and writes the Markdown exactly as shown in the approval dialog.
+- The CLI creates the target directory if it does not exist and writes the Markdown exactly as shown in the approval dialog.
 - Files are named `YYYY-MM-DD-slug.md`, where the slug comes from the spec title or first heading, and a counter is appended if a file with the same name already exists.
+
+## What happens after approval
+
+Once you approve a specification plan, droid systematically implements the changes while showing each modification for review. You maintain full control through the approval workflow, ensuring quality and alignment with requirements.
+
+For simpler changes that don't need comprehensive planning, droid can proceed directly while still showing all modifications for approval.
+
+Ready to try Specification Mode? Start with a simple description of what you want to build, and let droid handle the specification and planning complexity.

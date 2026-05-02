@@ -1,10 +1,10 @@
 ---
 title: "Quickstart"
-description: "Get productive with Droid in 5 minutes using the interactive terminal UI."
-keywords: ['quickstart', 'tutorial', 'getting started', 'droid', 'droid cli', 'install droid', 'setup', 'first steps', 'beginner', 'start', 'spec mode', 'autonomy level']
+description: "Get productive with droid in 5 minutes using the interactive terminal UI."
+keywords: ['quickstart', 'tutorial', 'getting started', 'droid', 'cli', 'install droid', 'setup', 'first steps', 'beginner', 'start']
 ---
 
-Use this quickstart to install the Droid CLI, inspect a project, choose the right planning and autonomy controls, and make your first change.
+This quickstart guide will have you collaborating with Factory's development agent in just a few minutes. You'll experience how droid understands your codebase, makes thoughtful changes, and integrates with your existing workflow.
 
 ## Before you begin
 
@@ -13,7 +13,7 @@ Make sure you have:
 - A terminal open in a code project
 - Git repository (recommended for full workflow demonstration)
 
-## Step 1: Install and start the Droid CLI
+## Step 1: Install and start droid
 
 <CodeGroup>
 
@@ -39,7 +39,7 @@ npm install -g droid
   **Linux users:** Ensure `xdg-utils` is installed for proper functionality. Install with: `sudo apt-get install xdg-utils`
 </Note>
 
-Then navigate to your project and start the Droid CLI.
+Then navigate to your project and start the droid CLI.
 
 <CodeGroup>
 ```bash
@@ -54,16 +54,16 @@ droid
 
 <img
   src="/images/droid_tui_intro.png"
-  alt="Droid CLI welcome screen"
+  alt="Droid CLI"
   height="450"
   className="rounded-lg"
 />
 
-You'll see Droid's welcome screen in a full-screen terminal interface. If prompted, sign in via your browser to connect your Factory account.
+You'll see droid's welcome screen in a full-screen terminal interface. If prompted, sign in via your browser to connect to Factory's development agent.
 
 ## Step 2: Explore your codebase
 
-Start by having Droid understand your project. Try one of these questions:
+Let's start by having droid understand your project. Try one of these questions:
 
 ```
 
@@ -83,21 +83,11 @@ Start by having Droid understand your project. Try one of these questions:
 
 ```
 
-Droid reads your files contextually and uses available organization context to explain project structure, conventions, and relevant files.
+Droid reads your files contextually and leverages organizational knowledge to provide comprehensive insights about your project structure and conventions.
 
-## Step 3: Choose Spec Mode and an Autonomy Level
+## Step 3: Make your first code change
 
-Before you ask Droid to change code, choose how much planning and automation you want:
-
-- **Spec Mode** plans before implementation. Use it for multi-file features, risky changes, migrations, and tasks where you want to approve the approach first.
-- **Autonomy Level Off** keeps manual approval for file edits and commands. This is the safest first-run setting.
-- **Autonomy Level options Low, Medium, and High** let Droid proceed without repeated confirmations for work at or below the selected risk level.
-
-Press **Shift+Tab** to switch between Auto and Spec Mode. Press **Ctrl+L** to change Autonomy Level, or keep it Off for manual approvals. See [Spec Mode](/cli/user-guides/specification-mode) and [Autonomy Level](/cli/user-guides/auto-run) for the full controls.
-
-## Step 4: Make your first code change
-
-Now try a simple modification:
+Now let's see droid in action with a simple modification:
 
 ```
 
@@ -108,15 +98,15 @@ Now try a simple modification:
 Droid will:
 
 1. Analyze your current logging setup
-2. Propose a concrete approach
-3. Show you what will be modified
-4. Apply changes according to your selected Autonomy Level and approval prompts
+2. Propose specific changes with a clear plan
+3. Show you exactly what will be modified
+4. Wait for your approval before making changes
 
-Keep Autonomy Level Off for your first run if you want Droid to ask before each edit and command.
+This transparent review process ensures you maintain full control over all code modifications.
 
-## Step 5: Experience enterprise workflows
+## Step 4: Experience enterprise workflows
 
-Try a more complex task that showcases how Droid uses integrated context:
+Try a more complex task that showcases droid's enterprise capabilities:
 
 ```
 
@@ -132,9 +122,9 @@ Or provide context from your team's tools by pasting a link:
 
 ```
 
-If you've integrated these platforms through Factory's dashboard, Droid can read context from Jira, Notion, Slack, and other sources. Droid can also connect to additional tools through MCP integrations.
+If you've integrated these platforms through Factory's dashboard, droid can automatically read context from Jira, Notion, Slack, and other sources. Droid can also connect to additional tools via MCP integrations for even more capabilities.
 
-## Step 6: Handle version control
+## Step 5: Handle version control
 
 Droid makes Git operations conversational and intelligent:
 
@@ -160,27 +150,24 @@ Droid makes Git operations conversational and intelligent:
 
 Here are the key interactions you'll use daily:
 
-| Action             | What it does                                 | How to use                               |
-| ------------------ | -------------------------------------------- | ---------------------------------------- |
-| Send message       | Submit a task or question                    | Type and press **Enter**                 |
-| Multi-line input   | Write longer prompts                         | **Shift\+Enter** for new lines           |
-| Enter Spec Mode    | Plan and approve before implementation       | Press **Shift\+Tab** until Spec Mode     |
-| Set Autonomy Level | Choose Off, Low, Medium, or High permissions | Press **Ctrl\+L**                       |
-| Approve changes    | Accept proposed modifications                | Accept change in the TUI                 |
-| Reject changes     | Decline proposed modifications               | Reject change in the TUI                 |
-| View shortcuts     | See all available commands                   | Press **?**                              |
-| Exit session       | Leave Droid                                  | **Ctrl\+C** or type `exit`               |
+| Action           | What it does                   | How to use                     |
+| ---------------- | ------------------------------ | ------------------------------ |
+| Send message     | Submit a task or question      | Type and press **Enter**       |
+| Multi-line input | Write longer prompts           | **Shift\+Enter** for new lines |
+| Approve changes  | Accept proposed modifications  | Accept change in the TUI       |
+| Reject changes   | Decline proposed modifications | Reject change in the TUI       |
+| Switch modes     | Toggle between modes           | **Shift\+Tab**                 |
+| View shortcuts   | See all available commands     | Press **?**                    |
+| Exit session     | Leave droid                    | **Ctrl\+C** or type `exit`     |
 
 ### Useful slash commands
 
 Quick shortcuts to common actions:
 
 - `/review` - Start AI-powered code review workflow ([learn more](/cli/features/code-review))
-- `/settings` - Configure Droid behavior, models, and preferences
+- `/settings` - Configure droid behavior, models, and preferences
 - `/model` - Switch between AI models mid-session
 - `/mcp` - Manage Model Context Protocol servers
-- `/readiness-report` - Generate an Agent Readiness report for the current repository
-- `/readiness-fix` - Fix issues identified by Agent Readiness checks
 - `/account` - Open your Factory account settings in browser
 - `/billing` - View and manage your billing settings
 - `/help` - See all available commands
@@ -193,11 +180,8 @@ Quick shortcuts to common actions:
 Instead of: "fix the bug"
 Try: "fix the authentication timeout issue where users get logged out after 5 minutes instead of the configured 30 minutes"
 
-**Use Spec Mode for complex features:**
-For larger features, switch to [Spec Mode](/cli/user-guides/specification-mode) before sending the request so Droid researches and proposes a plan before implementation.
-
-**Pick the right Autonomy Level:**
-Use Off or Low for unfamiliar work, Medium for routine local development, and High only when the environment is safe for broader automation.
+**Use spec mode for complex features:**
+For larger features, use [Specification Mode](/cli/user-guides/specification-mode) which automatically provides planning before implementation without needing to explicitly request it.
 
 **Leverage organizational knowledge:**
 
@@ -208,15 +192,49 @@ Use Off or Low for unfamiliar work, Medium for routine local development, and Hi
 ```
 
 **Use the review workflow:**
-Review Droid's proposed changes before approval. The transparent diff view helps you understand exactly what will be modified.
+Always review droid's proposed changes before approval. The transparent diff view helps you understand exactly what will be modified.
 
 ## Pro tips for enterprise teams
 
 **Security-first approach:**
-Droid considers security implications and can flag potential vulnerabilities during code generation.
+Droid automatically considers security implications and will flag potential vulnerabilities during code generation.
 
 **Compliance integration:**
-Connect your compliance tools through MCP so Droid can use them during implementation and verification.
+Connect your compliance tools through MCP to ensure all changes meet your organization's standards.
 
 **Team knowledge sharing:**
-Droid uses your organization's patterns to help maintain consistency across team members and projects.
+Droid learns from your organization's patterns and can help maintain consistency across team members and projects.
+
+## What's next?
+
+<CardGroup cols={2}>
+  <Card
+    title="Common Use Cases"
+    icon="lightbulb"
+    href="/cli/getting-started/common-use-cases"
+  >
+    Explore real-world scenarios and workflows
+  </Card>
+  <Card
+    title="Configuration"
+    icon="gear"
+    href="/cli/configuration/settings"
+  >
+    Customize droid for your team's workflow
+  </Card>
+  <Card
+    title="AGENTS.md Guide"
+    icon="file-text"
+    href="/cli/configuration/agents-md"
+  >
+    Document your project conventions and commands
+  </Card>
+  <Card
+    title="IDE Integration"
+    icon="code"
+    href="/integrations/ide-integrations"
+  >
+    Use droid within your favorite editor
+  </Card>
+</CardGroup>
+```
