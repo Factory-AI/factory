@@ -4,6 +4,26 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="May 2" rss={{ title: "CLI Updates", description: "Runtime-aware Execute tool, no-report readiness hint, payment method in onboarding, and CLI stability fixes" }}>
+  `v0.116.0`
+
+## New features
+
+- **Runtime-aware Execute tool** - Execute tool descriptions now adapt to your runtime, with WSL-specific guidance and an expanded bashism detector
+- **No-report readiness hint** - CLI surfaces a dynamic hint when a report isn't needed
+- **Payment method in onboarding** - You can now add a payment method during the final onboarding step (app)
+
+## Bug fixes
+
+- **Lingering prompts after resume** - User prompts are now cleared correctly after a droid resumes
+- **Gemini turn handling** - Scoped Gemini reasoning signals to the active turn for more reliable continuations
+- **Billing error classification** - Payment-required responses now surface as billing errors instead of generic invalid-request errors
+- **Working directory persistence** - Validated working directory is now persisted and locked until the computer connects (app)
+- **Computer details on transient errors** - Computer details now remain visible during transient query errors (app)
+- **Desktop updater download** - Desktop updater now downloads the new version only after you click to install (app)
+
+</Update>
+
 <Update label="May 1" rss={{ title: "CLI Updates", description: "PDF support for Gemini 3.1 Pro, GLM-5.1 reasoning, bulk image drag-and-drop, PDF uploads in app, and CLI stability fixes" }}>
   `v0.115.0`
 
