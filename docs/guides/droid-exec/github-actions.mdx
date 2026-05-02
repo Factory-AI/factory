@@ -1,250 +1,183 @@
 ---
 title: GitHub Actions
-description: Ready-to-use GitHub Actions workflows with droid exec.
-keywords: ['github actions', 'ci/cd', 'workflow', 'automation', 'pr review', 'droid exec']
+description: Run Droid Exec from GitHub Actions for pull request reviews, scheduled maintenance, and security checks.
+keywords:
+  [
+    'github actions',
+    'ci/cd',
+    'workflow',
+    'automation',
+    'pr review',
+    'droid exec',
+  ]
 ---
 
-# GitHub Actions
+Use Droid Exec in GitHub Actions when you want Factory to run a one-shot task from CI: review a pull request, refresh generated docs, scan for security risks, or run any repeatable repository workflow.
 
-**Prerequisites:** Add `FACTORY_API_KEY` to repository secrets (Settings → Secrets → Actions)
+Use the base scaffold once, then swap in the task-specific snippet that matches your workflow.
 
-## Example 1: Automated PR Review and Fix
+## Prerequisites
 
-Automatically reviews PRs, fixes issues, and posts detailed feedback.
+Before adding Droid Exec to a workflow:
 
-<Info>
-For a simpler setup, use the [`/install-github-app`](/cli/features/install-github-app) command which configures the Factory GitHub App with guided steps.
-</Info>
+1. Generate a Factory API key from [Factory Settings → API Keys](https://app.factory.ai/settings/api-keys).
+2. Add it to your repository secrets as `FACTORY_API_KEY` under **Settings → Secrets and variables → Actions**.
+3. Decide the minimum autonomy level the workflow needs. Most CI workflows should start with `--auto low` and only use broader permissions when the task truly requires them.
+
+<Warning>
+Never hardcode a Factory API key in a workflow file. Always reference `${{ secrets.FACTORY_API_KEY }}`.
+</Warning>
+
+## Base workflow scaffold
+
+Every GitHub Actions workflow using Droid Exec follows the same shape: check out the repository, install the Droid CLI, pass `FACTORY_API_KEY`, and run `droid exec` with a scoped prompt.
 
 ```yaml
-name: PR Assistant
-on:
-  pull_request:
-    types: [opened, synchronize]
+name: Droid Task
+on: pull_request
 
 jobs:
-  review-and-fix:
+  droid-task:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
-    
+      contents: read
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Setup droid CLI
+
+      - name: Setup Droid CLI
         run: |
           curl -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-      
-      - name: Analyze and fix code
+
+      - name: Run Droid Exec
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
         run: |
-          # Get the diff
-          git diff origin/${{ github.base_ref }}...HEAD > pr_changes.diff
-          
-          # Review and fix issues (pipe diff to stdin)
-          cat pr_changes.diff | droid exec --auto low "
-          Review this PR diff and:
-          1. Fix any obvious bugs, typos, or linting errors
-          2. Add missing error handling
-          3. Improve code comments where unclear
-          4. DO NOT commit or push changes
-          "
-          
-          # Generate review report (needs --auto to write files)
-          droid exec --auto low "Analyze the changes again and write a detailed review to review.md with:
-          - Summary of automated fixes made
-          - Remaining issues that need human attention
-          - Security or performance concerns
-          - Test coverage recommendations"
-      
-      - name: Commit fixes if any
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add -A
-            git commit -m "fix: automated improvements for PR #${{ github.event.pull_request.number }}
-            
-            Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
-            git push
-          fi
-      
-      - name: Post review comment
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            let review = '## 🤖 Automated Review\n\n';
-            
-            if (fs.existsSync('review.md')) {
-              review += fs.readFileSync('review.md', 'utf8');
-            } else {
-              review += 'Review completed successfully.';
-            }
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: review
-            });
+          droid exec --auto low "Summarize the key risks in this change. Do not modify files."
 ```
 
-## Example 2: Daily Documentation and Test Updates
+Raise `permissions` and the autonomy level only for workflows that need to write files, create pull requests, or open issues.
 
-Keeps documentation and tests in sync with code changes automatically.
+## Task snippets
 
-```yaml
-name: Daily Maintenance
-on:
-  schedule:
-    - cron: '0 3 * * *'  # 3 AM UTC daily
-  workflow_dispatch:  # Allow manual trigger
+Keep the checkout and `Setup Droid CLI` steps from the scaffold, then replace the final `Run Droid Exec` step with the relevant snippet. Also update the workflow trigger and job permissions as shown in the customization table below.
 
-jobs:
-  update-docs-and-tests:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup droid CLI
-        run: |
-          curl -fsSL https://app.factory.ai/cli | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-      
-      - name: Update documentation
-        env:
-          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
-        run: |
-          droid exec --auto low "
-          Review all code files modified in the last 7 days and:
-          1. Update any outdated JSDoc/docstring comments
-          2. Update README.md if new features were added
-          3. Add missing documentation for public APIs
-          4. Update examples to match current implementation
-          Write a summary of changes to docs-updates.md
-          "
-      
-      - name: Generate missing tests
-        env:
-          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
-        run: |
-          droid exec --auto low "
-          Find functions and components without test coverage and:
-          1. Generate unit tests for utility functions
-          2. Create basic test cases for React components
-          3. Add edge case tests for error handling
-          4. Follow existing test patterns in the codebase
-          Write a summary to test-updates.md
-          "
-      
-      - name: Create PR if changes exist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Note: gh CLI is pre-installed on GitHub-hosted runners
-          if [ -n "$(git status --porcelain)" ]; then
-            BRANCH="auto-updates-$(date +%Y%m%d)"
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            
-            git checkout -b $BRANCH
-            git add -A
-            git commit -m "chore: automated documentation and test updates
-            
-            Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
-            git push origin $BRANCH
-            
-            # Combine summaries for PR body
-            PR_BODY="## Automated Updates\n\n"
-            [ -f docs-updates.md ] && PR_BODY="${PR_BODY}### Documentation\n$(cat docs-updates.md)\n\n"
-            [ -f test-updates.md ] && PR_BODY="${PR_BODY}### Tests\n$(cat test-updates.md)\n\n"
-            
-            gh pr create \
-              --title "🤖 Daily automated updates" \
-              --body "$PR_BODY" \
-              --label "automated,documentation,tests"
-          fi
+<CodeGroup>
+
+```yaml PR review and fix
+- name: Review and fix
+  env:
+    FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+  run: |
+    git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr.diff
+
+    droid exec --auto low \
+      "Review /tmp/pr.diff and fix only high-confidence bugs, typos, missing error handling, or broken tests introduced by this pull request. Do not make stylistic rewrites."
+
+    droid exec --auto low \
+      "Write /tmp/review.md with: summary of fixes made, remaining issues for humans, security or performance concerns, and test recommendations."
+
+- name: Commit fixes
+  run: |
+    if [ -n "$(git status --porcelain)" ]; then
+      git config user.name "github-actions[bot]"
+      git config user.email "github-actions[bot]@users.noreply.github.com"
+      git add -A
+      git commit -m "fix: apply Droid review fixes"
+      git push
+    fi
+
+- name: Comment on pull request
+  if: always()
+  uses: actions/github-script@v7
+  with:
+    script: |
+      const fs = require('fs');
+      const body = fs.existsSync('/tmp/review.md')
+        ? fs.readFileSync('/tmp/review.md', 'utf8')
+        : 'Droid review completed.';
+      await github.rest.issues.createComment({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: context.issue.number,
+        body,
+      });
 ```
 
-## Example 3: Security and Dependency Scanner
+```yaml Scheduled maintenance
+- name: Update documentation and tests
+  env:
+    FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+  run: |
+    droid exec --auto low \
+      "Review code changed in the last 7 days. Update stale docstrings, add missing tests for changed behavior, follow existing project conventions, and write a summary to /tmp/maintenance-summary.md."
 
-Scans for vulnerabilities and outdated dependencies on a schedule.
-
-```yaml
-name: Security Scanner
-on:
-  schedule:
-    - cron: '0 9 * * 1'  # Mondays at 9 AM UTC
-  workflow_dispatch:
-
-jobs:
-  security-scan:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup droid CLI
-        run: |
-          curl -fsSL https://app.factory.ai/cli | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-      
-      - name: Security audit
-        env:
-          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
-        run: |
-          droid exec --auto medium "
-          Perform a comprehensive security audit:
-          1. Check package.json for known vulnerabilities
-          2. Update vulnerable dependencies to safe versions
-          3. Scan code for hardcoded secrets or API keys
-          4. Review authentication and authorization patterns
-          5. Check for SQL injection or XSS vulnerabilities
-          6. Generate security-report.md with all findings and fixes
-          "
-      
-      - name: Create issue if vulnerabilities found
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Note: gh CLI is pre-installed on GitHub-hosted runners
-          if [ -f security-report.md ] && grep -q "vulnerability\|security\|risk" security-report.md; then
-            gh issue create \
-              --title "🔒 Security audit findings - $(date +%Y-%m-%d)" \
-              --body-file security-report.md \
-              --label "security,high-priority" \
-              --assignee "${{ github.repository_owner }}"
-          fi
-      
-      - name: Create PR for fixes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Note: gh CLI is pre-installed on GitHub-hosted runners
-          if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            
-            git checkout -b security-fixes-$(date +%Y%m%d)
-            git add -A
-            git commit -m "fix: security updates and dependency patches
-            
-            Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
-            git push origin HEAD
-            
-            gh pr create \
-              --title "🔒 Security fixes" \
-              --body-file security-report.md \
-              --label "security,dependencies" \
-              --assignee "${{ github.repository_owner }}"
-          fi
+- name: Open pull request
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  run: |
+    if [ -n "$(git status --porcelain)" ]; then
+      branch="droid-maintenance-$(date +%Y%m%d)"
+      git config user.name "github-actions[bot]"
+      git config user.email "github-actions[bot]@users.noreply.github.com"
+      git checkout -b "$branch"
+      git add -A
+      git commit -m "chore: apply Droid maintenance updates"
+      git push -u origin "$branch"
+      gh pr create \
+        --title "Droid maintenance updates" \
+        --body-file /tmp/maintenance-summary.md
+    fi
 ```
+
+```yaml Security scan
+- name: Run security scan
+  env:
+    FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+  run: |
+    droid exec --auto low \
+      "Scan this repository for high-confidence security issues: exposed secrets, injection risks, unsafe authentication flows, dependency risks, and missing authorization checks. Write actionable findings to /tmp/security-report.md."
+
+- name: Create issue if findings exist
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  run: |
+    if [ -s /tmp/security-report.md ] && grep -Eqi "critical|high|vulnerability|secret|injection|authorization" /tmp/security-report.md; then
+      gh issue create \
+        --title "Droid security scan findings" \
+        --body-file /tmp/security-report.md \
+        --label security
+    fi
+```
+
+</CodeGroup>
+
+## What to customize
+
+| Workflow              | Trigger                                                                     | Job permissions                           | Notes                                                                                    |
+| --------------------- | --------------------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------- |
+| PR review and fix     | `pull_request` with `opened`, `synchronize`, `reopened`, `ready_for_review` | `contents: write`, `pull-requests: write` | Use only for trusted repositories where the Actions token may push to the source branch. |
+| Scheduled maintenance | `schedule` plus `workflow_dispatch`                                         | `contents: write`, `pull-requests: write` | Good for recurring docs, test, or lightweight maintenance PRs.                           |
+| Security scan         | `schedule` plus `workflow_dispatch`                                         | `contents: read`, `issues: write`         | Creates an issue when Droid writes actionable findings.                                  |
+
+<Info>
+  For a maintained review workflow with inline comments, review depth, security
+  review, and scheduled scans, use the [Automated Code Review
+  guide](/guides/droid-exec/code-review).
+</Info>
+
+## Prompt design for CI
+
+CI prompts should be durable enough to run without a human in the loop.
+
+- **Name the input**: tell Droid whether to inspect a diff file, changed files, the whole repository, or a prompt file.
+- **Constrain writes**: say whether Droid may edit files, create reports, open issues, or only print findings.
+- **Define success**: request a specific artifact such as `review.md`, `maintenance-summary.md`, or `security-report.md`.
+- **Exclude low-value work**: tell Droid not to make stylistic rewrites unless the workflow exists for cleanup.
+- **Start read-only**: use no `--auto` flag for analysis-only tasks; use `--auto low` when the workflow needs safe file operations.
+
+## See also
+
+- [Droid Exec overview](/cli/droid-exec/overview)
+- [Automated Code Review](/guides/droid-exec/code-review)
+- [CLI reference](/reference/cli-reference)

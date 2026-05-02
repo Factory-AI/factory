@@ -1,46 +1,45 @@
 ---
 title: Local Code Review
-description: Use the /review command to analyze local code changes with AI-powered review workflows
-keywords: ['local code review', 'code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'security review', 'review workflow', 'AI review', 'code analysis']
+description: Use the /review command to analyze local code changes before you commit or open a pull request.
+keywords:
+  [
+    'local code review',
+    'code review',
+    'review',
+    '/review',
+    'slash command',
+    'PR review',
+    'pull request',
+    'commit review',
+    'diff review',
+    'bug detection',
+    'security review',
+  ]
 ---
 
-## Overview
+Use `/review` when you want Droid to inspect local code changes before you commit, push, or open a pull request. The command opens an interactive workflow for reviewing a branch diff, uncommitted work, a specific commit, or custom review instructions.
 
-The `/review` command provides a local workflow for analyzing code changes with AI-powered insights. It offers multiple review modes to fit different development scenarios—from reviewing uncommitted changes to analyzing full branches or specific commits.
-
-When you run `/review`, droid guides you through selecting a review type, configuring parameters, and then performs a comprehensive analysis of your code changes based on industry-standard review guidelines.
+`/review` is designed for local CLI sessions. For automated pull request reviews in CI, use the [Automated Code Review guide](/guides/droid-exec/code-review).
 
 ## Quick start
 
 <Steps>
   <Step title="Start the review flow">
-    In a local droid session, type:
+    Open Droid in your repository and run:
+
     ```bash
     /review
     ```
-  </Step>
 
-  <Step title="Select a review type">
-    Choose from four review presets:
-    - **Review against a base branch** - PR-style review comparing your branch to a base branch
-    - **Review uncommitted changes** - Analyze working directory changes (staged, unstaged, and untracked)
-    - **Review a commit** - Examine a specific commit from history
-    - **Custom review instructions** - Define your own review criteria
   </Step>
-
-  <Step title="Configure parameters">
-    Depending on your selection:
-    - For **base branch reviews**: Select the target branch (e.g., `main`, `develop`)
-    - For **commit reviews**: Choose a commit from the interactive list
-    - For **custom reviews**: Enter your review instructions
+  <Step title="Choose what to review">
+    Select one of the review types: base branch, uncommitted changes, commit, or custom instructions.
   </Step>
-
+  <Step title="Configure the target">
+    Choose the base branch, commit, or custom instructions requested by the selected review type.
+  </Step>
   <Step title="Review the findings">
-    Droid analyzes the code changes and provides:
-    - Prioritized findings with severity levels [P0-P3]
-    - Specific file locations and line numbers
-    - Suggested fixes with code suggestions
-    - Overall assessment of the changes
+    Droid returns prioritized findings with file locations and concise explanations.
   </Step>
 </Steps>
 
@@ -48,228 +47,97 @@ When you run `/review`, droid guides you through selecting a review type, config
 
 ### Review against a base branch
 
-Compare your current branch against a base branch (like a pull request review). This is ideal for pre-PR reviews or checking what changes would be merged.
+Use a base branch review when you want PR-style feedback before you open or update a pull request.
 
-**How it works:**
-1. Select "Review against a base branch"
-2. Choose your target base branch from the list (local and remote branches shown)
-3. Droid finds the merge base and reviews the diff
-
-**Use cases:**
-- Pre-commit PR reviews
-- Checking branch changes before creating a pull request
-- Validating feature branch against main/develop
-
-**Example workflow:**
 ```bash
 > /review
 # Select: Review against a base branch
-# Choose: origin/main
-# Droid reviews all changes that would be merged
+# Choose: main
 ```
+
+Droid finds the merge base and reviews the diff between your branch and the selected base branch.
 
 ### Review uncommitted changes
 
-Analyze all current working directory changes—staged files, unstaged modifications, and untracked files.
+Use an uncommitted review for work in progress. Droid analyzes staged files, unstaged modifications, and untracked files in the current working tree.
 
-**Use cases:**
-- Quick sanity check before committing
-- Reviewing work in progress
-- Finding issues early in development
-
-**Example workflow:**
 ```bash
 > /review
 # Select: Review uncommitted changes
-# Droid immediately reviews all working directory changes
 ```
 
 ### Review a commit
 
-Examine the changes introduced by a specific commit in your repository history.
+Use a commit review when you want to inspect one commit from repository history.
 
-**How it works:**
-1. Select "Review a commit"
-2. Browse commits with hash, message, author, and date
-3. Select a commit to review
-
-**Use cases:**
-- Reviewing recent commits for issues
-- Understanding changes in a specific commit
-- Post-merge review of teammate's work
-
-**Example workflow:**
 ```bash
 > /review
 # Select: Review a commit
-# Browse and select: abc1234 - "Add user authentication"
-# Droid reviews that specific commit's changes
+# Choose a commit from the interactive list
 ```
+
+Droid reviews the changes introduced by the selected commit.
 
 ### Custom review instructions
 
-Define your own review criteria for specialized analysis.
+Use custom instructions for targeted checks such as security, performance, migration safety, or team-specific conventions.
 
-**Use cases:**
-- Security-focused reviews
-- Performance analysis
-- Checking specific coding standards
-- Domain-specific validations
-
-**Example workflow:**
 ```bash
 > /review
 # Select: Custom review instructions
-# Enter: "Check for SQL injection vulnerabilities and ensure all database queries use parameterized statements"
-# Droid performs a targeted security review
+# Enter: Check for SQL injection risks and ensure all database queries use parameterized statements.
 ```
 
-## Review guidelines
+Custom reviews work best when the instruction names the risk, affected surface, and expected evidence.
 
-All code reviews follow a structured rubric designed to provide actionable, high-quality feedback:
+## What Droid reviews
 
-### Severity levels
+Droid focuses on high-confidence, actionable bugs rather than stylistic preferences. It looks for issues such as:
 
-Reviews categorize findings using priority levels:
+- Runtime failures, broken control flow, and incorrect variable usage
+- Null or undefined dereferences
+- Missing error handling for critical operations
+- Resource leaks and unsafe async patterns
+- Injection vulnerabilities, exposed secrets, and authentication or authorization bugs
+- Breaking API, schema, serialization, or contract changes
+- Dead or unreachable production code introduced by the change
 
-- **[P0]** - Critical issues blocking release or operations
-- **[P1]** - Urgent issues that should be addressed in the next cycle
-- **[P2]** - Normal priority issues to fix eventually
-- **[P3]** - Low priority nice-to-have improvements
+Droid avoids speculative feedback, cosmetic preferences, and broad architectural opinions unless your custom instructions ask for them.
 
-### Bug detection criteria
+## Severity levels
 
-The AI only flags issues as bugs when they meet ALL of these criteria:
+Findings use priority labels so you can triage quickly:
 
-1. **Meaningful impact** - Affects accuracy, performance, security, or maintainability
-2. **Discrete and actionable** - Clear, specific issue with a clear fix
-3. **Appropriate rigor** - Fix doesn't demand more rigor than the rest of the codebase
-4. **Introduced in changes** - Bug was added in the reviewed changes (not pre-existing)
-5. **Worth fixing** - Author would likely fix if made aware
-6. **No unstated assumptions** - Based on verifiable facts, not speculation
-7. **Provably affected** - Can identify specific affected code, not theoretical
-8. **Not intentional** - Clearly not a deliberate design choice
+| Priority | Meaning                                                                   |
+| -------- | ------------------------------------------------------------------------- |
+| **[P0]** | Blocking issue: likely crash, exploit, data loss, or release blocker      |
+| **[P1]** | High-confidence correctness or security issue that should be fixed soon   |
+| **[P2]** | Plausible bug with a realistic trigger path but lower certainty or impact |
+| **[P3]** | Minor but real bug                                                        |
 
-### Comment style
+A good finding identifies the affected file and line, explains why the issue matters, and describes the trigger path or affected condition.
 
-Review comments follow these principles:
+## Output format
 
-- **Clear reasoning** - Explains why something is an issue
-- **Appropriate severity** - Communicates impact accurately
-- **Brief** - Maximum 1 paragraph per finding
-- **Minimal code** - Code chunks limited to 3 lines in markdown
-- **Scenario-specific** - Describes affected environments/conditions
-- **Matter-of-fact tone** - Avoids accusatory language
-- **Immediately graspable** - Easy for the author to understand
-- **No excessive flattery** - Focuses on actionable feedback
+Local `/review` output is a structured summary. Each finding includes a priority, file and line when available, and a concise description of the failure mode. If there are no findings, Droid returns a short LGTM message.
 
-### Output format
+## Tips
 
-Each finding includes:
+- Use base branch reviews before opening a pull request.
+- Review smaller uncommitted diffs during active development.
+- Add custom instructions for security, migrations, payments, authentication, or other high-risk surfaces.
 
-- **Clear title** (≤80 characters, imperative mood)
-- **Explanation** of why this is a problem
-- **File path and line numbers** where applicable
-- **Priority level** [P0-P3]
-- **Suggested fix** (when concrete replacement code is available)
+## Local review versus automated review
 
-Plus an **overall assessment**:
-- Whether changes are correct or incorrect
-- 1-3 sentence summary
-
-## Tips and best practices
-
-<AccordionGroup>
-  <Accordion title="When to use each review type">
-    - **Uncommitted changes**: During active development, before staging commits
-    - **Base branch review**: Before creating PRs, to catch issues early
-    - **Commit review**: After merging, to understand historical changes or review teammate's commits
-    - **Custom instructions**: When you need focused analysis (security, performance, specific patterns)
-  </Accordion>
-
-  <Accordion title="Making the most of reviews">
-    - Run reviews frequently during development, not just before commits
-    - Use custom instructions for domain-specific concerns your team cares about
-    - Treat P0/P1 findings seriously—they represent real issues worth addressing
-    - Review the overall assessment for context on whether changes are sound
-  </Accordion>
-
-  <Accordion title="Navigating the review UI">
-    - Press **Esc** to go back at any step in the review flow
-    - From the preset selection, **Esc** closes the review overlay
-    - Use arrow keys to navigate branch/commit lists
-    - Type to filter branches by name in real-time
-  </Accordion>
-
-  <Accordion title="Integration with workflows">
-    The `/review` command is meant for local CLI sessions. For automated reviews in CI/CD, use:
-    ```bash
-    droid exec "Review the changes in this PR for security issues and performance regressions"
-    ```
-    See the [Automated Code Review guide](/guides/droid-exec/code-review) for automation setup.
-  </Accordion>
-</AccordionGroup>
-
-## Examples
-
-### Pre-PR review
-
-```bash
-# Before creating a pull request
-> /review
-# Select: Review against a base branch
-# Choose: origin/main
-# Review findings, fix issues, then create PR
-```
-
-### Quick WIP check
-
-```bash
-# Check work in progress
-> /review
-# Select: Review uncommitted changes
-# Get immediate feedback on current changes
-```
-
-### Security-focused review
-
-```bash
-# Custom security review
-> /review
-# Select: Custom review instructions
-# Enter: "Check for security vulnerabilities: SQL injection, XSS, CSRF, insecure dependencies, exposed secrets, and authentication bypasses"
-```
-
-### Post-merge review
-
-```bash
-# Review a teammate's recent commit
-> /review
-# Select: Review a commit
-# Choose the recent commit to understand changes
-```
-
-## Automated reviews in CI
-
-For automated PR reviews, use the [Automated Code Review](/guides/droid-exec/code-review) workflow. It supports:
-
-- **Review depth** (`deep` or `shallow`) to control thoroughness and cost
-- **Security review** with STRIDE-based vulnerability scanning and configurable severity thresholds
-- **On-demand security scans** via `@droid security` comments on PRs, or `@droid security --full` for a full-repo scan
-- **Scheduled full-repo scans** via cron-based workflow triggers
-
-Set up with:
-
-```bash
-droid
-> /install-code-review
-```
-
-See the [Automated Code Review guide](/guides/droid-exec/code-review) for full configuration options.
+| Workflow              | Best for                                        | Setup                           |
+| --------------------- | ----------------------------------------------- | ------------------------------- |
+| `/review`             | Local, interactive pre-commit or pre-PR checks  | Run from a Droid CLI session    |
+| Automated code review | Automated GitHub or GitLab PR/MR review         | Run `/install-code-review`      |
+| Droid Exec in CI      | Custom CI automation and repository maintenance | Write a GitHub Actions workflow |
 
 ## See also
 
-- [CLI Reference](/reference/cli-reference) - Complete command reference including `/review`
-- [Automated Code Review guide](/guides/droid-exec/code-review) - Set up automated PR reviews with deep/shallow modes and security scanning
-- [Common use cases](/cli/getting-started/common-use-cases) - Other workflows and patterns
-- [How to talk to a droid](/cli/getting-started/how-to-talk-to-a-droid) - Getting better results from AI reviews
+- [Automated Code Review](/guides/droid-exec/code-review)
+- [GitHub Actions with Droid Exec](/guides/droid-exec/github-actions)
+- [CLI Reference](/reference/cli-reference)
+- [How to Talk to a Droid](/cli/getting-started/how-to-talk-to-a-droid)

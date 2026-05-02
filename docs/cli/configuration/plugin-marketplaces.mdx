@@ -1,0 +1,130 @@
+---
+title: Plugin Marketplaces
+description: Add plugin marketplaces, install official plugins, and configure team plugin rollout.
+keywords:
+  [
+    'plugin marketplace',
+    'plugins',
+    'marketplaces',
+    'factory plugins',
+    'external plugins',
+    'team plugins',
+    'enterprise plugin registry',
+  ]
+---
+
+Plugin marketplaces are Git-backed catalogs of plugins that Droid can browse, install, and update. Use marketplaces to discover official plugins, connect external plugin ecosystems, develop plugins locally, or distribute approved team workflows.
+
+## Marketplace commands
+
+Use `/plugins` and open the **Marketplaces** tab, or run marketplace commands from your shell.
+
+| Action               | Command                                                               |
+| -------------------- | --------------------------------------------------------------------- |
+| Add a marketplace    | `droid plugin marketplace add <source>`                               |
+| List marketplaces    | `droid plugin marketplace list`                                       |
+| Update marketplaces  | `droid plugin marketplace update [name]`                              |
+| Remove a marketplace | `droid plugin marketplace remove <name>`                              |
+| Install a plugin     | `droid plugin install <plugin@marketplace> [--scope user\|project]`   |
+| Update a plugin      | `droid plugin update [plugin@marketplace] [--scope user\|project]`    |
+| Uninstall a plugin   | `droid plugin uninstall <plugin@marketplace> [--scope user\|project]` |
+
+Plugin IDs use the format `pluginName@marketplaceName`.
+
+<Note>
+  Removing a marketplace does not uninstall plugins that came from that
+  marketplace. Installed plugins keep working from the local plugin cache.
+</Note>
+
+## Marketplace examples
+
+<CodeGroup>
+
+```bash Official Factory
+# Add the curated Factory marketplace
+droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
+
+# Install official plugins
+droid plugin install droid-control@factory-plugins
+droid plugin install droid-evolved@factory-plugins
+droid plugin install security-engineer@factory-plugins
+```
+
+```bash External marketplace
+# Add a compatible external marketplace, including Claude Code-origin marketplaces
+droid plugin marketplace add https://github.com/owner/external-plugins
+
+# Install from the external marketplace
+droid plugin install plugin-name@external-plugins
+```
+
+```bash Local or team marketplace
+# Add a local marketplace while developing plugins
+droid plugin marketplace add /path/to/local/marketplace
+
+# Install a team plugin and share it through the repository
+droid plugin install code-standards@team-plugins --scope project
+```
+
+</CodeGroup>
+
+## Official Factory marketplace
+
+Factory maintains a curated plugin marketplace at `Factory-AI/factory-plugins`.
+
+Common official plugins include:
+
+| Plugin                | Description                                                                                                          |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **droid-control**     | Terminal, browser, and computer automation for demos, QA, and behavior verification                                  |
+| **droid-evolved**     | Skills for session navigation, human writing, skill creation, visual design, frontend design, and browser automation |
+| **security-engineer** | Security review, threat modeling, commit scanning, and vulnerability validation                                      |
+
+## External plugin marketplaces
+
+Droid can add external Git-backed marketplaces when they use a compatible marketplace and plugin structure. This includes marketplaces originally built for Claude Code, private team marketplaces, and local marketplace folders used during plugin development.
+
+External marketplaces let teams reuse plugin ecosystems without copying plugin files into each repository.
+
+<Warning>
+  Review external plugin code before installing it. Plugins can include hooks
+  and MCP server configuration that run in your local environment.
+</Warning>
+
+## Team and organization rollout
+
+Use `extraKnownMarketplaces` and `enabledPlugins` in settings when a team or organization should register marketplaces or install plugins automatically:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "team-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "your-org/internal-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "code-standards@team-plugins": true
+  }
+}
+```
+
+When Droid starts, it registers marketplaces from `extraKnownMarketplaces` and installs plugins listed in `enabledPlugins` if they are not already installed.
+
+The installation scope follows the settings location:
+
+| Settings location             | Plugin scope |
+| ----------------------------- | ------------ |
+| Organization managed settings | `org`        |
+| User settings                 | `user`       |
+| Project settings              | `project`    |
+
+Organizations that need centralized control over approved plugins can use an [Enterprise Plugin Registry](/enterprise/enterprise-plugin-registry) pattern with org-managed settings.
+
+## See also
+
+- [Plugins](/cli/configuration/plugins)
+- [Building plugins](/guides/building/building-plugins)
+- [Enterprise Plugin Registry](/enterprise/enterprise-plugin-registry)

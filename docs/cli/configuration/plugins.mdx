@@ -1,115 +1,154 @@
 ---
 title: Plugins
-description: Extend Droid with shareable packages of skills, commands, and tools.
-keywords: ['plugins', 'extensions', 'marketplace', 'skills', 'commands', 'mcp', 'shareable']
+description: Extend Droid with shareable packages of skills, commands, droids, hooks, and MCP servers.
+keywords:
+  [
+    'plugins',
+    'extensions',
+    'marketplace',
+    'skills',
+    'commands',
+    'mcp',
+    'shareable',
+  ]
 ---
 
-Plugins let you extend Droid with custom functionality that can be shared across projects and teams. A plugin bundles skills, slash commands, agents, and MCP servers into a single, distributable package.
+Plugins package Droid customizations so they can be shared, installed, updated, and governed as one unit. A plugin can bundle skills, slash commands, custom droids, hooks, and MCP servers for a specific workflow, team, or organization.
 
-## What are plugins?
+Use standalone `.factory/` configuration for quick local iteration. Use a plugin when a customization should be reused across repositories, installed by teammates, or distributed through a marketplace.
 
-Plugins are directories containing a manifest file (`.factory-plugin/plugin.json`) and optional components like skills, commands, and agents. Unlike standalone configuration in `.factory/`, plugins are designed for sharing and distribution.
+## What plugins include
 
-**Plugin components:**
+A plugin is a directory with a required manifest at `.factory-plugin/plugin.json` and optional component folders at the plugin root.
 
-| Component | Purpose | Invocation |
-|-----------|---------|------------|
-| **Skills** | Reusable capabilities with instructions and tools | Model-invoked automatically based on task |
-| **Commands** | Slash commands for specific workflows | User-invoked via `/command-name` |
-| **Agents** | Specialized subagent definitions | Called via Task tool |
-| **Hooks** | Lifecycle event handlers | Automatic on matching events |
-| **MCP Servers** | External tool integrations | Available as tools when plugin is active |
+| Component       | Purpose                                                                 | Invocation                                         |
+| --------------- | ----------------------------------------------------------------------- | -------------------------------------------------- |
+| **Skills**      | Reusable capabilities with instructions, examples, and supporting files | Invoked by Droid when relevant or by `/skill-name` |
+| **Commands**    | User-invoked slash commands for repeatable workflows                    | Invoked directly by `/command-name`                |
+| **Droids**      | Specialized subagents with their own prompts, models, and tool policies | Used by the parent Droid through delegation        |
+| **Hooks**       | Lifecycle commands that enforce deterministic automation or guardrails  | Run automatically when matching events fire        |
+| **MCP servers** | External tools exposed to Droid through Model Context Protocol          | Available as tools when the plugin is active       |
 
-## When to use plugins vs standalone configuration
+For example, a security engineering plugin might include a security review skill, a `/threat-model` command, a security-focused custom droid, hooks that block risky files, and MCP configuration for a vulnerability database.
 
-| Approach | Best for |
-|----------|----------|
-| **Standalone** (`.factory/` directory) | Personal workflows, project-specific customizations, quick experiments |
-| **Plugins** | Sharing with teammates, distributing to community, versioned releases, reusable across projects |
+## When to use plugins
 
-Start with standalone configuration in `.factory/` for quick iteration, then convert to a plugin when you're ready to share.
+| Approach                         | Best for                                                                                  |
+| -------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Standalone `.factory/` files** | Personal workflows, project-specific context, experiments, one-off commands               |
+| **Plugins**                      | Shared team workflows, reusable conventions, curated tool bundles, versioned distribution |
+| **Org-managed plugin rollout**   | Organization-approved marketplaces and mandatory plugin installation                      |
+
+Start with standalone configuration when the workflow is still changing. Convert it to a plugin once the workflow is stable enough to share.
 
 ## Managing plugins
 
-Droid provides two ways to manage plugins:
+Use `/plugins` to browse, install, update, and remove plugins from the interactive CLI.
 
-### Interactive UI (recommended)
-
-Use the `/plugins` slash command to open the plugin manager:
-
-```
+```bash
 /plugins
 ```
 
-This opens a tabbed interface:
-- **Browse** - View and install plugins from registered marketplaces
-- **Installed** - Manage installed plugins (view info, update, uninstall)
-- **Marketplaces** - Add, update, or remove marketplaces
+The plugin manager has three tabs:
 
-**Navigation:**
-- Left/Right arrows: Switch between tabs
-- Up/Down arrows: Navigate within a tab
-- Enter: Select/confirm
-- Escape: Go back or close
+- **Browse** — view installable plugins from registered marketplaces.
+- **Installed** — inspect, update, or uninstall active plugins.
+- **Marketplaces** — add, update, or remove plugin sources.
 
-### CLI commands (for scripting)
-
-For automation, use CLI commands from your shell (not as slash commands):
+For scripting, use the `droid plugin` CLI commands from your shell:
 
 ```bash
-# Marketplace management
-droid plugin marketplace add <url>
-droid plugin marketplace remove <name>
-droid plugin marketplace list
-droid plugin marketplace update [name]
-
-# Plugin management
 droid plugin install <plugin@marketplace> [--scope user|project]
 droid plugin uninstall <plugin@marketplace> [--scope user|project]
 droid plugin update [plugin@marketplace] [--scope user|project]
 droid plugin list [--scope user|project]
 ```
 
-Plugin IDs use the format `pluginName@marketplaceName` (e.g., `security-guidance@claude-plugins-official`).
+Plugin IDs use the format `pluginName@marketplaceName`, such as `security-engineer@factory-plugins`.
+
+Marketplaces are Git-backed plugin catalogs. Use [Plugin Marketplaces](/cli/configuration/plugin-marketplaces) to add official, external, local, team, or organization-managed plugin sources.
 
 ## Plugin structure
 
-Every plugin follows this directory structure:
+Every plugin follows the same root-level layout:
 
-```
+```text
 my-plugin/
 ├── .factory-plugin/
 │   └── plugin.json          # Plugin manifest (required)
 ├── commands/                 # Slash commands (optional)
-│   └── my-command.md
-├── skills/                   # Agent skills (optional)
+├── skills/                   # Skills (optional)
 │   └── my-skill/
 │       └── SKILL.md
-├── droids/                   # Subagent definitions (optional)
-│   └── my-agent.md
+├── droids/                   # Custom droids (optional)
+├── hooks/                    # Hook configuration and scripts (optional)
+│   └── hooks.json
 ├── mcp.json                  # MCP server configs (optional)
-└── README.md                 # Documentation
+└── README.md                 # Human-facing documentation
 ```
 
 <Warning>
-Don't put `commands/`, `skills/`, `droids/`, or `hooks/` inside the `.factory-plugin/` directory. Only `plugin.json` goes inside `.factory-plugin/`. All other directories must be at the plugin root level.
+  Do not put `commands/`, `skills/`, `droids/`, `hooks/`, or `mcp.json` inside
+  `.factory-plugin/`. Only `plugin.json` belongs in `.factory-plugin/`; all
+  plugin components live at the plugin root.
 </Warning>
 
-### Plugin hooks
+## Plugin manifest
 
-Plugins can include hooks that execute at specific lifecycle events. Add a `hooks/` directory with a `hooks.json` file:
+The manifest defines the plugin's identity and display metadata.
 
+```json
+{
+  "name": "my-plugin",
+  "description": "A helpful description of what this plugin does",
+  "version": "1.0.0",
+  "author": {
+    "name": "Your Name"
+  }
+}
 ```
+
+| Field         | Purpose                                         |
+| ------------- | ----------------------------------------------- |
+| `name`        | Unique plugin identifier.                       |
+| `description` | Shown when browsing and installing the plugin.  |
+| `version`     | Human-readable release version in the manifest. |
+| `author`      | Optional attribution metadata.                  |
+
+Droid tracks installed plugin updates by marketplace Git commit. When you update a plugin, Droid fetches the latest version from the marketplace.
+
+<Note>
+  Version pinning is not currently supported. Plugin updates fetch the latest
+  marketplace version.
+</Note>
+
+## Plugin scopes
+
+Choose a scope when installing a plugin:
+
+| Scope       | Location              | Visibility                                   |
+| ----------- | --------------------- | -------------------------------------------- |
+| **User**    | `~/.factory/`         | Available across your projects               |
+| **Project** | `<project>/.factory/` | Shared with teammates through git            |
+| **Org**     | Managed settings      | Installed through organization configuration |
+
+You can manually install user or project scoped plugins. Org-scoped plugins are controlled by organization managed settings and are installed automatically.
+
+A plugin can only exist at one scope at a time. To change scope, uninstall it and install it again at the new scope.
+
+## Plugin hooks
+
+Plugins can include hooks that execute at specific Droid lifecycle events. Put hook definitions in `hooks/hooks.json` and scripts in the same `hooks/` directory.
+
+```text
 my-plugin/
 ├── .factory-plugin/
 │   └── plugin.json
 ├── hooks/
-│   ├── hooks.json         # Hook configuration
-│   └── my-script.sh       # Hook scripts
+│   ├── hooks.json
+│   └── format.sh
 └── ...
 ```
-
-**hooks/hooks.json example:**
 
 ```json
 {
@@ -127,178 +166,38 @@ my-plugin/
 }
 ```
 
-Use `${DROID_PLUGIN_ROOT}` to reference files within your plugin directory. This variable is expanded to the actual plugin path when the hook runs. See [Hooks reference](/reference/hooks-reference#plugin-hooks) for details.
-
-### Plugin manifest
-
-The manifest at `.factory-plugin/plugin.json` defines your plugin's identity:
-
-```json
-{
-  "name": "my-plugin",
-  "description": "A helpful description of what this plugin does",
-  "version": "1.0.0",
-  "author": {
-    "name": "Your Name"
-  }
-}
-```
-
-| Field | Purpose |
-|-------|---------|
-| `name` | Unique identifier for the plugin. |
-| `description` | Shown in the plugin manager when browsing or installing. |
-| `version` | Track releases using semantic versioning. |
-| `author` | Optional. Helpful for attribution. |
-
-## Plugin scopes
-
-When installing plugins, you choose an installation scope:
-
-| Scope | Location | Visibility |
-|-------|----------|------------|
-| **User** | `~/.factory/` | Available across all your projects |
-| **Project** | `<project>/.factory/` | Shared with teammates via git |
-
-<Note>
-**Org scope**: Plugins enabled via organization managed settings are automatically installed with `org` scope. You cannot manually set org scope.
-</Note>
-
-A plugin can only exist at one scope. To change scope, uninstall first and reinstall.
-
-## Version tracking
-
-Plugins are versioned by Git commit hash, not semantic version. When you update a plugin, Droid fetches the latest commit from the marketplace repository.
-
-<Note>
-Version pinning is not supported. Updates always fetch the latest version from the marketplace.
-</Note>
-
-## Marketplaces
-
-Marketplaces are catalogs of plugins that you can browse and install from.
-
-### Adding marketplaces
-
-Via UI: `/plugins` → Marketplaces tab → "Add new marketplace" → enter URL
-
-Via CLI:
-
-```bash
-# From GitHub
-droid plugin marketplace add https://github.com/owner/repo
-
-# From other Git hosts
-droid plugin marketplace add https://gitlab.com/company/plugins.git
-
-# From local path (for development)
-droid plugin marketplace add /path/to/local/marketplace
-```
-
-### Managing marketplaces
-
-Via UI: `/plugins` → Marketplaces tab → select marketplace → choose action (Update, Disable auto-update, Delete)
-
-Via CLI:
-
-```bash
-droid plugin marketplace list
-droid plugin marketplace update [marketplace-name]
-droid plugin marketplace remove <marketplace-name>
-```
-
-<Note>
-Removing a marketplace does not uninstall plugins from that marketplace. Installed plugins remain functional from cache.
-</Note>
-
-### Team marketplaces
-
-Configure automatic marketplace and plugin installation by adding to `.factory/settings.json`:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "your-org-internal-plugins": {
-      "source": {
-        "source": "github",
-        "repo": "your-org/internal-plugins"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "code-standards@your-org-internal-plugins": true
-  }
-}
-```
-
-When Droid starts, it automatically:
-1. Registers any marketplaces from `extraKnownMarketplaces` that aren't already registered
-2. Installs any plugins from `enabledPlugins` that aren't already installed
-
-The installation scope depends on where the setting is defined:
-- Org-managed settings → `org` scope
-- User settings → `user` scope
-- Project settings → `project` scope
-
-## Discovering plugins
-
-### Official Factory plugins
-
-Factory maintains an official plugin marketplace at `Factory-AI/factory-plugins` with curated plugins.
-
-Add via `/plugins` UI or CLI:
-
-```bash
-droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
-```
-
-**Available plugins:**
-
-| Plugin | Description |
-|--------|-------------|
-| **[droid-control](/cli/features/droid-control)** | Terminal, browser, and computer automation. Record demos, verify behavior claims, and run QA flows. |
-| **droid-evolved** | Skills for continuous learning: session navigation, human writing, skill creation, visual design, frontend design, browser automation |
-| **security-engineer** | Security review, threat modeling, commit scanning, and vulnerability validation |
-
-Install via `/plugins` UI (Browse tab) or CLI:
-
-```bash
-droid plugin install droid-control@factory-plugins
-droid plugin install droid-evolved@factory-plugins
-droid plugin install security-engineer@factory-plugins
-```
-
-### Community plugins
-
-| Plugin | Description | Source |
-|--------|-------------|--------|
-| **superpowers** | Complete software development workflow with brainstorming, planning, and subagent-driven development | `obra/superpowers` |
-
-### Enterprise Plugin Registry
-
-For organizations that need centralized control over approved plugins, see [Enterprise Plugin Registry](/enterprise/enterprise-plugin-registry). This allows you to:
-
-- Maintain a private marketplace of approved plugins
-- Pre-install mandatory plugins for all users
-- Organize plugins by team, role, or capability
-
-### Claude Code compatibility
-
-Droid is compatible with plugins built for Claude Code. If you find a Claude Code plugin you'd like to use, you can install it directly - the plugin format is interoperable. See the [Claude Code plugins documentation](https://code.claude.com/docs/en/plugins) for more details.
+Use `${DROID_PLUGIN_ROOT}` to reference files inside the installed plugin directory. See the [Hooks reference](/reference/hooks-reference#plugin-hooks) for hook event schemas and security considerations.
 
 ## Next steps
 
 <CardGroup cols={2}>
-  <Card title="Building plugins" href="/guides/building/building-plugins" icon="hammer">
-    Learn how to create your own plugins with skills and commands.
+  <Card
+    title="Plugin Marketplaces"
+    href="/cli/configuration/plugin-marketplaces"
+    icon="store"
+  >
+    Add official, external, local, team, and organization-managed plugin
+    sources.
   </Card>
-  <Card title="Skills" href="/cli/configuration/skills" icon="wand-magic-sparkles">
-    Understand how skills work and how to create them.
+  <Card
+    title="Building plugins"
+    href="/guides/building/building-plugins"
+    icon="hammer"
+  >
+    Create a plugin with skills, commands, droids, hooks, and MCP configuration.
   </Card>
-  <Card title="Custom commands" href="/cli/configuration/custom-slash-commands" icon="terminal">
-    Create user-invoked slash commands.
+  <Card
+    title="Skills"
+    href="/cli/configuration/skills"
+    icon="wand-magic-sparkles"
+  >
+    Define reusable capabilities that Droid can invoke on demand.
   </Card>
-  <Card title="Custom Droids" href="/cli/configuration/custom-droids" icon="robot">
-    Create specialized subagents for your plugins.
+  <Card
+    title="Custom Droids"
+    href="/cli/configuration/custom-droids"
+    icon="robot"
+  >
+    Create specialized subagents that plugins can package and distribute.
   </Card>
 </CardGroup>
