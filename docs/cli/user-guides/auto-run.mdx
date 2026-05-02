@@ -1,98 +1,119 @@
 ---
-title: Auto-Run Mode
-description: Choose low, medium, or high autonomy so droid can execute work that matches your risk tolerance without repeated confirmations.
-keywords: ['auto run', 'autorun', 'autonomy', 'automatic', 'auto mode', 'yolo', 'permissions', 'risk', 'approval']
+title: Autonomy Level
+description: Choose Off, Low, Medium, or High to control what Droid can do without repeated confirmations.
+keywords:
+  ['autonomy level', 'autonomy', 'automatic', 'permissions', 'risk', 'approval']
 ---
 
-Auto-Run Mode lets you decide how much autonomy droid has after you approve a plan. Instead of confirming every tool call, pick the level of risk you are comfortable with and droid will keep moving while still surfacing everything it does.
+Autonomy Level sets the highest-risk work Droid can run without pausing for approval. It is separate from interaction mode: Auto executes work, while Spec Mode plans before implementation.
 
-<CardGroup cols={2}>
-  <Card title="Configurable Autonomy" icon="slider">
-    Switch between Low, Medium, and High depending on the type of work in front of you.
-  </Card>
-  <Card title="Risk-Aware Execution" icon="shield-check">
-    Commands run automatically only when their risk rating is at or below your chosen level.
-  </Card>
-  <Card title="No Surprises" icon="eye">
-    Dangerous commands and command substitutions always require an explicit approval.
-  </Card>
-  <Card title="Persistent Preference" icon="floppy">
-    Your autonomy level is saved in settings and restored for the next session.
-  </Card>
-</CardGroup>
+## Choose a level
 
-## Autonomy levels at a glance
+Execute commands and MCP tools have a risk level (`low`, `medium`, or `high`). Droid runs them automatically when the risk is at or below your Autonomy Level, unless a denylist or sandbox check requires approval.
 
-| Level | What runs automatically | Typical examples |
-| --- | --- | --- |
-| **Auto (Low)** | File edits, file creation, and read-only commands from the built-in allowlist | `Edit`, `Create`, `ls`, `git status`, `rg` |
-| **Auto (Medium)** | Everything from Low plus reversible commands that change your workspace | `npm install`, `pip install`, `git commit`, `mv`, `cp`, build tooling |
-| **Auto (High)** | All commands that are not explicitly blocked for safety | `docker compose up`, `git push` (if allowed), migrations, custom scripts |
+| Autonomy Level | What can run without approval                           | Examples                                                               |
+| -------------- | ------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Off**        | Built-in read tools and allowlisted commands only       | `Read`, `LS`, `ls`, `pwd`, `git status`                                |
+| **Low**        | File edits plus low-risk commands and MCP tools         | `Edit`, `Create`, `rg`, showing logs                                   |
+| **Medium**     | Everything from Low plus reversible workspace changes   | `npm install`, `pip install`, `git commit`, `mv`, `cp`, build tooling  |
+| **High**       | High-risk actions unless safety checks require approval | `docker compose up`, `git push` if allowed, migrations, custom scripts |
 
-Auto-Run always shows streamed output and highlights every file change, regardless of the autonomy level.
+Droid still streams output and highlights file changes at every level.
 
-## Risk classification
+## Tool availability vs. approval
 
-Every command sent through the CLI includes a risk rating (`low`, `medium`, or `high`) along with a short justification. Auto-Run compares that rating to your selected autonomy level:
+Autonomy Level controls automatic approval. It is not a complete list of every tool Droid can request.
 
-- **Low risk** – read-only operations and changes that cannot create irreversible damage (listing files, showing logs, git diff).
-- **Medium risk** – actions that alter your workspace but are straightforward to undo (package installs, moving files, local git operations, builds).
-- **High risk** – commands that could be destructive, hard to roll back, or security sensitive (sudo, wiping directories, deploying, piping remote scripts).
+- **Interactive CLI** – Tools can still be requested when they exceed the current Autonomy Level; Droid pauses for approval before using them.
+- **Droid Exec** – Without `--auto`, Droid Exec exposes read-only tools plus `Execute` for low-risk commands. Any `--auto` level enables mutation tools, while `Task` subagent orchestration requires `--auto high` or `--skip-permissions-unsafe` at the top level.
+- **Tool policy** – Model support, custom droid tool lists, `--enabled-tools`, `--disabled-tools`, MCP server configuration, and organization controls can further restrict which tools are available.
 
-Commands run automatically only when their risk level is less than or equal to your current setting. If a tool labels a command above your threshold, the CLI pauses and asks for confirmation.
+## How approvals work
 
-## How Auto-Run decides what to execute
+- **Auto vs. Spec Mode** – Autonomy Level applies while Droid is in Auto. Spec Mode remains read-only except for saved spec files.
+- **File changes** – Low or higher lets Droid create, edit, and patch files without asking first.
+- **Commands and MCP tools** – Droid compares the tool risk level to your Autonomy Level. If the risk is higher, it asks before continuing.
+- **Allowlisted commands** – Commands in the allowlist can run without approval unless they also match the denylist.
+- **Spec approval** – When approving a Spec Mode plan, choose **Proceed with implementation** to keep manual controls, or choose an available Low, Medium, or High option for the implementation phase. Organization Maximum Autonomy Level can hide higher options.
+- **Safety checks** – Denylisted dangerous commands still ask at High, including dangerous commands nested inside `$(...)` or backticks. Sandbox read, write, and network checks can also prompt separately.
+- **Allow always** – Choosing an “always allow” option raises the current Autonomy Level to the level required by that prompt. Sandbox “allow always” options instead persist the allowed path or domain.
 
-- **File tools** (`Create`, `Edit`, `MultiEdit`, `ApplyPatch`) are treated as low risk and run instantly whenever Auto-Run is active.
-- **Execute commands** follow the risk threshold. Low autonomy auto-accepts only read-only allowlisted commands. Medium adds reversible commands. High accepts any command with a declared risk level, except for those blocked below.
-- **Safety interlocks** always trigger confirmation, even in Auto (High): dangerous patterns (`rm -rf /`, `dd of=/dev/*`, etc.), command substitution (`$(...)`, backticks), or anything explicitly flagged by the CLI security checks.
-- **Allowlist expansion** – when you approve a command, you can add it to the session allowlist so future occurrences run without another prompt.
+## Command allowlists and denylists
 
-## Enabling and switching modes
+Use `commandAllowlist` and `commandDenylist` in [Settings](/cli/configuration/settings) to encode command policy for your user profile, a project, a local project override, or a nested folder.
 
-- **Cycle from the keyboard** – press **Shift+Tab** (or `Ctrl+T` on Windows) to move through Normal → Spec → Auto (Low) → Auto (Medium) → Auto (High) → back to Normal. The active mode is shown in the status banner and Help popup.
-- **Set a default in Settings** – open the CLI settings menu, choose your preferred autonomy level, and the CLI persists it for future sessions.
-- **Choose it after a spec** – when approving a Specification Mode plan, pick “Proceed” (manual), or enable Auto-Run at Low, Medium, or High for the implementation phase.
-- **Return to manual control** at any time by cycling back to Normal; droid will resume asking for each file change and command.
+- Allowlist entries are treated as low-risk for the matching scope.
+- Denylist entries always take precedence over allowlist entries.
+- Commands not covered by either list fall back to the active Autonomy Level and command restrictions.
+- Organization-managed settings have the highest priority. Local and project settings can add defaults for a repo or machine, but they cannot weaken organization command policy or raise autonomy above the organization maximum. See [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control).
 
-## Workflow examples
+The default denylist includes these command patterns:
 
-**Auto (Low)** – quick file updates and reconnaissance
+```json
+[
+  "rm -rf /",
+  "rm -rf /*",
+  "rm -rf .",
+  "rm -rf ~",
+  "rm -rf ~/*",
+  "rm -rf $HOME",
+  "rm -r /",
+  "rm -r /*",
+  "rm -r ~",
+  "rm -r ~/*",
+  "mkfs",
+  "mkfs.ext4",
+  "mkfs.ext3",
+  "mkfs.vfat",
+  "mkfs.ntfs",
+  "dd if=/dev/zero of=/dev",
+  "dd of=/dev",
+  "shutdown",
+  "reboot",
+  "halt",
+  "poweroff",
+  "init 0",
+  "init 6",
+  ":(){ :|: & };:",
+  ":() { :|:& };:",
+  "chmod -R 777 /",
+  "chmod -R 000 /",
+  "chown -R",
+  "Format-Volume",
+  "format.com",
+  "powershell Remove-Item -Recurse -Force"
+]
 ```
-- Update docs/README.md with new instructions
-- Run ls, git status, and rg searches as needed
-```
-All edits and read-only checks happen without prompts, while anything that modifies dependencies still asks first.
 
-**Auto (Medium)** – feature work that needs tooling
-```
-- Add a new React component (multiple file edits)
-- npm install @acme/widget
-- npm run lint
-```
-File changes, dependency installs, and build scripts execute automatically so long as they are reversible.
+## Change the level
 
-**Auto (High)** – migrations or integration tests
-```
-- Run database migration script
-- docker compose up test-environment
-- git push origin feature/autonomy-docs
-```
-Droid executes the entire sequence without pauses while still blocking obviously dangerous commands.
+- Press `Ctrl+L` to cycle `Off → Low → Medium → High → Off`. Organization policy can cap the highest available level.
+- Press `Shift+Tab` to switch between Auto and Spec Mode. On Windows or WSL, use `Ctrl+T` if `Shift+Tab` is unavailable.
+- Set a default in the Factory CLI settings menu for future sessions.
+- Change Autonomy Level before implementation, from the [Spec Mode](/cli/user-guides/specification-mode) approval dialog, or any time after leaving Spec Mode.
 
-## When you will still get prompted
+## Where Autonomy Level applies
 
-- A command is rated above your current autonomy level.
-- The CLI detects command substitution or a dangerous pattern.
-- A tool requests something outside the session allowlist and you are in Auto (Low).
-- Droid needs clarity (e.g., missing context, ambiguous edits) and asks for input.
-- You manually interrupt with **Esc** (single tap interrupts operations; double tap clears current input).
+- **Interactive CLI** – `droid` uses the session's current Autonomy Level. `droid "<prompt>"` starts the same interactive CLI with an initial prompt, so the first task uses your configured default. See the [CLI reference](/reference/cli-reference).
+- **Droid Exec** – `droid exec` is read-only by default. Use `--auto low`, `--auto medium`, or `--auto high` for non-interactive runs that need edits, local development commands, or broader automation. See [Droid Exec](/cli/droid-exec/overview).
+- **Custom Droids (Subagents)** – subagents run as child Droid Exec sessions. In Auto, Task-launched subagents request `--auto high` regardless of the parent session's current Autonomy Level; the organization Maximum Autonomy Level can still cap that, and the droid tool policy can limit available tools. In Spec Mode, subagents are restricted to read-only work. See [Custom Droids](/cli/configuration/custom-droids).
+- **Missions** – Mission orchestration uses high autonomy for the orchestrator and worker sessions. `droid exec --mission` requires `--auto high` or `--skip-permissions-unsafe`, and admins can restrict who can start Missions. See [Missions](/cli/features/missions).
 
-## Best practices
+## Enterprise controls
 
-- Start new or high-stakes work in Normal or Auto (Low) until you trust the plan.
-- Use Auto (Medium) for day-to-day feature development and refactors that rely on package managers or build steps.
-- Reserve Auto (High) for well-understood pipelines where you expect droid to run end-to-end scripts.
-- If you spot a suspect command, interrupt, provide guidance, and resume at the autonomy level that fits the remaining risk.
+Enterprise admins can set organization-wide autonomy boundaries with organization-managed settings. See [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control).
 
-Ready to try it? Cycle into the level you need with **Shift+Tab**, or pick the desired option when you approve your next spec.
+- **Default Autonomy Level** sets the starting level for new sessions.
+- **Maximum Autonomy Level** caps how high members can raise autonomy. If the maximum is Medium, High is unavailable in the CLI.
+
+These controls layer with command allowlists, command denylists, MCP restrictions, sandbox settings, and Mission access controls.
+
+## Use it safely
+
+- Start new or high-stakes work with Off or Low until you trust the plan.
+- Match the minimum level to the work: use Low for file edits and generated reports, Medium when the run must install dependencies, build, test, or make local commits, and High for pushes, deployments, Task-launched subagents, Missions, or other orchestration.
+- Use Medium for day-to-day feature development and refactors that rely on package managers or build steps.
+- Reserve High for well-understood pipelines in safe environments.
+- Add defense in depth for automation: use [blocking hooks](/cli/configuration/hooks-guide) for repository-specific command checks, keep command denylists and MCP restrictions in organization-managed settings, and harden the host with least-privilege credentials, isolated runners, and network egress controls.
+- For action-based code review and other CI workflows, choose the lowest `droid exec --auto` level that allows the workflow to complete. Review-only or report-writing workflows often need Low; workflows that run installs, tests, commits, pushes, or subagents may need Medium or High. See [Automated Code Review](/guides/droid-exec/code-review) and [GitHub Actions examples](/guides/droid-exec/github-actions).
+- If you spot a suspect command, interrupt, provide guidance, and resume at the Autonomy Level that fits the remaining risk.
