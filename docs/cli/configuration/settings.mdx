@@ -1,13 +1,13 @@
 ---
 title: Settings
-description: Configure Factory CLI defaults, model routing, hooks, MCP servers, and local overrides with .factory settings.
+description: Configure Droid defaults, model routing, hooks, MCP servers, and local overrides with .factory settings.
 keywords:
   ["settings", "configuration", "config", "preferences", "settings.json", "session defaults"]
 ---
 
-Configure Droid with `/settings` for interactive changes or `.factory` JSON files for repeatable team configuration. The current settings surface is schema-backed JSON under `.factory`; repository instructions belong in [AGENTS.md](/cli/configuration/agents-md).
+Configure Droid with `/settings` for interactive changes or `.factory` JSON files for repeatable team configuration. The current settings surface is schema-backed JSON under `.factory`.
 
-## Open settings in the Factory CLI
+## Open settings in Droid
 
 1. Run `droid` in a terminal.
 2. Enter `/settings`.
@@ -145,27 +145,5 @@ Common personal preferences live at the root of `settings.json`.
 | `completionSound`, `awaitingInputSound`, `soundFocusMode` | Audio cues and when they play. |
 | `showThinkingInMainView` | Whether reasoning blocks appear in the main chat view. |
 | `statusLine` | Custom status line command. |
-| `llmRequestTimeout`, `subagentInactivityTimeout` | Request and subagent timeout controls in milliseconds. |
 | `compactionTokenLimit` | Context compaction controls. |
 | `cloudSessionSync`, `includeCoAuthoredByDroid`, `enableDroidShield`, `ideAutoConnect` | Session sync, commit attribution, Droid Shield, and IDE connection defaults. |
-
-## Enterprise managed settings
-
-Enterprise controls can provide organization-level defaults and restrictions for session defaults, model access, command policy, MCP policy, network policy, plugin settings, Managed Computers, session retention, and other shared controls. If a local setting appears to be ignored, check `/settings-debug` or ask an organization admin whether the value is managed.
-
-## Related resources
-
-<CardGroup cols={2}>
-  <Card title="AGENTS.md" icon="file-lines" href="/cli/configuration/agents-md">
-    Put repository instructions, conventions, and validation commands in AGENTS.md.
-  </Card>
-  <Card title="Mixed Models" icon="brain" href="/cli/configuration/mixed-models">
-    Configure a dedicated Spec Mode model and other model routing defaults.
-  </Card>
-  <Card title="Hooks" icon="code" href="/cli/configuration/hooks-guide">
-    Run local automation around Droid tool use and session events.
-  </Card>
-  <Card title="BYOK" icon="key" href="/cli/byok/overview">
-    Add custom models and API keys with `customModels`.
-  </Card>
-</CardGroup>
