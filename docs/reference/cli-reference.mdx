@@ -42,7 +42,7 @@ Customize droid's behavior with command-line flags:
 | Flag                              | Description                                                        | Example                                                      |
 | :-------------------------------- | :----------------------------------------------------------------- | :----------------------------------------------------------- |
 | `-f, --file <path>`               | Read prompt from a file                                            | `droid exec -f plan.md`                                      |
-| `-m, --model <id>`                | Select a specific model (see [model IDs](#available-models))       | `droid exec -m claude-opus-4-6`                              |
+| `-m, --model <id>`                | Select a specific [model ID](/models)                              | `droid exec -m claude-opus-4-7`                              |
 | `-s, --session-id <id>`           | Continue an existing session                                       | `droid exec -s session-abc123`                               |
 | `--auto <level>`                  | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)   | `droid exec --auto medium "run tests"`                       |
 | `--enabled-tools <ids>`           | Force-enable specific tools (comma or space separated)             | `droid exec --enabled-tools ApplyPatch,Bash`                 |
@@ -51,7 +51,7 @@ Customize droid's behavior with command-line flags:
 | `-o, --output-format <format>`    | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)    | `droid exec -o json "document API"`                          |
 | `--input-format <format>`         | Input format (`stream-json`, `stream-jsonrpc` for multi-turn)      | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
 | `-r, --reasoning-effort <level>`  | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`) | `droid exec -r high "debug flaky test"`                      |
-| `--spec-model <id>`               | Use a different model for specification planning                   | `droid exec --spec-model claude-sonnet-4-5-20250929`         |
+| `--spec-model <id>`               | Use a different [model ID](/models) for specification planning     | `droid exec --spec-model claude-sonnet-4-6`                  |
 | `--spec-reasoning-effort <level>` | Override reasoning effort for spec mode                            | `droid exec --use-spec --spec-reasoning-effort high`         |
 | `--use-spec`                      | Start in specification mode (plan before executing)                | `droid exec --use-spec "add user profiles"`                  |
 | `--skip-permissions-unsafe`       | Skip all permission prompts (⚠️ use with extreme caution)          | `droid exec --skip-permissions-unsafe`                       |
@@ -99,32 +99,9 @@ droid exec --auto high "Run tests, commit, and push changes"
   containers.
 </Warning>
 
-## Available models
+## Model IDs
 
-| Model ID                     | Name                      | Reasoning support                     | Default reasoning |
-| :--------------------------- | :------------------------ | :------------------------------------ | :---------------- |
-| `claude-opus-4-7`            | Claude Opus 4.7           | Yes (Off/Low/Medium/High/Max)         | high              |
-| `claude-opus-4-6`            | Claude Opus 4.6           | Yes (Off/Low/Medium/High/Max)         | high              |
-| `claude-opus-4-6-fast`       | Claude Opus 4.6 Fast      | Yes (Off/Low/Medium/High/Max)         | high              |
-| `claude-opus-4-5-20251101`   | Claude Opus 4.5           | Yes (Off/Low/Medium/High)             | off               |
-| `claude-sonnet-4-6`          | Claude Sonnet 4.6         | Yes (Off/Low/Medium/High/Max)         | high              |
-| `claude-sonnet-4-5-20250929` | Claude Sonnet 4.5         | Yes (Off/Low/Medium/High)             | off               |
-| `claude-haiku-4-5-20251001`  | Claude Haiku 4.5          | Yes (Off/Low/Medium/High)             | off               |
-| `gpt-5.5`                    | GPT-5.5                   | Yes (None/Low/Medium/High/Extra High) | medium            |
-| `gpt-5.5-fast`               | GPT-5.5 Fast              | Yes (None/Low/Medium/High/Extra High) | medium            |
-| `gpt-5.5-pro`                | GPT-5.5 Pro               | Yes (None/Low/Medium/High/Extra High) | medium            |
-| `gpt-5.4`                    | GPT-5.4                   | Yes (None/Low/Medium/High/Extra High) | medium            |
-| `gpt-5.3-codex`              | GPT-5.3-Codex             | Yes (None/Low/Medium/High/Extra High) | medium            |
-| `gpt-5.2-codex`              | GPT-5.2-Codex             | Yes (None/Low/Medium/High/Extra High) | medium            |
-| `gpt-5.2`                    | GPT-5.2                   | Yes (Off/Low/Medium/High/Extra High)  | low               |
-| `gemini-3.1-pro-preview`     | Gemini 3.1 Pro            | Yes (Low/Medium/High)                 | high              |
-| `gemini-3-flash-preview`     | Gemini 3 Flash            | Yes (Minimal/Low/Medium/High)         | high              |
-| `glm-5.1`                    | Droid Core (GLM-5.1)      | None only                             | none              |
-| `kimi-k2.5`                  | Droid Core (Kimi K2.5)    | None only                             | none              |
-| `kimi-k2.6`                  | Droid Core (Kimi K2.6)    | Yes (Off/High)                        | high              |
-| `minimax-m2.7`               | Droid Core (MiniMax M2.7) | Yes (Low/Medium/High)                 | high              |
-
-Custom models configured via [BYOK](/cli/byok/overview) use the format: `custom:<alias>`
+Use any [available model ID](/models) with `-m, --model` or `--spec-model`. For custom models, see [Bring Your Own Key (BYOK)](/cli/byok/overview).
 
 See [Choosing Your Model](/cli/user-guides/choosing-your-model) for detailed guidance on which model to use for different tasks.
 
