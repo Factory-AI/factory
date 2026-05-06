@@ -47,19 +47,11 @@ Findings are reported only when there is a realistic exploit path, such as an in
 
 ## Run locally
 
-Run the built-in skill directly from Droid:
+Run the built-in skill directly from Droid on any repo:
 
 ```text
-/security-review Run a full-project security audit of this repository. Review every source file and report high-confidence findings only.
+/security-review
 ```
-
-For a headless local run, pass the same request to `droid exec`:
-
-```bash
-droid exec --auto high "/security-review Run a full-project security audit of this repository. Review every source file, apply STRIDE, OWASP Top 10, OWASP LLM Top 10 when applicable, and supply-chain checks. Report only high-confidence findings with severity, file, line, exploit path, and suggested fix."
-```
-
-In full-project mode, Droid enumerates source files, excludes generated and vendored directories, groups files by module or directory, uses parallel subagents to review each group, validates findings, and summarizes which files or directories were covered.
 
 ## Run on pull requests
 
