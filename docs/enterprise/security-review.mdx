@@ -76,51 +76,24 @@ When `automatic_review` and `automatic_security_review` are both enabled, Droid 
 
 ## Full repository scans in GitHub Actions
 
-Use `@droid security --full` on a PR, or schedule a recurring full-repository scan:
+For a full repository security scan, comment on a PR:
 
-```yaml
-name: Droid Security Scan
-
-on:
-  schedule:
-    - cron: "0 9 * * 1" # Every Monday at 09:00 UTC
-  workflow_dispatch:
-
-jobs:
-  security-scan:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
-      id-token: write
-      actions: read
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - uses: Factory-AI/droid-action@main
-        with:
-          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
-          security_scan_schedule: true
-          security_scan_days: 7
+```text
+@droid security --full
 ```
 
 Full scans create a `droid/security-report-{date}` branch, write a report to `.factory/security/reports/security-report-{date}.md`, and open a PR with the findings.
 
 ## Configuration
 
+These are the Droid Action security inputs currently wired for the workflows documented on this page:
+
 | Input | Default | Description |
 | --- | --- | --- |
 | `automatic_security_review` | `false` | Run security review automatically on PRs without requiring `@droid security`. |
-| `security_model` | `""` | Override the model used for security review. Falls back to `review_model` if unset. |
-| `security_severity_threshold` | `medium` | Minimum severity to report: `critical`, `high`, `medium`, or `low`. |
-| `security_block_on_critical` | `true` | Submit a `REQUEST_CHANGES` review when critical findings are detected. |
-| `security_block_on_high` | `false` | Submit a `REQUEST_CHANGES` review when high-severity findings are detected. |
-| `security_notify_team` | `""` | GitHub team to mention on critical findings, such as `@org/security-team`. |
-| `security_scan_schedule` | `false` | Enable scheduled full-repository security scans. |
-| `security_scan_days` | `7` | Number of days of commits to include in scheduled scans. |
+| `security_model` | `""` | Override the model used for security review candidate generation and full-repository scans. Falls back to `review_model` if unset. |
+| `security_severity_threshold` | `medium` | Full-repository scans only: minimum severity to include in the generated report. |
+| `security_notify_team` | `""` | Full-repository scans only: GitHub team to cc in the generated scan PR body, such as `@org/security-team`. |
 
 ## See also
 
