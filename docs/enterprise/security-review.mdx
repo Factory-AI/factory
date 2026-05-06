@@ -21,18 +21,18 @@ Security review uses the built-in `security-review` skill. In PR automation, Dro
 
 The methodology applies multiple security frameworks together:
 
-- **STRIDE threat modeling** — Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege.
-- **OWASP Top 10:2021** — Broken access control, cryptographic failures, injection, insecure design, misconfiguration, vulnerable components, authentication failures, integrity failures, logging failures, and SSRF.
-- **OWASP Top 10 for LLM Applications:2025** — prompt injection, sensitive information disclosure, insecure LLM output handling, excessive agency, vector/embedding weaknesses, and other AI-specific risks when the codebase uses LLMs.
-- **Supply-chain analysis** — dependency manifest and lockfile review, including typosquatting signals, install scripts, overly broad version ranges, and newly published packages.
-- **Repository threat-model context** — if `.factory/threat-model.md` exists, Droid uses it as the attack-surface map.
+- **STRIDE threat modeling**: Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege.
+- **OWASP Top 10:2021**: Broken access control, cryptographic failures, injection, insecure design, misconfiguration, vulnerable components, authentication failures, integrity failures, logging failures, and SSRF.
+- **OWASP Top 10 for LLM Applications:2025**: prompt injection, sensitive information disclosure, insecure LLM output handling, excessive agency, vector/embedding weaknesses, and other AI-specific risks when the codebase uses LLMs.
+- **Supply-chain analysis**: dependency manifest and lockfile review, including typosquatting signals, install scripts, overly broad version ranges, and newly published packages.
+- **Repository threat-model context**: if `.factory/threat-model.md` exists, Droid uses it as the attack-surface map.
 
 ## Review pipeline
 
 Security review uses a two-pass workflow:
 
-1. **Candidate generation** — Droid reads the diff or codebase, identifies security-relevant areas, traces untrusted input across trust boundaries, and produces candidate vulnerabilities.
-2. **Validation** — Droid re-checks each candidate for reachability, exploitability, existing controls, and false positives before reporting it.
+1. **Candidate generation**: Droid reads the diff or codebase, identifies security-relevant areas, traces untrusted input across trust boundaries, and produces candidate vulnerabilities.
+2. **Validation**: Droid re-checks each candidate for reachability, exploitability, existing controls, and false positives before reporting it.
 
 Findings are reported only when there is a realistic exploit path, such as an injection vulnerability, missing authentication or authorization on a sensitive operation, hardcoded secret, data exposure, unsafe LLM output handling, or risky supply-chain change.
 
@@ -97,6 +97,6 @@ These are the Droid Action security inputs currently wired for the workflows doc
 
 ## See also
 
-- [Automated Code Review](/guides/droid-exec/code-review) — Standard PR code review automation.
-- [Skills](/cli/configuration/skills) — How to invoke and customize skills.
-- [GitHub Integration Security](/enterprise/github-integration-security) — Security architecture for the GitHub App integration.
+- [Automated Code Review](/guides/droid-exec/code-review): Standard PR code review automation.
+- [Skills](/cli/configuration/skills): How to invoke and customize skills.
+- [GitHub Integration Security](/enterprise/github-integration-security): Security architecture for the GitHub App integration.
