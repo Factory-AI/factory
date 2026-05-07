@@ -40,7 +40,7 @@ CLIは2つのモードで動作します：
 | フラグ                                 | 説明                                                                                                  | 例                                                    |
 | :----------------------------------- | :----------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------- |
 | `-f, --file <path>`                  | ファイルからプロンプトを読み込み                                                                                      | `droid exec -f plan.md`                                    |
-| `-m, --model <id>`                   | 特定のモデルを選択（[モデルID](#available-models)を参照）                                                 | `droid exec -m claude-opus-4-6`                            |
+| `-m, --model <id>`                   | 特定の[モデルID](/jp/models)を選択                                                                       | `droid exec -m claude-opus-4-7`                            |
 | `-s, --session-id <id>`              | 既存セッションを継続                                                                                 | `droid exec -s session-abc123`                             |
 | `--auto <level>`                     | [自律レベル](#autonomy-levels)を設定（`low`、`medium`、`high`）                                             | `droid exec --auto medium "run tests"`                     |
 | `--enabled-tools <ids>`              | 特定のツールを強制有効化（カンマまたはスペース区切り）                                                       | `droid exec --enabled-tools ApplyPatch,Bash`               |
@@ -49,7 +49,7 @@ CLIは2つのモードで動作します：
 | `-o, --output-format <format>`       | 出力形式（`text`、`json`、`stream-json`、`stream-jsonrpc`）                                              | `droid exec -o json "document API"`                        |
 | `--input-format <format>`            | 入力形式（マルチターン用の`stream-json`、`stream-jsonrpc`）                                                | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
 | `-r, --reasoning-effort <level>`     | 推論努力レベルを上書き（`off`、`none`、`low`、`medium`、`high`）                                           | `droid exec -r high "debug flaky test"`                    |
-| `--spec-model <id>`                  | 仕様計画に異なるモデルを使用                                                             | `droid exec --spec-model claude-sonnet-4-5-20250929`       |
+| `--spec-model <id>`                  | 仕様計画に別の[モデルID](/jp/models)を使用                                                              | `droid exec --spec-model claude-sonnet-4-6`                |
 | `--spec-reasoning-effort <level>`    | specモードの推論努力を上書き                                                                      | `droid exec --use-spec --spec-reasoning-effort high`       |
 | `--use-spec`                         | 仕様モードで開始（実行前に計画）                                                          | `droid exec --use-spec "add user profiles"`                |
 | `--skip-permissions-unsafe`          | すべての許可プロンプトをスキップ（⚠️ 極度に注意して使用）                                                    | `droid exec --skip-permissions-unsafe`                     |
@@ -95,34 +95,9 @@ droid exec --auto high "Run tests, commit, and push changes"
   `--skip-permissions-unsafe`はすべての安全性チェックを削除します。Dockerコンテナなどの分離された環境で**のみ**使用してください。
 </Warning>
 
-<a id="available-models"></a>
+## モデルID
 
-## 利用可能なモデル
-
-| モデルID                      | 名前                         | 推論サポート                        | デフォルト推論 |
-| :---------------------------- | :--------------------------- | :--------------------------------------- | :---------------- |
-| `claude-opus-4-7`             | Claude Opus 4.7              | あり (Off/Low/Medium/High/Max)            | high              |
-| `claude-opus-4-6`             | Claude Opus 4.6              | あり (Off/Low/Medium/High/Max)            | high              |
-| `claude-opus-4-6-fast`        | Claude Opus 4.6 Fast         | あり (Off/Low/Medium/High/Max)            | high              |
-| `claude-opus-4-5-20251101`    | Claude Opus 4.5              | あり (Off/Low/Medium/High)                | off               |
-| `claude-sonnet-4-6`           | Claude Sonnet 4.6            | あり (Off/Low/Medium/High/Max)            | high              |
-| `claude-sonnet-4-5-20250929`  | Claude Sonnet 4.5            | あり (Off/Low/Medium/High)                | off               |
-| `claude-haiku-4-5-20251001`   | Claude Haiku 4.5             | あり (Off/Low/Medium/High)                | off               |
-| `gpt-5.5`                     | GPT-5.5                      | あり (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.5-fast`                | GPT-5.5 Fast                 | あり (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.5-pro`                 | GPT-5.5 Pro                  | あり (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.4`                     | GPT-5.4                      | あり (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.3-codex`               | GPT-5.3-Codex                | あり (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.2-codex`               | GPT-5.2-Codex                | あり (None/Low/Medium/High/Extra High)    | medium            |
-| `gpt-5.2`                     | GPT-5.2                      | あり (Off/Low/Medium/High/Extra High)     | low               |
-| `gemini-3.1-pro-preview`      | Gemini 3.1 Pro               | あり (Low/Medium/High)                    | high              |
-| `gemini-3-flash-preview`      | Gemini 3 Flash               | あり (Minimal/Low/Medium/High)            | high              |
-| `glm-5.1`                     | Droid Core (GLM-5.1)         | Noneのみ                                | none              |
-| `kimi-k2.5`                   | Droid Core (Kimi K2.5)       | Noneのみ                                | none              |
-| `kimi-k2.6`                   | Droid Core (Kimi K2.6)       | あり (Off/High)                           | high              |
-| `minimax-m2.7`                | Droid Core (MiniMax M2.7)    | あり (Low/Medium/High)                    | high              |
-
-[BYOK](/jp/cli/byok/overview)で設定されたカスタムモデルは`custom:<alias>`の形式を使用します。
+`-m, --model`または`--spec-model`には、任意の[利用可能なモデルID](/jp/models)を使用できます。カスタムモデルについては、[Bring Your Own Key (BYOK)](/jp/cli/byok/overview)を参照してください。
 
 どのモデルをどのタスクに使用するかの詳細なガイダンスについては、[モデルの選択](/jp/cli/user-guides/choosing-your-model)をご覧ください。
 
