@@ -1,7 +1,7 @@
 ---
 title: ローカルコードレビュー
 description: /reviewコマンドを使用してAI駆動レビューでローカルのコード変更を解析する
-keywords: ['local code review', 'code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'security review', 'review workflow', 'AI review', 'code analysis']
+keywords: ['local code review', 'code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'review workflow', 'AI review', 'code analysis']
 ---
 
 ## 概要
@@ -108,7 +108,6 @@ keywords: ['local code review', 'code review', 'review', '/review', 'slash comma
 専門的な分析のための独自のレビュー基準を定義します。
 
 **ユースケース:**
-- セキュリティに焦点を当てたレビュー
 - パフォーマンス分析
 - 特定のコーディング標準の確認
 - ドメイン固有の検証
@@ -117,8 +116,8 @@ keywords: ['local code review', 'code review', 'review', '/review', 'slash comma
 ```bash
 > /review
 # Select: Custom review instructions
-# Enter: "Check for SQL injection vulnerabilities and ensure all database queries use parameterized statements"
-# Droid performs a targeted security review
+# Enter: "Focus on performance regressions and unnecessary re-renders"
+# Droid performs a targeted review
 ```
 ## レビューガイドライン
 
@@ -201,7 +200,7 @@ AIは以下の基準をすべて満たす場合のみ、問題をバグとして
     `/review`コマンドはローカルのCLIセッション用です。CI/CDでの自動レビューには以下を使用してください：
 
 ```bash
-    droid exec "Review the changes in this PR for security issues and performance regressions"
+    droid exec "Review the changes in this PR for correctness and performance regressions"
 ```
     自動レビューの設定については[自動コードレビューガイド](/jp/guides/droid-exec/code-review)を参照してください。
   </Accordion>
@@ -224,13 +223,6 @@ AIは以下の基準をすべて満たす場合のみ、問題をバグとして
 # Select: Review uncommitted changes
 # Get immediate feedback on current changes
 ```
-### セキュリティに焦点を当てたレビュー
-```bash
-# Custom security review
-> /review
-# Select: Custom review instructions
-# Enter: "Check for security vulnerabilities: SQL injection, XSS, CSRF, insecure dependencies, exposed secrets, and authentication bypasses"
-```
 ### マージ後レビュー
 ```bash
 # Review a teammate's recent commit
@@ -242,10 +234,9 @@ AIは以下の基準をすべて満たす場合のみ、問題をバグとして
 
 自動 PR レビューには、[自動コードレビュー](/jp/guides/droid-exec/code-review)ワークフローを使用してください。以下をサポートしています：
 
+- **自動 PR レビュー**：pull request イベントまたはコメントでトリガー
 - **レビューの深度**（`deep`または`shallow`）で徹底性とコストを制御
-- **セキュリティレビュー**：STRIDE ベースの脆弱性スキャン、設定可能な重要度閾値
-- **オンデマンドセキュリティスキャン**：PR での`@droid security`コメント、または`@droid security --full`でリポジトリ全体のスキャン
-- **スケジュール済み全体スキャン**：cron ベースのワークフロートリガー経由
+- **カスタムレビューガイドライン**：リポジトリ固有のチェックを追加
 
 以下で設定します：
 ```bash
@@ -257,6 +248,6 @@ droid
 ## 関連項目
 
 - [CLIリファレンス](/jp/reference/cli-reference) - `/review`を含む完全なコマンドリファレンス
-- [自動コードレビューガイド](/jp/guides/droid-exec/code-review) - deep/shallowモードとセキュリティスキャンによる自動PRレビューの設定
+- [自動コードレビューガイド](/jp/guides/droid-exec/code-review) - deep/shallowモードによる自動PRレビューの設定
 - [一般的な使用例](/jp/cli/getting-started/common-use-cases) - その他のワークフローとパターン
 - [Droidとの対話方法](/jp/cli/getting-started/how-to-talk-to-a-droid) - AIレビューからより良い結果を得る方法

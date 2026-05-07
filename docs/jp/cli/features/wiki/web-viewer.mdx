@@ -1,0 +1,59 @@
+---
+title: Webビューア
+description: Factory Web アプリから、生成した wiki を閲覧、検索、管理します。
+keywords: ['wiki', 'web', 'viewer', 'browse', 'search', 'refresh', 'export', 'app.factory.ai']
+---
+
+[app.factory.ai/wiki](https://app.factory.ai/wiki) の wiki Webビューアでは、すべてのリポジトリで生成された AI ドキュメントを 1 か所で閲覧、検索、管理できます。
+
+## wiki の閲覧
+
+メインの wiki ページには、wiki が生成済みのリポジトリ一覧が表で表示されます。各行にはリポジトリ名、最終更新日、ブランチが表示されます。リポジトリをクリックすると、その wiki が開きます。
+
+### Wiki リーダー
+
+Wiki リーダーでは次の機能を利用できます：
+
+- **Markdown レンダリング** -- 構文ハイライト付きコードブロックを含む、生成ドキュメントの高忠実度な表示
+- **目次** -- 現在のページをすばやく移動するためのサイドバーアウトライン
+- **パンくずリスト** -- ページツリー内の現在位置を示す階層ナビゲーション
+- **検索** -- wiki 内の全ページを対象にした全文検索
+- **バージョン履歴** -- 過去の wiki 生成を参照し、ドキュメントの変化を比較できるドロップダウン
+- **エクスポート** -- wiki を Markdown ファイルとしてダウンロード
+
+## wiki を更新する
+
+wiki ページの **Refresh** ボタンをクリックすると、ドキュメントを再生成できます。モーダルには 2 つのオプションが表示されます：
+
+<CardGroup cols={2}>
+  <Card title="一度だけ更新">
+    デフォルトブランチ上の最新コードを使って wiki を 1 回だけ再生成します。
+  </Card>
+  <Card title="定期更新（push ごと）">
+    デフォルトブランチへの push ごとに wiki を更新する CI アクションをインストールします。
+  </Card>
+</CardGroup>
+
+モードを選んだ後、生成の実行方法を選択します：
+
+| 方法 | 説明 |
+|--------|-------------|
+| **Local** | ローカルの Droid セッションに貼り付けられるよう、CLI コマンド（`/wiki` または `/install-wiki`）をコピーします |
+| **Cloud** | リポジトリに紐付いた cloud template 上で生成を実行します |
+
+### 一括更新
+
+[app.factory.ai/wiki](https://app.factory.ai/wiki) のトップレベル wiki ページから、複数のリポジトリを一度に更新することもできます：
+
+1. **Refresh** をクリックして選択モードに入る
+2. 更新したいリポジトリを選択する
+3. **One-time** または **Recurring** を選択する
+4. 実行先の **Droid Computer** を選択する
+
+Droid は選択したコンピュータ上で各リポジトリを clone し、可能な範囲で並列に wiki を生成します（または定期生成のセットアップを行います）。
+
+## 関連情報
+
+- [Wikiを生成する](/jp/cli/features/wiki/generate) -- CLI で `/wiki` を使って wiki を生成する
+- [自動更新を設定する](/jp/cli/features/wiki/auto-refresh) -- CI アクションで wiki を最新状態に保つ
+- [Wiki の概要](/jp/cli/features/wiki/overview) -- 各要素がどのように連携するか

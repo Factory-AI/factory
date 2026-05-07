@@ -1,0 +1,88 @@
+---
+title: Wikiを生成する
+description: /wiki コマンドを使って、CLI から包括的なコードベースドキュメントを生成します。
+keywords: ['wiki', '/wiki', 'generate', 'documentation', 'codebase docs', 'slash command', 'upload', 'github wiki sync']
+---
+
+`/wiki` コマンドはリポジトリを解析し、アーキテクチャ、モジュール、API、規約をカバーする構造化ドキュメントを生成します。生成された wiki は Factory cloud にアップロードされ、必要に応じて GitHub wiki タブにも同期されます。
+
+## クイックスタート
+
+<Steps>
+  <Step title="リポジトリで Droid セッションを開く">
+    プロジェクトディレクトリに移動して Droid を開始します：
+    ```bash
+    cd /path/to/your/project
+    droid
+    ```
+  </Step>
+  <Step title="wiki コマンドを実行する">
+    ```
+    > /wiki
+    ```
+    Droid はコードベースを解析し、プロジェクトディレクトリ内のローカル `droid-wiki/` フォルダに Markdown ファイルを生成します。生成が完了すると、内容を Factory cloud にアップロードします。
+  </Step>
+  <Step title="結果を確認する">
+    アップロードが完了すると、Droid は wiki へのリンクを表示します：
+    ```
+    Wiki uploaded successfully: https://app.factory.ai/wiki/{wikiRunId}
+    ```
+    リンクを開いてドキュメントを閲覧するか、
+    [app.factory.ai/wiki](https://app.factory.ai/wiki) にアクセスして
+    すべての wiki を確認してください。
+  </Step>
+</Steps>
+
+## 生成中に行われること
+
+`/wiki` を実行すると、Droid は次の手順を実行します：
+
+1. **コードベース解析** -- ソースファイル、設定、テスト、ドキュメントを読み取り、プロジェクト構造を把握します
+2. **ページ生成** -- トピックごと（アーキテクチャ、モジュール、API、セットアップなど）に整理された Markdown ファイル群を生成します
+3. **視覚的スクリーンショット** -- リポジトリに [QAスキル](/jp/guides/skills/automated-qa) がインストールされている場合、Droid はアプリケーションを起動し、wiki に含める Web UI と TUI のスクリーンショットを取得します。まだ設定していない場合は `/install-qa` を実行して追加してください。
+4. **Factory cloud へアップロード** -- ページと画像を Factory の API に送信します
+5. **GitHub wiki sync** -- GitHub リポジトリでは、ページをフラット化してリポジトリの wiki タブへ push します
+
+<Note>
+  wiki の生成には、現在のブランチと作業ディレクトリの状態が使われます。最も正確なドキュメントにするには、デフォルトブランチのクリーンな checkout から `/wiki` を実行してください。
+</Note>
+
+<Tip>
+  リポジトリで最初の wiki 生成には時間がかかる場合があります。Droid はコードベース全体を一から解析する必要があるためです。2 回目以降は incremental mode を使い、前回の生成以降にコード変更の影響を受けたページだけを更新するため、かなり高速になります。
+</Tip>
+
+## GitHub wiki sync
+
+Factory cloud へのアップロード後、CLI は GitHub でホストされているリポジトリについて、生成された wiki を GitHub の組み込み wiki タブへ自動同期します。この同期では次のことを行います：
+
+- 階層型のページツリーを GitHub のフラットな wiki 形式に変換します（例：`overview/architecture.md` は `overview--architecture.md` になります）
+- 内部リンクを書き換えてフラットなファイル名を使うようにします
+- ナビゲーション可能な目次として `_Sidebar.md` を生成します
+- wiki のルートページから `Home.md` を生成します
+- `{repo}.wiki.git` を clone し、すべての内容を置き換えて push します
+
+### GitHub 同期の前提条件
+
+- リポジトリが GitHub でホストされていること
+- wiki タブが初期化されていること（まだ使ったことがない場合は、`https://github.com/{owner}/{repo}/wiki` で最初のページを作成してください）
+- Git の認証情報に wiki リポジトリへの push 権限があること
+- 組織で [Wiki Cloud Sync](/jp/cli/features/wiki/overview#wiki-cloud-sync) が無効化されていないこと
+
+wiki が初期化されていない場合、CLI は最初のページ作成用リンクを含むメッセージを表示し、失敗扱いにせず同期をスキップします。
+
+## バージョン管理
+
+wiki を生成するたびに、次のメタデータを含む新しい **wiki run** が作成されます：
+
+- コミットハッシュとブランチ名
+- ローカルに未コミットの変更があったかどうか
+- 使用した Droid CLI バージョン
+- タイムスタンプ
+
+過去のバージョンは、[Webビューア](/jp/cli/features/wiki/web-viewer) のバージョンドロップダウンから参照できます。
+
+## 関連情報
+
+- [自動更新を設定する](/jp/cli/features/wiki/auto-refresh) -- CI アクションで wiki を最新の状態に保つ
+- [Wikiを閲覧する](/jp/cli/features/wiki/web-viewer) -- Web から閲覧、検索、エクスポートを行う
+- [Wiki の概要](/jp/cli/features/wiki/overview) -- 各要素がどのように連携するか
