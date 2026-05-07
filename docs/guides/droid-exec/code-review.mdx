@@ -58,63 +58,7 @@ You can also override the model or reasoning effort directly with `review_model`
 
 ## Security review
 
-Security review runs a STRIDE-based analysis alongside (or instead of) the standard code review. It uses a dedicated security-reviewer subagent that scans for spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege vulnerabilities.
-
-### Enabling automatic security review
-
-Add `automatic_security_review: true` to your workflow. When both `automatic_review` and `automatic_security_review` are enabled, the security reviewer runs as a parallel subagent during the code review pass:
-
-```yaml
-with:
-  automatic_review: true
-  automatic_security_review: true
-```
-
-The security review findings are included in the same PR comment, appended as a **Security Review Summary** section with its own severity ratings.
-
-### On-demand security review
-
-You can also trigger a security review manually by commenting on any PR:
-
-```
-@droid security
-```
-
-For a full repository security scan that creates a dedicated report:
-
-```
-@droid security --full
-```
-
-The `--full` scan creates a new branch (`droid/security-report-{date}`), generates a report at `.factory/security/reports/security-report-{date}.md`, and opens a PR with the findings.
-
-### Security configuration
-
-| Input | Default | Description |
-|-------|---------|-------------|
-| `automatic_security_review` | `false` | Run security review automatically on every PR |
-| `security_model` | (inherits from `review_model`) | Model for security analysis |
-| `security_severity_threshold` | `medium` | Minimum severity to report: `critical`, `high`, `medium`, `low` |
-
-### Scheduled security scans
-
-Run periodic full-repository scans on a schedule by adding a cron trigger to your workflow:
-
-```yaml
-name: Security Scan
-on:
-  schedule:
-    - cron: '0 6 * * 1'  # Every Monday at 6am
-
-jobs:
-  security-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Factory-AI/droid-action@main
-        with:
-          security_scan_schedule: true
-          security_scan_days: 7  # Scan commits from the last 7 days
-```
+Security review is a dedicated workflow for STRIDE, OWASP, OWASP LLM Top 10, and supply-chain analysis. See [Security Review](/enterprise/security-review) for automatic PR security reviews, scheduled scans, and local full-codebase audits with the built-in `security-review` skill.
 
 ## What Droid reviews
 
@@ -206,14 +150,12 @@ Guidelines:
 | `review_model` | (from depth) | Override model for code review |
 | `reasoning_effort` | (from depth) | Override reasoning effort |
 | `include_suggestions` | `true` | Include code suggestion blocks in comments |
-| `automatic_security_review` | `false` | Run security review on every PR |
-| `security_model` | (from `review_model`) | Override model for security review |
-| `security_severity_threshold` | `medium` | Minimum severity to report |
-| `security_scan_schedule` | `false` | Enable scheduled full-repo scans |
-| `security_scan_days` | `7` | Days of commits to scan |
+
+Security review inputs are documented in [Security Review](/enterprise/security-review#configuration).
 
 ## See also
 
+- [Security Review](/enterprise/security-review) - Security-focused PR reviews and full-codebase audits
 - [GitHub Integration Security](/enterprise/github-integration-security) - Security architecture for the GitHub App integration
 - [GitHub Actions examples](/guides/droid-exec/github-actions) - More automation workflows
 - [Droid Exec](/cli/droid-exec/overview) - Running Droid in CI/CD environments

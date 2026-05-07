@@ -1,7 +1,7 @@
 ---
 title: Local Code Review
 description: Use the /review command to analyze local code changes with AI-powered review workflows
-keywords: ['local code review', 'code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'security review', 'review workflow', 'AI review', 'code analysis']
+keywords: ['local code review', 'code review', 'review', '/review', 'slash command', 'PR review', 'pull request', 'commit review', 'diff review', 'code quality', 'bug detection', 'review workflow', 'AI review', 'code analysis']
 ---
 
 ## Overview
@@ -111,7 +111,6 @@ Examine the changes introduced by a specific commit in your repository history.
 Define your own review criteria for specialized analysis.
 
 **Use cases:**
-- Security-focused reviews
 - Performance analysis
 - Checking specific coding standards
 - Domain-specific validations
@@ -120,8 +119,8 @@ Define your own review criteria for specialized analysis.
 ```bash
 > /review
 # Select: Custom review instructions
-# Enter: "Check for SQL injection vulnerabilities and ensure all database queries use parameterized statements"
-# Droid performs a targeted security review
+# Enter: "Focus on performance regressions and unnecessary re-renders"
+# Droid performs a targeted review
 ```
 
 ## Review guidelines
@@ -204,7 +203,7 @@ Plus an **overall assessment**:
   <Accordion title="Integration with workflows">
     The `/review` command is meant for local CLI sessions. For automated reviews in CI/CD, use:
     ```bash
-    droid exec "Review the changes in this PR for security issues and performance regressions"
+    droid exec "Review the changes in this PR for correctness and performance regressions"
     ```
     See the [Automated Code Review guide](/guides/droid-exec/code-review) for automation setup.
   </Accordion>
@@ -231,15 +230,6 @@ Plus an **overall assessment**:
 # Get immediate feedback on current changes
 ```
 
-### Security-focused review
-
-```bash
-# Custom security review
-> /review
-# Select: Custom review instructions
-# Enter: "Check for security vulnerabilities: SQL injection, XSS, CSRF, insecure dependencies, exposed secrets, and authentication bypasses"
-```
-
 ### Post-merge review
 
 ```bash
@@ -253,10 +243,9 @@ Plus an **overall assessment**:
 
 For automated PR reviews, use the [Automated Code Review](/guides/droid-exec/code-review) workflow. It supports:
 
+- **Automatic PR reviews** triggered by pull request events or comments
 - **Review depth** (`deep` or `shallow`) to control thoroughness and cost
-- **Security review** with STRIDE-based vulnerability scanning and configurable severity thresholds
-- **On-demand security scans** via `@droid security` comments on PRs, or `@droid security --full` for a full-repo scan
-- **Scheduled full-repo scans** via cron-based workflow triggers
+- **Custom review guidelines** for repository-specific checks
 
 Set up with:
 
@@ -270,6 +259,6 @@ See the [Automated Code Review guide](/guides/droid-exec/code-review) for full c
 ## See also
 
 - [CLI Reference](/reference/cli-reference) - Complete command reference including `/review`
-- [Automated Code Review guide](/guides/droid-exec/code-review) - Set up automated PR reviews with deep/shallow modes and security scanning
+- [Automated Code Review guide](/guides/droid-exec/code-review) - Set up automated PR reviews with deep/shallow modes
 - [Common use cases](/cli/getting-started/common-use-cases) - Other workflows and patterns
 - [How to talk to a droid](/cli/getting-started/how-to-talk-to-a-droid) - Getting better results from AI reviews

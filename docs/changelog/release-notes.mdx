@@ -4,6 +4,59 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="May 7" rss={{ title: "CLI Updates", description: "Thinking duration, smoother scrollback, better session titles, and stability fixes" }}>
+  `v0.121.0`
+
+## New features
+
+- **Thinking duration** - CLI and app now show how long a droid spent thinking
+- **Scroll to most recent prompt** - You can now scroll down directly to the most recent prompt in the CLI
+
+## Improvements
+
+- **Smoother transcript scrollback** - Cached static transcript markdown rendering for faster scrolling
+- **Better session titles** - Session titles are now well-formed, with redundant syncs deduplicated
+- **Tighter /sessions layout** - Column widths in `/sessions` are now distributed more evenly
+- **Faster setup failure feedback** - Setup now fails fast with a clearer error when the daemon can't connect
+
+## Bug fixes
+
+- **Pasting long blocks** - Fixed issues when pasting large blocks of text into the CLI
+- **ACP tool call lifecycle** - Repaired the tool call lifecycle for ACP sessions
+- **Droid binary download** - Fixed an installation error when downloading the droid binary on some systems
+- **Computer reconnection** - Computers now reconnect automatically on activity (app)
+- **Clearer daemon error messages** - Improved daemon error messaging in desktop (app)
+
+</Update>
+
+<Update label="May 6" rss={{ title: "CLI Updates", description: "Per-user computer controls, Slack auto-run buttons, Windows performance, and stability fixes" }}>
+  `v0.120.0`
+
+## New features
+
+- **Per-user computer controls** - Admins can now toggle managed and bring-your-own-machine (BYOM) computers on a per-user basis (app)
+
+## Improvements
+
+- **Windows performance** - Sped up CLI responsiveness on Windows
+- **More reliable OpenAI file edits** - File edits now use the native patch tool for better reliability on OpenAI models
+
+## Bug fixes
+
+- **Wrapped hyperlink targets** - Hyperlinks that wrap across lines now preserve the correct target
+- **Working directory after machine change** - The working directory is now restored when the selected machine changes (app)
+- **Non-ASCII paths on Windows** - Native Windows tools now handle non-ASCII paths correctly
+- **Repeated context management notices** - Stopped showing the same context management notice multiple times in a row
+- **Windows daemon port retry** - Daemon now retries binding correctly when a port is already in use on Windows
+- **Plan cache after upgrade** - Organization cache now refreshes after plan changes so the new plan appears immediately (app)
+- **Droid Shield reliability** - Additional fixes to Droid Shield
+- **Applying patch header** - Removed a redundant "applying patch" header
+- **Droid message crash** - Fixed a rare crash when rendering droid messages (app)
+- **Payment methods for new organizations** - Organizations without a billing profile now see an empty payment method list instead of an error (app)
+- **Outdated thinking settings hint** - Removed a stale hint related to thinking settings
+
+</Update>
+
 <Update label="May 6" rss={{ title: "CLI Updates", description: "Windows setup script, MCP menu revamp, sticky user messages, wiki run deletion, and stability fixes" }}>
   `v0.119.0`
 
