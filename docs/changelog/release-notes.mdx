@@ -108,7 +108,7 @@ rss: true
 ## New features
 
 - **Live streaming in the app** - Desktop now streams partial text and thinking updates as a droid works (app)
-- **Bulk user limit updates** - Admins can update usage limits for multiple users at once (app)
+- **Bulk Usage Limit updates** - Admins can update Usage Limits for multiple users at once (app)
 
 ## Improvements
 
@@ -290,7 +290,7 @@ rss: true
 - **Refreshed hooks UI** - Updated UI for managing hooks
 - **Custom commands in Task prompts** - Task tool prompts now expand resolved custom slash commands
 - **Chat transcript scroll keybinds** - New keyboard shortcuts to jump between turns in the chat view
-- **Mission usage limits** - Missions now gracefully handle usage-limit responses
+- **Mission Rate Limits** - Missions now gracefully handle Rate Limit responses
 - **Mission entry overage gating** - Mission entry now respects your organization's overage preference
 - **Per-run automation viewer** - New visual viewer to inspect each automation run (app)
 - **Model access table** - New UI for managing organization-level model access (app)
@@ -334,7 +334,7 @@ rss: true
 
 ## New features
 
-- **Auto-fallback to Droid Core** - Sessions that hit usage limits now automatically fall back to Droid Core when your overage preference is set to Droid Core
+- **Auto-fallback to Droid Core** - Sessions that hit Rate Limits now automatically fall back to Droid Core when your overage preference is set to Droid Core
 - **Per-tool MCP autonomy overrides** - New `mcpAutonomyOverrides` setting lets you configure autonomy levels for individual MCP tools
 - **System theming** - Desktop app now follows your system theme (app)
 - **New desktop updater** - Improved auto-update flow for the desktop app (app)
@@ -596,9 +596,9 @@ rss: true
 ## Improvements
 
 - **CLI spinner redesign** - Updated CLI spinner animation for a refreshed look
-- **Token limit warning** - Warning banner now shown when setting a global token limit (app)
+- **Usage Limit warning** - Warning banner now shown when setting a global Usage Limit (app)
 - **Source control warning for Computers** - Warning displayed when creating a Droid Computer without source control configured (app)
-- **Usage limits clarity** - Usage limits now clearly display values in millions (app)
+- **Usage Limits clarity** - Usage Limits now clearly display values in millions (app)
 
 ## Bug fixes
 
@@ -636,7 +636,7 @@ rss: true
 - **Tool result display** - Fixed a crash when tool results contain non-string values
 - **Custom model stability** - Fixed custom model IDs changing unexpectedly between sessions
 - **Directory not found error** - Directory not found errors now appear immediately when confirming a directory (app)
-- **BYOK usage limits** - BYOK users can now continue chatting when platform usage limits are reached (app)
+- **BYOK Rate Limits** - BYOK users can now continue chatting when platform Rate Limits are reached (app)
 - **Ghost tool calls** - Fixed phantom tool calls appearing during message processing
 - **Chat input** - Fixed various chat input issues (app)
 - **Computer terminal** - Fixed terminal display issues when using Droid Computers (app)
@@ -770,7 +770,7 @@ rss: true
 ## New features
 
 - **/limits usage panel** - New `/limits` command shows an interactive credit usage breakdown with bucket views
-- **Credit usage countdown** - Live countdown timer shows remaining credit limits in real-time (app)
+- **Rate Limit countdown** - Live countdown timer shows remaining Rate Limits in real-time (app)
 - **Model selector expansion** - Model selector now includes a "show more" option to browse additional models (app)
 
 ## Improvements
@@ -883,7 +883,7 @@ rss: true
 - **Cleaner tool output** - Grep and Glob tool calls now display with the same clean formatting as Read tool calls
 - **Plan display polish** - Improved plan display formatting and cleaner worker output
 - **Changelog dismissal** - Changelog now auto-hides after first view and can be manually dismissed
-- **Tokens renamed to Credits** - "Tokens" renamed to "Credits" throughout the app UI (app)
+- **Billable Tokens renamed to Factory Standard Credits** - "Billable Tokens" renamed to "Factory Standard Credits" throughout the app UI (app)
 - **Auto-updating plugins** - Installed plugins now auto-update on CLI startup
 
 ## Bug fixes
@@ -973,7 +973,7 @@ rss: true
 - **Header redesign** - Refreshed CLI header with an updated layout for improved readability
 - **Execute tool syntax highlighting** - Execute tool calls now display with syntax highlighting for better readability
 - **Session type tags** - Sessions now display type tags for missions and subagents for easier identification
-- **Token limits settings UI** - New interface for viewing and managing token limit settings (app)
+- **Usage Limits settings UI** - New interface for viewing and managing Usage Limits settings (app)
 
 ## Improvements
 
@@ -1054,7 +1054,7 @@ rss: true
 - **Esc key during tool execution** - Fixed Esc key during tool execution incorrectly interrupting the next user message
 - **Model error notifications** - Model API errors are now shown as user notifications instead of being hidden
 - **Daemon startup reliability** - Fixed daemon startup failures caused by insufficient timeout on slower connections
-- **Usage limits display** - Fixed usage limits not displaying correctly for users (app)
+- **Usage Limits display** - Fixed Usage Limits not displaying correctly for users (app)
 - **Computer card navigation** - Fixed click navigation on computer name cards (app)
 - **Debug mode logging** - Fixed debug logs not appearing when running with the --debug flag
 
@@ -1100,7 +1100,7 @@ rss: true
 ## Improvements
 
 - **Mission Control shortcut** - Mission Control now toggles with Ctrl+T for quicker access
-- **Token rate limit display** - Improved UI for token rate limit notifications
+- **Rate Limit display** - Improved UI for Rate Limit notifications
 - **Droid Computer error messages** - Clearer error messages for Droid Computer commands
 - **Mission Control performance** - Reduced memory usage and latency in Mission Control
 - **Session ID tooltip** - Session ID now visible in the session tooltip for easier reference (app)
@@ -1308,13 +1308,13 @@ rss: true
 
 </Update>
 
-<Update label="March 4" rss={{ title: "CLI Updates", description: "Subagent inactivity timer, token rate limits settings, and streaming stability fixes" }}>
+<Update label="March 4" rss={{ title: "CLI Updates", description: "Subagent inactivity timer, Usage Limits settings, and streaming stability fixes" }}>
   `v0.68.0`
 
 ## New features
 
 - **Subagent inactivity timer** - Subagents now automatically stop after 3 minutes of inactivity to prevent idle resource usage
-- **Token rate limits settings** - Configure and view token rate limits directly within sessions and settings (app)
+- **Usage Limits settings** - Configure and view Usage Limits directly within sessions and settings (app)
 
 ## Bug fixes
 
@@ -1384,7 +1384,7 @@ rss: true
 - **Spec model display** - Corrected spec model display in `/model` selector and prevented global fallback on clear
 - **Session archiving** - Fixed session archive confirmation flow in the app
 - **Chat scrolling** - Fixed scroll-to-last-message behavior in session chat (app)
-- **User limits modal** - Fixed scroll bug in the Individual User Limits modal (app)
+- **User Usage Limits modal** - Fixed scroll bug in the Individual User Usage Limits modal (app)
 - **Diff generation** - Fixed potential crash with non-string inputs in diff generation
 
 </Update>
@@ -1450,7 +1450,7 @@ rss: true
 
 </Update>
 
-<Update label="February 24" rss={{ title: "CLI Updates", description: "Bedrock/Vertex support, session-scoped settings, readiness-fix command, and token rate limits" }}>
+<Update label="February 24" rss={{ title: "CLI Updates", description: "Bedrock/Vertex support, session-scoped settings, readiness-fix command, and Rate Limits" }}>
   `v0.62.0`
 
 ## New features
@@ -1458,7 +1458,7 @@ rss: true
 - **Bedrock/Vertex support** - Added Bedrock and Vertex support for Claude Sonnet 4.6 and Opus 4.6
 - **Session-scoped settings** - Model, autonomy, and reasoning settings are now session-scoped instead of global
 - **`/readiness-fix` command** - New slash command to automatically fix issues found in readiness reports
-- **Token rate limits UI** - Added UI handling for token rate limit notifications
+- **Rate Limits UI** - Added UI handling for Rate Limit notifications
 - **README requirement for missions** - Missions now require README updates before completion
 
 ## Bug fixes
@@ -1634,7 +1634,7 @@ rss: true
 ## Improvements
 
 - **Opus 4.6 Fast Mode** - Renamed from "Opus 4.6 Fast" to "Opus 4.6 Fast Mode" for clarity
-- **Opus 4.6 Fast Mode promo pricing** - Updated token multiplier from 12x to 6x promotional rate
+- **Opus 4.6 Fast Mode promo pricing** - Updated Model Multiplier from 12x to 6x promotional rate
 
 </Update>
 
@@ -2014,7 +2014,7 @@ rss: true
 - **PDF & text file uploads** - Attach PDFs and text files to chat in Web/Desktop apps (app)
 - **Send button** - Visual send button in session chat input (app)
 - **ASCII startup animation** - Animated Droid logo on CLI startup (configurable) (cli)
-- **Token multiplier display** - Shows Factory token rates in model descriptions (cli)
+- **Model Multiplier display** - Shows Factory model multipliers in model descriptions (cli)
 
 ## Bug fixes
 
@@ -2714,7 +2714,7 @@ rss: true
 - Fixed rendering for failed edit calls in spec mode
 - Fixed compaction logic and retry without tool results
 - Applied output transforms before compaction/caching
-- Persisted session's token usage for accurate cost tracking
+- Persisted session usage for accurate cost tracking
 - Fixed /new command to reset timer and sessionId properly
 - Fixed compaction retry without tool results
 - Fixed screenshot reading with unicode normalization fallback
