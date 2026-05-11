@@ -247,15 +247,17 @@ Use JSON format when you need to:
 - Extract session IDs for continuation
 - Process results in a pipeline
 
-### Build on raw JSON-RPC
+### Build custom flows on raw JSON-RPC
 
-For custom integrations, you can run Droid as a long-lived subprocess and speak JSON-RPC over stdin/stdout:
+For custom integrations, you can run Droid as a long-lived subprocess and drive the full JSON-RPC control surface over stdin/stdout:
 
 ```bash
 droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc --auto low
 ```
 
-Each stdin line is one JSON-RPC request. Each stdout line is a JSON-RPC response, server request, or notification. A minimal client typically:
+This is the lowest-level integration path for building your own interaction model around Droid. Your process can send turns, stream assistant output, handle permissions, update settings, manage MCP/tools, interrupt work, and resume or fork sessions.
+
+Each stdin line is one JSON-RPC request. Each stdout line is a JSON-RPC response, server request, or notification. A custom client typically:
 
 - Spawns `droid exec` with the project `cwd` and desired flags
 - Writes newline-delimited JSON-RPC requests with unique IDs
@@ -264,16 +266,17 @@ Each stdin line is one JSON-RPC request. Each stdout line is a JSON-RPC response
 - Reads stdout line-by-line and matches responses by `id`
 - Handles `droid.session_notification` events for assistant text deltas, tool events, token usage, errors, and turn completion
 - Responds to server-to-client requests such as `droid.request_permission` and `droid.ask_user`
-- Implements timeouts, interrupts, process cleanup, and session persistence
+- Calls other session methods to interrupt work, update settings, manage MCP servers/tools, inspect context, fork sessions, or compact history
+- Implements timeouts, process cleanup, and session persistence
 
-You can build on top of raw stdin/stdout to create:
+You can build on top of raw stdin/stdout to create custom interaction flows such as:
 
-- Web or desktop chat UIs that stream Droid responses into your own interface
-- CI job runners that execute Droid tasks and surface progress in build logs
-- Workflow engines that enqueue prompts, resume sessions, and persist results
-- Policy layers that approve, deny, or audit tool permission requests
-- Observability pipelines that capture tool use, token usage, errors, and turn completion
-- Custom session managers for multi-turn, resumable, or forked conversations
+- Web, desktop, or IDE agent experiences with your own UX and controls
+- Chat or copiloting surfaces that route user actions into Droid turns
+- CI and workflow runners that execute Droid tasks and surface progress in build logs
+- Orchestrators that queue work, resume sessions, fork conversations, and persist results
+- Policy layers that approve, deny, transform, or audit tool permission requests
+- Bridges from Droid events into your own protocol, message bus, telemetry, or storage layer
 
 For protocol reference and implementation patterns, see the low-level client and process transport in the [TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript).
 
