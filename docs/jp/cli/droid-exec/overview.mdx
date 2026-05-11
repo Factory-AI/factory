@@ -51,7 +51,7 @@ Arguments:
 
 Options:
   -o, --output-format <format>    Output format (default: "text")
-  --input-format <format>         Input format: stream-json for multi-turn sessions
+  --input-format <format>         Input format: stream-jsonrpc for multi-turn sessions
   -f, --file <path>               Read prompt from file
   --auto <level>                  Autonomy level: low|medium|high
   --skip-permissions-unsafe       Skip ALL permission checks - allows all permissions (unsafe)
@@ -259,63 +259,44 @@ JSON形式を使用する場面：
 - 継続のためにセッションIDを抽出する場合
 - パイプラインで結果を処理する場合
 
-### stream-json / debug
-エージェントの実行をリアルタイムで表示するストリーミングJSONLメッセージ。各行は独立して解析可能な個別のJSONイベントです：
-```bash
-$ droid exec "run ls command" --output-format stream-json
-{"type":"system","subtype":"init","cwd":"/path/to/dir","session_id":"abc-123","tools":["Read","Execute",...],"model":"claude-sonnet-4-5-20250929"}
-{"type":"message","role":"user","id":"msg-1","text":"run ls command","timestamp":1762517060816,"session_id":"abc-123"}
-{"type":"message","role":"assistant","id":"msg-2","text":"I'll run the ls command to list the contents...","timestamp":1762517062000,"session_id":"abc-123"}
-{"type":"tool_call","id":"call-1","messageId":"msg-2","toolId":"Execute","toolName":"Execute","parameters":{"command":"ls -la"},"timestamp":1762517062500,"session_id":"abc-123"}
-{"type":"tool_result","id":"call-1","messageId":"msg-3","toolId":"Execute","isError":false,"value":"total 16\ndrwxr-xr-x@ 8 user staff...","timestamp":1762517063000,"session_id":"abc-123"}
-{"type":"completion","finalText":"The ls command has been executed successfully. Here are the directory contents...","numTurns":1,"durationMs":3000,"session_id":"abc-123","timestamp":1762517064000}
-```
-<Note>
-`debug`形式は`stream-json`の非推奨エイリアスであり、同じように動作します。
-</Note>
+### 生のJSON-RPC上にカスタムフローを構築する
 
-### stream-jsonrpc (マルチターン)
-SDK統合とマルチターン会話には、JSON-RPCストリーミングプロトコルを使用してください：
+カスタム統合では、Droidを長時間実行されるサブプロセスとして起動し、stdin/stdout経由でJSON-RPCの完全な制御面を操作できます：
+
 ```bash
 droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc --auto low
 ```
-このモードはstdinからJSONLメッセージを読み取り、JSON-RPC形式のレスポンスを出力し、以下を可能にします：
-- 単一のexec実行内でのマルチターン会話
-- 実行中の動的モード切り替え
-- インタラクティブTUIと同様の完全なツールアクセス
 
-JSONLフォーマットでstdin経由でメッセージを送信し、構造化されたJSON-RPCレスポンスを受信します。
+これは、Droidを中心に独自のインタラクションモデルを構築するための最も低レベルな統合方法です。プロセスからターンを送信し、アシスタント出力をストリーミングし、権限を処理し、設定を更新し、MCP/ツールを管理し、作業を中断し、セッションを再開またはフォークできます。
 
-主要なイベントタイプ：
-- **system** - 利用可能なツールとモデルでのセッション初期化
-- **message** - ユーザーまたはアシスタントのテキストメッセージ
-- **tool_call** - エージェントがツールを呼び出し（Read、Executeなど）
-- **tool_result** - ツール実行からの結果
-- **completion** - `finalText`に完全なレスポンスを含む最終イベント
+stdinの各行は1つのJSON-RPCリクエストです。stdoutの各行はJSON-RPCレスポンス、サーバーからのリクエスト、または通知です。カスタムクライアントは通常、以下を行います：
 
-**completionイベント**は常に最後に発行され、以下を含みます：
-- `finalText` - エージェントの最終レスポンステキスト
-- `numTurns` - 実行されたアシスタントターン数
-- `durationMs` - 総実行時間（ミリ秒）
-- `session_id` - 継続用のセッション識別子
+- プロジェクトの`cwd`と必要なフラグで`droid exec`を起動する
+- 一意のIDを持つ改行区切りのJSON-RPCリクエストを書き込む
+- `droid.initialize_session`または`droid.load_session`で開始する
+- `droid.add_user_message`でターンを送信する
+- stdoutを1行ずつ読み取り、`id`でレスポンスを対応付ける
+- `droid.session_notification`イベントでアシスタントのテキスト差分、ツールイベント、トークン使用量、エラー、ターン完了を処理する
+- `droid.request_permission`や`droid.ask_user`などのサーバーからクライアントへのリクエストに応答する
+- その他のセッションメソッドを呼び出して、作業の中断、設定の更新、MCPサーバー/ツールの管理、コンテキストの確認、セッションのフォーク、履歴のコンパクト化を行う
+- タイムアウト、プロセスのクリーンアップ、セッション永続化を実装する
 
-Stream-JSONフォーマットは以下の用途に有用です：
-- エージェントの動作をリアルタイムで監視
-- ユーザーへの進捗更新のストリーミング
-- 実行問題のトラブルシューティング
-- ツール使用パターンの理解
-- `completion.finalText`からの最終結果の抽出
+生のstdin/stdoutの上に、以下のようなカスタムインタラクションフローを構築できます：
 
-シェルスクリプトでの解析例：
-```bash
-# Extract just the final result
-droid exec "analyze code" --output-format stream-json | \
-  jq -r 'select(.type == "completion") | .finalText'
+- 独自のUXとコントロールを持つWeb、デスクトップ、IDE向けのエージェント体験
+- ユーザー操作をDroidのターンにルーティングするチャットまたはコパイロット画面
+- Droidタスクを実行し、進捗をビルドログに表示するCIやワークフローランナー
+- 作業をキューに入れ、セッションを再開し、会話をフォークし、結果を永続化するオーケストレーター
+- ツール権限リクエストを承認、拒否、変換、監査するポリシーレイヤー
+- Droidイベントを独自のプロトコル、メッセージバス、テレメトリ、ストレージ層に接続するブリッジ
 
-# Monitor tool calls in real-time
-droid exec "complex task" --output-format stream-json | \
-  jq -r 'select(.type == "tool_call") | "\(.toolName): \(.parameters.command // .parameters.file_path // "")"'
-```
+プロトコルのリファレンスと実装パターンについては、[TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript)の低レベルクライアントとプロセストランスポートを参照してください。
+
+可能な場合はSDKの使用を推奨します：
+
+- **TypeScript**: [`@factory/droid-sdk`](https://github.com/Factory-AI/droid-sdk-typescript) は、Node.jsアプリ、ストリーミング、マルチターンセッション、構造化出力、権限、ツール制御、SDKバックエンドのMCPツールに対応
+- **Python**: [`droid-sdk`](https://github.com/Factory-AI/droid-sdk-python) は、asyncioアプリ、ストリーミング、直接的なクライアント制御、通知、権限、型付きイベント処理に対応
+
 自動化されたパイプラインの場合、エージェントに特定のアーティファクトを書くよう指示することもできます：
 ```bash
 droid exec --auto low "Analyze dependencies and write to deps.json"
