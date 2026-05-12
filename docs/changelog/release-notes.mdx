@@ -4,6 +4,34 @@ description: "Recent features and improvements to Factory CLI"
 rss: true
 ---
 
+<Update label="May 11" rss={{ title: "CLI Updates", description: "Factory token usage in mission control, model deprecation notices, and stability fixes" }}>
+  `v0.123.0`
+
+## New features
+
+- **Factory token usage in mission control** - Factory token usage is now persisted to session settings, with a toggle to show it in mission control
+- **Model deprecation notices** - Factory now surfaces notices when a model is scheduled for deprecation
+- **Optimistic message submit** - Messages can now be submitted before the session connection is ready (app)
+
+## Improvements
+
+- **Clearer parallel execute approvals** - Parallel execute approval prompts now make it clearer what's being approved
+- **Chat notice display** - Refreshed how chat notices render (app)
+
+## Bug fixes
+
+- **Spec reasoning tab cycle** - Restored cycling through tabs in the spec reasoning view
+- **Duplicate spec rendering** - Specs no longer render twice
+- **Padded multiline status lines** - Multiline status lines now render with consistent padding
+- **Subagent tokens in mission control** - Mission control token counts now include subagent tokens
+- **Queued messages during /compress** - Messages typed while `/compress` is running are now queued instead of dropped
+- **Stale /missions prompt** - Fixed a stale `/missions` prompt lingering after dismissal
+- **Provider tool name handling** - Improved handling of tool names returned by model providers
+- **Stuck session loading** - Fixed sessions that could get stuck loading (app)
+- **Ghost update badge** - Fixed a spurious update-available badge caused by an update manifest mismatch (app)
+
+</Update>
+
 <Update label="May 7" rss={{ title: "CLI Updates", description: "Thinking duration, smoother scrollback, better session titles, and stability fixes" }}>
   `v0.121.0`
 
