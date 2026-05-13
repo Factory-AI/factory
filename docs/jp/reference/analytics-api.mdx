@@ -1,6 +1,6 @@
 ---
 title: "分析API"
-description: 組織レベルの使用量メトリクス、トークン消費量、ツール使用量、生産性分析のためのREST API。
+description: 組織レベルの使用量メトリクス、Factory Standard Credits消費量、ツール使用量、生産性分析のためのREST API。
 keywords:
   [
     "api",
@@ -13,7 +13,7 @@ keywords:
   ]
 ---
 
-分析APIは、Factoryの組織レベルの使用量データへプログラムからアクセスする手段を提供します。組織全体のトークン消費量、ツール呼び出し、ユーザーアクティビティ、生産性メトリクスをクエリできます。
+分析APIは、Factoryの組織レベルの使用量データへプログラムからアクセスする手段を提供します。組織全体のFactory Standard Credits消費量、ツール呼び出し、ユーザーアクティビティ、生産性メトリクスをクエリできます。
 
 ---
 
@@ -74,7 +74,7 @@ https://api.factory.ai/api/v1/analytics
 
 | エンドポイント         | 説明                           |
 | :--------------- | :------------------------------------ |
-| `/tokens`        | モデルとユーザー別のトークン消費量   |
+| `/tokens`        | モデルとユーザー別のFactory Standard Credits消費量   |
 | `/tools`         | ツール呼び出しと自律性メトリクス |
 | `/activity`      | 日次、週次、月次アクティブユーザー |
 | `/productivity`  | ファイル操作とgitアクティビティ      |
@@ -94,9 +94,9 @@ https://api.factory.ai/api/v1/analytics
 
 ---
 
-## トークン使用量
+## Factory Standard Credits使用量
 
-組織全体の日次トークン消費量を返します。
+組織全体の日次Factory Standard Credits消費量を返します。
 
 ```
 GET /tokens
@@ -154,7 +154,7 @@ GET /tokens
 | フィールド               | 型   | 説明                                              |
 | :------------------ | :----- | :------------------------------------------------------- |
 | `date`              | string | `YYYY-MM-DD` 形式の日付                              |
-| `billable_tokens`   | number | 総請求対象トークン（入力+出力、キャッシュ割引適用後） |
+| `billable_tokens`   | number | 消費されたFactory Standard Credits（生の入力・出力トークンにキャッシュ割引を適用して算出） |
 | `input_tokens`      | number | モデルに送信された生の入力トークン                           |
 | `output_tokens`     | number | モデルによって生成されたトークン                                |
 | `cache_read_tokens` | number | プロンプトキャッシュから読み取られたトークン                            |
@@ -195,7 +195,7 @@ GET /tokens
 ### 例
 
 ```bash
-# 日付範囲のトークン使用量
+# 日付範囲のFactory Standard Credits使用量
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
 
@@ -389,7 +389,7 @@ GET /activity
 | クライアント               | 説明                              |
 | :------------------- | :--------------------------------------- |
 | `terminal-ui`        | インタラクティブCLIセッション                 |
-| `web`                | Factory ウェブインターフェース                    |
+| `web`                | Factory App                              |
 | `non-interactive-cli`| ヘッドレス/自動化CLI（`droid exec`）    |
 
 ### グループ化されたレスポンス
@@ -544,7 +544,7 @@ GET /users
 | `user_email`        | string \| null | ユーザーメールアドレス                        |
 | `date`              | string | `YYYY-MM-DD` 形式の日付                |
 | `tool_calls`        | number | このユーザーによるツール呼び出し数              |
-| `billable_tokens`   | number | このユーザーによって消費されたトークン数               |
+| `billable_tokens`   | number | このユーザーによって消費されたFactory Standard Credits数               |
 | `primary_model`     | string | 最も使用されたモデル                            |
 | `primary_model_tier`| string | モデルティア（`standard` または `thinking`）      |
 | `files_created`     | number | 作成されたファイル数                              |
@@ -658,10 +658,10 @@ CLI/デーモン → OTELイベント → BigQuery（raw） → dbtモデル →
 
 ### コスト監視ダッシュボード
 
-トークン消費量の傾向を追跡し、コスト要因を特定します：
+使用量の傾向を追跡し、コスト要因を特定します：
 
 ```bash
-# 月次の日次トークン使用量
+# 月次の日次使用量
 curl -H "Authorization: Bearer $FACTORY_API_KEY" \
   "https://api.factory.ai/api/v1/analytics/tokens?startDate=2026-01-14&endDate=2026-01-28"
 ```

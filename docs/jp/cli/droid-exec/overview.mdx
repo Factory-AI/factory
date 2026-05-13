@@ -66,35 +66,7 @@ Options:
   --cwd <path>                    Working directory path
   -h, --help                      display help for command
 ```
-サポートされているモデル（例）：
-
-- claude-opus-4-7
-- claude-opus-4-6
-- claude-opus-4-6-fast
-- claude-opus-4-5-20251101
-- claude-sonnet-4-6
-- claude-sonnet-4-5-20250929
-- claude-haiku-4-5-20251001
-- gpt-5.2
-- gpt-5.2-codex
-- gpt-5.3-codex
-- gpt-5.3-codex-fast
-- gpt-5.5
-- gpt-5.5-fast
-- gpt-5.5-pro
-- gpt-5.4
-- gpt-5.4-fast
-- gpt-5.4-mini
-- gemini-3.1-pro-preview
-- gemini-3-flash-preview
-- glm-5.1
-- kimi-k2.5
-- kimi-k2.6
-- minimax-m2.7
-
-<Note>
-利用可能なモデルの完全なリストについては、[利用可能なモデル](/jp/models)を参照してください。
-</Note>
+`--model`または`--spec-model`には、任意の[利用可能なモデルID](/jp/models)を使用できます。カスタムモデルについては、[Bring Your Own Key (BYOK)](/jp/cli/byok/overview)を参照してください。
 
 ## インストール
 
@@ -259,43 +231,42 @@ JSON形式を使用する場面：
 - 継続のためにセッションIDを抽出する場合
 - パイプラインで結果を処理する場合
 
-### 生のJSON-RPC上にカスタムフローを構築する
+### 生の JSON-RPC でカスタムフローを構築
 
-カスタム統合では、Droidを長時間実行されるサブプロセスとして起動し、stdin/stdout経由でJSON-RPCの完全な制御面を操作できます：
-
+カスタム統合では、Droid を長時間動作するサブプロセスとして起動し、stdin/stdout 経由で完全な JSON-RPC 制御インターフェースを操作できます：
 ```bash
 droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc --auto low
 ```
 
-これは、Droidを中心に独自のインタラクションモデルを構築するための最も低レベルな統合方法です。プロセスからターンを送信し、アシスタント出力をストリーミングし、権限を処理し、設定を更新し、MCP/ツールを管理し、作業を中断し、セッションを再開またはフォークできます。
+これは、Droid のまわりに独自の対話モデルを構築するための最も低レベルな統合方法です。プロセス側からターン送信、アシスタント出力のストリーミング、権限処理、設定更新、MCP/ツール管理、作業の割り込み、セッションの再開や fork を行えます。
 
-stdinの各行は1つのJSON-RPCリクエストです。stdoutの各行はJSON-RPCレスポンス、サーバーからのリクエスト、または通知です。カスタムクライアントは通常、以下を行います：
+stdin の各行は 1 つの JSON-RPC リクエストです。stdout の各行は JSON-RPC レスポンス、サーバーリクエスト、または通知です。一般的なカスタムクライアントでは、次のような処理を行います：
 
-- プロジェクトの`cwd`と必要なフラグで`droid exec`を起動する
-- 一意のIDを持つ改行区切りのJSON-RPCリクエストを書き込む
-- `droid.initialize_session`または`droid.load_session`で開始する
-- `droid.add_user_message`でターンを送信する
-- stdoutを1行ずつ読み取り、`id`でレスポンスを対応付ける
-- `droid.session_notification`イベントでアシスタントのテキスト差分、ツールイベント、トークン使用量、エラー、ターン完了を処理する
-- `droid.request_permission`や`droid.ask_user`などのサーバーからクライアントへのリクエストに応答する
-- その他のセッションメソッドを呼び出して、作業の中断、設定の更新、MCPサーバー/ツールの管理、コンテキストの確認、セッションのフォーク、履歴のコンパクト化を行う
-- タイムアウト、プロセスのクリーンアップ、セッション永続化を実装する
+- プロジェクトの `cwd` と必要なフラグを指定して `droid exec` を起動
+- 一意な ID を持つ改行区切りの JSON-RPC リクエストを書き込む
+- `droid.initialize_session` または `droid.load_session` から開始
+- `droid.add_user_message` でターンを送信
+- stdout を 1 行ずつ読み取り、`id` でレスポンスを対応付ける
+- アシスタントテキストの差分、ツールイベント、トークン使用量、エラー、ターン完了に関する `droid.session_notification` イベントを処理
+- `droid.request_permission` や `droid.ask_user` などの server-to-client リクエストに応答
+- 作業の割り込み、設定更新、MCP サーバー/ツール管理、コンテキスト確認、セッションの fork、履歴圧縮のためにほかのセッションメソッドを呼び出す
+- タイムアウト、プロセスのクリーンアップ、セッション永続化を実装
 
-生のstdin/stdoutの上に、以下のようなカスタムインタラクションフローを構築できます：
+生の stdin/stdout を土台にして、たとえば次のようなカスタム対話フローを構築できます：
 
-- 独自のUXとコントロールを持つWeb、デスクトップ、IDE向けのエージェント体験
-- ユーザー操作をDroidのターンにルーティングするチャットまたはコパイロット画面
-- Droidタスクを実行し、進捗をビルドログに表示するCIやワークフローランナー
-- 作業をキューに入れ、セッションを再開し、会話をフォークし、結果を永続化するオーケストレーター
+- 独自の UX と操作系を持つ Web、デスクトップ、IDE のエージェント体験
+- ユーザー操作を Droid のターンにルーティングするチャットや copiloting UI
+- Droid タスクを実行し、進捗をビルドログに出力する CI や workflow runner
+- 作業をキューイングし、セッションを再開し、会話を fork し、結果を永続化するオーケストレーター
 - ツール権限リクエストを承認、拒否、変換、監査するポリシーレイヤー
-- Droidイベントを独自のプロトコル、メッセージバス、テレメトリ、ストレージ層に接続するブリッジ
+- Droid イベントを独自のプロトコル、メッセージバス、telemetry、ストレージ層へ橋渡しするブリッジ
 
-プロトコルのリファレンスと実装パターンについては、[TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript)の低レベルクライアントとプロセストランスポートを参照してください。
+プロトコルのリファレンスと実装パターンについては、[TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript) の low-level client と process transport を参照してください。
 
-可能な場合はSDKの使用を推奨します：
+可能であれば SDK を優先してください：
 
-- **TypeScript**: [`@factory/droid-sdk`](https://github.com/Factory-AI/droid-sdk-typescript) は、Node.jsアプリ、ストリーミング、マルチターンセッション、構造化出力、権限、ツール制御、SDKバックエンドのMCPツールに対応
-- **Python**: [`droid-sdk`](https://github.com/Factory-AI/droid-sdk-python) は、asyncioアプリ、ストリーミング、直接的なクライアント制御、通知、権限、型付きイベント処理に対応
+- **TypeScript**: Node.js アプリ向けの [`@factory/droid-sdk`](https://github.com/Factory-AI/droid-sdk-typescript)。ストリーミング、マルチターンセッション、構造化出力、権限、ツール制御、SDK ベースの MCP ツールに対応
+- **Python**: asyncio アプリ向けの [`droid-sdk`](https://github.com/Factory-AI/droid-sdk-python)。ストリーミング、クライアントの直接制御、通知、権限、型付きイベント処理に対応
 
 自動化されたパイプラインの場合、エージェントに特定のアーティファクトを書くよう指示することもできます：
 ```bash
@@ -308,6 +279,16 @@ droid exec --auto low "Generate metrics report in CSV format to metrics.csv"
 ```
 droid exec --cwd /home/runner/work/repo "Map internal packages and dump graphviz DOT to deps.dot"
 ```
+
+- `-w, --worktree [name]` を使うと、専用ブランチを持つ隔離された [Gitワークツリー](/jp/reference/cli-reference#git-worktrees) の中でタスクを実行できます。同じリポジトリに対して、ファイル競合なしで `droid exec` ジョブを並列展開するのに便利です：
+
+```bash
+droid exec --worktree codemod-a --auto medium "apply codemod A" &
+droid exec --worktree codemod-b --auto medium "apply codemod B" &
+wait
+```
+
+クリーンなワークツリーは終了時に自動削除され、未コミット変更があるワークツリーは作業を確認して push できるよう保持されます。
 ## モデルと推論力
 
 モデルを `-m` で選択し、推論力を `-r` で調整してください。利用可能なモデルについては[利用可能なモデル](/jp/models)をご覧ください。

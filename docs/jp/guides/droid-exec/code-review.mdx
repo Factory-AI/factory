@@ -54,56 +54,8 @@ with:
 
 ## セキュリティレビュー
 
-セキュリティレビューは、標準的なコードレビューと並行して（またはその代わりに）STRIDEベースの分析を実行します。専用のセキュリティレビューサブエージェントを使用して、なりすまし、改ざん、否認防止、情報開示、サービス拒否、および権限昇格の脆弱性をスキャンします。
+セキュリティレビューは、STRIDE、OWASP、OWASP LLM Top 10、およびサプライチェーン分析のための専用ワークフローです。自動 PR セキュリティレビュー、スケジュールスキャン、組み込みの `security-review` スキルによるローカルのコードベース全体監査については、[セキュリティレビュー](/jp/enterprise/security-review)を参照してください。
 
-### 自動セキュリティレビューの有効化
-
-ワークフローに `automatic_security_review: true` を追加します。`automatic_review` と `automatic_security_review` の両方が有効な場合、セキュリティレビューアーはコードレビューパス中に並列サブエージェントとして実行されます：
-```yaml
-with:
-  automatic_review: true
-  automatic_security_review: true
-```
-セキュリティレビューの調査結果は、同じPRコメント内に含まれ、独自の重要度評価を持つ**セキュリティレビューサマリー**セクションとして追加されます。
-
-### オンデマンドセキュリティレビュー
-
-任意のPRにコメントすることで、セキュリティレビューを手動でトリガーすることもできます：
-```
-@droid security
-```
-専用のレポートを作成する完全なリポジトリセキュリティスキャンの場合:
-```
-@droid security --full
-```
-`--full` スキャンは新しいブランチ（`droid/security-report-{date}`）を作成し、`.factory/security/reports/security-report-{date}.md` にレポートを生成して、発見事項を含むPRを開きます。
-
-### セキュリティ設定
-
-| 入力 | デフォルト | 説明 |
-|-------|---------|-------------|
-| `automatic_security_review` | `false` | 全てのPRで自動的にセキュリティレビューを実行 |
-| `security_model` | （`review_model` から継承） | セキュリティ分析用のモデル |
-| `security_severity_threshold` | `medium` | レポートする最小重要度：`critical`、`high`、`medium`、`low` |
-
-### スケジュール化されたセキュリティスキャン
-
-ワークフローにcronトリガーを追加して、定期的なリポジトリ全体のスキャンをスケジュール実行：
-```yaml
-name: Security Scan
-on:
-  schedule:
-    - cron: '0 6 * * 1'  # Every Monday at 6am
-
-jobs:
-  security-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Factory-AI/droid-action@main
-        with:
-          security_scan_schedule: true
-          security_scan_days: 7  # Scan commits from the last 7 days
-```
 ## Droidがレビューする内容
 
 自動レビューアーは明確なバグと問題に焦点を当てます：
@@ -184,14 +136,12 @@ Guidelines:
 | `review_model` | (depthから) | コードレビュー用のモデルをオーバーライド |
 | `reasoning_effort` | (depthから) | 推論努力をオーバーライド |
 | `include_suggestions` | `true` | コメントにコード提案ブロックを含める |
-| `automatic_security_review` | `false` | すべてのPRでセキュリティレビューを実行 |
-| `security_model` | (`review_model`から) | セキュリティレビュー用のモデルをオーバーライド |
-| `security_severity_threshold` | `medium` | 報告する最小重要度 |
-| `security_scan_schedule` | `false` | スケジュールされた全リポジトリスキャンを有効化 |
-| `security_scan_days` | `7` | スキャンするコミットの日数 |
+
+セキュリティレビュー関連の入力は[セキュリティレビュー](/jp/enterprise/security-review#configuration)に記載しています。
 
 ## 関連項目
 
+- [セキュリティレビュー](/jp/enterprise/security-review) - セキュリティ重視の PR レビューとコードベース全体の監査
 - [GitHub統合セキュリティ](/jp/enterprise/github-integration-security) - GitHub App統合のセキュリティアーキテクチャ
 - [GitHub Actionsの例](/jp/guides/droid-exec/github-actions) - その他の自動化ワークフロー
 - [Droid Exec](/jp/cli/droid-exec/overview) - CI/CD環境でのDroid実行

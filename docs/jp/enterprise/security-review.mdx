@@ -1,0 +1,104 @@
+---
+title: セキュリティレビュー
+description: Droid を使用して、STRIDE、OWASP、サプライチェーン手法に基づくセキュリティ重視の PR レビューとコードベース全体の監査を実行します。
+keywords: ['security review', 'security audit', 'STRIDE', 'OWASP', 'OWASP LLM Top 10', 'supply chain', 'code review', 'droid action']
+---
+
+Droid のセキュリティレビューは、プルリクエストやリポジトリ全体にわたって信頼度の高い脆弱性を見つけるための専用セキュリティワークフローです。CLI からローカルで実行することも、GitHub Actions で自動実行することもできます。
+
+<CardGroup cols={2}>
+  <Card title="PR セキュリティレビュー" icon="shield-halved">
+    PR の差分のみをレビューし、変更されたデータフローを追跡して、重要度と推奨修正付きのインラインセキュリティ指摘を投稿します。
+  </Card>
+  <Card title="コードベース全体の監査" icon="magnifying-glass">
+    リポジトリ内のすべてのソースファイルを監査し、並列レビューのためにファイルをグループ化し、検証済みの発見事項を構造化レポートとして出力します。
+  </Card>
+</CardGroup>
+
+## 手法
+
+セキュリティレビューでは、組み込みの `security-review` スキルを使用します。PR 自動化では、Droid Action が専用の `security-reviewer` サブエージェントを実行し、ファイルを読む前にこの手法を読み込んでから、認証、認可、バリデーション、データベース、ネットワーク、ファイルシステム、および LLM の境界をまたぐ変更済みデータフローを追跡します。
+
+この手法では、複数のセキュリティフレームワークを組み合わせて適用します。
+
+- **STRIDE 脅威モデリング**: なりすまし、改ざん、否認、情報開示、サービス拒否、権限昇格。
+- **OWASP Top 10:2021**: アクセス制御の不備、暗号化の失敗、インジェクション、安全でない設計、設定ミス、脆弱なコンポーネント、認証の失敗、ソフトウェアとデータ完全性の不備、ロギングと監視の不備、SSRF。
+- **OWASP Top 10 for LLM Applications:2025**: プロンプトインジェクション、機密情報の開示、安全でない LLM 出力処理、過剰なエージェンシー、ベクトル/埋め込みの弱点、およびコードベースで LLM を使用する際のその他の AI 固有リスク。
+- **サプライチェーン分析**: 依存関係マニフェストと lockfile をレビューし、typosquatting の兆候、インストールスクリプト、広すぎるバージョン範囲、新規公開パッケージを確認します。
+- **リポジトリ脅威モデルのコンテキスト**: `.factory/threat-model.md` が存在する場合、Droid はそれを攻撃対象領域のマップとして使用します。
+
+## レビューパイプライン
+
+セキュリティレビューは 2 段階のワークフローを使用します。
+
+1. **候補生成**: Droid が差分またはコードベースを読み取り、セキュリティ上重要な領域を特定し、信頼境界をまたぐ未信頼入力を追跡して、脆弱性候補を生成します。
+2. **検証**: Droid が各候補について、到達可能性、悪用可能性、既存の防御、誤検知の有無を再確認してから報告します。
+
+インジェクション脆弱性、重要な操作における認証または認可の欠如、ハードコードされたシークレット、データ露出、安全でない LLM 出力処理、またはリスクの高いサプライチェーン変更など、現実的な悪用経路がある場合にのみ発見事項が報告されます。
+
+## 重要度レベル
+
+| 重要度 | 優先度 | 例 |
+| --- | --- | --- |
+| 重大 | `P0` | RCE、本番用シークレットのハードコード、認証バイパス、認証なしの管理者エンドポイント |
+| 高 | `P1` | 認証後に到達可能な SQL インジェクション、保存型 XSS、機密データの IDOR、公開されたばかりの依存関係 |
+| 中 | `P2` | 状態変更操作に対する CSRF、情報開示、認証が必要な経路でのプロンプトインジェクション |
+| 低 | `P3` | 具体的だが影響の小さい悪用経路を伴う軽微なセキュリティハードニング項目 |
+
+## ローカルで実行
+
+任意のリポジトリで、Droid から組み込みスキルを直接実行します。
+
+```text
+/security-review
+```
+
+ローカルのセキュリティレビューでは、現在の差分だけでなくコードベース全体を監査できます。Droid はリポジトリ内のソースファイルを列挙し、生成物や vendor ディレクトリをスキップし、モジュールまたはディレクトリごとにファイルをグループ化して、報告前に発見事項を検証します。
+
+## PR で実行
+
+[Droid Action](https://github.com/Factory-AI/droid-action) を使用している場合は、PR にコメントしてオンデマンドのセキュリティレビューをトリガーできます。
+
+```text
+@droid security
+```
+
+下書きではないすべての PR でセキュリティレビューを自動実行するには、レビュー用ワークフローに `automatic_security_review: true` を追加します。
+
+```yaml
+- name: Run Droid Auto Review
+  uses: Factory-AI/droid-action@main
+  with:
+    factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+    automatic_review: true
+    automatic_security_review: true
+```
+
+`automatic_review` と `automatic_security_review` の両方を有効にすると、Droid は標準コードレビューと並行してセキュリティパスを実行し、PR フィードバックにセキュリティサマリーを含めます。
+
+## GitHub Actions でのリポジトリ全体スキャン
+
+リポジトリ全体のセキュリティスキャンを実行するには、PR に次のコメントを付けます。
+
+```text
+@droid security --full
+```
+
+全体スキャンでは `droid/security-report-{date}` ブランチを作成し、`.factory/security/reports/security-report-{date}.md` にレポートを書き出して、発見事項を含む PR を開きます。
+
+## 設定
+
+以下は、このページで説明しているワークフローで現在使用されている Droid Action のセキュリティ入力です。
+
+| 入力 | デフォルト | 説明 |
+| --- | --- | --- |
+| `automatic_security_review` | `false` | `@droid security` を要求せずに、PR でセキュリティレビューを自動実行します。 |
+| `security_model` | `""` | セキュリティレビューの候補生成とリポジトリ全体スキャンに使用するモデルをオーバーライドします。未設定の場合は `review_model` にフォールバックします。 |
+| `security_severity_threshold` | `medium` | リポジトリ全体スキャンのみ: 生成されるレポートに含める最小重要度。 |
+| `security_notify_team` | `""` | リポジトリ全体スキャンのみ: 生成されるスキャン PR 本文で cc する GitHub チーム。例: `@org/security-team`。 |
+
+## 関連項目
+
+- [自動コードレビュー](/jp/guides/droid-exec/code-review): 標準的な PR コードレビュー自動化。
+- [スキル](/jp/cli/configuration/skills): スキルの呼び出し方法とカスタマイズ方法。
+- [GitHubインテグレーションセキュリティ](/jp/enterprise/github-integration-security): GitHub App 連携のセキュリティアーキテクチャ。
