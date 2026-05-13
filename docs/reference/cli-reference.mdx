@@ -56,6 +56,7 @@ Customize droid's behavior with command-line flags:
 | `--use-spec`                      | Start in specification mode (plan before executing)                | `droid exec --use-spec "add user profiles"`                  |
 | `--skip-permissions-unsafe`       | Skip all permission prompts (⚠️ use with extreme caution)          | `droid exec --skip-permissions-unsafe`                       |
 | `--cwd <path>`                    | Execute from a specific working directory                          | `droid exec --cwd ../service "run tests"`                    |
+| `-w, --worktree [name]`           | Run the session in an isolated [git worktree](#git-worktrees)      | `droid --worktree fix-bug`                                   |
 | `--tag <spec>`                    | Session tag (name or JSON, repeatable)                             | `droid exec --tag code-review`                               |
 | `--log-group-id <id>`             | Log group ID for filtering logs                                    | `droid exec --log-group-id grp-123`                          |
 | `-v, --version`                   | Display CLI version                                                | `droid -v`                                                   |
@@ -165,6 +166,48 @@ Available when running `droid` in interactive mode. Type the command at the prom
 
 For detailed information on slash commands, see the [interactive mode documentation](/cli/getting-started/quickstart#useful-slash-commands).
 
+### Git worktrees
+
+Use `-w, --worktree [name]` to run a session inside a native [git worktree](https://git-scm.com/docs/git-worktree) so you can work on multiple branches of the same repository in parallel without file conflicts. This flag is available on both `droid` (interactive) and `droid exec`.
+
+Each worktree is created as a sibling directory next to your repo (`../<repo>-wt-<branch>/`) with its own checkout and dedicated branch.
+
+**Branch naming:**
+
+- **`--worktree`** (no value) — Creates/reuses a worktree on a branch named `<current-branch>-wt`.
+- **`--worktree <name>`** — Uses `<name>` as the branch. If the branch already exists, it is checked out in the worktree; otherwise it is created from `HEAD`.
+- If the target branch is already checked out in another worktree, the command fails with a clear error.
+
+**Examples:**
+
+```bash
+# Interactive: derive branch from current branch (creates <current>-wt)
+droid --worktree
+
+# Interactive: explicit branch name
+droid -w fix-auth-bug "start debugging the login flow"
+
+# Headless: isolate an automated task on its own branch
+droid exec --worktree refactor-tests --auto medium "migrate jest suites to vitest"
+
+# Run two parallel sessions on the same repo, each on its own branch
+droid --worktree feature-a &
+droid --worktree feature-b &
+```
+
+**Session lifecycle:**
+
+- **Interactive mode** — The worktree persists after the session ends so you can resume work, inspect changes, or push the branch.
+- **`droid exec` mode** — On exit, a clean worktree (no uncommitted changes) is removed automatically; a dirty worktree is preserved and its path is printed so you can review the work.
+- The underlying git branch is **never deleted** by Droid — only the worktree directory is removed during cleanup.
+
+<Note>
+  When `--worktree` is active, Droid operates entirely inside the worktree directory. Run follow-up
+  commands (tests, builds, installs) from that directory rather than the original repo root. Fresh
+  worktrees may not have dependencies installed yet (for example `node_modules`) — set them up if
+  builds or tests fail with missing-module errors.
+</Note>
+
 ### MCP command reference
 
 The `/mcp` slash command opens an interactive manager UI for browsing and managing MCP servers.
@@ -252,6 +295,21 @@ droid exec "Create refactoring plan for auth module"
 # Execution
 droid exec --auto low --use-spec "Refactor auth module"
 ```
+
+### Parallel sessions on one repo
+
+```bash
+# Work on two branches of the same repo at the same time, each in its own worktree
+droid --worktree feature-a &
+droid --worktree feature-b &
+
+# Fan out headless tasks across branches without clobbering each other's files
+droid exec -w migration-step-1 --auto medium "apply codemod A" &
+droid exec -w migration-step-2 --auto medium "apply codemod B" &
+wait
+```
+
+See [Git worktrees](#git-worktrees) for details.
 
 ### CI/CD integration
 
