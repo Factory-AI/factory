@@ -1,18 +1,18 @@
 ---
-title: Missions
-description: Plan and execute large, multi-feature projects with structured orchestration. Describe your goal, collaborate on the plan, and let Droid manage the work.
-keywords: ['missions', 'mission', 'orchestration', 'multi-feature', 'milestones', 'skills', 'large projects', 'planning', 'mission control']
+title: Factory Missions
+description: Use Factory Missions to plan and execute large, multi-feature projects with structured orchestration. Describe your goal, collaborate on the plan, and let Droid manage the work.
+keywords: ['Factory Missions', 'missions', 'mission', 'orchestration', 'multi-feature', 'milestones', 'skills', 'large projects', 'planning', 'mission control']
 ---
 
 <Frame>
   <img src="/images/mission-control.png" alt="Mission Control orchestration view" />
 </Frame>
 
-## What are Missions?
+## What Factory Missions do
 
-Missions are a structured way to take on large, multi-feature work with Droid. Instead of tackling everything in a single session, you collaborate with Droid upfront to build a plan -- features, milestones, and the skills needed to accomplish each part -- then hand off execution to an orchestration layer that manages the work.
+Factory Missions are structured workflows for taking on large, multi-feature work with Droid. Instead of tackling everything in a single session, you collaborate with Droid upfront to build a plan -- features, milestones, and the skills needed to accomplish each part -- then hand off execution to an orchestration layer that manages the work.
 
-Access Missions with the `/missions` command (also available via `/mission`).
+Access Factory Missions with the `/missions` command (also available via `/mission`).
 
 <CardGroup cols={2}>
   <Card title="Collaborative Planning" icon="comments">
@@ -25,14 +25,14 @@ Access Missions with the `/missions` command (also available via `/mission`).
     Mission Control manages execution across agents, tracking progress through your plan.
   </Card>
   <Card title="Your Config Carries Over" icon="gear">
-    MCP integrations, skills, hooks, and custom droids all work inside missions.
+    MCP integrations, skills, hooks, and custom droids all work inside Factory Missions.
   </Card>
 </CardGroup>
 
 ## How it works
 
 <Steps>
-  <Step title="Enter a Mission">
+  <Step title="Enter Factory Missions">
     Start by running `/missions` in any Droid session.
   </Step>
   <Step title="Collaborate on the plan">
@@ -45,19 +45,19 @@ Access Missions with the `/missions` command (also available via `/mission`).
     Droid pulls in your existing skills where they apply, and develops specialized skills for parts of the work that need them. This means the execution is tailored to your project and workflow, not generic.
   </Step>
   <Step title="Enter Mission Control">
-    Once the plan is approved, Droid enters the Mission -- an orchestration view that manages execution of the plan. You can monitor progress, see which features are being worked on, and intervene when needed.
+    Once the plan is approved, Droid enters Mission Control -- the Factory Missions orchestration view that manages execution of the plan. You can monitor progress, see which features are being worked on, and intervene when needed.
   </Step>
 </Steps>
 
 ## The planning phase matters most
 
-The biggest value we have found in Missions is in the planning phase. Getting the upfront plan right -- the features, the ordering, the milestones, the skills involved -- is what determines whether the execution succeeds. Droid will push back, ask questions, and iterate with you until the plan is solid.
+The biggest value we have found in Factory Missions is in the planning phase. Getting the upfront plan right -- the features, the ordering, the milestones, the skills involved -- is what determines whether the execution succeeds. Droid will push back, ask questions, and iterate with you until the plan is solid.
 
 This is intentional. A well-scoped plan with clear milestones produces dramatically better results than jumping straight into execution on a vague goal.
 
 ### Validation
 
-- *Milestones** define validation frequency. Validation workers run at the end of each milestone, verifying its work. For simple projects, one milestone is often enough; for longer or complex projects, more frequent milestone validation helps keep the foundation stable as work scales.
+- **Milestones** define validation frequency. Validation workers run at the end of each milestone, verifying its work. For simple projects, one milestone is often enough; for longer or complex projects, more frequent milestone validation helps keep the foundation stable as work scales.
 
 For smaller, straightforward projects, a single milestone is often enough. For larger or longer-running projects, more granular milestones can prevent drift and reduce expensive rework later.
 
@@ -74,9 +74,9 @@ So an initial estimate is approximately:
 
 In practice, this is a floor rather than a ceiling. Validation may surface issues that require follow-up work, and the orchestrator can create additional fix features during execution.
 
-## What Missions are good for
+## What Factory Missions are good for
 
-We have built and tested Missions across a range of work:
+We have built and tested Factory Missions across a range of work:
 
 - **Full-stack development** -- Building complete applications with frontend, backend, database, and deployment.
 - **Research** -- Deep investigation tasks that require exploring multiple approaches, synthesizing findings, and producing structured output.
@@ -91,7 +91,7 @@ Once the plan is approved, Droid enters Mission Control -- the orchestration vie
 
 ### Intervening and redirecting
 
-Missions are not fire-and-forget. The orchestrator is an agent, and you can talk to it. The most effective way to use Missions is to treat yourself as the project manager -- monitoring progress, unblocking workers, and redirecting when the plan needs to change.
+Factory Missions are not fire-and-forget. The orchestrator is an agent, and you can talk to it. The most effective way to use Factory Missions is to treat yourself as the project manager -- monitoring progress, unblocking workers, and redirecting when the plan needs to change.
 
 <AccordionGroup>
   <Accordion title="The mission freezes or stops making progress">
@@ -121,13 +121,13 @@ Missions are not fire-and-forget. The orchestrator is an agent, and you can talk
 
 ### A new kind of debugging
 
-The skillset for working with Missions looks less like traditional debugging and more like **project management of agents**. You are not stepping through code line by line -- you are monitoring a team of workers, unblocking them when they get stuck, redirecting them when priorities change, and making judgment calls about when to push through versus when to re-plan.
+The skillset for working with Factory Missions looks less like traditional debugging and more like **project management of agents**. You are not stepping through code line by line -- you are monitoring a team of workers, unblocking them when they get stuck, redirecting them when priorities change, and making judgment calls about when to push through versus when to re-plan.
 
 This is a meaningfully different way of working with AI. The core skill is knowing when and how to intervene, not writing the code yourself.
 
 ## Configuration inheritance
 
-Missions inherit your existing Droid configuration:
+Factory Missions inherit your existing Droid configuration:
 
 - **MCP integrations** -- Workers can use your connected tools (Linear, Sentry, Notion, etc.)
 - **Custom skills** -- Your existing skills are available and new ones can be developed during planning.
@@ -137,17 +137,17 @@ Missions inherit your existing Droid configuration:
 
 ## Open questions
 
-Missions are early. We are shipping this as a research preview because there are fundamental questions we are still working through:
+Factory Missions are early. We are shipping this as a research preview because there are fundamental questions we are still working through:
 
 - **Is parallelization necessary?** Running multiple agents in parallel sounds good in theory, but does it actually produce better results than sequential execution? We are testing this.
 - **How do you maximize correctness?** Long-running plans accumulate errors. What validation and correction strategies work best at each stage?
 - **Cost vs. quality tradeoffs** -- How aggressive should the orchestrator be? More planning and validation means higher cost but potentially better output. Where is the right balance?
 
-We want your feedback on these. Use Missions, push them hard, and tell us what works and what does not.
+We want your feedback on these. Use Factory Missions, push the workflow hard, and tell us what works and what does not.
 
 ## See also
 
 - [Specification Mode](/cli/user-guides/specification-mode) -- For well-scoped tasks that benefit from planning before implementation
 - [Implementing Large Features](/cli/user-guides/implementing-large-features) -- Manual workflow for multi-phase projects
-- [Custom Droids](/cli/configuration/custom-droids) -- Build specialized subagents that missions can use
-- [Skills](/cli/configuration/skills) -- Create and manage skills that missions can leverage
+- [Custom Droids](/cli/configuration/custom-droids) -- Build specialized subagents that Factory Missions can use
+- [Skills](/cli/configuration/skills) -- Create and manage skills that Factory Missions can leverage

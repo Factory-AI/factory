@@ -52,10 +52,10 @@ The built-in denylist covers common destructive patterns such as filesystem wipe
 ## Where Autonomy Level applies
 
 - **Interactive CLI** – `droid` uses the session's current Autonomy Level. `droid "<prompt>"` starts the same interactive CLI with an initial prompt, so the first task uses your configured default. See the [CLI reference](/reference/cli-reference).
-- **Desktop App** – Desktop sessions use the same Auto/Spec Mode and Autonomy Level controls as CLI sessions.
+- **Factory App** – Factory App sessions use the same Auto/Spec Mode and Autonomy Level controls as CLI sessions.
 - **Droid Exec** – `droid exec` is read-only by default. Use `--auto low`, `--auto medium`, or `--auto high` for non-interactive runs that need edits, local development commands, or broader automation. See [Droid Exec](/cli/droid-exec/overview).
 - **Custom Droids (Subagents)** – Task-launched subagents request `--auto high` in Auto and are read-only in Spec Mode. Organization and Droid tool policy can still restrict them. See [Custom Droids](/cli/configuration/custom-droids).
-- **Missions** – Mission orchestration requires High autonomy or `--skip-permissions-unsafe` (unsafe: skips all permission checks; use only in isolated sandboxes), and admins can restrict who can start Missions. See [Missions](/cli/features/missions).
+- **Factory Missions** – Factory Missions orchestration requires High autonomy or `--skip-permissions-unsafe` (unsafe: skips all permission checks; use only in isolated sandboxes), and admins can restrict who can start Factory Missions. See [Factory Missions](/cli/features/missions).
 
 ## Enterprise controls
 
@@ -64,12 +64,12 @@ Enterprise admins can set organization-wide autonomy boundaries with organizatio
 - **Default Autonomy Level** sets the starting level for new sessions.
 - **Maximum Autonomy Level** caps how high members can raise autonomy. If the maximum is Medium, High is unavailable in the CLI.
 
-These controls layer with command allowlists, command denylists, MCP restrictions, sandbox settings, and Mission access controls.
+These controls layer with command allowlists, command denylists, MCP restrictions, sandbox settings, and Factory Missions access controls.
 
 ## Use it safely
 
 - Start new or high-stakes work with Off or Low until you trust the plan.
-- Match the minimum level to the work: use Low for file edits and generated reports, Medium when the run must install dependencies, build, test, or make local commits, and High for pushes, deployments, Task-launched subagents, Missions, or other orchestration.
+- Match the minimum level to the work: use Low for file edits and generated reports, Medium when the run must install dependencies, build, test, or make local commits, and High for pushes, deployments, Task-launched subagents, Factory Missions, or other orchestration.
 - Add defense in depth with [blocking hooks](/cli/configuration/hooks-guide), command denylists, MCP restrictions, least-privilege credentials, and isolated runners.
 - For CI workflows, choose the lowest `droid exec --auto` level that allows the workflow to complete. See [Automated Code Review](/guides/droid-exec/code-review) and [GitHub Actions examples](/guides/droid-exec/github-actions).
 - If you spot a suspect command, interrupt, provide guidance, and resume at the Autonomy Level that fits the remaining risk.
