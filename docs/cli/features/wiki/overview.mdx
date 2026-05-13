@@ -1,73 +1,73 @@
 ---
-title: Wiki
+title: AutoWiki
 sidebarTitle: Overview
-description: Codebase documentation that stays up to date across your repository, web, and GitHub.
-keywords: ['wiki', 'documentation', 'codebase', '/wiki', '/install-wiki', 'github wiki', 'auto-refresh', 'generate docs']
+description: AutoWiki keeps repository Wikis up to date in the Factory App and GitHub Wiki.
+keywords: ['autowiki', 'wiki', 'documentation', 'codebase', '/wiki', '/install-wiki', 'github wiki', 'auto-refresh', 'generate docs']
 ---
 
-Factory Wiki generates comprehensive, structured documentation for your repositories. It analyzes your codebase and produces a browsable wiki with architecture overviews, module breakdowns, and cross-linked pages -- then keeps it current as your code changes.
+AutoWiki generates comprehensive, structured Wikis for your repositories. It analyzes each codebase and produces browsable documentation with architecture overviews, module breakdowns, and cross-linked pages -- then keeps each Wiki current as your code changes.
 
 <CardGroup cols={3}>
   <Card title="Generate" icon="terminal" href="/cli/features/wiki/generate">
-    Run `/wiki` in the CLI to produce a wiki from any repo
+    Run `/wiki` in the Droid CLI to produce a Wiki for any repo
   </Card>
   <Card title="Auto-refresh" icon="rotate" href="/cli/features/wiki/auto-refresh">
-    Run `/install-wiki` to refresh the wiki on every push
+    Run `/install-wiki` to refresh Wikis on every push
   </Card>
   <Card title="Browse" icon="book-open" href="/cli/features/wiki/web-viewer">
-    Read, search, and export wikis in the Factory app
+    Read, search, and export Wikis in the Factory App
   </Card>
 </CardGroup>
 
 ## How it works
 
 <Steps>
-  <Step title="Generate from the CLI">
+  <Step title="Generate from the Droid CLI">
     Run `/wiki` inside a Droid session. Droid analyzes the codebase and produces
     a set of structured markdown pages covering architecture, modules, APIs,
     and conventions.
   </Step>
-  <Step title="Upload to Factory cloud">
-    The generated wiki is uploaded to Factory's cloud, where it becomes
+  <Step title="Store in the Factory App">
+    Cloud Sync stores the generated Wiki in the Factory App, where it becomes
     browsable at [app.factory.ai/wiki](https://app.factory.ai/wiki). Each
-    upload is versioned so you can compare changes over time.
+    sync is versioned so you can compare changes over time.
   </Step>
-  <Step title="Sync to GitHub wiki">
-    For GitHub-hosted repositories, the wiki is automatically pushed to the
-    repo's built-in wiki tab. Internal links are rewritten, a sidebar is
+  <Step title="Sync to GitHub Wiki">
+    For GitHub-hosted repositories, AutoWiki can push generated Wikis to the
+    repo's built-in GitHub Wiki tab. Internal links are rewritten, a sidebar is
     generated, and the content is pushed to `{repo}.wiki.git`.
   </Step>
   <Step title="Keep it current">
     Run `/install-wiki` to create a CI workflow (GitHub Actions or GitLab CI)
-    that regenerates the wiki on every push to the default branch -- or
-    trigger a refresh from the web UI at any time.
+    that regenerates the Wiki on every push to the default branch -- or
+    trigger a refresh from the Factory App at any time.
   </Step>
 </Steps>
 
-## GitHub wiki sync
+## GitHub Wiki sync
 
-When you generate a wiki for a GitHub-hosted repository, Factory optionally syncs the content to GitHub's built-in wiki tab. Your team can browse the wiki directly from the repository page without visiting the Factory app. For details on how the sync works, see [Generate a Wiki](/cli/features/wiki/generate#github-wiki-sync).
+When AutoWiki generates a Wiki for a GitHub-hosted repository, Factory can optionally sync the content to GitHub Wiki. Your team can browse the same documentation directly from the repository page without visiting the Factory App. For details on how the sync works, see [Generate a Wiki](/cli/features/wiki/generate#github-wiki-sync).
 
 <Note>
-  GitHub requires the wiki to be initialized before Factory can sync to it.
-  If you haven't used the wiki tab before, create the first page manually at
+  GitHub requires GitHub Wiki to be initialized before Factory can sync to it.
+  If you haven't used GitHub Wiki before, create the first page manually at
   `https://github.com/{owner}/{repo}/wiki`, then re-run `/wiki`.
 </Note>
 
 ## Enterprise controls
 
-### Wiki Cloud Sync
+### AutoWiki Cloud Sync
 
-Organizations that need to prevent wiki content from being stored in Factory's cloud can disable **Wiki Cloud Sync**. This is an org-level enterprise control available at [app.factory.ai](https://app.factory.ai) under **Settings > Enterprise Controls > Wiki**.
+Organizations that need to prevent AutoWiki content from being stored in the Factory App can disable **AutoWiki Cloud Sync**. This is an org-level enterprise control available at [app.factory.ai](https://app.factory.ai) under **Settings > Enterprise Controls > AutoWiki**.
 
-When Wiki Cloud Sync is **disabled**:
+When AutoWiki Cloud Sync is **disabled**:
 
-- All wiki API endpoints return 403 for your organization
-- The `/wiki` command will not upload content to Factory cloud
-- GitHub wiki sync is also skipped from the CLI
-- The web viewer at `app.factory.ai/wiki` shows no content
+- All AutoWiki API endpoints return 403 for your organization
+- The `/wiki` command will not store content in the Factory App
+- GitHub Wiki sync is also skipped from the Droid CLI
+- The AutoWiki page in the Factory App shows no content
 
-Wiki Cloud Sync is **enabled by default**. Only org managers can toggle this setting.
+AutoWiki Cloud Sync is **enabled by default**. Only org managers can toggle this setting.
 
 For more on how enterprise controls work, see [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control).
 
@@ -75,15 +75,15 @@ For more on how enterprise controls work, see [Hierarchical Settings & Org Contr
 
 <CardGroup cols={2}>
   <Card title="Generate a Wiki" icon="terminal" href="/cli/features/wiki/generate">
-    Step-by-step guide to producing your first wiki
+    Step-by-step guide to producing your first Wiki
   </Card>
-  <Card title="Set Up Auto-Refresh" icon="rotate" href="/cli/features/wiki/auto-refresh">
-    Install a CI action that keeps your wiki current
+  <Card title="Set Up AutoWiki Refresh" icon="rotate" href="/cli/features/wiki/auto-refresh">
+    Install a CI action that keeps Wikis current
   </Card>
-  <Card title="Browse in the Web App" icon="book-open" href="/cli/features/wiki/web-viewer">
-    Search, read, and export your wiki documentation
+  <Card title="Browse in the Factory App" icon="book-open" href="/cli/features/wiki/web-viewer">
+    Search, read, and export Wikis
   </Card>
   <Card title="Enterprise Settings" icon="building" href="/enterprise/hierarchical-settings-and-org-control">
-    Learn how org-level controls govern wiki and other features
+    Learn how org-level controls govern AutoWiki and other features
   </Card>
 </CardGroup>

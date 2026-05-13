@@ -35,7 +35,7 @@ The **same schema** applies at every level. What changes is **precedence**.
 
 ## Settings JSON schema
 
-Below is the full schema for org-managed settings. These are configured by org admins through the [Enterprise Controls](https://app.factory.ai) page in the Factory app. Every property is optional — omit any field you do not need to set.
+Below is the full schema for org-managed settings. These are configured by org admins through the [Enterprise Controls](https://app.factory.ai) page in the Factory App. Every property is optional — omit any field you do not need to set.
 
 <ResponseField name="sessionDefaultSettings" type="object">
   Session default preferences.
@@ -446,7 +446,7 @@ Again, users cannot override these rules; they can only choose safer personal de
 
 Beyond the general hierarchy, several features have dedicated org‑level toggles that override all lower levels:
 
-- **Wiki Cloud Sync** (`wikiCloudSync`) – Controls whether wiki content can be generated and stored in Factory's cloud. When disabled, all wiki API endpoints are blocked and the CLI skips cloud upload and GitHub wiki sync. Enabled by default. See [Wiki](/cli/features/wiki/overview#wiki-cloud-sync).
+- **AutoWiki Cloud Sync** (`wikiCloudSync`) – Controls whether Wikis can be generated and stored in the Factory App. When disabled, all AutoWiki API endpoints are blocked and the Droid CLI skips Cloud Sync and GitHub Wiki sync. Enabled by default. See [AutoWiki](/cli/features/wiki/overview#autowiki-cloud-sync).
 - **Cloud Session Sync** (`cloudSessionSync`) – Controls whether session data is synced to Factory's cloud.
 
 These controls are managed by org administrators in the **Enterprise Controls** section at [app.factory.ai](https://app.factory.ai).

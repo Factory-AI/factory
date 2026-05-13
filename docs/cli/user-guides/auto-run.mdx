@@ -52,10 +52,10 @@ The built-in denylist covers common destructive patterns such as filesystem wipe
 ## Where Autonomy Level applies
 
 - **Interactive CLI** – `droid` uses the session's current Autonomy Level. `droid "<prompt>"` starts the same interactive CLI with an initial prompt, so the first task uses your configured default. See the [CLI reference](/reference/cli-reference).
-- **Desktop App** – Desktop sessions use the same Auto/Spec Mode and Autonomy Level controls as CLI sessions.
+- **Factory App** – Factory App sessions use the same Auto/Spec Mode and Autonomy Level controls as CLI sessions.
 - **Droid Exec** – `droid exec` is read-only by default. Use `--auto low`, `--auto medium`, or `--auto high` for non-interactive runs that need edits, local development commands, or broader automation. See [Droid Exec](/cli/droid-exec/overview).
 - **Custom Droids (Subagents)** – Task-launched subagents request `--auto high` in Auto and are read-only in Spec Mode. Organization and Droid tool policy can still restrict them. See [Custom Droids](/cli/configuration/custom-droids).
-- **Missions** – Mission orchestration requires High autonomy or `--skip-permissions-unsafe` (unsafe: skips all permission checks; use only in isolated sandboxes), and admins can restrict who can start Missions. See [Missions](/cli/features/missions).
+- **Factory Missions** – Missions orchestration requires High autonomy or `--skip-permissions-unsafe` (unsafe: skips all permission checks; use only in isolated sandboxes), and admins can restrict who can start Missions. See [Factory Missions](/cli/features/missions).
 
 ## Enterprise controls
 
@@ -64,7 +64,7 @@ Enterprise admins can set organization-wide autonomy boundaries with organizatio
 - **Default Autonomy Level** sets the starting level for new sessions.
 - **Maximum Autonomy Level** caps how high members can raise autonomy. If the maximum is Medium, High is unavailable in the CLI.
 
-These controls layer with command allowlists, command denylists, MCP restrictions, sandbox settings, and Mission access controls.
+These controls layer with command allowlists, command denylists, MCP restrictions, sandbox settings, and Missions access controls.
 
 ## Use it safely
 

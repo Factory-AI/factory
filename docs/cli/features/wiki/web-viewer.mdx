@@ -1,36 +1,36 @@
 ---
-title: Web Viewer
-description: Browse, search, and manage your generated wikis from the Factory web app.
-keywords: ['wiki', 'web', 'viewer', 'browse', 'search', 'refresh', 'export', 'app.factory.ai']
+title: AutoWiki in the Factory App
+description: Browse, search, and manage Wikis from the Factory App.
+keywords: ['autowiki', 'wiki', 'factory app', 'browse', 'search', 'refresh', 'export', 'app.factory.ai']
 ---
 
-The wiki web viewer at [app.factory.ai/wiki](https://app.factory.ai/wiki) lets you browse, search, and manage AI-generated documentation for all your repositories in one place.
+The AutoWiki view in the Factory App at [app.factory.ai/wiki](https://app.factory.ai/wiki) lets you browse, search, and manage generated Wikis for all your repositories in one place.
 
-## Browsing your wikis
+## Browsing your Wikis
 
-The main wiki page shows a table of repositories that have generated wikis. Each row displays the repository name, last refresh date, and branch. Click a repository to open its wiki.
+The main AutoWiki page shows a table of repositories with generated Wikis. Each row displays the repository name, last refresh date, and branch. Click a repository to open its Wiki.
 
 ### Wiki reader
 
-The wiki reader provides:
+The Wiki reader provides:
 
 - **Markdown rendering** -- Full-fidelity rendering of the generated documentation with syntax-highlighted code blocks
 - **Table of contents** -- A sidebar outline of the current page for quick navigation
 - **Breadcrumbs** -- Hierarchical navigation showing your position in the page tree
-- **Search** -- Full-text search across all pages in the wiki
-- **Version history** -- A dropdown to browse previous wiki generations and compare how documentation has evolved
-- **Export** -- Download the wiki as markdown files
+- **Search** -- Full-text search across all generated pages
+- **Version history** -- A dropdown to browse previous Wiki generations and compare how documentation has evolved
+- **Export** -- Download the generated documentation as markdown files
 
-## Refreshing a wiki
+## Refreshing a Wiki
 
-Click the **Refresh** button on the wiki page to regenerate documentation. A modal presents two options:
+Click the **Refresh** button on a Wiki page to regenerate documentation. A modal presents two options:
 
 <CardGroup cols={2}>
   <Card title="One-time refresh">
-    Regenerate the wiki once using the latest code on the default branch.
+    Regenerate the Wiki once using the latest code on the default branch.
   </Card>
   <Card title="Recurring (on push)">
-    Install a CI action that refreshes the wiki on every push to the
+    Install a CI action that refreshes the Wiki on every push to the
     default branch.
   </Card>
 </CardGroup>
@@ -39,22 +39,22 @@ After choosing a mode, select how to run the generation:
 
 | Method | Description |
 |--------|-------------|
-| **Local** | Copies the CLI command (`/wiki` or `/install-wiki`) for you to paste into a local Droid session |
+| **Local** | Copies the Droid CLI command (`/wiki` or `/install-wiki`) for you to paste into a local Droid session |
 | **Cloud** | Runs the generation on a cloud template linked to the repository |
 
 ### Batch refresh
 
-From the top-level wiki page at [app.factory.ai/wiki](https://app.factory.ai/wiki), you can refresh multiple repositories at once:
+From the top-level AutoWiki page at [app.factory.ai/wiki](https://app.factory.ai/wiki), you can refresh multiple repositories at once:
 
 1. Click **Refresh** to enter selection mode
 2. Select the repositories you want to refresh
 3. Choose **One-time** or **Recurring**
 4. Select a **Droid Computer** to run the work
 
-Droid clones each repository on the selected computer and generates (or sets up recurring generation for) the wikis, running them in parallel where possible.
+Droid clones each repository on the selected Droid Computer and generates Wikis, or sets up recurring generation, running the jobs in parallel where possible.
 
 ## See also
 
-- [Generate a wiki](/cli/features/wiki/generate) -- Produce a wiki from the CLI with `/wiki`
-- [Set up auto-refresh](/cli/features/wiki/auto-refresh) -- Keep wikis current with a CI action
-- [Wiki overview](/cli/features/wiki/overview) -- How all the pieces fit together
+- [Generate a Wiki](/cli/features/wiki/generate) -- Produce a Wiki from the Droid CLI with `/wiki`
+- [Set up AutoWiki refresh](/cli/features/wiki/auto-refresh) -- Keep Wikis current with a CI action
+- [AutoWiki overview](/cli/features/wiki/overview) -- How all the pieces fit together

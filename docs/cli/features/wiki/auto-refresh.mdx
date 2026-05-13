@@ -1,10 +1,10 @@
 ---
-title: Auto-Refresh
-description: Use /install-wiki to set up a CI action that regenerates your wiki on every push to the default branch.
-keywords: ['wiki', '/install-wiki', 'auto-refresh', 'github actions', 'gitlab ci', 'CI', 'recurring', 'workflow', 'automation']
+title: AutoWiki Refresh
+description: Use /install-wiki to set up a CI action that regenerates a Wiki on every push to the default branch.
+keywords: ['autowiki', 'wiki', '/install-wiki', 'auto-refresh', 'github actions', 'gitlab ci', 'ci', 'recurring', 'workflow', 'automation']
 ---
 
-The `/install-wiki` command creates a CI workflow that automatically regenerates your wiki every time code is pushed to the default branch. It detects your CI framework -- GitHub Actions or GitLab CI -- and generates the appropriate configuration. This keeps your documentation in sync with your codebase without manual intervention.
+The `/install-wiki` command creates a CI workflow that automatically regenerates a Wiki every time code is pushed to the default branch. It detects your CI framework -- GitHub Actions or GitLab CI -- and generates the appropriate configuration. This keeps your documentation in sync with your codebase without manual intervention.
 
 ## Quick start
 
@@ -29,7 +29,7 @@ The `/install-wiki` command creates a CI workflow that automatically regenerates
     Generate a key at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys).
   </Step>
   <Step title="Merge the PR">
-    Once the secret is configured, merge the workflow PR. The wiki will now
+    Once the secret is configured, merge the workflow PR. The Wiki will now
     refresh automatically on every push to the default branch.
   </Step>
 </Steps>
@@ -43,7 +43,7 @@ Droid detects your CI framework and creates the appropriate configuration.
 Creates `.github/workflows/droid-wiki-refresh.yml` (replace `main` with your default branch if different):
 
 ```yaml
-name: Droid Wiki Refresh
+name: Droid AutoWiki Refresh
 
 on:
   push:
@@ -58,7 +58,7 @@ jobs:
       - name: Install Factory Droid
         run: curl -fsSL https://app.factory.ai/cli | sh
 
-      - name: Generate wiki
+      - name: Generate Wiki
         run: droid exec --auto high "/wiki"
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
@@ -85,7 +85,7 @@ Both workflows:
 
 - **Trigger on push** to the default branch
 - **Install the Droid CLI** using the official installer
-- **Run `/wiki`** in headless mode with high autonomy, generating and uploading the wiki
+- **Run `/wiki`** in headless mode with high autonomy, generating the Wiki and storing it in the Factory App with Cloud Sync
 
 <Tip>
   You can customize the workflow after installation. For example, change the
@@ -99,20 +99,20 @@ Both workflows:
 - A Factory API key -- generate one at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)
 - Permission to add secrets and merge PRs in the target repository
 
-## Refreshing from the web
+## Refreshing from the Factory App
 
-You can also set up recurring refreshes from the Factory web app:
+You can also set up recurring refreshes from the Factory App:
 
 1. Go to [app.factory.ai/wiki](https://app.factory.ai/wiki)
-2. Click **Refresh** on the wiki page
+2. Click **Refresh** on the Wiki page
 3. Select **Recurring (on push)**
 4. Choose a **Local** or **Cloud** method:
    - **Local** -- Copies the `/install-wiki` command for you to run in a local clone
    - **Cloud** -- Selects a cloud template or Droid Computer to run the setup remotely
 
-For batch operations across multiple repositories, the web UI lets you select several repos and run the setup on a Droid Computer in a single operation.
+For batch operations across multiple repositories, the Factory App lets you select several repos and run the setup on a Droid Computer in a single operation.
 
-See [Web Viewer](/cli/features/wiki/web-viewer) for more on the web interface.
+See [AutoWiki in the Factory App](/cli/features/wiki/web-viewer) for more on the Factory App interface.
 
 ## Troubleshooting
 
@@ -124,23 +124,23 @@ See [Web Viewer](/cli/features/wiki/web-viewer) for more on the web interface.
     if needed.
   </Accordion>
 
-  <Accordion title="Wiki not updating after push">
+  <Accordion title="AutoWiki not updating after push">
     Check that the workflow file exists at `.github/workflows/droid-wiki-refresh.yml`
     and that the branch trigger matches your default branch. View the Actions
     tab in your repository to see workflow run logs.
   </Accordion>
 
-  <Accordion title="GitHub wiki not syncing">
-    The GitHub wiki tab must be initialized before Factory can push to it. Create
+  <Accordion title="GitHub Wiki not syncing">
+    The GitHub Wiki tab must be initialized before Factory can push to it. Create
     the first page manually at `https://github.com/{owner}/{repo}/wiki`. Also
     verify that your organization hasn't disabled
-    [Wiki Cloud Sync](/cli/features/wiki/overview#wiki-cloud-sync).
+    [AutoWiki Cloud Sync](/cli/features/wiki/overview#autowiki-cloud-sync).
   </Accordion>
 </AccordionGroup>
 
 ## See also
 
-- [Generate a wiki](/cli/features/wiki/generate) -- One-time wiki generation with `/wiki`
-- [Browse your wiki](/cli/features/wiki/web-viewer) -- Read and search from the web
+- [Generate a Wiki](/cli/features/wiki/generate) -- One-time Wiki generation with `/wiki`
+- [Browse Wikis](/cli/features/wiki/web-viewer) -- Read and search Wikis from the Factory App
 - [GitHub App installation](/cli/features/install-github-app) -- Similar workflow for code review automation
 - [Droid Exec](/cli/droid-exec/overview) -- Headless mode used by the generated workflow
