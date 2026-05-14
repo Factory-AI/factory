@@ -33,7 +33,7 @@ User        → ~/.factory/
 
 ## Settings JSON スキーマ
 
-以下は組織管理設定の完全なスキーマです。これらは Factory アプリの [Enterprise Controls](https://app.factory.ai) ページで組織管理者によって設定されます。すべてのプロパティはオプションです。設定する必要のないフィールドは省略してください。
+以下は組織管理設定の完全なスキーマです。これらは Factory App の [Enterprise Controls](https://app.factory.ai) ページで組織管理者によって設定されます。すべてのプロパティはオプションです。設定する必要のないフィールドは省略してください。
 
 <ResponseField name="sessionDefaultSettings" type="object">
   セッションのデフォルト環境設定
@@ -65,6 +65,10 @@ User        → ~/.factory/
 
 <ResponseField name="cloudSessionSync" type="boolean">
   セッションがクラウドに同期されるかどうか
+</ResponseField>
+
+<ResponseField name="wikiCloudSync" type="boolean">
+  AutoWiki コンテンツを Factory App に保存し、GitHub wiki に同期できるかどうか
 </ResponseField>
 
 <ResponseField name="includeCoAuthoredByDroid" type="boolean">
@@ -436,6 +440,17 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
   ]
 }
 ```
+---
+
+## 機能別のエンタープライズ制御
+
+一般的な階層に加えて、いくつかの機能には下位レベルをすべて上書きする専用の組織レベル切り替えがあります：
+
+- **AutoWiki Cloud Sync** (`wikiCloudSync`) – AutoWiki コンテンツを Factory App に生成・保存できるかどうかを制御します。無効にすると、すべての wiki API エンドポイントがブロックされ、CLI は Factory App への保存と GitHub wiki 同期をスキップします。デフォルトで有効です。詳しくは [AutoWiki](/jp/cli/features/wiki/overview#autowiki-cloud-sync) を参照してください。
+- **Cloud Session Sync** (`cloudSessionSync`) – セッションデータを Factory cloud に同期するかどうかを制御します。
+
+これらの制御は、[app.factory.ai](https://app.factory.ai) の **Enterprise Controls** セクションで組織管理者が管理します。
+
 ---
 
 ## すべてをまとめる
