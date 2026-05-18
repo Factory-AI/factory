@@ -7,9 +7,20 @@ description: Factory's dedicated EU deployment for organizations with European d
   **Enterprise Feature** — The EU deployment is available to enterprise customers with European data-residency requirements. [Contact us](mailto:sales@factory.ai) to provision an EU organization for your team.
 </Info>
 
-Factory operates a dedicated EU deployment for organizations with European data-residency requirements. EU-tagged organizations have their session content stored in the EU, their LLM inference dispatched to EU-region model endpoints, and their traffic served by a separate EU backend running in Frankfurt.
+Factory operates a dedicated EU deployment for organizations with European data-residency requirements. EU-tagged organizations have their session content stored in the EU, their LLM inference dispatched to EU-region model endpoints, and their traffic served by a separate EU backend that is fully isolated from the Global (US) deployment.
 
 The same Factory CLI, desktop app, and web app are used regardless of region; clients detect the organization's region after login and automatically route to the correct deployment.
+
+---
+
+## Infrastructure regions
+
+The EU deployment runs on dedicated infrastructure pinned to two European regions:
+
+- **EU backend (API and web app):** Hosted on Vercel in the Frankfurt region (`fra1`). All `app.eu.factory.ai` and `api.eu.factory.ai` traffic terminates here, and no requests for EU organizations are served by the Global (US) backend.
+- **EU database:** A managed database instance in Belgium (`europe-west1`), holding all session content for EU organizations. The database is provisioned separately from the Global database, with its own credentials, backups, and access controls.
+
+Both regions are within the European Economic Area, and session traffic stays within the EU.
 
 ---
 
