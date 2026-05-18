@@ -1,0 +1,81 @@
+---
+title: EU Deployment
+description: Factory's dedicated EU deployment for organizations with European data-residency requirements, with EU-region session storage, inference, and backend.
+---
+
+<Info>
+  **Enterprise Feature** — The EU deployment is available to enterprise customers with European data-residency requirements. [Contact us](mailto:sales@factory.ai) to provision an EU organization for your team.
+</Info>
+
+Factory operates a dedicated EU deployment for organizations with European data-residency requirements. EU-tagged organizations have their session content stored in the EU, their LLM inference dispatched to EU-region model endpoints, and their traffic served by a separate EU backend running in Frankfurt.
+
+The same Factory CLI, desktop app, and web app are used regardless of region; clients detect the organization's region after login and automatically route to the correct deployment.
+
+---
+
+## Data residency
+
+**Stored in the EU (`europe-west1`, Belgium):**
+
+- Session content: prompts, assistant messages, tool calls and results, droid messages, git AI notes, and git AI checkpoints. Stored in a dedicated `factory-eu-sessions` Firestore project with point-in-time recovery, 7-day backups, and delete protection enabled.
+- Raw request and response bodies are never written to logs or object storage on the EU deployment.
+
+**Stored in the Global deployment (US):**
+
+- Organization records (a small pointer document containing the org's region tag), user profiles, and billing data. These contain no user-generated content and are required for cross-region authentication and account management.
+
+---
+
+## LLM inference
+
+All LLM requests from EU organizations are dispatched to EU-region endpoints only. Request payloads (including prompts and conversation history) do not transit US infrastructure during inference.
+
+### Available model providers on EU
+
+<CardGroup cols={2}>
+  <Card title="Anthropic Claude" icon="brain">
+    Served via AWS Bedrock (Frankfurt, `eu-central-1`) and Google Vertex AI (`europe-west1`). Includes Claude Opus 4.5, Opus 4.6, Opus 4.7, Sonnet 4.5, Sonnet 4.6, and Haiku 4.5.
+  </Card>
+  <Card title="OpenAI" icon="sparkles">
+    Served via the OpenAI direct API using a dedicated project configured for EU data residency. Includes the GPT-5 family (GPT-5.2, GPT-5.3 Codex, GPT-5.4, GPT-5.4 Mini, GPT-5.5, and GPT-5.5 Pro).
+  </Card>
+</CardGroup>
+
+Requests for any model or provider that is not available in the EU are rejected at the server with a clear error, and the model picker hides ineligible models on the EU deployment.
+
+---
+
+## Access and onboarding
+
+**Entry points:**
+
+- Web app: `https://app.eu.factory.ai`
+- API: `https://api.eu.factory.ai`
+
+**Onboarding:** EU organizations are provisioned by Factory. Customers requiring an EU org should contact their Factory account team. Self-serve organization creation is not available on the EU deployment.
+
+**Identity and SSO:** Factory uses WorkOS-based SSO. Identity is global, but each organization is pinned to a region at creation time. After authentication, only that org's region-resident data is loaded.
+
+**Network allowlists:** Customers should allowlist `*.factory.ai` hostnames. Outbound LLM traffic from the EU backend targets AWS `eu-central-1`, GCP `europe-west1`, and OpenAI's EU-residency endpoints.
+
+---
+
+## Region enforcement and client routing
+
+Region matching is enforced at multiple layers so that an organization's data and inference traffic can never be served by the wrong backend, even if a client mis-targets.
+
+### Server-side data guard
+
+Every session read or write on the backend resolves the target organization's region from Firestore and asserts it matches the deployment region (`assertOrgRegionMatchesEnv`). A mismatch — for example, an EU organization's request reaching the Global backend, or vice versa — fails closed with an error and no Firestore access occurs.
+
+### Server-side inference guard
+
+Every LLM proxy request passes through a region-aware validation gate (`enforceModelRegion`) that rejects any model or provider combination that is not eligible for the deployment region. EU traffic cannot dispatch to US-only providers, and Global traffic cannot dispatch to EU-only routes.
+
+### Client-side routing
+
+The same Factory CLI, desktop app, and web app are used by EU and Global organizations. After login, each client reads the organization's region and routes all subsequent API requests to the matching backend:
+
+- **Web app:** Each canonical hostname (`app.factory.ai`, `app.eu.factory.ai`) is statically backed by exactly one regional backend. Users who land on the wrong region are shown a redirect page with a link to the correct origin; they are not signed out.
+- **Desktop app:** The renderer reads the org's region from the authenticated session and targets the matching API host on every request.
+- **CLI:** The region is pinned to the user's local token cache on first login and used to resolve the API host for every request. Logout and re-login automatically re-derive the region.
