@@ -64,13 +64,9 @@ Requests for any model or provider that is not available in the EU are rejected 
 
 Region matching is enforced at multiple layers so that an organization's data and inference traffic can never be served by the wrong backend, even if a client mis-targets.
 
-### Server-side data guard
+### Server-side enforcement
 
-Every session read or write on the backend resolves the target organization's region and asserts it matches the deployment region. A mismatch — for example, an EU organization's request reaching the Global backend, or vice versa — fails closed with an error and no data access occurs.
-
-### Server-side inference guard
-
-Every LLM proxy request passes through a region-aware validation gate that rejects any model or provider combination that is not eligible for the deployment region. EU traffic cannot dispatch to US-only providers, and Global traffic cannot dispatch to EU-only routes.
+Both session data access and LLM inference are gated by region-aware checks on the backend. Requests for an organization whose region does not match the deployment fail closed with an error, and requests for a model or provider that is not eligible for the deployment region are rejected before any traffic is dispatched. EU traffic cannot reach US-only data or providers, and Global traffic cannot reach EU-only routes.
 
 ### Client-side routing
 
