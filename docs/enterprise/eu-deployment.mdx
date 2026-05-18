@@ -17,7 +17,7 @@ The same Factory CLI, desktop app, and web app are used regardless of region; cl
 
 **Stored in the EU (`europe-west1`, Belgium):**
 
-- Session content: prompts, assistant messages, tool calls and results, droid messages, git AI notes, and git AI checkpoints. Stored in a dedicated `factory-eu-sessions` Firestore project with point-in-time recovery, 7-day backups, and delete protection enabled.
+- Session content: prompts, assistant messages, tool calls and results, droid messages, git AI notes, and git AI checkpoints. Stored in a dedicated EU managed database with point-in-time recovery, 7-day backups, and delete protection enabled.
 - Raw request and response bodies are never written to logs or object storage on the EU deployment.
 
 **Stored in the Global deployment (US):**
@@ -66,16 +66,16 @@ Region matching is enforced at multiple layers so that an organization's data an
 
 ### Server-side data guard
 
-Every session read or write on the backend resolves the target organization's region from Firestore and asserts it matches the deployment region (`assertOrgRegionMatchesEnv`). A mismatch — for example, an EU organization's request reaching the Global backend, or vice versa — fails closed with an error and no Firestore access occurs.
+Every session read or write on the backend resolves the target organization's region and asserts it matches the deployment region. A mismatch — for example, an EU organization's request reaching the Global backend, or vice versa — fails closed with an error and no data access occurs.
 
 ### Server-side inference guard
 
-Every LLM proxy request passes through a region-aware validation gate (`enforceModelRegion`) that rejects any model or provider combination that is not eligible for the deployment region. EU traffic cannot dispatch to US-only providers, and Global traffic cannot dispatch to EU-only routes.
+Every LLM proxy request passes through a region-aware validation gate that rejects any model or provider combination that is not eligible for the deployment region. EU traffic cannot dispatch to US-only providers, and Global traffic cannot dispatch to EU-only routes.
 
 ### Client-side routing
 
 The same Factory CLI, desktop app, and web app are used by EU and Global organizations. After login, each client reads the organization's region and routes all subsequent API requests to the matching backend:
 
 - **Web app:** Each canonical hostname (`app.factory.ai`, `app.eu.factory.ai`) is statically backed by exactly one regional backend. Users who land on the wrong region are shown a redirect page with a link to the correct origin; they are not signed out.
-- **Desktop app:** The renderer reads the org's region from the authenticated session and targets the matching API host on every request.
+- **Desktop app:** Reads the org's region from the authenticated session and targets the matching API host on every request.
 - **CLI:** The region is pinned to the user's local token cache on first login and used to resolve the API host for every request. Logout and re-login automatically re-derive the region.
