@@ -154,6 +154,101 @@ Commands that appear in both lists default to the denylist behavior. Any command
 
 Review and update these arrays periodically to match your workflow and security posture, especially when sharing configurations across teams.
 
+## Session defaults
+
+Defaults applied when a new session starts. See also `sessionDefaultSettings.interactionMode` and `sessionDefaultSettings.autonomyLevel` in the table above.
+
+| Setting                                          | Type   | Options                                  | Default        | Description                                                |
+| ------------------------------------------------ | ------ | ---------------------------------------- | -------------- | ---------------------------------------------------------- |
+| `sessionDefaultSettings.specModeModel`           | string | Any [available model ID](/models)        | Inherits model | Override the model used when sessions start in Spec Mode.  |
+| `sessionDefaultSettings.specModeReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high`   | Model default  | Reasoning effort applied to the spec model.                |
+
+## Display and UI
+
+Tune how droid renders content in the terminal.
+
+| Setting                    | Type      | Options                                | Default      | Description                                                                                  |
+| -------------------------- | --------- | -------------------------------------- | ------------ | -------------------------------------------------------------------------------------------- |
+| `toolResultDisplay`        | string    | `expanded`, `compact`                  | `expanded`   | How tool results are rendered in the transcript.                                             |
+| `showTokenUsageIndicator`  | boolean   | `true`, `false`                        | `false`      | Show the live token usage indicator at the bottom of the input.                              |
+| `logoAnimation`            | string    | `once`, `always`, `off`                | `once`       | Animate the droid logo on startup.                                                           |
+| `theme`                    | string    | Theme ID (see `/themes`)               | System theme | Color theme used by the TUI.                                                                 |
+| `overrideTerminalColors`   | boolean   | `true`, `false`                        | `false`      | Force droid's theme to override the terminal's color scheme.                                 |
+| `nerdFont`                 | boolean   | `true`, `false`                        | `false`      | Enable Nerd Font glyphs in the UI (requires a Nerd Font in your terminal).                   |
+
+## Additional sound and notification settings
+
+Extends the [Sound notifications](#sound-notifications) section with toggles for the bell, per-event focus modes, and subagent activity.
+
+| Setting                          | Type    | Options                                | Default   | Description                                                          |
+| -------------------------------- | ------- | -------------------------------------- | --------- | -------------------------------------------------------------------- |
+| `subagentSounds`                 | string  | `on`, `off`                            | `off`     | Play sounds for subagent lifecycle events (start, complete, error).  |
+
+## Mission settings
+
+Configure [Missions](/cli/features/missions) — multi-agent orchestration runs.
+
+| Setting                                              | Type    | Options                                  | Default          | Description                                                                              |
+| ---------------------------------------------------- | ------- | ---------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------- |
+| `missionModelSettings.workerModel`                   | string  | Any [available model ID](/models)        | Inherits         | Default model used by mission worker subagents.                                          |
+| `missionModelSettings.workerReasoningEffort`         | string  | `off`, `none`, `low`, `medium`, `high`   | Model default    | Reasoning effort for mission workers.                                                    |
+| `missionModelSettings.validationWorkerModel`         | string  | Any [available model ID](/models)        | Inherits         | Model used by mission validators (scrutiny / user-testing workers).                      |
+| `missionModelSettings.validationWorkerReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high`  | Model default    | Reasoning effort for validation workers.                                                 |
+| `missionModelSettings.skipScrutiny`                  | boolean | `true`, `false`                          | `false`          | Skip scrutiny validation milestones during missions.                                     |
+| `missionModelSettings.skipUserTesting`               | boolean | `true`, `false`                          | `false`          | Skip user-testing validation milestones during missions.                                 |
+| `missionOrchestratorModel`                           | string  | Any [available model ID](/models)        | Inherits         | Model used by the mission orchestrator.                                                  |
+| `missionOrchestratorReasoningEffort`                 | string  | `off`, `none`, `low`, `medium`, `high`   | Model default    | Reasoning effort for the mission orchestrator.                                           |
+| `keepSystemAwakeDuringMissions`                      | boolean | `true`, `false`                          | `true`           | Prevent the OS from sleeping while a mission is running.                                 |
+
+## Context and compaction
+
+Controls when and how droid compacts the conversation to stay within the model's context window.
+
+| Setting                          | Type    | Options                                  | Default         | Description                                                                                |
+| -------------------------------- | ------- | ---------------------------------------- | --------------- | ------------------------------------------------------------------------------------------ |
+| `compactionTokenLimit`           | number  | Token count                              | Model-dependent | Token threshold that triggers automatic compaction of the current session.                 |
+| `compactionTokenLimitPerModel`   | object  | `{ "<modelId>": number }` map            | `{}`            | Per-model overrides for `compactionTokenLimit`.                                            |
+| `compactionModelMode`            | string  | `same`, `<modelId>`                      | `same`          | Which model performs compaction: `same` uses the current session model, or specify a model ID.                 |
+
+## Spec mode settings
+
+Controls the persistent spec store created by Spec Mode.
+
+| Setting           | Type    | Options                  | Default                       | Description                                                                |
+| ----------------- | ------- | ------------------------ | ----------------------------- | -------------------------------------------------------------------------- |
+| `specSaveDir`     | string  | Directory path           | `~/.factory/specs`            | Directory where saved specs are written. Supports `~` expansion.           |
+
+## Infrastructure
+
+System-level settings for status line, worktrees, and request timeouts.
+
+| Setting                | Type    | Options                                                                                          | Default               | Description                                                                                          |
+| ---------------------- | ------- | ------------------------------------------------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------- |
+| `statusLine`           | object  | `{ "command": string, "padding"?: number, "maxRows"?: number }`                                  | unset                 | Custom status line configuration. The `command` is executed and its stdout rendered above the input. Configure interactively with `/statusline`. |
+| `worktreeDirectory`    | string  | Directory path                                                                                   | `~/.factory/worktrees` | Default parent directory for git worktrees created with `--worktree` / `-w`.                         |
+| `llmRequestTimeout`    | number  | Milliseconds                                                                                     | Product default       | Timeout for individual LLM requests before they are aborted.                                         |
+
+## Enterprise and org-level settings
+
+<Note>
+**Enterprise / Org-level.** The settings below are typically managed by an organization administrator and pushed to members through the Factory web app or a managed `settings.json`. Individual users generally do not set these directly.
+</Note>
+
+| Setting                              | Type    | Options                                                                                                                | Default      | Description                                                                                                                          |
+| ------------------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `maxAutonomyLevel`                   | string  | `off`, `low`, `medium`, `high`                                                                                         | `high`       | **Enterprise.** Maximum [Autonomy Level](/cli/user-guides/auto-run) any session may use. Higher levels selected by users are clamped. |
+| `modelPolicy`                        | object  | `{ "allowedModelIds"?: string[], "blockedModelIds"?: string[], "allowCustomModels"?: boolean, "allowedBaseUrls"?: string[] }` | unset        | **Enterprise.** Restrict which models members can select, control whether custom models are permitted, and allowlist base URLs for custom model providers. |
+| `mcpPolicy`                          | object  | `{ "enabled"?: boolean, "allowlist"?: string[] }`                                                                      | unset        | **Enterprise.** Control whether MCP servers can run and which servers are permitted. See [MCP](/cli/configuration/mcp).              |
+| `missionPolicy`                      | object  | `{ "restrictedAccess"?: boolean, "allowedUserIds"?: string[] }`                                                        | unset        | **Enterprise.** Restrict who can launch [Missions](/cli/features/missions).                                                          |
+| `networkPolicy`                      | object  | `{ "allowedIps": string[] }`                                                                                           | unset        | **Enterprise.** Restrict outbound network access from droid sessions to the specified IPs or CIDR ranges in `allowedIps`.            |
+| `sandbox`                            | object  | `{ "enabled"?: boolean, "mode"?: string, "filesystem"?: object, "network"?: object }`                                  | unset        | **Enterprise.** Sandbox configuration controlling filesystem and network isolation for tool execution.                               |
+| `restrictMemberVisibility`           | boolean | `true`, `false`                                                                                                        | `false`      | **Org-level.** Hide other org members from non-admin users.                                                                          |
+| `restrictApiKeyCreationToManagers`   | boolean | `true`, `false`                                                                                                        | `false`      | **Org-level.** Only org managers may create API keys.                                                                                |
+| `sessionRetentionDays`               | number  | `14`–`365`                                                                                                             | Org default  | **Org-level.** How long synced session history is retained before deletion.                                                          |
+| `wikiCloudSync`                      | boolean | `true`, `false`                                                                                                        | `true`       | **Org-level.** Sync generated [Wiki](/cli/features/wiki/overview) content to Factory cloud.                                                                |
+| `managedComputersEnabled`            | boolean | `true`, `false`                                                                                                        | `false`      | **Enterprise.** Enable Factory-managed remote computers for the org.                                                                 |
+| `byomComputersEnabled`               | boolean | `true`, `false`                                                                                                        | `false`      | **Enterprise.** Allow members to register their own machines via `droid computer register` (BYOM).                                   |
+
 ## Example configuration
 
 ```json

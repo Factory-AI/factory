@@ -11,9 +11,7 @@ The `/readiness-report` slash command evaluates your current repository against 
 
 ## Prerequisites
 
-Before using this command:
-
-- Enable the feature in `/settings` → `Experimental` → `Readiness Report`
+- Run the command from inside a git repository with an `origin` remote configured (the repository URL is used to associate the report with your project in the Factory App).
 
 ---
 
@@ -39,7 +37,6 @@ When you run `/readiness-report`, the droid performs a comprehensive evaluation 
 3. **Criteria Evaluation** — Checks the criteria across all five maturity levels
 4. **Report Storage** — Persists the evaluation results for visualization in the Factory App
 5. **Summary Output** — Prints a human-readable report with results from the evaluation
-6. **Remediation _(Coming soon)_** — Option to select and automatically fix failing criteria
 
 ---
 
@@ -111,12 +108,39 @@ All readiness reports are automatically saved and can be viewed in the [web dash
 
 ---
 
-## Remediation (Coming Soon)
+## Remediation with `/readiness-fix`
 
-After running `/readiness-report`, you'll soon be able to automatically fix failing criteria directly from the CLI:
+Once you've generated a readiness report, the `/readiness-fix` slash command lets the droid automatically remediate the failing signals from the latest report — turning the report from a diagnostic tool into an automated improvement workflow.
 
-1. Review the evaluation results
-2. Select which failing criteria you'd like to remediate
-3. The droid will implement the fixes (e.g., add pre-commit hooks, create AGENTS.md, configure branch protection)
+### What it does
 
-This turns the report from a diagnostic tool into an automated improvement workflow.
+`/readiness-fix` fetches the most recent stored readiness report for your repository and starts an agent session that works through the failing criteria, implementing fixes such as adding pre-commit hooks, creating an `AGENTS.md`, configuring CI checks, or improving documentation.
+
+### Usage
+
+Navigate to the same repository you ran `/readiness-report` against and run:
+
+```bash
+droid
+> /readiness-fix
+```
+
+You can also pass additional natural-language instructions to focus the run:
+
+```bash
+> /readiness-fix prioritize style & validation; do not touch CI configuration
+```
+
+### What to expect
+
+1. **Report lookup** — The command resolves your repository from `git remote get-url origin` and fetches the latest readiness report stored for that repo.
+2. **Agent session** — The droid plans and applies changes to address failing criteria, one at a time, just like a normal coding session. You can review and approve changes as they happen.
+3. **Verification** — After fixes are applied, run `/readiness-report` again to re-score the repository and confirm signals have moved.
+
+<Note>
+  `/readiness-fix` requires that a readiness report has already been generated for the repo. If no prior report is found, run `/readiness-report` first.
+</Note>
+
+<Tip>
+  Treat `/readiness-fix` like any other agent run: review the proposed changes, run your tests, and commit only what looks good for your codebase.
+</Tip>

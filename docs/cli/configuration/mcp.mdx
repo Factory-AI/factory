@@ -298,3 +298,27 @@ For **http** servers:
 
 Droid automatically reloads when the configuration file changes, so servers are immediately available after adding them.
 
+## Enterprise MCP policy
+
+Organizations can centrally control which MCP servers are allowed via the `mcpPolicy` setting in org-managed settings. This lets administrators restrict MCP access at the org level so users can only connect to vetted servers.
+
+| Field | Type | Description |
+| :---- | :--- | :---------- |
+| `enabled` | `boolean` | Toggle MCP support on or off for the org. When `false`, all MCP servers are blocked. |
+| `allowlist` | `string[]` | Optional list of server names users are permitted to enable. When set, any server not on the list is blocked. |
+
+**Example org-managed settings:**
+
+```json
+{
+  "mcpPolicy": {
+    "enabled": true,
+    "allowlist": ["linear", "sentry", "notion"]
+  }
+}
+```
+
+<Note>
+  `mcpPolicy` is an enterprise/org-level setting and is enforced through managed settings — individual users cannot override it. Servers blocked by policy will not appear in the `/mcp` registry browser or load from `mcp.json`.
+</Note>
+

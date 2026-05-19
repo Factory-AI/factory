@@ -286,6 +286,32 @@ For organizations that need centralized control over approved plugins, see [Ente
 
 Droid is compatible with plugins built for Claude Code. If you find a Claude Code plugin you'd like to use, you can install it directly - the plugin format is interoperable. See the [Claude Code plugins documentation](https://code.claude.com/docs/en/plugins) for more details.
 
+## CLI command reference
+
+Quick reference for the `droid plugin` subcommands. All commands accept `--scope user|project` (alias `-s`) to control where the plugin is installed; omit the flag to be prompted.
+
+| Command | Purpose | Example |
+| :------ | :------ | :------ |
+| `droid plugin install <plugin@marketplace>` | Install a plugin from a registered marketplace. Alias: `droid plugin i`. | `droid plugin install droid-control@factory-plugins --scope project` |
+| `droid plugin uninstall <plugin@marketplace>` | Remove an installed plugin. Alias: `droid plugin remove`. | `droid plugin uninstall droid-control@factory-plugins` |
+| `droid plugin update [plugin@marketplace]` | Update a specific plugin, or all plugins when called without an argument. | `droid plugin update droid-control@factory-plugins` |
+| `droid plugin list` | List installed plugins, optionally scoped. | `droid plugin list --scope user` |
+| `droid plugin marketplace` | Manage marketplaces (`add`, `remove`, `list`, `update`). | `droid plugin marketplace add https://github.com/Factory-AI/factory-plugins` |
+
+**Common workflows:**
+
+```bash
+droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
+droid plugin install droid-control@factory-plugins
+droid plugin list
+droid plugin update
+droid plugin uninstall droid-control@factory-plugins
+```
+
+<Tip>
+  Prefer the interactive `/plugins` UI for browsing and one-off installs. Use the CLI when scripting onboarding, CI setup, or shared dotfiles.
+</Tip>
+
 ## Next steps
 
 <CardGroup cols={2}>

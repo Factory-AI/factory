@@ -159,6 +159,101 @@ droidイベントの音声フィードバックを設定します：
 ```
 これらの配列を定期的に見直し更新して、ワークフローとセキュリティ体制に合わせてください。特にチーム間で設定を共有する場合は重要です。
 
+## セッションデフォルト
+
+新しいセッションが開始されるときに適用されるデフォルト値です。上記の表にある`sessionDefaultSettings.interactionMode`と`sessionDefaultSettings.autonomyLevel`もあわせて参照してください。
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `sessionDefaultSettings.specModeModel` | string | 任意の[利用可能なモデルID](/jp/models) | `model`を継承 | セッションがSpec Modeで開始されたときに使用するモデルを上書きします。 |
+| `sessionDefaultSettings.specModeReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high` | モデルのデフォルト | Specモデルに適用される推論努力。 |
+
+## 表示とUI
+
+droidがターミナルでコンテンツをどのように描画するかを調整します。
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `toolResultDisplay` | string | `expanded`, `compact` | `expanded` | ツール結果をトランスクリプトでどのように表示するか。 |
+| `showTokenUsageIndicator` | boolean | `true`, `false` | `false` | 入力欄の下部にライブのトークン使用量インジケーターを表示します。 |
+| `logoAnimation` | string | `once`, `always`, `off` | `once` | 起動時にdroidロゴをアニメーションさせます。 |
+| `theme` | string | テーマID（`/themes`を参照） | システムテーマ | TUIで使用するカラーテーマ。 |
+| `overrideTerminalColors` | boolean | `true`, `false` | `false` | droidのテーマでターミナルのカラースキームを強制的に上書きします。 |
+| `nerdFont` | boolean | `true`, `false` | `false` | UIでNerd Fontのグリフを有効にします（ターミナルにNerd Fontが必要です）。 |
+
+## 追加の音声・通知設定
+
+[音声通知](#音声通知)セクションを拡張し、ベル、イベントごとのフォーカスモード、サブエージェントのアクティビティに対するトグルを追加します。
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `subagentSounds` | string | `on`, `off` | `off` | サブエージェントのライフサイクルイベント（開始、完了、エラー）の音声を再生します。 |
+
+## ミッション設定
+
+[ミッション](/jp/cli/features/missions) — マルチエージェントオーケストレーションの実行を設定します。
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `missionModelSettings.workerModel` | string | 任意の[利用可能なモデルID](/jp/models) | 継承 | ミッションのワーカーサブエージェントが使用するデフォルトモデル。 |
+| `missionModelSettings.workerReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high` | モデルのデフォルト | ミッションワーカーの推論努力。 |
+| `missionModelSettings.validationWorkerModel` | string | 任意の[利用可能なモデルID](/jp/models) | 継承 | ミッションのバリデーター（scrutiny / user-testingワーカー）が使用するモデル。 |
+| `missionModelSettings.validationWorkerReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high` | モデルのデフォルト | バリデーションワーカーの推論努力。 |
+| `missionModelSettings.skipScrutiny` | boolean | `true`, `false` | `false` | ミッション中のscrutiny検証マイルストーンをスキップします。 |
+| `missionModelSettings.skipUserTesting` | boolean | `true`, `false` | `false` | ミッション中のuser-testing検証マイルストーンをスキップします。 |
+| `missionOrchestratorModel` | string | 任意の[利用可能なモデルID](/jp/models) | 継承 | ミッションオーケストレーターが使用するモデル。 |
+| `missionOrchestratorReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high` | モデルのデフォルト | ミッションオーケストレーターの推論努力。 |
+| `keepSystemAwakeDuringMissions` | boolean | `true`, `false` | `true` | ミッション実行中にOSがスリープしないようにします。 |
+
+## コンテキストとコンパクション
+
+モデルのコンテキストウィンドウ内に収めるために、droidが会話をいつ・どのようにコンパクションするかを制御します。
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `compactionTokenLimit` | number | トークン数 | モデル依存 | 現在のセッションの自動コンパクションをトリガーするトークンしきい値。 |
+| `compactionTokenLimitPerModel` | object | `{ "<modelId>": number }`マップ | `{}` | `compactionTokenLimit`のモデルごとの上書き。 |
+| `compactionModelMode` | string | `same`, `<modelId>` | `same` | コンパクションを実行するモデル：`same`は現在のセッションモデルを使用し、特定のモデルIDを指定することもできます。 |
+
+## Spec Mode設定
+
+Spec Modeによって作成される永続的なspecストアを制御します。
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `specSaveDir` | string | ディレクトリパス | `~/.factory/specs` | 保存されたspecを書き込むディレクトリ。`~`の展開をサポートします。 |
+
+## インフラストラクチャ
+
+ステータスライン、worktree、リクエストタイムアウトに関するシステムレベルの設定。
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `statusLine` | object | `{ "command": string, "padding"?: number, "maxRows"?: number }` | 未設定 | カスタムステータスライン設定。`command`が実行され、その標準出力が入力欄の上に表示されます。`/statusline`で対話的に設定できます。 |
+| `worktreeDirectory` | string | ディレクトリパス | `~/.factory/worktrees` | `--worktree` / `-w`で作成されるgit worktreeのデフォルト親ディレクトリ。 |
+| `llmRequestTimeout` | number | ミリ秒 | 製品のデフォルト | 個々のLLMリクエストが中断されるまでのタイムアウト。 |
+
+## エンタープライズおよび組織レベルの設定
+
+<Note>
+  **エンタープライズ / 組織レベル。** 以下の設定は通常、組織管理者によって管理され、Factory webアプリまたは管理された`settings.json`を通じてメンバーに配布されます。個々のユーザーが直接設定することは通常ありません。
+</Note>
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `maxAutonomyLevel` | string | `off`, `low`, `medium`, `high` | `high` | **エンタープライズ。** 任意のセッションで使用できる最大[自律レベル](/jp/cli/user-guides/auto-run)。ユーザーが選択したより高いレベルはこの値に制限されます。 |
+| `modelPolicy` | object | `{ "allowedModelIds"?: string[], "blockedModelIds"?: string[], "allowCustomModels"?: boolean, "allowedBaseUrls"?: string[] }` | 未設定 | **エンタープライズ。** メンバーが選択できるモデルを制限し、カスタムモデルの許可可否を制御し、カスタムモデルプロバイダーのベースURLを許可リスト化します。 |
+| `mcpPolicy` | object | `{ "enabled"?: boolean, "allowlist"?: string[] }` | 未設定 | **エンタープライズ。** MCPサーバーの実行可否と許可されるサーバーを制御します。[MCP](/jp/cli/configuration/mcp)を参照してください。 |
+| `missionPolicy` | object | `{ "restrictedAccess"?: boolean, "allowedUserIds"?: string[] }` | 未設定 | **エンタープライズ。** [ミッション](/jp/cli/features/missions)を起動できるユーザーを制限します。 |
+| `networkPolicy` | object | `{ "allowedIps": string[] }` | 未設定 | **エンタープライズ。** droidセッションからのアウトバウンドネットワークアクセスを `allowedIps` に指定したIPまたはCIDRレンジに制限します。 |
+| `sandbox` | object | `{ "enabled"?: boolean, "mode"?: string, "filesystem"?: object, "network"?: object }` | 未設定 | **エンタープライズ。** ツール実行のファイルシステムとネットワーク隔離を制御するサンドボックス設定。 |
+| `restrictMemberVisibility` | boolean | `true`, `false` | `false` | **組織レベル。** 管理者以外のユーザーから他の組織メンバーを非表示にします。 |
+| `restrictApiKeyCreationToManagers` | boolean | `true`, `false` | `false` | **組織レベル。** 組織のマネージャーのみがAPIキーを作成できます。 |
+| `sessionRetentionDays` | number | `14`–`365` | 組織のデフォルト | **組織レベル。** 同期されたセッション履歴が削除されるまで保持される日数。 |
+| `wikiCloudSync` | boolean | `true`, `false` | `true` | **組織レベル。** 生成された[Wiki](/jp/cli/features/wiki/overview)コンテンツをFactoryクラウドに同期します。 |
+| `managedComputersEnabled` | boolean | `true`, `false` | `false` | **エンタープライズ。** 組織でFactoryマネージドのリモートコンピューターを有効にします。 |
+| `byomComputersEnabled` | boolean | `true`, `false` | `false` | **エンタープライズ。** メンバーが`droid computer register`で自分のマシンを登録できるようにします（BYOM）。 |
+
 ## 設定例
 ```json
 {
