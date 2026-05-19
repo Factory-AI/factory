@@ -4,6 +4,30 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="May 18" rss={{ title: "CLI Updates", description: "Streaming file hook events, faster large sessions, and stability fixes" }}>
+  `v0.129.0`
+
+## New features
+
+- **Streaming file hook events** - File hook execution events now stream so you can follow progress as hooks run
+
+## Improvements
+
+- **Faster large session rendering** - Large session transcripts now render faster by trimming at the cutoff before derivation
+
+## Bug fixes
+
+- **Esc cancels tool activity** - Pressing Esc now reliably cancels in-progress tool activity
+- **MCP tools with complex schemas** - Listing MCP tools no longer fails when schemas contain unresolvable references
+- **Claude Code subagent import** - Subagent import is now skipped when there is no project root to import into
+- **Session load file snapshots** - File snapshots are now initialized when reloading a saved session
+- **ACP todo updates** - Hardened parsing of todo updates over ACP against missing fields
+- **Read-only badge layout** - Read-only badges no longer get compressed in narrow layouts (app)
+- **Pinned group new session action** - Removed an unintended new-session action on pinned groups (app)
+- **Desktop session recovery** - Desktop sessions now recover after a period of daemon inactivity (app)
+
+</Update>
+
 <Update label="May 15" rss={{ title: "CLI Updates", description: "Stability fixes" }}>
   `v0.128.0`
 
