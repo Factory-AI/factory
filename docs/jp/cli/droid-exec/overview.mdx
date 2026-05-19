@@ -50,21 +50,34 @@ Arguments:
   prompt                          The prompt to execute
 
 Options:
-  -o, --output-format <format>    Output format (default: "text")
-  --input-format <format>         Input format: stream-jsonrpc for multi-turn sessions
-  -f, --file <path>               Read prompt from file
-  --auto <level>                  Autonomy level: low|medium|high
-  --skip-permissions-unsafe       Skip ALL permission checks - allows all permissions (unsafe)
-  -s, --session-id <id>           Existing session to continue (requires a prompt)
-  -m, --model <id>                Model ID to use
-  -r, --reasoning-effort <level>  Reasoning effort (defaults per model)
-  --spec-model <id>               Model ID to use for spec mode
-  --use-spec                      Start in spec mode
-  --enabled-tools <ids>           Enable specific tools (comma or space separated list)
-  --disabled-tools <ids>          Disable specific tools (comma or space separated list)
-  --list-tools                    List available tools for the selected model and exit
-  --cwd <path>                    Working directory path
-  -h, --help                      display help for command
+  -o, --output-format <format>          Output format (default: "text")
+  --input-format <format>               Input format: stream-jsonrpc for multi-turn sessions
+  -f, --file <path>                     Read prompt from file
+  --auto <level>                        Autonomy level: low|medium|high
+  --skip-permissions-unsafe             Skip ALL permission checks - allows all permissions (unsafe)
+  -s, --session-id <id>                 Existing session to continue (requires a prompt)
+  --fork <id>                           Fork an existing session and continue from it
+  -m, --model <id>                      Model ID to use
+  -r, --reasoning-effort <level>        Reasoning effort (defaults per model)
+  --spec-model <id>                     Model ID to use for spec mode
+  --spec-reasoning-effort <level>       Reasoning effort for spec mode
+  --use-spec                            Start in spec mode
+  --enabled-tools <ids>                 Enable specific tools (comma or space separated list)
+  --disabled-tools <ids>                Disable specific tools (comma or space separated list)
+  --list-tools                          List available tools for the selected model and exit
+  --cwd <path>                          Working directory path
+  -w, --worktree [name]                 Run in a git worktree
+  --worktree-dir <path>                 Directory for worktree creation
+  --tag <spec>                          Session tag (name or JSON, repeatable)
+  --log-group-id <id>                   Log group ID for filtering logs
+  --append-system-prompt <text>         Append custom text to end of system prompt
+  --append-system-prompt-file <path>    Append file contents to end of system prompt
+  --mission                             Run in mission mode (multi-agent orchestration)
+  --worker-model <id>                   Model for mission workers
+  --worker-reasoning-effort <level>     Reasoning effort for mission workers
+  --validator-model <id>                Model for mission validators
+  --validator-reasoning-effort <level>  Reasoning effort for mission validators
+  -h, --help                            display help for command
 ```
 `--model`または`--spec-model`には、任意の[利用可能なモデルID](/jp/models)を使用できます。カスタムモデルについては、[Bring Your Own Key (BYOK)](/jp/cli/byok/overview)を参照してください。
 
@@ -370,6 +383,68 @@ droid exec --model "custom:My-Custom-Model-0" "analyze this codebase"
 <Note>
 推論努力（`-r` / `--reasoning-effort`）はカスタムモデルではまだサポートされていませんが、近日対応予定です。
 </Note>
+
+## セッション、タグ付け、ログ
+
+Forkを使うと、元のセッションを乱すことなく既存セッションから分岐できます。新しい実行は分岐元セッションの履歴から開始され、新しいセッションIDが割り当てられます。
+
+```bash
+# Continue a session in-place
+droid exec --session-id <session-id> "next steps"
+
+# Branch off a session into a new run
+droid exec --fork <session-id> --auto low "try an alternative refactor"
+```
+
+`--tag` を使うと、実行に検索可能なラベルを付与できます。このフラグは繰り返し指定でき、プレーンな名前または構造化メタデータ用のJSONオブジェクトを受け付けます。`--log-group-id` と組み合わせて関連する実行のログを同じグループにまとめると、後段のフィルタリングや集計が容易になります。
+
+```bash
+droid exec \
+  --tag release-v2 \
+  --tag '{"name":"team","value":"platform"}' \
+  --log-group-id ci-nightly \
+  --auto low "run nightly checks and write report.md"
+```
+
+## システムプロンプトのカスタマイズ
+
+`--append-system-prompt` を使うと、単一実行のシステムプロンプトの末尾に追加テキストを付加できます。`--append-system-prompt-file` はファイルの内容を末尾に追加します。両方のフラグは組み合わせて使用でき、グローバル設定を変更することなくプロジェクト固有のガイダンス、スタイルガイド、不変条件を注入するのに便利です。
+
+```bash
+droid exec \
+  --append-system-prompt "Always prefer functional React components." \
+  --auto low "review src/components for class-based components"
+
+droid exec \
+  --append-system-prompt-file ./docs/style-guide.md \
+  --auto low "lint prose in README.md against the style guide"
+```
+
+## ミッションモード
+
+ミッションモードは、`droid exec` を作業を計画し、ワーカーエージェントに委任し、結果を検証するマルチエージェントオーケストレーターとして実行します。`--mission` で有効化し、ワーカーおよびバリデーターロール用の専用モデルと推論努力レベルをオプションで選択できます。
+
+```bash
+droid exec --mission \
+  --worker-model claude-sonnet-4-5-20250929 \
+  --worker-reasoning-effort medium \
+  --validator-model claude-sonnet-4-5-20250929 \
+  --validator-reasoning-effort high \
+  --auto medium \
+  "ship the new billing webhook end-to-end"
+```
+
+### ミッションモードのフラグ
+
+| フラグ | 説明 |
+|------|-------------|
+| `--mission` | ミッションモード（マルチエージェントオーケストレーション）で実行します。 |
+| `--worker-model <id>` | ミッションワーカーエージェントが使用するモデルID。 |
+| `--worker-reasoning-effort <level>` | ミッションワーカーの推論努力。 |
+| `--validator-model <id>` | ミッションバリデーターエージェントが使用するモデルID。 |
+| `--validator-reasoning-effort <level>` | ミッションバリデーターの推論努力。 |
+
+最上位の `-m, --model` と `-r, --reasoning-effort` フラグは引き続きオーケストレーター自体に適用されます。ワーカーおよびバリデーターのオーバーライドは、オーケストレーターが生成するエージェントにのみ影響します。
 
 ## バッチと並列パターン
 

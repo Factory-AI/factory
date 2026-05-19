@@ -45,6 +45,22 @@ Custom droids live as `.md` files under either your project's `.factory/droids/`
 
 Changes to droid files are picked up on the next menu open or Task tool invocation.
 
+### AI-assisted droid generation
+
+Don't want to write the system prompt by hand? Droid ships with a built-in `GenerateDroid` tool that creates a complete custom droid configuration from a short description. Just describe what the droid should do — e.g. "review pull requests for security issues, focused on Node.js services" — and Droid will:
+
+- Suggest a normalized `name`
+- Draft a focused system prompt
+- Pick a sensible `tools` set and `model`
+- Save the resulting `.md` file to your chosen project or personal location
+
+You can invoke it two ways:
+
+- From the **Create a new Droid** wizard in `/droids`, choose the AI-generated prompt option and provide a description.
+- Ask the assistant directly: "Use `GenerateDroid` to create a droid that…" and pass `location: project` or `location: personal` to control where the file is saved.
+
+This is the fastest way to scaffold a new droid; you can always open the generated `.md` file and tweak the prompt, model, or tool list afterwards.
+
 ---
 
 ## 4 · Configuration

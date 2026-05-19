@@ -264,6 +264,32 @@ droid plugin install security-engineer@factory-plugins
 
 DroidはClaude Code向けに構築されたプラグインと互換性があります。使用したいClaude Codeプラグインを見つけた場合、直接インストールできます - プラグイン形式は相互運用可能です。詳細については[Claude Codeプラグインドキュメント](https://code.claude.com/docs/en/plugins)を参照してください。
 
+## CLI コマンドリファレンス
+
+`droid plugin` サブコマンドのクイックリファレンスです。すべてのコマンドは `--scope user|project`（エイリアス `-s`）を受け付け、プラグインのインストール先を指定できます。フラグを省略するとプロンプトが表示されます。
+
+| コマンド | 目的 | 例 |
+| :------- | :--- | :- |
+| `droid plugin install <plugin@marketplace>` | 登録済みのマーケットプレイスからプラグインをインストール。エイリアス: `droid plugin i`。 | `droid plugin install droid-control@factory-plugins --scope project` |
+| `droid plugin uninstall <plugin@marketplace>` | インストール済みのプラグインを削除。エイリアス: `droid plugin remove`。 | `droid plugin uninstall droid-control@factory-plugins` |
+| `droid plugin update [plugin@marketplace]` | 特定のプラグインを更新。引数なしで呼び出すとすべてのプラグインを更新。 | `droid plugin update droid-control@factory-plugins` |
+| `droid plugin list` | インストール済みのプラグインを一覧表示。スコープの指定も可能。 | `droid plugin list --scope user` |
+| `droid plugin marketplace` | マーケットプレイスを管理（`add`、`remove`、`list`、`update`）。 | `droid plugin marketplace add https://github.com/Factory-AI/factory-plugins` |
+
+**よくあるワークフロー：**
+
+```bash
+droid plugin marketplace add https://github.com/Factory-AI/factory-plugins
+droid plugin install droid-control@factory-plugins
+droid plugin list
+droid plugin update
+droid plugin uninstall droid-control@factory-plugins
+```
+
+<Tip>
+  閲覧やワンオフのインストールにはインタラクティブな `/plugins` UI を推奨します。オンボーディングのスクリプト化、CI セットアップ、共有のドットファイルでは CLI を利用してください。
+</Tip>
+
 ## 次のステップ
 
 <CardGroup cols={2}>

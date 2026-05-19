@@ -41,6 +41,16 @@ droid
   **クイックヒント:** `!`を押すとbashモードに切り替わり、AIの解釈なしでシェルコマンドを直接実行できます。通常モードに戻るには`Esc`を押します。詳しくは[CLIリファレンス](/jp/reference/cli-reference#bash-mode)を参照してください。
 </Note>
 
+## 主な機能
+
+- **Missions**: オーケストレーターが専門のワーカー Droid を編成し、より大きな機能の計画・実装・検証を行うマルチエージェントプロジェクトを起動します。`/missions` で開始するか、`droid exec --mission` でヘッドレス実行できます。[詳細 →](/jp/cli/features/missions)
+- **MCP**: Model Context Protocol を通じて droid を外部のツールやデータソースに接続します。`droid mcp add` でサーバーを追加するか、`/mcp` で管理します。[詳細 →](/jp/cli/configuration/mcp)
+- **カスタム Droid**: 独自のシステムプロンプト、ツール、モデルを持つ専門サブエージェントを定義し、タスクを委任します。`/droids` から管理できます。[詳細 →](/jp/cli/configuration/custom-droids)
+- **Skills**: 再利用可能な手順やドメイン知識をパッケージ化し、droid がオンデマンドで呼び出せるようにします。`/skills` または `/create-skill` でスキルを閲覧・作成します。[詳細 →](/jp/cli/configuration/skills)
+- **Hooks**: 特定のツールイベントの前後にシェルコマンドを実行することで、エージェントのライフサイクル周辺の動作を自動化します。`/hooks` で設定します。[詳細 →](/jp/cli/configuration/hooks-guide)
+- **Plugins**: マーケットプレイスを通じて配布されるスラッシュコマンド、droid、スキル、フックの導入可能なバンドルで droid を拡張します。`droid plugin install` でインストールするか、`/plugins` で管理します。[詳細 →](/jp/cli/configuration/plugins)
+- **Exec モード**: スクリプト、CI/CD パイプライン、自動化のために droid をヘッドレスで実行します。構造化された入出力形式で `droid exec` を使用します。[詳細 →](/jp/cli/droid-exec/overview)
+
 ## `droid` がワークフローにもたらすもの
 
 - **エンドツーエンドの機能開発**: 計画から実装、テストまで - Droidは透明性のあるレビューワークフローを通じてあなたのコントロール下を保ちながら、完全な開発ライフサイクルを処理します。

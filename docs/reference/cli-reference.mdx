@@ -24,16 +24,31 @@ The Droid CLI operates in two modes:
 
 ## Droid CLI commands
 
-| Command                      | Description                               | Example                                        |
-| :--------------------------- | :---------------------------------------- | :--------------------------------------------- |
-| `droid`                      | Start interactive REPL                    | `droid`                                        |
-| `droid "query"`              | Start REPL with initial prompt            | `droid "explain this project"`                 |
-| `droid exec "query"`         | Execute task without interactive mode     | `droid exec "summarize src/auth"`              |
-| `droid exec -f prompt.md`    | Load prompt from file                     | `droid exec -f .factory/prompts/review.md`     |
-| `cat file \| droid exec`     | Process piped content                     | `git diff \| droid exec "draft release notes"` |
-| `droid exec -s <id> "query"` | Resume existing session in exec mode      | `droid exec -s session-123 "continue"`         |
-| `droid exec --list-tools`    | List available tools, then exit           | `droid exec --list-tools`                      |
-| `droid update`               | Manually update the CLI to latest version | `droid update`                                 |
+| Command                              | Description                                                            | Example                                        |
+| :----------------------------------- | :--------------------------------------------------------------------- | :--------------------------------------------- |
+| `droid`                              | Start interactive REPL                                                 | `droid`                                        |
+| `droid "query"`                      | Start REPL with initial prompt                                         | `droid "explain this project"`                 |
+| `droid --resume [sessionId]`         | Resume a session (defaults to last modified). Alias: `-r`              | `droid --resume`                               |
+| `droid --fork <sessionId>`           | Fork and resume a session in a new copy                                | `droid --fork session-abc123`                  |
+| `droid exec "query"`                 | Execute task without interactive mode                                  | `droid exec "summarize src/auth"`              |
+| `droid exec -f prompt.md`            | Load prompt from file                                                  | `droid exec -f .factory/prompts/review.md`     |
+| `cat file \| droid exec`             | Process piped content                                                  | `git diff \| droid exec "draft release notes"` |
+| `droid exec -s <id> "query"`         | Resume existing session in exec mode                                   | `droid exec -s session-123 "continue"`         |
+| `droid exec --list-tools`            | List available tools, then exit                                        | `droid exec --list-tools`                      |
+| `droid search "query"`               | Search across local sessions (messages, documents, tool results). Alias: `droid find` | `droid search "auth bug"`                      |
+| `droid mcp add <name> <url>`         | Add an MCP server                                                      | `droid mcp add api https://api.example.com/mcp --type http`  |
+| `droid mcp remove <name>`            | Remove an MCP server                                                   | `droid mcp remove linear`                      |
+| `droid plugin install <plugin>`      | Install a plugin. Alias: `droid plugin i`                              | `droid plugin install factory/code-review`     |
+| `droid plugin uninstall <plugin>`    | Uninstall a plugin. Alias: `droid plugin remove`                       | `droid plugin uninstall factory/code-review`   |
+| `droid plugin update <plugin>`       | Update a plugin to the latest version                                  | `droid plugin update factory/code-review`      |
+| `droid plugin list`                  | List installed plugins                                                 | `droid plugin list`                            |
+| `droid plugin marketplace`           | Manage plugin marketplaces                                             | `droid plugin marketplace`                     |
+| `droid computer register [name]`     | Register this machine as a Bring-Your-Own-Machine (BYOM) computer      | `droid computer register laptop`               |
+| `droid computer remove`              | Remove this machine's BYOM registration                                | `droid computer remove`                        |
+| `droid computer list`                | List registered BYOM computers                                         | `droid computer list`                          |
+| `droid computer ssh <name>`          | SSH into a registered BYOM computer                                    | `droid computer ssh laptop`                    |
+| `droid daemon`                       | Run the Factory daemon server                                          | `droid daemon`                                 |
+| `droid update`                       | Manually update the CLI to latest version                              | `droid update`                                 |
 
 ## Droid CLI flags
 
@@ -50,7 +65,8 @@ Customize droid's behavior with command-line flags:
 | `--list-tools`                    | Print available tools and exit                                     | `droid exec --list-tools`                                    |
 | `-o, --output-format <format>`    | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)    | `droid exec -o json "document API"`                          |
 | `--input-format <format>`         | Input format (`stream-jsonrpc` for multi-turn)                    | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
-| `-r, --reasoning-effort <level>`  | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`) | `droid exec -r high "debug flaky test"`                      |
+| `-r, --resume [sessionId]`        | Resume a previous session. In interactive mode, `-r` is `--resume`; in `droid exec`, `-r` is `--reasoning-effort`. | `droid -r`                                                   |
+| `-r, --reasoning-effort <level>`  | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`). In `droid exec`, `-r` maps to this flag. | `droid exec -r high "debug flaky test"`                      |
 | `--spec-model <id>`               | Use a different [model ID](/models) for specification planning     | `droid exec --spec-model claude-sonnet-4-6`                  |
 | `--spec-reasoning-effort <level>` | Override reasoning effort for spec mode                            | `droid exec --use-spec --spec-reasoning-effort high`         |
 | `--use-spec`                      | Start in specification mode (plan before executing)                | `droid exec --use-spec "add user profiles"`                  |
@@ -59,6 +75,14 @@ Customize droid's behavior with command-line flags:
 | `-w, --worktree [name]`           | Run the session in an isolated [git worktree](#git-worktrees)      | `droid --worktree fix-bug`                                   |
 | `--tag <spec>`                    | Session tag (name or JSON, repeatable)                             | `droid exec --tag code-review`                               |
 | `--log-group-id <id>`             | Log group ID for filtering logs                                    | `droid exec --log-group-id grp-123`                          |
+| `--fork <id>`                     | Fork and resume an existing session into a new copy                | `droid exec --fork session-abc123`                           |
+| `--mission`                       | Run `droid exec` in [mission mode](/cli/features/missions) (multi-agent orchestration) | `droid exec --mission -f mission.md`                         |
+| `--worker-model <id>`             | Model used for mission worker agents                               | `droid exec --mission --worker-model claude-sonnet-4-6`      |
+| `--worker-reasoning-effort <level>` | Reasoning effort for mission worker agents (`off`, `none`, `low`, `medium`, `high`) | `droid exec --mission --worker-reasoning-effort medium`      |
+| `--validator-model <id>`          | Model used for mission validator agents                            | `droid exec --mission --validator-model claude-opus-4-7`     |
+| `--validator-reasoning-effort <level>` | Reasoning effort for mission validator agents                  | `droid exec --mission --validator-reasoning-effort high`     |
+| `--append-system-prompt <text>`   | Append custom text to the end of the system prompt                 | `droid --append-system-prompt "Always run tests."`           |
+| `--append-system-prompt-file <path>` | Append the contents of a file to the end of the system prompt   | `droid --append-system-prompt-file .factory/system.md`       |
 | `-v, --version`                   | Display CLI version                                                | `droid -v`                                                   |
 | `-h, --help`                      | Show help information                                              | `droid --help`                                               |
 
@@ -108,6 +132,50 @@ See [Choosing Your Model](/cli/user-guides/choosing-your-model) for detailed gui
 
 ## Interactive mode features
 
+### Keyboard shortcuts
+
+The interactive REPL supports a rich set of keyboard shortcuts for navigation, overlays, and input control:
+
+| Shortcut          | Action                                                                          |
+| :---------------- | :------------------------------------------------------------------------------ |
+| `Ctrl+C`          | Cancel the current operation / interrupt the agent. Press twice quickly to exit |
+| `Ctrl+Z`          | Suspend the process (Unix only). Resume with `fg`                               |
+| `Ctrl+O`          | Toggle the detailed transcript view (full message details)                      |
+| `Ctrl+T`          | Toggle the Mission Control overlay (orchestrator sessions only)                 |
+| `Ctrl+P`          | Toggle the blog post viewer                                                     |
+| `Ctrl+N`          | Cycle through available models (when typing in chat input)                      |
+| `Ctrl+L`          | Cycle through autonomy levels (when typing in chat input)                       |
+| `Ctrl+Y`          | Toggle the `/btw` scroll view (side-question history)                           |
+| `Ctrl+J`          | Toggle the changelog display (dismiss / restore)                                |
+| `Ctrl+E`          | Toggle the approval details view                                                |
+| `Ctrl+V`          | Paste an image from the clipboard as an attachment                              |
+| `Tab`             | Cycle reasoning effort (`low` → `medium` → `high` → `off`)                      |
+| `Shift+Tab`       | Cycle interaction modes (Auto → Spec → Mission)                                 |
+| `@`               | File path autocomplete — typing `@` triggers fuzzy file search                  |
+| `Up` / `Down`     | Navigate input history (cycle through previously submitted messages)            |
+| `Double Escape`   | Second press clears the input draft; a third Escape opens the rewind menu       |
+| `?`               | Toggle the help popup (when the input is empty)                                 |
+| `Ctrl+/`          | Toggle the help popup (works even when the input has content)                   |
+| `Ctrl+A`          | Move the cursor to the start of the line                                        |
+| `Ctrl+W`          | Delete the word before the cursor                                               |
+| `Ctrl+K`          | Delete from the cursor to the end of the line                                   |
+| `Ctrl+U`          | Delete from the cursor to the start of the line                                 |
+| `Ctrl+D`          | Clear all attached images, or forward-delete the next character if none attached |
+| `Ctrl+R`          | Rename the highlighted session (in the `/sessions` list view)                   |
+| `Ctrl+X`          | Archive the highlighted session (in the `/sessions` list view)                  |
+| `Alt+Up`          | Scroll the transcript up (navigate any turn)                                    |
+| `Alt+Down`        | Scroll the transcript down (navigate any turn)                                  |
+| `Alt+PageUp`      | Scroll the transcript up to the previous user turn                              |
+| `Alt+PageDown`    | Scroll the transcript down to the next user turn                                |
+| `Escape`          | Close the active overlay or menu                                                |
+| `Shift+Enter`     | Insert a newline in the chat input (multiline editing)                          |
+| `!`               | Toggle [bash mode](#bash-mode) (when the input is empty)                        |
+
+<Tip>
+  Run `/terminal-setup` once to configure your terminal so `Shift+Enter` reliably produces a newline
+  in the chat input.
+</Tip>
+
 ### Bash mode
 
 Press `!` when the input is empty to toggle bash mode. In bash mode, commands execute directly in your shell without AI interpretation—useful for quick operations like checking `git status` or running `npm test`.
@@ -118,49 +186,74 @@ Press `!` when the input is empty to toggle bash mode. In bash mode, commands ex
 
 The prompt changes from `>` to `$` when bash mode is active.
 
+### Mermaid diagram rendering
+
+Droid automatically renders Mermaid diagram code blocks as ASCII art directly in the terminal — no external viewer or browser required. When a response contains a fenced ```` ```mermaid ```` block of a supported diagram type, the diagram is drawn inline in the transcript.
+
+**Supported diagram types:**
+
+- `flowchart` (and `graph`)
+- `sequenceDiagram`
+- `stateDiagram`
+- `classDiagram`
+- `erDiagram`
+
+Unsupported diagram types (for example `gantt`, `pie`, `mindmap`, `timeline`, `journey`, `gitGraph`) fall back to displaying the raw Mermaid source and a link to view the diagram externally.
+
 ### Slash commands
 
 Available when running `droid` in interactive mode. Type the command at the prompt:
 
-| Command                | Description                                                    |
-| :--------------------- | :------------------------------------------------------------- |
-| `/account`             | Open Factory account settings in browser                       |
-| `/billing`             | View and manage billing settings                               |
-| `/bg-process`          | Manage background processes                                    |
-| `/bug [title]`         | Create a bug report with session data and logs                 |
-| `/clear`               | Start a new session (alias for `/new`)                         |
-| `/commands`            | Manage custom slash commands                                   |
-| `/compress [prompt]`   | Compress session and move to new one with summary              |
-| `/cost`                | Show usage statistics                                          |
-| `/create-skill`        | Create a reusable skill from current session                   |
-| `/droids`              | Manage custom droids                                           |
-| `/missions`            | Enter Mission Mode                                             |
-| `/favorite`            | Mark current session as a favorite                             |
-| `/fork`                | Duplicate current session with all messages into a new session |
-| `/generate_blog`       | Generate semantic diff blog post                               |
-| `/help`                | Show available slash commands                                  |
-| `/hooks`               | Manage lifecycle hooks                                         |
-| `/ide`                 | Configure IDE integrations                                     |
-| `/install-code-review` | Set up automated code review                                   |
-| `/login`               | Sign in to Factory                                             |
-| `/logout`              | Sign out of Factory                                            |
-| `/mcp`                 | Manage Model Context Protocol servers                          |
-| `/model`               | Switch AI model mid-session                                    |
-| `/new`                 | Start a new session                                            |
-| `/plugins`             | Manage plugins and marketplaces                                |
-| `/quit`                | Exit droid (alias: `exit`, or press Ctrl+C)                    |
-| `/readiness-report`    | Generate readiness report                                      |
-| `/rename`              | Rename current session                                         |
-| `/review`              | Start AI-powered code review workflow                          |
-| `/rewind-conversation` | Undo recent changes in the session                             |
-| `/sessions`            | List and select previous sessions                              |
-| `/settings`            | Configure application settings                                 |
-| `/share`               | Share session with organization                                |
-| `/skills`              | Manage and invoke skills                                       |
-| `/status`              | Show current droid status and configuration                    |
-| `/statusline`          | Configure custom status line                                   |
-| `/terminal-setup`      | Configure terminal keybindings for Shift+Enter                 |
-| `/wrapped`             | Show Droid usage statistics                                    |
+| Command                       | Description                                                    |
+| :---------------------------- | :------------------------------------------------------------- |
+| `/account`                    | Open Factory account settings in browser                       |
+| `/billing`                    | View and manage billing settings                               |
+| `/btw <question>`             | Ask a side question without polluting the main transcript     |
+| `/bug [title]`                | Create a bug report with session data and logs                 |
+| `/clear`                      | Start a new session (alias for `/new`)                         |
+| `/commands`                   | Manage custom slash commands                                   |
+| `/compress [prompt]`          | Compress session and move to new one with summary              |
+| `/context`                    | Show context window usage breakdown with progress bar          |
+| `/copy`                       | Copy prompts, responses, turn ranges, or session ID            |
+| `/cost`                       | Show usage statistics                                          |
+| `/create-skill`               | Create a reusable skill from current session                   |
+| `/cwd <path>`                 | Change session working directory                               |
+| `/diagnostics`                | Show settings configuration errors                             |
+| `/droids`                     | Manage custom droids                                           |
+| `/missions`                   | Enter Mission Mode                                             |
+| `/fast`                       | Enable fast mode for current model (`/fast off` to disable)    |
+| `/favorite`                   | Mark current session as a favorite                             |
+| `/fork`                       | Duplicate current session with all messages into a new session |
+| `/generate_blog`              | Generate semantic diff blog post                               |
+| `/help`                       | Show available slash commands                                  |
+| `/hooks`                      | Manage lifecycle hooks                                         |
+| `/ide`                        | Configure IDE integrations                                     |
+| `/install-code-review`        | Set up automated code review                                   |
+| `/install-slack-app`          | Install/connect Slack integration                              |
+| `/language <locale>`          | Switch TUI display language                                    |
+| `/limits`                     | Manage token usage limits and overage preferences              |
+| `/login`                      | Sign in to Factory                                             |
+| `/logout`                     | Sign out of Factory                                            |
+| `/mcp`                        | Manage Model Context Protocol servers                          |
+| `/model`                      | Switch AI model mid-session                                    |
+| `/new`                        | Start a new session                                            |
+| `/plugins`                    | Manage plugins and marketplaces                                |
+| `/quit`                       | Exit droid (alias: `exit`, or press Ctrl+C)                    |
+| `/readiness-fix`              | Fix failing agent readiness signals from latest report         |
+| `/readiness-report`           | Generate readiness report                                      |
+| `/rename`                     | Rename current session                                         |
+| `/review`                     | Start AI-powered code review workflow                          |
+| `/rewind-conversation`        | Undo recent changes in the session                             |
+| `/sessions`                   | List and select previous sessions                              |
+| `/settings`                   | Configure application settings                                 |
+| `/setup-incident-response`    | Set up Slack auto-run for incident-response channel            |
+| `/share`                      | Share session with organization                                |
+| `/skills`                     | Manage and invoke skills                                       |
+| `/stats [period]`             | Show usage statistics (supports relative periods, date ranges) |
+| `/status`                     | Show current droid status and configuration                    |
+| `/statusline`                 | Configure custom status line                                   |
+| `/terminal-setup`             | Configure terminal keybindings for Shift+Enter                 |
+| `/themes`                     | Choose a color theme                                           |
 
 For detailed information on slash commands, see the [interactive mode documentation](/cli/getting-started/quickstart#useful-slash-commands).
 
@@ -205,6 +298,41 @@ droid --worktree feature-b &
   worktrees may not have dependencies installed yet (for example `node_modules`) — set them up if
   builds or tests fail with missing-module errors.
 </Note>
+
+### Subcommand flags
+
+In addition to the global flags above, several `droid` subcommands accept their own flags.
+
+#### `droid search` flags
+
+| Flag                  | Description                                                              | Example                                  |
+| :-------------------- | :----------------------------------------------------------------------- | :--------------------------------------- |
+| `--kind <kind>`       | Filter by entry kind: `message_text`, `document`, `tool_use`, `tool_result`, or `all` | `droid search "auth" --kind document`    |
+| `--limit-sessions <n>` | Maximum number of sessions to return                                    | `droid search "auth" --limit-sessions 5` |
+| `--limit-hits <n>`    | Maximum number of matches per kind per session                           | `droid search "auth" --limit-hits 3`     |
+| `--context-chars <n>` | Number of characters of context shown around each match                  | `droid search "auth" --context-chars 200`|
+| `--json`              | Emit results as JSON                                                     | `droid search "auth" --json`             |
+| `--reindex`           | Drop the search cache and rebuild the local index                        | `droid search "auth" --reindex`          |
+
+#### `droid mcp add` flags
+
+| Flag                       | Description                                                              | Example                                                          |
+| :------------------------- | :----------------------------------------------------------------------- | :--------------------------------------------------------------- |
+| `--type <type>`            | Server transport: `http` (streamable HTTP) or `stdio` (local)                      | `droid mcp add api https://api.example.com/mcp --type http`      |
+| `--env <KEY=VALUE>`        | Set an environment variable for a stdio server (repeatable)              | `droid mcp add gh "gh-mcp" --type stdio --env GH_TOKEN=$GH_TOKEN`|
+| `--header <KEY: VALUE>`    | Add an HTTP header for a remote server (repeatable)                      | `droid mcp add api https://api.example.com/mcp --type http --header "Authorization: Bearer $TOKEN"` |
+
+#### `droid plugin` flags
+
+| Flag                  | Description                                                              | Example                                                  |
+| :-------------------- | :----------------------------------------------------------------------- | :------------------------------------------------------- |
+| `-s, --scope <scope>` | Installation scope: `user` (default) or `project`                        | `droid plugin install factory/code-review --scope project` |
+
+#### `droid computer register` flags
+
+| Flag         | Description                                              | Example                              |
+| :----------- | :------------------------------------------------------- | :----------------------------------- |
+| `-y, --yes`  | Skip interactive prompts and accept registration defaults | `droid computer register laptop -y`  |
 
 ### MCP command reference
 

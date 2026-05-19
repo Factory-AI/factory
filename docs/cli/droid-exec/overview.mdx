@@ -51,21 +51,34 @@ Arguments:
   prompt                          The prompt to execute
 
 Options:
-  -o, --output-format <format>    Output format (default: "text")
-  --input-format <format>         Input format: stream-jsonrpc for multi-turn sessions
-  -f, --file <path>               Read prompt from file
-  --auto <level>                  Autonomy level: low|medium|high
-  --skip-permissions-unsafe       Skip ALL permission checks - allows all permissions (unsafe)
-  -s, --session-id <id>           Existing session to continue (requires a prompt)
-  -m, --model <id>                Model ID to use
-  -r, --reasoning-effort <level>  Reasoning effort (defaults per model)
-  --spec-model <id>               Model ID to use for spec mode
-  --use-spec                      Start in spec mode
-  --enabled-tools <ids>           Enable specific tools (comma or space separated list)
-  --disabled-tools <ids>          Disable specific tools (comma or space separated list)
-  --list-tools                    List available tools for the selected model and exit
-  --cwd <path>                    Working directory path
-  -h, --help                      display help for command
+  -o, --output-format <format>          Output format (default: "text")
+  --input-format <format>               Input format: stream-jsonrpc for multi-turn sessions
+  -f, --file <path>                     Read prompt from file
+  --auto <level>                        Autonomy level: low|medium|high
+  --skip-permissions-unsafe             Skip ALL permission checks - allows all permissions (unsafe)
+  -s, --session-id <id>                 Existing session to continue (requires a prompt)
+  --fork <id>                           Fork an existing session and continue from it
+  -m, --model <id>                      Model ID to use
+  -r, --reasoning-effort <level>        Reasoning effort (defaults per model)
+  --spec-model <id>                     Model ID to use for spec mode
+  --spec-reasoning-effort <level>       Reasoning effort for spec mode
+  --use-spec                            Start in spec mode
+  --enabled-tools <ids>                 Enable specific tools (comma or space separated list)
+  --disabled-tools <ids>                Disable specific tools (comma or space separated list)
+  --list-tools                          List available tools for the selected model and exit
+  --cwd <path>                          Working directory path
+  -w, --worktree [name]                 Run in a git worktree
+  --worktree-dir <path>                 Directory for worktree creation
+  --tag <spec>                          Session tag (name or JSON, repeatable)
+  --log-group-id <id>                   Log group ID for filtering logs
+  --append-system-prompt <text>         Append custom text to end of system prompt
+  --append-system-prompt-file <path>    Append file contents to end of system prompt
+  --mission                             Run in mission mode (multi-agent orchestration)
+  --worker-model <id>                   Model for mission workers
+  --worker-reasoning-effort <level>     Reasoning effort for mission workers
+  --validator-model <id>                Model for mission validators
+  --validator-reasoning-effort <level>  Reasoning effort for mission validators
+  -h, --help                            display help for command
 ```
 
 Use any [available model ID](/models) with `--model` or `--spec-model`. For custom models, see [Bring Your Own Key (BYOK)](/cli/byok/overview).
@@ -407,6 +420,68 @@ The index corresponds to the position in the `customModels` array (0-based).
 <Note>
 Reasoning effort (`-r` / `--reasoning-effort`) is not yet supported for custom models, but coming soon.
 </Note>
+
+## Sessions, tagging, and logs
+
+Forking lets you branch off an existing session without disturbing the original; the new run starts from the forked session's history and is assigned a fresh session ID.
+
+```bash
+# Continue a session in-place
+droid exec --session-id <session-id> "next steps"
+
+# Branch off a session into a new run
+droid exec --fork <session-id> --auto low "try an alternative refactor"
+```
+
+Use `--tag` to attach searchable labels to a run. The flag is repeatable and accepts either a plain name or a JSON object for structured metadata. Pair it with `--log-group-id` to bucket logs from related runs together for easier filtering and aggregation downstream.
+
+```bash
+droid exec \
+  --tag release-v2 \
+  --tag '{"name":"team","value":"platform"}' \
+  --log-group-id ci-nightly \
+  --auto low "run nightly checks and write report.md"
+```
+
+## Customizing the system prompt
+
+Use `--append-system-prompt` to append additional text to the end of the system prompt for a single run, or `--append-system-prompt-file` to append the contents of a file. Both flags can be combined and are useful for injecting project-specific guidance, style guides, or invariants without modifying global settings.
+
+```bash
+droid exec \
+  --append-system-prompt "Always prefer functional React components." \
+  --auto low "review src/components for class-based components"
+
+droid exec \
+  --append-system-prompt-file ./docs/style-guide.md \
+  --auto low "lint prose in README.md against the style guide"
+```
+
+## Mission mode
+
+Mission mode runs `droid exec` as a multi-agent orchestrator that plans work, delegates to worker agents, and validates results. Enable it with `--mission` and optionally select dedicated models and reasoning effort levels for the worker and validator roles.
+
+```bash
+droid exec --mission \
+  --worker-model claude-sonnet-4-5-20250929 \
+  --worker-reasoning-effort medium \
+  --validator-model claude-sonnet-4-5-20250929 \
+  --validator-reasoning-effort high \
+  --auto medium \
+  "ship the new billing webhook end-to-end"
+```
+
+### Mission mode flags
+
+| Flag | Description |
+|------|-------------|
+| `--mission` | Run in mission mode (multi-agent orchestration). |
+| `--worker-model <id>` | Model ID used by mission worker agents. |
+| `--worker-reasoning-effort <level>` | Reasoning effort for mission workers. |
+| `--validator-model <id>` | Model ID used by mission validator agents. |
+| `--validator-reasoning-effort <level>` | Reasoning effort for mission validators. |
+
+The top-level `-m, --model` and `-r, --reasoning-effort` flags still apply to the orchestrator itself; the worker and validator overrides only affect the agents the orchestrator spawns.
 
 ## Batch and parallel patterns
 
