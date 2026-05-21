@@ -1,0 +1,75 @@
+---
+title: Getting Started
+description: Authenticate with the Factory Public API and make your first request.
+keywords:
+  [
+    "api",
+    "getting started",
+    "authentication",
+    "api key",
+    "rest api",
+    "factory api",
+  ]
+---
+
+The Factory Public API exposes the same primitives that power the Droid CLI and Factory App: computers, sessions, and organization configuration. Use it to provision Droid environments, drive sessions programmatically, and manage org-level resources from your own systems.
+
+---
+
+## Authentication
+
+All requests require a Factory API key in the `Authorization` header:
+
+```bash
+Authorization: Bearer fk-your-api-key
+```
+
+### Generate an API key
+
+1. Sign in to the Factory App at <a href="https://app.factory.ai" target="_blank" rel="noreferrer" className="url-plain">app.factory.ai</a>.
+2. Open <a href="https://app.factory.ai/settings/api-keys" target="_blank" rel="noreferrer" className="url-plain">app.factory.ai/settings/api-keys</a>.
+3. Click **Create API key**, give it a descriptive name, and copy the value (it begins with `fk-`).
+
+The key is shown once. Store it in a secrets manager or environment variable. Treat it like a password: do not commit it to source control or paste it into shared logs.
+
+```bash
+export FACTORY_API_KEY="fk-your-api-key"
+```
+
+![Factory API keys settings page](/images/web/api-keys-page.png)
+
+### Permissions
+
+Only users with **Manager** or **Owner** roles can create API keys and call the Public API. Members and guests will receive a `403 Forbidden` response.
+
+API keys inherit the role of the user who created them. Revoke keys from [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys) when team members change roles or leave the organization.
+
+---
+
+## Available Endpoints
+
+The Public API is grouped into three resource families:
+
+| Group          | Description                                                                 |
+| :------------- | :-------------------------------------------------------------------------- |
+| `Computers`    | Provision, list, restart, and delete persistent Droid computer environments |
+| `Sessions`     | Create sessions, post messages, and inspect session history                 |
+| `Organization` | Manage org users, usage limits, and enterprise control history              |
+
+Browse the endpoint reference under each group in the left sidebar.
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="List Computers" href="/api-reference/computers/list-computers" icon="server">
+    See existing Droid computer environments in your organization
+  </Card>
+  <Card title="Create a Session" href="/api-reference/sessions/create-a-session" icon="play">
+    Drive a Droid programmatically from your own systems
+  </Card>
+  <Card title="Manage Organization Users" href="/api-reference/organization/list-organization-users" icon="users-gear">
+    Invite, remove, and configure org members for admin workflows
+  </Card>
+</CardGroup>
