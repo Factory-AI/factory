@@ -4,6 +4,40 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="May 20" rss={{ title: "CLI Updates", description: "Model favorites, spec save directory, paste expansion, and stability fixes" }}>
+  `v0.130.0`
+
+## New features
+
+- **Model favorites** - Mark and quickly access your preferred models from the model selector
+- **Spec save directory** - Configure where specs are saved with a new setting
+- **Expand pasted placeholders** - Press Alt+Shift+V (Opt+Shift+V on macOS) to expand truncated paste placeholders inline
+
+## Improvements
+
+- **Refined model selector** - Streamlined the model selector submenu
+- **BYOK model parity** - Brought the BYOK model experience in line with the rest of the model picker
+- **Clearer help output** - Improved formatting of the `help` command output
+
+## Bug fixes
+
+- **MCP OAuth clients** - Static MCP OAuth clients are now supported during authentication
+- **Image paste on Linux** - Pasting images now works on Linux, with a graceful fallback when clipboard data is unavailable
+- **Custom droids directory** - Non-directory entries under `~/.factory/droids` are now skipped without spurious errors
+- **OAuth provider errors** - 4xx responses from connected OAuth providers are now surfaced as user-facing errors
+- **Hook resilience** - Hooks tolerate malformed entries and preserve their original startup source
+- **ApplyPatch new files** - New files in ApplyPatch results now render correctly as creates
+- **CLI update reliability** - Prevented restart races during CLI daemon updates
+- **PowerShell under `exec`** - PowerShell commands now run non-interactively in `exec` mode
+- **`exec` stream-json pipes** - Stream-json writes in `exec` no longer crash when the receiving pipe closes early
+- **Create confirmation crash** - Guarded against missing file paths in Create tool confirmation prompts
+- **Daemon auth on reconnect** - Daemon auth tokens now refresh when reconnecting (app)
+- **Desktop paid onboarding** - The onboarding finish screen is now skipped on the desktop paid flow (app)
+- **Slack first-mention indicator** - Slack now shows the typing indicator from the very first mention
+- **Kimi tool ids** - Hyphenated Kimi tool ids are now regenerated correctly
+
+</Update>
+
 <Update label="May 15" rss={{ title: "CLI Updates", description: "Stability fixes" }}>
   `v0.128.0`
 
