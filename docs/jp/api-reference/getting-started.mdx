@@ -1,0 +1,75 @@
+---
+title: はじめに
+description: Factory Public APIで認証して、最初のリクエストを送信します。
+keywords:
+  [
+    "api",
+    "getting started",
+    "authentication",
+    "api key",
+    "rest api",
+    "factory api",
+  ]
+---
+
+Factory Public APIは、Droid CLIとFactory Appを動かしているのと同じプリミティブ（コンピューター、セッション、組織設定）を公開しています。Droid環境のプロビジョニング、セッションのプログラム制御、組織レベルのリソース管理を、ご自身のシステムから実行できます。
+
+---
+
+## 認証
+
+すべてのリクエストには、`Authorization`ヘッダーにFactory APIキーが必要です：
+
+```bash
+Authorization: Bearer fk-your-api-key
+```
+
+### APIキーの生成
+
+1. Factory Appに <a href="https://app.factory.ai" target="_blank" rel="noreferrer" className="url-plain">app.factory.ai</a> でサインインします。
+2. <a href="https://app.factory.ai/settings/api-keys" target="_blank" rel="noreferrer" className="url-plain">app.factory.ai/settings/api-keys</a> を開きます。
+3. **Create API key** をクリックし、わかりやすい名前を付けて、値（`fk-` で始まる文字列）をコピーします。
+
+キーは一度だけ表示されます。シークレットマネージャーまたは環境変数に保存してください。パスワードと同様に扱い、ソース管理にコミットしたり、共有ログに貼り付けたりしないでください。
+
+```bash
+export FACTORY_API_KEY="fk-your-api-key"
+```
+
+![Factory APIキー設定画面](/images/web/api-keys-page.png)
+
+### 権限
+
+APIキーの作成とPublic APIの呼び出しが可能なのは、**Manager** または **Owner** ロールのユーザーのみです。メンバーとゲストは `403 Forbidden` レスポンスを受け取ります。
+
+APIキーは作成したユーザーのロールを継承します。チームメンバーのロールが変更されたり組織を離れたりした場合は、[app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys) からキーを失効させてください。
+
+---
+
+## 利用可能なエンドポイント
+
+Public APIは3つのリソースグループに分かれています：
+
+| グループ        | 説明                                                                  |
+| :------------- | :-------------------------------------------------------------------- |
+| `Computers`    | 永続的なDroidコンピューター環境のプロビジョニング、一覧、再起動、削除 |
+| `Sessions`     | セッションの作成、メッセージの投稿、セッション履歴の取得              |
+| `Organization` | 組織ユーザー、使用量上限、エンタープライズコントロール履歴の管理      |
+
+各グループのエンドポイントリファレンスは、左サイドバーから参照できます。
+
+---
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="コンピューター一覧" href="/jp/api-reference/computers/list-computers" icon="server">
+    組織内の既存のDroidコンピューター環境を確認します
+  </Card>
+  <Card title="セッションの作成" href="/jp/api-reference/sessions/create-a-session" icon="play">
+    ご自身のシステムからDroidをプログラム制御します
+  </Card>
+  <Card title="組織ユーザーの管理" href="/jp/api-reference/organization/list-organization-users" icon="users-gear">
+    管理者ワークフロー向けに組織メンバーを招待、削除、設定します
+  </Card>
+</CardGroup>
