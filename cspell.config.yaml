@@ -1,0 +1,33 @@
+version: '0.2'
+language: en,en-US
+
+import:
+  - '@cspell/dict-en_us/cspell-ext.json'
+  - '@cspell/dict-software-terms/cspell-ext.json'
+  - '@cspell/dict-companies/cspell-ext.json'
+
+files:
+  - docs/**/*.{md,mdx}
+
+ignorePaths:
+  - docs/jp/**
+  - node_modules/**
+  - tooling/**/node_modules/**
+  - .git/**
+  - .factory/**
+  - build/**
+  - coverage/**
+  - dist/**
+
+dictionaryDefinitions:
+  - name: factory-docs
+    path: ./tooling/docs-lint/cspell-project-words.txt
+    addWords: true
+
+dictionaries:
+  - en_us
+  - softwareTerms
+  - software-tools
+  - web-services
+  - companies
+  - factory-docs
