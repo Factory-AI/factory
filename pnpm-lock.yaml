@@ -93,10 +93,20 @@ importers:
         version: 5.9.3
 
   tooling/docs-vars:
+    dependencies:
+      zod:
+        specifier: ^3.25.74
+        version: 3.25.76
     devDependencies:
+      '@types/node':
+        specifier: ^22.19.19
+        version: 22.19.19
       typescript:
         specifier: ^5.6.3
         version: 5.9.3
+      vitest:
+        specifier: ^4.0.14
+        version: 4.1.7(@types/node@22.19.19)(vite@8.0.13(@types/node@22.19.19)(yaml@2.9.0))
 
 packages:
 
@@ -2315,6 +2325,9 @@ packages:
     resolution: {integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==}
     engines: {node: '>= 14.6'}
     hasBin: true
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -5360,5 +5373,7 @@ snapshots:
   xdg-basedir@5.1.0: {}
 
   yaml@2.9.0: {}
+
+  zod@3.25.76: {}
 
   zwitch@2.0.4: {}
