@@ -26,10 +26,6 @@ From any Droid session, enter a mission and kick off the security review:
 /security-review deep audit
 ```
 
-`/missions` builds a plan that partitions the codebase by module, surface area, and trust boundary, pulls in the `security-review` and `deep-security-review` skills, and runs the audit through Mission Control with milestone-level validation. The output is a consolidated report of validated findings, grouped by severity.
-
-The planning phase is where missions earn their depth. A well-scoped audit plan -- with milestones around authentication, data handling, dependencies, and LLM surfaces -- produces materially better results than a one-shot scan.
-
 ### Periodic scan in CI
 
 Run the same mission-based audit on a schedule by invoking `droid exec --mission` from a workflow:
@@ -75,7 +71,7 @@ Full scans create a `droid/security-report-{date}` branch, write a report to `.f
 To review the current diff in your working tree or branch from the CLI, run the built-in skill in any Droid session:
 
 ```text
-/security-review
+/security-review local diff
 ```
 
 When invoked on a diff, Droid traces changed data flows across authentication, authorization, validation, database, network, filesystem, and LLM boundaries, and reports validated findings inline with severity and suggested fixes.
