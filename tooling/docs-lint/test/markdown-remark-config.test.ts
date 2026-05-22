@@ -18,10 +18,30 @@ const markdownlintIgnoreUrl = new URL(
   import.meta.url
 );
 
+const requiredMarkdownlintIgnores = [
+  'docs/jp/**',
+  'node_modules/**',
+  '**/node_modules/**',
+  '**/dist/**',
+  '**/.factory/**',
+  '**/.husky/_/**',
+] as const;
+
+const getRemarkRuleName = (plugin: unknown): string => {
+  const normalizedPlugin = Array.isArray(plugin) ? plugin[0] : plugin;
+
+  return typeof normalizedPlugin === 'function' ? normalizedPlugin.name : '';
+};
+
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 describe('Markdown and MDX lint config', () => {
   it('configures markdownlint-cli2 for repo Markdown while ignoring JP docs', () => {
-    expect(markdownlintConfig.globs).toEqual(['*.md', 'docs/**/*.md']);
-    expect(markdownlintConfig.ignores).toContain('docs/jp/**');
+    expect(markdownlintConfig.globs).toEqual(['**/*.md']);
+    expect(markdownlintConfig.ignores).toEqual(
+      expect.arrayContaining([...requiredMarkdownlintIgnores])
+    );
     expect(markdownlintConfig.config).toMatchObject({
       default: true,
       MD001: false,
@@ -37,7 +57,7 @@ describe('Markdown and MDX lint config', () => {
     });
   });
 
-  it('declares all required remark plugins and lint rules', () => {
+  it('declares required remark plugins without blanket-disabling presets', async () => {
     expect(remarkConfig.plugins).toEqual(
       expect.arrayContaining([
         remarkMdx,
@@ -54,6 +74,31 @@ describe('Markdown and MDX lint config', () => {
           Array.isArray(plugin) && plugin[0] === remarkLintNoUndefinedReferences
       )
     ).toBe(true);
+
+    const disabledRules = remarkConfig.plugins
+      .filter((plugin) => Array.isArray(plugin) && plugin[1] === false)
+      .map(getRemarkRuleName);
+
+    expect(disabledRules).toEqual([
+      'remark-lint:no-literal-urls',
+      'remark-lint:table-cell-padding',
+    ]);
+
+    const remarkConfigSource = await readFile(
+      new URL('../remark.config.mjs', import.meta.url),
+      'utf8'
+    );
+
+    for (const disabledRule of disabledRules) {
+      expect(remarkConfigSource).toMatch(
+        new RegExp(
+          `^\\s*// ${escapeRegExp(
+            disabledRule.replace('remark-lint:', '')
+          )}: .+`,
+          'm'
+        )
+      );
+    }
   });
 
   it('wires root markdown and remark scripts with required ignores', async () => {
@@ -66,6 +111,12 @@ describe('Markdown and MDX lint config', () => {
     expect(rootPackageJson.scripts['lint:markdownlint']).toContain(
       'markdownlint-cli2 --config tooling/docs-lint/markdownlint.config.mjs'
     );
+    expect(rootPackageJson.scripts['lint:markdownlint']).toContain('"**/*.md"');
+    for (const ignore of requiredMarkdownlintIgnores) {
+      expect(rootPackageJson.scripts['lint:markdownlint']).toContain(
+        `"#${ignore}"`
+      );
+    }
     expect(rootPackageJson.scripts['lint:remark']).toContain(
       'remark --rc-path tooling/docs-lint/remark.config.mjs'
     );
@@ -84,6 +135,10 @@ describe('Markdown and MDX lint config', () => {
   it('documents the generated JP docs mirror in markdownlint ignores', async () => {
     const markdownlintIgnore = await readFile(markdownlintIgnoreUrl, 'utf8');
 
-    expect(markdownlintIgnore).toMatch(/^docs\/jp\/$/m);
+    for (const ignore of requiredMarkdownlintIgnores) {
+      expect(markdownlintIgnore).toMatch(
+        new RegExp(`^${escapeRegExp(ignore)}$`, 'm')
+      );
+    }
   });
 });

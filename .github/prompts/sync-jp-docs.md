@@ -1,3 +1,5 @@
+# Japanese docs sync prompt
+
 You are updating Japanese technical documentation files in this repository.
 
 Working style:

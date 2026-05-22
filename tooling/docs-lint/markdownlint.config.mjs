@@ -7,8 +7,15 @@ export default {
     MD040: false,
     MD025: { level: 2 },
   },
-  globs: ['*.md', 'docs/**/*.md'],
-  ignores: ['docs/jp/**'],
+  globs: ['**/*.md'],
+  ignores: [
+    'docs/jp/**',
+    'node_modules/**',
+    '**/node_modules/**',
+    '**/dist/**',
+    '**/.factory/**',
+    '**/.husky/_/**',
+  ],
   noBanner: true,
   noProgress: true,
 };
