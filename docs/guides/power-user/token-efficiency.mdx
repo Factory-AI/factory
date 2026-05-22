@@ -16,7 +16,7 @@ Token usage isn't just about cost—it's about feedback loop speed and context w
 
 Tokens are consumed in three main areas:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────┐
 │                    Token Consumption                      │
 ├────────────────┬────────────────┬────────────────────────┤
@@ -136,7 +136,7 @@ See [Available Models](/models) for current model multipliers.
 
 ### Task-Based Model Selection
 
-```
+```text
 Simple edit, formatting      → Haiku 4.5 (0.4×)
 Implement feature from spec  → GPT-5.3-Codex (0.7×)
 Debug complex issue          → Sonnet 4.5 (1.2×)
@@ -170,7 +170,7 @@ Higher reasoning = more "thinking" tokens but often fewer retries.
 Use [Specification Mode](/cli/user-guides/specification-mode) (`Shift+Tab` or `/spec`) to plan before implementing.
 
 **Without Spec Mode:**
-```
+```text
 Turn 1: Start implementing → wrong approach → wasted tokens
 Turn 2: Undo and try different approach → more tokens
 Turn 3: Finally get it right
@@ -178,7 +178,7 @@ Total: 3 turns of implementation tokens
 ```
 
 **With Spec Mode:**
-```
+```text
 Turn 1: Plan with exploration → correct approach identified
 Turn 2: Implement correctly
 Total: 1 turn of planning + 1 turn of implementation
@@ -196,14 +196,14 @@ Total: 1 turn of planning + 1 turn of implementation
 
 Without IDE plugin, Droid must read files to understand context:
 
-```
+```text
 Read file A → Read file B → Read file C → Understand context → Work
 (4 tool calls before actual work)
 ```
 
 With IDE plugin, context is immediate:
 
-```
+```text
 Work (IDE provides open files, errors, selection)
 (0 extra tool calls for context)
 ```
@@ -211,13 +211,13 @@ Work (IDE provides open files, errors, selection)
 ### Pattern 3: Specific Over General
 
 **Expensive prompt:**
-```
+```text
 "Fix the bug in the auth module"
 ```
 → Droid reads multiple files to find the bug, explores different possibilities
 
 **Efficient prompt:**
-```
+```text
 "Fix the timeout bug in src/auth/session.ts line 45 where the session expires after 5 minutes instead of 24 hours"
 ```
 → Droid goes directly to the issue
@@ -225,7 +225,7 @@ Work (IDE provides open files, errors, selection)
 ### Pattern 4: Batch Similar Work
 
 **Expensive:**
-```
+```text
 Turn 1: "Add logging to userService"
 Turn 2: "Add logging to orderService"
 Turn 3: "Add logging to paymentService"
@@ -233,7 +233,7 @@ Turn 3: "Add logging to paymentService"
 ```
 
 **Efficient:**
-```
+```text
 Turn 1: "Add structured logging to all services in src/services/. Use the pattern from src/lib/logger.ts. Services: user, order, payment."
 (1 turn, pattern established once)
 ```
@@ -256,15 +256,15 @@ Turn 1: "Add structured logging to all services in src/services/. Use the patter
 
 Ask for specific output formats to reduce verbosity:
 
-```
+```text
 "Add the feature. Return only the changed code, no explanations unless something is unclear."
 ```
 
-```
+```text
 "Review this code. Format: bullet list of issues only, no preamble."
 ```
 
-```
+```text
 "Debug this test failure. Show me the fix, then explain in 2-3 sentences."
 ```
 
@@ -333,7 +333,7 @@ If you're significantly exceeding these ranges, review the waste patterns above.
 
 ## Summary: The Token-Efficient Workflow
 
-```
+```text
 1. Set up your project
    └─ AGENTS.md with commands
    └─ Fast tests

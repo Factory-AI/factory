@@ -98,7 +98,7 @@ For example, `/activity` without `group_by` returns `daily_active_users_by_clien
 
 Returns daily Factory Standard Credits consumption across your organization.
 
-```
+```text
 GET /tokens
 ```
 
@@ -141,7 +141,7 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 
 Returns daily tool invocations, MCP usage, skills, slash commands, and autonomy metrics.
 
-```
+```text
 GET /tools
 ```
 
@@ -262,7 +262,7 @@ When `group_by=tool_name`, returns one row per tool per day inside `data`:
 
 Returns daily, weekly, and monthly active users along with session counts.
 
-```
+```text
 GET /activity
 ```
 
@@ -355,7 +355,7 @@ When `group_by=client`, returns one row per client type per day inside `data`:
 
 Returns daily file operations and git activity.
 
-```
+```text
 GET /productivity
 ```
 
@@ -414,7 +414,7 @@ GET /productivity
 
 Returns detailed metrics per user with cursor-based pagination.
 
-```
+```text
 GET /users
 ```
 
@@ -563,7 +563,7 @@ The API returns standard HTTP status codes:
 
 Analytics data flows through the following pipeline:
 
-```
+```text
 CLI/Daemon → OTEL Events → BigQuery (raw) → dbt models → API
 ```
 

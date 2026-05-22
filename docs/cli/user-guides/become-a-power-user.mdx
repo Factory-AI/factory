@@ -32,12 +32,12 @@ Make sure to install Factory IDE plugin for Droid. The Factory IDE plugin acts a
 - Your cursor position and recent edits
 
 **Without the plugin:**
-```
+```text
 "Fix 'Property user does not exist on type AuthContext' error in auth.ts"
 ```
 
 **With the plugin:**
-```
+```text
 "Fix error"
 ```
 
@@ -187,7 +187,7 @@ The TUI ships with shortcuts for nearly every common action. Learn a handful and
 
 Press `!` on an empty input to drop into bash mode. Anything you type runs in your shell, and the output stays in the transcript so Droid can see it on the next turn — no copy/paste required.
 
-```
+```text
 ! git status
 ! npm test -- --watch=false
 ```
@@ -213,7 +213,7 @@ Long-running work doesn't have to live in a single session. Use these commands t
 - `/fork` — branch the current session so you can explore an alternative without losing your place
 - `/compress` — compact the transcript when you start hitting context limits (also available as `/compact` or `/handoff`)
 
-```
+```text
 /fork
 /compress focus on the failing migration
 ```
@@ -224,7 +224,7 @@ Forking is especially powerful for "what if" experiments — branch, try the ris
 
 `/fast` flips the current model into its fast variant for snappier turns when you're iterating on small edits or exploration. Toggle it back with `/fast off`.
 
-```
+```text
 /fast
 ```
 
@@ -234,7 +234,7 @@ Forking is especially powerful for "what if" experiments — branch, try the ris
 
 `/btw` lets you ask a side question — Droid answers in a separate scroll buffer (`Ctrl+Y` to view) without polluting the main transcript or shifting focus from the task.
 
-```
+```text
 /context
 /btw what does the @decorator pattern in src/auth.ts do?
 ```
@@ -245,7 +245,7 @@ Together they keep the main session focused while still letting you research on 
 
 Save your most-used prompts as reusable shortcuts. `/commands` opens the manager where you can create, edit, and scope custom slash commands at the project or user level.
 
-```
+```text
 /commands
 ```
 
@@ -255,7 +255,7 @@ Define a `/ship` command that runs your release checklist, a `/triage` command t
 
 `/hooks` lets you register lifecycle scripts that fire before or after Droid runs tools — think pre-commit checks, audit logging, automatic formatters, or guardrails that reject risky shell commands.
 
-```
+```text
 /hooks
 ```
 
@@ -275,7 +275,7 @@ Once connected, Droid can read tickets, query databases, or invoke any other cap
 
 For work that spans many features or files, switch to Missions with `/missions`. Droid plans the work, spawns specialist worker agents, and validates each milestone — closing the gap between "agent in a chat" and "team of agents executing a plan."
 
-```
+```text
 /missions
 ```
 
@@ -285,7 +285,7 @@ Configure worker and validator models via `missionModelSettings` and run them he
 
 `/droids` manages your library of custom droids: subagents with their own system prompts, tool sets, and models. Use them to encapsulate expertise — a "frontend reviewer" droid, a "SQL migration writer" droid, a "release notes" droid — and invoke them from any session.
 
-```
+```text
 /droids
 ```
 
@@ -295,7 +295,7 @@ You can also generate a new droid from a natural-language description, then iter
 
 Make the TUI feel like home. `/themes` switches color schemes, `/statusline` configures a custom status bar, and the `completionSound`, `soundFocusMode`, and `subagentSounds` settings let you wire audio cues to important events (completion, awaiting input, subagent activity).
 
-```
+```text
 /themes
 /statusline
 ```

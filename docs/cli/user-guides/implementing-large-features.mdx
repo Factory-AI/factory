@@ -28,19 +28,19 @@ This approach is ideal for:
 
 **Massive refactors** - Touching 100+ files across your entire codebase
 
-```
+```text
 "Migrate from REST API to GraphQL across all frontend components"
 ```
 
 **Major component migrations** - Replacing core system dependencies
 
-```
+```text
 "Switch from Stripe to a new billing provider across the entire payment system"
 ```
 
 **Large feature implementations** - New functionality spanning 30+ files
 
-```
+```text
 "Add comprehensive user roles and permissions system to the existing application"
 ```
 
@@ -71,7 +71,7 @@ Start by using **Shift+Tab** to enter Specification Mode and create a comprehens
 
 **Example prompt:**
 
-```
+```text
 Create a detailed implementation plan for migrating our entire authentication system
 from Firebase Auth to Auth0. This affects user login, registration, session management,
 role-based access control, and integrations across 50+ components.
@@ -103,7 +103,7 @@ Begin each phase with a new droid session to maintain focus and clean context.
 
 **Example prompt for Phase 1:**
 
-```
+```text
 I'm implementing Phase 1 of the authentication migration plan documented in
 IMPLEMENTATION_PLAN.md.
 
@@ -118,7 +118,7 @@ document to mark Phase 1 as complete.
 
 For phases involving significant changes, use **Shift+Tab** to get detailed planning:
 
-```
+```text
 Following IMPLEMENTATION_PLAN.md, implement Phase 3: Update all login components
 to use the new Auth0 service while maintaining backward compatibility with
 the existing Firebase auth as fallback.
@@ -128,11 +128,11 @@ the existing Firebase auth as fallback.
 
 After each phase completion, ask Droid to commit your changes:
 
-```
+```text
 Commit all changes for Phase 1 of the auth migration with a detailed message.
 ```
 
-```
+```text
 Create a commit for the Auth0 service setup work with bullet points for each major change.
 ```
 
@@ -142,11 +142,11 @@ Droid will stage all changes and create the commit with proper co-authorship att
 
 Ask Droid to create pull requests for each completed phase:
 
-```
+```text
 Create a PR for the auth migration Phase 1 work on a new branch called auth-migration-phase-1.
 ```
 
-```
+```text
 Open a pull request with a comprehensive description of what was completed and testing done.
 ```
 
@@ -160,35 +160,35 @@ Don't wait until the end - validate functionality after each phase:
 
 **Phase 1 completion:**
 
-```
+```text
 Run the authentication tests and verify the Auth0 service works in isolation.
 Test user registration, login, and logout with the new service.
 ```
 
 **Phase 2 completion:**
 
-```
+```text
 Test the migration script with a subset of test users. Verify data integrity
 and that users can log in with both old and new systems.
 ```
 
 ### Use feature flags for gradual rollout
 
-```
+```text
 Add a feature flag for auth0-migration with 10% rollout that can be controlled by environment variable.
 ```
 
-```
+```text
 Implement progressive rollout logic using feature flags to gradually migrate users from Firebase to Auth0.
 ```
 
 ### Automated testing at phase boundaries
 
-```
+```text
 Run the full test suite after each phase including unit, integration, and e2e tests.
 ```
 
-```
+```text
 Set up automated testing that validates auth migration functionality at each phase boundary.
 ```
 

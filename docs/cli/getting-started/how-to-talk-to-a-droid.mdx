@@ -20,27 +20,27 @@ Droid works best with clear, specific instructions. Like pairing with a skilled 
 
 The best prompts are direct and include relevant details:
 
-```
+```text
 Add comprehensive error handling to the payment processor in src/payments/processor.ts.
 Catch gateway timeouts and retry up to 3 times with exponential backoff.
 Similar retry logic exists in src/notifications/sender.ts.
 Run the payment integration tests to verify it works.
 ```
 
-```
+```text
 Run the build and fix all TypeScript errors. Focus on the auth module first.
 ```
 
-```
+```text
 Review my uncommitted changes with git diff and suggest improvements before I commit.
 ```
 
-```
+```text
 The login form allows empty submissions. Add client-side validation and return proper error messages.
 Check that localhost:3000/login shows validation errors when fields are empty.
 ```
 
-```
+```text
 Refactor the database connection logic into a separate module but don't change any query interfaces.
 ```
 
@@ -56,18 +56,18 @@ Notice these examples:
 
 For complex features, use [Specification Mode](/cli/user-guides/specification-mode) which automatically provides planning and review before implementation:
 
-```
+```text
 Add user preferences API with key-value storage following REST conventions.
 Include validation and comprehensive tests.
 ```
 
 For straightforward tasks, droid can proceed directly while still showing you changes for approval:
 
-```
+```text
 Fix the failing test in tests/auth.test.ts line 42
 ```
 
-```
+```text
 Add logging to the startup sequence with appropriate log levels.
 ```
 
@@ -85,17 +85,17 @@ Add logging to the startup sequence with appropriate log levels.
 
 **Understanding code:**
 
-```
+```text
 Explain how user authentication flows through this system.
 ```
 
-```
+```text
 What are the main components in the frontend and how do they interact?
 ```
 
 **Implementing features:**
 
-```
+```text
 Add a PATCH /users/:id endpoint with email uniqueness validation.
 Update the OpenAPI spec and add integration tests.
 Similar patterns exist in src/routes/users/get.ts.
@@ -103,20 +103,20 @@ Similar patterns exist in src/routes/users/get.ts.
 
 **Fixing bugs:**
 
-```
+```text
 Users report file uploads fail randomly. Error in browser console: "Network timeout".
 Upload logic is in src/upload/handler.ts. Check for timeout handling.
 ```
 
 **Code review:**
 
-```
+```text
 Look at git diff and review these changes for security issues and maintainability.
 ```
 
 **Refactoring:**
 
-```
+```text
 Extract the email sending logic into a separate service class.
 Keep the same interfaces but make it testable in isolation.
 ```
@@ -125,7 +125,7 @@ Keep the same interfaces but make it testable in isolation.
 
 Reference your team's tools by pasting links to tickets or documents:
 
-```
+```text
 Implement the feature described in this Jira ticket: https://company.atlassian.net/browse/PROJ-123
 Follow our security standards from the compliance docs.
 ```
@@ -134,7 +134,7 @@ If you've integrated these platforms in Factory's dashboard, droid can automatic
 
 For security-sensitive work:
 
-```
+```text
 Add file upload functionality with proper validation to prevent directory traversal attacks.
 Follow the security patterns used in our document upload feature.
 ```
@@ -145,13 +145,13 @@ Start new conversations when context gets cluttered or when switching to unrelat
 
 For large projects, break work into phases:
 
-```
+```text
 First implement the database schema changes. Don't add the API endpoints yet.
 ```
 
 Then in a follow-up:
 
-```
+```text
 Now add the REST endpoints using the new schema. Include validation and error handling.
 ```
 
@@ -159,14 +159,14 @@ Now add the REST endpoints using the new schema. Include validation and error ha
 
 **Test-driven development:**
 
-```
+```text
 Write comprehensive tests for the user registration flow first.
 Don't implement the actual registration logic yet.
 ```
 
 **Plan-driven development:**
 
-```
+```text
 Create a markdown file outlining the plan for updating both backend API and React components.
 Include the shared data structure and implementation order.
 Then implement each part following the documented plan.
@@ -176,27 +176,27 @@ Then implement each part following the documented plan.
 
 Here are real examples that work well:
 
-```
+```text
 Run git blame on the file I have open and figure out who added the rate limiting logic.
 ```
 
-```
+```text
 Look at git diff staged and remove any debug statements before I commit.
 ```
 
-```
+```text
 Convert these 5 React components to use TypeScript. Use proper interfaces for props.
 ```
 
-```
+```text
 Find the commit that introduced the caching mechanism and explain how it works.
 ```
 
-```
+```text
 Add input validation to all the forms in the admin panel. Return 400 with clear error messages.
 ```
 
-```
+```text
 Check the production logs for any errors in the last hour and suggest fixes for the most common ones.
 ```
 
