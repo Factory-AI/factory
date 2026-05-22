@@ -3,7 +3,6 @@ import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import ts from 'typescript';
-import { visit } from 'unist-util-visit';
 
 import { renderVarsMdx, type DocsVars } from '../src/render';
 import { VarsSchema } from '../src/schema';
@@ -24,7 +23,17 @@ type MdxNode = {
   value?: unknown;
   name?: string;
   children?: MdxNode[];
+  attributes?: MdxNode[];
+  url?: unknown;
+  title?: unknown;
+  alt?: unknown;
   position?: Position;
+};
+
+type StringSurface = {
+  node: MdxNode;
+  ancestors: MdxNode[];
+  value: string;
 };
 
 type FindingKind =
@@ -79,14 +88,19 @@ const inconsistencyRules = [
 ];
 const legalContextPattern =
   /\b(copyright|all rights reserved|legal|liability|liable|warranty|warranties|damages|terms|privacy)\b|©/i;
-const skippedTextAncestorTypes = new Set([
-  'code',
-  'inlineCode',
-  'definition',
-  'image',
-  'link',
-  'mdxJsxFlowElement',
-  'mdxJsxTextElement',
+const skippedTextAncestorTypes = new Set(['code', 'inlineCode']);
+const markdownStringPropertiesByNodeType: Record<string, string[]> = {
+  definition: ['url', 'title'],
+  image: ['url', 'title', 'alt'],
+  imageReference: ['alt'],
+  link: ['url', 'title'],
+  linkReference: ['url', 'title'],
+};
+const expressionNodeTypes = new Set([
+  'mdxFlowExpression',
+  'mdxTextExpression',
+  'mdxJsxExpressionAttribute',
+  'mdxJsxAttributeValueExpression',
 ]);
 
 const toRepoRelativePath = (filePath: string): string =>
@@ -323,6 +337,42 @@ const pointForNodeValueIndex = (
   };
 };
 
+const pointForNodeStringValueIndex = (
+  node: MdxNode,
+  content: string,
+  value: string,
+  valueIndex: number
+): Point => {
+  const startOffset = node.position?.start.offset;
+  const endOffset = node.position?.end.offset;
+
+  if (typeof startOffset === 'number' && typeof endOffset === 'number') {
+    const sourceSlice = content.slice(startOffset, endOffset);
+    const sourceValueIndex = sourceSlice.indexOf(value);
+
+    if (sourceValueIndex !== -1) {
+      return pointFromOffset(
+        content,
+        startOffset + sourceValueIndex + valueIndex
+      );
+    }
+  }
+
+  return pointForNodeValueIndex(node, content, valueIndex);
+};
+
+const pointForStringSurfaceIndex = (
+  surface: StringSurface,
+  content: string,
+  valueIndex: number
+): Point =>
+  pointForNodeStringValueIndex(
+    surface.node,
+    content,
+    surface.value,
+    valueIndex
+  );
+
 const createFinding = (
   kind: FindingKind,
   filePath: string,
@@ -391,27 +441,26 @@ const validateExpressionRefs = (
 ): Finding[] => {
   const findings: Finding[] = [];
 
-  visit(tree, (node: MdxNode) => {
-    if (
-      node.type !== 'mdxFlowExpression' &&
-      node.type !== 'mdxTextExpression' &&
-      node.type !== 'mdxJsxAttributeValueExpression'
-    ) {
+  walkNodes(tree, [], (node) => {
+    if (!expressionNodeTypes.has(node.type) || typeof node.value !== 'string') {
       return;
     }
 
-    if (typeof node.value !== 'string') {
-      return;
-    }
+    const nodeValue = node.value;
 
-    for (const match of node.value.matchAll(varReferencePattern)) {
+    for (const match of nodeValue.matchAll(varReferencePattern)) {
       const varPath = match[0];
 
       if (metadata.validPaths.has(varPath)) {
         continue;
       }
 
-      const point = pointForNodeValueIndex(node, content, match.index ?? 0);
+      const point = pointForNodeStringValueIndex(
+        node,
+        content,
+        nodeValue,
+        match.index ?? 0
+      );
       const suggestion = suggestNearestPath(varPath, metadata.validPaths);
 
       findings.push(
@@ -433,6 +482,11 @@ const hasSkippedAncestor = (ancestors: MdxNode[]): boolean =>
     ancestor.type ? skippedTextAncestorTypes.has(ancestor.type) : false
   );
 
+const isMdxNode = (value: unknown): value is MdxNode =>
+  typeof value === 'object' &&
+  value !== null &&
+  typeof (value as { type?: unknown }).type === 'string';
+
 const walkNodes = (
   node: MdxNode,
   ancestors: MdxNode[],
@@ -440,12 +494,22 @@ const walkNodes = (
 ): void => {
   visitor(node, ancestors);
 
-  if (!Array.isArray(node.children)) {
-    return;
+  const childAncestors = [...ancestors, node];
+
+  if (Array.isArray(node.attributes)) {
+    for (const attribute of node.attributes) {
+      walkNodes(attribute, childAncestors, visitor);
+    }
   }
 
-  for (const child of node.children) {
-    walkNodes(child, [...ancestors, node], visitor);
+  if (isMdxNode(node.value)) {
+    walkNodes(node.value, childAncestors, visitor);
+  }
+
+  if (Array.isArray(node.children)) {
+    for (const child of node.children) {
+      walkNodes(child, childAncestors, visitor);
+    }
   }
 };
 
@@ -485,7 +549,71 @@ const isPreMigrationDriftContext = (
     return true;
   }
 
+  if (
+    literal === 'https://factory.ai' &&
+    relativePath ===
+      'docs/guides/power-user/evaluating-context-compression.mdx' &&
+    /\/news\/evaluating-compression\b/i.test(nodeValue)
+  ) {
+    return true;
+  }
+
   return false;
+};
+
+const collectStringSurfaces = (tree: MdxNode): StringSurface[] => {
+  const surfaces: StringSurface[] = [];
+
+  walkNodes(tree, [], (node, ancestors) => {
+    if (
+      node.type === 'text' &&
+      typeof node.value === 'string' &&
+      !hasSkippedAncestor(ancestors)
+    ) {
+      surfaces.push({
+        node,
+        ancestors,
+        value: node.value,
+      });
+    }
+
+    const markdownStringProperties =
+      markdownStringPropertiesByNodeType[node.type] ?? [];
+
+    for (const property of markdownStringProperties) {
+      const propertyValue = (node as Record<string, unknown>)[property];
+
+      if (typeof propertyValue === 'string' && propertyValue.length > 0) {
+        surfaces.push({
+          node,
+          ancestors,
+          value: propertyValue,
+        });
+      }
+    }
+
+    if (node.type === 'mdxJsxAttribute' && typeof node.value === 'string') {
+      surfaces.push({
+        node,
+        ancestors,
+        value: node.value,
+      });
+    }
+
+    if (
+      (node.type === 'mdxJsxAttributeValueExpression' ||
+        node.type === 'mdxJsxExpressionAttribute') &&
+      typeof node.value === 'string'
+    ) {
+      surfaces.push({
+        node,
+        ancestors,
+        value: node.value,
+      });
+    }
+  });
+
+  return surfaces;
 };
 
 const detectDrift = (
@@ -497,26 +625,18 @@ const detectDrift = (
   const findings: Finding[] = [];
   const relativePath = toRepoRelativePath(filePath);
 
-  walkNodes(tree, [], (node, ancestors) => {
-    if (node.type !== 'text' || typeof node.value !== 'string') {
-      return;
-    }
-
-    if (hasSkippedAncestor(ancestors)) {
-      return;
-    }
-
+  for (const surface of collectStringSurfaces(tree)) {
     const coveredRanges: Array<{ start: number; end: number }> = [];
 
     for (const rule of driftRules) {
-      let searchIndex = node.value.indexOf(rule.literal);
+      let searchIndex = surface.value.indexOf(rule.literal);
 
       while (searchIndex !== -1) {
         const endIndex = searchIndex + rule.literal.length;
 
         if (
           !isRangeCovered(coveredRanges, searchIndex, endIndex) &&
-          !isPreMigrationDriftContext(relativePath, rule.literal, node.value)
+          !isPreMigrationDriftContext(relativePath, rule.literal, surface.value)
         ) {
           coveredRanges.push({ start: searchIndex, end: endIndex });
 
@@ -524,28 +644,27 @@ const detectDrift = (
             createFinding(
               'drift',
               filePath,
-              pointForNodeValueIndex(node, content, searchIndex),
+              pointForStringSurfaceIndex(surface, content, searchIndex),
               `Raw value "${rule.literal}" should use ${rule.varPath}.`
             )
           );
         }
 
-        searchIndex = node.value.indexOf(rule.literal, searchIndex + 1);
+        searchIndex = surface.value.indexOf(rule.literal, searchIndex + 1);
       }
     }
-  });
+  }
 
   return findings;
 };
 
-const isLegalContext = (node: MdxNode, ancestors: MdxNode[]): boolean => {
-  const nodeValue = typeof node.value === 'string' ? node.value : '';
-  const ancestorNames = ancestors
+const isLegalContext = (surface: StringSurface): boolean => {
+  const ancestorNames = [...surface.ancestors, surface.node]
     .map((ancestor) => ancestor.name)
     .filter((name): name is string => Boolean(name))
     .join(' ');
 
-  return legalContextPattern.test(`${nodeValue} ${ancestorNames}`);
+  return legalContextPattern.test(`${surface.value} ${ancestorNames}`);
 };
 
 const detectInconsistencies = (
@@ -555,20 +674,12 @@ const detectInconsistencies = (
 ): Finding[] => {
   const findings: Finding[] = [];
 
-  walkNodes(tree, [], (node, ancestors) => {
-    if (node.type !== 'text' || typeof node.value !== 'string') {
-      return;
-    }
-
-    if (hasSkippedAncestor(ancestors)) {
-      return;
-    }
-
+  for (const surface of collectStringSurfaces(tree)) {
     for (const rule of inconsistencyRules) {
-      for (const match of node.value.matchAll(rule.pattern)) {
+      for (const match of surface.value.matchAll(rule.pattern)) {
         const matchedText = match[0];
 
-        if (matchedText === 'Factory AI' && isLegalContext(node, ancestors)) {
+        if (matchedText === 'Factory AI' && isLegalContext(surface)) {
           continue;
         }
 
@@ -576,13 +687,13 @@ const detectInconsistencies = (
           createFinding(
             'inconsistency',
             filePath,
-            pointForNodeValueIndex(node, content, match.index ?? 0),
+            pointForStringSurfaceIndex(surface, content, match.index ?? 0),
             `Found "${matchedText}" outside an allowed context; canonical form: ${rule.canonical}.`
           )
         );
       }
     }
-  });
+  }
 
   return findings;
 };
