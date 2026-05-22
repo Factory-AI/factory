@@ -41,6 +41,31 @@ droid
 - [VS Code Extension](https://marketplace.visualstudio.com/items?itemName=Factory.factory-vscode-extension)
 - ACP support for [JetBrains IDEs](https://docs.factory.ai/integrations/jetbrains) and [Zed](https://docs.factory.ai/integrations/zed)
 
+## Internal Contributor Setup
+
+Use this flow from a clean shell for a fresh local docs workspace. Required prerequisites are Git, `fnm` initialized in your shell, `pnpm` 11, and Google Chrome for the automatic dev-server open. An `nvm` setup is also fine if it honors `.nvmrc`; use `nvm install && nvm use` in place of the `fnm` commands.
+
+```sh
+git clone https://github.com/Factory-AI/factory.git factory-docs-as-code
+cd factory-docs-as-code
+eval "$(fnm env --use-on-cd)"
+fnm install
+fnm use
+pnpm install
+nohup pnpm dev > /tmp/factory-docs-mintlify.log 2>&1 &
+echo $! > /tmp/factory-docs-mintlify.pid
+for i in $(seq 1 60); do
+  curl -fsS http://localhost:3333/ >/dev/null && break
+  sleep 1
+done
+curl -fsS http://localhost:3333/ >/dev/null
+pnpm test
+pnpm lint
+pnpm typecheck
+```
+
+After this block finishes, Mintlify should still be running at <http://localhost:3333> and available in your browser. Stop it when you are done by terminating the PID saved in `/tmp/factory-docs-mintlify.pid`.
+
 ## Quick Links
 
 - [Factory Website](https://factory.ai)
