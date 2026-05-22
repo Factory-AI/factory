@@ -4,6 +4,8 @@ description: Use /install-wiki to set up a CI action that regenerates a Wiki on 
 keywords: ['autowiki', 'wiki', '/install-wiki', 'auto-refresh', 'github actions', 'gitlab ci', 'ci', 'recurring', 'workflow', 'automation']
 ---
 
+import { vars, ProductName } from '/snippets/vars.mdx';
+
 The `/install-wiki` command creates a CI workflow that automatically regenerates a Wiki every time code is pushed to the default branch. It detects your CI framework -- GitHub Actions or GitLab CI -- and generates the appropriate configuration. This keeps your documentation in sync with your codebase without manual intervention.
 
 ## Quick start
@@ -26,7 +28,7 @@ The `/install-wiki` command creates a CI workflow that automatically regenerates
     - **GitHub**: Repository **Settings > Secrets and variables > Actions** (or at the organization level under **Organization Settings > Secrets and variables > Actions**)
     - **GitLab**: Repository **Settings > CI/CD > Variables** (or at the group level under **Group Settings > CI/CD > Variables**)
 
-    Generate a key at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys).
+    Generate a key in the <a href={`${vars.urls.app}/settings/api-keys`}>Factory API keys settings</a>.
   </Step>
   <Step title="Merge the PR">
     Once the secret is configured, merge the workflow PR. The Wiki will now
@@ -96,23 +98,23 @@ Both workflows:
 ## Prerequisites
 
 - A GitHub or GitLab hosted repository
-- A Factory API key -- generate one at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)
+- A <ProductName variant="factory" /> API key -- generate one in the <a href={`${vars.urls.app}/settings/api-keys`}>Factory API keys settings</a>
 - Permission to add secrets and merge PRs in the target repository
 
 ## Refreshing from the Factory App
 
-You can also set up recurring refreshes from the Factory App:
+You can also set up recurring refreshes from the <ProductName variant="factoryApp" />:
 
-1. Go to [app.factory.ai/wiki](https://app.factory.ai/wiki)
+1. Go to <a href={`${vars.urls.app}/wiki`}>app.factory.ai/wiki</a>
 2. Click **Refresh** on the Wiki page
 3. Select **Recurring (on push)**
 4. Choose a **Local** or **Cloud** method:
    - **Local** -- Copies the `/install-wiki` command for you to run in a local clone
    - **Cloud** -- Selects a cloud template or Droid Computer to run the setup remotely
 
-For batch operations across multiple repositories, the Factory App lets you select several repos and run the setup on a Droid Computer in a single operation.
+For batch operations across multiple repositories, the <ProductName variant="factoryApp" /> lets you select several repos and run the setup on a Droid Computer in a single operation.
 
-See [AutoWiki in the Factory App](/cli/features/wiki/web-viewer) for more on the Factory App interface.
+See [AutoWiki in the Factory App](/cli/features/wiki/web-viewer) for more on the <ProductName variant="factoryApp" /> interface.
 
 ## Troubleshooting
 
@@ -120,7 +122,7 @@ See [AutoWiki in the Factory App](/cli/features/wiki/web-viewer) for more on the
   <Accordion title="Workflow fails with authentication error">
     Verify the `FACTORY_API_KEY` secret is set correctly in your repository's
     **Settings > Secrets and variables > Actions**. Generate a new key at
-    [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)
+    <a href={`${vars.urls.app}/settings/api-keys`}>Factory API keys settings</a>
     if needed.
   </Accordion>
 

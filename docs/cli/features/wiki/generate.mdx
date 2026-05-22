@@ -4,6 +4,8 @@ description: Use the /wiki command to generate a comprehensive Wiki with AutoWik
 keywords: ['autowiki', 'wiki', '/wiki', 'generate', 'documentation', 'codebase docs', 'slash command', 'upload', 'github wiki sync']
 ---
 
+import { vars } from '/snippets/vars.mdx';
+
 The `/wiki` command analyzes your repository and generates a structured Wiki covering architecture, modules, APIs, and conventions. Cloud Sync stores the Wiki in the Factory App, and AutoWiki can optionally sync it to GitHub Wiki.
 
 ## Quick start
@@ -30,7 +32,7 @@ The `/wiki` command analyzes your repository and generates a structured Wiki cov
     Wiki uploaded successfully: https://app.factory.ai/wiki/{wikiRunId}
     ```
     Open the link to browse your documentation, or visit
-    [app.factory.ai/wiki](https://app.factory.ai/wiki) to see all your Wikis.
+    <a href={`${vars.urls.app}/wiki`}>app.factory.ai/wiki</a> to see all your Wikis.
   </Step>
 </Steps>
 

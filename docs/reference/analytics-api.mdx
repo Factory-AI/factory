@@ -13,7 +13,9 @@ keywords:
   ]
 ---
 
-The Analytics API provides programmatic access to organization-level usage data for Factory. Query Factory Standard Credits consumption, tool invocations, user activity, and productivity metrics across your entire organization.
+import { vars, ProductName, SupportLink } from '/snippets/vars.mdx';
+
+The Analytics API provides programmatic access to organization-level usage data for <ProductName variant="factory" />. Query <ProductName variant="factory" /> Standard Credits consumption, tool invocations, user activity, and productivity metrics across your entire organization.
 
 ---
 
@@ -28,13 +30,13 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 
 ## Authentication
 
-All requests require a Factory API key in the `Authorization` header:
+All requests require a <ProductName variant="factory" /> API key in the `Authorization` header:
 
 ```bash
 Authorization: Bearer fk-your-api-key
 ```
 
-Generate API keys at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys).
+Generate API keys in the <a href={`${vars.urls.app}/settings/api-keys`}>Factory API keys settings</a>.
 
 ### Permissions
 
@@ -44,9 +46,7 @@ Only users with **Manager** or **Owner** roles can access the Analytics API. Mem
 
 ## Base URL
 
-```
-https://api.factory.ai/api/v1/analytics
-```
+<code>{vars.urls.api}/api/v1/analytics</code>
 
 ---
 
@@ -531,7 +531,7 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 
 ### Rate Limits
 
-Rate limits vary by plan. [Contact us](mailto:support@factory.ai) for specifics or if you need higher limits for dashboard or automation use cases.
+Rate limits vary by plan. <SupportLink>Contact us</SupportLink> for specifics or if you need higher limits for dashboard or automation use cases.
 
 ---
 

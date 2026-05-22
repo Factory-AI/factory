@@ -3,6 +3,8 @@ title: "Deploy Droid on a VPS Server"
 description: "Learn how to set up droid on a VPS for remote access and headless automation"
 ---
 
+import { vars, InstallCommand, ProductName, DiscordInvite } from '/snippets/vars.mdx';
+
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://youtube.com/embed/a3tqhTdSugg"
@@ -25,7 +27,7 @@ description: "Learn how to set up droid on a VPS for remote access and headless 
 Before starting, you'll need:
 
 - **The Droid CLI is installed locally** - Follow the [installation guide](/cli/getting-started/quickstart)
-- **Factory account** - Sign up at [factory.ai](https://factory.ai)
+- **Factory account** - Sign up at <a href={vars.urls.factory}>factory.ai</a>
 - **VPS provider account** - This tutorial uses [Hetzner](https://www.hetzner.com/), but works with any VPS provider (DigitalOcean, Linode, AWS EC2, etc.)
 - **Basic terminal familiarity** - You'll be running commands in your local terminal and on the server
 
@@ -112,10 +114,13 @@ Host example
 ```bash
 # In a new terminal window, connect to your VPS
 ssh example
+```
 
-# Install the Droid CLI on the VPS
-curl -fsSL https://app.factory.ai/cli | sh
+Install the <ProductName variant="droidCli" /> on the VPS:
 
+<InstallCommand platform="macos" />
+
+```bash
 # Activate the installation
 source ~/.bashrc  # or source ~/.zshrc if using zsh
 
@@ -267,7 +272,7 @@ Now that you have droid running on your VPS:
 1. **Explore automation**: Start with simple `droid exec` commands and build up to custom scripts
 2. **Set up monitoring**: Use droid to help configure system monitoring and alerting
 3. **Create scheduled tasks**: Combine droid exec with cron jobs for recurring automation
-4. **Join the community**: Share your use cases and learn from others in the [Factory Discord](https://discord.gg/zuudFXxg69)
+4. **Join the community**: Share your use cases and learn from others in the <DiscordInvite>Factory Discord</DiscordInvite>
 
 For more information:
 - [Droid CLI documentation](/cli/getting-started/overview)

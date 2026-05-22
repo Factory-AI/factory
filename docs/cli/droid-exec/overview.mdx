@@ -4,6 +4,8 @@ description: Non-interactive execution mode for CI/CD pipelines and automation s
 keywords: ['droid exec', 'headless', 'ci/cd', 'automation', 'pipeline', 'github actions', 'scripts', 'batch', 'non-interactive']
 ---
 
+import { vars, InstallCommand, GithubRepo } from '/snippets/vars.mdx';
+
 Droid Exec is Factory's headless execution mode designed for automation workflows. Unlike the interactive CLI, `droid exec` runs as a one-shot command that completes a task and exits, making it ideal for CI/CD pipelines, shell scripts, and batch processing.
 
 <Tip>
@@ -87,19 +89,17 @@ Use any [available model ID](/models) with `--model` or `--spec-model`. For cust
 
 <Steps>
   <Step title="Install the Droid CLI">
-    <CodeGroup>
-    ```bash macOS/Linux
-    curl -fsSL https://app.factory.ai/cli | sh
-    ```
+    **macOS/Linux**
 
-    ```powershell Windows
-    irm https://app.factory.ai/cli/windows | iex
-    ```
-    </CodeGroup>
+    <InstallCommand platform="macos" />
+
+    **Windows**
+
+    <InstallCommand platform="windows" />
   </Step>
 
   <Step title="Get Factory API Key">
-    Generate your API key from the [Factory Settings Page](https://app.factory.ai/settings/api-keys)
+    Generate your API key from the <a href={`${vars.urls.app}/settings/api-keys`}>Factory Settings Page</a>
   </Step>
 
   <Step title="Set Environment Variable">
@@ -291,12 +291,12 @@ You can build on top of raw stdin/stdout to create custom interaction flows such
 - Policy layers that approve, deny, transform, or audit tool permission requests
 - Bridges from Droid events into your own protocol, message bus, telemetry, or storage layer
 
-For protocol reference and implementation patterns, see the low-level client and process transport in the [TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript).
+For protocol reference and implementation patterns, see the low-level client and process transport in the <GithubRepo repo="sdkTs">TypeScript SDK</GithubRepo>.
 
 Prefer an SDK when possible:
 
-- **TypeScript**: [`@factory/droid-sdk`](https://github.com/Factory-AI/droid-sdk-typescript) for Node.js apps, streaming, multi-turn sessions, structured output, permissions, tool controls, and SDK-backed MCP tools
-- **Python**: [`droid-sdk`](https://github.com/Factory-AI/droid-sdk-python) for asyncio apps, streaming, direct client control, notifications, permissions, and typed event handling
+- **TypeScript**: <GithubRepo repo="sdkTs">`@factory/droid-sdk`</GithubRepo> for Node.js apps, streaming, multi-turn sessions, structured output, permissions, tool controls, and SDK-backed MCP tools
+- **Python**: <GithubRepo repo="sdkPy">`droid-sdk`</GithubRepo> for asyncio apps, streaming, direct client control, notifications, permissions, and typed event handling
 
 For automated pipelines, you can also direct the agent to write specific artifacts:
 

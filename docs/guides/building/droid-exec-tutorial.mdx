@@ -3,6 +3,8 @@ title: "Building Interactive Apps with Droid Exec"
 description: "Learn how to build a chat with X feature using Droid Exec"
 ---
 
+import { InstallCommand, ProductName, DiscordInvite } from '/snippets/vars.mdx';
+
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://youtube.com/embed/pd8fWTwJylw"
@@ -28,7 +30,7 @@ description: "Learn how to build a chat with X feature using Droid Exec"
 
 ### Requirements
 - Bun (the example uses Bun, but Node.js works too)
-- The Droid CLI on your PATH (`droid`)
+- The <ProductName variant="droidCli" /> on your PATH (`droid`)
 - A local repository to chat with
 
 ### Installation
@@ -36,10 +38,13 @@ description: "Learn how to build a chat with X feature using Droid Exec"
 ```bash
 # Install Bun
 curl -fsSL https://bun.sh/install | bash
+```
 
-# Install the Droid CLI
-curl -fsSL https://app.factory.ai/cli | sh
+Install the <ProductName variant="droidCli" />:
 
+<InstallCommand platform="macos" />
+
+```bash
 # Sign in to Factory (one-time browser auth)
 droid
 ```
@@ -410,7 +415,7 @@ This creates a transparent, trust-building experience where users see exactly wh
 - [Model Configuration](/reference/cli-reference) - Available models and settings
 
 **Community:**
-- [Factory Discord](https://discord.gg/zuudFXxg69) - Get help from the team
+- <DiscordInvite>Factory Discord</DiscordInvite> - Get help from the team
 - [GitHub Discussions](https://github.com/factory-ai/factory/discussions) - Share your builds
 
 ---

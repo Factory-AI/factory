@@ -18,6 +18,8 @@ keywords:
   ]
 ---
 
+import { vars, ProductName, InstallCommand } from '/snippets/vars.mdx';
+
 ## Setup
 
 In any JetBrains IDE (2025.3+) with JetBrains AI (make sure to update to the latest version):
@@ -37,20 +39,18 @@ If you prefer to manually configure Droid inside JetBrains, you can follow the i
 1. **Install the Droid CLI (supported on all operating systems except Windows ARM machines)**
    - Install via:
 
-     ```bash
-     curl -fsSL https://app.factory.ai/cli | sh
-     ```
+     <InstallCommand platform="macos" />
 
    - Ensure the `droid` binary is on your PATH (or note its full path).
 
 2. **(Optional) Factory API key** - instead of using the login flow, you can set up an API key:
-   - Sign up at https://app.factory.ai.
+   - Sign up in the <a href={vars.urls.app}>Factory App</a>.
    - Add a payment method if prompted.
-   - Create an API key at https://app.factory.ai/settings/api-keys.
+   - Create an API key in the <a href={`${vars.urls.app}/settings/api-keys`}>Factory API keys settings</a>.
    - Set the `FACTORY_API_KEY` environment variable in your shell (for example, add `export FACTORY_API_KEY=your_key_here` to your shell profile).
 
 <Note>
-  You cannot sign up for Factory or manage billing entirely inside JetBrains.
+  You cannot sign up for <ProductName variant="factory" /> or manage billing entirely inside JetBrains.
   Account creation and API key management always happen in the web app.
 </Note>
 
@@ -81,7 +81,7 @@ If you prefer to use an API key instead of the login flow, add an `env` block:
       "command": "*path/to/droid/cli*",
       "args": ["exec", "--output-format", "acp"],
       "env": {
-        "FACTORY_API_KEY": "*your API key from https://app.factory.ai/settings/api-keys*"
+        "FACTORY_API_KEY": "*your Factory API key*"
       }
     }
   }

@@ -4,6 +4,8 @@ description: Run security-focused PR reviews and full-codebase audits with Droid
 keywords: ['security review', 'security audit', 'STRIDE', 'OWASP', 'OWASP LLM Top 10', 'supply chain', 'code review', 'droid action']
 ---
 
+import { GithubRepo } from '/snippets/vars.mdx';
+
 Droid security review is a dedicated security workflow for finding high-confidence vulnerabilities in pull requests or across an entire repository. It can run locally from the CLI or automatically in GitHub Actions.
 
 <CardGroup cols={2}>
@@ -57,7 +59,7 @@ Local security review can audit the full codebase, not just the current diff. Dr
 
 ## Run on pull requests
 
-With [Droid Action](https://github.com/Factory-AI/droid-action), comment on a pull request to trigger an on-demand security review:
+With <GithubRepo repo="action">Droid Action</GithubRepo>, comment on a pull request to trigger an on-demand security review:
 
 ```text
 @droid security

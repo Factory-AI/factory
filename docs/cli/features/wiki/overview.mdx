@@ -5,6 +5,8 @@ description: AutoWiki keeps repository Wikis up to date in the Factory App and G
 keywords: ['autowiki', 'wiki', 'documentation', 'codebase', '/wiki', '/install-wiki', 'github wiki', 'auto-refresh', 'generate docs']
 ---
 
+import { vars, ProductName } from '/snippets/vars.mdx';
+
 AutoWiki generates comprehensive, structured Wikis for your repositories. It analyzes each codebase and produces browsable documentation with architecture overviews, module breakdowns, and cross-linked pages -- then keeps each Wiki current as your code changes.
 
 <CardGroup cols={3}>
@@ -29,7 +31,7 @@ AutoWiki generates comprehensive, structured Wikis for your repositories. It ana
   </Step>
   <Step title="Store in the Factory App">
     Cloud Sync stores the generated Wiki in the Factory App, where it becomes
-    browsable at [app.factory.ai/wiki](https://app.factory.ai/wiki). Each
+    browsable at <a href={`${vars.urls.app}/wiki`}>app.factory.ai/wiki</a>. Each
     sync is versioned so you can compare changes over time.
   </Step>
   <Step title="Sync to GitHub Wiki">
@@ -58,14 +60,14 @@ When AutoWiki generates a Wiki for a GitHub-hosted repository, Factory can optio
 
 ### AutoWiki Cloud Sync
 
-Organizations that need to prevent AutoWiki content from being stored in the Factory App can disable **AutoWiki Cloud Sync**. This is an org-level enterprise control available at [app.factory.ai](https://app.factory.ai) under **Settings > Enterprise Controls > AutoWiki**.
+Organizations that need to prevent AutoWiki content from being stored in the <ProductName variant="factoryApp" /> can disable **AutoWiki Cloud Sync**. This is an org-level enterprise control available in the <a href={vars.urls.app}>Factory App</a> under **Settings > Enterprise Controls > AutoWiki**.
 
 When AutoWiki Cloud Sync is **disabled**:
 
 - All AutoWiki API endpoints return 403 for your organization
-- The `/wiki` command will not store content in the Factory App
+- The `/wiki` command will not store content in the <ProductName variant="factoryApp" />
 - GitHub Wiki sync is also skipped from the Droid CLI
-- The AutoWiki page in the Factory App shows no content
+- The AutoWiki page in the <ProductName variant="factoryApp" /> shows no content
 
 AutoWiki Cloud Sync is **enabled by default**. Only org managers can toggle this setting.
 

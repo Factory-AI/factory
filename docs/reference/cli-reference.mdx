@@ -3,21 +3,19 @@ title: Droid CLI Reference
 description: Complete reference for the Droid CLI, including commands and flags
 ---
 
+import { vars, ProductName, InstallCommand } from '/snippets/vars.mdx';
+
 ## Installation
 
-<CodeGroup>
+**macOS/Linux**
 
-```bash macOS/Linux
-curl -fsSL https://app.factory.ai/cli | sh
-```
+<InstallCommand platform="macos" />
 
-```powershell Windows
-irm https://app.factory.ai/cli/windows | iex
-```
+**Windows**
 
-</CodeGroup>
+<InstallCommand platform="windows" />
 
-The Droid CLI operates in two modes:
+The <ProductName variant="droidCli" /> operates in two modes:
 
 - **Interactive (`droid`)** - Chat-first REPL with slash commands
 - **Non-interactive (`droid exec`)** - Single-shot execution for automation and scripting
@@ -352,7 +350,7 @@ See [MCP Configuration](/cli/configuration/mcp) for the full registry list, CLI 
 
 ## Authentication
 
-1. Generate an API key at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)
+1. Generate an API key in the <a href={`${vars.urls.app}/settings/api-keys`}>Factory API keys settings</a>
 2. Set the environment variable:
 
 <CodeGroup>
@@ -450,7 +448,7 @@ See [Git worktrees](#git-worktrees) for details.
 
 ## See also
 
-- [Quickstart guide](/cli/getting-started/quickstart) - Getting started with the Droid CLI
+- [Quickstart guide](/cli/getting-started/quickstart) - Getting started with the <ProductName variant="droidCli" />
 - [Interactive mode](/cli/getting-started/quickstart) - Shortcuts, input modes, and features
 - [Choosing your model](/cli/user-guides/choosing-your-model) - Model selection guidance
 - [Settings](/cli/configuration/settings) - Configuration options

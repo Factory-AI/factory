@@ -5,6 +5,8 @@ description: Terminal, browser, and desktop automation. Record demos, verify beh
 keywords: ['droid-control', 'automation', 'demo', 'verify', 'qa-test', 'terminal', 'browser', 'recording', 'video', 'showcase', 'tuistory', 'remotion', 'tctl', 'plugin']
 ---
 
+import { vars } from '/snippets/vars.mdx';
+
 Droid Control lets Droids *operate* software: launch apps, type commands, click buttons, record what happens, and produce polished video evidence of it. Built by Droids, for Droids.
 
 <Frame caption="This video was planned, recorded, and rendered entirely by a Droid.">
@@ -246,7 +248,7 @@ The plugin uses a composition architecture with three layers:
 
 Every workflow flows through **capture → compose → verify**. Commands declare *what* to produce; atoms own *how*. Skills chain through explicit handoffs rather than hardcoded pipelines, so the droid follows the flow naturally.
 
-<Card title="Architecture deep dive" href="https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/ARCHITECTURE.md" icon="sitemap">
+<Card title="Architecture deep dive" href={`${vars.urls.github.repo.plugins}/blob/master/plugins/droid-control/ARCHITECTURE.md`} icon="sitemap">
   Design rationale: UX for droids, waterfall routing, task delegation, and hybrid handoffs.
 </Card>
 
@@ -283,7 +285,7 @@ Only install what you need for your use case.
 ## See also
 
 <CardGroup cols={2}>
-  <Card title="Source code" href="https://github.com/Factory-AI/factory-plugins/tree/master/plugins/droid-control" icon="github">
+  <Card title="Source code" href={`${vars.urls.github.repo.plugins}/tree/master/plugins/droid-control`} icon="github">
     Full plugin source: skills, commands, scripts, and Remotion components.
   </Card>
   <Card title="Plugins" href="/cli/configuration/plugins" icon="puzzle-piece">
@@ -292,7 +294,7 @@ Only install what you need for your use case.
   <Card title="Automated QA skill" href="/guides/skills/automated-qa" icon="vial-circle-check">
     Deeper QA automation with CI integration, failure learning, and structured reports.
   </Card>
-  <Card title="README" href="https://github.com/Factory-AI/factory-plugins/blob/master/plugins/droid-control/README.md" icon="book-open">
+  <Card title="README" href={`${vars.urls.github.repo.plugins}/blob/master/plugins/droid-control/README.md`} icon="book-open">
     Quick start, command reference, and prerequisites.
   </Card>
 </CardGroup>
