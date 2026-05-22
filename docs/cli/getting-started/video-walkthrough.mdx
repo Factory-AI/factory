@@ -4,6 +4,10 @@ description: "A video tutorial covering installation, configuration, and all key
 keywords: ['video', 'tutorial', 'walkthrough', 'demo', 'guide', 'learn', 'watch', 'youtube']
 ---
 
+import { InstallCommand, ProductName } from '/snippets/vars.mdx';
+
+{/* cspell:ignore openrouter modelcontextprotocol */}
+
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://youtube.com/embed/aw0thMXwAMY"
@@ -15,19 +19,15 @@ keywords: ['video', 'tutorial', 'walkthrough', 'demo', 'guide', 'learn', 'watch'
 
 ## Installation & Setup
 
-Get started by installing the Droid CLI in your terminal of choice.
+Get started by installing the <ProductName variant="droidCli" /> in your terminal of choice.
 
-<CodeGroup>
+**macOS/Linux**
 
-```bash macOS/Linux
-curl -fsSL https://app.factory.ai/cli | sh
-```
+<InstallCommand platform="macos" />
 
-```powershell Windows
-irm https://app.factory.ai/cli/windows | iex
-```
+**Windows**
 
-</CodeGroup>
+<InstallCommand platform="windows" />
 
 Verify the installation:
 
@@ -35,7 +35,7 @@ Verify the installation:
 which droid
 ```
 
-Start the Droid CLI:
+Start the <ProductName variant="droidCli" />:
 
 ```bash
 cd /path/to/your/project

@@ -4,7 +4,9 @@ description: "Get productive with droid in 5 minutes using the interactive termi
 keywords: ['quickstart', 'tutorial', 'getting started', 'droid', 'cli', 'install droid', 'setup', 'first steps', 'beginner', 'start']
 ---
 
-This quickstart guide will have you collaborating with Factory's development agent in just a few minutes. You'll experience how droid understands your codebase, makes thoughtful changes, and integrates with your existing workflow.
+import { InstallCommand, ProductName } from '/snippets/vars.mdx';
+
+This quickstart guide will have you collaborating with <ProductName variant="factory" />'s development agent in just a few minutes. You'll experience how <ProductName variant="droid" /> understands your codebase, makes thoughtful changes, and integrates with your existing workflow.
 
 ## Before you begin
 
@@ -13,33 +15,29 @@ Make sure you have:
 - A terminal open in a code project
 - Git repository (recommended for full workflow demonstration)
 
-## Step 1: Install and start droid
+## Step 1: Install and start <ProductName variant="droid" />
 
-<CodeGroup>
+**macOS/Linux**
 
-```bash macOS/Linux
-curl -fsSL https://app.factory.ai/cli | sh
-```
+<InstallCommand platform="macos" />
 
-```bash Homebrew
-brew install --cask droid
-```
+**Homebrew**
 
-```powershell Windows
-irm https://app.factory.ai/cli/windows | iex
-```
+<InstallCommand platform="brew" />
 
-```bash npm
-npm install -g droid
-```
+**Windows**
 
-</CodeGroup>
+<InstallCommand platform="windows" />
+
+**npm**
+
+<InstallCommand platform="npm" />
 
 <Note>
   **Linux users:** Ensure `xdg-utils` is installed for proper functionality. Install with: `sudo apt-get install xdg-utils`
 </Note>
 
-Then navigate to your project and start the Droid CLI.
+Then navigate to your project and start the <ProductName variant="droidCli" />.
 
 <CodeGroup>
 ```bash
@@ -59,7 +57,7 @@ droid
   className="rounded-lg"
 />
 
-You'll see droid's welcome screen in a full-screen terminal interface. If prompted, sign in via your browser to connect to Factory's development agent.
+You'll see <ProductName variant="droid" />'s welcome screen in a full-screen terminal interface. If prompted, sign in via your browser to connect to <ProductName variant="factory" />'s development agent.
 
 ## Step 2: Explore your codebase
 
@@ -83,7 +81,7 @@ Let's start by having droid understand your project. Try one of these questions:
 
 ```
 
-Droid reads your files contextually and leverages organizational knowledge to provide comprehensive insights about your project structure and conventions.
+<ProductName variant="droid" /> reads your files contextually and leverages organizational knowledge to provide comprehensive insights about your project structure and conventions.
 
 ## Step 3: Make your first code change
 
@@ -95,7 +93,7 @@ Now let's see droid in action with a simple modification:
 
 ```
 
-Droid will:
+<ProductName variant="droid" /> will:
 
 1. Analyze your current logging setup
 2. Propose specific changes with a clear plan
@@ -126,7 +124,7 @@ If you've integrated these platforms through Factory's dashboard, droid can auto
 
 ## Step 5: Handle version control
 
-Droid makes Git operations conversational and intelligent:
+<ProductName variant="droid" /> makes Git operations conversational and intelligent:
 
 ```
 
@@ -210,13 +208,13 @@ Always review droid's proposed changes before approval. The transparent diff vie
 ## Pro tips for enterprise teams
 
 **Security-first approach:**
-Droid automatically considers security implications and will flag potential vulnerabilities during code generation.
+<ProductName variant="droid" /> automatically considers security implications and will flag potential vulnerabilities during code generation.
 
 **Compliance integration:**
 Connect your compliance tools through MCP to ensure all changes meet your organization's standards.
 
 **Team knowledge sharing:**
-Droid learns from your organization's patterns and can help maintain consistency across team members and projects.
+<ProductName variant="droid" /> learns from your organization's patterns and can help maintain consistency across team members and projects.
 
 ## What's next?
 
