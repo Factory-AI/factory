@@ -18,7 +18,7 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "vars:build": "pnpm --filter @factory/docs-vars build",
     "vars:check": "pnpm --filter @factory/docs-vars check",
-    "test:build": "node -e \"console.log('test:build scaffold: Mintlify build validation is wired in M4')\"",
+    "test:build": "cd docs && PATH=/opt/homebrew/opt/node@22/bin:$PATH mintlify validate && PATH=/opt/homebrew/opt/node@22/bin:$PATH mintlify broken-links",
     "prepare": "husky"
   },
   "devDependencies": {
