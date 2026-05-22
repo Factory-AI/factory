@@ -33,6 +33,26 @@ The **same schema** applies at every level. What changes is **precedence**.
 
 ---
 
+## System-managed settings file
+
+For deployments where org policy must be applied **before any user signs in** — managed laptops, CI runners that aren’t authenticated to Factory, airgapped or restricted‑network installs — IT/MDM administrators can drop a `settings.json` at a hardcoded, well‑known path on each machine:
+
+| OS           | Path                                                  |
+| ------------ | ----------------------------------------------------- |
+| macOS        | `/Library/Application Support/Factory/settings.json`  |
+| Linux & WSL  | `/etc/factory/settings.json`                          |
+| Windows      | `C:\Program Files\Factory\settings.json`              |
+
+The file uses the same [Settings JSON schema](#settings-json-schema) as the rest of this page.
+
+When this file is present it is the **authoritative source for org‑level settings** on that machine — it short‑circuits any API fetch or developer‑mode environment overrides for org settings. The `factoryTier` signal is still queried from the Factory API on a best‑effort basis (failures are non‑fatal) so enterprise‑gated behaviors keep working for managed deployments.
+
+If the file is absent or unreadable, Droid falls back to the existing org‑settings flow (Factory App / managed‑settings endpoint). If the file is present but malformed or fails schema validation, org settings resolve to an empty policy and the failure is logged — a broken admin deployment is **not** silently bypassed.
+
+This is the recommended way to ship base policy with an MDM image or installer; users cannot override or weaken it.
+
+---
+
 ## Settings JSON schema
 
 Below is the full schema for org-managed settings. These are configured by org admins through the [Enterprise Controls](https://app.factory.ai) page in the Factory App. Every property is optional — omit any field you do not need to set.
