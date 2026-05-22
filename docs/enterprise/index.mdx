@@ -3,22 +3,26 @@ title: Enterprise Overview
 description: How to deploy, secure, and operate Droids in the world’s highest‑security environments.
 ---
 
-Factory’s enterprise platform is designed for the **highest‑security customers**—systemically important banks, governments, healthcare, national security, and other regulated organizations.
+import { vars, ProductName } from '/snippets/vars.mdx';
 
-Instead of forcing you into a single cloud IDE, Droid is a **CLI and agent runtime that runs anywhere**:
+{/* cspell:ignore airgapped SDLC */}
+
+<ProductName variant="factory" />’s enterprise platform is designed for the **highest‑security customers**—systemically important banks, governments, healthcare, national security, and other regulated organizations.
+
+Instead of forcing you into a single cloud IDE, <ProductName variant="droid" /> is a **CLI and agent runtime that runs anywhere**:
 
 - On developer laptops, in any terminal or IDE
 - In CI/CD pipelines (GitHub, GitLab, internal runners)
 - In VMs, Kubernetes clusters, and hardened devcontainers
 - In **fully airgapped environments** with no outbound internet access
 
-This section explains how to deploy Droid safely, govern which models and tools it can use, and observe its behavior at enterprise scale.
+This section explains how to deploy <ProductName variant="droid" /> safely, govern which models and tools it can use, and observe its behavior at enterprise scale.
 
 ---
 
 ## What this section covers
 
-Use these pages together as your enterprise playbook for Droids:
+Use these pages together as your enterprise playbook for <ProductName variant="droid" />:
 
 <CardGroup cols={2}>
   <Card title="Identity & Access" icon="building">
@@ -57,11 +61,11 @@ Use these pages together as your enterprise playbook for Droids:
 
 ### Multi‑deployment by design
 
-Factory supports three deployment patterns for Droid, all built on the same core binary and configuration model:
+<ProductName variant="factory" /> supports three deployment patterns for <ProductName variant="droid" />, all built on the same core binary and configuration model:
 
-1. **Cloud‑managed** – Droid runs on developer machines and CI but uses Factory’s cloud for coordination and optional analytics. Models are either Factory‑brokered or brought by you.
-2. **Hybrid enterprise** – Droid runs entirely in your infrastructure (VMs, CI runners, containers), optionally connecting to Factory cloud for UX while all LLMs and telemetry terminate inside your network.
-3. **Fully airgapped** – Droid runs in a network with **no outbound internet access**. Models and OTEL collectors are hosted entirely inside this environment; Factory never receives traffic.
+1. **Cloud‑managed** – <ProductName variant="droid" /> runs on developer machines and CI but uses <ProductName variant="factory" />’s cloud for coordination and optional analytics. Models are either <ProductName variant="factory" />‑brokered or brought by you.
+2. **Hybrid enterprise** – <ProductName variant="droid" /> runs entirely in your infrastructure (VMs, CI runners, containers), optionally connecting to <ProductName variant="factory" /> cloud for UX while all LLMs and telemetry terminate inside your network.
+3. **Fully airgapped** – <ProductName variant="droid" /> runs in a network with **no outbound internet access**. Models and OTEL collectors are hosted entirely inside this environment; <ProductName variant="factory" /> never receives traffic.
 
 You can start in cloud‑managed mode, then migrate critical workloads to hybrid or airgapped environments without changing how developers talk to Droid.
 
@@ -80,7 +84,7 @@ Learn more in [Hierarchical Settings & Org Control](/enterprise/hierarchical-set
 
 ### Defense‑in‑depth agent safety
 
-LLMs are probabilistic; Factory treats them as powerful but untrusted components. Droid’s safety story combines:
+LLMs are probabilistic; <ProductName variant="factory" /> treats them as powerful but untrusted components. <ProductName variant="droid" />’s safety story combines:
 
 - **Deterministic controls** – command risk classification, allow/deny lists, file and repo protections, and sandbox boundaries
 - **Droid Shield** – secret scanning and DLP‑style checks across prompts, files, and commands
@@ -93,13 +97,13 @@ These layers are independent of which LLM or IDE a developer prefers.
 
 All serious enterprise deployments need to answer: _“What are agents doing, where, and at what cost?”_
 
-Droid emits **OpenTelemetry metrics, traces, and logs** so you can:
+<ProductName variant="droid" /> emits **OpenTelemetry metrics, traces, and logs** so you can:
 
 - Send telemetry directly to existing collectors (Prometheus, Datadog, Splunk, Jaeger, etc.)
 - Track sessions, LLM usage, code edits, tool invocations, and errors per org/team/user
 - Correlate Droid activity with SDLC metrics you already use
 
-Factory’s own cloud analytics are **optional**; high‑security customers can route all telemetry exclusively to their own infrastructure.
+<ProductName variant="factory" />’s own cloud analytics are **optional**; high‑security customers can route all telemetry exclusively to their own infrastructure.
 
 See [Usage, Cost & Productivity Analytics](/enterprise/usage-cost-and-analytics) and [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
 
@@ -107,12 +111,12 @@ See [Usage, Cost & Productivity Analytics](/enterprise/usage-cost-and-analytics)
 
 ## Trust & compliance
 
-Factory maintains a security and compliance posture suitable for the most demanding organizations:
+<ProductName variant="factory" /> maintains a security and compliance posture suitable for the most demanding organizations:
 
 - **SOC 2**
 - **ISO 27001**
 - **ISO 42001**
 
-You can find the latest reports, sub‑processor lists, and security architecture details in our **Trust Center**.
+You can find the latest reports, sub‑processor lists, and security architecture details in our <a href={vars.urls.trust}>Trust Center</a>.
 
-For a deeper dive into how Droid fits your regulatory and audit requirements, start with [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).
+For a deeper dive into how <ProductName variant="droid" /> fits your regulatory and audit requirements, start with [Compliance, Audit & Monitoring](/enterprise/compliance-audit-and-monitoring).

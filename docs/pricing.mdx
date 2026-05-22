@@ -4,13 +4,15 @@ description: "Factory plans and pricing"
 keywords: ['pricing', 'plans', 'limits', 'pro', 'plus', 'max', 'enterprise', 'subscription', 'rate limits', 'droid core', 'extra usage']
 ---
 
+import { vars, ProductName } from '/snippets/vars.mdx';
+
 ## Pricing Structure
 
-Factory plans use rolling Rate Limits across three windows: 5-hour, weekly, and monthly. Your plan's Standard Usage gives you access to all models and is consumed first. Teams and Enterprise plans are not affected by Rate Limit changes.
+<ProductName variant="factory" /> plans use rolling Rate Limits across three windows: 5-hour, weekly, and monthly. Your plan's Standard Usage gives you access to all models and is consumed first. Teams and Enterprise plans are not affected by Rate Limit changes.
 
 When you hit a Standard Usage Rate Limit, you have two options:
 
-- **Droid Core** -- a selection of leading open-weight models with a separate set of Rate Limits. Free, no additional cost.
+- **<ProductName variant="droidCore" />** -- a selection of leading open-weight models with a separate set of Rate Limits. Free, no additional cost.
 - **Extra Usage** -- prepaid credits that let you keep using any model. Pay-as-you-go, $10 minimum.
 
 Standard Usage is always consumed first. You can monitor your usage in **Settings > Usage** or with the `/limits` command in Droid.
@@ -22,7 +24,7 @@ Standard Usage is always consumed first. You can monitor your usage in **Setting
 Complete software development agents for individuals.
 
 - Agent-native, multi-platform experience
-  - Factory App / Droid CLI / Droid SDK
+  - <ProductName variant="factoryApp" /> / <ProductName variant="droidCli" /> / Droid SDK
   - Cloud & local background agents
   - Track billing and usage statistics
   - Agent-readiness dashboard
@@ -33,7 +35,7 @@ Everything in Pro, and:
 
 - Expanded rolling Rate Limits
   - ~5x the usage of Pro
-  - Droid Computers -- access to Factory-managed Droid Computers (remote cloud environments)
+  - Droid Computers -- access to <ProductName variant="factory" />-managed Droid Computers (remote cloud environments)
 
 ### Max -- $200/mo
 
@@ -55,7 +57,7 @@ For growing teams that need tailored plans.
 - Zero Data Retention (ZDR)
 - Basic admin controls (model selection, autonomy level, model access controls, org-level deny lists)
 
-Teams plans are not affected by Rate Limit changes. [Contact Sales](https://factory.ai/contact) for Teams pricing.
+Teams plans are not affected by Rate Limit changes. <a href={`${vars.urls.factory}/contact`}>Contact Sales</a> for Teams pricing.
 
 ### Enterprise
 
@@ -75,15 +77,15 @@ Every feature prior, and:
   - Priority support with SLAs
   - Custom onboarding program
 
-Enterprise plans are not affected by Rate Limit changes. [Contact Sales](https://factory.ai/contact) for Enterprise pricing.
+Enterprise plans are not affected by Rate Limit changes. <a href={`${vars.urls.factory}/contact`}>Contact Sales</a> for Enterprise pricing.
 
-## Droid Core
+## <ProductName variant="droidCore" />
 
-Droid Core is a set of leading open-weight models that Factory has designated as Core. These are typically smaller, cost-efficient models that handle most coding tasks well. When you exhaust your Standard Usage Rate Limits, Droid Core lets you keep working at no additional cost on its own separate Rate Limits.
+<ProductName variant="droidCore" /> is a set of leading open-weight models that <ProductName variant="factory" /> has designated as Core. These are typically smaller, cost-efficient models that handle most coding tasks well. When you exhaust your Standard Usage Rate Limits, <ProductName variant="droidCore" /> lets you keep working at no additional cost on its own separate Rate Limits.
 
 You can see the current list of Core models in **Settings > Models**. The list updates as new models are released.
 
-Droid Core usage counts against your Standard Usage if you still have Standard Usage remaining. Once Standard Usage is exhausted, Droid Core draws from its own separate Rate Limit pool.
+<ProductName variant="droidCore" /> usage counts against your Standard Usage if you still have Standard Usage remaining. Once Standard Usage is exhausted, <ProductName variant="droidCore" /> draws from its own separate Rate Limit pool.
 
 ## Extra Usage
 
@@ -94,11 +96,11 @@ Extra Usage is a prepaid, USD-denominated credit balance. It kicks in whenever y
 - **Toggle:** enable once, stays on until you turn it off or run out of credits
 - **Priority:** Standard Usage is always consumed first. Extra Usage is never touched while Standard Usage is available.
 
-## Factory Missions
+## <ProductName variant="factoryMissions" />
 
 Missions use the same rolling Rate Limits as regular sessions. Running a Mission requires Extra Usage to be enabled. If a Mission hits a Rate Limit, the Mission pauses.
 
-**Tip:** run a Mission on Droid Core when possible. Core models often deliver comparable results and stretch your plan further.
+**Tip:** run a Mission on <ProductName variant="droidCore" /> when possible. Core models often deliver comparable results and stretch your plan further.
 
 ## BYOK
 
@@ -109,7 +111,7 @@ All Individual, Teams, and Enterprise plans include an allowance of free BYOK us
 ### General
 
 **What counts toward each Rate Limit?**
-Droid sessions consume Factory Standard Credits based on model usage, along with compute usage for Droid Computers.
+<ProductName variant="droid" /> sessions consume <ProductName variant="factory" /> Standard Credits based on model usage, along with compute usage for Droid Computers.
 
 **Do the three Rate Limits run independently?**
 Yes. Hitting the 5-hour cap doesn't eat into weekly or monthly any faster, and vice versa. You need headroom in all three to send a request.
@@ -120,16 +122,16 @@ All three are rolling: 5-hour, 7-day, and 30-day. Each starts ticking when you f
 **Does unused Standard Usage roll over?**
 No, similar to the previous plan Standard Usage does not rollover month to month. Extra Usage that you purchase does roll over.
 
-### Droid Core
+### <ProductName variant="droidCore" />
 
-**Which models are "Droid Core"?**
-A set of models Factory has designated as Core -- typically smaller, cheaper models that handle most coding tasks well. You can see the current list in Settings > Models. This list changes as new models come out.
+**Which models are "<ProductName variant="droidCore" />"?**
+A set of models <ProductName variant="factory" /> has designated as Core -- typically smaller, cheaper models that handle most coding tasks well. You can see the current list in Settings > Models. This list changes as new models come out.
 
-**Does enabling Droid Core cost extra?**
+**Does enabling <ProductName variant="droidCore" /> cost extra?**
 No. Same Standard Usage billing, just restricted to the Core model pool so you can keep working after you've hit premium-model Rate Limits.
 
-**If I use Droid Core, does it count against my Standard Usage?**
-Yes, if you have Standard Usage remaining. Standard Usage is consumed first. If you have used up your Standard Usage, then you have a separate set of Rate Limits for Droid Core.
+**If I use <ProductName variant="droidCore" />, does it count against my Standard Usage?**
+Yes, if you have Standard Usage remaining. Standard Usage is consumed first. If you have used up your Standard Usage, then you have a separate set of Rate Limits for <ProductName variant="droidCore" />.
 
 ### Extra Usage
 
@@ -151,7 +153,7 @@ Standard, always. After that it depends on which fallback you picked in settings
 ### Rate Limits
 
 **What happens mid-session when I hit a Rate Limit?**
-The current request finishes, then subsequent requests get refused with a Rate Limit error in the CLI or Factory App. Run `/limits` to toggle Droid Core or Extra Usage and retry immediately. No need to reopen the session.
+The current request finishes, then subsequent requests get refused with a Rate Limit error in the CLI or <ProductName variant="factoryApp" />. Run `/limits` to toggle <ProductName variant="droidCore" /> or Extra Usage and retry immediately. No need to reopen the session.
 
 **Does a long-running autonomous agent get throttled?**
 Yes. It pauses and surfaces the same limit error. This is intentional. Rate Limits prevent a runaway agent from burning a month of quota in an afternoon.

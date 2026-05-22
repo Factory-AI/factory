@@ -3,29 +3,35 @@ title: "Support"
 description: "Get help from the Factory team"
 ---
 
-If you need assistance with Factory, our team is here to help. Below you will find the best ways to reach us depending on the nature of your request.
+import { vars, ProductName, SupportLink, DiscordInvite } from '/snippets/vars.mdx';
+
+If you need assistance with <ProductName variant="factory" />, our team is here to help. Below you will find the best ways to reach us depending on the nature of your request.
 
 ## Contact Support
 
 For account issues, billing questions, or technical problems, reach out to our support team directly.
 
-<Card title="Email Support" icon="envelope" href="mailto:support@factory.ai">
-  support@factory.ai
+<Card title="Email Support" icon="envelope" href={`mailto:${vars.emails.support}`}>
+  Contact the support team by email.
 </Card>
+
+You can also email <SupportLink /> directly.
 
 ## Community
 
 Join our Discord community to ask questions, share feedback, and connect with other Factory users and the team.
 
-<Card title="Discord" icon="discord" href="https://discord.gg/zuudFXxg69">
-  Join the Factory Discord server
+<Card title="Discord" icon="discord" href={vars.urls.discord}>
+  Join the <ProductName variant="factory" /> Discord server
 </Card>
+
+<DiscordInvite>Open the <ProductName variant="factory" /> Discord invite</DiscordInvite>.
 
 ## Report a Bug
 
 If you have found a bug or want to request a feature, open an issue on our GitHub repository.
 
-<Card title="GitHub Issues" icon="github" href="https://github.com/factory-ai/factory/issues">
+<Card title="GitHub Issues" icon="github" href={`${vars.urls.github.repo.factory}/issues`}>
   Open an issue on GitHub
 </Card>
 
