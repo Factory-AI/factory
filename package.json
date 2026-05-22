@@ -6,7 +6,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "PATH=/opt/homebrew/opt/node@22/bin:$PATH mintlify dev --port 3333",
+    "dev": "PATH=/opt/homebrew/opt/node@22/bin:$PATH sh tooling/dev-server.sh \"open -a 'Google Chrome' http://localhost:3333\"",
     "format": "node -e \"console.log('format scaffold: no formatter configured yet')\"",
     "format:check": "node -e \"console.log('format:check scaffold: no formatter configured yet')\"",
     "lint": "pnpm format:check && pnpm vars:check",
@@ -15,6 +15,10 @@
     "vars:build": "pnpm --filter @factory/docs-vars build",
     "vars:check": "pnpm --filter @factory/docs-vars check",
     "test:build": "node -e \"console.log('test:build scaffold: Mintlify build validation is wired in M4')\"",
-    "prepare": "node -e \"process.exit(0)\""
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5"
   }
 }
