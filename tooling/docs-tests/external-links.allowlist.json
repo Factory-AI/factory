@@ -1,0 +1,38 @@
+[
+  {
+    "pattern": "^https://app\\.factory\\.ai/(?:settings|api|wiki)(?:[/?#].*)?$",
+    "reason": "Factory App settings, wiki, download, and API URLs can require authentication or trigger downloads."
+  },
+  {
+    "pattern": "^https://api\\.factory\\.ai/api/.*$",
+    "reason": "Factory API examples require bearer authentication."
+  },
+  {
+    "pattern": "^https?://localhost(?::\\d+)?(?:[/?#].*)?$",
+    "reason": "Localhost URLs are contributor-local examples."
+  },
+  {
+    "pattern": "^https?://127\\.0\\.0\\.1(?::\\d+)?(?:[/?#].*)?$",
+    "reason": "Loopback URLs are contributor-local examples."
+  },
+  {
+    "pattern": "^https?://(?:[^/]+\\.)?example\\.(?:com|org|net)(?::\\d+)?(?:[/?#].*)?$",
+    "reason": "IANA example domains are placeholders, not real targets to health-check."
+  },
+  {
+    "pattern": "^https://company\\.atlassian\\.net/.*$",
+    "reason": "Placeholder Jira ticket URLs in examples are not public pages."
+  },
+  {
+    "pattern": "^https://notion\\.so/team/.*$",
+    "reason": "Placeholder Notion spec URLs in examples are not public pages."
+  },
+  {
+    "pattern": "^https://github\\.com/(?:org|you|owner)/.*$",
+    "reason": "Placeholder GitHub repository URLs in examples are not public pages."
+  },
+  {
+    "pattern": "^https://(?:www\\.)?youtube\\.com/embed/.*$",
+    "reason": "Embedded video endpoints can be bot-protected or disallow link-checker requests."
+  }
+]
