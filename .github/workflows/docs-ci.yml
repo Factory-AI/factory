@@ -327,3 +327,299 @@ jobs:
 
       - name: Run typecheck
         run: pnpm typecheck
+
+  lint-vale:
+    name: lint:vale
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '11'
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Vale
+        shell: bash
+        run: |
+          set -euo pipefail
+          vale_version='3.14.2'
+          curl -fsSL \
+            "https://github.com/errata-ai/vale/releases/download/v${vale_version}/vale_${vale_version}_Linux_64-bit.tar.gz" \
+            -o "${RUNNER_TEMP}/vale.tar.gz"
+          tar -xzf "${RUNNER_TEMP}/vale.tar.gz" -C "${RUNNER_TEMP}" vale
+          sudo install -m 0755 "${RUNNER_TEMP}/vale" /usr/local/bin/vale
+          vale --version
+
+      - name: Run lint:vale
+        id: run-check
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          pnpm lint:vale > "${RUNNER_TEMP}/lint-vale.log" 2>&1
+          status=$?
+          cat "${RUNNER_TEMP}/lint-vale.log"
+          echo "exit_code=${status}" >> "${GITHUB_OUTPUT}"
+          exit "${status}"
+
+      - name: Prepare lint:vale PR comment
+        if: always()
+        shell: bash
+        env:
+          COMMAND_NAME: pnpm lint:vale
+          COMMENT_PATH: ${{ runner.temp }}/lint-vale-comment.md
+          EXIT_CODE: ${{ steps.run-check.outputs.exit_code }}
+          LOG_PATH: ${{ runner.temp }}/lint-vale.log
+          MARKER: '<!-- docs-ci:lint-vale -->'
+          STEP_OUTCOME: ${{ steps.run-check.outcome }}
+          TITLE: lint:vale
+        run: |
+          set -euo pipefail
+          {
+            echo "${MARKER}"
+            echo "## Docs CI informational: ${TITLE}"
+            echo
+            echo "- Command: \`${COMMAND_NAME}\`"
+            echo "- Step outcome: \`${STEP_OUTCOME:-not-run}\`"
+            echo "- Exit code: \`${EXIT_CODE:-not-run}\`"
+            echo "- Run: [${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+            echo
+            echo "This informational check does not block merges. See the workflow logs for full details."
+            if [ -f "${LOG_PATH}" ]; then
+              echo
+              echo "<details><summary>Last 200 log lines</summary>"
+              echo
+              echo '```text'
+              tail -n 200 "${LOG_PATH}"
+              echo '```'
+              echo
+              echo '</details>'
+            fi
+          } > "${COMMENT_PATH}"
+
+      - name: Find lint:vale PR comment
+        id: find-comment
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '<!-- docs-ci:lint-vale -->'
+
+      - name: Upsert lint:vale PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          body-path: ${{ runner.temp }}/lint-vale-comment.md
+          edit-mode: replace
+
+  lint-cspell:
+    name: lint:cspell
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '11'
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint:cspell
+        id: run-check
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          pnpm lint:cspell > "${RUNNER_TEMP}/lint-cspell.log" 2>&1
+          status=$?
+          cat "${RUNNER_TEMP}/lint-cspell.log"
+          echo "exit_code=${status}" >> "${GITHUB_OUTPUT}"
+          exit "${status}"
+
+      - name: Prepare lint:cspell PR comment
+        if: always()
+        shell: bash
+        env:
+          COMMAND_NAME: pnpm lint:cspell
+          COMMENT_PATH: ${{ runner.temp }}/lint-cspell-comment.md
+          EXIT_CODE: ${{ steps.run-check.outputs.exit_code }}
+          LOG_PATH: ${{ runner.temp }}/lint-cspell.log
+          MARKER: '<!-- docs-ci:lint-cspell -->'
+          STEP_OUTCOME: ${{ steps.run-check.outcome }}
+          TITLE: lint:cspell
+        run: |
+          set -euo pipefail
+          {
+            echo "${MARKER}"
+            echo "## Docs CI informational: ${TITLE}"
+            echo
+            echo "- Command: \`${COMMAND_NAME}\`"
+            echo "- Step outcome: \`${STEP_OUTCOME:-not-run}\`"
+            echo "- Exit code: \`${EXIT_CODE:-not-run}\`"
+            echo "- Run: [${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+            echo
+            echo "This informational check does not block merges. See the workflow logs for full details."
+            if [ -f "${LOG_PATH}" ]; then
+              echo
+              echo "<details><summary>Last 200 log lines</summary>"
+              echo
+              echo '```text'
+              tail -n 200 "${LOG_PATH}"
+              echo '```'
+              echo
+              echo '</details>'
+            fi
+          } > "${COMMENT_PATH}"
+
+      - name: Find lint:cspell PR comment
+        id: find-comment
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '<!-- docs-ci:lint-cspell -->'
+
+      - name: Upsert lint:cspell PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          body-path: ${{ runner.temp }}/lint-cspell-comment.md
+          edit-mode: replace
+
+  test-external-links:
+    name: test:external-links
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '11'
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install lychee
+        uses: taiki-e/install-action@v2
+        with:
+          tool: lychee@0.24.2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run test:external-links
+        id: run-check
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          pnpm test:external-links > "${RUNNER_TEMP}/test-external-links.log" 2>&1
+          status=$?
+          cat "${RUNNER_TEMP}/test-external-links.log"
+          echo "exit_code=${status}" >> "${GITHUB_OUTPUT}"
+          exit "${status}"
+
+      - name: Prepare test:external-links PR comment
+        if: always()
+        shell: bash
+        env:
+          COMMAND_NAME: pnpm test:external-links
+          COMMENT_PATH: ${{ runner.temp }}/test-external-links-comment.md
+          EXIT_CODE: ${{ steps.run-check.outputs.exit_code }}
+          LOG_PATH: ${{ runner.temp }}/test-external-links.log
+          MARKER: '<!-- docs-ci:test-external-links -->'
+          STEP_OUTCOME: ${{ steps.run-check.outcome }}
+          TITLE: test:external-links
+        run: |
+          set -euo pipefail
+          {
+            echo "${MARKER}"
+            echo "## Docs CI informational: ${TITLE}"
+            echo
+            echo "- Command: \`${COMMAND_NAME}\`"
+            echo "- Step outcome: \`${STEP_OUTCOME:-not-run}\`"
+            echo "- Exit code: \`${EXIT_CODE:-not-run}\`"
+            echo "- Run: [${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+            echo
+            echo "This informational check does not block merges. See the workflow logs for full details."
+            if [ -f "${LOG_PATH}" ]; then
+              echo
+              echo "<details><summary>Last 200 log lines</summary>"
+              echo
+              echo '```text'
+              tail -n 200 "${LOG_PATH}"
+              echo '```'
+              echo
+              echo '</details>'
+            fi
+          } > "${COMMENT_PATH}"
+
+      - name: Find test:external-links PR comment
+        id: find-comment
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '<!-- docs-ci:test-external-links -->'
+
+      - name: Upsert test:external-links PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          body-path: ${{ runner.temp }}/test-external-links-comment.md
+          edit-mode: replace

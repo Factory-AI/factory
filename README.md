@@ -66,6 +66,13 @@ pnpm typecheck
 
 After this block finishes, Mintlify should still be running at <http://localhost:3333> and available in your browser. Stop it when you are done by terminating the PID saved in `/tmp/factory-docs-mintlify.pid`.
 
+## Docs CI Tiers
+
+Docs pull requests use a two-tier CI gate:
+
+- **Blocking checks** must pass before merge. These cover formatting, Markdown/MDX linting, vars validation, structural docs tests, internal links, image/code-fence checks, Mintlify build validation, cross-browser rendering, and TypeScript type checks.
+- **Informational checks** do not block merge. Vale prose linting, cspell, and external-link health run on every docs PR and update stable PR comments with their latest results so contributors can fix issues without flaky checks becoming merge blockers.
+
 ## Quick Links
 
 - [Factory Website](https://factory.ai)
