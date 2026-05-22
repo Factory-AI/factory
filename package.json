@@ -7,8 +7,8 @@
   },
   "scripts": {
     "dev": "PATH=/opt/homebrew/opt/node@22/bin:$PATH sh tooling/dev-server.sh \"open -a 'Google Chrome' http://localhost:3333\"",
-    "format": "node -e \"console.log('format scaffold: no formatter configured yet')\"",
-    "format:check": "node -e \"console.log('format:check scaffold: no formatter configured yet')\"",
+    "format": "prettier --config tooling/docs-lint/prettier.config.mjs --write \"*.{ts,js,json,yml,md}\" \"tooling/**/*.{ts,js,json,yml,md}\" \"docs/**/*.{ts,js,json,yml,md}\" \".github/*.yml\"",
+    "format:check": "prettier --config tooling/docs-lint/prettier.config.mjs --check \"*.{ts,js,json,yml,md}\" \"tooling/**/*.{ts,js,json,yml,md}\" \"docs/**/*.{ts,js,json,yml,md}\" \".github/*.yml\"",
     "lint": "pnpm format:check && pnpm vars:check",
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.5"
+    "lint-staged": "^17.0.5",
+    "prettier": "^3.8.3"
   }
 }
