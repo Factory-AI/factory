@@ -25,7 +25,8 @@
     "vars:build": "pnpm --filter @factory/docs-vars build",
     "vars:check": "pnpm --filter @factory/docs-vars check",
     "vars:watch": "pnpm --filter @factory/docs-vars watch",
-    "test:build": "cd docs && PATH=/opt/homebrew/opt/node@22/bin:$PATH mintlify validate && PATH=/opt/homebrew/opt/node@22/bin:$PATH mintlify broken-links",
+    "test:build": "pnpm --filter @factory/docs-tests check:mintlify-build",
+    "test:browsers": "pnpm --filter @factory/docs-tests check:browser-render",
     "prepare": "husky"
   },
   "devDependencies": {

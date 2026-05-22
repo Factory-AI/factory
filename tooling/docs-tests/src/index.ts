@@ -4,3 +4,6 @@ export * from './check-internal-links';
 export * from './check-external-links';
 export * from './check-code-fences';
 export * from './check-images';
+export * from './check-mintlify-build';
+export * from './check-browser-render';
+export * from './mintlify-docs-workspace';
