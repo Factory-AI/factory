@@ -55,50 +55,74 @@ export const vars = {
 };
 
 export function ProductName({ variant }) {
-  return vars.products[variant];
+  const products = {
+  "droid": "Droid",
+  "droidCli": "Droid CLI",
+  "factory": "Factory",
+  "factoryApp": "Factory App",
+  "droidExec": "Droid Exec",
+  "droidShield": "Droid Shield",
+  "droidShieldPlus": "Droid Shield Plus",
+  "droidCore": "Droid Core",
+  "factoryMissions": "Factory Missions"
+};
+
+  return products[variant];
 }
 
 export function InstallCommand({ platform }) {
-  return (
-    <pre>
-      <code>{vars.install[platform]}</code>
-    </pre>
-  );
+  const installCommands = {
+  "macos": "curl -fsSL https://app.factory.ai/cli | sh",
+  "windows": "irm https://app.factory.ai/cli/windows | iex",
+  "npm": "npm install -g droid",
+  "brew": "brew install --cask droid"
+};
+
+  return installCommands[platform];
 }
 
 export function SupportLink({ children }) {
-  return (
-    <a href={`mailto:${vars.emails.support}`}>
-      {children ?? vars.emails.support}
-    </a>
-  );
+  const supportEmail = "support@factory.ai";
+  const href = `mailto:${supportEmail}`;
+
+  return <a href={href}>{children ?? supportEmail}</a>;
 }
 
 export function SecurityLink({ children }) {
-  return (
-    <a href={`mailto:${vars.emails.security}`}>
-      {children ?? vars.emails.security}
-    </a>
-  );
+  const securityEmail = "security@factory.ai";
+  const href = `mailto:${securityEmail}`;
+
+  return <a href={href}>{children ?? securityEmail}</a>;
 }
 
 export function DiscordInvite({ children }) {
+  const discordUrl = "https://discord.gg/zuudFXxg69";
+
   return (
-    <a href={vars.urls.discord} target="_blank" rel="noreferrer">
-      {children ?? vars.urls.discord}
+    <a href={discordUrl} target="_blank" rel="noreferrer">
+      {children ?? discordUrl}
     </a>
   );
 }
 
 export function DocsURL({ path = '', children }) {
+  const docsUrl = "https://docs.factory.ai";
   const normalizedPath = path && path.startsWith('/') ? path : `/${path}`;
-  const href = path ? `${vars.urls.docs}${normalizedPath}` : vars.urls.docs;
+  const href = path ? `${docsUrl}${normalizedPath}` : docsUrl;
 
   return <a href={href}>{children ?? href}</a>;
 }
 
 export function GithubRepo({ repo, children }) {
-  const href = vars.urls.github.repo[repo];
+  const githubRepos = {
+  "factory": "https://github.com/Factory-AI/factory",
+  "action": "https://github.com/Factory-AI/droid-action",
+  "sdkTs": "https://github.com/Factory-AI/droid-sdk-typescript",
+  "sdkPy": "https://github.com/Factory-AI/droid-sdk-python",
+  "plugins": "https://github.com/Factory-AI/factory-plugins",
+  "eslint": "https://github.com/Factory-AI/eslint-plugin"
+};
+  const href = githubRepos[repo];
 
   return (
     <a href={href} target="_blank" rel="noreferrer">
