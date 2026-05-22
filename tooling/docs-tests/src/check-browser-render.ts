@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { withMintlifyCliPath } from './mintlify-cli-env';
 import { prepareMintlifyDocsWorkspace } from './mintlify-docs-workspace';
 
 export const BROWSER_RENDER_BROWSERS = ['chromium', 'firefox'] as const;
@@ -140,7 +141,6 @@ export type BrowserRenderCheckOptions = {
   startDevServer?: DevServerStarter;
 };
 
-const node22Bin = '/opt/homebrew/opt/node@22/bin';
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(packageRoot, '../..');
 const defaultDocsRoot = resolve(repoRoot, 'docs');
@@ -153,11 +153,6 @@ const sleep = (milliseconds: number): Promise<void> =>
   new Promise((resolvePromise) => {
     setTimeout(resolvePromise, milliseconds);
   });
-
-const withNode22Path = (env: NodeJS.ProcessEnv = process.env) => ({
-  ...env,
-  PATH: `${node22Bin}:${env.PATH ?? ''}`,
-});
 
 export const normalizeVisibleText = (text: string): string =>
   text.replace(/\s+/g, ' ').trim();
@@ -318,7 +313,7 @@ export const startMintlifyDevServer: DevServerStarter = async (
     {
       cwd: docsRoot,
       detached: true,
-      env: withNode22Path(),
+      env: withMintlifyCliPath(),
       stdio: ['ignore', 'pipe', 'pipe'],
     }
   );

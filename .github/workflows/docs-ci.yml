@@ -183,6 +183,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
+      - name: Install lychee
+        uses: taiki-e/install-action@v2
+        with:
+          tool: lychee@0.24.2
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 

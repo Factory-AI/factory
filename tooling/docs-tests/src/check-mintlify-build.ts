@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { withMintlifyCliPath } from './mintlify-cli-env';
 import { prepareMintlifyDocsWorkspace } from './mintlify-docs-workspace';
 
 export type MintlifyBuildCommand = 'validate' | 'broken-links';
@@ -40,18 +41,12 @@ type FormatOptions = {
   cwd?: string;
 };
 
-const node22Bin = '/opt/homebrew/opt/node@22/bin';
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(packageRoot, '../..');
 const defaultDocsRoot = resolve(repoRoot, 'docs');
 
 const normalizePathForMatching = (filePath: string): string =>
   filePath.replaceAll('\\', '/');
-
-const withNode22Path = (env: NodeJS.ProcessEnv = process.env) => ({
-  ...env,
-  PATH: `${node22Bin}:${env.PATH ?? ''}`,
-});
 
 const defaultRunMintlifyCommand: RunMintlifyCommand = (command, options) => {
   const result = spawnSync('mintlify', [command], {
@@ -89,7 +84,7 @@ export const checkMintlifyBuild = (
       commands.push(
         runCommand(command, {
           cwd: workspace.docsRoot,
-          env: withNode22Path(),
+          env: withMintlifyCliPath(),
         })
       );
     }

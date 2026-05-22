@@ -7,7 +7,8 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
@@ -15,10 +16,13 @@ import {
   checkMintlifyBuild,
   formatMintlifyBuildResult,
 } from '../src/check-mintlify-build';
+import { withMintlifyCliPath } from '../src/mintlify-cli-env';
 import { prepareMintlifyDocsWorkspace } from '../src/mintlify-docs-workspace';
 
 const createFixtureRoot = (): string =>
   mkdtempSync(join(tmpdir(), 'factory-mintlify-build-'));
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 
 const writeFixture = (
   fixtureRoot: string,
@@ -53,6 +57,16 @@ const docsJson = {
 };
 
 describe('mintlify build validator', () => {
+  it('prepends Node 22 and the docs workspace Mintlify bin to PATH', () => {
+    const env = withMintlifyCliPath({ PATH: '/usr/bin' });
+
+    expect(env.PATH.split(':').slice(0, 3)).toEqual([
+      '/opt/homebrew/opt/node@22/bin',
+      join(repoRoot, 'docs/node_modules/.bin'),
+      '/usr/bin',
+    ]);
+  });
+
   it('prepares an English-only Mintlify docs workspace that excludes docs/jp', () => {
     const fixtureRoot = createFixtureRoot();
     const fixtureDocsRoot = join(fixtureRoot, 'docs');
