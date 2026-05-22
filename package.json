@@ -29,5 +29,13 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3"
+  },
+  "lint-staged": {
+    "*.{ts,js,json,yml,md}": "prettier --config tooling/docs-lint/prettier.config.mjs --write",
+    "*.mdx": [
+      "tooling/docs-lint/node_modules/.bin/remark --rc-path tooling/docs-lint/remark.config.mjs --report ./tooling/docs-lint/remark-reporter.mjs --frail --quiet --silently-ignore --ignore-pattern docs/jp/** --ignore-pattern docs/snippets/**",
+      "node tooling/docs-lint/check-mdx-vars.mjs",
+      "cspell --config cspell.config.yaml --no-progress --no-summary --exclude docs/jp/**"
+    ]
   }
 }
