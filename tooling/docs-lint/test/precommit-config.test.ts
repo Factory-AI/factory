@@ -37,7 +37,7 @@ describe('pre-commit lint-staged wiring', () => {
     expect(mdxTasks).toEqual(
       expect.arrayContaining([
         expect.stringContaining('tooling/docs-lint/node_modules/.bin/remark'),
-        expect.stringContaining('node tooling/docs-lint/check-mdx-vars.mjs'),
+        expect.stringContaining('pnpm vars:check'),
         expect.stringContaining('cspell --config cspell.config.yaml'),
       ])
     );
