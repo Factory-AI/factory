@@ -22,6 +22,64 @@ rss: true
 
 </Update>
 
+<Update label="May 22" rss={{ title: "CLI Updates", description: "Render deployments and stability fixes" }}>
+  `v0.132.0`
+
+## New features
+
+- **Deploy to Render** - New `/deploy-to-render` skill helps you deploy projects to Render
+
+## Improvements
+
+- **Security review scope confirmation** - The `/security-review` skill now confirms the scope and audit branch with you before running
+- **Faster EU connections** - Reduced connection latency for users in the EU region
+
+## Bug fixes
+
+- **Disabled model selector rows** - Restored disabled rows in the model selector so all options are visible
+- **Missions across reconnects** - Active missions now keep running through network reconnects
+- **Mission computer in mission control** - The active mission computer now appears on the mission control page (app)
+- **Windows desktop setup** - Fixed setup and scripts for the Windows desktop app (app)
+- **Rich text autofocus** - Improved autofocus reliability for rich text inputs (app)
+
+</Update>
+
+<Update label="May 21" rss={{ title: "CLI Updates", description: "Maintenance release" }}>
+  `v0.131.0`
+
+  Maintenance release with under-the-hood improvements.
+
+</Update>
+
+<Update label="May 20" rss={{ title: "CLI Updates", description: "Model favorites, spec save directory, paste expansion, and stability fixes" }}>
+  `v0.130.0`
+
+## New features
+
+- **Model favorites** - Mark and quickly access your preferred models from the model selector
+- **Spec save directory** - Configure where specs are saved with a new setting
+- **Expand pasted placeholders** - Press Alt+Shift+V (Opt+Shift+V on macOS) to expand truncated paste placeholders inline
+
+## Improvements
+
+- **Refined model selector** - Streamlined the model selector submenu
+- **BYOK model parity** - Brought the BYOK model experience in line with the rest of the model picker
+- **Clearer help output** - Improved formatting of the `help` command output
+
+## Bug fixes
+
+- **Image paste on Linux** - Pasting images now works on Linux, with a graceful fallback when clipboard data is unavailable
+- **MCP OAuth clients** - Static MCP OAuth clients are now supported during authentication
+- **OAuth provider errors** - 4xx responses from connected OAuth providers are now surfaced as user-facing errors
+- **ApplyPatch new files** - New files in ApplyPatch results now render correctly as creates
+- **CLI update reliability** - Prevented restart races during CLI daemon updates
+- **PowerShell under `exec`** - PowerShell commands now run non-interactively in `exec` mode
+- **Slack first-mention indicator** - Slack now shows the typing indicator from the very first mention
+- **Daemon auth on reconnect** - Daemon auth tokens now refresh when reconnecting (app)
+- **Desktop paid onboarding** - The onboarding finish screen is now skipped on the desktop paid flow (app)
+
+</Update>
+
 <Update label="May 18" rss={{ title: "CLI Updates", description: "Streaming file hook events, faster large sessions, and stability fixes" }}>
   `v0.129.0`
 
