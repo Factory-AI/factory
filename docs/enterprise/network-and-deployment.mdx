@@ -153,5 +153,6 @@ Network and deployment configuration is expressed through:
 - **Environment variables** – proxies, gateways, OTEL endpoints, custom certificates.
 - **Org and project `.factory/settings.json`** – hierarchical policies about where Droid may run, which models and gateways are allowed, and default telemetry destinations.
 - **Org config endpoints** – for large organizations, a central configuration service can distribute a standard `.factory` bundle to all environments.
+- **System-managed `settings.json`** – for MDM-deployed and airgapped fleets, drop a settings file at a hardcoded platform path so org policy is in effect before any user authenticates. See [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control#system-managed-settings-file).
 
 For details on the hierarchy and merge behavior, see [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control).
