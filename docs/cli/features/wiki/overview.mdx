@@ -1,11 +1,13 @@
 ---
 title: AutoWiki
 sidebarTitle: Overview
-description: AutoWiki keeps repository Wikis up to date in the Factory App and GitHub Wiki.
+description: AutoWiki generates comprehensive, structured Wikis for your repositories.
 keywords: ['autowiki', 'wiki', 'documentation', 'codebase', '/wiki', '/install-wiki', 'github wiki', 'auto-refresh', 'generate docs']
 ---
 
 AutoWiki generates comprehensive, structured Wikis for your repositories. It analyzes each codebase and produces browsable documentation with architecture overviews, module breakdowns, and cross-linked pages -- then keeps each Wiki current as your code changes.
+
+![AutoWiki repository overview in the Factory App](/images/wiki/autowiki-list.png)
 
 <CardGroup cols={3}>
   <Card title="Generate" icon="terminal" href="/cli/features/wiki/generate">
@@ -48,6 +50,8 @@ AutoWiki generates comprehensive, structured Wikis for your repositories. It ana
 
 When AutoWiki generates a Wiki for a GitHub-hosted repository, Factory can optionally sync the content to GitHub Wiki. Your team can browse the same documentation directly from the repository page without visiting the Factory App. For details on how the sync works, see [Generate a Wiki](/cli/features/wiki/generate#github-wiki-sync).
 
+![Generated AutoWiki content synced to GitHub Wiki](/images/wiki/github-wiki-sync.png)
+
 <Note>
   GitHub requires GitHub Wiki to be initialized before Factory can sync to it.
   If you haven't used GitHub Wiki before, create the first page manually at
@@ -58,7 +62,9 @@ When AutoWiki generates a Wiki for a GitHub-hosted repository, Factory can optio
 
 ### AutoWiki Cloud Sync
 
-Organizations that need to prevent AutoWiki content from being stored in the Factory App can disable **AutoWiki Cloud Sync**. This is an org-level enterprise control available at [app.factory.ai](https://app.factory.ai) under **Settings > Enterprise Controls > AutoWiki**.
+Organizations that need to prevent AutoWiki content from being stored in the Factory App can disable **AutoWiki Cloud Sync**. This is an org-level enterprise control available at [app.factory.ai](https://app.factory.ai) under **Settings > Enterprise Controls**.
+
+![AutoWiki Cloud Sync enterprise control in Factory settings](/images/wiki/autowiki-enterprise-controls.png)
 
 When AutoWiki Cloud Sync is **disabled**:
 

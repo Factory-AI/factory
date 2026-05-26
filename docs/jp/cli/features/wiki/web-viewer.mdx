@@ -6,6 +6,20 @@ keywords: ['wiki', 'web', 'viewer', 'browse', 'search', 'refresh', 'export', 'ap
 
 [app.factory.ai/wiki](https://app.factory.ai/wiki) のFactory App内にあるAutoWikiビューでは、すべてのリポジトリで生成されたAIドキュメントを1か所で閲覧、検索、管理できます。
 
+## 表示される内容
+
+トップレベルのWikiビューには、生成済みの各リポジトリWikiが表示され、鮮度インジケーターと、ドキュメントの検索、フィルタリング、更新のための操作が用意されています。
+
+![Factory App内のAutoWikiリポジトリ一覧](/images/wiki/autowiki-list.png)
+
+リポジトリを開くと、ナビゲーション、ページアウトライン、検索、エクスポート、更新操作とともに生成ページを閲覧できます。
+
+![生成されたアーキテクチャドキュメントを表示するAutoWiki reader](/images/wiki/autowiki-reader.png)
+
+GitHub Wiki syncが有効な場合、同じ生成ページをリポジトリのGitHub Wikiタブからも利用できます。
+
+![GitHub Wikiに同期されたAutoWikiコンテンツ](/images/wiki/github-wiki-sync.png)
+
 ## wiki の閲覧
 
 メインのAutoWikiページには、Wikiが生成済みのリポジトリ一覧が表で表示されます。各行にはリポジトリ名、最終更新日、ブランチが表示されます。リポジトリをクリックすると、そのWikiが開きます。
@@ -49,6 +63,8 @@ Wikiページの **Refresh** ボタンをクリックすると、ドキュメン
 2. 更新したいリポジトリを選択する
 3. **One-time** または **Recurring** を選択する
 4. 実行先の **Droid Computer** を選択する
+
+![AutoWikiの一括更新選択モード](/images/wiki/autowiki-batch-refresh.png)
 
 Droid は選択したコンピュータ上で各リポジトリを clone し、可能な範囲で並列に wiki を生成します（または定期生成のセットアップを行います）。
 
