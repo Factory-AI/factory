@@ -29,6 +29,16 @@ Alloy is designed for teams that want strong results without manually changing m
   </Card>
 </CardGroup>
 
+## Model Options
+
+Alloy routes to one of the following models. The same pricing applies depending on which model Alloy routes the request to.
+
+| Model | Multiplier |
+| --- | --- |
+| Claude Opus 4.7 | 2× |
+| Kimi K2.6 | 0.4× |
+| MiniMax M2.7 | 0.12× |
+
 ## Availability
 
 Alloy is available in the Factory CLI and App model selector for select customers as **Alloy (Research Preview)**.
@@ -38,3 +48,21 @@ Alloy is available in the Factory CLI and App model selector for select customer
 Enterprise admins can manage Alloy through the same model governance system used for other Factory-supported models, including allowing or restricting Alloy at the organization level like any other model.
 
 For more information on enterprise control of models, see [Models, LLM Gateways & Integrations](https://docs.factory.ai/enterprise/models-llm-gateways-and-integrations).
+
+## FAQ
+
+### How does model routing work?
+
+Alloy is a per-task router that uses a mix of session and per-request routing. It strongly considers prompt cache maintenance and savings in its optimization.
+
+### Are we able to configure it?
+
+Alloy can be enabled/disabled like any other model today. We also offer Enterprise Controls for Alloy routing guidance.
+
+### Do we have benchmarks?
+
+Yes. Alloy maintains frontier-level performance on challenging benchmarks like Terminal Bench 2 and Legacy Bench, and provides the best balance of quality, latency, and cost.
+
+### Do we have references on cost/performance?
+
+Alloy maintains frontier-level performance while reducing costs roughly 20–25% compared with always using top-tier models.
