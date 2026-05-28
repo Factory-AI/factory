@@ -109,23 +109,21 @@ exit 0
 chmod +x .factory/hooks/load-context.sh
 ```
 
-`.factory/settings.json`に追加:
+`.factory/hooks.json`に追加:
 
 ```json
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/load-context.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/load-context.sh",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
 }
 ```
 

@@ -9,12 +9,17 @@ description: "Reference documentation for implementing hooks in Droid"
 
 ## Configuration
 
-Droid hooks are configured in your [settings files](/cli/configuration/settings):
+Droid hooks live in `hooks.json` at each scope, alongside [`settings.json`](/cli/configuration/settings):
 
-* `~/.factory/settings.json` - User settings
-* `.factory/settings.json` - Project settings
-* `.factory/settings.local.json` - Local project settings (not committed)
-* Enterprise managed policy settings
+* `~/.factory/hooks.json` – User (applies to all projects)
+* `.factory/hooks.json` – Project (commit to share)
+* Enterprise managed policy hooks
+
+If `hooks.json` is absent, Droid falls back to hooks declared under the `hooks` key in the matching `settings.json`.
+
+<Note>
+  **Migrating from `.factory/hooks/hooks.json`.** Droid previously wrote hooks to a nested `hooks/hooks.json` file. Existing files keep working unchanged; the next save writes `hooks.json` at the scope root and archives the old file as `hooks/hooks.migrated.json`.
+</Note>
 
 ### Structure
 

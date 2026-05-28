@@ -83,23 +83,21 @@ exit 0
 chmod +x .factory/hooks/notify-wait.sh
 ```
 
-`~/.factory/settings.json`に追加（ユーザー全体）：
+`~/.factory/hooks.json`に追加（ユーザー全体）：
 
 ```json
 {
-  "hooks": {
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.factory/hooks/notify-wait.sh",
-            "timeout": 5
-          }
-        ]
-      }
-    ]
-  }
+  "Notification": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.factory/hooks/notify-wait.sh",
+          "timeout": 5
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -137,23 +135,21 @@ exit 0
 chmod +x .factory/hooks/completion-sound.sh
 ```
 
-`~/.factory/settings.json`に追加：
+`~/.factory/hooks.json`に追加：
 
 ```json
 {
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.factory/hooks/completion-sound.sh",
-            "timeout": 3
-          }
-        ]
-      }
-    ]
-  }
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.factory/hooks/completion-sound.sh",
+          "timeout": 3
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -244,34 +240,32 @@ webhook URLを設定：
 export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 ```
 
-`~/.factory/settings.json`に追加：
+`~/.factory/hooks.json`に追加：
 
 ```json
 {
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.factory/hooks/slack-notify.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.factory/hooks/slack-notify.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.factory/hooks/slack-notify.sh",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "SessionEnd": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.factory/hooks/slack-notify.sh",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
 }
 ```
 

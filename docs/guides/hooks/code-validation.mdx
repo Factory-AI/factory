@@ -98,24 +98,22 @@ exit 0
 chmod +x .factory/hooks/protect-files.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/protect-files.sh",
-            "timeout": 3
-          }
-        ]
-      }
-    ]
-  }
+  "PreToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/protect-files.sh",
+          "timeout": 3
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -172,20 +170,18 @@ For PostToolUse validation:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.(ts|tsx)$' && [ -f \"$file_path\" ]; then npx tsc --noEmit \"$file_path\" 2>&1 || { echo '⚠️ Type errors detected in '$file_path >&2; }; fi; }",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.(ts|tsx)$' && [ -f \"$file_path\" ]; then npx tsc --noEmit \"$file_path\" 2>&1 || { echo '⚠️ Type errors detected in '$file_path >&2; }; fi; }",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -267,24 +263,22 @@ exit 0
 chmod +x .factory/hooks/scan-secrets.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/scan-secrets.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/scan-secrets.sh",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -346,24 +340,22 @@ exit 0
 chmod +x .factory/hooks/check-deps.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-deps.sh",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-deps.sh",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -438,24 +430,22 @@ exit 0
 chmod +x .factory/hooks/lint-check.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/lint-check.sh",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/lint-check.sh",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -547,24 +537,22 @@ chmod +x .factory/hooks/check-complexity.py
 pip install radon  # For Python complexity checking
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-complexity.py",
-            "timeout": 15
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-complexity.py",
+          "timeout": 15
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -619,24 +607,22 @@ exit 0
 chmod +x .factory/hooks/validate-business-logic.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/validate-business-logic.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/validate-business-logic.sh",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -717,24 +703,22 @@ except Exception as e:
 chmod +x .factory/hooks/check-architecture.py
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-architecture.py",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/check-architecture.py",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
 }
 ```
 
