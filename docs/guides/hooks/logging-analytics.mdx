@@ -86,24 +86,22 @@ exit 0
 chmod +x .factory/hooks/log-commands.sh
 ```
 
-Add to `~/.factory/settings.json`:
+Add to `~/.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.factory/hooks/log-commands.sh",
-            "timeout": 2
-          }
-        ]
-      }
-    ]
-  }
+  "PreToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.factory/hooks/log-commands.sh",
+          "timeout": 2
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -273,30 +271,28 @@ Add to hooks:
 
 ```json
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.factory/hooks/track-session.sh",
-            "timeout": 2
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.factory/hooks/track-session.sh",
-            "timeout": 2
-          }
-        ]
-      }
-    ]
-  }
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.factory/hooks/track-session.sh",
+          "timeout": 2
+        }
+      ]
+    }
+  ],
+  "SessionEnd": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.factory/hooks/track-session.sh",
+          "timeout": 2
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -434,20 +430,18 @@ Add to PreToolUse for all tools:
 
 ```json
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.factory/hooks/tool-stats.sh",
-            "timeout": 1
-          }
-        ]
-      }
-    ]
-  }
+  "PreToolUse": [
+    {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.factory/hooks/tool-stats.sh",
+          "timeout": 1
+        }
+      ]
+    }
+  ]
 }
 ```
 

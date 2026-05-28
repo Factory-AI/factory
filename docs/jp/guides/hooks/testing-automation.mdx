@@ -140,24 +140,22 @@ exit 0
 chmod +x .factory/hooks/run-tests.sh
 ```
 
-`.factory/settings.json`に追加：
+`.factory/hooks.json`に追加：
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/run-tests.sh",
-            "timeout": 60
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/run-tests.sh",
+          "timeout": 60
+        }
+      ]
+    }
+  ]
 }
 ```
 

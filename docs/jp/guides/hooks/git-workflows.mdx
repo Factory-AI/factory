@@ -105,24 +105,22 @@ exit 0
 chmod +x .factory/hooks/validate-commit-msg.sh
 ```
 
-`.factory/settings.json` に追加：
+`.factory/hooks.json` に追加：
 
 ```json
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/validate-commit-msg.sh",
-            "timeout": 3
-          }
-        ]
-      }
-    ]
-  }
+  "PreToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/validate-commit-msg.sh",
+          "timeout": 3
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -319,20 +317,18 @@ PostToolUseに追加：
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/update-changelog.sh",
-            "timeout": 5
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/update-changelog.sh",
+          "timeout": 5
+        }
+      ]
+    }
+  ]
 }
 ```
 

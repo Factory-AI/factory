@@ -113,24 +113,22 @@ exit 0
 chmod +x .factory/hooks/generate-api-docs.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/generate-api-docs.sh",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/generate-api-docs.sh",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -616,19 +614,17 @@ Run on session end:
 
 ```json
 {
-  "hooks": {
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/docs-coverage.py",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
+  "SessionEnd": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/docs-coverage.py",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
 }
 ```
 
