@@ -1,0 +1,105 @@
+---
+title: Sandbox
+description: OS-level sandboxing isolates Droid from your filesystem and network using kernel-enforced policies (Beta).
+keywords:
+  [
+    "sandbox",
+    "sandboxing",
+    "security",
+    "isolation",
+    "seatbelt",
+    "bubblewrap",
+    "permissions",
+    "denyWrite",
+    "denyRead",
+    "allowedDomains",
+  ]
+---
+
+<Note>
+  **Beta** — OS-level Sandbox is opt-in and under active development. Behavior,
+  settings, and platform support may change between releases.
+</Note>
+
+OS-level sandboxing lets users set filesystem and network boundaries for Droid. In the Beta version, all shell commands initiated by Droid run in a separate process that is limited to the filesystem and network boundaries configured by users and enforced at the OS kernel level.
+
+Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp on Linux, and an HTTP/SOCKS proxy for domain-level network filtering. Windows is supported via WSL2.
+
+## Default access policies (when sandbox is enabled)
+
+| Resource        | Default policy                                                                                                            | Configurable via                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **File reads**  | Allow all. Only explicit `denyRead` entries are blocked.                                                                  | `sandbox.filesystem.denyRead`                                   |
+| **File writes** | Deny all except **CWD** (current working directory). Additional paths can be allowed. `denyWrite` overrides `allowWrite`. | `sandbox.filesystem.allowWrite`, `sandbox.filesystem.denyWrite` |
+| **Network**     | Deny all except `*.factory.ai` (always allowed by default). Additional domains must be explicitly allowed.                | `sandbox.network.allowedDomains`                                |
+
+## What's included
+
+**Per-command sandbox mode** (default when enabled):
+
+- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- `checkFileAccess()` before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes
+- **Execute tool** -- shell commands wrapped in OS sandbox (Seatbelt/bubblewrap) with network routed through SRT's filtering proxy for domain-level control
+- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`
+- **Note** -- main Droid process, MCPs and subagent are not isolated yet.
+
+**Interactive permission prompts (TUI mode):**
+
+- Sandbox violations interrupt the agent loop with a TUI prompt, even at Auto (High) autonomy
+- Three options: **Allow once**, **Allow always** (persists to settings), **Deny**
+- For `denyWrite` violations: "Remove from deny list" option instead of "Allow always" (removes the entry from `denyWrite` in settings)
+- For `denyRead` violations: "Remove from deny list" option instead of "Allow always"
+- For Execute network violations: real-time domain prompts via SRT's proxy callback with 60s auto-deny timeout
+
+**Non-interactive mode (`droid exec`):**
+
+- Sandbox violations are auto-denied without prompting -- no hang, no user interaction required
+- The agent receives a denial message and reports it in the output
+
+**Allow-always persistence:**
+
+- File write violations (outside CWD): adds parent directory to `sandbox.filesystem.allowWrite` in user settings
+- `denyWrite` violations: removes the entry from `sandbox.filesystem.denyWrite`
+- `denyRead` violations: removes the entry from `sandbox.filesystem.denyRead`
+- Domain violations: adds domain (with wildcard for 3+ part domains, e.g. `registry.npmjs.org` -> `*.npmjs.org`) to `sandbox.network.allowedDomains`
+- Changes take effect immediately in the current session
+
+**Org-managed enforcement:**
+
+- Org-level `denyWrite`/`denyRead` settings cannot be overridden by user "Allow always"
+- Violation prompt shows "(organization policy)" when the deny comes from org settings
+
+**TUI indicators:**
+
+- `SANDBOX` status indicator in footer when sandbox is enabled
+- "Sandbox Violation" prompt with violation details (path, domain, reason)
+
+## Settings config
+
+```jsonc
+{
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      // Additional writable paths beyond CWD (which is always writable)
+      "allowWrite": ["/tmp/build-output", "~/.config"],
+      // Deny writes to specific subpaths even if parent is in allowWrite
+      "denyWrite": ["/tmp/build-output/cache/locks", "~/.config/secrets"],
+      // Block reads to specific paths (everything else is readable)
+      "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"],
+    },
+    "network": {
+      // Only these domains are reachable (*.factory.ai always included)
+      "allowedDomains": ["github.com", "*.npmjs.org"],
+    },
+  },
+}
+```
+
+Settings merge across the hierarchy (org > project > user). `denyWrite`/`denyRead` use union merge -- org denies cannot be removed downstream.
+
+## Related
+
+- [Autonomy Level](/cli/user-guides/auto-run) -- approval policy for tool risk.
+- [Settings](/cli/configuration/settings) -- where `sandbox.*` lives.
+- [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) -- how org policy merges with user settings.
+- [Security](/cli/account/security) -- broader security model for the Droid CLI.
