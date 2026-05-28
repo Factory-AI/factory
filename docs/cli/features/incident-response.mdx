@@ -16,15 +16,11 @@ keywords:
 
 When an alert lands in a configured Slack channel, Factory automatically starts a linked Droid session so Droid can investigate the incident with the right context, machine, and instructions.
 
-Droid can work toward an RCA, open a PR for a fix when appropriate, and update a local incident runbook so future investigations of the same alert type start faster.
+Droid can work toward an RCA, open a PR for a fix when appropriate, and update an incident runbook so future investigations of the same alert type start faster.
 
-## Prerequisites
-
-Before setting up Incident Response, make sure you have:
-
-- A connected [Slack integration](/integrations/slack).
-- The Factory Slack app invited to the incident channel with `/invite @Factory`.
-- A Factory **Manager** or **Owner** role. Channel auto-run settings require elevated org permissions.
+<Warning>
+  Configuring Factory channel auto-run requires a Factory **Owner** or **Manager** role.
+</Warning>
 
 ## Quickstart: set up from the Factory App
 
@@ -32,7 +28,7 @@ Use the web UI when you want to review all Slack channel settings in one place.
 
 <Steps>
   <Step title="Open the Slack integration settings">
-    In the Factory App, go to **Settings → Integrations → Slack**. Confirm Slack is connected, then open the Slack management view.
+    In the Factory App, go to **Settings → Integrations → Slack**. If you have not connected Slack yet, set up the [Slack integration](/integrations/slack) first, then open the Slack management view.
   </Step>
 
   <Step title="Invite Factory to the incident channel">
@@ -73,7 +69,7 @@ Use the web UI when you want to review all Slack channel settings in one place.
   </Step>
 </Steps>
 
-## Quickstart: set up from Droid CLI
+## Alternative: Set up with Droid CLI
 
 Use the CLI flow when you are already in Droid and want a guided incident-channel setup.
 
