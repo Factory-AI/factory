@@ -101,24 +101,18 @@ Use the CLI flow when you are already in Droid and want a guided incident-channe
   </Step>
 </Steps>
 
-## How the incident flow works
-
-Once configured, Incident Response follows this flow:
-
-1. An alert bot posts a top-level message in the configured Slack channel.
-2. Factory recognizes the channel and auto-run settings.
-3. Factory starts a Droid session using the configured owner, machine, visibility, model, and prompt.
-4. Droid receives the Slack message and incident instructions.
-5. Droid checks for an `incident-guidelines` runbook on the local device and reuses any matching alert-type guidance before rediscovering tools, auth, repos, and investigation paths.
-6. Droid investigates with the configured tools and should invoke the `/incident` workflow when RCA is appropriate.
-7. After a confirmed RCA, Droid can save reusable learnings back to `incident-guidelines` so future incidents of the same type start with the known tools, repos, auth methods, and gotchas.
-8. Factory posts status and session links back into Slack so responders can follow the investigation.
-
-The generated session gives Droid a strong starting point: the Slack alert text, the channel-specific prompt, access to the selected execution environment, and any matching local incident runbook. From there, Droid can inspect code, query logs, read dashboards through connected tools, ask for clarification when supported, and summarize likely root cause, impact, mitigations, and follow-up actions.
-
-The `incident-guidelines` runbook is stored as a local skill, either in the project at `.factory/skills/incident-guidelines/SKILL.md` for team reuse or in `~/.factory/skills/incident-guidelines/SKILL.md` for personal reuse. It stores concise, reusable mappings for alert types, required tools, interfaces, auth methods, repositories, and generic gotchas; it should not store secrets, account IDs, hardcoded URLs, one-off RCA details, or inline scripts.
-
 ## Configuration details
+
+### Customizing the prompt
+
+The channel prompt is injected into every auto-run session for that channel. Keep it specific to incident work:
+
+- Tell Droid to run RCA and use the `/incident` workflow when appropriate.
+- Mention the primary services or repositories for that channel.
+- Point Droid at runbooks, dashboards, or common alert sources.
+- State escalation expectations, such as when to summarize uncertainty instead of taking action.
+
+Avoid prompts that make the channel a general-purpose automation surface. Incident Response works best when the prompt is narrow and operational.
 
 ### Channel selection
 
@@ -143,22 +137,23 @@ The selected computer or workspace is where Droid runs the investigation. It sho
 
 Use [Droid Computers](/cli/features/droid-computers) when the incident workflow depends on a persistent environment with preconfigured tools.
 
-### Prompt
-
-The channel prompt is injected into every auto-run session for that channel. Keep it specific to incident work:
-
-- Tell Droid to run RCA and use the `/incident` workflow when appropriate.
-- Mention the primary services or repositories for that channel.
-- Point Droid at runbooks, dashboards, or common alert sources.
-- State escalation expectations, such as when to summarize uncertainty instead of taking action.
-
-Avoid prompts that make the channel a general-purpose automation surface. Incident Response works best when the prompt is narrow and operational.
-
 ### Visibility and model
 
 Private sessions are visible to the session owner. Organization-visible sessions can be reviewed by other members, which is useful for incident handoff and postmortem review.
 
 Use the default model unless your team has a known preference for incident analysis. For complex production incidents, choose a stronger reasoning model if available.
+
+## How the incident flow works
+
+Once configured, Incident Response follows this flow:
+
+1. An alert bot posts a top-level message in the configured Slack channel.
+2. Factory starts a Droid session using the channel's owner, machine, visibility, model, and prompt.
+3. Droid receives the Slack alert context and checks for any matching `incident-guidelines` runbook guidance.
+4. Droid investigates with the configured tools and should invoke the `/incident` workflow when RCA is appropriate.
+5. Factory posts status and session links back into Slack, and Droid can save reusable learnings for similar incidents.
+
+The `incident-guidelines` runbook is stored locally at `.factory/skills/incident-guidelines/SKILL.md` for team reuse or `~/.factory/skills/incident-guidelines/SKILL.md` for personal reuse. It should store reusable investigation guidance, not secrets or one-off RCA details.
 
 ## Troubleshooting
 
