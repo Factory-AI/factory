@@ -27,11 +27,11 @@ Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp
 
 ## Default access policies (when sandbox is enabled)
 
-| Resource        | Default policy                                                                                                                              | Configurable via                                                |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| **File reads**  | Allow all. Only explicit `denyRead` entries are blocked.                                                                                    | `sandbox.filesystem.denyRead`                                   |
-| **File writes** | Deny all except **CWD** (current working directory). Additional paths can be allowed. `denyWrite` overrides `allowWrite`.                   | `sandbox.filesystem.allowWrite`, `sandbox.filesystem.denyWrite` |
-| **Network**     | Deny all except `*.factory.ai` (always allowed by default). Additional domains must be explicitly allowed.                                  | `sandbox.network.allowedDomains`                                |
+| Resource        | Default policy                                                                                                            | Configurable via                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **File reads**  | Allow all. Only explicit `denyRead` entries are blocked.                                                                  | `sandbox.filesystem.denyRead`                                   |
+| **File writes** | Deny all except **CWD** (current working directory). Additional paths can be allowed. `denyWrite` overrides `allowWrite`. | `sandbox.filesystem.allowWrite`, `sandbox.filesystem.denyWrite` |
+| **Network**     | Deny all except `*.factory.ai` (always allowed by default). Additional domains must be explicitly allowed.                | `sandbox.network.allowedDomains`                                |
 
 ## What's included
 
@@ -39,8 +39,8 @@ Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp
 
 - **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- `checkFileAccess()` before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes
 - **Execute tool** -- shell commands wrapped in OS sandbox (Seatbelt/bubblewrap) with network routed through SRT's filtering proxy for domain-level control
-- **FetchUrl / WebSearch** -- `checkNetworkAccess()` against `allowedDomains`
-- **Task (subagent)** -- inherits the same sandbox config
+- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`
+- **Note** -- main Droid process, MCPs and subagent are not isolated yet.
 
 **Interactive permission prompts (TUI mode):**
 
@@ -85,13 +85,13 @@ Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp
       // Deny writes to specific subpaths even if parent is in allowWrite
       "denyWrite": ["/tmp/build-output/cache/locks", "~/.config/secrets"],
       // Block reads to specific paths (everything else is readable)
-      "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"]
+      "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"],
     },
     "network": {
       // Only these domains are reachable (*.factory.ai always included)
-      "allowedDomains": ["github.com", "*.npmjs.org"]
-    }
-  }
+      "allowedDomains": ["github.com", "*.npmjs.org"],
+    },
+  },
 }
 ```
 
