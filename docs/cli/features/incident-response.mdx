@@ -1,6 +1,6 @@
 ---
 title: Incident Response
-description: Set up Droid to investigate incidents from Slack, run RCA workflows, and keep response work linked to the alert channel.
+description: Set up Droid to respond to production alerts in Slack and resolve or investigate incidents autonomously.
 keywords:
   [
     "incident response",
@@ -14,9 +14,9 @@ keywords:
   ]
 ---
 
-Incident Response turns production alerts and incident threads into Droid-led RCA investigations.
+When an alert lands in a configured Slack channel, Factory automatically starts a linked Droid session so Droid can investigate the incident with the right context, machine, and instructions.
 
-It helps responders move from alert to investigation faster by automatically starting a linked Droid session with the right context, machine, and instructions.
+Droid can work toward an RCA, open a PR for a fix when appropriate, and update a local incident runbook so future investigations of the same alert type start faster.
 
 ## Prerequisites
 
@@ -25,10 +25,6 @@ Before setting up Incident Response, make sure you have:
 - A connected [Slack integration](/integrations/slack).
 - The Factory Slack app invited to the incident channel with `/invite @Factory`.
 - A Factory **Manager** or **Owner** role. Channel auto-run settings require elevated org permissions.
-
-<Note>
-  Connecting Slack itself may require Slack workspace admin permissions. Configuring Factory channel auto-run requires a Factory Manager or Owner role.
-</Note>
 
 ## Quickstart: set up from the Factory App
 
