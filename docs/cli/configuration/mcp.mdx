@@ -44,7 +44,7 @@ Type `/mcp` within droid to open the interactive MCP manager. From here you can:
 
 ## Adding Servers via CLI
 
-For scripting and automation, use `droid mcp add`. Droid supports two types of servers: **http** (remote endpoints) and **stdio** (local processes).
+For scripting and automation, use `droid mcp add`. Droid supports three transports: **http** (streamable HTTP remote endpoints), **sse** (Server-Sent Events remote endpoints), and **stdio** (local processes).
 
 ### Adding HTTP Servers
 
@@ -167,9 +167,26 @@ droid mcp add stytch http://mcp.stytch.dev/mcp --type http
 ```
 
 <Tip>
-  Many HTTP servers require OAuth authentication. After adding, use the
-  interactive `/mcp` UI to complete the authentication flow.
+  Many remote servers (HTTP and SSE) require OAuth authentication. After adding,
+  use the interactive `/mcp` UI to complete the authentication flow.
 </Tip>
+
+### Adding SSE Servers
+
+SSE servers are remote MCP endpoints that stream responses over Server-Sent Events — use this transport when a server exposes an SSE endpoint instead of streamable HTTP. Arguments mirror HTTP servers; only `--type` changes.
+
+**Syntax:**
+
+```bash
+droid mcp add <name> <url> --type sse [--header "KEY: VALUE"...]
+```
+
+**Example:**
+
+```bash
+droid mcp add example-sse https://mcp.example.com/sse --type sse \
+  --header "Authorization: Bearer YOUR_TOKEN"
+```
 
 ### Adding Stdio Servers
 
@@ -235,16 +252,19 @@ Type `/mcp` within droid to open an interactive UI for managing MCP servers.
 
 ## Configuration
 
-MCP server configurations can be stored at two levels:
+MCP server configurations are loaded from local files at the following levels:
 
 | Level | Location | Purpose |
 | :---- | :------- | :------ |
 | **User** | `~/.factory/mcp.json` | Your personal servers, available in all projects |
-| **Project** | `.factory/mcp.json` | Shared team servers, committed to the repo |
+| **Folder** | `.factory/mcp.json` in any ancestor directory of the project | Servers shared across nested projects under a common parent folder |
+| **Project** | `.factory/mcp.json` in the project root | Shared team servers, committed to the repo |
+
+Organization administrators can also centrally provide servers and restrict which ones are allowed via organization-managed settings (see [Enterprise MCP policy](#enterprise-mcp-policy)).
 
 ### How Layering Works
 
-User config takes priority over project config. When both levels define the same server, the user-level settings win.
+When the same server is defined at multiple levels, user config takes priority, followed by folder-level config, then project config.
 
 **Key behaviors:**
 - When you **enable/disable** a project-defined server, a copy is saved to your user config with the new state. The original project config remains unchanged, so your teammates aren't affected.
@@ -263,7 +283,7 @@ Each server entry includes:
 
 | Field | Type | Description |
 | :---- | :--- | :---------- |
-| `type` | `"stdio" \| "http"` | Server type |
+| `type` | `"stdio" \| "http" \| "sse"` | Server type. May be omitted for stdio servers, which default to `stdio`. |
 | `disabled` | `boolean` | Temporarily disable the server (default: `false`) |
 | `disabledTools` | `string[]` | List of tool names to disable for this MCP server |
 
@@ -272,9 +292,14 @@ For **stdio** servers:
 - **args**: Command-line arguments (array)
 - **env**: Environment variables (object)
 
-For **http** servers:
+For **http** and **sse** servers:
 - **url**: HTTP/HTTPS endpoint URL
 - **headers**: HTTP headers for authentication (object)
+- **oauth**: Optional OAuth overrides for the remote server (object). Supported fields:
+  - **scopes**: OAuth scopes to request (array)
+  - **clientId**: OAuth client ID
+  - **clientSecret**: OAuth client secret
+  - **callbackPort**: Local port used for the OAuth callback
 
 **Example `mcp.json`:**
 
@@ -286,8 +311,15 @@ For **http** servers:
       "url": "https://mcp.linear.app/mcp",
       "disabled": false
     },
+    "example-sse": {
+      "type": "sse",
+      "url": "https://mcp.example.com/sse",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      },
+      "disabled": false
+    },
     "playwright": {
-      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest"],
       "disabled": false
@@ -304,8 +336,8 @@ Organizations can centrally control which MCP servers are allowed via the `mcpPo
 
 | Field | Type | Description |
 | :---- | :--- | :---------- |
-| `enabled` | `boolean` | Toggle MCP support on or off for the org. When `false`, all MCP servers are blocked. |
-| `allowlist` | `string[]` | Optional list of server names users are permitted to enable. When set, any server not on the list is blocked. |
+| `enabled` | `boolean` | Whether policy enforcement is active. Enforcement applies only when `enabled` is `true`. When `enabled` is absent or `false`, no policy is enforced and configured MCP servers are allowed. |
+| `allowlist` | `string[]` | List of allowed server matchers, applied only when the policy is enabled. Entries match the hostname of a remote HTTP/SSE server's URL, or the command and arguments of a stdio server — not the configured server name. When the policy is enabled with an empty or absent allowlist, all servers are blocked. |
 
 **Example org-managed settings:**
 
@@ -313,12 +345,12 @@ Organizations can centrally control which MCP servers are allowed via the `mcpPo
 {
   "mcpPolicy": {
     "enabled": true,
-    "allowlist": ["linear", "sentry", "notion"]
+    "allowlist": ["mcp.linear.app", "mcp.sentry.dev", "npx"]
   }
 }
 ```
 
 <Note>
-  `mcpPolicy` is an enterprise/org-level setting and is enforced through managed settings — individual users cannot override it. Servers blocked by policy will not appear in the `/mcp` registry browser or load from `mcp.json`.
+  `mcpPolicy` is an enterprise/org-level setting and is enforced through managed settings — individual users cannot override it. Servers disallowed by policy remain in `mcp.json` and are still loaded into your configuration, but they are filtered out from running or connecting and do not appear as available in the `/mcp` manager.
 </Note>
 
