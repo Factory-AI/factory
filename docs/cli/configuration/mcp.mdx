@@ -163,7 +163,7 @@ droid mcp add vercel https://mcp.vercel.com/ --type http
 **Stytch** - Configure authentication services
 
 ```bash
-droid mcp add stytch http://mcp.stytch.dev/mcp --type http
+droid mcp add stytch https://mcp.stytch.dev/mcp --type http
 ```
 
 <Tip>
@@ -300,6 +300,10 @@ For **http** and **sse** servers:
   - **clientId**: OAuth client ID
   - **clientSecret**: OAuth client secret
   - **callbackPort**: Local port used for the OAuth callback
+
+<Warning>
+  Project-level `.factory/mcp.json` is committed to the repo. Never put secrets — `headers` auth tokens (e.g. `Authorization`), `oauth.clientSecret`, or API keys — in project config. Keep them in your user-level config (`~/.factory/mcp.json`) or supply them via environment variables, and rely on Droid's keyring for OAuth tokens.
+</Warning>
 
 **Example `mcp.json`:**
 
