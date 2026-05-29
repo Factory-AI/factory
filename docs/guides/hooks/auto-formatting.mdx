@@ -45,24 +45,22 @@ rustup component add rustfmt
 
 ### Single language project
 
-For a JavaScript/TypeScript project, add this to your `.factory/settings.json`:
+For a JavaScript/TypeScript project, add this to your `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.(ts|tsx|js|jsx)$'; then npx prettier --write \"$file_path\" 2>&1 && echo \"✓ Formatted $file_path\"; fi; }",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.(ts|tsx|js|jsx)$'; then npx prettier --write \"$file_path\" 2>&1 && echo \"✓ Formatted $file_path\"; fi; }",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -136,24 +134,22 @@ Make the script executable:
 chmod +x .factory/hooks/format.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format.sh",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format.sh",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -165,20 +161,18 @@ Use project-specific prettier config:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.(ts|tsx|js|jsx)$'; then npx prettier --config \"$DROID_PROJECT_DIR\"/.prettierrc --write \"$file_path\" 2>&1; fi; }",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.(ts|tsx|js|jsx)$'; then npx prettier --config \"$DROID_PROJECT_DIR\"/.prettierrc --write \"$file_path\" 2>&1; fi; }",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -243,24 +237,22 @@ Make the script executable:
 chmod +x .factory/hooks/format-and-lint.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format-and-lint.sh",
-            "timeout": 45
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format-and-lint.sh",
+          "timeout": 45
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -300,24 +292,22 @@ Make the script executable:
 chmod +x .factory/hooks/format-src-only.sh
 ```
 
-Add to `.factory/settings.json`:
+Add to `.factory/hooks.json`:
 
 ```json
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Create|Edit|ApplyPatch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format-src-only.sh",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "PostToolUse": [
+    {
+      "matcher": "Create|Edit|ApplyPatch",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "\"$DROID_PROJECT_DIR\"/.factory/hooks/format-src-only.sh",
+          "timeout": 30
+        }
+      ]
+    }
+  ]
 }
 ```
 
