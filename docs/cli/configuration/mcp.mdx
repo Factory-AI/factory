@@ -44,7 +44,7 @@ Type `/mcp` within droid to open the interactive MCP manager. From here you can:
 
 ## Adding Servers via CLI
 
-For scripting and automation, use `droid mcp add`. Droid supports three transports: **http** (streamable HTTP remote endpoints), **sse** (Server-Sent Events remote endpoints), and **stdio** (local processes).
+For scripting and automation, use `droid mcp add`. Droid supports three transports: **http** (Streamable HTTP — the current MCP standard, which uses SSE internally to stream responses), **sse** (the legacy standalone HTTP+SSE transport, for older servers), and **stdio** (local processes).
 
 ### Adding HTTP Servers
 
@@ -173,7 +173,7 @@ droid mcp add stytch http://mcp.stytch.dev/mcp --type http
 
 ### Adding SSE Servers
 
-SSE servers are remote MCP endpoints that stream responses over Server-Sent Events — use this transport when a server exposes an SSE endpoint instead of streamable HTTP. Arguments mirror HTTP servers; only `--type` changes.
+`sse` is the legacy HTTP+SSE transport (MCP protocol version `2024-11-05`), which exposes a standalone Server-Sent Events endpoint. It was superseded by Streamable HTTP (`--type http`), which already streams over SSE internally — so prefer `http` and reach for `sse` only when a server offers just the older standalone SSE endpoint. Arguments mirror HTTP servers; only `--type` changes.
 
 **Syntax:**
 
