@@ -298,6 +298,10 @@ For **http** servers:
 
 Droid automatically reloads when the configuration file changes, so servers are immediately available after adding them.
 
+## Per-droid server selection
+
+[Custom droids](/cli/configuration/custom-droids) can select which configured MCP servers they're allowed to use via the `mcpServers` field in their frontmatter. This scopes a subagent to specific servers (e.g., `mcpServers: ["linear", "github"]`) instead of inheriting every server in the session. For finer-grained control, a droid's `tools` list can name exact registered MCP tool IDs. See [Selecting MCP servers](/cli/configuration/custom-droids#selecting-mcp-servers) for details.
+
 ## Enterprise MCP policy
 
 Organizations can centrally control which MCP servers are allowed via the `mcpPolicy` setting in org-managed settings. This lets administrators restrict MCP access at the org level so users can only connect to vetted servers.
