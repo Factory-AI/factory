@@ -189,6 +189,10 @@ droid mcp add <name> "<command>" [--env KEY=VALUE...]
 
 ### 人気のStdio MCPサーバー
 
+<Tip>
+  これらの `npx` の例は、各パッケージの最新公開バージョンをインストールします。セキュリティが重要な環境では、明示的なバージョンをピン留め（例：`airtable-mcp-server@1.4.0`）して、更新を意図的に行い、実行前に変更を監査できるようにしてください。
+</Tip>
+
 **Airtable** - レコードの読み取り/書き込み、ベースとテーブルの管理
 
 ```bash
@@ -265,7 +269,9 @@ OAuthトークンはシステムキーリング（またはフォールバック
 | :---- | :--- | :---------- |
 | `type` | `"stdio" \| "http"` | サーバータイプ |
 | `disabled` | `boolean` | サーバーを一時的に無効化（デフォルト：`false`） |
-| `disabledTools` | `string[]` | このMCPサーバーで無効化するツール名のリスト |
+| `enabledTools` | `string[]` | このサーバーから読み込むツール名の許可リスト。設定されている場合、リストに記載されたツールのみがコンテキストに読み込まれます。 |
+| `disabledTools` | `string[]` | このサーバーから除外するツール名のブロックリスト。無効化されたツールはコンテキストに読み込まれません。 |
+| `timeoutMs` | `number` | MCP ツール呼び出しタイムアウトのサーバーごとの上書き（ミリ秒）。省略時はグローバルデフォルトにフォールバックします。 |
 
 **stdio**サーバーの場合：
 - **command**: 実行する実行可能ファイル
@@ -297,6 +303,128 @@ OAuthトークンはシステムキーリング（またはフォールバック
 ```
 
 Droidは設定ファイルの変更時に自動的にリロードされるため、サーバーを追加した後すぐに利用可能になります。
+
+### 変数展開
+
+Droid は設定の読み込み時に、現在のシェル環境に対して `mcp.json` 内の `${VAR}` および `${VAR:-default}` 参照を展開します。これにより、シークレットをファイル自体から切り離し、シークレットマネージャー、`.env` ローダー、またはシェルプロファイルから取得できます。
+
+変数展開がサポートされる箇所：
+
+- **stdio** サーバーの `command` および `args` エントリ
+- **stdio** サーバーの `env` 値
+- **http** サーバーの `url`
+- **http** サーバーの `headers` 値
+
+**例 — 環境から API キーを取得：**
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "disabled": false
+    },
+    "airtable": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "airtable-mcp-server"],
+      "env": {
+        "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+参照された変数が未設定でデフォルトも指定されていない場合、Droid はプレースホルダーをそのまま残し、次回サーバー起動時に警告を表示します。安全なデフォルトを提供するには `${VAR:-fallback}` を使用してください。
+
+<Note>
+  生の `mcp.json` ファイルが展開後の値で書き換えられることはありません。展開は読み込み時にメモリ内で行われるため、シークレットがディスクやバージョン管理に残ることはありません。
+</Note>
+
+### ツール単位のフィルタリング
+
+サーバーは多数のツールを公開することがあり、必ずしもすべてをすべてのセッションに読み込む必要はありません。`enabledTools` と `disabledTools` を使えば、`mcp.json` の中でツールの公開範囲を永続的に絞り込めます。これは `droid exec` の `--enabled-tools` / `--disabled-tools` フラグと同等の機能をファイルベースで提供します。
+
+- `disabledTools`：ブロックリスト — サーバーが報告するすべてのツールが読み込まれますが、リストされた名前は**除外**されます。
+- `enabledTools`：許可リスト — リストされたツール**のみ**が読み込まれます。
+- 両方が設定された場合は `enabledTools` が優先され、`disabledTools` は無視されます。
+- フィルタリングで除外されたツールはモデルに登録されないため、コンテキストトークンを消費しません。
+
+**例 — 不要なツールをブロックリストに追加：**
+
+```json
+{
+  "mcpServers": {
+    "my-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@some/mcp-server"],
+      "disabledTools": ["tool_i_dont_need", "another_unused_tool"]
+    }
+  }
+}
+```
+
+**例 — 使用するツールのみを許可リストに指定：**
+
+```json
+{
+  "mcpServers": {
+    "another-server": {
+      "type": "http",
+      "url": "https://mcp.example.com/mcp",
+      "enabledTools": ["only_tool_i_want", "and_this_one"]
+    }
+  }
+}
+```
+
+<Tip>
+  Droid 内で `/mcp` を実行すると、サーバーが公開するツールの完全なリストを確認できます。そこから正確なツール名をコピーして `enabledTools` または `disabledTools` に貼り付けてください。
+</Tip>
+
+### MCP 呼び出しタイムアウト
+
+デフォルトでは、Droid はすべての MCP ツール呼び出しにグローバルタイムアウトを適用します。長時間実行されるツール（大規模なデータエクスポート、ブラウザ自動化、モデルバックエンドのサーバーなど）はこのデフォルトを超えてタイムアウトエラーで失敗することがあります。
+
+サーバーごとに `timeoutMs` でタイムアウトを上書きできます：
+
+```json
+{
+  "mcpServers": {
+    "slow-server": {
+      "type": "stdio",
+      "command": "my-long-running-server",
+      "timeoutMs": 120000
+    }
+  }
+}
+```
+
+`settings.json` の `mcp.callTimeoutMs` 設定でグローバルデフォルトを変更することもできます：
+
+```json
+{
+  "mcp": {
+    "callTimeoutMs": 60000
+  }
+}
+```
+
+解決順序（優先度の高い順）：
+
+1. `mcp.json` 内のサーバーごとの `timeoutMs`
+2. `settings.json` 内のグローバル `mcp.callTimeoutMs`
+3. 組み込みデフォルト
+
+<Note>
+  タイムアウトを延長しても変わるのは Droid がレスポンスを待つ時間だけで、MCP サーバー自身や上流の API が課すタイムアウトは延長されません。
+</Note>
 
 ## Enterprise MCP ポリシー
 
