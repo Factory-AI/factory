@@ -112,6 +112,7 @@ Key metadata fields:
 | `model`           | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`. See the [Available Models](/models) for model IDs. |
 | `reasoningEffort` | Optional. Set reasoning effort for models that support it (e.g., `low`, `medium`, `high`). Ignored when `model` is `inherit`. Must be compatible with the selected model. |
 | `tools`           | Tool selection: omit for all tools, use a category string (e.g., `read-only`), or specify an array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive. |
+| `mcpServers`      | Optional. Array of [MCP server](/cli/configuration/mcp) names whose tools should be available to this droid. When set, only tools from the listed servers are exposed to the subagent; omit to fall back to your global MCP tool availability. |
 
 Prompts must start with YAML frontmatter containing at least `name` and include a non-empty body. `DroidValidator` surfaces errors (invalid names, unknown models, unknown tools) and warnings (missing description, duplicated tools). Validation issues appear in the CLI logs when a file fails to load.
 
@@ -136,6 +137,31 @@ Explicit arrays must use the tool names above (case-sensitive). Unknown names ca
 <Note>
   When using `Edit` with OpenAI models, `ApplyPatch` is automatically included for compatibility. When `model` is `inherit`, both tools are enabled to ensure coverage across model providers.
 </Note>
+
+### Scoping MCP servers to a droid
+
+Use `mcpServers` to limit which [MCP servers](/cli/configuration/mcp) a custom droid can use. The droid receives the tools from each listed server in addition to any tools declared in `tools`; servers that are configured in `mcp.json` but not listed here are excluded from the subagent's tool allowlist.
+
+```md
+---
+name: mcp-reviewer
+description: Reviews diffs with Chrome DevTools context
+model: inherit
+tools:
+  - Read
+mcpServers:
+  - chrome-devtools
+---
+
+Use the configured MCP server when needed.
+```
+
+Notes:
+
+- Server names must match entries already configured in `~/.factory/mcp.json` or `.factory/mcp.json`.
+- Omitting `mcpServers` keeps the existing behavior — the droid inherits MCP tool availability from the parent session.
+- Setting `mcpServers: []` excludes all MCP servers, even those configured globally.
+- The configured servers are shown under **MCP Servers:** in the `/droids` detail view so you can confirm the selection is persisted.
 
 ---
 
