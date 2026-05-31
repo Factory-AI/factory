@@ -349,7 +349,7 @@ Each rule maps a URL pattern to a risk level:
 
 - **Remote servers only.** Rules match remote servers that have a URL (`http` and `sse` transports); local `stdio` servers are unaffected.
 - **First match wins.** Rules are checked in order, so list them most-specific first.
-- **Safety floor.** `high` always requires confirmation, and any tool that isn't read-only (destructive, or missing safety metadata) is forced to `high` regardless of the rule — you can relax confirmation for read-only tools but never auto-approve destructive ones.
+- **Safety floor.** A rule sets a tool's risk *classification*, not an absolute prompt: `high`-classified tools still follow the normal [Autonomy Level](/cli/user-guides/auto-run) comparison (High autonomy runs them without an extra prompt unless another safety check intervenes). The floor is one-directional — `low` or `medium` cannot pull a tool that isn't read-only (destructive, or missing safety metadata) below `high`, so you can relax confirmation for read-only tools but never auto-approve destructive ones.
 - **Fallback.** Servers with no matching rule use Droid's built-in tool risk classification (read-only hints and curated defaults).
 
 <Note>
