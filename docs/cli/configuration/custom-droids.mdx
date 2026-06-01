@@ -111,7 +111,8 @@ Key metadata fields:
 | `description`     | Optional. Shown in the UI list. Keep ≤500 chars.                                                                               |
 | `model`           | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`. See the [Available Models](/models) for model IDs. |
 | `reasoningEffort` | Optional. Set reasoning effort for models that support it (e.g., `low`, `medium`, `high`). Ignored when `model` is `inherit`. Must be compatible with the selected model. |
-| `tools`           | Tool selection: omit for all tools, use a category string (e.g., `read-only`), or specify an array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive. |
+| `tools`           | Tool selection: omit for all tools, use a category string (e.g., `read-only`), or specify an array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive. To restrict a droid to specific MCP tools, list their exact registered tool IDs here. |
+| `mcpServers`      | Optional. Array of configured MCP server names (e.g., `["linear", "github"]`) whose tools this droid may use. Servers must already be configured in your [MCP settings](/cli/configuration/mcp). See [Selecting MCP servers](#selecting-mcp-servers). |
 
 Prompts must start with YAML frontmatter containing at least `name` and include a non-empty body. `DroidValidator` surfaces errors (invalid names, unknown models, unknown tools) and warnings (missing description, duplicated tools). Validation issues appear in the CLI logs when a file fails to load.
 
@@ -127,7 +128,7 @@ You can use a category name directly as the `tools` value (e.g., `tools: read-on
 | `web`       | `WebSearch`, `FetchUrl`          | Internet research and content      |
 | `mcp`       | Dynamically populated (if any)   | Model Context Protocol tools       |
 
-Explicit arrays must use the tool names above (case-sensitive). Unknown names cause validation errors.
+Explicit arrays must use valid tool IDs from the table above (case-sensitive) and/or exact registered MCP tool IDs. Unknown IDs cause validation errors.
 
 <Note>
   `TodoWrite` is automatically included for all droids to enable task tracking. You don't need to add it to your tools list.
@@ -136,6 +137,27 @@ Explicit arrays must use the tool names above (case-sensitive). Unknown names ca
 <Note>
   When using `Edit` with OpenAI models, `ApplyPatch` is automatically included for compatibility. When `model` is `inherit`, both tools are enabled to ensure coverage across model providers.
 </Note>
+
+### Selecting MCP servers
+
+Use the `mcpServers` field to grant a droid access to specific [MCP servers](/cli/configuration/mcp) you've already configured. Listing a server enables that server's MCP tools for the droid, without exposing every other server connected to your session.
+
+```md
+---
+name: issue-researcher
+description: Researches issues using repository context and tracker data
+model: inherit
+tools: ["Read", "Grep"]
+mcpServers: ["linear", "github"]
+---
+
+Investigate the issue referenced in the prompt using the codebase and the
+selected MCP servers, then summarize findings and propose next steps.
+```
+
+- `mcpServers` references servers by the names they're registered under in `mcp.json` (user or project level), and grants the droid every MCP tool those servers expose.
+- For finer-grained control, list exact registered MCP tool IDs in `tools` to allow only specific tools rather than a whole server.
+- Servers blocked by an [enterprise MCP policy](/cli/configuration/mcp#enterprise-mcp-policy) stay unavailable even if listed here.
 
 ---
 
