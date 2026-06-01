@@ -4,6 +4,42 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="May 29" rss={{ title: "CLI Updates", description: "Usage stats, airgapped BYOK, and stability fixes" }}>
+  `v0.137.0`
+
+## New features
+
+- **Airgapped BYOK** - New `FACTORY_AIRGAP_ENABLED` option lets you bypass Factory auth when using your own model keys
+
+## Bug fixes
+
+- **Duplicate thinking output** - Thinking output no longer renders twice
+- **MCP permission persistence** - MCP permissions now persist across all confirmation paths
+- **Context usage meter** - Fixed alignment of the context usage meter
+
+</Update>
+
+<Update label="May 27" rss={{ title: "CLI Updates", description: "Adaptive terminal theme, agent-browser update, and stability fixes" }}>
+  `v0.135.0`
+
+## New features
+
+- **Adaptive terminal theme** - The CLI now auto-detects your terminal background and picks a matching theme
+
+## Improvements
+
+- **Agent-browser update** - Updated the bundled `agent-browser` skill to a newer release with better automation reliability
+- **Subagent type badges** - Subagent type badges in `TaskOutput` now render in PascalCase for easier reading
+
+## Bug fixes
+
+- **Message draft attachments** - Message draft attachments are now preserved when switching contexts (app)
+- **Session activity indicator** - Improved the activity indicator in the session panel (app)
+- **Enterprise Controls forms** - Empty arrays and records are no longer written when saving Enterprise Controls (app)
+- **Enterprise Controls layout** - Aligned control heights across Enterprise Controls forms (app)
+  
+</Update>
+
 <Update label="May 28" rss={{ title: "CLI Updates", description: "Deep review skill, side questions in the app, session compression controls, and stability fixes" }}>
   `v0.136.0`
 
@@ -26,6 +62,25 @@ rss: true
 - **Autoscroll fixes** - Fixed several autoscroll issues in the session view (app)
 - **Reasoning-only turns** - Fixed sessions stalling when the assistant returned only reasoning
 - **DeepSeek tool calls** - Improved reliability of multi-step tool calls when using DeepSeek models
+
+</Update>
+
+<Update label="May 26" rss={{ title: "CLI Updates", description: "Stability fixes and UI polish" }}>
+  `v0.134.0`
+
+## Improvements
+
+- **Figma helper skill** - The built-in Figma skill has been renamed from `figma-mcp-promotion` to `figma-mcp-helper`
+- **System-managed settings** - System-managed settings are now loaded from standard platform paths
+
+## Bug fixes
+
+- **File tool rendering** - File tool inputs now wait for streaming to complete before rendering to avoid showing partial data
+- **Slash command suggestions** - Slash command suggestion rows now keep a consistent height
+- **Pending command approvals** - Capped the number of pending command approvals shown at once
+- **New session sidebar animation** - Smoothed the animation when starting a new session from the sidebar (app)
+- **Session titles in sidebar** - Session titles are now preserved correctly in the sidebar (app)
+- **AskUser question labels** - Question labels now pluralize correctly when multiple questions are asked
 
 </Update>
 
