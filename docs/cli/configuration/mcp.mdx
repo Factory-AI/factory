@@ -1,7 +1,7 @@
 ---
 title: 'Model Context Protocol (MCP)'
 description: 'Connect your own tools with Model Context Protocol'
-keywords: ['mcp', 'model context protocol', 'tools', 'droid mcp', 'mcp servers', 'mcp tools', 'integrations', 'connect tools', 'extend droid', 'cli mcp', 'add mcp', 'mcp add']
+keywords: ['mcp', 'model context protocol', 'tools', 'droid mcp', 'mcp servers', 'mcp tools', 'integrations', 'connect tools', 'extend droid', 'cli mcp', 'add mcp', 'mcp add', 'mcp autonomy', 'mcpAutonomyUrlOverrides', 'mcp policy', 'managed settings']
 ---
 
 Model Context Protocol (MCP) servers extend droid's capabilities by providing additional tools and context. Droid offers two ways to manage them: an interactive UI for easy browsing and setup, or CLI commands for scripting and automation.
@@ -322,3 +322,36 @@ Organizations can centrally control which MCP servers are allowed via the `mcpPo
   `mcpPolicy` is an enterprise/org-level setting and is enforced through managed settings — individual users cannot override it. Servers blocked by policy will not appear in the `/mcp` registry browser or load from `mcp.json`.
 </Note>
 
+## MCP autonomy URL overrides
+
+Administrators can assign a default [autonomy risk level](/cli/user-guides/auto-run) to remote MCP servers by URL with the `mcpAutonomyUrlOverrides` org-managed setting, controlling how much confirmation a matching server's tools require before Droid runs them.
+
+Each rule maps a URL pattern to a risk level:
+
+| Field | Type | Description |
+| :---- | :--- | :---------- |
+| `urlPattern` | `string` | Glob pattern ([picomatch](https://github.com/micromatch/picomatch) syntax) matched against the server's URL. |
+| `defaultLevel` | `"low" \| "medium" \| "high"` | Risk level for the matching server's tools, compared against the user's Autonomy Level to decide auto-run vs. confirm. |
+
+**Example org-managed settings:**
+
+```json
+{
+  "mcpAutonomyUrlOverrides": [
+    { "urlPattern": "https://mcp.internal.example.com/**", "defaultLevel": "low" },
+    { "urlPattern": "https://*.partner.example.com/**", "defaultLevel": "medium" },
+    { "urlPattern": "https://**", "defaultLevel": "high" }
+  ]
+}
+```
+
+### Matching and precedence
+
+- **Remote servers only.** Rules match remote servers that have a URL (`http` and `sse` transports); local `stdio` servers are unaffected.
+- **First match wins.** Rules are checked in order, so list them most-specific first.
+- **Safety floor.** A rule sets a tool's risk *classification*, not an absolute prompt: `high`-classified tools still follow the normal [Autonomy Level](/cli/user-guides/auto-run) comparison (High autonomy runs them without an extra prompt unless another safety check intervenes). The floor is one-directional — `low` or `medium` cannot pull a tool that isn't read-only (destructive, or missing safety metadata) below `high`, so you can relax confirmation for read-only tools but never auto-approve destructive ones.
+- **Fallback.** Servers with no matching rule use Droid's built-in tool risk classification (read-only hints and curated defaults).
+
+<Note>
+  `mcpAutonomyUrlOverrides` is admin-managed (MDM): it is delivered through [org-managed settings](/enterprise/hierarchical-settings-and-org-control) and users cannot override or weaken it.
+</Note>
