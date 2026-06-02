@@ -112,6 +112,7 @@ Perform deep analysis of the code or problem presented...
 | `model`           | `inherit` （親セッションのモデルを使用）、またはモデル識別子を指定します。組み込みモデルの場合、`claude-sonnet-4-5-20250929` のような値を使用します。カスタムモデル（BYOK）の場合、`custom:` + 設定の `model` フィールドを使用します（例：`custom:gpt-4o-mini`）。`model_display_name` では**ありません**。モデルIDについては [利用可能なモデル](/jp/models) を参照してください。 |
 | `reasoningEffort` | 任意。対応するモデル（例：`low`、`medium`、`high`）の推論努力を設定します。`model` が `inherit` の場合は無視されます。選択したモデルと互換性が必要です。 |
 | `tools`           | ツール選択：すべてのツールを使用する場合は省略、カテゴリ文字列を使用（例：`read-only`）、または `["Read", "Edit", "Execute"]` のようなツールIDの配列を指定します。大文字小文字を区別します。 |
+| `mcpServers`      | 任意。この droid で利用可能にする [MCP サーバー](/jp/cli/configuration/mcp) 名の配列。設定すると、リストに記載されたサーバーのツールのみがサブエージェントに公開されます。省略するとグローバルな MCP ツールの可用性にフォールバックします。 |
 
 プロンプトは少なくとも `name` を含むYAML frontmatter で始まり、空でない本文を含む必要があります。`DroidValidator` はエラー（無効な名前、未知のモデル、未知のツール）と警告（説明の欠落、重複したツール）を表示します。検証の問題は、ファイルの読み込みに失敗した際にCLI ログに表示されます。
 
@@ -136,6 +137,31 @@ Perform deep analysis of the code or problem presented...
 <Note>
   OpenAIモデルで`Edit`を使用する場合、互換性のため`ApplyPatch`が自動的に含まれます。`model`が`inherit`の場合、モデルプロバイダー全体をカバーするため両方のツールが有効になります。
 </Note>
+
+### droid への MCP サーバーのスコープ設定
+
+`mcpServers` を使うと、カスタム droid が使用できる [MCP サーバー](/jp/cli/configuration/mcp) を限定できます。droid は `tools` で宣言されたツールに加えて、リストされた各サーバーのツールを受け取ります。`mcp.json` で構成されていても、ここにリストされていないサーバーはサブエージェントのツール許可リストから除外されます。
+
+```md
+---
+name: mcp-reviewer
+description: Chrome DevTools のコンテキストを使って差分をレビューします
+model: inherit
+tools:
+  - Read
+mcpServers:
+  - chrome-devtools
+---
+
+必要に応じて構成済みの MCP サーバーを使用してください。
+```
+
+注意点：
+
+- サーバー名は `~/.factory/mcp.json` または `.factory/mcp.json` に既に構成されているエントリと一致している必要があります。
+- `mcpServers` を省略すると既存の動作が維持され、droid は親セッションの MCP ツール可用性を継承します。
+- `mcpServers: []` を設定すると、グローバルに構成されているサーバーを含むすべての MCP サーバーが除外されます。
+- 構成されたサーバーは `/droids` の詳細ビューの **MCP Servers:** に表示され、設定が永続化されていることを確認できます。
 
 ---
 

@@ -206,6 +206,10 @@ droid mcp add <name> "<command>" [--env KEY=VALUE...]
 
 ### Popular Stdio MCP Servers
 
+<Tip>
+  These `npx` examples install the latest published version of each package. For security-sensitive setups, pin an explicit version (e.g. `airtable-mcp-server@1.4.0`) so updates are deliberate and you can audit changes before they run.
+</Tip>
+
 **Airtable** - Read/write records, manage bases and tables
 
 ```bash
@@ -285,7 +289,9 @@ Each server entry includes:
 | :---- | :--- | :---------- |
 | `type` | `"stdio" \| "http" \| "sse"` | Server type. May be omitted for stdio servers, which default to `stdio`. |
 | `disabled` | `boolean` | Temporarily disable the server (default: `false`) |
-| `disabledTools` | `string[]` | List of tool names to disable for this MCP server |
+| `enabledTools` | `string[]` | Allowlist of tool names to load from this server. When set, only listed tools are loaded into context. |
+| `disabledTools` | `string[]` | Blocklist of tool names to exclude from this server. Disabled tools are not loaded into context. |
+| `timeoutMs` | `number` | Per-server override for the MCP tool call timeout in milliseconds. Falls back to the global default when omitted. |
 
 For **stdio** servers:
 - **command**: Executable to run
@@ -333,6 +339,128 @@ For **http** and **sse** servers:
 ```
 
 Droid automatically reloads when the configuration file changes, so servers are immediately available after adding them.
+
+### Variable expansion
+
+Droid expands `${VAR}` and `${VAR:-default}` references in `mcp.json` against your current shell environment when the configuration is loaded. This lets you keep secrets out of the file itself and source them from a secret manager, `.env` loader, or your shell profile.
+
+Variable expansion is supported in:
+
+- `command` and `args` entries for **stdio** servers
+- `env` values for **stdio** servers
+- `url` for **http** servers
+- `headers` values for **http** servers
+
+**Example — sourcing an API key from the environment:**
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "disabled": false
+    },
+    "airtable": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "airtable-mcp-server"],
+      "env": {
+        "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+If a referenced variable is unset and no default is provided, droid leaves the placeholder in place and surfaces a warning the next time the server is started. Use `${VAR:-fallback}` to provide a safe default.
+
+<Note>
+  The raw `mcp.json` file is never rewritten with expanded values — expansion happens in memory at load time, so secrets stay out of disk and version control.
+</Note>
+
+### Per-tool filtering
+
+Servers can expose many tools, and not all of them need to be loaded into every session. `enabledTools` and `disabledTools` let you trim the tool surface persistently in `mcp.json`, mirroring the `--enabled-tools` / `--disabled-tools` flags available on `droid exec`.
+
+- `disabledTools`: blocklist — every tool the server reports is loaded **except** the listed names.
+- `enabledTools`: allowlist — **only** the listed tools are loaded.
+- If both are set, `enabledTools` takes precedence and `disabledTools` is ignored.
+- Filtered-out tools are never registered with the model, so they don't consume context tokens.
+
+**Example — blocklist a noisy tool:**
+
+```json
+{
+  "mcpServers": {
+    "my-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@some/mcp-server"],
+      "disabledTools": ["tool_i_dont_need", "another_unused_tool"]
+    }
+  }
+}
+```
+
+**Example — allowlist only the tools you use:**
+
+```json
+{
+  "mcpServers": {
+    "another-server": {
+      "type": "http",
+      "url": "https://mcp.example.com/mcp",
+      "enabledTools": ["only_tool_i_want", "and_this_one"]
+    }
+  }
+}
+```
+
+<Tip>
+  Run `/mcp` inside droid to see the full list of tools a server exposes, then copy the exact tool names into `enabledTools` or `disabledTools`.
+</Tip>
+
+### MCP call timeout
+
+By default, droid applies a global timeout to every MCP tool invocation. Long-running tools (large data exports, browser automations, model-backed servers) can exceed this default and fail with a timeout error.
+
+Override the timeout per server with `timeoutMs`:
+
+```json
+{
+  "mcpServers": {
+    "slow-server": {
+      "type": "stdio",
+      "command": "my-long-running-server",
+      "timeoutMs": 120000
+    }
+  }
+}
+```
+
+You can also set a global default via the `mcp.callTimeoutMs` setting in `settings.json`:
+
+```json
+{
+  "mcp": {
+    "callTimeoutMs": 60000
+  }
+}
+```
+
+Resolution order, highest priority first:
+
+1. Per-server `timeoutMs` in `mcp.json`
+2. Global `mcp.callTimeoutMs` in `settings.json`
+3. Built-in default
+
+<Note>
+  Increasing the timeout only changes how long droid waits for a response — it does not extend any timeouts enforced by the MCP server itself or its upstream APIs.
+</Note>
 
 ## Per-droid server selection
 
