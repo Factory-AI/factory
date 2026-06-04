@@ -4,6 +4,31 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="June 3" rss={{ title: "CLI Updates", description: "Claude Opus 4.8 and Gemini 3.5 Flash support, MCP tool search, incident response, and stability fixes" }}>
+  `v0.140.0`
+
+## New features
+
+- **Claude Opus 4.8** - Added support for Claude Opus 4.8, including a faster Fast Mode variant
+- **Gemini 3.5 Flash** - Added support for Gemini 3.5 Flash
+- **MCP tool search** - Droid can now search and load MCP tools on demand, keeping large MCP setups fast and context-efficient
+- **Incident response** - Droid can automatically investigate production alerts posted to a configured Slack channel and work toward a root-cause analysis
+
+## Improvements
+
+- **Accurate status banners** - Spinner status banners now reflect the true state of the current turn
+- **Context menu text actions** - Added text actions to the right-click context menu (app)
+
+## Bug fixes
+
+- **Terminal write errors** - The CLI no longer crashes when the terminal rejects output writes
+- **Paste handling** - Fixed a crash on certain pasted input and corrected handling of split bracketed pastes
+- **Agent loop stalls** - The agent loop no longer runs unbounded when turns produce no output
+- **Empty chat placeholder** - Restored the placeholder shown in empty chats (app)
+- **Machine connection crash** - Fixed a crash when loading sessions with older machine connection types (app)
+
+</Update>
+
 <Update label="June 1" rss={{ title: "CLI Updates", description: "MCP management upgrades, Mermaid export, and stability fixes" }}>
   `v0.138.0`
 
