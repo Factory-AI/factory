@@ -28,7 +28,7 @@ From any Droid session, enter a mission and kick off the security review:
 
 ### Periodic scan in CI
 
-Run the same mission-based audit on a schedule by invoking `droid exec --mission` from a workflow:
+Run the same mission-based audit on a schedule by invoking `droid exec --mission` from a workflow. The audit writes its full output under `~/security-audits/<slug>-<YYYYMMDD>/` on the runner, so add an `actions/upload-artifact` step to preserve findings after the runner exits:
 
 ```yaml
 on:
@@ -40,13 +40,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: Install Droid CLI
+        run: |
           curl -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          droid exec --mission --auto high -m claude-opus-4-7 \
-            "/security-review across the entire repository"
+      - name: Run deep security review
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        run: |
+          droid exec --mission --auto high -m claude-opus-4-7 \
+            "/security-review across the entire repository"
+      - name: Upload security review output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-security-review-${{ github.run_id }}
+          path: ~/security-audits/
+          if-no-files-found: warn
+          retention-days: 90
 ```
 
 ## Run locally on a diff
