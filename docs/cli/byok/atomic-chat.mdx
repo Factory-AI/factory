@@ -26,26 +26,16 @@ Add to `~/.factory/settings.json`:
 ```
 
 <Note>
-  The `model` value must **exactly match** the model id Atomic Chat is currently serving. Atomic Chat serves the model you have loaded in the app and matches requests by id — if the id doesn't match, the server returns `404 No running session found for model ...`. Run `curl http://localhost:1337/v1/models` to see the exact id of the active model.
+  The `model` value must **exactly match** the id Atomic Chat is serving (it matches requests by id; a mismatch returns `404 No running session found for model ...`). Get the active id with `curl http://localhost:1337/v1/models`.
 </Note>
 
 ## Setup
 
 1. Install Atomic Chat from [atomic.chat](https://atomic.chat)
-2. Download and load a model in the app (**Models** tab). The local server starts automatically at `http://127.0.0.1:1337/v1`.
-3. Confirm the active model id:
-   ```bash
-   curl http://localhost:1337/v1/models
-   ```
-4. Add the configuration above to your Factory config, setting `model` to that id.
-5. Run Droid against it:
-   ```bash
-   droid exec -m custom:Atomic-Chat-0 "Say hi in one short sentence."
-   ```
-
-<Note>
-  The server binds to `127.0.0.1` by default for privacy. To use Atomic Chat from another machine on your LAN, set `host: 0.0.0.0` in Atomic Chat's settings and update `baseUrl` accordingly.
-</Note>
+2. Load a model in the app (**Models** tab) — the local server starts automatically.
+3. Get the active model id: `curl http://localhost:1337/v1/models`
+4. Add the config above, setting `model` to that id.
+5. Run Droid: `droid exec -m custom:Atomic-Chat-0 "Say hi in one short sentence."`
 
 ## Troubleshooting
 
@@ -61,5 +51,5 @@ Add to `~/.factory/settings.json`:
 ## Notes
 
 - Everything runs on-device — your code and prompts stay local.
-- Any `apiKey` placeholder works (the local server doesn't require authentication).
-- Atomic Chat can also proxy to cloud providers; use the locally served id either way.
+- Any `apiKey` placeholder works; the local server doesn't require authentication.
+- Bound to `127.0.0.1` by default. To use it across your LAN, set `host: 0.0.0.0` in Atomic Chat and update `baseUrl`.
