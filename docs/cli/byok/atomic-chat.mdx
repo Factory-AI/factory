@@ -1,0 +1,71 @@
+---
+title: Atomic Chat
+description: Run open-weight models locally through Atomic Chat's OpenAI-compatible server
+keywords: ['atomic chat', 'local', 'self-hosted', 'byok', 'offline', 'on-device', 'openai-compatible', 'privacy']
+---
+
+[Atomic Chat](https://atomic.chat) is a private, local AI app (macOS, Windows, Linux, iOS, Android) that runs open-weight models on-device and exposes an OpenAI-compatible server. Point Droid at it via BYOK and run agentic coding fully locally — no cloud, no API keys.
+
+Atomic Chat is model-agnostic: it serves whichever model you have loaded (Llama, Gemma, Qwen, Mistral, Phi, and others from Hugging Face), and can also route to cloud providers. It even ships a one-click **Run Droid** action in the app.
+
+<Note>
+  **Performance Notice**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. For production coding, load a larger coding-focused model in Atomic Chat (e.g. a 30B+ Qwen Coder). Smaller models (7B, 13B) are great for experimentation and offline use.
+</Note>
+
+## Configuration
+
+Add to `~/.factory/settings.json`:
+
+```json
+{
+  "customModels": [
+    {
+      "model": "unsloth/Qwen3_5-9B-GGUF-Qwen3_5-9B-IQ4_XS",
+      "displayName": "Atomic Chat",
+      "baseUrl": "http://127.0.0.1:1337/v1",
+      "apiKey": "atomic",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 16384
+    }
+  ]
+}
+```
+
+<Note>
+  The `model` value must **exactly match** the model id Atomic Chat is currently serving. Atomic Chat serves the model you have loaded in the app and matches requests by id — if the id doesn't match, the server returns `404 No running session found for model ...`. Run `curl http://localhost:1337/v1/models` to see the exact id of the active model.
+</Note>
+
+## Setup
+
+1. Install Atomic Chat from [atomic.chat](https://atomic.chat)
+2. Download and load a model in the app (**Models** tab). The local server starts automatically at `http://127.0.0.1:1337/v1`.
+3. Confirm the active model id:
+   ```bash
+   curl http://localhost:1337/v1/models
+   ```
+4. Add the configuration above to your Factory config, setting `model` to that id.
+5. Run Droid against it:
+   ```bash
+   droid exec -m custom:Atomic-Chat-0 "Say hi in one short sentence."
+   ```
+
+<Note>
+  The server binds to `127.0.0.1` by default for privacy. To use Atomic Chat from another machine on your LAN, set `host: 0.0.0.0` in Atomic Chat's settings and update `baseUrl` accordingly.
+</Note>
+
+## Troubleshooting
+
+### `404 No running session found for model ...`
+- The `model` id in your config doesn't match the model Atomic Chat is serving.
+- Check the active id with `curl http://localhost:1337/v1/models` and set `model` to match.
+
+### Local server not connecting
+- Make sure Atomic Chat is running and a model is loaded.
+- Check the server: `curl http://localhost:1337/v1/models`
+- Confirm nothing else is using port `1337`.
+
+## Notes
+
+- Everything runs on-device — your code and prompts stay local.
+- Any `apiKey` placeholder works (the local server doesn't require authentication).
+- Atomic Chat can also proxy to cloud providers; use the locally served id either way.
