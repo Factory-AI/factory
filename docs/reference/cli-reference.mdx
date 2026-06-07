@@ -57,7 +57,7 @@ Customize droid's behavior with command-line flags:
 | Flag                              | Description                                                        | Example                                                      |
 | :-------------------------------- | :----------------------------------------------------------------- | :----------------------------------------------------------- |
 | `-f, --file <path>`               | Read prompt from a file                                            | `droid exec -f plan.md`                                      |
-| `-m, --model <id>`                | Select a specific [model ID](/models)                              | `droid exec -m claude-opus-4-7`                              |
+| `-m, --model <id>`                | Select a specific [model ID](/models)                              | `droid exec -m claude-opus-4-8`                              |
 | `-s, --session-id <id>`           | Continue an existing session                                       | `droid exec -s session-abc123`                               |
 | `--auto <level>`                  | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)   | `droid exec --auto medium "run tests"`                       |
 | `--enabled-tools <ids>`           | Force-enable specific tools (comma or space separated)             | `droid exec --enabled-tools ApplyPatch,Bash`                 |
@@ -66,8 +66,8 @@ Customize droid's behavior with command-line flags:
 | `-o, --output-format <format>`    | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)    | `droid exec -o json "document API"`                          |
 | `--input-format <format>`         | Input format (`stream-jsonrpc` for multi-turn)                    | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
 | `-r, --resume [sessionId]`        | Resume a previous session. In interactive mode, `-r` is `--resume`; in `droid exec`, `-r` is `--reasoning-effort`. | `droid -r`                                                   |
-| `-r, --reasoning-effort <level>`  | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`). In `droid exec`, `-r` maps to this flag. | `droid exec -r high "debug flaky test"`                      |
-| `--spec-model <id>`               | Use a different [model ID](/models) for specification planning     | `droid exec --spec-model claude-opus-4-7`                    |
+| `-r, --reasoning-effort <level>`  | Override reasoning effort; valid values are model-dependent (see [Reasoning effort](/cli/configuration/settings#reasoning-effort)). In `droid exec`, `-r` maps to this flag. | `droid exec -r high "debug flaky test"`                      |
+| `--spec-model <id>`               | Use a different [model ID](/models) for specification planning     | `droid exec --spec-model claude-opus-4-8`                    |
 | `--spec-reasoning-effort <level>` | Override reasoning effort for spec mode                            | `droid exec --use-spec --spec-reasoning-effort high`         |
 | `--use-spec`                      | Start in specification mode (plan before executing)                | `droid exec --use-spec "add user profiles"`                  |
 | `--skip-permissions-unsafe`       | Skip all permission prompts (⚠️ use with extreme caution)          | `droid exec --skip-permissions-unsafe`                       |
@@ -78,8 +78,8 @@ Customize droid's behavior with command-line flags:
 | `--fork <id>`                     | Fork and resume an existing session into a new copy                | `droid exec --fork session-abc123`                           |
 | `--mission`                       | Run `droid exec` in [mission mode](/cli/features/missions) (multi-agent orchestration) | `droid exec --mission -f mission.md`                         |
 | `--worker-model <id>`             | Model used for mission worker agents                               | `droid exec --mission --worker-model claude-sonnet-4-6`      |
-| `--worker-reasoning-effort <level>` | Reasoning effort for mission worker agents (`off`, `none`, `low`, `medium`, `high`) | `droid exec --mission --worker-reasoning-effort medium`      |
-| `--validator-model <id>`          | Model used for mission validator agents                            | `droid exec --mission --validator-model claude-opus-4-7`     |
+| `--worker-reasoning-effort <level>` | Reasoning effort for mission worker agents (model-dependent; see [Reasoning effort](/cli/configuration/settings#reasoning-effort)) | `droid exec --mission --worker-reasoning-effort medium`      |
+| `--validator-model <id>`          | Model used for mission validator agents                            | `droid exec --mission --validator-model claude-opus-4-8`     |
 | `--validator-reasoning-effort <level>` | Reasoning effort for mission validator agents                  | `droid exec --mission --validator-reasoning-effort high`     |
 | `--append-system-prompt <text>`   | Append custom text to the end of the system prompt                 | `droid --append-system-prompt "Always run tests."`           |
 | `--append-system-prompt-file <path>` | Append the contents of a file to the end of the system prompt   | `droid --append-system-prompt-file .factory/system.md`       |
@@ -149,7 +149,7 @@ The interactive REPL supports a rich set of keyboard shortcuts for navigation, o
 | `Ctrl+J`          | Toggle the changelog display (dismiss / restore)                                |
 | `Ctrl+E`          | Toggle the approval details view                                                |
 | `Ctrl+V`          | Paste an image from the clipboard as an attachment                              |
-| `Tab`             | Cycle reasoning effort (`low` → `medium` → `high` → `off`)                      |
+| `Tab`             | Cycle reasoning effort through the levels supported by the current model        |
 | `Shift+Tab`       | Cycle interaction modes (Auto → Spec → Mission)                                 |
 | `@`               | File path autocomplete — typing `@` triggers fuzzy file search                  |
 | `Up` / `Down`     | Navigate input history (cycle through previously submitted messages)            |
