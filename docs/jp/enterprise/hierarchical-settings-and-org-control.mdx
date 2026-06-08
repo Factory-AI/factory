@@ -187,6 +187,12 @@ User        → ~/.factory/
         <ResponseField name="repo" type="string" required>
           `owner/repo` 形式のGitHubリポジトリ。
         </ResponseField>
+        <ResponseField name="ref" type="string">
+          追跡するGitブランチまたはタグ（例: `"main"`、`"v1.2.0"`）。オプション。
+        </ResponseField>
+        <ResponseField name="sha" type="string">
+          40文字のフルコミットSHA。設定すると、マーケットプレイスはこのコミットに固定されます。オプション。
+        </ResponseField>
       </Expandable>
       <Expandable title="url">
         <ResponseField name="source" type="string" required>
@@ -194,6 +200,12 @@ User        → ~/.factory/
         </ResponseField>
         <ResponseField name="url" type="string" required>
           マーケットプレイスマニフェストのURL。
+        </ResponseField>
+        <ResponseField name="ref" type="string">
+          追跡するGitブランチまたはタグ。オプション。
+        </ResponseField>
+        <ResponseField name="sha" type="string">
+          固定する40文字のフルコミットSHA。オプション。
         </ResponseField>
       </Expandable>
       <Expandable title="local">
