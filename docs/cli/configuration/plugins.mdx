@@ -170,9 +170,7 @@ A plugin can only exist at one scope. To change scope, uninstall first and reins
 
 Plugins are versioned by Git commit hash, not semantic version. When you update a plugin, Droid fetches the latest commit from the marketplace repository.
 
-<Note>
-Version pinning is not supported. Updates always fetch the latest version from the marketplace.
-</Note>
+To pin a marketplace to a specific version, set `ref` (a branch or tag) or `sha` (a full 40-character commit SHA) on the marketplace source. See [Pinning a marketplace to a ref or commit](#pinning-a-marketplace-to-a-ref-or-commit) below.
 
 ## Marketplaces
 
@@ -239,6 +237,45 @@ The installation scope depends on where the setting is defined:
 - Org-managed settings → `org` scope
 - User settings → `user` scope
 - Project settings → `project` scope
+
+### Pinning a marketplace to a ref or commit
+
+By default Droid tracks the marketplace's default branch and pulls the latest commit on update. You can pin a marketplace to a specific Git ref or commit by adding `ref` or `sha` to the source object.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ref` | string | Branch or tag to track (e.g. `"main"`, `"v1.2.0"`, `"staging"`). |
+| `sha` | string | Full 40-character commit SHA. When set, the marketplace stays on this exact commit and `droid plugin marketplace update` is a no-op. |
+
+`ref` and `sha` are supported on the `github`, `url`, and `git-subdir` source types. They are mutually informative — set `sha` for hard pins, `ref` to follow a branch or tag.
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "your-org-internal-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "your-org/internal-plugins",
+        "ref": "v1.2.0"
+      }
+    },
+    "your-org-frozen-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "your-org/internal-plugins",
+        "sha": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b"
+      }
+    }
+  }
+}
+```
+
+From the CLI, pass `--ref` or `--sha` when adding a marketplace:
+
+```bash
+droid plugin marketplace add https://github.com/your-org/internal-plugins --ref v1.2.0
+droid plugin marketplace add https://github.com/your-org/internal-plugins --sha 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+```
 
 ## Discovering plugins
 
