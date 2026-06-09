@@ -1,0 +1,58 @@
+---
+title: Factory Router
+sidebarTitle: Factory Router
+description: 各タスクに最適なモデルを自動的に選択します。
+keywords: ['自動モデルルーティング', 'Factory Router', 'モデルルーティング', 'モデル', 'エンタープライズ制御', 'コスト削減']
+---
+
+<Note>
+  Factory Routerは現在 **Research Preview** です。
+</Note>
+
+Factory Routerは、各Droidタスクに最適なモデルを自動的に選択します。セッションごとに単一のモデルを毎回手動で選ぶ代わりに、Factory Routerがタスクを評価し、品質、レイテンシ、コストのバランスが最もよいモデルに作業をルーティングします。
+
+Factory RouterはFactory CLIとFactory Appで利用でき、他のモデルと同じエンタープライズ制御で動作します。
+
+## Factory Routerを使う理由
+
+Factory Routerは、ワークフローごとにモデル選択を手動で切り替えなくても高い成果を得たいチーム向けに設計されています。
+
+<CardGroup cols={2}>
+  <Card title="高性能をより低コストで" icon="chart-line">
+    Factoryの評価では、Factory Routerは難易度の高いベンチマークでフロンティア級の性能を維持しながら、常に最上位モデルを使用する場合と比べてコストをおよそ **20〜25%** 削減しました。
+  </Card>
+  <Card title="モデル選択の改善" icon="shuffle">
+    Droidは定型的なステップを高速または低コストのモデルにルーティングし、より深い推論が必要な作業には高性能なモデルを確保できます。
+  </Card>
+  <Card title="エンタープライズ対応の制御" icon="shield-halved">
+    Factory Routerは、Factoryプラットフォーム全体で使われている組織、プロジェクト、ユーザーレベルの同じモデル制御に従います。
+  </Card>
+</CardGroup>
+
+## 提供状況
+
+Factory Routerは、一部のお客様向けにFactory CLIとFactory Appのモデルセレクターで **Factory Router (Research Preview)** として利用できます。
+
+## エンタープライズ制御
+
+エンタープライズ管理者は、他のFactory対応モデルと同じモデルガバナンスシステムを通じてFactory Routerを管理でき、他のモデルと同様に組織レベルでFactory Routerを許可または制限できます。
+
+モデルのエンタープライズ制御の詳細については、[モデル、LLM ゲートウェイ、インテグレーション](/jp/enterprise/models-llm-gateways-and-integrations)を参照してください。
+
+## FAQ
+
+### モデルルーティングはどのように動作しますか？
+
+Factory Routerはタスク単位のルーターで、セッション単位のルーティングとリクエスト単位のルーティングを組み合わせて使用します。最適化では、プロンプトキャッシュの維持とコスト削減を強く考慮します。
+
+### Factory Routerは設定できますか？
+
+Factory Routerは現在、他のモデルと同様に有効化または無効化できます。また、Factory Router向けのガイダンスとして Enterprise Controls も提供しています。
+
+### Factory Routerのパフォーマンスに関するベンチマークはありますか？
+
+はい。Factory Routerは、Terminal Bench 2 や Legacy Bench のような難易度の高いベンチマークでフロンティア級の性能を維持し、品質、レイテンシ、コストの最良のバランスを実現します。
+
+### Factory Routerのコスト面での利点は何ですか？
+
+Factory Routerはフロンティア級の性能を維持しながら、常に最上位モデルを使用する場合と比べてコストをおよそ20〜25%削減します。
