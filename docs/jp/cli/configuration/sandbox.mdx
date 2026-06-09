@@ -1,0 +1,106 @@
+---
+title: サンドボックス
+tag: "Beta"
+description: OSレベルのサンドボックス化により、カーネルによって強制されるポリシーでDroidをファイルシステムとネットワークから分離します（Beta）。
+keywords:
+  [
+    "sandbox",
+    "sandboxing",
+    "security",
+    "isolation",
+    "seatbelt",
+    "bubblewrap",
+    "permissions",
+    "denyWrite",
+    "denyRead",
+    "allowedDomains",
+  ]
+---
+
+<Note>
+  **Beta** — OSレベルのサンドボックスはオプトインで、現在も活発に開発中です。挙動、
+  設定、プラットフォームサポートはリリースごとに変更される可能性があります。
+</Note>
+
+OSレベルのサンドボックス化では、ユーザーがDroidのファイルシステム境界とネットワーク境界を設定できます。Beta版では、Droidが開始するすべてのシェルコマンドが別プロセスで実行され、ユーザーが設定し、OSカーネルレベルで強制されるファイルシステムおよびネットワーク境界の範囲内に制限されます。
+
+内部的には、サンドボックスは macOS では Seatbelt プロファイル、Linux では seccomp と組み合わせた bubblewrap、ドメインレベルのネットワークフィルタリングには HTTP/SOCKS プロキシを使用します。Windows は WSL2 経由でサポートされます。
+
+## デフォルトのアクセスポリシー（サンドボックス有効時）
+
+| リソース | デフォルトポリシー | 設定項目 |
+| --- | --- | --- |
+| **ファイル読み取り** | すべて許可。明示的な `denyRead` エントリのみブロックされます。 | `sandbox.filesystem.denyRead` |
+| **ファイル書き込み** | **CWD**（現在の作業ディレクトリ）以外はすべて拒否。追加のパスは許可できます。`denyWrite` は `allowWrite` より優先されます。 | `sandbox.filesystem.allowWrite`, `sandbox.filesystem.denyWrite` |
+| **ネットワーク** | `*.factory.ai`（デフォルトで常に許可）以外はすべて拒否。追加のドメインは明示的に許可する必要があります。 | `sandbox.network.allowedDomains` |
+
+## 含まれる機能
+
+**コマンド単位のサンドボックスモード**（有効時のデフォルト）:
+
+- **ファイルツール**（Read、Edit、Create、LS、Grep、Glob、ApplyPatch） -- すべての操作の前に `checkFileAccess()` を実行し、読み取りには `denyRead`、書き込みには `allowWrite` / `denyWrite` を適用
+- **Execute ツール** -- シェルコマンドを OS サンドボックス（Seatbelt / bubblewrap）でラップし、ネットワークはドメインレベル制御のために SRT のフィルタリングプロキシ経由でルーティング
+- **FetchUrl** -- `allowedDomains` に対して `checkNetworkAccess()` を実行
+- **注記** -- メインのDroidプロセス、MCP、サブエージェントはまだ分離されていません。
+
+**対話型の権限プロンプト（TUIモード）:**
+
+- サンドボックス違反があると、Auto（High）自律レベルでもエージェントループが中断され、TUIプロンプトが表示されます
+- 3つの選択肢: **1回だけ許可**、**常に許可**（設定に永続化）、**拒否**
+- `denyWrite` 違反では、「常に許可」の代わりに「拒否リストから削除」オプションが表示されます（設定の `denyWrite` から該当エントリを削除）
+- `denyRead` 違反でも、「常に許可」の代わりに「拒否リストから削除」オプションが表示されます
+- Execute のネットワーク違反では、SRT のプロキシコールバックを通じたリアルタイムのドメインプロンプトが表示され、60秒で自動拒否されます
+
+**非対話モード（`droid exec`）:**
+
+- サンドボックス違反はプロンプトなしで自動拒否されます -- ハングせず、ユーザー操作も不要です
+- エージェントは拒否メッセージを受け取り、それを出力に報告します
+
+**「常に許可」の永続化:**
+
+- ファイル書き込み違反（CWD外）: ユーザー設定の `sandbox.filesystem.allowWrite` に親ディレクトリを追加
+- `denyWrite` 違反: `sandbox.filesystem.denyWrite` から該当エントリを削除
+- `denyRead` 違反: `sandbox.filesystem.denyRead` から該当エントリを削除
+- ドメイン違反: ドメイン（3つ以上のパートを持つドメインではワイルドカード付き。例: `registry.npmjs.org` -> `*.npmjs.org`）を `sandbox.network.allowedDomains` に追加
+- 変更は現在のセッションにすぐ反映されます
+
+**組織管理による強制:**
+
+- 組織レベルの `denyWrite` / `denyRead` 設定は、ユーザーの「常に許可」では上書きできません
+- 拒否が組織設定に由来する場合、違反プロンプトには「（組織ポリシー）」と表示されます
+
+**TUI インジケーター:**
+
+- サンドボックス有効時は、フッターに `SANDBOX` ステータスインジケーターを表示
+- 違反の詳細（パス、ドメイン、理由）を含む「Sandbox Violation」プロンプトを表示
+
+## 設定構成
+
+```jsonc
+{
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      // CWD（常に書き込み可）に加えて書き込み可能にするパス
+      "allowWrite": ["/tmp/build-output", "~/.config"],
+      // 親が allowWrite にあっても特定のサブパスへの書き込みを拒否
+      "denyWrite": ["/tmp/build-output/cache/locks", "~/.config/secrets"],
+      // 特定のパスへの読み取りをブロック（それ以外は読み取り可）
+      "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"],
+    },
+    "network": {
+      // 到達可能なドメインはこれらのみ（*.factory.ai は常に含まれる）
+      "allowedDomains": ["github.com", "*.npmjs.org"],
+    },
+  },
+}
+```
+
+設定は階層全体（組織 > プロジェクト > ユーザー）でマージされます。`denyWrite` / `denyRead` は和集合マージを使用するため、組織による拒否は下位レイヤーで削除できません。
+
+## 関連
+
+- [自律レベル](/jp/cli/user-guides/auto-run) -- ツールリスクに対する承認ポリシー。
+- [設定](/jp/cli/configuration/settings) -- `sandbox.*` の定義場所。
+- [階層設定と組織管理](/jp/enterprise/hierarchical-settings-and-org-control) -- 組織ポリシーがユーザー設定とどのようにマージされるか。
+- [セキュリティ](/jp/cli/account/security) -- Droid CLI のより広いセキュリティモデル。
