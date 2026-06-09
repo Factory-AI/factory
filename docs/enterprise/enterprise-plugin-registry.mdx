@@ -207,13 +207,39 @@ Pre-installed plugins:
 
 Plugins are versioned by Git commit hash. When a plugin is updated, Droid fetches the latest commit from the marketplace.
 
-To control versions, use Git branches:
-- `main` - Production-ready for all users
-- `staging` - For early adopters
-- `dev` - For internal testing
+To control versions, pin the marketplace source itself with `ref` (branch or tag) or `sha` (full commit SHA):
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "acme-corp-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "your-org/droid-plugins",
+        "ref": "v2.4.0"
+      }
+    },
+    "acme-corp-plugins-frozen": {
+      "source": {
+        "source": "github",
+        "repo": "your-org/droid-plugins",
+        "sha": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b"
+      }
+    }
+  }
+}
+```
+
+Common patterns:
+- `ref: "main"` — production-ready for all users (default behavior)
+- `ref: "staging"` — early-adopter channel
+- `ref: "v1.2.0"` — pin to a release tag
+- `sha: "<40-char SHA>"` — hard pin to a specific commit; `droid plugin marketplace update` is a no-op
+
+See [Plugins · Pinning a marketplace to a ref or commit](/cli/configuration/plugins#pinning-a-marketplace-to-a-ref-or-commit) for the full source schema.
 
 <Note>
-Version pinning via the `version` field is not currently supported. The field is for documentation only.
+Version pinning via the per-plugin `version` field is not currently supported. To pin a plugin's version, pin the marketplace it lives in via `ref` or `sha`.
 </Note>
 
 ## Private repository access

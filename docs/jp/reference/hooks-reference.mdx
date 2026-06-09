@@ -411,7 +411,7 @@ Droidセッションが終了するときに実行されます。クリーンア
   "continue": true, // Whether Droid should continue after hook execution (default: true)
   "stopReason": "string", // Message shown when continue is false
 
-  "suppressOutput": true, // Hide stdout from transcript mode (default: false)
+  "suppressOutput": true, // フックが終了コード0で終了した場合、フックブロックをチャットビューから非表示にします（デフォルト: false）。詳細トランスクリプト（Ctrl+O）には引き続き表示され、失敗したフック（非ゼロ終了コード）は常に表示されます。
   "systemMessage": "string" // Optional warning message shown to the user
 }
 ```
@@ -666,7 +666,7 @@ if tool_name == "Read":
         output = {
             "decision": "approve",
             "reason": "Documentation file auto-approved",
-            "suppressOutput": True  # Don't show in transcript mode
+            "suppressOutput": True  # チャットビューからフックブロックを非表示にします（トランスクリプトには表示）
         }
         print(json.dumps(output))
         sys.exit(0)

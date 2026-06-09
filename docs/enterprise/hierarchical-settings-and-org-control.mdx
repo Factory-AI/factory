@@ -206,13 +206,25 @@ Below is the full schema for org-managed settings. These are configured by org a
         <ResponseField name="repo" type="string" required>
           GitHub repository in `owner/repo` format.
         </ResponseField>
+        <ResponseField name="ref" type="string">
+          Optional Git branch or tag to track (e.g. `"main"`, `"v1.2.0"`).
+        </ResponseField>
+        <ResponseField name="sha" type="string">
+          Optional full 40-character commit SHA. When set, the marketplace is pinned to this exact commit.
+        </ResponseField>
       </Expandable>
       <Expandable title="url">
         <ResponseField name="source" type="string" required>
           Must be `"url"`.
         </ResponseField>
         <ResponseField name="url" type="string" required>
-          URL of the marketplace manifest.
+          Git repository URL of the marketplace (e.g. `https://gitlab.com/company/plugins.git`).
+        </ResponseField>
+        <ResponseField name="ref" type="string">
+          Optional Git branch or tag to track.
+        </ResponseField>
+        <ResponseField name="sha" type="string">
+          Optional full 40-character commit SHA to pin to.
         </ResponseField>
       </Expandable>
       <Expandable title="local">
