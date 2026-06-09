@@ -88,7 +88,11 @@ User        → ~/.factory/
 </ResponseField>
 
 <ResponseField name="commandDenylist" type="string[]">
-  常に拒否されるシェルコマンドパターン（レベル間で累積）
+  常に拒否されるシェルコマンドパターン（レベル間で累積）。拒否されたコマンドでも、ユーザーが明示的に承認すれば実行できます。
+</ResponseField>
+
+<ResponseField name="commandBlocklist" type="string[]">
+  絶対に実行されないシェルコマンドパターン（レベル間で累積）。拒否リストとは異なり、ブロックされたコマンドには承認の手段がありません。完全自律、自動実行、`--skip-permissions-unsafe`のいずれの場合でもブロックが適用されます。droidは照合前に実際に呼び出されるプログラムを解決するため、ラッパーシェル、絶対パス、クォートのトリック、コマンド置換で回避することはできません。組織が義務付けるハードストップに使用してください。
 </ResponseField>
 
 <ResponseField name="customModels" type="object[]">
@@ -399,6 +403,7 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
   "ideAutoConnect": true,
   "commandAllowlist": ["npm *", "yarn *", "pnpm *", "make *"],
   "commandDenylist": ["rm -rf /", "sudo *"],
+  "commandBlocklist": ["shutdown", "mkfs", "curl"],
   "customModels": [
     {
       "model": "my-internal-model",
