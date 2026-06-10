@@ -31,6 +31,30 @@ User        → ~/.factory/
 
 ---
 
+<a id="system-managed-settings-file"></a>
+
+## システム管理 `settings.json` ファイル
+
+ユーザーがサインインする**前に**組織ポリシーを適用する必要があるデプロイメント — 管理対象ラップトップ、Factory に認証されていない CI ランナー、エアギャップ環境または制限付きネットワークのインストール — では、IT / MDM 管理者は各マシンのハードコードされた既知のパスに `settings.json` を配置できます：
+
+| OS | パス |
+| ------------ | ----------------------------------------------------- |
+| macOS | `/Library/Application Support/Factory/settings.json` |
+| Linux と WSL | `/etc/factory/settings.json` |
+| Windows | `C:\Program Files\Factory\settings.json` |
+
+このファイルは、このページの他の部分と同じ [Settings JSON スキーマ](#settings-json-schema) を使用します。
+
+このファイルが存在する場合、そのマシンでは**組織レベル設定の正式な情報源**となり、組織設定に対する API 取得や開発者モードの環境変数オーバーライドは行われません。`factoryTier` シグナルは引き続きベストエフォートで Factory API に問い合わせられ（失敗しても致命的ではありません）、管理対象デプロイメントでもエンタープライズ限定の動作が維持されます。
+
+このファイルが存在しない、または読み取れない場合、Droid は既存の組織設定フロー（Factory App / managed-settings エンドポイント）にフォールバックします。ファイルが存在しても形式が不正、またはスキーマ検証に失敗した場合、組織設定は空のポリシーとして解決され、失敗はログに記録されます。つまり、壊れた管理者デプロイメントが**黙ってバイパスされることはありません**。
+
+これは、MDM イメージやインストーラーとともにベースポリシーを配布する推奨方法であり、ユーザーがこれを上書きしたり弱めたりすることはできません。
+
+---
+
+<a id="settings-json-schema"></a>
+
 ## Settings JSON スキーマ
 
 以下は組織管理設定の完全なスキーマです。これらは Factory App の [Enterprise Controls](https://app.factory.ai) ページで組織管理者によって設定されます。すべてのプロパティはオプションです。設定する必要のないフィールドは省略してください。
@@ -187,13 +211,25 @@ User        → ~/.factory/
         <ResponseField name="repo" type="string" required>
           `owner/repo` 形式のGitHubリポジトリ。
         </ResponseField>
+        <ResponseField name="ref" type="string">
+          追跡するGitブランチまたはタグ（例：`"main"`、`"v1.2.0"`）
+        </ResponseField>
+        <ResponseField name="sha" type="string">
+          オプションの40文字フルコミットSHA。設定すると、マーケットプレイスはこの正確なコミットに固定されます。
+        </ResponseField>
       </Expandable>
       <Expandable title="url">
         <ResponseField name="source" type="string" required>
           `"url"` である必要があります。
         </ResponseField>
         <ResponseField name="url" type="string" required>
-          マーケットプレイスマニフェストのURL。
+          マーケットプレイスのGitリポジトリURL（例：`https://gitlab.com/company/plugins.git`）
+        </ResponseField>
+        <ResponseField name="ref" type="string">
+          追跡するオプションのGitブランチまたはタグ
+        </ResponseField>
+        <ResponseField name="sha" type="string">
+          固定先となるオプションの40文字フルコミットSHA
         </ResponseField>
       </Expandable>
       <Expandable title="local">
@@ -221,8 +257,8 @@ User        → ~/.factory/
 | プロバイダー | モデルID |
 |---|---|
 | **Anthropic** | `claude-sonnet-4-5-20250929`, `claude-sonnet-4-6`, `claude-opus-4-5-20251101`, `claude-opus-4-6`, `claude-opus-4-6-fast`, `claude-opus-4-7`, `claude-haiku-4-5-20251001` |
-| **OpenAI** | `gpt-5.1`, `gpt-5.1-codex`, `gpt-5.1-codex-max`, `gpt-5.2`, `gpt-5.2-codex`, `gpt-5.3-codex` |
-| **Google** | `gemini-3-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview` |
+| **OpenAI** | `gpt-5.1`, `gpt-5.1-codex`, `gpt-5.1-codex-max`, `gpt-5.2`, `gpt-5.3-codex` |
+| **Google** | `gemini-3.5-flash`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview` |
 | **XAI** | `grok-code-fast-1` |
 | **オープンソース** | `glm-5`, `glm-5.1`, `kimi-k2.5`, `kimi-k2.6`, `minimax-m2.7` |
 
@@ -373,11 +409,11 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
 ```json
 {
   "sessionDefaultSettings": {
-    "model": "claude-opus-4-6",
+    "model": "claude-sonnet-4-6",
     "reasoningEffort": "high",
     "interactionMode": "auto",
     "autonomyMode": "auto-medium",
-    "specModeModel": "claude-sonnet-4-6",
+    "specModeModel": "claude-opus-4-6",
     "specModeReasoningEffort": "medium"
   },
   "maxAutonomyLevel": "high",

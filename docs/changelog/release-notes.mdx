@@ -4,6 +4,227 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="June 9" rss={{ title: "CLI Updates", description: "More reliable context summarization when a model declines a request" }}>
+  `v0.144.1`
+
+## Bug fixes
+
+- **Context summarization fallback** - When a model declines to summarize your conversation, Droid now falls back gracefully instead of retrying repeatedly
+
+</Update>
+
+<Update label="June 9" rss={{ title: "CLI Updates", description: "Session file suggestions, safer command risk handling, and MCP reliability fixes" }}>
+  `v0.144.0`
+
+## New features
+
+- **Session file suggestions** - The new session page now suggests relevant files as you get started (app)
+
+## Improvements
+
+- **Safer command risk handling** - Commands that could destroy your working tree are now treated as high risk
+- **tmux key support** - Improved keyboard handling when running inside tmux
+
+## Bug fixes
+
+- **MCP reliability** - Improved reliability of MCP authentication and connectors
+
+</Update>
+
+<Update label="June 9" rss={{ title: "CLI Updates", description: "Maintenance and stability release" }}>
+  `v0.143.1`
+
+## Improvements
+
+- **Maintenance and stability** - Routine maintenance and reliability updates under the hood
+
+</Update>
+
+<Update label="June 8" rss={{ title: "CLI Updates", description: "Richer Jira details" }}>
+  `v0.143.0`
+
+## New features
+
+- **Self-serve organization deactivation** - Deactivate your organization yourself, with subscription cancellation now available in billing settings (app)
+
+## Improvements
+
+- **Richer Jira details** - Fetching a Jira issue now includes more fields, comments, and linked-issue URLs
+- **Quieter hooks** - Hooks can hide their output block in the TUI by setting `suppressOutput`
+
+## Bug fixes
+
+- **Windows home directory** - Fixed home directory resolution on Windows to avoid username corruption (app)
+- **Session integrity** - Fixed an issue that could overwrite an existing session
+
+</Update>
+
+<Update label="June 5" rss={{ title: "CLI Updates", description: "GitLab code review setup and chat stability fixes" }}>
+  `v0.142.0`
+
+## Improvements
+
+- **GitLab code review setup** - The install-code-review skill now configures review pipelines using a GitLab CI Component
+
+## Bug fixes
+
+- **Duplicate chat messages** - Fixed duplicate messages appearing in chat
+- **Diff viewer counts** - The diff viewer now refreshes its change counts correctly (app)
+
+</Update>
+
+<Update label="June 4" rss={{ title: "CLI Updates", description: "More reliable command output and CLI fixes" }}>
+  `v0.141.0`
+
+## Improvements
+
+- **Large command output** - Command execution now handles very large outputs more reliably
+
+## Bug fixes
+
+- **Input hint placement** - The running hint now stays below your typed input
+- **Guidelines in non-git projects** - Droid no longer looks for guideline files in parent directories when you're not inside a git repository
+
+</Update>
+
+<Update label="June 4" rss={{ title: "CLI Updates", description: "Maintenance and stability release" }}>
+  `v0.140.1`
+
+## Improvements
+
+- **Maintenance and stability** - Routine maintenance and reliability updates under the hood
+
+</Update>
+
+<Update label="June 3" rss={{ title: "CLI Updates", description: "Claude Opus 4.8 and Gemini 3.5 Flash support, MCP tool search, incident response, and stability fixes" }}>
+  `v0.140.0`
+
+## New features
+
+- **Claude Opus 4.8** - Added support for Claude Opus 4.8, including a faster Fast Mode variant
+- **Gemini 3.5 Flash** - Added support for Gemini 3.5 Flash
+- **MCP tool search** - Droid can now search and load MCP tools on demand, keeping large MCP setups fast and context-efficient
+- **Incident response** - Droid can automatically investigate production alerts posted to a configured Slack channel and work toward a root-cause analysis
+
+## Improvements
+
+- **Accurate status banners** - Spinner status banners now reflect the true state of the current turn
+- **Context menu text actions** - Added text actions to the right-click context menu (app)
+
+## Bug fixes
+
+- **Terminal write errors** - The CLI no longer crashes when the terminal rejects output writes
+- **Paste handling** - Fixed a crash on certain pasted input and corrected handling of split bracketed pastes
+- **Agent loop stalls** - The agent loop no longer runs unbounded when turns produce no output
+- **Empty chat placeholder** - Restored the placeholder shown in empty chats (app)
+- **Machine connection crash** - Fixed a crash when loading sessions with older machine connection types (app)
+
+</Update>
+
+<Update label="June 2" rss={{ title: "CLI Updates", description: "Custom commands and skills in the slash menu and MCP fixes" }}>
+  `v0.139.0`
+
+## New features
+
+- **Custom commands and skills in the slash menu** - Your custom commands and skills now appear directly in the slash menu
+
+## Bug fixes
+
+- **MCP schema compatibility** - Improved handling of MCP servers with incompatible tool schemas
+- **Clearing MCP server fields** - You can now clear fields when editing an MCP server
+- **Local session labels** - Local sessions are now labeled "Local" instead of "Ephemeral" (app)
+
+</Update>
+
+<Update label="June 1" rss={{ title: "CLI Updates", description: "MCP management upgrades, Mermaid export, and stability fixes" }}>
+  `v0.138.0`
+
+## New features
+
+- **Interactive MCP management** - Add, remove, and list MCP servers interactively
+- **MCP credential variables** - MCP server configs can now expand credential variables at runtime
+- **Configurable MCP call timeout** - Set a custom timeout for MCP tool calls
+- **`mcp off` shortcut** - Quickly disable MCP servers with a new shortcut
+- **MCP servers for custom droids** - Choose which MCP servers are available to custom droids
+- **Per-server MCP risk** - Configure command risk levels for each MCP server
+- **Mermaid export** - Export Mermaid diagrams from chat (app)
+
+## Improvements
+
+- **Highlighted new models** - New models now appear highlighted at the top of `/models`
+- **MCP embedded resources** - MCP servers' embedded resources are now surfaced in chat
+- **Composer loading state** - The message composer now shows a loading state (app)
+- **Session archiving** - Unified the session archive flow across the app and desktop (app)
+- **Pinned messages** - Clicking a pinned message now scrolls to its source (app)
+
+## Bug fixes
+
+- **Turn cancellation** - Canceling a turn now takes effect immediately
+- **Session rename** - Renamed session titles are now trimmed of extra whitespace (app)
+
+</Update>
+
+<Update label="May 29" rss={{ title: "CLI Updates", description: "Usage stats, airgapped BYOK, and stability fixes" }}>
+  `v0.137.0`
+
+## New features
+
+- **Airgapped BYOK** - New `FACTORY_AIRGAP_ENABLED` option lets you bypass Factory auth when using your own model keys
+
+## Bug fixes
+
+- **Duplicate thinking output** - Thinking output no longer renders twice
+- **MCP permission persistence** - MCP permissions now persist across all confirmation paths
+- **Context usage meter** - Fixed alignment of the context usage meter
+
+</Update>
+
+<Update label="May 28" rss={{ title: "CLI Updates", description: "Deep review skill, side questions in the app, session compression controls, and stability fixes" }}>
+  `v0.136.0`
+
+## New features
+
+- **Deep review skill** - New `/deep-review` skill for a more thorough, multi-pass code review
+- **Side questions in the app** - The `/btw` side questions panel is now available in the app (app)
+- **Auto-compression toggle** - Turn automatic session compression on or off to manage long sessions
+- **Configurable compression model** - Choose which model handles automatic session compression
+
+## Improvements
+
+- **Org details in `/status`** - The `/status` command now shows your organization details
+- **Standardized hooks config path** - Hooks configuration now uses a standardized file path with automatic migration
+- **Faster large pastes** - Sped up pasting large amounts of text
+- **Tool summary hover affordance** - Tool summaries now show a hover affordance for available actions (app)
+
+## Bug fixes
+
+- **Autoscroll fixes** - Fixed several autoscroll issues in the session view (app)
+- **Reasoning-only turns** - Fixed sessions stalling when the assistant returned only reasoning
+- **DeepSeek tool calls** - Improved reliability of multi-step tool calls when using DeepSeek models
+
+</Update>
+
+<Update label="May 27" rss={{ title: "CLI Updates", description: "Adaptive terminal theme, agent-browser update, and stability fixes" }}>
+  `v0.135.0`
+
+## New features
+
+- **Adaptive terminal theme** - The CLI now auto-detects your terminal background and picks a matching theme
+
+## Improvements
+
+- **Agent-browser update** - Updated the bundled `agent-browser` skill to a newer release with better automation reliability
+- **Subagent type badges** - Subagent type badges in `TaskOutput` now render in PascalCase for easier reading
+
+## Bug fixes
+
+- **Message draft attachments** - Message draft attachments are now preserved when switching contexts (app)
+- **Session activity indicator** - Improved the activity indicator in the session panel (app)
+- **Enterprise Controls forms** - Empty arrays and records are no longer written when saving Enterprise Controls (app)
+- **Enterprise Controls layout** - Aligned control heights across Enterprise Controls forms (app)
+  
+</Update>
+
 <Update label="May 26" rss={{ title: "CLI Updates", description: "Stability fixes and UI polish" }}>
   `v0.134.0`
 
@@ -213,6 +434,13 @@ rss: true
 - **Bounded resume history** - Resume now renders a bounded history so large sessions stay responsive
 - **Message send flash** - Fixed a visual flash when submitting a message (app)
 - **Desktop tutorial in desktop app** - The "install desktop" onboarding step is now skipped when you're already in the desktop app (app)
+
+</Update>
+
+<Update label="May 12" rss={{ title: "CLI Updates", description: "Maintenance release" }}>
+  `v0.123.1`
+
+  Maintenance release with under-the-hood improvements.
 
 </Update>
 

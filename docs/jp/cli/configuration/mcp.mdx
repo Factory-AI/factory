@@ -1,7 +1,7 @@
 ---
 title: "モデルコンテキストプロトコル（MCP）"
 description: 'Model Context Protocolで独自ツールを接続する'
-keywords: ['mcp', 'model context protocol', 'tools', 'droid mcp', 'mcp servers', 'mcp tools', 'integrations', 'connect tools', 'extend droid', 'cli mcp', 'add mcp', 'mcp add']
+keywords: ['mcp', 'model context protocol', 'tools', 'droid mcp', 'mcp servers', 'mcp tools', 'integrations', 'connect tools', 'extend droid', 'cli mcp', 'add mcp', 'mcp add', 'mcp autonomy', 'mcpAutonomyUrlOverrides', 'mcp policy', 'managed settings']
 ---
 
 Model Context Protocol (MCP) サーバーは、追加のツールとコンテキストを提供することでdroidの機能を拡張します。Droidでは、簡単なブラウジングとセットアップのためのインタラクティブUIと、スクリプトや自動化のためのCLIコマンドの2つの管理方法を提供しています。
@@ -44,7 +44,7 @@ droid内で`/mcp`と入力すると、インタラクティブMCPマネージャ
 
 ## CLIでサーバーを追加
 
-スクリプトや自動化には、`droid mcp add`を使用してください。Droidは2種類のサーバーをサポートしています：**http**（リモートエンドポイント）と**stdio**（ローカルプロセス）。
+スクリプトや自動化には、`droid mcp add`を使用してください。Droidは3つのトランスポートをサポートしています：**http**（Streamable HTTP — 現行のMCP標準で、内部でSSEを使ってレスポンスをストリーミングします）、**sse**（古いサーバー向けのレガシーな単独HTTP+SSEトランスポート）、**stdio**（ローカルプロセス）。
 
 ### HTTPサーバーの追加
 
@@ -163,13 +163,30 @@ droid mcp add vercel https://mcp.vercel.com/ --type http
 **Stytch** - 認証サービスの設定
 
 ```bash
-droid mcp add stytch http://mcp.stytch.dev/mcp --type http
+droid mcp add stytch https://mcp.stytch.dev/mcp --type http
 ```
 
 <Tip>
-  多くのHTTPサーバーではOAuth認証が必要です。追加後は
-  インタラクティブな`/mcp` UIを使用して認証フローを完了します。
+  多くのリモートサーバー（HTTP と SSE）では OAuth 認証が必要です。追加後は、
+  インタラクティブな`/mcp` UIを使用して認証フローを完了してください。
 </Tip>
+
+### SSEサーバーの追加
+
+`sse` はレガシーな HTTP+SSE トランスポート（MCP プロトコルバージョン `2024-11-05`）で、独立した Server-Sent Events エンドポイントを公開します。これは、内部で既に SSE を使う Streamable HTTP（`--type http`）に置き換えられました。そのため、通常は `http` を優先し、サーバーが古い単独 SSE エンドポイントしか提供しない場合にのみ `sse` を使ってください。引数は HTTP サーバーと同じで、変わるのは `--type` だけです。
+
+**構文：**
+
+```bash
+droid mcp add <name> <url> --type sse [--header "KEY: VALUE"...]
+```
+
+**例：**
+
+```bash
+droid mcp add example-sse https://mcp.example.com/sse --type sse \
+  --header "Authorization: Bearer YOUR_TOKEN"
+```
 
 ### Stdioサーバーの追加
 
@@ -188,6 +205,10 @@ droid mcp add <name> "<command>" [--env KEY=VALUE...]
 - `--env KEY=VALUE` - 環境変数（複数回使用可能）
 
 ### 人気のStdio MCPサーバー
+
+<Tip>
+  これらの `npx` の例では、各パッケージの公開済み最新バージョンをインストールします。セキュリティに敏感な環境では、`airtable-mcp-server@1.4.0` のように明示的なバージョンを固定し、更新を意図的に行い、実行前に変更内容を監査できるようにしてください。
+</Tip>
 
 **Airtable** - レコードの読み取り/書き込み、ベースとテーブルの管理
 
@@ -235,16 +256,19 @@ droid内で`/mcp`と入力すると、MCPサーバーを管理するためのイ
 
 ## 設定
 
-MCPサーバーの設定は2つのレベルで保存できます：
+MCPサーバー設定は、次のレベルのローカルファイルから読み込まれます：
 
 | レベル | 場所 | 目的 |
 | :---- | :------- | :------ |
 | **ユーザー** | `~/.factory/mcp.json` | 個人のサーバー、すべてのプロジェクトで利用可能 |
-| **プロジェクト** | `.factory/mcp.json` | チーム共有サーバー、リポジトリにコミット |
+| **フォルダ** | プロジェクトの任意の祖先ディレクトリにある `.factory/mcp.json` | 共通の親フォルダ配下のネストしたプロジェクト間で共有するサーバー |
+| **プロジェクト** | プロジェクトルートの `.factory/mcp.json` | チーム共有サーバー、リポジトリにコミット |
+
+組織管理者は、組織管理設定を通じてサーバーを一元提供し、許可するサーバーを制限することもできます（[Enterprise MCP ポリシー](#enterprise-mcp-policy) を参照）。
 
 ### レイヤー化の仕組み
 
-ユーザー設定がプロジェクト設定よりも優先されます。両方のレベルで同じサーバーが定義されている場合、ユーザーレベルの設定が優先されます。
+同じサーバーが複数レベルで定義されている場合は、ユーザー設定、フォルダレベル設定、プロジェクト設定の順に優先されます。
 
 **重要な動作：**
 - プロジェクト定義のサーバーを**有効化/無効化**すると、新しい状態でコピーがユーザー設定に保存されます。元のプロジェクト設定は変更されないため、チームメンバーには影響しません。
@@ -263,18 +287,29 @@ OAuthトークンはシステムキーリング（またはフォールバック
 
 | フィールド | 型 | 説明 |
 | :---- | :--- | :---------- |
-| `type` | `"stdio" \| "http"` | サーバータイプ |
+| `type` | `"stdio" \| "http" \| "sse"` | サーバータイプ。stdio サーバーでは省略でき、その場合は `stdio` がデフォルトになります。 |
 | `disabled` | `boolean` | サーバーを一時的に無効化（デフォルト：`false`） |
-| `disabledTools` | `string[]` | このMCPサーバーで無効化するツール名のリスト |
+| `enabledTools` | `string[]` | このサーバーから読み込むツール名の許可リスト。設定した場合、列挙したツールだけがコンテキストに読み込まれます。 |
+| `disabledTools` | `string[]` | このサーバーから除外するツール名のブロックリスト。無効化したツールはコンテキストに読み込まれません。 |
+| `timeoutMs` | `number` | MCP ツール呼び出しタイムアウトのサーバー単位の上書き値（ミリ秒）。省略時はグローバル設定のデフォルトにフォールバックします。 |
 
 **stdio**サーバーの場合：
 - **command**: 実行する実行可能ファイル
 - **args**: コマンドライン引数（配列）
 - **env**: 環境変数（オブジェクト）
 
-**http**サーバーの場合：
+**http** および **sse** サーバーの場合：
 - **url**: HTTP/HTTPSエンドポイントURL
 - **headers**: 認証用HTTPヘッダー（オブジェクト）
+- **oauth**: リモートサーバー用の任意の OAuth 上書き設定（オブジェクト）。対応フィールド:
+  - **scopes**: 要求する OAuth スコープ（配列）
+  - **clientId**: OAuth クライアント ID
+  - **clientSecret**: OAuth クライアントシークレット
+  - **callbackPort**: OAuth コールバックに使用するローカルポート
+
+<Warning>
+  プロジェクトレベルの `.factory/mcp.json` はリポジトリにコミットされます。`headers` の認証トークン（例：`Authorization`）、`oauth.clientSecret`、API キーなどのシークレットは決してプロジェクト設定に入れないでください。これらはユーザーレベル設定（`~/.factory/mcp.json`）に置くか、環境変数で渡し、OAuth トークンには Droid の keyring を利用してください。
+</Warning>
 
 **`mcp.json`の例：**
 
@@ -286,8 +321,15 @@ OAuthトークンはシステムキーリング（またはフォールバック
       "url": "https://mcp.linear.app/mcp",
       "disabled": false
     },
+    "example-sse": {
+      "type": "sse",
+      "url": "https://mcp.example.com/sse",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      },
+      "disabled": false
+    },
     "playwright": {
-      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest"],
       "disabled": false
@@ -298,14 +340,144 @@ OAuthトークンはシステムキーリング（またはフォールバック
 
 Droidは設定ファイルの変更時に自動的にリロードされるため、サーバーを追加した後すぐに利用可能になります。
 
+### 変数展開
+
+Droid は `mcp.json` の読み込み時に、`${VAR}` と `${VAR:-default}` の参照を現在のシェル環境に対して展開します。これにより、シークレットをファイル本体に書かずに、シークレットマネージャー、`.env` ローダー、またはシェルプロファイルから読み込めます。
+
+変数展開に対応している場所：
+
+- **stdio** サーバーの `command` と `args`
+- **stdio** サーバーの `env` の値
+- **http** サーバーの `url`
+- **http** サーバーの `headers` の値
+
+**例 — API キーを環境変数から読み込む:**
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "disabled": false
+    },
+    "airtable": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "airtable-mcp-server"],
+      "env": {
+        "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+参照した変数が未設定で、かつデフォルト値も指定していない場合、droid はプレースホルダーをそのまま残し、次回そのサーバーを起動するときに警告を表示します。安全なデフォルト値を指定するには `${VAR:-fallback}` を使ってください。
+
+<Note>
+  生の `mcp.json` ファイルが展開後の値で書き換えられることはありません。展開は読み込み時にメモリ上でのみ行われるため、シークレットはディスクやバージョン管理に残りません。
+</Note>
+
+### ツールごとのフィルタリング
+
+サーバーは多数のツールを公開できますが、すべてを毎回のセッションに読み込む必要はありません。`enabledTools` と `disabledTools` を使うと、`mcp.json` でツールの公開範囲を永続的に絞り込めます。これは `droid exec` で使える `--enabled-tools` / `--disabled-tools` フラグに対応しています。
+
+- `disabledTools`: ブロックリスト — サーバーが報告したツールのうち、列挙した名前**以外**を読み込みます。
+- `enabledTools`: 許可リスト — 列挙したツール**のみ**を読み込みます。
+- 両方を設定した場合は `enabledTools` が優先され、`disabledTools` は無視されます。
+- フィルタで除外されたツールはモデルに登録されないため、コンテキストトークンを消費しません。
+
+**例 — ノイズの多いツールをブロックリスト化する:**
+
+```json
+{
+  "mcpServers": {
+    "my-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@some/mcp-server"],
+      "disabledTools": ["tool_i_dont_need", "another_unused_tool"]
+    }
+  }
+}
+```
+
+**例 — 使うツールだけを許可リスト化する:**
+
+```json
+{
+  "mcpServers": {
+    "another-server": {
+      "type": "http",
+      "url": "https://mcp.example.com/mcp",
+      "enabledTools": ["only_tool_i_want", "and_this_one"]
+    }
+  }
+}
+```
+
+<Tip>
+  droid 内で `/mcp` を実行すると、サーバーが公開しているツールの完全な一覧を確認できます。その正確なツール名を `enabledTools` または `disabledTools` にコピーしてください。
+</Tip>
+
+<a id="mcp-call-timeout"></a>
+
+### MCP 呼び出しタイムアウト
+
+デフォルトでは、droid はすべての MCP ツール呼び出しにグローバルタイムアウトを適用します。長時間実行されるツール（大規模なデータエクスポート、ブラウザー自動化、モデル連携サーバーなど）はこの既定値を超え、タイムアウトエラーになる場合があります。
+
+サーバーごとに `timeoutMs` でタイムアウトを上書きできます：
+
+```json
+{
+  "mcpServers": {
+    "slow-server": {
+      "type": "stdio",
+      "command": "my-long-running-server",
+      "timeoutMs": 120000
+    }
+  }
+}
+```
+
+`settings.json` の `mcp.callTimeoutMs` 設定でグローバル既定値を設定することもできます：
+
+```json
+{
+  "mcp": {
+    "callTimeoutMs": 60000
+  }
+}
+```
+
+優先順位（高い順）：
+
+1. `mcp.json` のサーバー単位 `timeoutMs`
+2. `settings.json` のグローバル `mcp.callTimeoutMs`
+3. 組み込みのデフォルト値
+
+<Note>
+  タイムアウトを長くしても、droid が応答を待つ時間が変わるだけで、MCP サーバー自体やその上流 API が強制するタイムアウトが延長されるわけではありません。
+</Note>
+
+## Droid ごとのサーバー選択
+
+[カスタム Droid](/jp/cli/configuration/custom-droids) は、frontmatter の `mcpServers` フィールドを使って、使用を許可する設定済み MCP サーバーを選択できます。これにより、セッション内のすべてのサーバーを継承する代わりに、サブエージェントを特定のサーバー（例：`mcpServers: ["linear", "github"]`）に限定できます。さらに細かく制御したい場合は、droid の `tools` リストに登録済みの正確な MCP ツールIDを指定できます。詳細は [MCP サーバーの選択](/jp/cli/configuration/custom-droids#selecting-mcp-servers) を参照してください。
+
+<a id="enterprise-mcp-policy"></a>
+
 ## Enterprise MCP ポリシー
 
 組織は、組織管理設定の `mcpPolicy` 設定を通じて、許可される MCP サーバーを集中的に制御できます。これにより、管理者は組織レベルで MCP アクセスを制限し、ユーザーが検証済みのサーバーにのみ接続できるようにします。
 
 | フィールド | 型 | 説明 |
 | :--------- | :- | :--- |
-| `enabled` | `boolean` | 組織の MCP サポートを有効または無効にします。`false` の場合、すべての MCP サーバーがブロックされます。 |
-| `allowlist` | `string[]` | ユーザーが有効化を許可されるサーバー名の任意のリスト。設定されている場合、リストにないサーバーはすべてブロックされます。 |
+| `enabled` | `boolean` | ポリシー適用が有効かどうか。適用は `enabled` が `true` のときだけ行われます。`enabled` がない、または `false` の場合、ポリシーは適用されず、設定済みの MCP サーバーが許可されます。 |
+| `allowlist` | `string[]` | 許可されるサーバーマッチャーのリスト。ポリシーが有効な場合にのみ適用されます。各エントリは、リモート HTTP/SSE サーバーでは URL のホスト名に、stdio サーバーではコマンドと引数に一致します。設定されたサーバー名には一致しません。ポリシーが有効で allowlist が空または未設定の場合、すべてのサーバーがブロックされます。 |
 
 **組織管理設定の例：**
 
@@ -313,11 +485,45 @@ Droidは設定ファイルの変更時に自動的にリロードされるため
 {
   "mcpPolicy": {
     "enabled": true,
-    "allowlist": ["linear", "sentry", "notion"]
+    "allowlist": ["mcp.linear.app", "mcp.sentry.dev", "npx"]
   }
 }
 ```
 
 <Note>
-  `mcpPolicy` はエンタープライズ／組織レベルの設定で、管理設定を通じて適用されます。個々のユーザーが上書きすることはできません。ポリシーによってブロックされたサーバーは、`/mcp` のレジストリブラウザに表示されず、`mcp.json` からも読み込まれません。
+  `mcpPolicy` はエンタープライズ／組織レベルの設定で、管理設定を通じて適用されます。個々のユーザーが上書きすることはできません。ポリシーで許可されないサーバーは `mcp.json` に残り、設定にも読み込まれたままですが、実行・接続の対象から除外され、`/mcp` マネージャーでも利用可能としては表示されません。
+</Note>
+
+## MCP 自律性 URL オーバーライド
+
+管理者は、組織管理設定 `mcpAutonomyUrlOverrides` を使って、リモート MCP サーバーの URL ごとに既定のリスクレベルを割り当てられます。このリスクレベルは [自律レベル](/jp/cli/user-guides/auto-run) と比較され、一致したサーバーのツールを Droid が実行する前に、どの程度確認を求めるかを制御します。
+
+各ルールは、URL パターンをリスクレベルに対応付けます。
+
+| フィールド | 型 | 説明 |
+| :---- | :--- | :---------- |
+| `urlPattern` | `string` | サーバーの URL に対して照合する glob パターン（[picomatch](https://github.com/micromatch/picomatch) 構文）。 |
+| `defaultLevel` | `"low" \| "medium" \| "high"` | 一致したサーバーのツールに適用するリスクレベル。ユーザーの自律レベルと比較して、自動実行するか確認するかを決定します。 |
+
+**組織管理設定の例：**
+
+```json
+{
+  "mcpAutonomyUrlOverrides": [
+    { "urlPattern": "https://mcp.internal.example.com/**", "defaultLevel": "low" },
+    { "urlPattern": "https://*.partner.example.com/**", "defaultLevel": "medium" },
+    { "urlPattern": "https://**", "defaultLevel": "high" }
+  ]
+}
+```
+
+### マッチングと優先順位
+
+- **リモートサーバーのみ。** ルールが一致するのは URL を持つリモートサーバー（`http` と `sse` トランスポート）のみで、ローカルの `stdio` サーバーには影響しません。
+- **最初に一致したものが優先。** ルールは順番に評価されるため、より具体的なものを先に記述してください。
+- **安全性の下限。** ルールはツールのリスク *分類* を設定するものであり、プロンプトを絶対的に決めるものではありません。`high` に分類されたツールでも、通常の [自律レベル](/jp/cli/user-guides/auto-run) との比較に従います（別の安全チェックが介入しない限り、High 自律では追加確認なしで実行されます）。この下限は一方向で、`low` や `medium` でも読み取り専用でないツール（破壊的なもの、または安全性メタデータがないもの）を `high` 未満に下げることはできません。つまり、読み取り専用ツールの確認は緩和できますが、破壊的なツールを自動承認することはできません。
+- **フォールバック。** 一致するルールがないサーバーには、Droid 組み込みのツールリスク分類（読み取り専用ヒントと厳選されたデフォルト）が使われます。
+
+<Note>
+  `mcpAutonomyUrlOverrides` は管理者が管理する（MDM）設定です。[組織管理設定](/jp/enterprise/hierarchical-settings-and-org-control) を通じて配布され、ユーザーが上書きしたり弱めたりすることはできません。
 </Note>

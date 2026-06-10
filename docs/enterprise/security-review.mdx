@@ -15,47 +15,62 @@ Droid security review is a dedicated security workflow for finding high-confiden
   </Card>
 </CardGroup>
 
-## Methodology
+## Run a full-codebase audit
 
-Security review uses the built-in `security-review` skill. In PR automation, Droid Action runs a dedicated `security-reviewer` subagent that loads this methodology before reading files, then traces changed data flows across authentication, authorization, validation, database, network, filesystem, and LLM boundaries.
+For the most thorough security results, run the audit inside a [Mission](/cli/features/missions). Missions plan the audit upfront, fan out work across orchestrated agents, and validate findings at each milestone, which produces dramatically deeper coverage than a single-session run.
 
-The methodology applies multiple security frameworks together:
-
-- **STRIDE threat modeling**: Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege.
-- **OWASP Top 10:2021**: Broken access control, cryptographic failures, injection, insecure design, misconfiguration, vulnerable components, authentication failures, integrity failures, logging failures, and SSRF.
-- **OWASP Top 10 for LLM Applications:2025**: prompt injection, sensitive information disclosure, insecure LLM output handling, excessive agency, vector/embedding weaknesses, and other AI-specific risks when the codebase uses LLMs.
-- **Supply-chain analysis**: dependency manifest and lockfile review, including typosquatting signals, install scripts, overly broad version ranges, and newly published packages.
-- **Repository threat-model context**: if `.factory/threat-model.md` exists, Droid uses it as the attack-surface map.
-
-## Review pipeline
-
-Security review uses a two-pass workflow:
-
-1. **Candidate generation**: Droid reads the diff or codebase, identifies security-relevant areas, traces untrusted input across trust boundaries, and produces candidate vulnerabilities.
-2. **Validation**: Droid re-checks each candidate for reachability, exploitability, existing controls, and false positives before reporting it.
-
-Findings are reported only when there is a realistic exploit path, such as an injection vulnerability, missing authentication or authorization on a sensitive operation, hardcoded secret, data exposure, unsafe LLM output handling, or risky supply-chain change.
-
-## Severity levels
-
-| Severity | Priority | Examples |
-| --- | --- | --- |
-| Critical | `P0` | RCE, hardcoded production secret, auth bypass, unauthenticated admin endpoint |
-| High | `P1` | SQL injection behind auth, stored XSS, sensitive-data IDOR, very new dependency |
-| Medium | `P2` | CSRF on state-changing operations, information disclosure, prompt injection behind auth |
-| Low | `P3` | Minor security hardening with a concrete but low-impact exploit path |
-
-## Run locally
-
-Run the built-in skill directly from Droid on any repo:
+From any Droid session, enter a mission and kick off the security review:
 
 ```text
-/security-review
+/missions
+/security-review deep audit
 ```
 
-Local security review can audit the full codebase, not just the current diff. Droid enumerates source files in the repository, skips generated and vendored directories, groups files by module or directory, and validates findings before reporting them.
+### Periodic scan in CI
 
-## Run on pull requests
+Run the same mission-based audit on a schedule by invoking `droid exec --mission` from a workflow. The audit writes its full output under `~/security-audits/<slug>-<YYYYMMDD>/` on the runner, so add an `actions/upload-artifact` step to preserve findings after the runner exits:
+
+```yaml
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Droid CLI
+        run: |
+          curl -fsSL https://app.factory.ai/cli | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Run deep security review
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        run: |
+          droid exec --mission --auto high -m claude-opus-4-7 \
+            "/security-review across the entire repository"
+      - name: Upload security review output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-security-review-${{ github.run_id }}
+          path: ~/security-audits/
+          if-no-files-found: warn
+          retention-days: 90
+```
+
+## Run locally on a diff
+
+To review the current diff in your working tree or branch from the CLI, run the built-in skill in any Droid session:
+
+```text
+/security-review local diff
+```
+
+When invoked on a diff, Droid traces changed data flows across authentication, authorization, validation, database, network, filesystem, and LLM boundaries, and reports validated findings inline with severity and suggested fixes.
+
+## Run in GitHub CI on pull requests
 
 With [Droid Action](https://github.com/Factory-AI/droid-action), comment on a pull request to trigger an on-demand security review:
 
@@ -76,16 +91,6 @@ To run security review automatically on every non-draft PR, add `automatic_secur
 
 When `automatic_review` and `automatic_security_review` are both enabled, Droid runs the security pass alongside the standard code review and includes the security summary in the PR feedback.
 
-## Full repository scans in GitHub Actions
-
-For a full repository security scan, comment on a PR:
-
-```text
-@droid security --full
-```
-
-Full scans create a `droid/security-report-{date}` branch, write a report to `.factory/security/reports/security-report-{date}.md`, and open a PR with the findings.
-
 ## Configuration
 
 These are the Droid Action security inputs currently wired for the workflows documented on this page:
@@ -97,8 +102,39 @@ These are the Droid Action security inputs currently wired for the workflows doc
 | `security_severity_threshold` | `medium` | Full-repository scans only: minimum severity to include in the generated report. |
 | `security_notify_team` | `""` | Full-repository scans only: GitHub team to cc in the generated scan PR body, such as `@org/security-team`. |
 
+## Methodology
+
+Security review uses the built-in `security-review` skill. In PR automation, Droid Action runs a dedicated `security-reviewer` subagent that loads this methodology before reading files, then traces changed data flows across authentication, authorization, validation, database, network, filesystem, and LLM boundaries.
+
+The methodology applies multiple security frameworks together:
+
+- **STRIDE threat modeling**: Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege.
+- **OWASP Top 10:2021**: Broken access control, cryptographic failures, injection, insecure design, misconfiguration, vulnerable components, authentication failures, integrity failures, logging failures, and SSRF.
+- **OWASP Top 10 for LLM Applications:2025**: prompt injection, sensitive information disclosure, insecure LLM output handling, excessive agency, vector/embedding weaknesses, and other AI-specific risks when the codebase uses LLMs.
+- **Supply-chain analysis**: dependency manifest and lockfile review, including typosquatting signals, install scripts, overly broad version ranges, and newly published packages.
+- **Repository threat-model context**: if `.factory/threat-model.md` exists, Droid uses it as the attack-surface map.
+
+### Review pipeline
+
+Security review uses a two-pass workflow:
+
+1. **Candidate generation**: Droid reads the diff or codebase, identifies security-relevant areas, traces untrusted input across trust boundaries, and produces candidate vulnerabilities.
+2. **Validation**: Droid re-checks each candidate for reachability, exploitability, existing controls, and false positives before reporting it.
+
+Findings are reported only when there is a realistic exploit path, such as an injection vulnerability, missing authentication or authorization on a sensitive operation, hardcoded secret, data exposure, unsafe LLM output handling, or risky supply-chain change.
+
+### Severity levels
+
+| Severity | Priority | Examples |
+| --- | --- | --- |
+| Critical | `P0` | RCE, hardcoded production secret, auth bypass, unauthenticated admin endpoint |
+| High | `P1` | SQL injection behind auth, stored XSS, sensitive-data IDOR, very new dependency |
+| Medium | `P2` | CSRF on state-changing operations, information disclosure, prompt injection behind auth |
+| Low | `P3` | Minor security hardening with a concrete but low-impact exploit path |
+
 ## See also
 
+- [Missions](/cli/features/missions): Plan and orchestrate large multi-step work, including thorough audits.
 - [Automated Code Review](/guides/droid-exec/code-review): Standard PR code review automation.
 - [Skills](/cli/configuration/skills): How to invoke and customize skills.
 - [GitHub Integration Security](/enterprise/github-integration-security): Security architecture for the GitHub App integration.

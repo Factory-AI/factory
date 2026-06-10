@@ -111,7 +111,8 @@ Perform deep analysis of the code or problem presented...
 | `description`     | 任意。UI リストに表示されます。≤500文字に抑えてください。                                                                               |
 | `model`           | `inherit` （親セッションのモデルを使用）、またはモデル識別子を指定します。組み込みモデルの場合、`claude-sonnet-4-5-20250929` のような値を使用します。カスタムモデル（BYOK）の場合、`custom:` + 設定の `model` フィールドを使用します（例：`custom:gpt-4o-mini`）。`model_display_name` では**ありません**。モデルIDについては [利用可能なモデル](/jp/models) を参照してください。 |
 | `reasoningEffort` | 任意。対応するモデル（例：`low`、`medium`、`high`）の推論努力を設定します。`model` が `inherit` の場合は無視されます。選択したモデルと互換性が必要です。 |
-| `tools`           | ツール選択：すべてのツールを使用する場合は省略、カテゴリ文字列を使用（例：`read-only`）、または `["Read", "Edit", "Execute"]` のようなツールIDの配列を指定します。大文字小文字を区別します。 |
+| `tools`           | ツール選択：すべてのツールを使用する場合は省略、カテゴリ文字列を使用（例：`read-only`）、または `["Read", "Edit", "Execute"]` のようなツールIDの配列を指定します。大文字小文字を区別します。droid を特定の MCP ツールのみに制限したい場合は、ここにその登録済みツールIDを正確に列挙します。 |
+| `mcpServers`      | 任意。設定済みの [MCP サーバー](/jp/cli/configuration/mcp) 名の配列です（例：`["linear", "github"]`）。設定すると、列挙したサーバーのツールだけがこの droid で利用可能になります。省略すると、グローバルな MCP ツールの可用性にフォールバックします。詳しくは [MCP サーバーの選択](#selecting-mcp-servers) を参照してください。 |
 
 プロンプトは少なくとも `name` を含むYAML frontmatter で始まり、空でない本文を含む必要があります。`DroidValidator` はエラー（無効な名前、未知のモデル、未知のツール）と警告（説明の欠落、重複したツール）を表示します。検証の問題は、ファイルの読み込みに失敗した際にCLI ログに表示されます。
 
@@ -127,7 +128,7 @@ Perform deep analysis of the code or problem presented...
 | `web`       | `WebSearch`、`FetchUrl`          | インターネット調査とコンテンツ      |
 | `mcp`       | 動的に追加（存在する場合）   | Model Context Protocol ツール       |
 
-明示的な配列は上記のツール名を使用する必要があります（大文字小文字を区別）。未知の名前は検証エラーを引き起こします。
+明示的な配列では、上表にある有効なツールID（大文字小文字を区別）および/または登録済みの正確な MCP ツールIDを使用する必要があります。未知のIDは検証エラーを引き起こします。
 
 <Note>
   タスク追跡を有効にするため、`TodoWrite`はすべてのdroidに自動的に含まれます。ツール一覧に追加する必要はありません。
@@ -136,6 +137,34 @@ Perform deep analysis of the code or problem presented...
 <Note>
   OpenAIモデルで`Edit`を使用する場合、互換性のため`ApplyPatch`が自動的に含まれます。`model`が`inherit`の場合、モデルプロバイダー全体をカバーするため両方のツールが有効になります。
 </Note>
+
+<a id="selecting-mcp-servers"></a>
+
+### MCP サーバーの選択
+
+`mcpServers` を使うと、カスタム droid が利用できる [MCP サーバー](/jp/cli/configuration/mcp) を制限できます。droid は `tools` で宣言したツールに加えて、列挙した各サーバーのツールを受け取ります。`mcp.json` で設定されていても、ここに列挙されていないサーバーはサブエージェントのツール許可リストから除外されます。
+
+```md
+---
+name: issue-researcher
+description: Researches issues using repository context and tracker data
+model: inherit
+tools: ["Read", "Grep"]
+mcpServers: ["linear", "github"]
+---
+
+Investigate the issue referenced in the prompt using the codebase and the
+selected MCP servers, then summarize findings and propose next steps.
+```
+
+注記:
+
+- サーバー名は `~/.factory/mcp.json` または `.factory/mcp.json` にすでに設定されているエントリ名と一致している必要があります（ユーザーレベルまたはプロジェクトレベル）。
+- `mcpServers` を省略すると既存の動作になり、droid は親セッションから MCP ツールの可用性を継承します。
+- `mcpServers: []` を設定すると、グローバルに設定されているものも含めて、すべての MCP サーバーが除外されます。
+- より細かく制御したい場合は、サーバー単位ではなく `tools` に登録済みの正確な MCP ツールIDを列挙して、特定のツールだけを許可できます。
+- [Enterprise MCP ポリシー](/jp/cli/configuration/mcp#enterprise-mcp-policy) でブロックされているサーバーは、ここに列挙しても利用できません。
+- 設定されたサーバーは `/droids` の詳細ビューで **MCP Servers:** の下に表示されるため、選択内容が保存されていることを確認できます。
 
 ---
 

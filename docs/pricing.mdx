@@ -11,9 +11,9 @@ Factory plans use rolling Rate Limits across three windows: 5-hour, weekly, and 
 When you hit a Standard Usage Rate Limit, you have two options:
 
 - **Droid Core** -- a selection of leading open-weight models with a separate set of Rate Limits. Free, no additional cost.
-- **Extra Usage** -- prepaid credits that let you keep using any model. Pay-as-you-go, $10 minimum.
+- **Extra Usage** -- prepaid credits that let you keep working after included usage is exhausted. Pay-as-you-go, $10 minimum.
 
-Standard Usage is always consumed first. You can monitor your usage in **Settings > Usage** or with the `/limits` command in Droid.
+Standard Usage is always consumed first. For Droid Core-labeled models, Droid Core Rate Limits are used before Extra Usage. You can monitor your usage in **Settings > Usage** or with the `/limits` command in Droid.
 
 ## Plans
 
@@ -83,16 +83,16 @@ Droid Core is a set of leading open-weight models that Factory has designated as
 
 You can see the current list of Core models in **Settings > Models**. The list updates as new models are released.
 
-Droid Core usage counts against your Standard Usage if you still have Standard Usage remaining. Once Standard Usage is exhausted, Droid Core draws from its own separate Rate Limit pool.
+Droid Core usage counts against your Standard Usage if you still have Standard Usage remaining. Once Standard Usage is exhausted, Droid Core-labeled models draw from their own separate Rate Limit pool before using Extra Usage.
 
 ## Extra Usage
 
-Extra Usage is a prepaid, USD-denominated credit balance. It kicks in whenever your Standard Usage runs out (if enabled).
+Extra Usage is a prepaid, USD-denominated credit balance. It kicks in when your Standard Usage runs out (if enabled). For Droid Core-labeled models, Extra Usage is only used after both Standard Usage and Droid Core Rate Limits are exhausted.
 
 - **Minimum purchase:** $10
 - **Expiration:** credits never expire
 - **Toggle:** enable once, stays on until you turn it off or run out of credits
-- **Priority:** Standard Usage is always consumed first. Extra Usage is never touched while Standard Usage is available.
+- **Priority:** Standard Usage is always consumed first. Droid Core-labeled models use Droid Core Rate Limits next, then Extra Usage.
 
 ## Factory Missions
 
@@ -146,7 +146,7 @@ No. Credits persist until you use them.
 No. The toggle is sticky. Enable it once and it stays on until you turn it off or run out of credits.
 
 **Which is consumed first, Standard or Extra Usage?**
-Standard, always. After that it depends on which fallback you picked in settings. Extra Usage is never touched while you have Standard Usage available.
+Standard, always. For non-Droid Core-labeled models, Extra Usage applies after Standard Usage is exhausted. For Droid Core-labeled models, Droid Core Rate Limits are used before Extra Usage.
 
 ### Rate Limits
 
