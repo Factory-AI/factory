@@ -51,16 +51,20 @@ Rather than introducing another proprietary file format, AGENTS.md uses a standa
 
 ## 3 · File locations & discovery hierarchy
 
-Agents look for AGENTS.md in this order (first match wins):
+Agents load **all** `AGENTS.md` files along the path from your repo root down to your current working directory, plus a personal override. Every file is concatenated into the agent's context — discovery is **additive, not first-match**.
 
-1. `./AGENTS.md` in the **current working directory**
-2. The nearest parent directory up to the repo root
-3. Any `AGENTS.md` in sub-folders the agent is working inside
-4. Personal override: `~/.factory/AGENTS.md`
+At session start, agents load (in this order):
+
+1. Personal override: `~/.factory/AGENTS.md`
+2. Each `AGENTS.md` from the **repo root** down to the **current working directory**
+
+In addition, when the agent reads a file deeper in the tree via the `Read` tool, any previously unseen `AGENTS.md` files along the path to that file are loaded on demand.
 
 <Note>
-  Multiple files can coexist. The closer one to the file being edited takes
-  precedence.
+  Multiple files coexist. If their instructions conflict, the file **closest to
+  the working directory (or to the file being edited) takes precedence** over
+  files higher up the hierarchy. Non-conflicting instructions from parent files
+  still apply.
 </Note>
 
 ---
@@ -263,7 +267,9 @@ The API is GraphQL (Apollo). Web uses Next.js with SSR.
 
 <Steps>
   <Step title="Ingestion">
-    On task start, agents load the nearest AGENTS.md into their context window.
+    On task start, agents load every AGENTS.md from the repo root down to the
+    current working directory (plus the personal `~/.factory/AGENTS.md`
+    override) into their context window.
   </Step>
   <Step title="Planning">
     Build/test commands are used to form the execution plan (e.g. run tests
