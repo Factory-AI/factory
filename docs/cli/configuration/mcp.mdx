@@ -275,6 +275,66 @@ For **stdio** servers:
 For **http** servers:
 - **url**: HTTP/HTTPS endpoint URL
 - **headers**: HTTP headers for authentication (object)
+- **oauth**: OAuth overrides for this server (object), or `false` to disable OAuth entirely
+
+### OAuth Overrides
+
+For most remote servers, OAuth works with zero configuration: droid discovers the authorization server, registers a client automatically via Dynamic Client Registration (DCR), and uses Factory's published client metadata when the server supports Client ID Metadata Documents (CIMD). **Prefer these defaults.** Only set `oauth` overrides when a provider requires a custom trust or compatibility policy.
+
+The `oauth` object on an **http** server supports:
+
+| Field | Type | Description |
+| :---- | :--- | :---------- |
+| `scopes` | `string[]` | OAuth scopes to request instead of the discovered defaults |
+| `authorizationServerIssuer` | `string` | Authorization server issuer URL. Required when `clientId` / `clientSecret` are set. |
+| `clientId` | `string` | Pre-registered OAuth client ID, skipping dynamic registration |
+| `clientSecret` | `string` | Client secret for the pre-registered client |
+| `clientMetadataUrl` | `string` | HTTPS URL of a custom Client ID Metadata Document (CIMD) to use as the public client identity |
+| `tokenEndpointAuthMethod` | `"none" \| "client_secret_basic" \| "client_secret_post"` | Force a token endpoint authentication method instead of the discovered one |
+| `callbackPort` | `number` | Fixed localhost port for the OAuth callback (1-65535) |
+
+**Constraints:**
+
+- `clientMetadataUrl` must be an HTTPS URL with a non-root path and no credentials, query string, fragment, or dot segments.
+- `clientMetadataUrl` is mutually exclusive with `clientId` / `clientSecret`: a metadata document **is** the client identity, so pre-registered credentials cannot be combined with it.
+- `clientMetadataUrl` describes a public client, so `tokenEndpointAuthMethod` must be `"none"` (or omitted) when it is set.
+- `clientId` / `clientSecret` require `authorizationServerIssuer` to be set.
+
+**Example: custom CIMD document**
+
+Point a CIMD-capable server at your own hosted client metadata document:
+
+```json
+{
+  "mcpServers": {
+    "internal-tools": {
+      "type": "http",
+      "url": "https://mcp.internal.example.com/mcp",
+      "oauth": {
+        "clientMetadataUrl": "https://auth.example.com/oauth/client-metadata.json"
+      }
+    }
+  }
+}
+```
+
+**Example: force public client authentication**
+
+Force `"none"` when an authorization server advertises confidential methods but your deployment requires a public client flow:
+
+```json
+{
+  "mcpServers": {
+    "partner-api": {
+      "type": "http",
+      "url": "https://mcp.partner.example.com/mcp",
+      "oauth": {
+        "tokenEndpointAuthMethod": "none"
+      }
+    }
+  }
+}
+```
 
 **Example `mcp.json`:**
 
