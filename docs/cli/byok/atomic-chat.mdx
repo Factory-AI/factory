@@ -1,0 +1,55 @@
+---
+title: Atomic Chat
+description: Run open-weight models locally through Atomic Chat's OpenAI-compatible server
+keywords: ['atomic chat', 'local', 'self-hosted', 'byok', 'offline', 'on-device', 'openai-compatible', 'privacy']
+---
+
+[Atomic Chat](https://atomic.chat) runs open-weight models locally (llama.cpp / MLX) and exposes an OpenAI-compatible server at `http://127.0.0.1:1337/v1`.
+
+## Configuration
+
+Add to `~/.factory/settings.json`:
+
+```json
+{
+  "customModels": [
+    {
+      "model": "unsloth/Qwen3_5-9B-GGUF-Qwen3_5-9B-IQ4_XS",
+      "displayName": "Atomic Chat",
+      "baseUrl": "http://127.0.0.1:1337/v1",
+      "apiKey": "atomic",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 16384
+    }
+  ]
+}
+```
+
+<Note>
+  The `model` value must **exactly match** the id Atomic Chat is serving (it matches requests by id; a mismatch returns `404 No running session found for model ...`). Get the active id with `curl http://localhost:1337/v1/models`.
+</Note>
+
+## Setup
+
+1. Install Atomic Chat from [atomic.chat](https://atomic.chat)
+2. Load a model in the app (**Models** tab) — the local server starts automatically.
+3. Get the active model id: `curl http://localhost:1337/v1/models`
+4. Add the config above, setting `model` to that id.
+5. Run Droid: `droid exec -m custom:Atomic-Chat-0 "Say hi in one short sentence."`
+
+## Troubleshooting
+
+### `404 No running session found for model ...`
+- The `model` id in your config doesn't match the model Atomic Chat is serving.
+- Check the active id with `curl http://localhost:1337/v1/models` and set `model` to match.
+
+### Local server not connecting
+- Make sure Atomic Chat is running and a model is loaded.
+- Check the server: `curl http://localhost:1337/v1/models`
+- Confirm nothing else is using port `1337`.
+
+## Notes
+
+- Everything runs on-device — your code and prompts stay local.
+- Any `apiKey` placeholder works; the local server doesn't require authentication.
+- Bound to `127.0.0.1` by default. To use it across your LAN, set `host: 0.0.0.0` in Atomic Chat and update `baseUrl`.
