@@ -89,6 +89,10 @@ Below is the full schema for org-managed settings. These are configured by org a
   Whether sessions are synced to the cloud.
 </ResponseField>
 
+<ResponseField name="wikiCloudSync" type="boolean">
+  Whether AutoWiki content can be stored in the Factory App and synced to GitHub wikis.
+</ResponseField>
+
 <ResponseField name="includeCoAuthoredByDroid" type="boolean">
   Include a `Co-authored-by: Droid` trailer in git commits.
 </ResponseField>
@@ -106,7 +110,7 @@ Below is the full schema for org-managed settings. These are configured by org a
 </ResponseField>
 
 <ResponseField name="commandDenylist" type="string[]">
-  Shell command patterns that are always denied (accumulated across levels). A denied command still runs if the user explicitly approves it.
+  Shell command patterns that always require confirmation (accumulated across levels). A denylisted command can still run if the user explicitly approves it; use `commandBlocklist` for a hard block.
 </ResponseField>
 
 <ResponseField name="commandBlocklist" type="string[]">
