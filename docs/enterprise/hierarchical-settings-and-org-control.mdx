@@ -89,6 +89,10 @@ Below is the full schema for org-managed settings. These are configured by org a
   Whether sessions are synced to the cloud.
 </ResponseField>
 
+<ResponseField name="wikiCloudSync" type="boolean">
+  Whether AutoWiki content can be stored in the Factory App and synced to GitHub wikis.
+</ResponseField>
+
 <ResponseField name="includeCoAuthoredByDroid" type="boolean">
   Include a `Co-authored-by: Droid` trailer in git commits.
 </ResponseField>
@@ -106,7 +110,11 @@ Below is the full schema for org-managed settings. These are configured by org a
 </ResponseField>
 
 <ResponseField name="commandDenylist" type="string[]">
-  Shell command patterns that are always denied (accumulated across levels).
+  Shell command patterns that always require confirmation (accumulated across levels). A denylisted command can still run if the user explicitly approves it; use `commandBlocklist` for a hard block.
+</ResponseField>
+
+<ResponseField name="commandBlocklist" type="string[]">
+  Shell command patterns that can never run (accumulated across levels). Unlike the denylist, blocked commands have no approval path: the block holds even under full autonomy, auto-run, or `--skip-permissions-unsafe`. droid resolves the actual program being invoked before matching, so a blocked command cannot be bypassed with a wrapper shell, an absolute path, quoting tricks, or command substitution. Use this for organization-mandated hard stops.
 </ResponseField>
 
 <ResponseField name="customModels" type="object[]">
@@ -418,6 +426,7 @@ Again, users cannot override these rules; they can only choose safer personal de
   "ideAutoConnect": true,
   "commandAllowlist": ["npm *", "yarn *", "pnpm *", "make *"],
   "commandDenylist": ["rm -rf /", "sudo *"],
+  "commandBlocklist": ["shutdown", "mkfs", "curl"],
   "customModels": [
     {
       "model": "my-internal-model",

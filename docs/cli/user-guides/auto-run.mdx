@@ -8,7 +8,7 @@ Autonomy Level sets the highest-risk work Droid can run without pausing for appr
 
 ## Choose a level
 
-Execute commands and MCP tools have a risk level (`low`, `medium`, or `high`). Droid runs them automatically when the risk is at or below your Autonomy Level, unless a denylist or sandbox check requires approval.
+Execute commands and MCP tools have a risk level (`low`, `medium`, or `high`). Droid runs them automatically when the risk is at or below your Autonomy Level, unless a denylist or sandbox check requires approval, or the command matches the blocklist. Blocklisted commands never run at any level and have no approval prompt.
 
 | Autonomy Level | What can run without approval                           | Examples                                                               |
 | -------------- | ------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -26,21 +26,26 @@ Autonomy Level controls automatic approval, not which tools are available. Tool 
 - **Auto vs. Spec Mode** – In Auto, Autonomy Level controls approvals. Spec Mode is read-only planning; after approval, Droid exits Spec Mode and uses the selected Autonomy Level for implementation.
 - **File changes** – Low or higher lets Droid create, edit, and patch files without asking first.
 - **Commands and MCP tools** – Droid compares the tool risk level to your Autonomy Level. If the risk is higher, it asks before continuing.
-- **Allowlisted commands** – Commands in the allowlist can run without approval unless they also match the denylist.
-- **Safety checks** – Denylisted dangerous commands still ask at High, including dangerous commands nested inside `$(...)` or backticks. [Sandbox](/cli/configuration/sandbox) read, write, and network checks can also prompt separately.
+- **Allowlisted commands** – Commands in the allowlist can run without approval unless they also match the denylist or blocklist.
+- **Safety checks** – Denylisted dangerous commands still ask at High, including dangerous commands nested inside `$(...)` or backticks. Blocklisted commands are rejected outright at every level, with no approval prompt. [Sandbox](/cli/configuration/sandbox) read, write, and network checks can also prompt separately.
 - **Allow always** – Choosing an “always allow” option raises the current Autonomy Level to the level required by that prompt. Sandbox “allow always” options instead persist the allowed path or domain.
 - **Spec approval** – When approving a Spec Mode plan, choose **Proceed with implementation** to keep the current Autonomy Level, or choose an available Low, Medium, or High option for implementation. Organization Maximum Autonomy Level can hide higher options.
 
-## Command allowlists and denylists
+## Command allowlists, denylists, and blocklists
 
-Use `commandAllowlist` and `commandDenylist` in [Settings](/cli/configuration/settings) to encode command policy for your user profile, a project, a local project override, or a nested folder.
+Use `commandAllowlist`, `commandDenylist`, and `commandBlocklist` in [Settings](/cli/configuration/settings) to encode command policy for your user profile, a project, a local project override, or a nested folder.
 
 - Allowlist entries are treated as low-risk for the matching scope.
-- Denylist entries always take precedence over allowlist entries.
-- Commands not covered by either list fall back to the active Autonomy Level and command restrictions.
+- Denylist entries always take precedence over allowlist entries. A denied command still runs if you explicitly approve it.
+- Blocklist entries can never run: there is no approval prompt, and the block holds even under full autonomy, auto-run, or `--skip-permissions-unsafe`. Use it for commands that must be hard-stopped regardless of approvals.
+- Commands not covered by any list fall back to the active Autonomy Level and command restrictions.
 - Organization-managed settings have the highest priority. Local and project settings can add defaults for a repo or machine, but they cannot weaken organization command policy or raise autonomy above the organization maximum. See [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control).
 
 The built-in denylist covers common destructive patterns such as filesystem wipes, disk formatting, shutdown commands, fork bombs, and broad permission or ownership changes. Add project-specific commands when your repo has additional dangerous scripts or deployment paths.
+
+<Warning>
+  Because the blocklist cannot be bypassed by approval, it is the strongest control available. droid resolves the actual program being invoked before matching, so a blocked command cannot be slipped through with a wrapper shell (for example `bash -c "…"`), an absolute path, quoting tricks, or command substitution.
+</Warning>
 
 ## Change the level
 

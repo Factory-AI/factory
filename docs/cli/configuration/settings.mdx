@@ -55,6 +55,7 @@ Local overrides merge on top of the corresponding `settings.json` at the same le
 | `soundFocusMode`           | `always`, `focused`, `unfocused`                                                                                                                                                                                                                                         | `always`                      | When to play sound notifications.                                          |
 | `commandAllowlist`         | Array of commands                                                                                                                                                                                                                                                        | Safe defaults provided        | Commands that run without extra confirmation.                              |
 | `commandDenylist`          | Array of commands                                                                                                                                                                                                                                                        | Restrictive defaults provided | Commands that always require confirmation.                                 |
+| `commandBlocklist`         | Array of commands                                                                                                                                                                                                                                                        | `[]` (none)                   | Commands that can never run, even when approvals are skipped.              |
 | `includeCoAuthoredByDroid` | `true`, `false`                                                                                                                                                                                                                                                          | `true`                        | Automatically append the Droid co-author trailer to commits.               |
 | `enableDroidShield`        | `true`, `false`                                                                                                                                                                                                                                                          | `true`                        | Enable secret scanning and git guardrails.                                 |
 | `hooksDisabled`            | `true`, `false`                                                                                                                                                                                                                                                          | `false`                       | Globally disable all hooks execution.                                      |
@@ -135,25 +136,27 @@ The `ideAutoConnect` setting controls whether droid automatically connects to yo
 - **`true`** – Auto-connect to IDE from any terminal
 
 
-## Command allowlist & denylist
+## Command allowlist, denylist & blocklist
 
 Use these settings to control which commands droid can execute automatically and which it must never run:
 
 - **`commandAllowlist`** – Commands in this array are treated as safe and run without additional confirmation, regardless of autonomy prompts. Include only low-risk utilities you rely on frequently (for example `ls`, `pwd`, `dir`).
-- **`commandDenylist`** – Commands in this array always require confirmation and are typically blocked because they are destructive or unsafe (for example recursive `rm`, `mkfs`, or privileged system operations).
+- **`commandDenylist`** – Commands in this array always require confirmation and are typically blocked because they are destructive or unsafe (for example recursive `rm`, `mkfs`, or privileged system operations). A denied command can still be run if you explicitly approve it.
+- **`commandBlocklist`** – Commands in this array can **never** run. Unlike the denylist, there is no prompt and no way to approve them: the block applies even under full autonomy, auto-run, or `--skip-permissions-unsafe`. droid also resolves the actual program being invoked, so a blocked command cannot be slipped through with a wrapper shell, an absolute path, quoting tricks, or command substitution.
 
-Commands that appear in both lists default to the denylist behavior. Any command that is in neither list falls back to the autonomy level you selected for the session.
+Commands that appear in both the allowlist and denylist default to the denylist behavior. The blocklist always takes precedence over both. Any command that is in none of the lists falls back to the autonomy level you selected for the session.
 
-### Example allow/deny configuration
+### Example allow/deny/block configuration
 
 ```json
 {
   "commandAllowlist": ["ls", "pwd", "dir"],
-  "commandDenylist": ["rm -rf /", "mkfs", "shutdown"]
+  "commandDenylist": ["rm -rf /", "mkfs", "shutdown"],
+  "commandBlocklist": ["shutdown", "mkfs", "curl"]
 }
 ```
 
-Review and update these arrays periodically to match your workflow and security posture, especially when sharing configurations across teams.
+Use `commandBlocklist` for commands that should be hard-stopped regardless of approvals; use `commandDenylist` for commands that are allowed only after explicit confirmation. Review and update these arrays periodically to match your workflow and security posture, especially when sharing configurations across teams.
 
 ## Session defaults
 
