@@ -2,7 +2,7 @@
 title: Droid Control
 sidebarTitle: Droid Control
 description: Terminal, browser, and desktop automation. Record demos, verify behavior claims, and run QA flows.
-keywords: ['droid-control', 'automation', 'demo', 'verify', 'qa-test', 'terminal', 'browser', 'recording', 'video', 'showcase', 'tuistory', 'remotion', 'tctl', 'plugin']
+keywords: ['droid-control', 'automation', 'demo', 'verify', 'qa-test', 'terminal', 'browser', 'desktop', 'desktop-control', 'cua-driver', 'computer-use', 'recording', 'video', 'showcase', 'tuistory', 'remotion', 'tctl', 'plugin']
 ---
 
 Droid Control lets Droids *operate* software: launch apps, type commands, click buttons, record what happens, and produce polished video evidence of it. Built by Droids, for Droids.
@@ -192,9 +192,9 @@ Every video below was planned, recorded, and rendered entirely by a Droid.
 
 ## Automation drivers
 
-Droid Control supports three automation backends. The right one is selected automatically based on what you're targeting.
+Droid Control supports four automation backends. The right one is selected automatically based on what you're targeting.
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="tuistory" icon="terminal">
     **Virtual PTY automation.** Default for terminal work. Playwright-style CLI with asciinema recording and forced truecolor output.
   </Card>
@@ -203,6 +203,9 @@ Droid Control supports three automation backends. The right one is selected auto
   </Card>
   <Card title="agent-browser" icon="globe">
     **Web and Electron apps.** Playwright-backed CLI with Chrome DevTools Protocol support. Navigates pages, fills forms, clicks buttons, captures screenshots.
+  </Card>
+  <Card title="desktop-control" icon="desktop">
+    **Native desktop apps.** Accessibility-tree snapshots, element or pixel actions, and per-window screenshots via [trycua/cua](https://github.com/trycua/cua) `cua-driver` -- all without stealing focus. macOS and Windows are production tier; Linux is pre-release.
   </Card>
 </CardGroup>
 
@@ -241,7 +244,7 @@ Demo and showcase videos are rendered with [Remotion](https://www.remotion.dev/)
 The plugin uses a composition architecture with three layers:
 
 - **Orchestrator** -- Routes each request through three independent lookups (target, stage, artifact) to determine which skills to load.
-- **10 atom skills** -- Self-contained background knowledge loaded on demand, split into drivers, targets, stages, and polish.
+- **11 atom skills** -- Self-contained background knowledge loaded on demand, split into drivers, targets, stages, and polish.
 - **3 commands** -- Parse arguments into commitments, then delegate to atoms via hybrid handoffs.
 
 Every workflow flows through **capture → compose → verify**. Commands declare *what* to produce; atoms own *how*. Skills chain through explicit handoffs rather than hardcoded pipelines, so the droid follows the flow naturally.
@@ -267,6 +270,13 @@ Only install what you need for your use case.
     ```bash
     agent-browser install   # downloads Chromium
     ```
+  </Accordion>
+  <Accordion title="Native desktop apps (desktop-control)">
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/cua-driver/scripts/install.sh | bash
+    cua-driver skills install   # upstream skill pack (deep tool reference)
+    ```
+    Windows installs via PowerShell: `irm https://raw.githubusercontent.com/trycua/cua/main/libs/cua-driver/scripts/install.ps1 | iex`. macOS additionally needs `cua-driver permissions grant` (Accessibility + Screen Recording).
   </Accordion>
   <Accordion title="Real terminal emulator (true-input)">
     | Platform | Required tools |
