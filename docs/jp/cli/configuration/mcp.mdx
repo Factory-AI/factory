@@ -301,11 +301,66 @@ OAuthトークンはシステムキーリング（またはフォールバック
 **http** および **sse** サーバーの場合：
 - **url**: HTTP/HTTPSエンドポイントURL
 - **headers**: 認証用HTTPヘッダー（オブジェクト）
-- **oauth**: リモートサーバー用の任意の OAuth 上書き設定（オブジェクト）。対応フィールド:
-  - **scopes**: 要求する OAuth スコープ（配列）
-  - **clientId**: OAuth クライアント ID
-  - **clientSecret**: OAuth クライアントシークレット
-  - **callbackPort**: OAuth コールバックに使用するローカルポート
+- **oauth**: このサーバー用の OAuth 上書き設定（オブジェクト）、または OAuth を完全に無効化する `false`
+
+### OAuth の上書き設定
+
+ほとんどのリモートサーバーでは、OAuth は設定不要で動作します。droid が認可サーバーを検出し、Dynamic Client Registration（DCR）でクライアントを自動登録し、サーバーが Client ID Metadata Documents（CIMD）に対応している場合は Factory が公開しているクライアントメタデータを使用します。**まずはこれらのデフォルトを優先してください。** `oauth` の上書き設定は、プロバイダーが独自の信頼ポリシーや互換性ポリシーを必要とする場合にのみ設定してください。
+
+**http** または **sse** サーバーの `oauth` オブジェクトでは、以下のフィールドを使用できます。
+
+| フィールド | 型 | 説明 |
+| :---- | :--- | :---------- |
+| `scopes` | `string[]` | 検出されたデフォルトの代わりに要求する OAuth スコープ |
+| `authorizationServerIssuer` | `string` | 認可サーバーの issuer URL。`clientId` / `clientSecret` を設定する場合は必須です。 |
+| `clientId` | `string` | Dynamic Client Registration をスキップして使う、事前登録済みの OAuth クライアント ID |
+| `clientSecret` | `string` | 事前登録済みクライアント用のクライアントシークレット |
+| `clientMetadataUrl` | `string` | 公開クライアントのアイデンティティとして使う、カスタム Client ID Metadata Document（CIMD）の HTTPS URL |
+| `tokenEndpointAuthMethod` | `"none" \| "client_secret_basic" \| "client_secret_post"` | 検出結果ではなく、トークンエンドポイントの認証方式を強制的に指定します |
+| `callbackPort` | `number` | OAuth コールバックに使用する固定の localhost ポート（1〜65535） |
+
+**制約:**
+
+- `clientMetadataUrl` は HTTPS URL である必要があり、ルート以外のパスを持ち、認証情報、クエリ文字列、フラグメント、ドットセグメントを含めてはいけません。
+- `clientMetadataUrl` と `clientId` / `clientSecret` は同時に使用できません。メタデータドキュメント自体がクライアントアイデンティティであるため、事前登録済みの認証情報と組み合わせることはできません。
+- `clientMetadataUrl` は公開クライアントを表すため、これを設定する場合、`tokenEndpointAuthMethod` は `"none"` にするか省略する必要があります。
+- `clientId` / `clientSecret` を使う場合は、`authorizationServerIssuer` の設定が必要です。
+
+**例: カスタム CIMD ドキュメント**
+
+CIMD 対応サーバーで、独自にホストしたクライアントメタデータドキュメントを使用する例です。
+
+```json
+{
+  "mcpServers": {
+    "internal-tools": {
+      "type": "http",
+      "url": "https://mcp.internal.example.com/mcp",
+      "oauth": {
+        "clientMetadataUrl": "https://auth.example.com/oauth/client-metadata.json"
+      }
+    }
+  }
+}
+```
+
+**例: 公開クライアント認証を強制する**
+
+認可サーバーが confidential クライアント向けの方式を告知していても、デプロイで公開クライアントフローが必要な場合は `"none"` を強制します。
+
+```json
+{
+  "mcpServers": {
+    "partner-api": {
+      "type": "http",
+      "url": "https://mcp.partner.example.com/mcp",
+      "oauth": {
+        "tokenEndpointAuthMethod": "none"
+      }
+    }
+  }
+}
+```
 
 <Warning>
   プロジェクトレベルの `.factory/mcp.json` はリポジトリにコミットされます。`headers` の認証トークン（例：`Authorization`）、`oauth.clientSecret`、API キーなどのシークレットは決してプロジェクト設定に入れないでください。これらはユーザーレベル設定（`~/.factory/mcp.json`）に置くか、環境変数で渡し、OAuth トークンには Droid の keyring を利用してください。
