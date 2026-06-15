@@ -327,9 +327,147 @@ Create `.factory-plugin/marketplace.json`:
 | `description` | No | Shown when browsing marketplaces |
 | `owner` | No | Contact information |
 | `plugins[].name` | Yes | Plugin identifier |
-| `plugins[].source` | Yes | Relative path to plugin directory |
+| `plugins[].source` | Yes | Where to fetch the plugin from. A relative path string or a source object. See [Plugin sources](#plugin-sources). |
 | `plugins[].description` | No | Shown in plugin browser |
 | `plugins[].category` | No | For organizing plugins |
+
+### Plugin sources
+
+Each plugin entry's `source` field tells Droid where to fetch the plugin from. The default form, a relative path string like `"./plugin-one"`, points at a directory inside the marketplace repository. For plugins that live elsewhere, use a source object.
+
+Pinning behavior depends on the source type. Git-based sources (`github`, `url`, `git-subdir`) are pinned per-plugin via `ref` (branch or tag) or `sha`. Relative-path plugins are pinned by pinning the marketplace source they live in. `npm` plugins are pinned via the `version` field, which follows npm version resolution.
+
+| Source type | Fields | Use when |
+| :---------- | :----- | :------- |
+| Relative path | `"./path/to/plugin"` | Plugin lives inside the marketplace repository. |
+| `github` | `repo`, `ref?`, `sha?` | Plugin is hosted in its own GitHub repository. |
+| `url` | `url`, `ref?`, `sha?` | Plugin is hosted on a non-GitHub git host (GitLab, Bitbucket, self-hosted). |
+| `git-subdir` | `url`, `path`, `ref?`, `sha?` | Plugin lives inside a subdirectory of a larger git repository, such as a monorepo. |
+| `npm` | `package`, `version?`, `registry?` | Plugin is published as an npm package. |
+
+#### npm packages
+
+Distribute plugins as npm packages when you already ship to a private registry (Artifactory, CodeArtifact, GitHub Packages, Verdaccio, and so on) and want to reuse that channel for your Droid plugins. Public packages on the npm registry work the same way. For npm sources, pinning and updates follow npm version resolution via the `version` field; the git commit-hash guidance in [Version management](#version-management) applies to git-based sources only.
+
+Requires `npm` to be installed and available on `PATH`. The CLI surfaces a clear error if it is not.
+
+```json
+{
+  "name": "pr-triage",
+  "source": {
+    "source": "npm",
+    "package": "@your-org/droid-pr-triage"
+  }
+}
+```
+
+Pin to a specific version or range:
+
+```json
+{
+  "name": "pr-triage",
+  "source": {
+    "source": "npm",
+    "package": "@your-org/droid-pr-triage",
+    "version": "2.4.0"
+  }
+}
+```
+
+Install from a private registry:
+
+```json
+{
+  "name": "pr-triage",
+  "source": {
+    "source": "npm",
+    "package": "@your-org/droid-pr-triage",
+    "version": "^2.0.0",
+    "registry": "https://npm.your-org.example"
+  }
+}
+```
+
+| Field | Required | Description |
+| :---- | :------- | :---------- |
+| `package` | Yes | npm package name. Scoped packages (`@scope/name`) are supported. |
+| `version` | No | npm version, range, or dist-tag (for example `2.4.0`, `^2.0.0`, `latest`). Defaults to `latest`. Tarball URLs, `file:` paths, `git+...` specs, and `npm:` aliases are rejected; the source must resolve through the configured registry. |
+| `registry` | No | Custom registry URL. Defaults to the system npm registry. Must be `https://` with no embedded credentials, query string, or fragment, so that secrets stay in your registry client config rather than the marketplace JSON. The setting is scoped to the install run and never written to your global `~/.npmrc`. |
+
+**Layout requirements.** The published package root must contain a plugin manifest. Both the native Droid layout (`.factory-plugin/plugin.json`, `droids/`, `mcp.json`) and the Claude Code layout (`.claude-plugin/plugin.json`, `agents/`, `.mcp.json`) are accepted. Claude Code layouts are translated into Droid form when the package is copied into the plugin cache.
+
+A typical published package looks like this:
+
+```
+@your-org/droid-pr-triage/
+├── .factory-plugin/
+│   └── plugin.json
+├── package.json
+├── skills/
+│   └── classify/
+│       └── SKILL.md
+├── droids/
+│   └── triage-reviewer.md
+└── README.md
+```
+
+Set the `files` field in `package.json` so only the plugin payload ships:
+
+```json
+{
+  "name": "@your-org/droid-pr-triage",
+  "version": "2.4.0",
+  "files": [
+    ".factory-plugin",
+    "skills",
+    "droids",
+    "mcp.json",
+    "hooks",
+    "README.md"
+  ]
+}
+```
+
+**Hardening.** Droid runs `npm install` in a per-plugin scratch directory with `--ignore-scripts`, `--no-save`, `--no-audit`, and `--no-fund`. Lifecycle scripts (`postinstall`, `preinstall`, and so on) are not executed, and your global npm configuration is not consulted or mutated. Because lifecycle scripts are skipped, packages that rely on a `postinstall` build step won't ship usable contents. Publish prebuilt artifacts (run your build before `npm publish`) so the package contents under the `files` allowlist are ready to use as-is.
+
+<Note>
+`npm:` is not a valid marketplace source. Droid only accepts `npm` as a per-plugin source inside a marketplace's `marketplace.json`. To ship a single npm-published plugin to your team without standing up a full marketplace repo, publish a thin wrapper marketplace (see below).
+</Note>
+
+##### Wrapper marketplace for a single npm plugin
+
+To distribute one npm-published plugin without a dedicated marketplace repo, commit a small `marketplace.json` to any folder. The folder name becomes the marketplace name.
+
+```
+your-org-plugins/
+└── .factory-plugin/
+    └── marketplace.json
+```
+
+```json
+{
+  "name": "your-org-plugins",
+  "owner": { "name": "Your Org Platform Team" },
+  "plugins": [
+    {
+      "name": "pr-triage",
+      "description": "Triage and label new pull requests for the on-call rotation",
+      "source": {
+        "source": "npm",
+        "package": "@your-org/droid-pr-triage",
+        "version": "^2.0.0"
+      }
+    }
+  ]
+}
+```
+
+Teammates add it like any other local marketplace:
+
+```bash
+droid plugin marketplace add ./your-org-plugins
+droid plugin install pr-triage@your-org-plugins
+```
 
 ### Version management
 
@@ -340,7 +478,7 @@ Use semantic versioning in your plugin manifest for documentation purposes:
 - **Patch** (1.0.0 → 1.0.1): Bug fixes
 
 <Note>
-Droid tracks plugin versions by Git commit hash, not semantic version. By default, updating a plugin fetches the latest commit from the marketplace. To pin a plugin to a specific version, pin the marketplace it lives in by setting `ref` (branch or tag) or `sha` (full commit SHA) on the marketplace source — see [Pinning a marketplace to a ref or commit](/cli/configuration/plugins#pinning-a-marketplace-to-a-ref-or-commit).
+For git-based plugin sources (relative path, `github`, `url`, `git-subdir`), Droid tracks plugin versions by Git commit hash, not semantic version. By default, updating a plugin fetches the latest commit from the marketplace. To pin a plugin to a specific version, pin the marketplace it lives in by setting `ref` (branch or tag) or `sha` (full commit SHA) on the marketplace source — see [Pinning a marketplace to a ref or commit](/cli/configuration/plugins#pinning-a-marketplace-to-a-ref-or-commit). For `npm` plugin sources, pinning follows npm version resolution via the per-plugin `version` field instead.
 </Note>
 
 ## Claude Code compatibility
