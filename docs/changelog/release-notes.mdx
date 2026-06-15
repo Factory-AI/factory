@@ -4,6 +4,75 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="June 14" rss={{ title: "CLI Updates", description: "MCP connection status, org-wide auto-update control, and reliability fixes" }}>
+  `v0.148.0`
+
+## New features
+
+- **MCP connection status** - `droid mcp list` and your session now show each MCP server's connection and authentication status
+- **Org-wide auto-update control** - Organizations can turn off CLI auto-updates with a new `disableAutoUpdate` setting
+
+## Improvements
+
+- **Log rotation** - The CLI now rotates its log files to avoid filling up disk space
+- **Faster MCP loading in editors** - MCP servers load without blocking when connecting from external editors
+- **Streamlined desktop sign-up** - Signing up on desktop now takes you straight to login (app)
+- **Clearer unsaved changes banner** - The unsaved changes banner is now easier to spot (app)
+
+## Bug fixes
+
+- **Duplicate BYOK models** - Removed duplicate models from the bring-your-own-key model selector
+- **BYOK custom endpoints** - Fixed compatibility with custom bring-your-own-key model endpoints
+- **Duplicate transcript** - Fixed a duplicate transcript appearing in the session view
+- **Plugins slash command** - The `/plugins` command now appears before a session finishes initializing (app)
+- **Wiki reader dragging** - Restored window dragging in the wiki reader (app)
+- **MCP authentication notices** - Improved how MCP authentication prompts are shown
+
+</Update>
+
+<Update label="June 12" rss={{ title: "CLI Updates", description: "Command blocklist, MCP OAuth improvements, and welcome screen sign-in" }}>
+  `v0.147.0`
+
+## New features
+
+- **Command blocklist** - The new `commandBlocklist` setting hard-stops specified commands so they can never run, even under full autonomy or skipped approvals
+- **Welcome screen sign-in** - Added log-in and sign-up CTAs to the welcome screen (app)
+
+## Improvements
+
+- **MCP OAuth** - MCP servers can now authenticate using Client ID Metadata Documents (CIMD), with improved compatibility for servers that require a resource indicator
+- **Updated tooltips** - Refreshed tooltips for clearer guidance
+
+## Bug fixes
+
+- **Ctrl+Enter tooltip** - Fixed the Ctrl+Enter tooltip
+- **Desktop MCP OAuth banner** - The MCP OAuth banner now points at the MCP button (app)
+
+</Update>
+
+<Update label="June 10" rss={{ title: "CLI Updates", description: "Browser-based desktop onboarding, air-gapped mode improvements, and MCP and chat fixes" }}>
+  `v0.144.1`
+
+## New features
+
+- **Browser-based desktop onboarding** - Desktop onboarding now opens in your browser for a smoother first-run setup (app)
+
+## Improvements
+
+- **Queue message shortcut** - Queue a message with Ctrl+Enter
+- **Earlier session titles** - Droid now names your session earlier in the conversation
+
+## Bug fixes
+
+- **Chat cursor on resize** - The chat input now keeps your cursor position when the terminal is resized
+- **MCP authentication** - Improved MCP sign-in reliability, including desktop OAuth and servers that advertise no scopes
+- **Context summarization hangs** - Fixed a rare hang that could occur while summarizing long conversations
+- **Content filtering** - Responses blocked by a content filter are now surfaced as a clear moderation error
+- **Desktop onboarding top bar** - The top bar can now be dragged on desktop onboarding screens (app)
+- **Data retention dialog** - The data retention dialog no longer interferes with desktop navigation (app)
+
+</Update>
+
 <Update label="June 9" rss={{ title: "CLI Updates", description: "More reliable context summarization when a model declines a request" }}>
   `v0.144.1`
 
