@@ -4,6 +4,15 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="June 15" rss={{ title: "CLI Updates", description: "Air-gapped CLI binary distribution fix" }}>
+  `v0.148.1`
+
+## Bug fixes
+
+- **Air-gapped binaries** - Air-gapped CLI binaries are now properly signed and published so air-gapped installs receive the latest builds
+
+</Update>
+
 <Update label="June 14" rss={{ title: "CLI Updates", description: "MCP connection status, org-wide auto-update control, and reliability fixes" }}>
   `v0.148.0`
 
@@ -50,8 +59,8 @@ rss: true
 
 </Update>
 
-<Update label="June 10" rss={{ title: "CLI Updates", description: "Browser-based desktop onboarding, air-gapped mode improvements, and MCP and chat fixes" }}>
-  `v0.144.1`
+<Update label="June 12" rss={{ title: "CLI Updates", description: "Browser-based desktop onboarding, air-gapped mode improvements, and chat, MCP, and onboarding fixes" }}>
+  `v0.146.0`
 
 ## New features
 
@@ -61,15 +70,27 @@ rss: true
 
 - **Queue message shortcut** - Queue a message with Ctrl+Enter
 - **Earlier session titles** - Droid now names your session earlier in the conversation
+- **Air-gapped BYOK defaults** - Air-gapped mode auto-picks a sensible default BYOK model, and configuration errors point you at `settings.json`
+- **Wider air-gapped coverage** - `FACTORY_AIRGAP_ENABLED` now applies in more places
 
 ## Bug fixes
 
 - **Chat cursor on resize** - The chat input now keeps your cursor position when the terminal is resized
-- **MCP authentication** - Improved MCP sign-in reliability, including desktop OAuth and servers that advertise no scopes
 - **Context summarization hangs** - Fixed a rare hang that could occur while summarizing long conversations
 - **Content filtering** - Responses blocked by a content filter are now surfaced as a clear moderation error
+- **Desktop MCP OAuth** - Desktop MCP OAuth now flows through the hosted callback (app)
 - **Desktop onboarding top bar** - The top bar can now be dragged on desktop onboarding screens (app)
 - **Data retention dialog** - The data retention dialog no longer interferes with desktop navigation (app)
+
+</Update>
+
+<Update label="June 10" rss={{ title: "CLI Updates", description: "MCP authentication fixes" }}>
+  `v0.144.2`
+
+## Bug fixes
+
+- **MCP authentication** - Improved MCP sign-in reliability for servers that advertise no scopes
+- **Desktop MCP OAuth banner** - The MCP OAuth banner no longer overlaps the top bar (app)
 
 </Update>
 
