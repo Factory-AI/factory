@@ -242,6 +242,35 @@ See [Plugins · Pinning a marketplace to a ref or commit](/cli/configuration/plu
 Version pinning via the per-plugin `version` field is not currently supported. To pin a plugin's version, pin the marketplace it lives in via `ref` or `sha`.
 </Note>
 
+## Private npm registry authentication
+
+For plugins distributed as npm packages from private registries that require token-based authentication (JFrog Artifactory, AWS CodeArtifact, GitHub Packages), use the `authTokenEnvVar` field in the plugin source to specify which environment variable holds the auth token:
+
+```json
+{
+  "plugins": [
+    {
+      "name": "internal-tools",
+      "description": "Internal tooling plugin",
+      "source": {
+        "source": "npm",
+        "package": "@acme/droid-internal-tools",
+        "registry": "https://acme.jfrog.io/artifactory/api/npm/npm-virtual/",
+        "authTokenEnvVar": "JFROG_NPM_TOKEN"
+      }
+    }
+  ]
+}
+```
+
+At install time, Droid reads the token from the named environment variable and writes a registry-path-scoped `_authToken` entry into a temporary `.npmrc`. The token never persists on disk beyond the install. If the variable is not set, the install fails early with an actionable error telling users which variable to export.
+
+Ensure your onboarding documentation instructs developers to export the required token:
+
+```bash
+export JFROG_NPM_TOKEN="$(jfrog rt access-token-create --groups readers | jq -r .access_token)"
+```
+
 ## Private repository access
 
 For private Git repositories, ensure Droid can authenticate:
