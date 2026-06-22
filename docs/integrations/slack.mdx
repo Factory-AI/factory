@@ -5,6 +5,10 @@ description: "Step-by-step guide to connect Factory with your Slack workspace"
 
 Connect Factory to Slack so Droid can work with Slack conversations and team context.
 
+<Warning>
+If the Factory Slack app is already installed in your workspace, rerun the Slack install flow below to grant the latest permissions. This enables Droid to ingest images from Slack threads and post videos, generated artifacts, and other files back to Slack.
+</Warning>
+
 ## Prerequisites 
 
 - A Factory account with admin privileges
@@ -41,27 +45,20 @@ To ensure the integration is working correctly:
 1. Mention `@Factory` in a thread within a channel where the app has been added.
 2. Verify that Factory responds with a link to open the conversation in Factory.
 3. Click the link and confirm that the Slack thread content appears in your new Factory session.
+4. If you reran the install flow for the latest permissions, test with a thread that includes an image attachment and confirm Droid can use it as context.
+5. If your workflow posts results back to Slack, confirm Droid can upload a generated file or short result video to the thread.
 
 
-## Slack Tools
+## Capabilities
 
-<Warning>
-Before using the tools below, make sure that the Factory app is invited
-to the channels you'd like to interact with by sending <code>/invite&nbsp;@Factory</code> in those channels.
-</Warning>
+With the Slack integration, Droid can:
 
-Factory currently provides one native Slack tool:
-
-| Tool | What it does |
-| ---- | ------------ |
-| **Post Message** | Sends a message to a channel or replies in an existing thread |
-
-## Additional Features
-
-Besides the tools above, the Slack integration also allows you to: 
-
-- Mention `@Factory` in any Slack thread to receive a link to continue the conversation in Factory
-- Import Slack thread context into Factory by clicking the provided link
+- Mention `@Factory` in any Slack thread to start a Droid session from that thread
+- Import full Slack thread context into Factory by clicking the provided link
+- Include supported image attachments from Slack as session context
+- Send follow-up messages and image attachments from Slack into an active Droid session
+- Answer Droid clarification prompts directly in Slack
+- Have Droid post messages, generated files, artifacts, and result videos back to Slack
 - Reference Slack threads in Factory by pasting a thread URL into a Factory chat
 
 When a Slack thread is imported, Factory has access to the entire conversation history, allowing it to provide context-aware assistance.
@@ -79,6 +76,7 @@ If you encounter issues during integration:
 
 - Ensure you have admin rights in both Factory and your Slack workspace.
 - Verify that the Factory app has been added to the channel where you're mentioning it.
+- If Droid cannot read image attachments or upload files/videos, rerun the Slack install flow above to refresh the Factory Slack app's permissions.
 - If you see a "not_in_channel" error toast when trying to paste a Slack thread URL, it means the Factory bot needs to be invited to that channel. Use `/invite @Factory` in the channel to resolve this issue.
 - Check that your organization's firewall isn't blocking webhook communications.
 - For persistent issues, contact Factory support with specific error messages.
