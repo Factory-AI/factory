@@ -6,7 +6,7 @@ description: "Step-by-step guide to connect Factory with your Slack workspace"
 Connect Factory to Slack so Droid can work with Slack conversations and team context.
 
 <Warning>
-If the Factory Slack app is already installed in your workspace, rerun the Slack install flow below to grant the latest permissions. This enables Droid to ingest images from Slack threads and post videos, generated artifacts, and other files back to Slack.
+If the Factory Slack app is already installed in your workspace, rerun the Slack install flow below to grant the latest permissions. This enables Droid to ingest images from Slack threads and post videos, generated artifacts, and other files back to Slack. An admin may have to approve this depending on your Slack workspace settings.
 </Warning>
 
 ## Prerequisites 
@@ -51,15 +51,17 @@ To ensure the integration is working correctly:
 
 ## Capabilities
 
-With the Slack integration, Droid can:
+With the Slack integration, you can:
 
 - Mention `@Factory` in any Slack thread to start a Droid session from that thread
+- Continue the session on Web or Desktop
 - Import full Slack thread context into Factory by clicking the provided link
 - Include supported image attachments from Slack as session context
-- Send follow-up messages and image attachments from Slack into an active Droid session
-- Answer Droid clarification prompts directly in Slack
 - Have Droid post messages, generated files, artifacts, and result videos back to Slack
+- Send follow-up messages and attachments from Slack into an active Droid session
 - Reference Slack threads in Factory by pasting a thread URL into a Factory chat
+
+When creating a PR, the Slack integration will also use a subagent to handle CI so the agent can respond faster.
 
 When a Slack thread is imported, Factory has access to the entire conversation history, allowing it to provide context-aware assistance.
 
