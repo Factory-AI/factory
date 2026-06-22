@@ -65,6 +65,37 @@ When creating a PR, the Slack integration will also use a subagent to handle CI 
 
 When a Slack thread is imported, Factory has access to the entire conversation history, allowing it to provide context-aware assistance.
 
+## Service accounts
+
+Use service accounts when Slack sessions should run from a shared identity and a preconfigured Droid Computer instead of the Slack user who mentions Factory. This is useful for incident, operations, or release channels that need consistent credentials and tool access.
+
+Before using a service account with Slack, make sure:
+
+- Service accounts are enabled for your organization.
+- The service account is active.
+- The service account owns at least one Droid Computer.
+- The Factory app has been invited to the Slack channel.
+
+<Steps>
+  <Step title="Open Slack channel settings">
+    In Factory, go to **Settings** → **Integrations** → **Slack** → **Channels**. Enable the channel and expand its settings.
+  </Step>
+  <Step title="Choose the run identity">
+    If the **Run as** row appears, select the service account. Selecting a service account makes the channel run with that service account's identity and computers.
+  </Step>
+  <Step title="Choose the computer">
+    Service account Slack sessions run on Droid Computers. When a service account is selected, Factory locks the target to **Computer** and only shows computers owned by that service account.
+  </Step>
+  <Step title="Configure Auto-Run if needed">
+    For automated channel workflows, turn on **Auto-Run** and configure the prompt, model, and visibility settings for that channel.
+  </Step>
+  <Step title="Test from Slack">
+    Mention `@Factory` in the channel, or send a test alert if Auto-Run is enabled. Factory starts the session as the selected service account.
+  </Step>
+</Steps>
+
+For ad hoc Slack sessions, the computer picker can also show a **Run as** selector. Choose a service account, pick one of its computers, and optionally save it as your default for future Slack mentions.
+
 ## Best Practices
 
 - Add the Factory app only to channels where development discussions occur.
