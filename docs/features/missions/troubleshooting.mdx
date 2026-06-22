@@ -1,0 +1,47 @@
+---
+title: Troubleshooting
+description: Common Mission issues and how to recover -- frozen missions, stuck workers and milestones, and changing direction mid-mission.
+keywords: ['factory missions', 'missions', 'troubleshooting', 'stuck', 'frozen', 'orchestrator', 'recover', 'intervene']
+---
+
+Missions are not fire-and-forget. The orchestrator is an agent, and you can talk to it. When something goes wrong, the most effective move is to pause the orchestrator, describe what you are seeing in plain language, and ask it to recover. The scenarios below cover the issues we see most often, with example prompts you can adapt.
+
+<AccordionGroup>
+  <Accordion title="The mission freezes or stops making progress">
+    If the mission appears stuck and nothing is happening, pause the orchestrator and tell it what you are seeing. Be direct: explain that the mission appears frozen or broken, describe what the last visible activity was, and ask it to recover. The orchestrator can re-assess the state and pick back up.
+
+    **Example:** *"The mission seems frozen -- the last worker finished 10 minutes ago and nothing new has started. Re-assess and continue."*
+  </Accordion>
+
+  <Accordion title="A worker is taking too long on a single item">
+    If one worker is spinning on a task for too long without making meaningful progress, you do not need to wait for it to finish. Pause the orchestrator and tell it to mark the current item as complete and move on. You can always come back to that item later, or handle it manually.
+
+    **Example:** *"The worker on the auth integration has been stuck for 20 minutes. Mark it as complete and move to the next feature."*
+  </Accordion>
+
+  <Accordion title="The mission is stuck on a milestone">
+    Sometimes the orchestrator hits a milestone that has become blocked -- maybe an earlier assumption was wrong, or a dependency is missing. When this happens, ask the orchestrator to re-assess the remaining work and figure out why it has become blocked. It can re-plan around the obstacle, reorder features, or adjust the milestone scope.
+
+    **Example:** *"We are stuck on Milestone 3. Re-assess the remaining work and tell me what is blocking progress."*
+  </Accordion>
+
+  <Accordion title="You want to change direction mid-mission">
+    If you realize the plan needs to change -- a feature should be dropped, a new requirement has come in, or the approach is wrong -- pause and tell the orchestrator. It can update the plan, re-scope milestones, and continue from the new direction.
+
+    **Example:** *"Drop the email notification feature and add Slack integration instead. Re-plan the remaining milestones."*
+  </Accordion>
+
+  <Accordion title='You see "Feature retry limit reached"'>
+    A message like *"Feature retry limit reached. A feature kept failing..."* means a single feature has failed repeatedly and the orchestrator has stopped retrying it. Inspect the latest worker for that feature to figure out why it keeps failing. Often this is a user-testing validator, which indicates the application cannot be QA'd correctly -- the mission has no reliable way to stand up and exercise the app. Make sure your project provides a script that stands up or mocks the app's dependencies so QA can simulate real user flows, and that logs are written to the filesystem where Droid can inspect them. See [Planning & Validation](/features/missions/planning#development-scripting-for-qa). If the project does not need QA-style validation, disable it in the mission settings inside Mission Control.
+  </Accordion>
+
+  <Accordion title="Validation keeps failing or QA cannot run">
+    If validation workers repeatedly fail, the mission often lacks a reliable way to exercise the running application. Make sure your project has a script that stands up or mocks the app's dependencies so QA can simulate real user flows, and that logs are written to the filesystem where Droid can inspect them. See [Planning & Validation](/features/missions/planning#development-scripting-for-qa). If your project does not need QA-style validation at all, you can disable it in the mission settings inside Mission Control.
+  </Accordion>
+</AccordionGroup>
+
+## See also
+
+- [Running in the CLI](/cli/features/missions/running-cli) -- Monitor and steer execution from the terminal
+- [Running in the Desktop/Web](/web/missions) -- Pause, re-assess, and re-plan from the dashboard
+- [Planning & Validation](/features/missions/planning) -- Scope milestones and set up QA scripting
