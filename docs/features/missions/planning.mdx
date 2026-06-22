@@ -1,0 +1,47 @@
+---
+title: Planning & Validation
+description: The planning phase is where Missions deliver the most value. Learn how to scope features and milestones, set validation frequency, and estimate cost and duration.
+keywords: ['factory missions', 'missions', 'planning', 'milestones', 'validation', 'cost', 'estimation']
+---
+
+## The planning phase matters most
+
+The biggest value we have found in Missions is in the planning phase. Getting the upfront plan right -- the features, the ordering, the milestones, the skills involved, and how the work gets validated -- is what determines whether the execution succeeds. Droid will push back, ask questions, and iterate with you until the plan is solid.
+
+This is intentional. A well-scoped plan with clear milestones produces dramatically better results than jumping straight into execution on a vague goal.
+
+## Validation
+
+Milestones define validation frequency. Validation workers run at the end of each milestone, verifying its work. For simple projects, one milestone is often enough; for longer or complex projects, more frequent milestone validation helps keep the foundation stable as work scales.
+
+For smaller, straightforward projects, a single milestone is often enough. For larger or longer-running projects, more granular milestones can prevent drift and reduce expensive rework later.
+
+If your project is not one that requires QA-style validation, you can disable it in the mission settings inside Mission Control.
+
+## Development scripting for QA
+
+Missions validate their own work by exercising your running application, so one of the most valuable things you can prepare is reliable scripting that lets Droid stand up, drive, and observe the app. Good patterns we have seen:
+
+- **One command to start the app.** For a web app, provide a single script that starts both the backend and frontend (plus any required services) so a worker can bring the whole stack up reproducibly.
+- **Route logs to the filesystem.** Send application logs to files on disk so Droid can read and inspect them after each action. Logs that only stream to a terminal are much harder for a worker to use.
+- **Keep resource usage modest.** Make sure running the app does not consume too many resources (RAM, CPU, disk). Workers run alongside the app, and a heavy local stack slows down or destabilizes the mission.
+- **Provide a way to send input.** Give Droid a programmatic way to drive the app the way a user would. We ship some tooling by default -- `tuistory` and `agent-browser` -- to enable QA testing of web apps, Electron apps, and terminal UI applications. If your app does not fall into one of these categories, we strongly encourage finding a way to give Droid a custom toolchain for driving it.
+
+## Estimating cost and duration
+
+As a rough planning heuristic, mission duration and cost scale with the number of worker runs:
+
+- **Feature workers:** roughly one run per feature
+- **Validator workers:** roughly one run per milestone
+
+So an initial estimate is approximately:
+
+`total runs ≈ #features + 2 * #milestones`
+
+In practice, this is a floor rather than a ceiling. Validation may surface issues that require follow-up work, and the orchestrator can create additional fix features during execution.
+
+## See also
+
+- [Factory Missions overview](/features/missions/overview) -- Concepts and how Missions work
+- [Running in the CLI](/cli/features/missions/running-cli) -- Execute and steer an approved plan
+- [Configuration & Reference](/features/missions/reference) -- Settings that control workers and validators
