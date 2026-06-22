@@ -27,6 +27,10 @@ Missions validate their own work by exercising your running application, so one 
 - **Keep resource usage modest.** Make sure running the app does not consume too many resources (RAM, CPU, disk). Workers run alongside the app, and a heavy local stack slows down or destabilizes the mission.
 - **Provide a way to send input.** Give Droid a programmatic way to drive the app the way a user would. We ship some tooling by default -- `tuistory` and `agent-browser` -- to enable QA testing of web apps, Electron apps, and terminal UI applications. If your app does not fall into one of these categories, we strongly encourage finding a way to give Droid a custom toolchain for driving it.
 
+<Warning>
+  Logs written to disk can capture secrets -- credentials, tokens, session IDs, or PII -- especially on shared machines or when logs are uploaded as CI artifacts. Redact sensitive fields, restrict file permissions on the log files, and make sure they are excluded from version control (for example via `.gitignore`) and from CI artifact collection.
+</Warning>
+
 ## Estimating cost and duration
 
 As a rough planning heuristic, mission duration and cost scale with the number of worker runs:
