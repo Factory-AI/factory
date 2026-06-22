@@ -1,0 +1,85 @@
+---
+title: 設定とリファレンス
+description: 設定の継承、droid exec --mission によるヘッドレス実行、ミッション設定、組織のアクセスポリシー。
+keywords: ['missions', 'reference', 'droid exec', 'headless', 'settings', 'missionModelSettings', 'missionPolicy', 'configuration']
+---
+
+## 設定の継承
+
+Factory Missions は既存の Droid 設定を継承します：
+
+- **MCP 統合** -- ワーカーは接続されたツール（Linear、Sentry、Notion など）を使用できます
+- **カスタムスキル** -- 既存のスキルが利用可能で、計画中に新しいものを開発できます
+- **フック** -- ライフサイクルフックはミッション実行中に発火します
+- **カスタム droids** -- プロジェクトで設定されたサブエージェントがワーカーで利用できます
+- **AGENTS.md** -- ワーカーはプロジェクトの慣例とコーディング標準に従います
+
+## ヘッドレスでのミッション実行
+
+ミッションは `droid exec --mission` を使って非対話的に実行することもできます。これは CI、スケジュール実行、ライブ TUI なしでオーケストレーターに計画と実行を任せたい環境で便利です。
+
+```bash
+droid exec --mission -f mission.md
+```
+
+オーケストレーターのワーカーエージェントと検証エージェントが使用するモデルや推論努力を上書きできます：
+
+```bash
+droid exec --mission \
+  --worker-model claude-sonnet-4-6 \
+  --worker-reasoning-effort medium \
+  --validator-model claude-opus-4-7 \
+  --validator-reasoning-effort high \
+  -f mission.md
+```
+
+| フラグ                                  | 説明                                                         |
+| --------------------------------------- | ------------------------------------------------------------ |
+| `--mission`                             | `droid exec` をミッションモード（マルチエージェントオーケストレーション）で実行します。 |
+| `--worker-model <id>`                   | ミッションワーカーエージェントが使用するモデル。             |
+| `--worker-reasoning-effort <level>`     | ミッションワーカーエージェントの推論努力。                   |
+| `--validator-model <id>`                | ミッション検証エージェントが使用するモデル。                 |
+| `--validator-reasoning-effort <level>`  | ミッション検証エージェントの推論努力。                       |
+
+ヘッドレス実行の完全なリファレンスは [`droid exec`](/jp/cli/droid-exec/overview) を参照してください。
+
+## 設定
+
+ミッションは `missionModelSettings` オブジェクトといくつかのトップレベルキーで調整できます。これらはグローバルまたはプロジェクトの[設定](/jp/cli/configuration/settings)ファイルで指定します。
+
+| 設定                                                    | 説明                                                                              |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `missionModelSettings.workerModel`                      | ミッションワーカーサブエージェントが使用するデフォルトのモデル。                    |
+| `missionModelSettings.workerReasoningEffort`            | ミッションワーカーの推論努力（`off`、`none`、`low`、`medium`、`high`）。            |
+| `missionModelSettings.validationWorkerModel`            | 検証ワーカー（scrutiny と user-testing）が使用するモデル。                          |
+| `missionModelSettings.validationWorkerReasoningEffort`  | 検証ワーカーの推論努力。                                                          |
+| `missionModelSettings.skipScrutiny`                     | ミッション中の scrutiny 検証マイルストーンをスキップします。                       |
+| `missionModelSettings.skipUserTesting`                  | ミッション中のユーザーテスト検証マイルストーンをスキップします。                   |
+| `missionOrchestratorModel`                              | ミッションオーケストレーターが使用するモデル。                                    |
+| `missionOrchestratorReasoningEffort`                    | ミッションオーケストレーターの推論努力。                                          |
+| `keepSystemAwakeDuringMissions`                         | ミッション実行中に OS がスリープしないようにします。デフォルトは `true`。         |
+
+<Tip>
+  強力なオーケストレーターモデルと高速なワーカーモデルを組み合わせるのは、コストと品質のトレードオフとしてよくある選択です。計画と検証は追加の推論で恩恵を受けやすく、定型的なワーカータスクは軽量なモデルで十分です。
+</Tip>
+
+## Enterprise: ミッションへのアクセス制限
+
+組織は `missionPolicy` の組織レベル設定により、ミッションを起動できるユーザーを制限できます：
+
+```json
+{
+  "missionPolicy": {
+    "restrictedAccess": true,
+    "allowedUserIds": ["user_123", "user_456"]
+  }
+}
+```
+
+`restrictedAccess` が `true` の場合、`allowedUserIds` に列挙されたメンバーのみが新しいミッションを開始できます。組織向けポリシーの全容は[設定リファレンス](/jp/cli/configuration/settings)を参照してください。
+
+## 関連項目
+
+- [Factory Missions 概要](/jp/features/missions/overview) -- コンセプトと動作の仕組み
+- [計画と検証](/jp/features/missions/planning) -- 機能、マイルストーン、検証のスコープ設定
+- [CLIでの実行](/jp/cli/features/missions/running-cli) -- 実行を監視・操作する

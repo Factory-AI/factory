@@ -1,0 +1,47 @@
+---
+title: トラブルシューティング
+description: ミッションでよくある問題と復旧方法 -- 停止したミッション、詰まったワーカーやマイルストーン、途中での方向転換。
+keywords: ['factory missions', 'missions', 'troubleshooting', 'stuck', 'frozen', 'orchestrator', 'recover', 'intervene']
+---
+
+Factory Missions は設定したら放置するものではありません。オーケストレーターはエージェントであり、会話することができます。問題が起きたときに最も効果的なのは、オーケストレーターを一時停止し、見えている状況を平易な言葉で説明し、復旧を依頼することです。以下のシナリオは、私たちが最もよく遭遇する問題と、応用できる例文をまとめたものです。
+
+<AccordionGroup>
+  <Accordion title="missionが停止または進行しない">
+    missionが止まって何も起きていないように見える場合は、オーケストレーターを一時停止し、見えている状況を伝えます。直接的に、missionが停止または壊れているように見えること、最後に見えたアクティビティ、復旧してほしいことを説明してください。オーケストレーターは状態を再評価し、再開できます。
+
+    **例:** *"The mission seems frozen -- the last worker finished 10 minutes ago and nothing new has started. Re-assess and continue."*
+  </Accordion>
+
+  <Accordion title="ワーカーが1つの項目に時間をかけすぎている">
+    1つのworkerが意味のある進捗なしに長時間タスクで止まっている場合、完了を待つ必要はありません。オーケストレーターを一時停止し、現在の項目を完了としてマークして次へ進むよう伝えます。その項目には後で戻ることも、手動で対応することもできます。
+
+    **例:** *"The worker on the auth integration has been stuck for 20 minutes. Mark it as complete and move to the next feature."*
+  </Accordion>
+
+  <Accordion title="missionがマイルストーンで詰まっている">
+    以前の前提が間違っていたり、依存関係が不足していたりして、オーケストレーターがブロックされたマイルストーンに到達することがあります。この場合は、残りの作業を再評価し、なぜブロックされたのかを特定するよう依頼します。障害を回避する再計画、機能の並べ替え、マイルストーン範囲の調整が可能です。
+
+    **例:** *"We are stuck on Milestone 3. Re-assess the remaining work and tell me what is blocking progress."*
+  </Accordion>
+
+  <Accordion title="missionの途中で方向転換したい">
+    計画を変更する必要があると気づいた場合（機能を削除する、新しい要件が入った、アプローチが間違っているなど）は、一時停止してオーケストレーターに伝えます。計画を更新し、マイルストーンのスコープを見直し、新しい方向から続行できます。
+
+    **例:** *"Drop the email notification feature and add Slack integration instead. Re-plan the remaining milestones."*
+  </Accordion>
+
+  <Accordion title='「Feature retry limit reached」と表示される'>
+    *"Feature retry limit reached. A feature kept failing..."* のようなメッセージは、特定の機能が繰り返し失敗し、オーケストレーターがその再試行を停止したことを意味します。その機能の最新のワーカーを調べ、なぜ失敗し続けるのかを特定してください。多くの場合、これはユーザーテスト用バリデーターであり、アプリケーションを正しく QA できないこと、つまりミッションにアプリを確実に立ち上げて動かす手段がないことを示しています。アプリの依存関係を立ち上げるかモックして QA が実際のユーザーフローをシミュレートできるスクリプトを用意し、ログが Droid の確認できるファイルシステムに書き出されていることを確認してください。[計画と検証](/jp/features/missions/planning) を参照してください。QAスタイルの検証が不要なプロジェクトの場合は、Mission Control 内のミッション設定で無効化してください。
+  </Accordion>
+
+  <Accordion title="検証が失敗し続ける、またはQAが実行できない">
+    検証ワーカーが繰り返し失敗する場合、実行中のアプリケーションを確実に動かす手段がミッションに不足していることがよくあります。アプリの依存関係を立ち上げるかモックしてQAが実際のユーザーフローをシミュレートできるスクリプトを用意し、ログが Droid の確認できるファイルシステムに書き出されていることを確認してください。[計画と検証](/jp/features/missions/planning) を参照してください。QAスタイルの検証がそもそも不要なプロジェクトの場合は、Mission Control 内のミッション設定で無効化できます。
+  </Accordion>
+</AccordionGroup>
+
+## 関連項目
+
+- [CLIでの実行](/jp/cli/features/missions/running-cli) -- ターミナルから実行を監視・操作する
+- [Desktop/Webでの実行](/jp/web/missions) -- ダッシュボードから一時停止・再評価・再計画する
+- [計画と検証](/jp/features/missions/planning) -- マイルストーンのスコープ設定とQAスクリプトの準備

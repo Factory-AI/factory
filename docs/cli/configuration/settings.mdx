@@ -190,7 +190,7 @@ Extends the [Sound notifications](#sound-notifications) section with toggles for
 
 ## Mission settings
 
-Configure [Missions](/cli/features/missions) — multi-agent orchestration runs.
+Configure [Missions](/features/missions/overview) — multi-agent orchestration runs.
 
 | Setting                                              | Type    | Options                                  | Default          | Description                                                                              |
 | ---------------------------------------------------- | ------- | ---------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------- |
@@ -243,7 +243,7 @@ System-level settings for status line, worktrees, and request timeouts.
 | `maxAutonomyLevel`                   | string  | `off`, `low`, `medium`, `high`                                                                                         | `high`       | **Enterprise.** Maximum [Autonomy Level](/cli/user-guides/auto-run) any session may use. Higher levels selected by users are clamped. |
 | `modelPolicy`                        | object  | `{ "allowedModelIds"?: string[], "blockedModelIds"?: string[], "allowCustomModels"?: boolean, "allowedBaseUrls"?: string[] }` | unset        | **Enterprise.** Restrict which models members can select, control whether custom models are permitted, and allowlist base URLs for custom model providers. |
 | `mcpPolicy`                          | object  | `{ "enabled"?: boolean, "allowlist"?: string[] }`                                                                      | unset        | **Enterprise.** Control whether MCP servers can run and which servers are permitted. See [MCP](/cli/configuration/mcp).              |
-| `missionPolicy`                      | object  | `{ "restrictedAccess"?: boolean, "allowedUserIds"?: string[] }`                                                        | unset        | **Enterprise.** Restrict who can launch [Missions](/cli/features/missions).                                                          |
+| `missionPolicy`                      | object  | `{ "restrictedAccess"?: boolean, "allowedUserIds"?: string[] }`                                                        | unset        | **Enterprise.** Restrict who can launch [Missions](/features/missions/overview).                                                          |
 | `networkPolicy`                      | object  | `{ "allowedIps": string[] }`                                                                                           | unset        | **Enterprise.** Restrict outbound network access from droid sessions to the specified IPs or CIDR ranges in `allowedIps`.            |
 | `sandbox`                            | object  | `{ "enabled"?: boolean, "mode"?: string, "filesystem"?: object, "network"?: object }`                                  | unset        | **Beta.** Sandbox configuration controlling filesystem and network isolation for tool execution. See [Sandbox](/cli/configuration/sandbox).                               |
 | `restrictMemberVisibility`           | boolean | `true`, `false`                                                                                                        | `false`      | **Org-level.** Hide other org members from non-admin users.                                                                          |

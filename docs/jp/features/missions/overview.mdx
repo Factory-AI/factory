@@ -1,0 +1,95 @@
+---
+title: "Factory Missions"
+description: Factory Missionsを使って、構造化されたオーケストレーションで複数機能にまたがる大規模プロジェクトを計画・実行します。目標を説明し、計画を共同作成し、作業管理をDroidに任せます。
+keywords: ['missions', 'mission', 'orchestration', 'multi-feature', 'milestones', 'skills', 'large projects', 'planning', 'mission control']
+---
+
+<Frame>
+  <img src="/images/mission-control.png" alt="Mission Controlのオーケストレーション画面" />
+</Frame>
+
+## Factory Missions とは？
+
+Factory Missions は、Droid を使って大規模でマルチ機能の作業を構造化された方法で取り組むための仕組みです。すべてを単一のセッションで処理するのではなく、まず Droid と協力してプラン（機能、マイルストーン、各部分を達成するために必要なスキル）を構築し、その後作業を管理するオーケストレーション層に実行を委ねます。
+
+Factory Missions には `/missions` コマンドでアクセスできます（`/mission` でも利用可能）。
+
+<CardGroup cols={2}>
+  <Card title="共同計画" icon="comments">
+    コードを書く前に、Droidと一緒に機能、マイルストーン、成功基準を定義します。
+  </Card>
+  <Card title="スキルを考慮した実行" icon="toolbox">
+    既存のスキルを活用し、作業の各部分に合わせて新しい専門スキルを開発します。
+  </Card>
+  <Card title="構造化されたオーケストレーション" icon="diagram-project">
+    Mission Controlはエージェント全体の実行を管理し、計画に沿って進捗を追跡します。
+  </Card>
+  <Card title="設定は引き継がれます" icon="gear">
+    MCP連携、スキル、フック、カスタムDroidはすべてFactory Missions内で動作します。
+  </Card>
+</CardGroup>
+
+## 最適な成果のために
+
+<Warning>
+  最良の結果を得るには、リポジトリが [Agent Readiness](/jp/web/agent-readiness/overview) の **レベル4（Optimized）以上** であることが望ましいです。
+
+  ミッションは作業を進めながら、各機能を検証し自己修正するために、アプリケーションに対してユーザー視点のQAテストを実行します。既存のプロジェクトでこれを機能させるには、ユーザーと同じようにアプリを動かせる、自動化されたスクリプト可能な手段（例: アプリのすべての依存関係を立ち上げるかモックして、起こりうるすべてのユーザーフローをシミュレートするスクリプト）がコードベースに必要です。これがないと、ミッションは自らの作業を確実に検証できません。
+
+  まだ到達していない場合は、[`/readiness-report`](/jp/cli/features/readiness-report) で準備状況を再評価し、[`/readiness-fix`](/jp/cli/features/readiness-report#remediation-with-readiness-fix) でギャップを解消してください。
+</Warning>
+
+## 動作の仕組み
+
+<Steps>
+  <Step title="Factory Missionsに入る">
+    任意のDroidセッションで`/missions`を実行して開始します。
+  </Step>
+  <Step title="計画を共同作成">
+    Droidは目標を理解するために対話を重ねます。明確化の質問をし、制約を掘り下げ、実際に作りたいものを一緒に定義します。これは一度きりのプロンプトではなく会話です。
+  </Step>
+  <Step title="機能とマイルストーンを作成">
+    会話に基づき、Droidは機能をマイルストーンに整理した構造化計画を作成します。各マイルストーンは作業上の意味のあるチェックポイントです。
+  </Step>
+  <Step title="スキルを活用または作成する">
+    Droidは適用できる既存スキルを取り込み、必要な作業部分には専門スキルを開発します。これにより、汎用的ではなくプロジェクトとワークフローに合わせた実行になります。
+  </Step>
+  <Step title="Mission Controlに入る">
+    計画が承認されると、Droidは計画の実行を管理するオーケストレーション画面であるMission Controlに入ります。進捗を監視し、作業中の機能を確認し、必要に応じて介入できます。
+  </Step>
+</Steps>
+
+プランを正しく組み立てる方法については [計画と検証](/jp/features/missions/planning) を参照してください。承認済みのミッションを実行・操作するには [CLIでの実行](/jp/cli/features/missions/running-cli) または [Desktop/Webでの実行](/jp/web/missions) を参照してください。
+
+## Factory Missions が適している用途
+
+私たちは様々な作業で Factory Missions を構築・テストしてきました：
+
+- **フルスタック開発** -- フロントエンド、バックエンド、データベース、デプロイメントを含む完全なアプリケーションの構築
+- **リサーチ** -- 複数のアプローチを探索し、発見を統合し、構造化された出力を生成する深い調査タスク
+- **ブラウンフィールド移行** -- 既存の動作を保持しながら、既存コードベースの現代化、フレームワークの交換、大規模プロジェクトの再構築
+- **野心的なプロトタイプ** -- 単なるスケッチではなく、機能的である必要がある製品実験
+
+共通点：アドホックなプロンプトではなく、事前計画と構造化された分解から恩恵を受ける作業。
+
+## 未解決の問題
+
+Factory Missions は初期段階です。まだ取り組んでいる根本的な問題があるため、これをリサーチプレビューとして提供しています：
+
+- **並列化は必要か？** 複数のエージェントを並列実行するのは理論的には良く聞こえますが、実際に逐次実行よりも良い結果を生み出すのでしょうか？これをテストしています。
+- **正確性を最大化するには？** 長期間のプランはエラーが蓄積されます。各段階でどの検証と修正戦略が最も効果的でしょうか？
+- **コスト vs. 品質のトレードオフ** -- オーケストレーターはどの程度積極的であるべきでしょうか？より多くの計画と検証は高コストを意味しますが、潜在的により良い出力をもたらします。適切なバランスはどこでしょうか？
+
+これらについてあなたのフィードバックが欲しいです。Factory Missions を使用し、限界まで押し、何が機能し何が機能しないかを教えてください。
+
+## 関連項目
+
+- [計画と検証](/jp/features/missions/planning) -- 事前プランを正しく組み立て、検証頻度を調整する
+- [CLIでの実行](/jp/cli/features/missions/running-cli) -- ターミナルから監視・介入・リダイレクトする
+- [Desktop/Webでの実行](/jp/web/missions) -- 視覚的な Mission Control ダッシュボード
+- [トラブルシューティング](/jp/features/missions/troubleshooting) -- 停止したミッション、詰まったワーカー、ブロックされたマイルストーンからの復旧
+- [設定とリファレンス](/jp/features/missions/reference) -- ヘッドレス実行、設定、組織ポリシー
+- [仕様モード](/jp/cli/user-guides/specification-mode) -- 実装前の計画から恩恵を受ける適切にスコープされたタスクに対して
+- [大規模機能の実装](/jp/cli/user-guides/implementing-large-features) -- マルチフェーズプロジェクトのマニュアルワークフロー
+- [カスタムDroid](/jp/cli/configuration/custom-droids) -- ミッションが使用できる専門的なサブエージェントを構築
+- [スキル](/jp/cli/configuration/skills) -- ミッションが活用できるスキルの作成と管理
