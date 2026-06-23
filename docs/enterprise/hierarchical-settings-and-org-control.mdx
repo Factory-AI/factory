@@ -117,6 +117,47 @@ Below is the full schema for org-managed settings. These are configured by org a
   Shell command patterns that can never run (accumulated across levels). Unlike the denylist, blocked commands have no approval path: the block holds even under full autonomy, auto-run, or `--skip-permissions-unsafe`. droid resolves the actual program being invoked before matching, so a blocked command cannot be bypassed with a wrapper shell, an absolute path, quoting tricks, or command substitution. Use this for organization-mandated hard stops.
 </ResponseField>
 
+<ResponseField name="allowManagedHooksOnly" type="boolean">
+  When `true`, only org-managed hooks and hooks from org-enabled plugins are loaded. Hooks defined at the user and project levels are ignored. Defaults to `false`, where hooks from every level participate as usual. See [Org-managed hooks](/reference/hooks-reference#org-managed-hooks).
+</ResponseField>
+
+<ResponseField name="hooks" type="object">
+  Org-managed hook definitions, keyed by [hook event](/reference/hooks-reference#hook-events). Org-defined hooks are always loaded and cannot be removed by lower levels. See the [hooks reference](/reference/hooks-reference) for full hook semantics.
+  <Expandable title="properties">
+    <ResponseField name="<EventName>" type="object[]">
+      One key per hook event: `PreToolUse`, `PostToolUse`, `Notification`, `UserPromptSubmit`, `Stop`, `SubagentStop`, `PreCompact`, `SessionStart`, `SessionEnd`. Each value is an array of matcher groups. Unknown event keys are tolerated but warned about at load time.
+      <Expandable title="properties">
+        <ResponseField name="matcher" type="string">
+          Tool name pattern to match (only applies to `PreToolUse` and `PostToolUse`).
+        </ResponseField>
+        <ResponseField name="commandRegex" type="string">
+          Optional regular expression matched against the command.
+        </ResponseField>
+        <ResponseField name="hooks" type="object[]" required>
+          Commands to run when the matcher matches.
+          <Expandable title="properties">
+            <ResponseField name="type" type="string" required>
+              Must be `"command"`.
+            </ResponseField>
+            <ResponseField name="command" type="string" required>
+              Shell command to execute.
+            </ResponseField>
+            <ResponseField name="timeout" type="number">
+              Per-command timeout in seconds.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="hooksDisabled" type="boolean">
+      Disable all hooks for the session.
+    </ResponseField>
+    <ResponseField name="showHookOutput" type="boolean">
+      Show hook output in the session view.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="customModels" type="object[]">
   Org-provisioned custom model definitions.
   <Expandable title="properties">
@@ -427,6 +468,21 @@ Again, users cannot override these rules; they can only choose safer personal de
   "commandAllowlist": ["npm *", "yarn *", "pnpm *", "make *"],
   "commandDenylist": ["rm -rf /", "sudo *"],
   "commandBlocklist": ["shutdown", "mkfs", "curl"],
+  "allowManagedHooksOnly": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Execute",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$FACTORY_PROJECT_DIR\"/.factory/hooks/audit-command.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
   "customModels": [
     {
       "model": "my-internal-model",
