@@ -34,14 +34,36 @@ Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp
 | **File writes** | Deny all except **CWD** (current working directory). Additional paths can be allowed. `denyWrite` overrides `allowWrite`. | `sandbox.filesystem.allowWrite`, `sandbox.filesystem.denyWrite` |
 | **Network**     | Deny all except `*.factory.ai` (always allowed by default). Additional domains must be explicitly allowed.                | `sandbox.network.allowedDomains`                                |
 
+## Sandbox modes
+
+The `sandbox.mode` setting selects how isolation is applied:
+
+- **`per-command`** (default) -- only Droid-initiated shell commands and tool operations are sandboxed.
+- **`whole-process`** (Linux only) -- the entire Droid process is launched inside the OS sandbox, extending isolation to the main process, MCP stdio transports, and subagents.
+
 ## What's included
 
-**Per-command sandbox mode** (default when enabled):
+**Per-command sandbox mode** (`mode: "per-command"`, default when enabled):
 
 - **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- `checkFileAccess()` before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes
 - **Execute tool** -- shell commands wrapped in OS sandbox (Seatbelt/bubblewrap) with network routed through SRT's filtering proxy for domain-level control
 - **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`
-- **Note** -- main Droid process, MCPs and subagent are not isolated yet.
+- **MCP tools** -- fail closed (denied) under an active sandbox. MCP tool behavior is opaque (a server can read/write files, reach the network, etc.) and the protocol exposes no per-tool effect metadata, so MCP tools cannot be mapped to an enforceable sandbox policy and are blocked by the default-deny tool policy below.
+- **Note** -- the main Droid process and subagents are not isolated in this mode. Use `whole-process` mode to isolate them.
+
+**Whole-process sandbox mode** (`mode: "whole-process"`, Linux only):
+
+- At startup the entire Droid process is re-executed inside the OS sandbox, so the main process, MCP stdio transports, and subagent lifecycles all run within the configured filesystem and network boundaries
+- Network requests made directly by the Droid process (not only those from the Execute tool) are filtered against `allowedDomains`, with interactive domain prompts in TUI mode
+- **Fails closed** -- if the secure runtime cannot be established at startup (unsupported platform, missing sandbox support, or a failed isolation check), Droid refuses to start rather than running unsandboxed
+- Default access policies, filesystem and network configuration, and allow-always persistence behave the same as per-command mode
+
+**Tool policy (default-deny):**
+
+- Every registered tool declares sandbox side-effect metadata (`filesystem-read`, `filesystem-write`, `network`, `process`, `external-service`, `persistent-settings`)
+- When sandbox is enabled, a tool is allowed only if every declared side effect maps to a sandbox policy handler (file access, network, or per-command Execute). Tools with an unannotated, unknown, or unhandled side effect are denied
+- Tools whose effects cannot be enforced locally -- such as MCP tools and connectors (`external-service`) -- have no handler and therefore fail closed
+- Tool-policy denials are **non-promptable**: user approval cannot bypass missing policy coverage, and these denials are not configurable via `allowWrite`/`allowedDomains`
 
 **Interactive permission prompts (TUI mode):**
 
@@ -80,19 +102,21 @@ Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp
 {
   "sandbox": {
     "enabled": true,
+    // Isolation scope: "per-command" (default) or "whole-process" (Linux only)
+    "mode": "per-command",
     "filesystem": {
       // Additional writable paths beyond CWD (which is always writable)
       "allowWrite": ["/tmp/build-output", "~/.config"],
       // Deny writes to specific subpaths even if parent is in allowWrite
       "denyWrite": ["/tmp/build-output/cache/locks", "~/.config/secrets"],
       // Block reads to specific paths (everything else is readable)
-      "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"],
+      "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"]
     },
     "network": {
       // Only these domains are reachable (*.factory.ai always included)
-      "allowedDomains": ["github.com", "*.npmjs.org"],
-    },
-  },
+      "allowedDomains": ["github.com", "*.npmjs.org"]
+    }
+  }
 }
 ```
 
