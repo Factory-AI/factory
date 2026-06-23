@@ -21,6 +21,45 @@ Droidフックは各スコープの`hooks.json`に保存され、[`settings.json
   **`.factory/hooks/hooks.json`からの移行。** Droidは以前、ネストされた`hooks/hooks.json`ファイルにフックを書き込んでいました。既存ファイルは変更なしで引き続き動作します。次回の保存時にスコープルートに`hooks.json`を書き込み、旧ファイルを`hooks/hooks.migrated.json`としてアーカイブします。
 </Note>
 
+<a id="org-managed-hooks"></a>
+
+### 組織管理フック
+
+組織は、[Enterprise Controls](https://app.factory.ai) の **Hooks Policy** セクションを通じて権威あるフックを一元的に定義でき、組織管理設定に保存されます。これにより管理者は標準フックをすべてのマシンに配布でき、必要に応じてすべての非管理フックを無視できます。
+
+| フィールド | 型 | 説明 |
+| :---- | :--- | :---------- |
+| `hooks` | `object` | [フックイベント](#hook-events) をキーとする組織定義フック。各イベントは、`hooks.json` ファイルと同じ [構造](#structure) を使用するマッチャーグループの配列にマッピングされます。常に読み込まれ、下位レベルで削除したり弱めたりすることはできません。 |
+| `allowManagedHooksOnly` | `boolean` | `true` の場合、組織管理フックとプラグインフックのみが読み込まれます。ユーザーレベルおよびプロジェクトレベルのフック（ローカルで有効化されたプラグインのフックを含む）は無視されます。デフォルトは `false` で、すべてのレベルのフックが通常どおりマージされます。 |
+
+**組織管理設定の例:**
+
+```json
+{
+  "allowManagedHooksOnly": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Execute",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/bin/audit-command.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+<Note>
+  `hooks` と `allowManagedHooksOnly` は [管理設定](/jp/enterprise/hierarchical-settings-and-org-control) を通じて適用されるエンタープライズ/組織レベルの設定です。個々のユーザーがこれらを上書きしたり弱めたりすることはできません。他のレベルとのマージ方法については [完全なスキーマ](/jp/enterprise/hierarchical-settings-and-org-control#settings-json-schema) を参照してください。
+</Note>
+
+<a id="structure"></a>
+
 ### 構造
 
 フックはマッチャーによって整理され、各マッチャーは複数のフックを持つことができます：
@@ -150,6 +189,8 @@ Droidフックは各スコープの`hooks.json`に保存され、[`settings.json
 * すべての標準環境変数が利用可能
 
 プラグインフックの作成については、プラグインコンポーネントリファレンスを参照してください。
+
+<a id="hook-events"></a>
 
 ## フックイベント
 
