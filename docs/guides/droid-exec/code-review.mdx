@@ -41,6 +41,51 @@ Once enabled, the Droid Review workflow:
 5. Posts inline comments on problematic lines
 6. Submits an approval when no issues are found
 
+## Authentication
+
+Automated review needs two separate kinds of access: permission to run Droid, and permission to post on your pull requests. You set them up independently.
+
+### 1. Factory API key (run Droid)
+
+Droid runs using your Factory API key. Create one at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys), then add it to your repository or organization as a secret named `FACTORY_API_KEY`. The workflow passes it in like this:
+
+```yaml
+- uses: Factory-AI/droid-action@main
+  with:
+    factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+```
+
+This is required for every run.
+
+### 2. GitHub access (post reviews)
+
+To leave comments and approvals on your PRs, Droid needs a GitHub token. There are two ways to provide one:
+
+- **Factory Droid GitHub App (default, recommended).** If you don't supply a token, the action securely requests one for the installed Factory Droid GitHub App. For most teams this is all you need: install the app on your repositories and you're done. It requires the `id-token: write` permission so the action can request the token:
+
+  ```yaml
+  permissions:
+    contents: write
+    pull-requests: write
+    issues: write
+    id-token: write # required for GitHub App auth
+  ```
+
+- **Your own token (override).** If you'd rather use a personal access token or your own GitHub App, for example on GitHub Enterprise or to control which account posts comments, pass it as `github_token`. When set, Droid uses it directly and skips the app. The token needs write access to pull requests and repository contents.
+
+  ```yaml
+  - uses: Factory-AI/droid-action@main
+    with:
+      factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+      github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+  ```
+
+<Note>
+  On GitLab, the same two pieces apply: set `FACTORY_API_KEY` and `GITLAB_TOKEN` as CI/CD variables. The `/install-code-review` flow configures both for you.
+</Note>
+
+For the security architecture behind the GitHub App, see [GitHub Integration Security](/enterprise/github-integration-security).
+
 ## Review depth
 
 The `review_depth` input controls the thoroughness and cost of each review. You choose the depth during `/install-code-review` setup, or set it directly in your workflow.
