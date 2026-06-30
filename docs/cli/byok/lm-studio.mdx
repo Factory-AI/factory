@@ -1,0 +1,72 @@
+---
+title: LM Studio
+description: Run OpenAI-compatible local models with LM Studio
+keywords: ['lm studio', 'local', 'byok', 'openai compatible', 'offline', 'self-hosted']
+---
+
+Run models locally on your hardware with LM Studio's OpenAI-compatible local server.
+
+<Note>
+  **Performance Notice**: Models below 30 billion parameters have shown significantly lower performance on agentic coding tasks. While smaller models can be useful for experimentation and learning, they are generally not recommended for production coding work or complex software engineering tasks.
+</Note>
+
+## Configuration
+
+Add to `~/.factory/settings.json`:
+
+```json
+{
+  "customModels": [
+    {
+      "model": "google/gemma-4-e4b",
+      "displayName": "Gemma 4 E4B [LM Studio]",
+      "baseUrl": "http://localhost:1234/v1",
+      "apiKey": "not-needed",
+      "provider": "openai",
+      "maxOutputTokens": 16000
+    }
+  ]
+}
+```
+
+Replace `model` with the exact model identifier shown by your LM Studio local server.
+
+## Setup
+
+<Warning>
+  **Context Window Configuration**: For optimal performance with Factory, configure the model context window to at least 32,000 tokens in LM Studio before starting the server. Without adequate context, the experience will be significantly degraded.
+</Warning>
+
+1. Install LM Studio from [lmstudio.ai](https://lmstudio.ai)
+2. Download a coding model, such as Qwen Coder or another OpenAI-compatible chat model
+3. Open the **Developer** tab in LM Studio
+4. Load your model and start the local server
+5. Confirm the server is running at `http://localhost:1234/v1`
+6. Add the configuration above to Factory config
+
+## Finding Your Model ID
+
+LM Studio exposes loaded models through its OpenAI-compatible API:
+
+```bash
+curl http://localhost:1234/v1/models
+```
+
+Use the returned `id` value as the `model` in your Factory configuration.
+
+## Troubleshooting
+
+### Local server not connecting
+- Ensure the LM Studio local server is running from the Developer tab
+- Check that the server port matches your `baseUrl`, usually `1234`
+- Try `curl http://localhost:1234/v1/models` to test connectivity
+
+### Model not found
+- Load the model in LM Studio before using it from Factory
+- Confirm the exact model ID with `curl http://localhost:1234/v1/models`
+
+## Notes
+
+- LM Studio's local API does not require authentication, so use any placeholder value for `apiKey`
+- Base URL format: `http://localhost:1234/v1`
+- Use the `openai` provider with LM Studio's OpenAI-compatible endpoints

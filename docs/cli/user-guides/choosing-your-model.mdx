@@ -71,18 +71,17 @@ This guide was last updated on Wednesday, June 3rd 2026.
 
 | Scenario                                                         | Recommended model                                                                                                                                                                                                                                                                             |
 | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.7** for best depth and safety (1× promotional multiplier through April 30), or fall back to **Opus 4.6** / **Opus 4.6 Fast** for faster turnaround. Use **Sonnet 4.6** or **Sonnet 4.5** when you want balanced cost/quality, or **GPT-5.4** for large-context reasoning. |
-| **Full-feature development, large refactors**                    | **Opus 4.7** or **Opus 4.6** for depth and safety. **GPT-5.4**, **GPT-5.3-Codex**, or **GPT-5.2-Codex** when you need speed plus **Extra High** reasoning; **Sonnet 4.6** or **Sonnet 4.5** for balanced loops.                                                                               |
+| **Deep planning, architecture reviews, ambiguous product specs** | Start with **Opus 4.8** for best depth and safety, or fall back to **Opus 4.7** / **Opus 4.6** for faster turnaround. Use **Sonnet 4.6** or **Sonnet 4.5** when you want balanced cost/quality, or **GPT-5.4** for large-context reasoning. |
+| **Full-feature development, large refactors**                    | **Opus 4.8** or **Opus 4.7** for depth and safety. **GPT-5.4**, **GPT-5.3-Codex**, or **GPT-5.2-Codex** when you need speed plus **Extra High** reasoning; **Sonnet 4.6** or **Sonnet 4.5** for balanced loops.                                                                               |
 | **Repeatable edits, summarization, boilerplate generation**      | **Haiku 4.5** or **Droid Core** (including **MiniMax M2.7** at 0.12×) for speed and cost. **GPT-5.2** when you need higher quality or structured outputs.                                                                                                                                     |
 | **CI/CD or automation loops**                                    | Favor **Haiku 4.5** or **Droid Core** for predictable, low-cost throughput. Use **GPT-5.3-Codex** or **GPT-5.4** when automation needs stronger reasoning.                                                                                                                                    |
 | **High-volume automation, frequent quick turns**                 | **Haiku 4.5** for speedy feedback. **Droid Core** (especially **MiniMax M2.7** at 0.12× with reasoning) when cost is critical or you need air-gapped deployment.                                                                                                                              |
 
 <Tip>
-  **Claude Opus 4.7** is the newest top-tier option for extremely complex architecture decisions or critical
-  work where you need maximum reasoning capability—and it runs at a promotional 1× multiplier through April 30
-  (2× afterward). **Claude Opus 4.6** remains an excellent alternative, and **Opus 4.6 Fast** is tuned for
-  faster responses at a higher cost. Most tasks don't require Opus-level power—start with Sonnet 4.6 or Sonnet
-  4.5 and escalate only if needed.
+  **Claude Opus 4.8** is the newest top-tier option for extremely complex architecture decisions or critical
+  work where you need maximum reasoning capability. **Claude Opus 4.7** and **Claude Opus 4.6** remain
+  excellent alternatives, and **Opus 4.6 Fast** is tuned for faster responses at a higher cost. Most tasks
+  don't require Opus-level power—start with Sonnet 4.6 or Sonnet 4.5 and escalate only if needed.
 </Tip>
 
 Tip: you can swap models mid-session with `/model` or by toggling in the settings panel (`Shift+Tab` → **Settings**).
@@ -100,6 +99,7 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 
 ## 4 · Reasoning effort settings
 
+- **Opus 4.8**: Off / Low / Medium / High / **Max** (default: High)
 - **Opus 4.7**: Off / Low / Medium / High / **Max** (default: High)
 - **Opus 4.6 / Opus 4.6 Fast**: Off / Low / Medium / High / **Max** (default: High)
 - **Sonnet 4.6**: Off / Low / Medium / High / **Max** (default: High)
@@ -116,7 +116,7 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 - **Droid Core (Kimi K2.5)**: None only (default: None)
 - **Droid Core (MiniMax M2.7)**: Low / Medium / High (default: High)
 
-Reasoning effort increases latency and cost—start low for simple work and escalate as needed. **Max** is available on Claude Opus 4.7, the Opus 4.6 family (Opus 4.6 and Opus 4.6 Fast), and Sonnet 4.6. **Extra High** is available on GPT-5.4, GPT-5.2, GPT-5.2-Codex, and GPT-5.3-Codex.
+Reasoning effort increases latency and cost—start low for simple work and escalate as needed. **Max** is available on Claude Opus 4.8, Claude Opus 4.7, the Opus 4.6 family (Opus 4.6 and Opus 4.6 Fast), and Sonnet 4.6. **Extra High** is available on GPT-5.4, GPT-5.2, GPT-5.2-Codex, and GPT-5.3-Codex.
 
 <Tip>Change reasoning effort from `/model` → **Reasoning effort**, or via the settings menu.</Tip>
 

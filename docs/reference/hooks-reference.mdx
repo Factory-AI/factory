@@ -21,6 +21,41 @@ If `hooks.json` is absent, Droid falls back to hooks declared under the `hooks` 
   **Migrating from `.factory/hooks/hooks.json`.** Droid previously wrote hooks to a nested `hooks/hooks.json` file. Existing files keep working unchanged; the next save writes `hooks.json` at the scope root and archives the old file as `hooks/hooks.migrated.json`.
 </Note>
 
+### Org-managed hooks
+
+Organizations can centrally define authoritative hooks through the **Hooks Policy** section of [Enterprise Controls](https://app.factory.ai), stored in org-managed settings. This lets administrators ship standard hooks to every machine and, optionally, ignore all non-managed hooks.
+
+| Field | Type | Description |
+| :---- | :--- | :---------- |
+| `hooks` | `object` | Org-defined hooks, keyed by [hook event](#hook-events). Each event maps to an array of matcher groups using the same [structure](#structure) as a `hooks.json` file. Always loaded; lower levels cannot remove or weaken them. |
+| `allowManagedHooksOnly` | `boolean` | When `true`, only org-managed and plugin hooks load. User- and project-level hooks (including hooks from locally enabled plugins) are ignored. Defaults to `false`, where hooks from every level merge as usual. |
+
+**Example org-managed settings:**
+
+```json
+{
+  "allowManagedHooksOnly": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Execute",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/bin/audit-command.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+<Note>
+  `hooks` and `allowManagedHooksOnly` are enterprise/org-level settings enforced through [managed settings](/enterprise/hierarchical-settings-and-org-control) — individual users cannot override or weaken them. See the [full schema](/enterprise/hierarchical-settings-and-org-control#settings-json-schema) for how they merge with other levels.
+</Note>
+
 ### Structure
 
 Hooks are organized by matchers, where each matcher can have multiple hooks:

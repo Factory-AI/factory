@@ -119,6 +119,47 @@ User        → ~/.factory/
   絶対に実行されないシェルコマンドパターン（レベル間で累積）。拒否リストとは異なり、ブロックされたコマンドには承認の手段がありません。完全自律、自動実行、`--skip-permissions-unsafe`のいずれの場合でもブロックが適用されます。droidは照合前に実際に呼び出されるプログラムを解決するため、ラッパーシェル、絶対パス、クォートのトリック、コマンド置換で回避することはできません。組織が義務付けるハードストップに使用してください。
 </ResponseField>
 
+<ResponseField name="allowManagedHooksOnly" type="boolean">
+  `true` の場合、組織管理フックと組織が有効化したプラグインのフックのみが読み込まれます。ユーザーレベルおよびプロジェクトレベルで定義されたフックは無視されます。デフォルトは `false` で、すべてのレベルのフックが通常どおり参加します。[組織管理フック](/jp/reference/hooks-reference#org-managed-hooks) を参照してください。
+</ResponseField>
+
+<ResponseField name="hooks" type="object">
+  [フックイベント](/jp/reference/hooks-reference#hook-events) をキーとする組織管理フック定義。組織が定義したフックは常に読み込まれ、下位レベルで削除することはできません。フックの完全なセマンティクスについては [フックリファレンス](/jp/reference/hooks-reference) を参照してください。
+  <Expandable title="properties">
+    <ResponseField name="<EventName>" type="object[]">
+      フックイベントごとに1つのキー: `PreToolUse`、`PostToolUse`、`Notification`、`UserPromptSubmit`、`Stop`、`SubagentStop`、`PreCompact`、`SessionStart`、`SessionEnd`。各値はマッチャーグループの配列です。不明なイベントキーは許容されますが、読み込み時に警告が表示されます。
+      <Expandable title="properties">
+        <ResponseField name="matcher" type="string">
+          照合するツール名のパターン（`PreToolUse` と `PostToolUse` のみに適用）。
+        </ResponseField>
+        <ResponseField name="commandRegex" type="string">
+          コマンドに対して照合される任意の正規表現。
+        </ResponseField>
+        <ResponseField name="hooks" type="object[]" required>
+          マッチャーが一致したときに実行するコマンド。
+          <Expandable title="properties">
+            <ResponseField name="type" type="string" required>
+              `"command"` である必要があります。
+            </ResponseField>
+            <ResponseField name="command" type="string" required>
+              実行するシェルコマンド。
+            </ResponseField>
+            <ResponseField name="timeout" type="number">
+              コマンドごとのタイムアウト（秒）。
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="hooksDisabled" type="boolean">
+      セッションのすべてのフックを無効にします。
+    </ResponseField>
+    <ResponseField name="showHookOutput" type="boolean">
+      セッションビューにフック出力を表示します。
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="customModels" type="object[]">
   組織提供のカスタムモデル定義
   <Expandable title="properties">
@@ -428,6 +469,21 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
   "commandAllowlist": ["npm *", "yarn *", "pnpm *", "make *"],
   "commandDenylist": ["rm -rf /", "sudo *"],
   "commandBlocklist": ["shutdown", "mkfs", "curl"],
+  "allowManagedHooksOnly": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Execute",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$FACTORY_PROJECT_DIR\"/.factory/hooks/audit-command.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
   "customModels": [
     {
       "model": "my-internal-model",
@@ -489,6 +545,7 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
 
 - **AutoWiki Cloud Sync** (`wikiCloudSync`) – AutoWiki コンテンツを Factory App に生成・保存できるかどうかを制御します。無効にすると、すべての wiki API エンドポイントがブロックされ、CLI は Factory App への保存と GitHub wiki 同期をスキップします。デフォルトで有効です。詳しくは [AutoWiki](/jp/cli/features/wiki/overview#autowiki-cloud-sync) を参照してください。
 - **Cloud Session Sync** (`cloudSessionSync`) – セッションデータを Factory cloud に同期するかどうかを制御します。
+- **Hooks Policy** (`allowManagedHooksOnly`, `hooks`) – 組織管理者が組織管理フックを定義でき、「管理/プラグインフックのみ」を有効にすると、すべてのユーザーレベルおよびプロジェクトレベルのフックが解決時に破棄されます。組織管理フックは権威があり、メンバーがそれらを削除したり独自のフックを再導入したりすることはできません。[組織管理フック](/jp/reference/hooks-reference#org-managed-hooks) を参照してください。
 
 これらの制御は、[app.factory.ai](https://app.factory.ai) の **Enterprise Controls** セクションで組織管理者が管理します。
 

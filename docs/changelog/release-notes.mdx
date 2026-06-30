@@ -4,6 +4,86 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="June 29" rss={{ title: "CLI Updates", description: "Hooks manager overhaul, chat transcript search, and faster searches" }}>
+  `v0.161.0`
+
+## New features
+
+- **Hooks manager overhaul** - Redesigned the hooks manager for viewing and configuring your hooks
+- **WezTerm setup** - Added terminal setup support for WezTerm
+- **Chat transcript search** - Search within a chat transcript (app)
+
+## Improvements
+
+- **Faster searches** - Avoided unnecessary search cache rebuilds
+
+</Update>
+
+<Update label="June 25" rss={{ title: "CLI Updates", description: "Archive projects, deeper security review controls, and MCP fixes" }}>
+  `v0.159.0`
+
+## New features
+
+- **Archive projects** - Archive projects you're no longer working on to keep your project list tidy (app)
+
+## Improvements
+
+- **Clearer MCP auth guidance** - When an MCP server fails to authenticate, the CLI now explains how to resolve it
+
+## Bug fixes
+
+- **MCP config errors** - MCP configuration parse errors are now surfaced clearly instead of failing silently
+
+</Update>
+
+<Update label="June 24" rss={{ title: "CLI Updates", description: "Plugin toggles, tab slash-command completion, and login and rendering fixes" }}>
+  `v0.158.0`
+
+## New features
+
+- **Enable and disable plugins** - Turn individual plugins on or off with a new toggle
+
+## Improvements
+
+- **Tab to complete slash commands** - Press Tab to complete slash commands
+- **MCP authentication** - Improved handling of MCP authentication responses and desktop redirects
+- **Account credit checkout** - Subscribe to or upgrade your plan using account credit
+
+## Bug fixes
+
+- **Invalid API key login** - The CLI now exits with an error on an invalid `FACTORY_API_KEY` instead of stalling at login
+- **Cancel AskUser prompts** - Cancelling an AskUser prompt now interrupts the agent instead of letting it continue
+- **Duplicate tool approvals** - Approval-gated tool executions now render only once
+- **Windows background processes** - Fixed cleanup of background processes on exit on Windows
+- **Document skills location** - Document skills are now written to your current working directory
+- **Dark mode toggles** - Dark mode toggles are now visible and loading spinners animate correctly (app)
+- **Editable composer** - The composer stays editable during session blockers (app)
+
+</Update>
+
+<Update label="June 24" rss={{ title: "CLI Updates", description: "Slack follow-up prompt fix" }}>
+  `v0.157.2`
+
+## Bug fixes
+
+- **Slack follow-up prompt** - Fixed a duplicate "tag to follow up" prompt that could appear in Slack threads
+
+</Update>
+
+<Update label="June 23" rss={{ title: "CLI Updates", description: "External prompt editing and input and onboarding fixes" }}>
+  `v0.157.0`
+
+## New features
+
+- **Edit prompts externally** - Open and edit your prompt in an external editor for composing longer messages
+
+## Bug fixes
+
+- **Caps-lock cursor keys** - Fixed cursor key handling when caps lock is on
+- **Onboarding crash** - Fixed a crash that could occur when connecting before onboarding finished (app)
+
+</Update>
+
 <Update label="June 22" rss={{ title: "CLI Updates", description: "Conversation rewind and reliability fixes" }}>
   `v0.156.2`
 
@@ -26,12 +106,48 @@ rss: true
 
 </Update>
 
-<Update label="June 18" rss={{ title: "CLI Updates", description: "Private npm registry auth for plugins" }}>
+<Update label="June 18" rss={{ title: "CLI Updates", description: "Command-line autonomy flag, org MCP and marketplace controls, and reliability fixes" }}>
+  `v0.152.0`
+
+## New features
+
+- **Autonomy flag** - Set Droid's autonomy level straight from the command line with `droid --auto high`
+- **Org MCP and marketplace controls** - Organizations can centrally govern MCP server and plugin marketplace access
+- **In-app membership controls** - Manage organization members directly in the app (app)
+
+## Improvements
+
+- **Private npm registry plugins** - Plugin sources can now authenticate to private npm registries using an auth token environment variable
+- **Onboarding copy** - Clearer guidance during Droid setup onboarding (app)
+
+## Bug fixes
+
+- **Status after interrupt** - Droid's status now clears correctly after you interrupt it
+- **Event hooks** - Multiple hooks configured for the same event are now combined correctly
+- **Summaries across directories** - Fixed conversation summaries when your working directory changes
+- **Streaming placeholder** - Fixed a stale placeholder that could linger in the chat (app)
+- **Connection stability** - Reduced session UI flicker during brief connection drops (app)
+
+</Update>
+
+<Update label="June 17" rss={{ title: "CLI Updates", description: "Branded macOS installer and MCP and session reliability fixes" }}>
   `v0.151.0`
 
 ## New features
 
-- **Private npm registry auth** - Plugin npm sources now support `authTokenEnvVar` for token-based authentication with private registries (JFrog Artifactory, AWS CodeArtifact, GitHub Packages)
+- **Skill slash commands in editors** - Skill slash commands are now available when connecting from external editors
+
+## Improvements
+
+- **macOS installer branding** - The macOS DMG installer is now branded (app)
+- **MCP results as markdown** - MCP tool results returned as JSON now render as formatted markdown
+
+## Bug fixes
+
+- **Session reconnection** - Sessions now stay rendered and reconnect instead of redirecting to a Session Unavailable page (app)
+- **Org switcher** - The desktop organization switcher now shows the currently selected organization (app)
+- **Desktop MCP sign-in** - Improved desktop MCP authentication callback handling (app)
+- **Composer actions layout** - Composer actions now stay on a single line (app)
 
 </Update>
 
@@ -55,12 +171,12 @@ rss: true
 
 </Update>
 
-<Update label="June 15" rss={{ title: "CLI Updates", description: "Air-gapped CLI binary distribution fix" }}>
-  `v0.148.1`
+<Update label="June 15" rss={{ title: "CLI Updates", description: "Canva MCP authentication fix" }}>
+  `v0.149.0`
 
 ## Bug fixes
 
-- **Air-gapped binaries** - Air-gapped CLI binaries are now properly signed and published so air-gapped installs receive the latest builds
+- **Canva MCP authentication** - Added a fallback so connecting the Canva MCP server works more reliably
 
 </Update>
 
@@ -110,7 +226,7 @@ rss: true
 
 </Update>
 
-<Update label="June 12" rss={{ title: "CLI Updates", description: "Browser-based desktop onboarding, air-gapped mode improvements, and chat, MCP, and onboarding fixes" }}>
+<Update label="June 12" rss={{ title: "CLI Updates", description: "Browser-based desktop onboarding and chat, MCP, and onboarding fixes" }}>
   `v0.146.0`
 
 ## New features
@@ -121,8 +237,6 @@ rss: true
 
 - **Queue message shortcut** - Queue a message with Ctrl+Enter
 - **Earlier session titles** - Droid now names your session earlier in the conversation
-- **Air-gapped BYOK defaults** - Air-gapped mode auto-picks a sensible default BYOK model, and configuration errors point you at `settings.json`
-- **Wider air-gapped coverage** - `FACTORY_AIRGAP_ENABLED` now applies in more places
 
 ## Bug fixes
 
@@ -307,10 +421,6 @@ rss: true
 
 <Update label="May 29" rss={{ title: "CLI Updates", description: "Usage stats, airgapped BYOK, and stability fixes" }}>
   `v0.137.0`
-
-## New features
-
-- **Airgapped BYOK** - New `FACTORY_AIRGAP_ENABLED` option lets you bypass Factory auth when using your own model keys
 
 ## Bug fixes
 
