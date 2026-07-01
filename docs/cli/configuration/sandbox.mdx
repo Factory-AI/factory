@@ -8,8 +8,6 @@ keywords:
     "sandboxing",
     "security",
     "isolation",
-    "seatbelt",
-    "bubblewrap",
     "permissions",
     "denyWrite",
     "denyRead",
@@ -32,16 +30,39 @@ Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp
 | --------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | **File reads**  | Allow all. Only explicit `denyRead` entries are blocked.                                                                  | `sandbox.filesystem.denyRead`                                   |
 | **File writes** | Deny all except **CWD** (current working directory). Additional paths can be allowed. `denyWrite` overrides `allowWrite`. | `sandbox.filesystem.allowWrite`, `sandbox.filesystem.denyWrite` |
-| **Network**     | Deny all except `*.factory.ai` (always allowed by default). Additional domains must be explicitly allowed.                | `sandbox.network.allowedDomains`                                |
+| **Network**     | Deny all except Factory's own domains (always allowed by default). Additional domains must be explicitly allowed.          | `sandbox.network.allowedDomains`                                |
+
+## Sandbox modes
+
+The `sandbox.mode` setting selects how isolation is applied:
+
+- **`per-command`** (default) -- only Droid-initiated shell commands and tool operations are sandboxed.
+- **`whole-process`** -- the entire Droid process is launched inside the OS sandbox, extending isolation to the main process, MCP stdio transports, and subagents.
 
 ## What's included
 
-**Per-command sandbox mode** (default when enabled):
+**Per-command sandbox mode** (`mode: "per-command"`, default when enabled):
 
-- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- `checkFileAccess()` before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes
-- **Execute tool** -- shell commands wrapped in OS sandbox (Seatbelt/bubblewrap) with network routed through SRT's filtering proxy for domain-level control
+- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- checked before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes
+- **Execute tool** -- shell commands run inside the OS sandbox, with network routed through a filtering proxy for domain-level control
 - **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`
-- **Note** -- main Droid process, MCPs and subagent are not isolated yet.
+- **WebSearch** -- `checkNetworkAccess()` against `allowedDomains`
+- **MCP tools** -- still enforced, but mediated by argument inspection rather than blanket-denied. Before the call runs, each argument is checked: values that parse as `http(s)` URLs go through `checkNetworkAccess()` against `allowedDomains`, and values that look like filesystem paths (by argument name, `file://`, or path form) go through `checkFileAccess()` for read and/or write. The call proceeds only if every detected path and URL passes; any violation blocks it. MCP server transports also egress through the sandbox proxy and are filtered against `allowedDomains`. An MCP tool still fails closed if its sandbox side-effect metadata is missing or declares an effect with no handler.
+- **Subagents (Task tool)** -- delegated subagents inherit the parent sandbox policy
+- **Note** -- the main Droid process itself is not isolated in this mode. Use `whole-process` mode to isolate it.
+
+**Whole-process sandbox mode** (`mode: "whole-process"`):
+
+- At startup the entire Droid process is re-executed inside the OS sandbox, so the main process, MCP stdio transports, and subagent lifecycles all run within the configured filesystem and network boundaries
+- Network requests made directly by the Droid process (not only those from the Execute tool) are filtered against `allowedDomains`, with interactive domain prompts in TUI mode
+- **Fails closed** -- if the secure runtime cannot be established at startup (unsupported platform, missing sandbox support, or a failed isolation check), Droid refuses to start rather than running unsandboxed
+- Default access policies, filesystem and network configuration, and allow-always persistence behave the same as per-command mode
+
+**Tool policy (default-deny):**
+
+- When sandbox is enabled, a tool is allowed only if every effect it can have (filesystem, network, process, etc.) can be enforced by a sandbox policy (file access, network, or per-command Execute). Tools with an unknown or unenforceable effect are denied
+- Tools whose effects cannot be enforced locally -- such as connectors (external services) -- fail closed. MCP tools are the exception: they reach external services but are mediated by argument inspection (see above) rather than blanket-denied
+- These denials are **non-promptable**: user approval cannot bypass them, and they are not configurable via `allowWrite`/`allowedDomains`
 
 **Interactive permission prompts (TUI mode):**
 
@@ -80,19 +101,21 @@ Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp
 {
   "sandbox": {
     "enabled": true,
+    // Isolation scope: "per-command" (default) or "whole-process"
+    "mode": "per-command",
     "filesystem": {
       // Additional writable paths beyond CWD (which is always writable)
       "allowWrite": ["/tmp/build-output", "~/.config"],
       // Deny writes to specific subpaths even if parent is in allowWrite
       "denyWrite": ["/tmp/build-output/cache/locks", "~/.config/secrets"],
       // Block reads to specific paths (everything else is readable)
-      "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"],
+      "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"]
     },
     "network": {
-      // Only these domains are reachable (*.factory.ai always included)
-      "allowedDomains": ["github.com", "*.npmjs.org"],
-    },
-  },
+      // Only these domains are reachable (Factory's own domains always included)
+      "allowedDomains": ["github.com", "*.npmjs.org"]
+    }
+  }
 }
 ```
 
