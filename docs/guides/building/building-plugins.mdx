@@ -343,7 +343,7 @@ Pinning behavior depends on the source type. Git-based sources (`github`, `url`,
 | `github` | `repo`, `ref?`, `sha?` | Plugin is hosted in its own GitHub repository. |
 | `url` | `url`, `ref?`, `sha?` | Plugin is hosted on a non-GitHub git host (GitLab, Bitbucket, self-hosted). |
 | `git-subdir` | `url`, `path`, `ref?`, `sha?` | Plugin lives inside a subdirectory of a larger git repository, such as a monorepo. |
-| `npm` | `package`, `version?`, `registry?` | Plugin is published as an npm package. |
+| `npm` | `package`, `version?`, `registry?`, `authTokenEnvVar?` | Plugin is published as an npm package. |
 
 #### npm packages
 
@@ -388,11 +388,42 @@ Install from a private registry:
 }
 ```
 
+Authenticate with a private registry that requires a token (for example JFrog Artifactory, AWS CodeArtifact, or GitHub Packages):
+
+```json
+{
+  "name": "pr-triage",
+  "source": {
+    "source": "npm",
+    "package": "@your-org/droid-pr-triage",
+    "registry": "https://acme.jfrog.io/artifactory/api/npm/npm-virtual/",
+    "authTokenEnvVar": "JFROG_NPM_TOKEN"
+  }
+}
+```
+
+Users must set the named environment variable before launching Droid:
+
+```bash
+# bash/zsh
+export JFROG_NPM_TOKEN="your-token-here"
+```
+
+```powershell
+# PowerShell
+$env:JFROG_NPM_TOKEN="your-token-here"
+```
+
+<Warning>
+Never commit tokens to source control or paste them into marketplace JSON. The `authTokenEnvVar` field stores only the variable name, not the secret itself.
+</Warning>
+
 | Field | Required | Description |
 | :---- | :------- | :---------- |
 | `package` | Yes | npm package name. Scoped packages (`@scope/name`) are supported. |
 | `version` | No | npm version, range, or dist-tag (for example `2.4.0`, `^2.0.0`, `latest`). Defaults to `latest`. Tarball URLs, `file:` paths, `git+...` specs, and `npm:` aliases are rejected; the source must resolve through the configured registry. |
 | `registry` | No | Custom registry URL. Defaults to the system npm registry. Must be `https://` with no embedded credentials, query string, or fragment, so that secrets stay in your registry client config rather than the marketplace JSON. The setting is scoped to the install run and never written to your global `~/.npmrc`. |
+| `authTokenEnvVar` | No | Name of an environment variable that holds an authentication token for the private registry (for example `JFROG_NPM_TOKEN`). Must be a valid shell variable name (`[A-Za-z_][A-Za-z0-9_]*`). Only takes effect when `registry` is also set. At install time, Droid reads the token from this variable and writes a path-scoped `_authToken` entry into a temporary `.npmrc` that is cleaned up after install. If the variable is not set, the install fails early with a clear error. |
 
 **Layout requirements.** The published package root must contain a plugin manifest. Both the native Droid layout (`.factory-plugin/plugin.json`, `droids/`, `mcp.json`) and the Claude Code layout (`.claude-plugin/plugin.json`, `agents/`, `.mcp.json`) are accepted. Claude Code layouts are translated into Droid form when the package is copied into the plugin cache.
 
