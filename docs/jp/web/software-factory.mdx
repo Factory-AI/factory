@@ -1,0 +1,88 @@
+---
+title: Software Factory
+description: Software Factory を使って、ソフトウェアデリバリーライフサイクル全体をカバーする自動化を管理します。
+keywords: ['software factory', 'automations', 'sdlc', 'triage', 'code review', 'qa', 'autowiki', 'incident response']
+---
+
+Software Factory は、インテークとトリアージから、計画、実行、検証、リリース、監視、継続的な自動化まで、ソフトウェア開発ライフサイクル全体で AI エージェントをつなぐ 24 時間 365 日稼働の自律システムです。
+
+<Info>
+  Software Factory はプライベートプレビュー中です。アクセスをリクエストするには、[factory.ai/contact](https://factory.ai/contact) のフォームに入力するか、Factory のアカウントチームにお問い合わせください。
+</Info>
+
+<Frame>
+  <img src="/images/software-factory-dashboard.png" alt="Software Factory の概要ダッシュボード" />
+</Frame>
+
+## Software Factory とは
+
+Factory App の Software Factory では、チームはライブメトリクス、接続済みの連携、リポジトリカバレッジ、ステージの健全性、永続的な自動化を 1 か所で追跡できます。
+
+| ステージ | 対象 |
+| --- | --- |
+| **Triage** | 受信した作業を分類し、重複を減らし、項目を振り分けます。 |
+| **Code-gen** | Slack や課題管理ツールからの依頼を実装セッションにつなげます。 |
+| **Validate** | マージ前にコードレビュー、セキュリティレビュー、QA を実行します。 |
+| **Release** | デプロイのゲートを追跡し、利用可能になったワークフローを使ってリリースを進めます。 |
+| **Document** | AutoWiki でリポジトリの知識を最新に保ちます。 |
+| **Monitor** | インシデント、アラート、エージェントの有効性をエンジニアリング作業へ結び付けます。 |
+
+### Software Factory を使うタイミング
+
+Software Factory は、ソフトウェアデリバリーライフサイクル全体におけるプロダクトの健全性を一元的に把握するために使用します。
+
+- どの SDLC ステージにすでに自動化のカバレッジがあるか。
+- どのリポジトリ、連携、ステージでセットアップが必要か。
+- レビュー、QA、ドキュメント、トリアージ、インシデント対応のワークフローが健全か。
+- Factory が時間の経過とともにどれだけの作業を処理したか。
+
+## SDLC 全体のカバレッジを管理する
+
+[**Software Factory**](https://app.factory.ai/software-factory) を開くと、デリバリーライフサイクルを自動化カバレッジマップとして確認できます。各ステージには、すでに接続されているもの、健全なもの、次にカバレッジを追加すべき場所が表示されます。
+
+ダッシュボードでは次のことができます。
+
+- 期間を切り替える。
+- インパクトメトリクスとステージの健全性を確認する。
+- GitHub、Slack、Linear、GitLab などの連携で絞り込む。
+- ステージを開いて、テンプレート、自動化、カバーされているリポジトリを確認する。
+- ステージ詳細ページまたは [Automations](/jp/web/automations) ページから不足している自動化を作成する。
+
+リポジトリに紐づくステージではリポジトリカバレッジが表示されるため、**Code Review**、**QA**、**Security Audit**、**AutoWiki** などのワークフローがどのリポジトリをカバーしているか確認できます。
+
+| ステージ | テンプレートとセットアップ | 表示されるカバレッジ |
+| --- | --- | --- |
+| **Triage** | Triage | インテーク自動化のカバレッジ |
+| **Code-gen** | Slack と Linear からの委任 | 連携のカバレッジ |
+| **Validate** | Code Review、QA、Security Audit | リポジトリのカバレッジ |
+| **Release** | 利用可能な Release ワークフロー | リリースステータス |
+| **Document** | AutoWiki | リポジトリのカバレッジ |
+| **Monitor** | Incident Response、Agent Effectiveness | インシデントと効率性のカバレッジ |
+
+## メトリクスとカバレッジ
+
+### 自動化メトリクス
+
+Software Factory では、次のような指標で SDLC 全体における自動化の効果をリアルタイムに確認できます。
+
+<Frame>
+  <img src="/images/software-factory-automation-metrics.png" alt="Software Factory の自動化メトリクス" />
+</Frame>
+
+| 指標 | 意味 |
+| --- | --- |
+| **Tickets Triaged** | トリアージワークフローによって分類、重複排除、振り分けされたチケット数。 |
+| **PR Validations** | PR に対して実行された QA とコードレビューのチェック数。 |
+| **PRs Merged** | 選択した期間内にマージされた PR 数。 |
+| **Incidents Processed** | インシデント対応ワークフローが処理したインシデント、エラー、アラート数。 |
+
+これらのメトリクスを使うと、自動化がどこで作業を前に進めているか、どこでチームにさらなるカバレッジが必要かを把握できます。
+
+### 健全性とカバレッジ
+
+健全性とカバレッジを使うと、Software Factory の実行準備が整っている場所と、セットアップが不足している場所を見つけられます。
+
+- **Health** は、ステージが必要な連携と自動化を備えているかを示します。
+- **Coverage** は、それらの自動化がどこに適用されるかを示します。たとえば **Validate** や **Document** がどのリポジトリをカバーしているかなどです。
+
+不足しているものがあれば、ステージを開いて連携を接続し、リポジトリやチャンネルを追加するか、想定されている自動化を作成してください。
