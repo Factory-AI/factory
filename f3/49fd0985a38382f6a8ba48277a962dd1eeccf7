@@ -1,0 +1,533 @@
+docs/reference/hooks-reference.mdx
+  1600e9cc0eb6f7b4 24-58
+docs/jp/enterprise/hierarchical-settings-and-org-control.mdx
+  1600e9cc0eb6f7b4 122-162,472-486,548
+docs/jp/reference/hooks-reference.mdx
+  1600e9cc0eb6f7b4 24-59,61-62,193-194
+docs/enterprise/hierarchical-settings-and-org-control.mdx
+  1600e9cc0eb6f7b4 120-160,471-485
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.2",
+  "base_commit_sha": "f349fd0985a38382f6a8ba48277a962dd1eeccf7",
+  "prompts": {
+    "1600e9cc0eb6f7b4": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "1952e264-9a4b-42ca-a378-3aa92bf7aece",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Emily Wen",
+      "messages": [],
+      "total_additions": 209,
+      "total_deletions": 13,
+      "accepted_lines": 188,
+      "overriden_lines": 0
+    },
+    "751ded8da1d5e54b": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "f4ce77e4-34ef-4cf8-87a9-bc210cff5c8c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Emily Wen",
+      "messages": [
+        {
+          "type": "user",
+          "text": "<system-reminder>\nThe tools listed below are available in this environment, but their schemas may be omitted from the current tool list to save context.\nOnly use ToolSearch for tools that appear in the Deferred tools list below. The only valid ToolSearch names are the exact strings before the colon on each list entry. Use query \"select:<name>[,<name>...]\" to load one or more of those listed tools before calling them.\nDo NOT call ToolSearch for tools that are already present in the current tool list, including core tools like Read, Grep, Glob, LS, Execute, ApplyPatch, AskUser, Create, Edit, TodoWrite, or ExitSpecMode. Call available tools directly.\nDo NOT guess tool names or use aliases, invent MCP namespaces, or search for tools not shown in the Deferred tools list. If a needed tool is neither currently available nor listed below, it is unavailable in this session; do not retry ToolSearch for it. Calling an omitted tool directly will fail with InputValidationError.\n\nIMPORTANT: When a user's task matches one of these tools and the tool is absent from the current tool list, load and use it rather than routing around it via Execute. Examples of routing violations to avoid:\n- Using curl, wget, or gh pr view <url> instead of loading and calling FetchUrl\n- Using gh search or scraping search engines instead of loading and calling WebSearch\n- Hitting MCP server HTTP endpoints via curl instead of the corresponding MCP tool\n\nDeferred tools:\nGenerateDroid: Generate a custom droid configuration based on your description using AI | Inputs (* required): description* (string): Comprehensive description of what this droid should do and when it should be us…; location (string): Where to save the droid: project (.factory/droids) or personal (~/.factory/droi…\nCronCreate: Schedule a one-time or recurring prompt. Use same_session for /loop-style reminders to this Droid, or new_session for root-scoped local automations that start a fresh Droid session. | Inputs (* required): expression* (string): Standard 5-field cron expression in local time.; job* (object); target (union); recurring* (boolean): true for recurring tasks, false for once\nCronList: List scheduled crons visible from this Droid session, including root-scoped local automations.\nCronDelete: Cancel one scheduled cron by cron ID. | Inputs (* required): cronId* (string)\nCreateAutomation: Create a scheduled cloud automation (executionLocation=\"remote\") that runs on a droid computer and fires once immediately. Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": create a cloud automation that runs on a droid computer. Loca…; name* (string): Display name for the automation.; schedule* (string): A 5-field cron expression or natural-language cadence (normalized server-side f…; prompt* (string): Agent instructions to run on each scheduled tick.; descri…\nListAutomations: List scheduled cloud automations (executionLocation=\"remote\"). Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": list cloud automations. Local automations are not yet support…\nReadAutomation: Read one scheduled cloud automation by ID (executionLocation=\"remote\"). Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": read a cloud automation by id. Local automations are not yet…; automationId* (string): Automation id.\nEditAutomation: Update one scheduled cloud automation by ID (executionLocation=\"remote\"): name, prompt, status, schedule, description, computer. Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": edit a cloud automation by id. Local automations are not yet…; automationId* (string): Automation id.; name (string): New display name.; description (string): New description.; schedule (string): New cron expression or natural-language cadence.; +3 more\nDeleteAutomation: Delete one scheduled cloud automation by ID (executionLocation=\"remote\"). Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": delete a cloud automation by id. Local automations are not ye…; automationId* (string): Automation id.\n</system-reminder>",
+          "timestamp": "2026-06-22T23:31:09.815Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>IMPORTANT - Current date for web search relevance:\n- Today's date is 2026-06-22. Use this date when WebSearch needs the current year for recent information, documentation, or current events.</system-reminder>",
+          "timestamp": "2026-06-22T23:31:09.815Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\nAvailable skills for the Skill tool are listed below. The Skill tool definition relies on this system reminder for valid skill names.\n\nSkills instructions:\nWhen users ask you to perform tasks, check if any available skill can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.\n\nHow to use skills:\n- Invoke skills using the Skill tool with the skill name only.\n- The skill's prompt will expand and provide detailed instructions on how to complete the task.\n- Only use skills listed in the available-skills system reminders or dynamic skill-discovery reminders.\n- Do not invoke a skill that is already running.\n\nAvailable skills:\nagent-browser: Automates browsers and Electron desktop apps (VS Code, Slack, Discord, Figma, Notion, Spotify, etc.) for testing, form filling, screenshots, and data extraction. Use when the user needs to navigate, interact with, test, or extract data from any website or Electron desktop app.\ntuistory: Automates terminal user interface (TUI) testing. Use when you need to launch, interact with, test, or debug terminal applications, capture TUI snapshots, or automate terminal inputs.\nfigma-mcp-helper: Promote and assist with Figma MCP integration. ACTIVATE when the user shares a Figma URL (figma.com), mentions Figma designs or components, shares PNG images that may originate from Figma, or when Figma MCP tools are already connected and being used. Handles installation encouragement, conversational promotion, and push-back-to-Figma flows.\ninstall-code-review: Install and configure Factory Droid for automated code review on GitHub or GitLab. Supports single-repo setup or org/group-wide rollout across hundreds of repos. Use when a user wants to set up Droid review on their repositories.\ninstall-triage: Scaffold a scheduled Slack triage automation, generalized to any company. Sets up a Python tool layer (run_triage.py) plus a HEARTBEAT.md agent loop that scans configured Slack channels for actionable messages, dedupes against a ticketing system (Linear or Jira), files tickets, and posts a run summary. Use when the user wants to stand up an automated triage bot.\nreview: Review code changes and identify high-confidence, actionable bugs. Use when the user wants to: - Review a pull request or branch diff - Find bugs, security issues, or correctness problems in code changes - Get a structured summary of review findings\nsimplify: Review changed code for reuse, quality, and efficiency, then fix any issues found.\nsession-navigation: Navigate, search, and manage Droid sessions. Use when the user wants to: - List recent sessions - Search session history for specific topics or patterns - Resume a previous session - Get details about what was accomplished in a session - Find sessions by project, date, or content\npdf-document: Produce polished PDF documents (reports, invoices, resumes, letters, flyers, certificates, any \"export to PDF\" deliverable). Use whenever the user asks for a PDF or a printable document.\npowerpoint: Produce polished PowerPoint presentations (decks, slide shows, pitch decks, any \"export to PowerPoint\" deliverable). Use whenever the user asks for a PowerPoint, a slide deck, or a presentation.\nexcel: Produce polished Excel spreadsheets (reports, budgets, data exports, any \"export to Excel\" deliverable). Use whenever the user asks for an Excel file, a spreadsheet, or an .xlsx deliverable.\nword-document: Produce polished Word documents (reports, letters, proposals, printable docs, any .docx deliverable). Use whenever the user asks for a Word document or a .docx file.\ninstall-qa: Set up automated QA testing for this project. Performs deep codebase analysis, asks targeted questions, and generates a modular QA skill with sub-skills per app, a GitHub Actions workflow, and a report template. This is a complex, multi-phase process -- quality assurance is foundational and we take the time to get it right.\nsecurity-review: Security-focused code review using STRIDE, OWASP Top 10, OWASP LLM Top 10, and supply chain analysis. Use when: - Reviewing a PR for security vulnerabilities - Performing a security audit of code changes - Identifying injection, auth, data exposure, and other security issues - Running a full-project security audit reviewing every source file\ndeep-security-review: Correctness-first, depth-first security audit of a single repository. Invoked by /security-review when the user opts into \"thorough\" mode. Uses a heterogeneous multi-model jury (latest Opus + latest GPT + latest Gemini). A mandatory 3-pass floor (line-anchor verification, vendor prior-art, deep prior-art) runs against every Pass 0 lieutenant-seeded candidate; a conditional escalation tier (dataflow + reachability, exploit construction, adversarial red-team disprove) fires on per-finding triggers. Produces FINDINGS.md, JUDGE.md, STATUS.md, severity-sorted master list, and optional PoC + evidence artifacts for that repo. Never uploads or submits anything; all outputs local.\nwiki: Generate comprehensive codebase documentation for a repository. Uploads the wiki to view in the Factory app.\nwiki-video-gen: Generate Factory-branded HyperFrames video overviews for repository wikis. Use when wiki generation reaches Phase 3.6, or when the user asks for a narrated repository overview video.\ninstall-wiki: Install a CI action that automatically refreshes the Factory Wiki on each push to the default branch. Use when the user wants to set up automated wiki generation, install wiki CI, or configure wiki refresh.\nbrowse-wiki: Search and read wiki documentation for a repository\nincident: RCA runbook for alerts. Given an alert link (or prompted to provide one), identifies the alert type, verifies tooling/auth, and walks through root cause analysis using deep research. Persists learnings to incident-guidelines for future reuse.\napply-setup: Install, repair, or audit the Factory team harness on macOS or a Linux droid computer. Use when setting up a fresh machine, onboarding, fixing one service's auth (Slack, Salesforce, BigQuery, GWS, Notion, Gong, Granola), checking what's missing, or running Homebrew, core CLIs, or terminal permissions. NOT for building skills (crud-skills), MCP servers (crud-mcps), or post-auth setup.\nctrl-macos: Programmatic macOS control via mctrl CLI. Use when you need to click, type, press keys, take a screenshot, read screen text via OCR, inspect an accessibility tree, manage app windows, or automate Calendar/Mail/Messages/Contacts. macOS only (no Linux droid computers). NOT for terminal management or browser automation.\nctrl-terminal: Programmatic control of macOS Terminal.app via AppleScript. Use when spawning Terminal windows or tabs, sending shell commands, capturing visible contents or history, focusing tabs, or monitoring Terminal workflows. macOS only. NOT for running shell commands directly (use Execute tool), raw TUI keystrokes, Kitty/iTerm2/Ghostty control, or GUI desktop automation (use ctrl-macos).\nnav-droid-sessions: Search, inspect, and maintain prior Droid sessions with compact, progressive-disclosure workflows. Use when finding old conversations, reconstructing prior decisions, pulling cross-session context, archiving low-value sessions, or backfilling better session titles and tags. NOT for repository code search, general docs lookup, or bulk transcript export.\nask: Use this when you are exploring the codebase. It lets you ask the AI who wrote code questions about how things work and why they chose to build things the way they did. Think of it as asking the engineer who wrote the code for help understanding it.\ngit-ai-search: Search and restore AI conversation context from git history\nprompt-analysis: Analyze AI prompting patterns and acceptance rates\n\nProactively invoke a listed skill when the user's request warrants specialized instructions or would benefit from that skill's domain knowledge.\n</system-reminder>",
+          "timestamp": "2026-06-22T23:31:09.815Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\n\nUser system info (darwin 25.5.0)\n\nModel: Claude Opus 4.8\nToday's date: 2026-06-22\nUser language: en\n\n# The commands below were executed at the start of all sessions to gather context about the environment.\n# You do not need to repeat them, unless you think the environment has changed.\n# Remember: They are not necessarily related to the current conversation, but may be useful for context.\n\n% pwd\n/Users/emily/factory\n\n% ls\nREADME.md\ndocs\n\n% git status -b --porcelain | head -n1\nmain\n\n% git status --porcelain\n\n\n% git log --oneline -5\nb7508061 docs(missions): reorganize Missions docs into focused pages (#1249)\nd6782e66 docs: add CLI changelog entry for v0.156.2 (#1250)\n6a64aca3 docs: add GLM-5.2 to Available Models page (#1248)\n1810e42d docs: refresh Slack integration capabilities (#1247)\n0b138699 docs(enterprise): clarify service account creation and editing permissions (#1242)\n\n% git symbolic-ref refs/remotes/origin/HEAD\nrefs/remotes/origin/main\n\n\n\n\n\nIMPORTANT:\n- Double check the tools installed in the environment before using them.\n- Never call a file editing tool for the same file in parallel.\n- Always prefer the Grep, Glob and LS tools over shell commands like find, grep, or ls for codebase exploration.\n- Always prefer using the absolute paths when using tools, to avoid any ambiguity.\n- To enter a mission, the user needs to run the `/missions` slash command.\n\n</system-reminder>",
+          "timestamp": "2026-06-22T23:31:09.815Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>IMPORTANT: TodoWrite was not called yet. You must call it for any non-trivial task requested by the user. It would benefit overall performance. Make sure to keep the todo list up to date to the state of the conversation. Performance tip: call the TodoWrite tool in parallel to the main flow related tool calls to save user's time and tokens.</system-reminder>",
+          "timestamp": "2026-06-22T23:31:09.815Z"
+        },
+        {
+          "type": "user",
+          "text": "address this ticket https://linear.app/factoryai/issue/CLI-975/update-public-docs-after-factory-aifactory-mono13561-featcli-add",
+          "timestamp": "2026-06-22T23:31:09.816Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I need to pull up the Linear ticket to see what the requirements are.",
+          "timestamp": "2026-06-22T23:31:13.504Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "FetchUrl",
+          "input": {
+            "url": "https://linear.app/factoryai/issue/CLI-975/update-public-docs-after-factory-aifactory-mono13561-featcli-add"
+          },
+          "timestamp": "2026-06-22T23:31:13.504Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I'm checking the source PR and reviewing the sandbox documentation to understand what needs to be addressed.",
+          "timestamp": "2026-06-22T23:31:18.978Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/cli/configuration/sandbox.mdx"
+          },
+          "timestamp": "2026-06-22T23:31:18.978Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I need to check the source PR to see what changes were made.",
+          "timestamp": "2026-06-22T23:31:28.452Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "FetchUrl",
+          "input": {
+            "url": "https://github.com/Factory-AI/factory-mono/pull/13561"
+          },
+          "timestamp": "2026-06-22T23:31:28.452Z"
+        },
+        {
+          "type": "assistant",
+          "text": " The sandbox.mdx documentation needs updating because MCP tools now fail closed under an active sandbox with a default-deny tool policy, but the docs still claim MCPs \"are not isolated yet.\" I need to revise that section to reflect the current behavior.",
+          "timestamp": "2026-06-22T23:31:40.114Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "head_limit": 80,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/emily/.factory/artifacts/tool-outputs/fetch_url-toolu_bdrk_01Ve2jM3YWRg9pVN5wGkUryG-71090449.log",
+            "pattern": "SandboxSideEffect|fail closed|default-deny|not isolated|MCP"
+          },
+          "timestamp": "2026-06-22T23:31:40.114Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I need to find the enum definition for SandboxSideEffect to see what categories are available.",
+          "timestamp": "2026-06-22T23:31:46.486Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/emily/.factory/artifacts/tool-outputs/fetch_url-toolu_bdrk_01Ve2jM3YWRg9pVN5wGkUryG-71090449.log",
+            "pattern": "enum SandboxSideEffect|FilesystemRead =|FilesystemWrite =|Network =|Process =|ExternalService =|PersistentSettings ="
+          },
+          "timestamp": "2026-06-22T23:31:46.486Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I'm checking the sandboxPreCheck default-deny logic to see which tools get handled versus denied, looking at the relevant code sections around those line numbers.",
+          "timestamp": "2026-06-22T23:31:50.436Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/.factory/artifacts/tool-outputs/fetch_url-toolu_bdrk_01Ve2jM3YWRg9pVN5wGkUryG-71090449.log",
+            "limit": 30,
+            "offset": 3258
+          },
+          "timestamp": "2026-06-22T23:31:50.436Z"
+        },
+        {
+          "type": "assistant",
+          "text": " So the critical insight is that ExternalService lacks a sandbox handler, which means MCP tools and other external services fail safely when a sandbox is active. I need to identify which side effects actually have handlers—Process for Execute, FilesystemRead/Write for file operations, and Network for FetchUrl—then examine the sandboxPreCheck logic to understand how this enforcement works.",
+          "timestamp": "2026-06-22T23:31:55.948Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/.factory/artifacts/tool-outputs/fetch_url-toolu_bdrk_01Ve2jM3YWRg9pVN5wGkUryG-71090449.log",
+            "limit": 60,
+            "offset": 2400
+          },
+          "timestamp": "2026-06-22T23:31:55.948Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I need to check the Japanese version of the documentation to make sure I update both versions consistently.",
+          "timestamp": "2026-06-22T23:31:59.427Z"
+        },
+        {
+          "type": "assistant",
+          "text": "I have enough understanding. Now let me read the Japanese version of the doc.",
+          "timestamp": "2026-06-22T23:31:59.427Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/jp/cli/configuration/sandbox.mdx"
+          },
+          "timestamp": "2026-06-22T23:31:59.427Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I need to clarify the sandbox isolation status in the docs—MCP tools now fail closed under an active sandbox, so only the main Droid process and subagents remain unisolated. I should also add a section explaining the default-deny tool policy and how each tool declares its sandbox side-effects.",
+          "timestamp": "2026-06-22T23:32:12.379Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I'll update the English doc. First, the misleading note about MCPs:",
+          "timestamp": "2026-06-22T23:32:12.379Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/cli/configuration/sandbox.mdx",
+            "new_str": "- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`\n- **MCP tools** -- fail closed (denied) under an active sandbox. MCP tool behavior is opaque (a server can read/write files, reach the network, etc.) and the protocol exposes no per-tool effect metadata, so MCP tools cannot be mapped to an enforceable sandbox policy and are blocked by the default-deny tool policy below.\n- **Note** -- the main Droid process and subagents are not isolated yet.\n\n**Tool policy (default-deny):**\n\n- Every registered tool declares sandbox side-effect metadata (`filesystem-read`, `filesystem-write`, `network`, `process`, `external-service`, `persistent-settings`)\n- When sandbox is enabled, a tool is allowed only if every declared side effect maps to a sandbox policy handler (file access, network, or per-command Execute). Tools with an unannotated, unknown, or unhandled side effect are denied\n- Tools whose effects cannot be enforced locally -- such as MCP tools and connectors (`external-service`) -- have no handler and therefore fail closed\n- Tool-policy denials are **non-promptable**: user approval cannot bypass missing policy coverage, and these denials are not configurable via `allowWrite`/`allowedDomains`",
+            "old_str": "- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`\n- **Note** -- main Droid process, MCPs and subagent are not isolated yet."
+          },
+          "timestamp": "2026-06-22T23:32:12.379Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now the Japanese doc:",
+          "timestamp": "2026-06-22T23:32:26.049Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/jp/cli/configuration/sandbox.mdx",
+            "new_str": "- **FetchUrl** -- `allowedDomains` に対して `checkNetworkAccess()` を実行\n- **MCP ツール** -- サンドボックス有効時は fail closed（拒否）になります。MCP ツールの挙動は不透明で（サーバーがファイルの読み書きやネットワークアクセスなどを行う可能性があります）、プロトコルはツールごとの効果メタデータを公開しないため、強制可能なサンドボックスポリシーにマッピングできず、後述のデフォルト拒否ツールポリシーによってブロックされます。\n- **注記** -- メインのDroidプロセスとサブエージェントはまだ分離されていません。\n\n**ツールポリシー（デフォルト拒否）:**\n\n- 登録されたすべてのツールは、サンドボックスの副作用メタデータ（`filesystem-read`、`filesystem-write`、`network`、`process`、`external-service`、`persistent-settings`）を宣言します\n- サンドボックス有効時、宣言されたすべての副作用がサンドボックスポリシーハンドラ（ファイルアクセス、ネットワーク、またはコマンド単位の Execute）にマッピングされる場合にのみ、ツールが許可されます。注釈のない副作用、不明な副作用、または未処理の副作用を持つツールは拒否されます\n- ローカルで強制できない効果を持つツール（MCP ツールやコネクタ（`external-service`）など）はハンドラを持たないため、fail closed になります\n- ツールポリシーによる拒否は**プロンプト不可**です。ユーザーの承認でポリシーカバレッジの欠如を回避することはできず、これらの拒否は `allowWrite` / `allowedDomains` では設定できません",
+            "old_str": "- **FetchUrl** -- `allowedDomains` に対して `checkNetworkAccess()` を実行\n- **注記** -- メインのDroidプロセス、MCP、サブエージェントはまだ分離されていません。"
+          },
+          "timestamp": "2026-06-22T23:32:26.049Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I should check if there are other places in the documentation mentioning MCPs not being isolated, and also look into whether the repo has any linting or build scripts for the docs.",
+          "timestamp": "2026-06-22T23:32:31.609Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Let me check for any other stale references to MCP isolation in the docs:",
+          "timestamp": "2026-06-22T23:32:31.609Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/emily/factory/docs",
+            "pattern": "not isolated|分離されていません|MCPs"
+          },
+          "timestamp": "2026-06-22T23:32:31.609Z"
+        },
+        {
+          "type": "assistant",
+          "text": "The remaining references are unrelated. Both docs are updated to reflect that MCP tools now fail closed under an active sandbox, with a new \"Tool policy (default-deny)\" section explaining the side-effect metadata model.\n\nI updated `docs/cli/configuration/sandbox.mdx` and `docs/jp/cli/configuration/sandbox.mdx`: replaced the stale \"MCPs are not isolated yet\" note with an entry stating MCP tools fail closed under an active sandbox, and added a \"Tool policy (default-deny)\" section describing side-effect metadata, handler-based allow/deny, and non-promptable tool-policy denials.",
+          "timestamp": "2026-06-22T23:32:36.023Z"
+        }
+      ],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 16,
+      "overriden_lines": 0
+    },
+    "c7e6ca531eb39679": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "094e8a16-1abb-4193-b04b-14776d9c581b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Emily Wen",
+      "messages": [
+        {
+          "type": "user",
+          "text": "<system-reminder>\nThe tools listed below are available in this environment, but their schemas may be omitted from the current tool list to save context.\nOnly use ToolSearch for tools that appear in the Deferred tools list below. The only valid ToolSearch names are the exact strings before the colon on each list entry. Use query \"select:<name>[,<name>...]\" to load one or more of those listed tools before calling them.\nDo NOT call ToolSearch for tools that are already present in the current tool list, including core tools like Read, Grep, Glob, LS, Execute, ApplyPatch, AskUser, Create, Edit, TodoWrite, or ExitSpecMode. Call available tools directly.\nDo NOT guess tool names or use aliases, invent MCP namespaces, or search for tools not shown in the Deferred tools list. If a needed tool is neither currently available nor listed below, it is unavailable in this session; do not retry ToolSearch for it. Calling an omitted tool directly will fail with InputValidationError.\n\nIMPORTANT: When a user's task matches one of these tools and the tool is absent from the current tool list, load and use it rather than routing around it via Execute. Examples of routing violations to avoid:\n- Using curl, wget, or gh pr view <url> instead of loading and calling FetchUrl\n- Using gh search or scraping search engines instead of loading and calling WebSearch\n- Hitting MCP server HTTP endpoints via curl instead of the corresponding MCP tool\n\nDeferred tools:\nGenerateDroid: Generate a custom droid configuration based on your description using AI | Inputs (* required): description* (string): Comprehensive description of what this droid should do and when it should be us…; location (string): Where to save the droid: project (.factory/droids) or personal (~/.factory/droi…\nCronCreate: Schedule a one-time or recurring prompt. Use same_session for /loop-style reminders to this Droid, or new_session for root-scoped local automations that start a fresh Droid session. | Inputs (* required): expression* (string): Standard 5-field cron expression in local time.; job* (object); target (union); recurring* (boolean): true for recurring tasks, false for once\nCronList: List scheduled crons visible from this Droid session, including root-scoped local automations.\nCronDelete: Cancel one scheduled cron by cron ID. | Inputs (* required): cronId* (string)\nCreateAutomation: Create a scheduled cloud automation (executionLocation=\"remote\") that runs on a droid computer and fires once immediately. Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": create a cloud automation that runs on a droid computer. Loca…; name* (string): Display name for the automation.; schedule* (string): A 5-field cron expression or natural-language cadence (normalized server-side f…; prompt* (string): Agent instructions to run on each scheduled tick.; descri…\nListAutomations: List scheduled cloud automations (executionLocation=\"remote\"). Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": list cloud automations. Local automations are not yet support…\nReadAutomation: Read one scheduled cloud automation by ID (executionLocation=\"remote\"). Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": read a cloud automation by id. Local automations are not yet…; automationId* (string): Automation id.\nEditAutomation: Update one scheduled cloud automation by ID (executionLocation=\"remote\"): name, prompt, status, schedule, description, computer. Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": edit a cloud automation by id. Local automations are not yet…; automationId* (string): Automation id.; name (string): New display name.; description (string): New description.; schedule (string): New cron expression or natural-language cadence.; +3 more\nDeleteAutomation: Delete one scheduled cloud automation by ID (executionLocation=\"remote\"). Local automations are not yet supported in the CLI. | Inputs (* required): executionLocation* (string): Must be \"remote\": delete a cloud automation by id. Local automations are not ye…; automationId* (string): Automation id.\n</system-reminder>",
+          "timestamp": "2026-06-22T23:31:26.314Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>IMPORTANT - Current date for web search relevance:\n- Today's date is 2026-06-22. Use this date when WebSearch needs the current year for recent information, documentation, or current events.</system-reminder>",
+          "timestamp": "2026-06-22T23:31:26.314Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\nAvailable skills for the Skill tool are listed below. The Skill tool definition relies on this system reminder for valid skill names.\n\nSkills instructions:\nWhen users ask you to perform tasks, check if any available skill can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.\n\nHow to use skills:\n- Invoke skills using the Skill tool with the skill name only.\n- The skill's prompt will expand and provide detailed instructions on how to complete the task.\n- Only use skills listed in the available-skills system reminders or dynamic skill-discovery reminders.\n- Do not invoke a skill that is already running.\n\nAvailable skills:\nagent-browser: Automates browsers and Electron desktop apps (VS Code, Slack, Discord, Figma, Notion, Spotify, etc.) for testing, form filling, screenshots, and data extraction. Use when the user needs to navigate, interact with, test, or extract data from any website or Electron desktop app.\ntuistory: Automates terminal user interface (TUI) testing. Use when you need to launch, interact with, test, or debug terminal applications, capture TUI snapshots, or automate terminal inputs.\nfigma-mcp-helper: Promote and assist with Figma MCP integration. ACTIVATE when the user shares a Figma URL (figma.com), mentions Figma designs or components, shares PNG images that may originate from Figma, or when Figma MCP tools are already connected and being used. Handles installation encouragement, conversational promotion, and push-back-to-Figma flows.\ninstall-code-review: Install and configure Factory Droid for automated code review on GitHub or GitLab. Supports single-repo setup or org/group-wide rollout across hundreds of repos. Use when a user wants to set up Droid review on their repositories.\ninstall-triage: Scaffold a scheduled Slack triage automation, generalized to any company. Sets up a Python tool layer (run_triage.py) plus a HEARTBEAT.md agent loop that scans configured Slack channels for actionable messages, dedupes against a ticketing system (Linear or Jira), files tickets, and posts a run summary. Use when the user wants to stand up an automated triage bot.\nreview: Review code changes and identify high-confidence, actionable bugs. Use when the user wants to: - Review a pull request or branch diff - Find bugs, security issues, or correctness problems in code changes - Get a structured summary of review findings\nsimplify: Review changed code for reuse, quality, and efficiency, then fix any issues found.\nsession-navigation: Navigate, search, and manage Droid sessions. Use when the user wants to: - List recent sessions - Search session history for specific topics or patterns - Resume a previous session - Get details about what was accomplished in a session - Find sessions by project, date, or content\npdf-document: Produce polished PDF documents (reports, invoices, resumes, letters, flyers, certificates, any \"export to PDF\" deliverable). Use whenever the user asks for a PDF or a printable document.\npowerpoint: Produce polished PowerPoint presentations (decks, slide shows, pitch decks, any \"export to PowerPoint\" deliverable). Use whenever the user asks for a PowerPoint, a slide deck, or a presentation.\nexcel: Produce polished Excel spreadsheets (reports, budgets, data exports, any \"export to Excel\" deliverable). Use whenever the user asks for an Excel file, a spreadsheet, or an .xlsx deliverable.\nword-document: Produce polished Word documents (reports, letters, proposals, printable docs, any .docx deliverable). Use whenever the user asks for a Word document or a .docx file.\ninstall-qa: Set up automated QA testing for this project. Performs deep codebase analysis, asks targeted questions, and generates a modular QA skill with sub-skills per app, a GitHub Actions workflow, and a report template. This is a complex, multi-phase process -- quality assurance is foundational and we take the time to get it right.\nsecurity-review: Security-focused code review using STRIDE, OWASP Top 10, OWASP LLM Top 10, and supply chain analysis. Use when: - Reviewing a PR for security vulnerabilities - Performing a security audit of code changes - Identifying injection, auth, data exposure, and other security issues - Running a full-project security audit reviewing every source file\ndeep-security-review: Correctness-first, depth-first security audit of a single repository. Invoked by /security-review when the user opts into \"thorough\" mode. Uses a heterogeneous multi-model jury (latest Opus + latest GPT + latest Gemini). A mandatory 3-pass floor (line-anchor verification, vendor prior-art, deep prior-art) runs against every Pass 0 lieutenant-seeded candidate; a conditional escalation tier (dataflow + reachability, exploit construction, adversarial red-team disprove) fires on per-finding triggers. Produces FINDINGS.md, JUDGE.md, STATUS.md, severity-sorted master list, and optional PoC + evidence artifacts for that repo. Never uploads or submits anything; all outputs local.\nwiki: Generate comprehensive codebase documentation for a repository. Uploads the wiki to view in the Factory app.\nwiki-video-gen: Generate Factory-branded HyperFrames video overviews for repository wikis. Use when wiki generation reaches Phase 3.6, or when the user asks for a narrated repository overview video.\ninstall-wiki: Install a CI action that automatically refreshes the Factory Wiki on each push to the default branch. Use when the user wants to set up automated wiki generation, install wiki CI, or configure wiki refresh.\nbrowse-wiki: Search and read wiki documentation for a repository\nincident: RCA runbook for alerts. Given an alert link (or prompted to provide one), identifies the alert type, verifies tooling/auth, and walks through root cause analysis using deep research. Persists learnings to incident-guidelines for future reuse.\napply-setup: Install, repair, or audit the Factory team harness on macOS or a Linux droid computer. Use when setting up a fresh machine, onboarding, fixing one service's auth (Slack, Salesforce, BigQuery, GWS, Notion, Gong, Granola), checking what's missing, or running Homebrew, core CLIs, or terminal permissions. NOT for building skills (crud-skills), MCP servers (crud-mcps), or post-auth setup.\nctrl-macos: Programmatic macOS control via mctrl CLI. Use when you need to click, type, press keys, take a screenshot, read screen text via OCR, inspect an accessibility tree, manage app windows, or automate Calendar/Mail/Messages/Contacts. macOS only (no Linux droid computers). NOT for terminal management or browser automation.\nctrl-terminal: Programmatic control of macOS Terminal.app via AppleScript. Use when spawning Terminal windows or tabs, sending shell commands, capturing visible contents or history, focusing tabs, or monitoring Terminal workflows. macOS only. NOT for running shell commands directly (use Execute tool), raw TUI keystrokes, Kitty/iTerm2/Ghostty control, or GUI desktop automation (use ctrl-macos).\nnav-droid-sessions: Search, inspect, and maintain prior Droid sessions with compact, progressive-disclosure workflows. Use when finding old conversations, reconstructing prior decisions, pulling cross-session context, archiving low-value sessions, or backfilling better session titles and tags. NOT for repository code search, general docs lookup, or bulk transcript export.\nask: Use this when you are exploring the codebase. It lets you ask the AI who wrote code questions about how things work and why they chose to build things the way they did. Think of it as asking the engineer who wrote the code for help understanding it.\ngit-ai-search: Search and restore AI conversation context from git history\nprompt-analysis: Analyze AI prompting patterns and acceptance rates\n\nProactively invoke a listed skill when the user's request warrants specialized instructions or would benefit from that skill's domain knowledge.\n</system-reminder>",
+          "timestamp": "2026-06-22T23:31:26.314Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\n\nUser system info (darwin 25.5.0)\n\nModel: Claude Opus 4.8\nToday's date: 2026-06-22\nUser language: en\n\n# The commands below were executed at the start of all sessions to gather context about the environment.\n# You do not need to repeat them, unless you think the environment has changed.\n# Remember: They are not necessarily related to the current conversation, but may be useful for context.\n\n% pwd\n/Users/emily/factory\n\n% ls\nREADME.md\ndocs\n\n% git status -b --porcelain | head -n1\nmain\n\n% git status --porcelain\n\n\n% git log --oneline -5\nb7508061 docs(missions): reorganize Missions docs into focused pages (#1249)\nd6782e66 docs: add CLI changelog entry for v0.156.2 (#1250)\n6a64aca3 docs: add GLM-5.2 to Available Models page (#1248)\n1810e42d docs: refresh Slack integration capabilities (#1247)\n0b138699 docs(enterprise): clarify service account creation and editing permissions (#1242)\n\n% git symbolic-ref refs/remotes/origin/HEAD\nrefs/remotes/origin/main\n\n\n\n\n\nIMPORTANT:\n- Double check the tools installed in the environment before using them.\n- Never call a file editing tool for the same file in parallel.\n- Always prefer the Grep, Glob and LS tools over shell commands like find, grep, or ls for codebase exploration.\n- Always prefer using the absolute paths when using tools, to avoid any ambiguity.\n- To enter a mission, the user needs to run the `/missions` slash command.\n\n</system-reminder>",
+          "timestamp": "2026-06-22T23:31:26.314Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>IMPORTANT: TodoWrite was not called yet. You must call it for any non-trivial task requested by the user. It would benefit overall performance. Make sure to keep the todo list up to date to the state of the conversation. Performance tip: call the TodoWrite tool in parallel to the main flow related tool calls to save user's time and tokens.</system-reminder>",
+          "timestamp": "2026-06-22T23:31:26.314Z"
+        },
+        {
+          "type": "user",
+          "text": "address this ticket https://linear.app/factoryai/issue/CLI-1017/update-public-docs-after-factory-aifactory-mono13574-fixcli-implement",
+          "timestamp": "2026-06-22T23:31:26.315Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I need to pull up the Linear ticket to see what the requirements are.",
+          "timestamp": "2026-06-22T23:31:29.953Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "FetchUrl",
+          "input": {
+            "url": "https://linear.app/factoryai/issue/CLI-1017/update-public-docs-after-factory-aifactory-mono13574-fixcli-implement"
+          },
+          "timestamp": "2026-06-22T23:31:29.953Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I'm checking the existing sandbox documentation and reviewing the source PR to understand what's already there.",
+          "timestamp": "2026-06-22T23:31:34.517Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "FetchUrl",
+          "input": {
+            "url": "https://github.com/Factory-AI/factory-mono/pull/13574"
+          },
+          "timestamp": "2026-06-22T23:31:34.517Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/cli/configuration/sandbox.mdx"
+          },
+          "timestamp": "2026-06-22T23:31:34.517Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I see the PR adds whole-process sandbox mode, so I need to update the docs to cover this new mode alongside the existing per-command documentation. Let me check the settings and constants to understand how the mode field works and what the default behavior is.",
+          "timestamp": "2026-06-22T23:31:46.008Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "head_limit": 80,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/emily/.factory/artifacts/tool-outputs/fetch_url-toolu_bdrk_01G9t1c3mKEgzimQfBNsmfY7-71096808.log",
+            "pattern": "whole-process|WholeProcess|per-command|PerCommand|platform|darwin|linux|supportedPlatform|mode:"
+          },
+          "timestamp": "2026-06-22T23:31:46.008Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I'm checking the sandbox mode implementation to understand the platform constraints. The whole-process mode appears to be Linux-only based on validators at specific line numbers, and it's a new addition alongside the existing per-command default. This mode isolates the entire Droid process rather than individual commands.",
+          "timestamp": "2026-06-22T23:31:56.573Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "head_limit": 40,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/emily/.factory/artifacts/tool-outputs/fetch_url-toolu_bdrk_01G9t1c3mKEgzimQfBNsmfY7-71096808.log",
+            "pattern": "SandboxMode|DEFAULT_SANDBOX|enum|PerCommand|DROID_SANDBOXED|allowAllUnixSockets"
+          },
+          "timestamp": "2026-06-22T23:31:56.573Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I'm checking the SandboxMode enum to see what values are supported—looks like \"per-command\" and \"whole-process\" are the options. Now I need to verify whether the settings documentation actually documents a `mode` field, since the current sandbox.mdx doesn't seem to include it.",
+          "timestamp": "2026-06-22T23:32:02.336Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/.factory/artifacts/tool-outputs/fetch_url-toolu_bdrk_01G9t1c3mKEgzimQfBNsmfY7-71096808.log",
+            "limit": 60,
+            "offset": 2820
+          },
+          "timestamp": "2026-06-22T23:32:02.336Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I'm looking at the SandboxMode enum definition to understand the exact string values for the different modes—\"per-command\" as the default and \"whole-process\"—and checking whether whole-process is Linux-only or if that restriction applies elsewhere in the codebase.",
+          "timestamp": "2026-06-22T23:32:16.716Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/jp/cli/configuration/sandbox.mdx"
+          },
+          "timestamp": "2026-06-22T23:32:16.716Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I'm checking the SandboxMode enum values to confirm the string mappings—\"whole-process\" for WholeProcess and \"per-command\" as the default—and looking at the settings documentation to see if there's existing mode documentation.",
+          "timestamp": "2026-06-22T23:32:30.006Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/emily/factory/docs/cli/configuration/settings.mdx",
+            "pattern": "sandbox|mode|whole-process|per-command"
+          },
+          "timestamp": "2026-06-22T23:32:30.006Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I see that `mode` is already documented in settings.mdx, so I just need to update the sandbox documentation to cover whole-process mode. I'm planning to add the `mode` field to the settings config example and revise the note about the main Droid process and MCPs.\n\nI'm restructuring the \"What's included\" section to clearly distinguish between per-command mode (the default) and whole-process mode (Linux-only, isolates the entire Droid process including MCP stdio and subagents, fails closed on startup if it can't establish a secure runtime). I'll add a new \"Sandbox modes\" subsection that explains how the `mode` setting controls which isolation approach is used. Adding sandbox mode configuration...",
+          "timestamp": "2026-06-22T23:32:54.558Z"
+        },
+        {
+          "type": "assistant",
+          "text": "I have enough understanding. The PR adds a `whole-process` sandbox mode (Linux-only) that isolates the entire Droid process, MCP stdio transports, and subagents, fixing the stale note that says these \"are not isolated yet.\" Let me update both docs.",
+          "timestamp": "2026-06-22T23:32:54.558Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/cli/configuration/sandbox.mdx",
+            "new_str": "## Sandbox modes\n\nThe `sandbox.mode` setting selects how isolation is applied:\n\n- **`per-command`** (default) -- only Droid-initiated shell commands and tool operations are sandboxed.\n- **`whole-process`** (Linux only) -- the entire Droid process is launched inside the OS sandbox, extending isolation to the main process, MCP stdio transports, and subagents.\n\n## What's included\n\n**Per-command sandbox mode** (`mode: \"per-command\"`, default when enabled):\n\n- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- `checkFileAccess()` before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes\n- **Execute tool** -- shell commands wrapped in OS sandbox (Seatbelt/bubblewrap) with network routed through SRT's filtering proxy for domain-level control\n- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`\n- **Note** -- the main Droid process, MCPs, and subagents run unsandboxed in this mode. Use `whole-process` mode to isolate them.\n\n**Whole-process sandbox mode** (`mode: \"whole-process\"`, Linux only):\n\n- At startup the entire Droid process is re-executed inside the OS sandbox, so the main process, MCP stdio transports, and subagent lifecycles all run within the configured filesystem and network boundaries\n- Network requests made directly by the Droid process (not only those from the Execute tool) are filtered against `allowedDomains`, with interactive domain prompts in TUI mode\n- **Fails closed** -- if the secure runtime cannot be established at startup (unsupported platform, missing sandbox support, or a failed isolation check), Droid refuses to start rather than running unsandboxed\n- Default access policies, filesystem and network configuration, and allow-always persistence behave the same as per-command mode",
+            "old_str": "## What's included\n\n**Per-command sandbox mode** (default when enabled):\n\n- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- `checkFileAccess()` before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes\n- **Execute tool** -- shell commands wrapped in OS sandbox (Seatbelt/bubblewrap) with network routed through SRT's filtering proxy for domain-level control\n- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`\n- **Note** -- main Droid process, MCPs and subagent are not isolated yet."
+          },
+          "timestamp": "2026-06-22T23:32:54.558Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/cli/configuration/sandbox.mdx",
+            "limit": 35,
+            "offset": 42
+          },
+          "timestamp": "2026-06-22T23:32:58.204Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I need to reload the file to see what's changed since it was modified externally.",
+          "timestamp": "2026-06-22T23:33:03.070Z"
+        },
+        {
+          "type": "assistant",
+          "text": "The file changed. Let me re-read the full current version.",
+          "timestamp": "2026-06-22T23:33:03.070Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/cli/configuration/sandbox.mdx"
+          },
+          "timestamp": "2026-06-22T23:33:03.070Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I'll apply the edits to the English doc.",
+          "timestamp": "2026-06-22T23:33:15.471Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/cli/configuration/sandbox.mdx",
+            "new_str": "## Sandbox modes\n\nThe `sandbox.mode` setting selects how isolation is applied:\n\n- **`per-command`** (default) -- only Droid-initiated shell commands and tool operations are sandboxed.\n- **`whole-process`** (Linux only) -- the entire Droid process is launched inside the OS sandbox, extending isolation to the main process, MCP stdio transports, and subagents.\n\n## What's included\n\n**Per-command sandbox mode** (`mode: \"per-command\"`, default when enabled):\n\n- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- `checkFileAccess()` before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes\n- **Execute tool** -- shell commands wrapped in OS sandbox (Seatbelt/bubblewrap) with network routed through SRT's filtering proxy for domain-level control\n- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`\n- **MCP tools** -- fail closed (denied) under an active sandbox. MCP tool behavior is opaque (a server can read/write files, reach the network, etc.) and the protocol exposes no per-tool effect metadata, so MCP tools cannot be mapped to an enforceable sandbox policy and are blocked by the default-deny tool policy below.\n- **Note** -- the main Droid process and subagents are not isolated in this mode. Use `whole-process` mode to isolate them.\n\n**Whole-process sandbox mode** (`mode: \"whole-process\"`, Linux only):\n\n- At startup the entire Droid process is re-executed inside the OS sandbox, so the main process, MCP stdio transports, and subagent lifecycles all run within the configured filesystem and network boundaries\n- Network requests made directly by the Droid process (not only those from the Execute tool) are filtered against `allowedDomains`, with interactive domain prompts in TUI mode\n- **Fails closed** -- if the secure runtime cannot be established at startup (unsupported platform, missing sandbox support, or a failed isolation check), Droid refuses to start rather than running unsandboxed\n- Default access policies, filesystem and network configuration, and allow-always persistence behave the same as per-command mode",
+            "old_str": "## What's included\n\n**Per-command sandbox mode** (default when enabled):\n\n- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- `checkFileAccess()` before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes\n- **Execute tool** -- shell commands wrapped in OS sandbox (Seatbelt/bubblewrap) with network routed through SRT's filtering proxy for domain-level control\n- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`\n- **MCP tools** -- fail closed (denied) under an active sandbox. MCP tool behavior is opaque (a server can read/write files, reach the network, etc.) and the protocol exposes no per-tool effect metadata, so MCP tools cannot be mapped to an enforceable sandbox policy and are blocked by the default-deny tool policy below.\n- **Note** -- the main Droid process and subagents are not isolated yet."
+          },
+          "timestamp": "2026-06-22T23:33:15.471Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/cli/configuration/sandbox.mdx",
+            "new_str": "  \"sandbox\": {\n    \"enabled\": true,\n    // Isolation scope: \"per-command\" (default) or \"whole-process\" (Linux only)\n    \"mode\": \"per-command\",\n    \"filesystem\": {",
+            "old_str": "  \"sandbox\": {\n    \"enabled\": true,\n    \"filesystem\": {"
+          },
+          "timestamp": "2026-06-22T23:33:19.901Z"
+        },
+        {
+          "type": "assistant",
+          "text": " I need to check the Japanese documentation to see its current state—the English version was updated with new sections like MCP tools and tool policy that the Japanese version doesn't have yet. Since I'm adding the whole-process mode structure, I should make sure both documents align structurally before proceeding.",
+          "timestamp": "2026-06-22T23:33:28.481Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now the Japanese doc. Let me re-read it to confirm current state.",
+          "timestamp": "2026-06-22T23:33:28.481Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/jp/cli/configuration/sandbox.mdx",
+            "limit": 20,
+            "offset": 36
+          },
+          "timestamp": "2026-06-22T23:33:28.481Z"
+        },
+        {
+          "type": "assistant",
+          "text": "The JP doc now has the same structure. Let me apply matching edits.",
+          "timestamp": "2026-06-22T23:34:04.259Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/jp/cli/configuration/sandbox.mdx",
+            "new_str": "## サンドボックスモード\n\n`sandbox.mode` 設定で、分離の適用方法を選択します:\n\n- **`per-command`**（デフォルト） -- Droid が開始するシェルコマンドとツール操作のみがサンドボックス化されます。\n- **`whole-process`**（Linux のみ） -- Droid プロセス全体が OS サンドボックス内で起動され、メインプロセス、MCP の stdio トランスポート、サブエージェントにまで分離が拡張されます。\n\n## 含まれる機能\n\n**コマンド単位のサンドボックスモード**（`mode: \"per-command\"`、有効時のデフォルト）:\n\n- **ファイルツール**（Read、Edit、Create、LS、Grep、Glob、ApplyPatch） -- すべての操作の前に `checkFileAccess()` を実行し、読み取りには `denyRead`、書き込みには `allowWrite` / `denyWrite` を適用\n- **Execute ツール** -- シェルコマンドを OS サンドボックス（Seatbelt / bubblewrap）でラップし、ネットワークはドメインレベル制御のために SRT のフィルタリングプロキシ経由でルーティング\n- **FetchUrl** -- `allowedDomains` に対して `checkNetworkAccess()` を実行\n- **MCP ツール** -- サンドボックス有効時は fail closed（拒否）になります。MCP ツールの挙動は不透明で（サーバーがファイルの読み書きやネットワークアクセスなどを行う可能性があります）、プロトコルはツールごとの効果メタデータを公開しないため、強制可能なサンドボックスポリシーにマッピングできず、後述のデフォルト拒否ツールポリシーによってブロックされます。\n- **注記** -- このモードではメインのDroidプロセスとサブエージェントは分離されません。これらを分離するには `whole-process` モードを使用してください。\n\n**プロセス全体のサンドボックスモード**（`mode: \"whole-process\"`、Linux のみ）:\n\n- 起動時に Droid プロセス全体が OS サンドボックス内で再実行されるため、メインプロセス、MCP の stdio トランスポート、サブエージェントのライフサイクルがすべて、設定されたファイルシステムおよびネットワーク境界の範囲内で実行されます\n- Droid プロセスが直接行うネットワークリクエスト（Execute ツールからのものだけでなく）も `allowedDomains` に対してフィルタリングされ、TUI モードでは対話型のドメインプロンプトが表示されます\n- **Fails closed** -- 起動時にセキュアなランタイムを確立できない場合（非対応プラットフォーム、サンドボックスサポートの欠如、または分離チェックの失敗）、Droid はサンドボックスなしで実行するのではなく起動を拒否します\n- デフォルトのアクセスポリシー、ファイルシステムおよびネットワーク設定、「常に許可」の永続化は、コマンド単位モードと同じ挙動です",
+            "old_str": "## 含まれる機能\n\n**コマンド単位のサンドボックスモード**（有効時のデフォルト）:\n\n- **ファイルツール**（Read、Edit、Create、LS、Grep、Glob、ApplyPatch） -- すべての操作の前に `checkFileAccess()` を実行し、読み取りには `denyRead`、書き込みには `allowWrite` / `denyWrite` を適用\n- **Execute ツール** -- シェルコマンドを OS サンドボックス（Seatbelt / bubblewrap）でラップし、ネットワークはドメインレベル制御のために SRT のフィルタリングプロキシ経由でルーティング\n- **FetchUrl** -- `allowedDomains` に対して `checkNetworkAccess()` を実行\n- **MCP ツール** -- サンドボックス有効時は fail closed（拒否）になります。MCP ツールの挙動は不透明で（サーバーがファイルの読み書きやネットワークアクセスなどを行う可能性があります）、プロトコルはツールごとの効果メタデータを公開しないため、強制可能なサンドボックスポリシーにマッピングできず、後述のデフォルト拒否ツールポリシーによってブロックされます。\n- **注記** -- メインのDroidプロセスとサブエージェントはまだ分離されていません。"
+          },
+          "timestamp": "2026-06-22T23:34:04.259Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/emily/factory/docs/jp/cli/configuration/sandbox.mdx",
+            "new_str": "  \"sandbox\": {\n    \"enabled\": true,\n    // 分離のスコープ: \"per-command\"（デフォルト）または \"whole-process\"（Linux のみ）\n    \"mode\": \"per-command\",\n    \"filesystem\": {",
+            "old_str": "  \"sandbox\": {\n    \"enabled\": true,\n    \"filesystem\": {"
+          },
+          "timestamp": "2026-06-22T23:34:08.401Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Both docs updated. Summary of changes addressing CLI-1017:\n\n- `docs/cli/configuration/sandbox.mdx` and `docs/jp/cli/configuration/sandbox.mdx`:\n  - Added a **Sandbox modes** section documenting `per-command` (default) vs `whole-process` (Linux only).\n  - Added a **Whole-process sandbox mode** subsection describing full-process isolation (main process, MCP stdio transports, subagents), direct-process network filtering, and fail-closed startup behavior.\n  - Replaced the stale \"not isolated yet\" note with a pointer to `whole-process` mode.\n  - Added the `\"mode\"` field to the settings config example.",
+          "timestamp": "2026-06-22T23:34:13.551Z"
+        }
+      ],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 36,
+      "overriden_lines": 0
+    }
+  }
+}
