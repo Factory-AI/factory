@@ -58,6 +58,29 @@ Droid Shield uses smart pattern matching with randomness validation:
 
 ---
 
+## Droid Shield 2.0: Learned Secret Detection
+
+Droid Shield 2.0 augments the deterministic scanner with two fine-tuned classification models that add a semantic layer on top of pattern-based detection. Every commit and push still passes through the deterministic scanner first; the models then classify specific contexts the scanner flagged or missed.
+
+<Note>
+  Droid Shield 2.0 is in research preview. To enable it for your organization, [contact us](mailto:support@factory.ai).
+</Note>
+
+### The Two Classification Models
+
+The models sit on opposite sides of the deterministic scanner and are optimized for distinct failure modes:
+
+<CardGroup cols={2}>
+  <Card title="Risk model" icon="shield-exclamation">
+    Runs on changed lines the deterministic scanner did **not** fire on, but that still look secret-bearing based on surrounding context. Optimized for recall to catch real secrets the pattern set would miss. Produces a warning when it flags a possible missed secret.
+  </Card>
+  <Card title="Downgrade model" icon="rotate">
+    Runs on lines where the scanner **did** fire. It reviews the surrounding context with the detected secret masked out, and decides whether the scanner hit is a true positive (keep blocking) or a false alarm (downgrade to a warning).
+  </Card>
+</CardGroup>
+
+---
+
 ## When Droid Shield Activates
 
 Droid Shield automatically activates during these git operations:
@@ -130,6 +153,10 @@ Droid Shield uses conservative patterns to err on the side of caution. If you be
 2. **Use a manual commit** - Perform the git operation yourself outside of Droid
 3. **Report the pattern** - Contact support@factory.ai if you encounter recurring false positives
 
+<Note>
+  When Droid Shield 2.0 is enabled, the downgrade model automatically reviews scanner hits and can clear obvious false alarms (placeholders, examples, test fixtures) without manual intervention.
+</Note>
+
 ---
 
 ## Best Practices
@@ -165,13 +192,11 @@ Droid Shield uses conservative patterns to err on the side of caution. If you be
 ## Limitations
 
 <Note>
-  **Droid Shield is a detection tool, not a guarantee.** While it catches many common secret patterns, it cannot detect:
+  **Droid Shield is a detection tool, not a guarantee.** While it catches many common secret patterns, the deterministic scanner alone cannot detect:
   - Custom secret formats not in the pattern database
   - Secrets that don't follow recognizable patterns
   - Obfuscated or encoded credentials
   - Business logic vulnerabilities or code security issues
-  
-  Always follow security best practices and never rely solely on automated tools for secret protection.
 </Note>
 
 ---
@@ -184,6 +209,12 @@ Droid Shield uses conservative patterns to err on the side of caution. If you be
   </Card>
   <Card title="Settings" icon="gear" href="/cli/configuration/settings">
     Configure Droid settings including Droid Shield preferences.
+  </Card>
+  <Card title="Droid Shield 2.0 Research Post" icon="newspaper" href="https://factory.ai/news/droid-shield-2-0">
+    Technical deep dive on the learned classification models, training data, and evaluation results.
+  </Card>
+  <Card title="Agent Safety & Controls" icon="shield-check" href="/enterprise/llm-safety-and-agent-controls">
+    How Droid Shield fits into the broader enterprise safety model.
   </Card>
 </CardGroup>
 
