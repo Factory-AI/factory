@@ -62,7 +62,8 @@ Options:
   --spec-model <id>                     Model ID to use for spec mode
   --spec-reasoning-effort <level>       Reasoning effort for spec mode
   --use-spec                            Start in spec mode
-  --enabled-tools <ids>                 Enable specific tools (comma or space separated list)
+  --restrict-tools <ids>                Restrict the run to only the specified tools (comma or space separated list)
+  --additional-tools <ids>              Enable additional tools beyond the defaults (comma or space separated list)
   --disabled-tools <ids>                Disable specific tools (comma or space separated list)
   --list-tools                          List available tools for the selected model and exit
   --cwd <path>                          Working directory path
@@ -325,8 +326,11 @@ droid exec --model gpt-5-codex --list-tools --output-format json
 ```
 特定のツールを有効または無効にする:
 ```bash
+# Restrict to only specific tools
+droid exec --restrict-tools ApplyPatch "refactor files"
+
 # Enable additional tools
-droid exec --enabled-tools ApplyPatch "refactor files"
+droid exec --additional-tools ApplyPatch "refactor files"
 
 # Disable specific tools
 droid exec --auto medium --disabled-tools execute-cli "run edits only"
