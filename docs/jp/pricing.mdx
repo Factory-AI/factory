@@ -1,34 +1,168 @@
 ---
 title: "プランと料金"
 description: "Factoryのプランと料金"
-keywords: ['pricing', 'plans', 'limits', 'pro', 'max', 'enterprise', 'subscription']
+keywords: ['pricing', 'plans', 'limits', 'pro', 'plus', 'max', 'business', 'enterprise', 'subscription', 'rate limits', 'droid core', 'extra usage']
 ---
+
+## 料金体系
+
+Factoryのプランでは、5時間、週次、月次の3つの期間でローリングRate Limitsを使用します。プランに含まれるStandard Usageではすべてのモデルを利用でき、最初に消費されます。BusinessおよびEnterpriseプランはRate Limitの変更による影響を受けません。
+
+Standard UsageのRate Limitに達した場合、次の2つの選択肢があります。
+
+- **Droid Core** -- 個別のRate Limitsを持つ主要なオープンウェイトモデル群。無料で、追加料金はかかりません。
+- **Extra Usage** -- 含まれる使用量を使い切った後も作業を続けるためのプリペイドクレジット。従量課金制で、最低購入額は$10です。
+
+Standard Usageは常に最初に消費されます。Droid Coreラベル付きモデルでは、Extra Usageより前にDroid Core Rate Limitsが使用されます。使用量は**Settings > Usage**またはDroidの`/limits`コマンドで確認できます。
 
 ## プラン
 
 ### Pro -- $20/月
 
-個人および小規模チーム向けの完全なコーディングエージェントワークスペース。
+個人向けの完全なソフトウェア開発エージェント。
 
-- **最先端モデルによる専用コンピュート** -- モデルが利用可能になった日から、高速で直接的な優先ルーティング
-- **エージェントネイティブなマルチプラットフォーム体験** -- デスクトップ、ウェブ、CLIに対応。クラウド＆ローカルバックグラウンドエージェントと拡張されたファーストパーティ統合
-- **チームコラボレーション** -- 最大2名のチームメンバー（追加シートあたり$5）、分析、請求、使用統計、エージェント準備状況ダッシュボード
+- エージェントネイティブなマルチプラットフォーム体験
+  - Factory App / Droid CLI / Droid SDK
+  - クラウドおよびローカルのバックグラウンドエージェント
+  - 請求と使用統計の追跡
+  - エージェント準備状況ダッシュボード
+
+### Plus -- $100/月
+
+Proのすべてに加えて：
+
+- 拡張されたローリングRate Limits
+  - Proの約5倍の使用量
+  - Droid Computers -- Factory管理のDroid Computers（リモートクラウド環境）へのアクセス
 
 ### Max -- $200/月
 
-Proプランのすべてに加えて：
+Plusのすべてに加えて：
 
-- **拡張された予約容量** -- Proプランの10倍の使用量
-- **Droid Computers** -- リモートDroid向けのFactory管理クラウドコンピュータへのアクセス
-- 新機能への**早期アクセス**
-- **チームコラボレーション** -- 5シート上限（追加シートあたり$5）
+- 拡張されたローリングRate Limits
+  - Proの約10倍の使用量
+  - 新機能への早期アクセス
+
+### Business
+
+成長中のチーム向けの柔軟なプラン。
+
+- 最大150席までの複数チームメンバー
+- カスタム使用量上限
+- 専用オンボーディングとサポート
+- Single Sign-On（SSO）連携
+- SAML/SCIMプロビジョニング
+- Zero Data Retention（ZDR）
+- 監査ログとアクティビティトレイル
+- 基本的な管理者コントロール（モデル選択、自律性レベル、モデルアクセス制御、組織レベルの拒否リスト、ネットワークポリシー）
+
+BusinessプランはRate Limitの変更による影響を受けません。Businessの料金については[営業チームにお問い合わせ](https://factory.ai/contact)ください。
 
 ### Enterprise
 
-Maxプランのすべてに加えて：
+以前のすべての機能に加えて：
 
-- **エンタープライズスケール** -- 無制限のチームメンバー、カスタムメッセージングおよびクレジット制限、高度なリポジトリ権限
-- **エンタープライズ機能** -- エンタープライズスケールのコードベース分析、監査ログとアクティビティトレイル、エージェント準備状況改善プログラム、エンタープライズ専用オートメーションクックブック、SSO、SAML/SCIMプロビジョニング、コンプライアンスレポート、オンプレミスデプロイオプション
-- **プレミアムサポート** -- 専任アカウントマネージャーおよびカスタマーエンジニア、SLA付き優先サポート、カスタムオンボーディングプログラム
+- エンタープライズスケール
+  - 無制限のチームメンバー
+  - パーティション化された推論プールによる専用コンピュート
+- エンタープライズ機能
+  - エージェント準備状況改善プログラム
+  - エンタープライズ専用オートメーションクックブック
+  - オンプレミスデプロイオプション
+  - サブ組織
+  - 完全な管理者コントロール
+  - 顧客管理の暗号化キー
+  - データレジデンシー
+- プレミアムサポート
+  - 専任アカウントマネージャーおよびカスタマーエンジニア
+  - SLA付き優先サポート
+  - カスタムオンボーディングプログラム
 
-Enterpriseの料金については[営業チームにお問い合わせ](https://factory.ai/contact)ください。
+EnterpriseプランはRate Limitの変更による影響を受けません。Enterpriseの料金については[営業チームにお問い合わせ](https://factory.ai/contact)ください。
+
+## Droid Core
+
+Droid Coreは、FactoryがCoreとして指定した主要なオープンウェイトモデル群です。通常、ほとんどのコーディングタスクを十分にこなせる小型でコスト効率の高いモデルです。Standard UsageのRate Limitsを使い切った後も、Droid Coreでは独自のRate Limits内で追加料金なしに作業を続けられます。
+
+現在のCoreモデル一覧は**Settings > Models**で確認できます。この一覧は新しいモデルのリリースに応じて更新されます。
+
+Standard Usageが残っている場合、Droid Coreの使用量はStandard Usageにカウントされます。Standard Usageを使い切ると、Droid Coreラベル付きモデルはExtra Usageを使用する前に、独自のRate Limitプールから消費します。
+
+## Extra Usage
+
+Extra Usageは、USD建てのプリペイドクレジット残高です。有効にしている場合、Standard Usageを使い切ると適用されます。Droid Coreラベル付きモデルでは、Standard UsageとDroid Core Rate Limitsの両方を使い切った後にのみExtra Usageが使用されます。
+
+- **最低購入額：** $10
+- **有効期限：** クレジットに有効期限はありません
+- **切り替え：** 一度有効にすると、無効にするかクレジットを使い切るまで有効です
+- **優先順位：** Standard Usageは常に最初に消費されます。Droid Coreラベル付きモデルでは、Droid Core Rate Limits、その後Extra Usageの順に使用されます。
+
+## Factory Missions
+
+Missionsは通常のセッションと同じローリングRate Limitsを使用します。Missionの実行にはExtra Usageを有効にする必要があります。MissionがRate Limitに達した場合、Missionは一時停止します。
+
+**ヒント：** 可能な場合はDroid CoreでMissionを実行してください。Coreモデルは多くの場合、同等の結果を出しながらプランの使用量をより長く活用できます。
+
+## BYOK
+
+すべてのIndividualプランには無料のBYOK使用枠が含まれます。この枠を超えたBYOK使用量は、該当プランに応じて課金されます。
+
+## FAQ
+
+### 一般
+
+**各Rate Limitには何がカウントされますか？**
+Droidセッションは、モデル使用量に基づくFactory Standard Creditsと、Droid Computersのコンピュート使用量を消費します。
+
+**3つのRate Limitsは独立して動作しますか？**
+はい。5時間の上限に達しても、週次や月次の上限が早く消費されることはありません。その逆も同様です。リクエストを送るには、3つすべてに余裕が必要です。
+
+**各期間はいつリセットされますか？**
+3つすべてがローリング方式です：5時間、7日、30日。Droidを初めて使用した時点から計測が始まり、期間が経過するとリセットされます。
+
+**未使用のStandard Usageは繰り越されますか？**
+いいえ。以前のプランと同様に、Standard Usageは月をまたいで繰り越されません。購入したExtra Usageは繰り越されます。
+
+### Droid Core
+
+**「Droid Core」モデルとは何ですか？**
+FactoryがCoreとして指定したモデル群です。通常、ほとんどのコーディングタスクを十分にこなせる小型で低コストのモデルです。現在の一覧はSettings > Modelsで確認できます。この一覧は新しいモデルの登場に応じて変わります。
+
+**Droid Coreを有効にすると追加料金がかかりますか？**
+いいえ。同じStandard Usage課金で、Coreモデルプールに限定されるだけです。プレミアムモデルのRate Limitsに達した後も作業を続けられます。
+
+**Droid Coreを使うとStandard Usageにカウントされますか？**
+はい。Standard Usageが残っている場合は、Standard Usageが最初に消費されます。Standard Usageを使い切ると、Droid Core用の個別のRate Limitsが使用されます。
+
+### Extra Usage
+
+**Extra Usageの料金体系はどうなっていますか？**
+USD建てのプリペイドクレジットです。金額を購入すると、セッションでモデルを使用するたびに残高から差し引かれます。必要に応じて追加購入できます。
+
+**最低購入額はいくらですか？**
+$10です。
+
+**Extra Usageに有効期限はありますか？**
+いいえ。クレジットは使用するまで残ります。
+
+**毎サイクルExtra Usageを再度有効にする必要がありますか？**
+いいえ。トグルは保持されます。一度有効にすると、無効にするかクレジットを使い切るまで有効です。
+
+**Standard UsageとExtra Usageのどちらが先に消費されますか？**
+常にStandard Usageが先です。Droid Coreラベルのないモデルでは、Standard Usageを使い切った後にExtra Usageが適用されます。Droid Coreラベル付きモデルでは、Extra Usageより前にDroid Core Rate Limitsが使用されます。
+
+### Rate Limits
+
+**セッション中にRate Limitに達するとどうなりますか？**
+現在のリクエストは完了し、その後のリクエストはCLIまたはFactory AppでRate Limitエラーとして拒否されます。Droidで`/limits`を実行してDroid CoreまたはExtra Usageを切り替え、すぐに再試行できます。セッションを開き直す必要はありません。
+
+**長時間実行される自律エージェントは制限されますか？**
+はい。一時停止し、同じ制限エラーを表示します。これは意図された動作です。Rate Limitsは、暴走したエージェントが短時間で月間割り当てを消費し尽くすことを防ぎます。
+
+### その他
+
+**各Rate Limitはユーザー単位ですか、組織単位ですか？**
+組織単位で、メンバー間で共有されます。プランはチーム使用量に対応するため、シート数に応じて拡張されます。
+
+**BusinessまたはEnterpriseの場合はどうなりますか？**
+BusinessおよびEnterpriseプランは、この変更による影響を受けません。
