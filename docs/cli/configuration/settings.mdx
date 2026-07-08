@@ -204,6 +204,24 @@ Configure [Missions](/features/missions/overview) — multi-agent orchestration 
 | `missionOrchestratorReasoningEffort`                 | string  | `off`, `none`, `low`, `medium`, `high`   | Model default    | Reasoning effort for the mission orchestrator.                                           |
 | `keepSystemAwakeDuringMissions`                      | boolean | `true`, `false`                          | `true`           | Prevent the OS from sleeping while a mission is running.                                 |
 
+## Subagent settings
+
+Configure subagents spawned by the Task tool. These appear in the **Subagents** tab of `/settings`.
+
+| Setting                  | Type   | Options                                   | Default   | Description                                                                                                       |
+| ------------------------ | ------ | ----------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------- |
+| `subagentAutonomyLevel`  | string | `inherit`, `off`, `low`, `medium`, `high` | `inherit` | [Autonomy Level](/cli/user-guides/auto-run) applied to subagents spawned by the Task tool.                       |
+
+### Subagent autonomy level
+
+`subagentAutonomyLevel` controls how much subagents can do without approval:
+
+- **`inherit`** – Subagents use the parent session's autonomy level (default).
+- **`off`** – Subagents require manual approval for every action.
+- **`low`**, **`medium`**, **`high`** – Pre-authorize subagent work at or below that risk level.
+
+An explicit level is still clamped to the org-managed `maxAutonomyLevel`, so it can never exceed the enterprise cap. Mission workers do not use this setting.
+
 ## Context and compaction
 
 Controls when and how droid compacts the conversation to stay within the model's context window.
