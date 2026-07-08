@@ -44,8 +44,8 @@ Local overrides merge on top of the corresponding `settings.json` at the same le
 
 | Setting                    | Options                                                                                                                                                                                                                                                                  | Default                       | Description                                                                |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------------------- |
-| `model`                    | Any [available model ID](/models)                                                                                                                                                                                                                                        | Product default               | The default AI model used by droid                                         |
-| `reasoningEffort`          | `off`, `none`, `low`, `medium`, `high` (availability depends on the model)                                                                                                                                                                                               | Model-dependent default       | Controls how much structured thinking the model performs.                  |
+| `sessionDefaultSettings.model`           | Any [available model ID](/models)                                             | Product default               | The default AI model used by droid                                         |
+| `sessionDefaultSettings.reasoningEffort` | Reasoning value (model-dependent) — see [Reasoning effort](#reasoning-effort) | Model-dependent default       | Controls how much structured thinking the model performs.                  |
 | `sessionDefaultSettings.interactionMode` | `auto`, `spec`                                                                                                                                                                                                                                                           | `auto`                        | Sets whether new sessions start in Auto or Spec Mode.                      |
 | `sessionDefaultSettings.autonomyLevel`   | `off`, `low`, `medium`, `high`                                                                                                                                                                                                                                           | `off`                         | Sets the default [Autonomy Level](/cli/user-guides/auto-run) for new sessions. |
 | `cloudSessionSync`         | `true`, `false`                                                                                                                                                                                                                                                          | `true`                        | Mirror CLI sessions to Factory web.                                        |
@@ -66,16 +66,25 @@ Local overrides merge on top of the corresponding `settings.json` at the same le
 
 ### Model
 
-Set `model` to a [model ID from Available Models](/models). For custom models, see [Bring Your Own Key (BYOK)](/cli/byok/overview).
+Set `sessionDefaultSettings.model` to a [model ID from Available Models](/models). For custom models, see [Bring Your Own Key (BYOK)](/cli/byok/overview).
+
+<Note>For backward compatibility, `model`, `reasoningEffort`, `autonomyMode`, `specModeModel`, and `specModeReasoningEffort` are also accepted as top-level keys; droid migrates them into `sessionDefaultSettings` on load. New configurations should nest them under `sessionDefaultSettings`.</Note>
 
 ### Reasoning effort
 
-`reasoningEffort` adjusts how much structured thinking the model performs before replying. Available values depend on the model, but typically include:
+`sessionDefaultSettings.reasoningEffort` controls how much structured thinking the model performs before replying. The model picker and the [Available Models](/models) **Reasoning** column show these levels as display labels; use the matching value below in `settings.json`:
 
-- **`off` / `none`** – disable structured reasoning (fastest).
-- **`low`**, **`medium`**, **`high`** – progressively increase deliberation time for more complex reasoning.
+| Label        | `settings.json` value |
+| ------------ | --------------------- |
+| Off / None   | `off` / `none`        |
+| Minimal      | `minimal`             |
+| Low          | `low`                 |
+| Medium       | `medium`              |
+| High         | `high`                |
+| Extra High   | `xhigh`               |
+| Max          | `max`                 |
 
-Anthropic models default to `off`, while GPT-5 starts on `medium`.
+Higher effort increases latency and cost. Which levels are available — and which is the default — depend on the model, so check the **Reasoning** column in [Available Models](/models). Display labels can vary slightly by surface (for example, `max` may appear as **Max** or **Maximum**).
 
 ### Autonomy level
 
@@ -165,7 +174,7 @@ Defaults applied when a new session starts. See also `sessionDefaultSettings.int
 | Setting                                          | Type   | Options                                  | Default        | Description                                                |
 | ------------------------------------------------ | ------ | ---------------------------------------- | -------------- | ---------------------------------------------------------- |
 | `sessionDefaultSettings.specModeModel`           | string | Any [available model ID](/models)        | Inherits model | Override the model used when sessions start in Spec Mode.  |
-| `sessionDefaultSettings.specModeReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high`   | Model default  | Reasoning effort applied to the spec model.                |
+| `sessionDefaultSettings.specModeReasoningEffort` | string | See [Reasoning effort](#reasoning-effort) | Model default  | Reasoning effort applied to the spec model.                |
 
 ## Display and UI
 
@@ -195,13 +204,13 @@ Configure [Missions](/features/missions/overview) — multi-agent orchestration 
 | Setting                                              | Type    | Options                                  | Default          | Description                                                                              |
 | ---------------------------------------------------- | ------- | ---------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------- |
 | `missionModelSettings.workerModel`                   | string  | Any [available model ID](/models)        | Inherits         | Default model used by mission worker subagents.                                          |
-| `missionModelSettings.workerReasoningEffort`         | string  | `off`, `none`, `low`, `medium`, `high`   | Model default    | Reasoning effort for mission workers.                                                    |
+| `missionModelSettings.workerReasoningEffort`         | string  | See [Reasoning effort](#reasoning-effort) | Model default    | Reasoning effort for mission workers.                                                    |
 | `missionModelSettings.validationWorkerModel`         | string  | Any [available model ID](/models)        | Inherits         | Model used by mission validators (scrutiny / user-testing workers).                      |
-| `missionModelSettings.validationWorkerReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high`  | Model default    | Reasoning effort for validation workers.                                                 |
+| `missionModelSettings.validationWorkerReasoningEffort` | string | See [Reasoning effort](#reasoning-effort) | Model default    | Reasoning effort for validation workers.                                                 |
 | `missionModelSettings.skipScrutiny`                  | boolean | `true`, `false`                          | `false`          | Skip scrutiny validation milestones during missions.                                     |
 | `missionModelSettings.skipUserTesting`               | boolean | `true`, `false`                          | `false`          | Skip user-testing validation milestones during missions.                                 |
 | `missionOrchestratorModel`                           | string  | Any [available model ID](/models)        | Inherits         | Model used by the mission orchestrator.                                                  |
-| `missionOrchestratorReasoningEffort`                 | string  | `off`, `none`, `low`, `medium`, `high`   | Model default    | Reasoning effort for the mission orchestrator.                                           |
+| `missionOrchestratorReasoningEffort`                 | string  | See [Reasoning effort](#reasoning-effort) | Model default    | Reasoning effort for the mission orchestrator.                                           |
 | `keepSystemAwakeDuringMissions`                      | boolean | `true`, `false`                          | `true`           | Prevent the OS from sleeping while a mission is running.                                 |
 
 ## Subagent settings
@@ -275,8 +284,10 @@ System-level settings for status line, worktrees, and request timeouts.
 
 ```json
 {
-  "model": "claude-opus-4-7",
-  "reasoningEffort": "low",
+  "sessionDefaultSettings": {
+    "model": "claude-opus-4-8",
+    "reasoningEffort": "high"
+  },
   "diffMode": "github",
   "cloudSessionSync": true,
   "completionSound": "fx-ok01",
