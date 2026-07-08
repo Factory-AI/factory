@@ -41,30 +41,42 @@ Incident Response is set up as an [automation](/web/automations) in the Factory 
 
   <Step title="Choose the Incident Response template">
     From the template gallery, select the **Incident Response** template under Software Factory templates.
+
+    <Frame>
+      <img src="/images/incident-response-templates.png" alt="Automation template gallery with the Incident Response template" />
+    </Frame>
   </Step>
 
   <Step title="Name the automation and select trigger channels">
-    Give the automation a name, then under **Triggers**, search for and select the incident channel. Use **Trigger on messages from** to limit which senders start sessions, such as the alert bots that post incidents.
+    Give the automation a name, then under **Triggers**, search for and select the incident channel. **Trigger on messages from** defaults to **Bots only**, which matches alert bots posting incidents; change it only if humans should also trigger investigations.
+
+    <Frame>
+      <img src="/images/incident-response-create.png" alt="New Incident Response automation form" />
+    </Frame>
   </Step>
 
   <Step title="Choose Run as and Run on">
-    - **Run as** sets the identity and billing the automation runs under. Keep **Myself** or select a [service account](/enterprise/service-accounts) when incident sessions should run from a shared, preconfigured account.
+    - **Run as** sets the identity and billing the automation runs under. A [service account](/enterprise/service-accounts) is recommended for incident response so the computer and session interactivity are shared across the team.
     - **Run on** sets the computer where Droid investigates. Pick the environment with the right repository checkout, observability tools, and credentials.
   </Step>
 
-  <Step title="Set the prompt and model">
-    Enter the instructions injected into every session triggered from the channel and optionally select a model.
+  <Step title="Configure MCP servers">
+    Use **Configure MCP Servers** to add and authenticate the observability tools and context sources Droid needs to respond to incidents. MCP servers are configured per computer.
+  </Step>
 
-    A good starting prompt is:
+  <Step title="Review the prompt and model">
+    The template pre-fills a prompt that is injected into every session triggered from the channel:
 
     ```text
     Use the `/incident` skill for Slack incidents and run an RCA if applicable.
     If the thread message is an incident or asking for RCA/root-cause analysis, invoke the `incident` skill before investigating.
     ```
+
+    Keep the default or add channel-specific instructions, and optionally select a model.
   </Step>
 
   <Step title="Set session privacy and create">
-    Choose whether triggered sessions are **Private** or visible to the organization, review any **Optional Settings**, then click **Create**.
+    Choose whether triggered sessions are visible to your **Team** or **Private**, review any **Additional Settings**, then click **Create**.
   </Step>
 
   <Step title="Send a test alert">
@@ -91,14 +103,14 @@ Incident Response is designed for channels where incident alerts arrive as top-l
 
 For best results, use a dedicated channel such as `#incidents`, `#alerts-production`, or a service-specific incident channel.
 
-The channel picker only shows channels where Factory has been invited. Use **Trigger on messages from** to restrict which senders start sessions, such as your alert bots, so ordinary messages in the channel do not trigger investigations.
+The channel picker only shows channels where Factory has been invited. **Trigger on messages from** defaults to **Bots only** so ordinary messages in the channel do not trigger investigations; widen it only if humans should also be able to start incident sessions.
 
 ### Run as
 
 **Run as** sets the identity and billing the automation runs under.
 
 - **Myself** runs incident sessions as your Factory user, using your connected tools and organization permissions.
-- A [service account](/enterprise/service-accounts) runs sessions from that account's identity and computers.
+- A [service account](/enterprise/service-accounts) runs sessions from that account's identity and computers. This is recommended for incident response so the computer and session interactivity are shared.
 
 When a service account is selected, the **Run on** picker is limited to computers owned by that service account. Use this for shared incident-response setups where the automation should always run from the same preconfigured account and machine.
 
@@ -119,7 +131,7 @@ If you select a Bring Your Own Machine (BYOM) computer, Factory warns that sessi
 
 ### Session privacy and model
 
-**Session privacy** controls who can see triggered sessions. Private sessions are visible to the run identity. Organization-visible sessions can be reviewed by other members, which is useful for incident handoff and postmortem review.
+**Session privacy** controls who can see triggered sessions. **Private** sessions are visible to the run identity. **Team** sessions can be reviewed by other members, which is useful for incident handoff and postmortem review.
 
 Use the default model unless your team has a known preference for incident analysis. For complex production incidents, choose a stronger reasoning model if available.
 
