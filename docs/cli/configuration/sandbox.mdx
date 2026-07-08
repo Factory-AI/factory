@@ -49,7 +49,7 @@ The `sandbox.mode` setting selects how isolation is applied:
 - **Execute tool** -- shell commands run inside the OS sandbox, with network routed through a filtering proxy for domain-level control
 - **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`
 - **WebSearch** -- `checkNetworkAccess()` against `allowedDomains`
-- **MCP tools** -- still enforced, but mediated by argument inspection rather than blanket-denied. Before the call runs, each argument is checked: values that parse as `http(s)` URLs go through `checkNetworkAccess()` against `allowedDomains`, and values that look like filesystem paths (by argument name, `file://`, or path form) go through `checkFileAccess()` for read and/or write. The call proceeds only if every detected path and URL passes; any violation blocks it. MCP server transports also egress through the sandbox proxy and are filtered against `allowedDomains`. Sandboxed stdio MCP servers additionally run with a scrubbed environment -- ambient variables (including host secrets) are dropped by default, keeping only a safe operational allowlist (for example `PATH`, `HOME`, `LANG`) plus any keys you set explicitly in `mcp.json`. An MCP tool still fails closed if its sandbox side-effect metadata is missing or declares an effect with no handler.
+- **MCP tools** -- run within the same sandbox boundaries as built-in tools. Any file or URL an MCP tool tries to access is checked against your filesystem and network rules, so reads or writes to protected paths and requests to domains outside `allowedDomains` are blocked. Connections to the MCP servers themselves are limited to your allowed domains as well. Locally launched (stdio) MCP servers start with a minimal environment, so your shell secrets and other ambient variables are not passed to them -- only standard operational variables (such as `PATH`, `HOME`, and `LANG`) and any values you set in `mcp.json`. An MCP tool is blocked if its access cannot be checked against your sandbox rules.
 - **Subagents (Task tool)** -- delegated subagents inherit the parent sandbox policy
 - **Hooks** -- hook commands (PreToolUse, PostToolUse, etc.) are wrapped by the sandbox and run with the same proxy/runtime env as the Execute tool; if the sandbox cannot be established the hook fails closed (non-success result) instead of running on the host
 - **Note** -- the main Droid process itself is not isolated in this mode. Use `whole-process` mode to isolate it.
@@ -64,7 +64,7 @@ The `sandbox.mode` setting selects how isolation is applied:
 **Tool policy (default-deny):**
 
 - When sandbox is enabled, a tool is allowed only if every effect it can have (filesystem, network, process, etc.) can be enforced by a sandbox policy (file access, network, or per-command Execute). Tools with an unknown or unenforceable effect are denied
-- Tools whose effects cannot be enforced locally -- such as connectors (external services) -- fail closed. MCP tools are the exception: they reach external services but are mediated by argument inspection (see above) rather than blanket-denied
+- Tools whose actions cannot be checked against your sandbox rules -- such as connectors to external services -- are blocked. MCP tools are handled separately: because their file and network access is checked against your filesystem and network rules, they stay available within those boundaries (see above)
 - These denials are **non-promptable**: user approval cannot bypass them, and they are not configurable via `allowWrite`/`allowedDomains`
 
 **Interactive permission prompts (TUI mode):**
