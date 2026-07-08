@@ -72,38 +72,6 @@ Incident Response is set up as an [automation](/web/automations) in the Factory 
   </Step>
 </Steps>
 
-## Alternative: Set up with Droid CLI
-
-Use the CLI flow when you are already in Droid and want a guided incident-channel setup.
-
-<Steps>
-  <Step title="Run the setup command">
-    In the Droid CLI, run:
-
-    ```text
-    /setup-incident-response
-    ```
-
-    If Slack is not connected yet, Droid opens the Slack OAuth flow before continuing.
-  </Step>
-
-  <Step title="Select the incident channel">
-    Choose the Slack channel that receives incident alerts. If the channel is missing, invite Factory to it with `/invite @Factory` and run the setup command again.
-  </Step>
-
-  <Step title="Select the computer">
-    Choose the computer Droid should use for incident investigations. Pick the environment with the right repository checkout, observability tools, and credentials.
-  </Step>
-
-  <Step title="Accept or edit the RCA prompt">
-    Keep the default incident prompt or add channel-specific instructions, such as which runbooks, dashboards, repositories, or escalation rules Droid should check first.
-  </Step>
-
-  <Step title="Apply and verify">
-    Confirm the setup, then send a test alert in Slack to verify that Droid starts automatically.
-  </Step>
-</Steps>
-
 ## Configuration details
 
 ### Customizing the prompt
@@ -175,7 +143,7 @@ The `incident-guidelines` runbook is stored locally at `.factory/skills/incident
 
 <AccordionGroup>
   <Accordion title="The Slack channel does not appear in the channel picker">
-    Invite Factory to the channel with `/invite @Factory`, then search for the channel again in the automation's trigger settings or re-run `/setup-incident-response`. Private channels must invite Factory explicitly.
+    Invite Factory to the channel with `/invite @Factory`, then search for the channel again in the automation's trigger settings. Private channels must invite Factory explicitly.
   </Accordion>
 
   <Accordion title="I cannot create the automation">
