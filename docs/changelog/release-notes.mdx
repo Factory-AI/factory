@@ -4,6 +4,43 @@ description: "Recent features and improvements to the Factory App, Droid CLI, an
 rss: true
 ---
 
+<Update label="July 7" rss={{ title: "CLI Updates", description: "Port-forwarding for droid computers, faster startup and search, and Windows and Linux fixes" }}>
+  `v0.167.0`
+
+## New features
+
+- **Port-forward for droid computers** - New `droid computer port-forward` command to forward ports from a droid computer to your local machine
+
+## Improvements
+
+- **Faster app startup** - Startup boot phases now run in parallel, reducing time to a usable window (app)
+- **Faster session search** - Session search is quicker and returns better-ranked results
+- **Full-screen help** - Help now opens as a full-screen overlay you can dismiss with `?` or `Esc`
+- **Slash menu filtering** - Filtered slash menu results are flattened with a clearer category block
+- **Cleaner model names** - Model names display more clearly across the app (app)
+- **Cleaner chat transcript** - Internal tool lookups no longer clutter the chat transcript (app)
+- **Update rollback** - The app can now roll back to a previous version when needed (app)
+
+## Bug fixes
+
+- **Image paste on Windows** - Fixed pasting images into the composer on Windows
+- **Safe exit during updates** - You can now exit safely while a background update is in progress
+- **SessionStart hooks** - A hung `SessionStart` hook no longer blocks session initialization
+- **Completion sound** - Restored the completion sound
+- **Windows home directory** - Fixed resolving the home directory for non-ASCII Windows usernames
+- **Draft attachments** - Draft attachments are now preserved when the screen repaints
+- **Sandboxed hooks** - Fixed hook command execution under the sandbox
+- **Detailed transcript freeze** - Capped detailed transcript tool results to stop `Ctrl+O` from freezing
+- **New session shortcut** - The new-session shortcut now ignores Shift (app)
+- **Truncated sessions** - Fixed context handling in truncated sessions
+- **Linux clipboard** - Text clipboard is now Wayland-first on Linux
+- **Special characters** - Typing `å`, `Å`, or `´` is no longer treated as an Option shortcut
+- **Unavailable tools** - Calls to unavailable tools are now clearly marked as errors
+- **Highlighted code** - Highlighted code text is now preserved (app)
+- **Airgap mode** - Improved the reliability of airgap mode (app)
+
+</Update>
+
 <Update label="July 2" rss={{ title: "CLI Updates", description: "Grouped slash commands, cloud sync control, and MCP and login fixes" }}>
   `v0.164.0`
 
