@@ -242,6 +242,35 @@ plugins/
 プラグインごとの `version` フィールドによるバージョン固定は現在サポートされていません。プラグインのバージョンを固定するには、`ref` または `sha` を使用してプラグインが含まれるマーケットプレイスを固定してください。
 </Note>
 
+## プライベート npm レジストリ認証
+
+トークンベース認証が必要なプライベートレジストリ（JFrog Artifactory、AWS CodeArtifact、GitHub Packages など）から npm パッケージとして配布するプラグインでは、プラグインソースの `authTokenEnvVar` フィールドを使って、認証トークンを保持する環境変数を指定します：
+
+```json
+{
+  "plugins": [
+    {
+      "name": "internal-tools",
+      "description": "社内ツール用プラグイン",
+      "source": {
+        "source": "npm",
+        "package": "@acme/droid-internal-tools",
+        "registry": "https://acme.jfrog.io/artifactory/api/npm/npm-virtual/",
+        "authTokenEnvVar": "JFROG_NPM_TOKEN"
+      }
+    }
+  ]
+}
+```
+
+インストール時に、Droid は指定された環境変数からトークンを読み取り、一時的な `.npmrc` にレジストリパス単位の `_authToken` エントリを書き込みます。トークンがインストール後にディスクへ永続化されることはありません。環境変数が設定されていない場合、インストールは早い段階で失敗し、どの変数を `export` すべきかを示す具体的なエラーが表示されます。
+
+オンボーディング用ドキュメントでは、必要なトークンを開発者が `export` するよう案内してください：
+
+```bash
+export JFROG_NPM_TOKEN="$(jfrog rt access-token-create --groups readers | jq -r .access_token)"
+```
+
 ## プライベートリポジトリアクセス
 
 プライベートGitリポジトリの場合、Droidが認証できることを確認します：

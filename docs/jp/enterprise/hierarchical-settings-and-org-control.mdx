@@ -87,6 +87,10 @@ User        → ~/.factory/
   任意のユーザーまたはプロジェクトが設定できる最大自律レベル。`off`、`low`、`medium`、`high` のいずれか
 </ResponseField>
 
+<ResponseField name="subagentAutonomyLevel" type="string">
+  Task ツールによって起動されるサブエージェントに適用される自律レベル。`inherit`、`off`、`low`、`medium`、`high` のいずれか。デフォルトは `inherit` で、親セッションの自律レベルにフォールバックします。明示的なレベルは `maxAutonomyLevel` によって制限されるため、エンタープライズの上限を超えることはありません。
+</ResponseField>
+
 <ResponseField name="cloudSessionSync" type="boolean">
   セッションがクラウドに同期されるかどうか
 </ResponseField>
@@ -120,7 +124,7 @@ User        → ~/.factory/
 </ResponseField>
 
 <ResponseField name="allowManagedHooksOnly" type="boolean">
-  `true` の場合、組織管理フックと組織が有効化したプラグインのフックのみが読み込まれます。ユーザーレベルおよびプロジェクトレベルで定義されたフックは無視されます。デフォルトは `false` で、すべてのレベルのフックが通常どおり参加します。[組織管理フック](/jp/reference/hooks-reference#org-managed-hooks) を参照してください。
+  `true` の場合、組織管理フックと、組織が有効にしたプラグイン由来のフックのみが読み込まれます。ユーザーレベルおよびプロジェクトレベルで定義されたフックは無視されます。デフォルトは `false` で、すべてのレベルのフックが通常どおりマージされます。[組織管理フック](/jp/reference/hooks-reference#org-managed-hooks) を参照してください。
 </ResponseField>
 
 <ResponseField name="hooks" type="object">
@@ -331,6 +335,7 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
 - `sessionDefaultSettings.model`
 - `sessionDefaultSettings.autonomyMode`
 - `maxAutonomyLevel`
+- `subagentAutonomyLevel`
 
 これにより、組織の決定（どのモデルや自律レベルが許可されているかなど）が権威を保持することが保証されます。
 
@@ -462,6 +467,7 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
     "specModeReasoningEffort": "medium"
   },
   "maxAutonomyLevel": "high",
+  "subagentAutonomyLevel": "inherit",
   "cloudSessionSync": true,
   "includeCoAuthoredByDroid": true,
   "enableDroidShield": true,

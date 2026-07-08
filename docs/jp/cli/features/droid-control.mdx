@@ -2,7 +2,7 @@
 title: Droid Control
 sidebarTitle: ドロイド制御
 description: ターミナル、ブラウザ、デスクトップの自動化。デモの記録、動作検証、QAフローの実行。
-keywords: ['droid-control', 'automation', 'demo', 'verify', 'qa-test', 'terminal', 'browser', 'recording', 'video', 'showcase', 'tuistory', 'remotion', 'tctl', 'plugin']
+keywords: ['droid-control', 'automation', 'demo', 'verify', 'qa-test', 'terminal', 'browser', 'desktop', 'desktop-control', 'cua-driver', 'computer-use', 'recording', 'video', 'showcase', 'tuistory', 'remotion', 'tctl', 'plugin']
 ---
 
 Droid Controlは、Droidsがソフトウェアを*操作*できるようにします：アプリの起動、コマンドの入力、ボタンのクリック、動作の記録、そして洗練された動画証拠の生成を行います。Droidsによって、Droidsのために作られました。
@@ -181,9 +181,9 @@ PRリファレンスをオプションのクレームと共に受け付けます
 
 ## 自動化ドライバー
 
-Droid Controlは3つの自動化バックエンドをサポートしています。対象に基づいて適切なものが自動的に選択されます。
+Droid Controlは4つの自動化バックエンドをサポートしています。対象に基づいて適切なものが自動的に選択されます。
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="tuistory" icon="terminal">
     **仮想PTY自動化。** ターミナル作業のデフォルト。asciinema録画と強制トゥルーカラー出力を備えたPlaywright風CLI。
   </Card>
@@ -192,6 +192,9 @@ Droid Controlは3つの自動化バックエンドをサポートしています
   </Card>
   <Card title="agent-browser" icon="globe">
     **ウェブとElectronアプリ。** Chrome DevTools Protocolサポートを備えたPlaywrightベースのCLI。ページをナビゲートし、フォームを記入し、ボタンをクリックし、スクリーンショットを取得。
+  </Card>
+  <Card title="desktop-control" icon="desktop">
+    **ネイティブデスクトップアプリ。** [trycua/cua](https://github.com/trycua/cua) の `cua-driver` によるアクセシビリティツリーのスナップショット、要素またはピクセル単位の操作、ウィンドウごとのスクリーンショットを、フォーカスを奪わずに実行できます。macOSとWindowsは本番対応、Linuxはプレリリースです。
   </Card>
 </CardGroup>
 
@@ -230,7 +233,7 @@ Droid Controlは3つの自動化バックエンドをサポートしています
 プラグインは3つのレイヤーからなる構成アーキテクチャを使用しています：
 
 - **オーケストレーター** -- 各リクエストを3つの独立したルックアップ（対象、ステージ、アーティファクト）を通じてルーティングし、読み込むスキルを決定します。
-- **10のアトムスキル** -- オンデマンドで読み込まれる自己完結型の背景知識で、ドライバー、対象、ステージ、ポリッシュに分割されています。
+- **11のアトムスキル** -- オンデマンドで読み込まれる自己完結型の背景知識で、ドライバー、対象、ステージ、ポリッシュに分割されています。
 - **3つのコマンド** -- 引数をコミットメントに解析し、ハイブリッドハンドオフを介してアトムに委任します。
 
 すべてのワークフローは**キャプチャ → 合成 → 検証**を通じて流れます。コマンドは*何を*生成するかを宣言し、アトムが*どのように*行うかを所有します。スキルはハードコードされたパイプラインではなく明示的なハンドオフを通じてチェーンするため、droidは自然にフローに従います。
@@ -258,6 +261,13 @@ Droid Controlは3つの自動化バックエンドをサポートしています
     ```bash
     agent-browser install   # downloads Chromium
     ```
+  </Accordion>
+  <Accordion title="ネイティブデスクトップアプリ（desktop-control）">
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/cua-driver/scripts/install.sh | bash
+    cua-driver skills install   # upstream skill pack (deep tool reference)
+    ```
+    WindowsではPowerShellで `irm https://raw.githubusercontent.com/trycua/cua/main/libs/cua-driver/scripts/install.ps1 | iex` を実行してインストールします。macOSでは追加で `cua-driver permissions grant`（アクセシビリティ + 画面収録）が必要です。
   </Accordion>
   <Accordion title="実際のターミナルエミュレータ（true-input）">
     | プラットフォーム | 必要なツール |

@@ -39,6 +39,51 @@ droid
 5. 問題のある行にインラインコメントを投稿
 6. 問題が見つからない場合は承認を送信
 
+## 認証
+
+自動レビューには、Droidを実行する権限と、プルリクエストに投稿する権限という、2種類の別々のアクセスが必要です。これらはそれぞれ独立して設定します。
+
+### 1. Factory API key（Droidを実行）
+
+DroidはFactory API keyを使用して実行されます。[app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys)でキーを作成し、`FACTORY_API_KEY`という名前のシークレットとしてリポジトリまたは組織に追加してください。ワークフローでは次のように渡します：
+
+```yaml
+- uses: Factory-AI/droid-action@main
+  with:
+    factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+```
+
+これはすべての実行で必須です。
+
+### 2. GitHub access（レビューを投稿）
+
+PRにコメントや承認を残すには、DroidにGitHub tokenが必要です。指定方法は2つあります：
+
+- **Factory Droid GitHub App（デフォルト、推奨）**。tokenを指定しない場合、actionはインストール済みのFactory Droid GitHub App用のtokenを安全に要求します。ほとんどのチームではこれだけで十分です。[app.factory.ai/settings/organization](https://app.factory.ai/settings/organization)から対象のリポジトリにAppをインストールすれば完了です。actionがtokenを要求できるように、`id-token: write` 権限が必要です：
+
+  ```yaml
+  permissions:
+    contents: write
+    pull-requests: write
+    issues: write
+    id-token: write # GitHub App認証に必須
+  ```
+
+- **独自のtoken（オーバーライド）**。GitHub Enterpriseで利用する場合や、どのアカウントでコメントを投稿するかを制御したい場合など、personal access tokenや独自のGitHub Appを使いたいなら、`github_token`として渡します。設定すると、Droidはそのtokenを直接使用し、Appはスキップされます。このtokenにはpull requestとrepository contentsへの書き込み権限が必要です。
+
+  ```yaml
+  - uses: Factory-AI/droid-action@main
+    with:
+      factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+      github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+  ```
+
+<Note>
+  GitLabでも必要な要素は同じです。`FACTORY_API_KEY`と`GITLAB_TOKEN`をCI/CD変数として設定してください。`/install-code-review`フローが両方を設定します。
+</Note>
+
+GitHub Appのセキュリティアーキテクチャについては、[GitHub統合セキュリティ](/enterprise/github-integration-security)を参照してください。
+
 ## レビューの深度
 
 `review_depth` 入力は各レビューの徹底さとコストを制御します。`/install-code-review` セットアップ時に深度を選択するか、ワークフローで直接設定します。

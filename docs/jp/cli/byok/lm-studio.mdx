@@ -1,0 +1,72 @@
+---
+title: "LM Studio"
+description: LM StudioでOpenAI互換のローカルモデルを実行する
+keywords: ['lm studio', 'local', 'byok', 'openai compatible', 'offline', 'self-hosted']
+---
+
+LM StudioのOpenAI互換ローカルサーバーを使って、自分のハードウェア上でモデルをローカル実行します。
+
+<Note>
+  **パフォーマンスに関する注意**: 300億パラメータ未満のモデルは、エージェント型コーディングタスクで大幅に低い性能を示しています。小型モデルは実験や学習には役立ちますが、本番のコーディング作業や複雑なソフトウェアエンジニアリングタスクには一般的に推奨されません。
+</Note>
+
+## 設定
+
+`~/.factory/settings.json` に追加：
+
+```json
+{
+  "customModels": [
+    {
+      "model": "google/gemma-4-e4b",
+      "displayName": "Gemma 4 E4B [LM Studio]",
+      "baseUrl": "http://localhost:1234/v1",
+      "apiKey": "not-needed",
+      "provider": "openai",
+      "maxOutputTokens": 16000
+    }
+  ]
+}
+```
+
+`model` は、LM Studioのローカルサーバーに表示される正確なモデル識別子に置き換えてください。
+
+## セットアップ
+
+<Warning>
+  **コンテキストウィンドウ設定**: Factoryで最適なパフォーマンスを得るには、サーバーを起動する前にLM Studioでモデルのコンテキストウィンドウを少なくとも32,000トークンに設定してください。十分なコンテキストがない場合、体験は大幅に低下します。
+</Warning>
+
+1. [lmstudio.ai](https://lmstudio.ai) からLM Studioをインストール
+2. Qwen Coder などのコーディングモデル、または別のOpenAI互換チャットモデルをダウンロード
+3. LM Studioで **Developer** タブを開く
+4. モデルをロードし、ローカルサーバーを起動
+5. サーバーが `http://localhost:1234/v1` で実行されていることを確認
+6. 上記の設定をFactory設定に追加
+
+## モデル ID の確認
+
+LM Studioは、OpenAI互換APIを通じてロード済みモデルを公開します：
+
+```bash
+curl http://localhost:1234/v1/models
+```
+
+返された `id` の値を、Factory設定の `model` として使用してください。
+
+## トラブルシューティング
+
+### ローカルサーバーが接続できない
+- LM Studioの **Developer** タブからローカルサーバーが実行中であることを確認
+- サーバーポートが `baseUrl` と一致していることを確認（通常は `1234`）
+- 接続テストとして `curl http://localhost:1234/v1/models` を試す
+
+### モデルが見つからない
+- Factoryから使用する前に、LM Studioでモデルをロード
+- `curl http://localhost:1234/v1/models` で正確なモデル ID を確認
+
+## 注意事項
+
+- LM StudioのローカルAPIは認証を必要としないため、`apiKey` には任意のプレースホルダー値を使用できます
+- Base URL の形式: `http://localhost:1234/v1`
+- LM StudioのOpenAI互換エンドポイントでは `openai` プロバイダーを使用します
