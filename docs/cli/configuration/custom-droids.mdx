@@ -6,7 +6,7 @@ keywords: ['subagents', 'custom droids', 'agents', 'specialized agents', 'delega
 
 A **subagent** is a separate agent that Droid launches through the **Task** tool to handle a focused piece of work. Each subagent runs in its own context window and its own session, with its own system prompt, tool policy, model, and autonomy level. When it finishes, it returns a single final message to the parent agent.
 
-Subagents come in two flavors:
+There are two kinds of subagents:
 
 - **Built-in subagents** – `worker` and `explorer`, available out of the box.
 - **Custom droids** – reusable subagents you define as Markdown files, so you can capture team-specific review, testing, research, or release checklists as code and hand them off with a single call.
@@ -109,7 +109,7 @@ Subagents run at an autonomy level just like the main session (`Off`, `Low`, `Me
 
 Notes:
 
-- The resolved level is always **clamped to the organization's Maximum Autonomy Level** — an explicit setting can never exceed the enterprise cap.
+- The resolved level is always clamped to the organization's **Maximum Autonomy Level**, so an explicit setting can never exceed the enterprise cap.
 - When the parent session is in **Spec Mode**, subagents are restricted to read-only operations and low-risk shell commands; file edits and file creation are disabled.
 - On `resume`, a subagent's autonomy level is realigned to the parent's current level for the follow-up turn.
 
