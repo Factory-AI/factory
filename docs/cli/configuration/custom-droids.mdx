@@ -110,7 +110,7 @@ Subagents run at an autonomy level just like the main session (`Off`, `Low`, `Me
 Notes:
 
 - The resolved level is always **clamped to the organization's Maximum Autonomy Level** — an explicit setting can never exceed the enterprise cap.
-- When the parent session is in **Spec Mode**, subagents are restricted to read-only operations and low-risk shell commands; file edits, file creation, and spawning further subagents are disabled.
+- When the parent session is in **Spec Mode**, subagents are restricted to read-only operations and low-risk shell commands; file edits and file creation are disabled.
 - On `resume`, a subagent's autonomy level is realigned to the parent's current level for the follow-up turn.
 
 ---
@@ -429,7 +429,7 @@ Common unmapped tools:
 - **Resume for follow-ups** – reuse an existing subagent's context by passing `resume` with its `task_id` instead of starting over.
 - **Structure output** – organize the prompt to emit sections like `Summary:` and `Findings:` so the Task tool UI can summarize results clearly.
 - **Share and collaborate** – check `.factory/droids/*.md` into your repo so teammates can use shared droids, and version-control prompt updates like code.
-- **Leverage Claude Code agents** – import your existing Claude Code agents (see the "Importing Claude Code subagents" section below) to reuse them as custom droids in Factory.
+- **Leverage Claude Code agents** – import your existing Claude Code agents (see the "Importing Claude Code subagents" section above) to reuse them as custom droids in Factory.
 
 ---
 
