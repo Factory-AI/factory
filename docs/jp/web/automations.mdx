@@ -1,0 +1,115 @@
+---
+title: Automations
+description: ソフトウェアデリバリーライフサイクル全体でワークフローを実行する Factory の自動化を作成・管理します。
+keywords: ['automations', 'software factory', 'scheduled automations', 'slack automations', 'github automations', 'code review', 'qa', 'autowiki', 'security audit', 'triage']
+---
+
+Automations は、繰り返し発生するエンジニアリング作業で Droid をチームメイトのように活用できるようにします。スケジュール、Slack メッセージ、GitHub イベントから実行でき、コードレビュー、QA、AutoWiki、セキュリティ監査、トリアージ、インシデント対応、Slack からの依頼受付、定期チェックをカバーします。
+
+<Frame>
+  <img src="/images/automations-list.png" alt="Factory App の Automations 一覧" />
+</Frame>
+
+## Automations とは
+
+自動化には次の要素があります。
+
+- **トリガー**: 開始するタイミング。
+- **指示**: Droid に委任するプロンプト。
+- **実行ターゲット**: Droid が実行される場所。たとえばコンピューター、Slack チャンネル、GitHub workflow など。
+- **公開範囲**: 閲覧または管理できるユーザー。
+
+### Automations を使うタイミング
+
+ワークフローを繰り返し実行したいとき、イベントを起点に開始したいとき、または毎回手動で処理するのではなくチームで共有したいときに Automations を使用します。
+
+## Automations の使い方
+
+### 自分の自動化を表示する
+
+Factory App のサイドバーで **Software Factory** 配下の [**All Automations**](https://app.factory.ai/automations) を開きます。一覧では次のことができます。
+
+- タイトル、説明、SDLC ステージで検索する。
+- **Private** と **Shared** を切り替える。
+- **Scheduled**、**Slack**、**GitHub** のトリガー種別で絞り込む。
+- 所有者、ステータス、実行ターゲット、SDLC ステージを確認する。
+
+### 新しい自動化を作成する
+
+**New automation** をクリックし、テンプレートを選択します。Software Factory テンプレートは SDLC ステージに対応しており、カスタムテンプレートは独自のトリガーやワークフローを作るための柔軟な出発点になります。
+
+<Frame>
+  <img src="/images/automations-templates.png" alt="自動化テンプレートギャラリー" />
+</Frame>
+
+#### Software Factory テンプレート
+
+Software Factory の特定の SDLC ステージに自動化を追加するには、これらのテンプレートを使用します。
+
+| テンプレート | 用途 |
+| --- | --- |
+| **Code Review** | PR を自動でレビューします。 |
+| **QA** | QA チェックを生成して実行します。 |
+| **AutoWiki** | リポジトリドキュメントを更新します。 |
+| **Security Audit** | スケジュールに従って詳細なセキュリティレビューを実行します。 |
+| **Triage** | インテークソースをスキャンして作業を振り分けます。 |
+| **Incident Response** | Slack チャンネルからのアラートを調査します。 |
+
+#### カスタムテンプレート
+
+独自のチャンネル、スケジュール、GitHub イベントに基づく自動化を作成するには、これらのテンプレートを使用します。
+
+| テンプレート | 用途 |
+| --- | --- |
+| **Slack** | Slack メッセージから Droid セッションを開始します。 |
+| **Scheduled** | 定期スケジュールでプロンプトを実行します。 |
+| **GitHub** | カスタム GitHub workflow イベントから Droid を実行します。 |
+
+### トリガーを設定する
+
+テンプレートを選択すると、Factory がトリガーと実行先に合わせて設定項目を調整します。
+
+<Frame>
+  <img src="/images/automations-slack-create.png" alt="Slack 自動化の作成フォーム" />
+</Frame>
+
+| トリガー種別 | 設定内容 |
+| --- | --- |
+| **Scheduled** | スケジュール、プロンプト、実行ターゲット、モデル、必要に応じて作業ディレクトリ。 |
+| **Slack** | チャンネル、メッセージソース、プロンプト、実行ターゲット、公開範囲、キーワード、モデル。 |
+| **GitHub** | リポジトリ、イベント、workflow 設定、テンプレート固有のオプション。 |
+
+### 自動化を管理する
+
+自動化の行を選択すると詳細ビューが開きます。トリガー種別と権限に応じて、今すぐ実行、一時停止、再開、共有、フォーク、名前変更、編集、削除ができます。
+
+## 自動化の設定
+
+### トリガー種別
+
+トリガー種別は、自動化を開始する条件と、Droid が受け取るコンテキストを定義します。
+
+- **Scheduled automations** は、自然言語または cron のスケジュールでプロンプトを実行します。
+- **Slack automations** は、設定した Slack チャンネルからセッションを開始します。メッセージソースやキーワードでトリガーを制限できます。
+- **GitHub automations** は、GitHub workflow ファイルを通じて実行され、pull request、push、コメント、ラベル、check などのイベントに応答できます。
+
+### 実行ターゲット、ID、モデル
+
+実行設定を使うと、自動化を Droid がどのように実行するかを制御できます。
+
+- **Run as**: 自動化を実行するユーザーまたはサービスアカウント。
+- **Run on**: Droid が実行されるコンピューター。
+- **Model**: 自動化の実行に使用するモデル。
+
+共有のチームワークフローでは、実行を安定した ID と環境で維持するために、[サービスアカウント](/jp/enterprise/service-accounts) と [Droid Computers](/jp/cli/features/droid-computers) を使用します。
+
+### 公開範囲と所有者
+
+- **Private** 自動化は所有者のみが閲覧できます。
+- **Shared** 自動化は組織内に公開されます。
+- 所有者は自動化の編集、共有、一時停止、再開、削除ができます。
+- 所有者以外は、自分用のコピーが必要な場合に共有自動化をフォークできます。
+
+### 実行履歴とダッシュボード
+
+自動化の詳細ビューには最近の実行とステータスが表示されます。Scheduled 自動化では、表、グラフ、要約など、自動化が生成した視覚的なダッシュボード出力も表示できます。
