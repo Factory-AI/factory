@@ -110,7 +110,7 @@ With the sandbox enabled, a tool runs only if the sandbox can check everything i
 - **Execute tool** -- shell commands run inside the OS sandbox, with network routed through a filtering proxy for domain-level control
 - **FetchUrl** -- network requests are checked against `allowedDomains`
 - **WebSearch** -- network requests are checked against `allowedDomains`
-- **MCP tools** -- filesystem and network requests are checked; locally launched servers receive a minimal environment so host secrets are not exposed
+- **MCP tools** -- filesystem and network requests are checked; locally launched servers receive a minimal environment (ambient host environment variables are dropped, keeping only a safe operational allowlist plus keys set in `mcp.json`)
 - **Subagents (Task tool)** -- delegated subagents inherit the parent sandbox policy
 - **Hooks** -- hook commands (PreToolUse, PostToolUse, etc.) are wrapped by the sandbox and run with the same proxy/runtime env as the Execute tool; if the sandbox cannot be established the hook is blocked instead of running on the host
 
@@ -143,7 +143,7 @@ Sandboxing reduces the impact of a mistake or a prompt-injection attack, but it 
 
 - **Allowed network egress can still leak data.** Every domain in `allowedDomains` is a channel through which data the agent can read might leave. Keep the allowlist as narrow as your workflow permits.
 - **A writable path can still be modified.** The sandbox limits *where* writes land, not *what* is written within the allowed paths -- including your own project code under the working directory.
-- **Your settings files are protected.** A sandboxed process can never write to Droid's own configuration (e.g. `settings.json`), so it cannot modify its own sandbox policy. 
+- **Your settings files are protected.** Sandboxed tool processes cannot write to Droid's own configuration files (e.g. `settings.json`), so they cannot silently change sandbox policy.
 
 Treat Sandbox as defense in depth alongside [Autonomy Level](/cli/user-guides/auto-run) approvals and human review, not as a hard boundary around untrusted code. To evaluate code you do not trust, run Droid inside a container or a dedicated virtual machine.
 
