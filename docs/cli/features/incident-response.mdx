@@ -6,7 +6,7 @@ keywords:
     "incident response",
     "RCA",
     "root cause analysis",
-    "Slack auto-run",
+    "automations",
     "Slack incidents",
     "alerts",
     "incident channel",
@@ -14,25 +14,21 @@ keywords:
   ]
 ---
 
+<Info>
+  Incident Response is in private preview. To request access, fill out the form at [factory.ai/contact](https://factory.ai/contact) or contact your Factory account team.
+</Info>
+
 ## Overview
 
-When an alert lands in a configured Slack channel, Factory automatically starts a linked Droid session so Droid can investigate the incident with the right context, machine, and instructions.
+When an alert lands in a configured Slack channel, an Incident Response automation automatically starts a linked Droid session so Droid can investigate the incident with the right context, machine, and instructions.
 
 Droid can work toward an RCA, open a PR for a fix when appropriate, and update an incident runbook so future investigations of the same alert type start faster.
 
-<Warning>
-  Configuring Factory channel auto-run requires a Factory **Owner** or **Manager** role.
-</Warning>
-
 ## Quickstart: set up from the Factory App
 
-Use the web UI when you want to review all Slack channel settings in one place.
+Incident Response is set up as an [automation](/web/automations) in the Factory App.
 
 <Steps>
-  <Step title="Open the Slack Channels settings">
-    In the Factory App, go to **Settings → Integrations → Slack**. If you have not connected Slack yet, set up the [Slack integration](/integrations/slack) first, then open the Slack management view and select the **Channels** tab.
-  </Step>
-
   <Step title="Invite Factory to the incident channel">
     In Slack, open the channel where alert bots post incidents and run:
 
@@ -40,70 +36,55 @@ Use the web UI when you want to review all Slack channel settings in one place.
     /invite @Factory
     ```
 
-    Only channels where Factory has been invited appear in the channel list.
+    If you have not connected Slack yet, set up the [Slack integration](/integrations/slack) first. Only channels where Factory has been invited appear in the channel picker.
   </Step>
 
-  <Step title="Enable Auto-Backlink for the channel">
-    In **Select Auto-Backlinked Channels**, search for the incident channel and turn on **Auto-Backlink**. This links Slack messages in that channel back to Factory sessions and expands the channel settings.
+  <Step title="Create a new automation">
+    In the Factory App, open [**All Automations**](https://app.factory.ai/automations) under **Software Factory** in the sidebar and click **New automation**.
   </Step>
 
-  <Step title="Choose who the channel runs as">
-    If the **Run as** row appears, leave it set to **Factory user** or select a service account. Service accounts use their own computers and run identity, so choose one when you want incident sessions to run from a shared, preconfigured account.
+  <Step title="Choose the Incident Response template">
+    From the template gallery, select the **Incident Response** template under Software Factory templates.
+
+    <Frame>
+      <img src="/images/incident-response-templates.png" alt="Automation template gallery with the Incident Response template" />
+    </Frame>
   </Step>
 
-  <Step title="Choose the session target">
-    Select the **Machine Type** and target Droid should use. Most orgs use **Computer**; some orgs can choose **Cloud** or **Computer**. If you select a service account, Machine Type is locked to **Computer** and the **Computer** picker only shows computers owned by that service account.
+  <Step title="Name the automation and select trigger channels">
+    Give the automation a name, then under **Triggers**, search for and select the incident channel. **Trigger on messages from** defaults to **Bots only**, which matches alert bots posting incidents; change it only if humans should also trigger investigations.
+
+    <Frame>
+      <img src="/images/incident-response-create.png" alt="New Incident Response automation form" />
+    </Frame>
   </Step>
 
-  <Step title="Turn on Auto-Run">
-    Enable **Auto-Run**. This lets Factory start a Droid session automatically when an incident alert arrives. If Auto-Run cannot be enabled, select or create the required computer or workspace first.
+  <Step title="Choose Account and Computer">
+    - **Run as** sets the identity and billing the automation runs under. A [service account](/enterprise/service-accounts) is recommended for incident response so the computer and session interactivity are shared across the team.
+    - **Run on** sets the computer where Droid investigates. Pick the computer with the right repositories, observability tools, and anything else you want to add that can help the agent. Learn more about Droid Computers [here](/cli/features/droid-computers).
   </Step>
 
-  <Step title="Tune visibility, model, and prompt">
-    Choose the session owner when using **Factory user**, set whether sessions are private or visible to the organization, optionally select a model, and set the custom incident prompt.
+  <Step title="Configure MCP servers">
+    Use **Configure MCP Servers** to add and authenticate the observability tools and context sources Droid needs to respond to incidents. MCP servers are configured per computer and **require connection to the computer to set up**; if you have issues, retry a few times or change the computer.
+  </Step>
 
-    A good starting prompt is:
+  <Step title="Review the prompt and model">
+    The template pre-fills a prompt that is injected into every session triggered from the channel:
 
     ```text
     Use the `/incident` skill for Slack incidents and run an RCA if applicable.
     If the thread message is an incident or asking for RCA/root-cause analysis, invoke the `incident` skill before investigating.
     ```
+
+    Keep the default or add channel-specific instructions, and optionally select a model.
+  </Step>
+
+  <Step title="Set session privacy and create">
+    Choose whether triggered sessions are visible to your **Team** or **Private**, review any **Additional Settings**, then click **Create**.
   </Step>
 
   <Step title="Send a test alert">
-    Post a test top-level alert from the same kind of bot that will send real incidents. Confirm Factory starts an auto-run Droid session and links it from the Slack thread.
-  </Step>
-</Steps>
-
-## Alternative: Set up with Droid CLI
-
-Use the CLI flow when you are already in Droid and want a guided incident-channel setup.
-
-<Steps>
-  <Step title="Run the setup command">
-    In the Droid CLI, run:
-
-    ```text
-    /setup-incident-response
-    ```
-
-    If Slack is not connected yet, Droid opens the Slack OAuth flow before continuing.
-  </Step>
-
-  <Step title="Select the incident channel">
-    Choose the Slack channel that receives incident alerts. If the channel is missing, invite Factory to it with `/invite @Factory` and run the setup command again.
-  </Step>
-
-  <Step title="Select the computer">
-    Choose the computer Droid should use for incident investigations. Pick the environment with the right repository checkout, observability tools, and credentials.
-  </Step>
-
-  <Step title="Accept or edit the RCA prompt">
-    Keep the default incident prompt or add channel-specific instructions, such as which runbooks, dashboards, repositories, or escalation rules Droid should check first.
-  </Step>
-
-  <Step title="Apply and verify">
-    Confirm the setup, then send a test alert in Slack to verify that Droid starts automatically.
+    Post a test top-level alert from the same kind of bot that will send real incidents. Confirm the automation starts a Droid session and links it from the Slack thread. You can review runs from the automation's detail view.
   </Step>
 </Steps>
 
@@ -111,65 +92,39 @@ Use the CLI flow when you are already in Droid and want a guided incident-channe
 
 ### Customizing the prompt
 
-The channel prompt is injected into every auto-run session for that channel. Keep it specific to incident work:
+The automation prompt is injected into every session triggered from the channel. Keep it specific to incident work:
 
 - Tell Droid to run RCA and use the `/incident` workflow when appropriate.
 - Mention the primary services or repositories for that channel.
 - Point Droid at runbooks, dashboards, or common alert sources.
 - State escalation expectations, such as when to summarize uncertainty instead of taking action.
 
-Avoid prompts that make the channel a general-purpose automation surface. Incident Response works best when the prompt is narrow and operational.
+Avoid prompts that make the automation a general-purpose Slack surface. Incident Response works best when the prompt is narrow and operational. For broader Slack workflows, create a separate [Slack automation](/web/automations) instead.
 
-### Channel selection
+### Channel selection and trigger source
 
-Incident Response is designed for channels where incident alerts arrive as top-level messages. Thread replies are not used to start new auto-run sessions, which prevents ordinary discussion from repeatedly launching Droids.
+Incident Response is designed for channels where incident alerts arrive as top-level messages. Thread replies are not used to start new sessions, which prevents ordinary discussion from repeatedly launching Droids.
 
 For best results, use a dedicated channel such as `#incidents`, `#alerts-production`, or a service-specific incident channel.
 
-The Slack Channels settings table only shows channels where Factory has been invited. Enable **Auto-Backlink** for the channel first, then expand the row to configure Auto-Run.
+The channel picker only shows channels where Factory has been invited. **Trigger on messages from** defaults to **Bots only** so ordinary messages in the channel do not trigger investigations; widen it only if humans should also be able to start incident sessions.
 
-### Run as
+### Session privacy and model
 
-The **Run as** picker appears when service account channel delegation is available for your organization.
-
-- **Factory user** uses the configured session owner for Auto-Run sessions.
-- A service account uses that service account's identity and computers.
-
-When a service account is selected, Factory locks **Machine Type** to **Computer**, hides the session owner row, and limits the computer picker to computers owned by that service account. Use this for shared incident-response setups where the channel should always run from the same preconfigured account and machine.
-
-### Session owner
-
-When **Run as** is set to **Factory user**, the session owner determines the Factory user identity used by the Auto-Run session. Choose an owner whose connected tools and organization permissions are appropriate for incident investigation.
-
-If a session fails because the owner cannot be found or lacks access, update the channel settings to use a current user with the right permissions.
-
-### Machine target
-
-The selected computer or workspace is where Droid runs the investigation. In the channel settings, choose **Machine Type**, then select the target **Computer** or **Workspace**. Auto-Run requires a selected target before it can be enabled.
-
-The target should have:
-
-- The relevant repositories available.
-- Required package managers and CLIs installed.
-- Authenticated access to observability, incident, and source-control systems.
-- Safe permissions for the actions Droid may need to take during RCA.
-
-Use [Droid Computers](/cli/features/droid-computers) when the incident workflow depends on a persistent environment with preconfigured tools.
-
-If you select a Bring Your Own Machine (BYOM) computer, Factory warns that session output, including machine information, may be posted back to the Slack channel.
-
-### Visibility and model
-
-Private sessions are visible to the session owner. Organization-visible sessions can be reviewed by other members, which is useful for incident handoff and postmortem review.
+**Session privacy** controls who can see triggered sessions. **Private** sessions are visible to the run identity. **Team** sessions can be reviewed by other members, which is useful for incident handoff and postmortem review.
 
 Use the default model unless your team has a known preference for incident analysis. For complex production incidents, choose a stronger reasoning model if available.
+
+### Managing the automation
+
+Open the automation from [**All Automations**](https://app.factory.ai/automations) to see recent runs and statuses. Depending on your permissions, you can run now, pause, resume, share, fork, rename, edit, or delete the automation. Pause the automation instead of deleting it when you want to temporarily stop incident sessions.
 
 ## How the incident flow works
 
 Once configured, Incident Response follows this flow:
 
 1. An alert bot posts a top-level message in the configured Slack channel.
-2. Factory starts a Droid session using the channel's run identity, target machine, visibility, model, and prompt.
+2. The automation starts a Droid session using its run identity, computer, session privacy, model, and prompt.
 3. Droid receives the Slack alert context and checks for any matching `incident-guidelines` runbook guidance.
 4. Droid investigates with the configured tools and should invoke the `/incident` workflow when RCA is appropriate.
 5. Factory posts status and session links back into Slack, and Droid can save reusable learnings for similar incidents.
@@ -179,24 +134,20 @@ The `incident-guidelines` runbook is stored locally at `.factory/skills/incident
 ## Troubleshooting
 
 <AccordionGroup>
-  <Accordion title="The Slack channel does not appear in Factory">
-    Invite Factory to the channel with `/invite @Factory`, then refresh the Slack settings or re-run `/setup-incident-response`. Private channels must invite Factory explicitly.
+  <Accordion title="The Slack channel does not appear in the channel picker">
+    Invite Factory to the channel with `/invite @Factory`, then search for the channel again in the automation's trigger settings. Private channels must invite Factory explicitly.
   </Accordion>
 
-  <Accordion title="I cannot enable or edit channel settings">
-    You need a Factory Manager or Owner role to configure Slack auto-run settings. Ask an org owner to update your role or perform the setup.
-  </Accordion>
-
-  <Accordion title="Auto-Run cannot be enabled">
-    Make sure the channel has a selected computer or workspace. If **Run as** is set to a service account, that service account must own at least one computer.
+  <Accordion title="I cannot create the automation">
+    Make sure the automation has a selected **Run on** computer. If **Run as** is set to a service account, that service account must be active and own at least one computer.
   </Accordion>
 
   <Accordion title="No session starts after a test message">
-    Confirm the message is a top-level alert in the configured channel, not a thread reply. For the incident setup flow, alert bot messages are the expected trigger.
+    Confirm the message is a top-level alert in the configured channel, not a thread reply, and that the sender matches the **Trigger on messages from** setting. Also check that the automation is not paused.
   </Accordion>
 
   <Accordion title="Droid starts but cannot investigate the issue">
-    Check that the selected machine has the right repository, tooling, and credentials. Update the channel prompt with links to runbooks or dashboards Droid should use first.
+    Check that the selected computer has the right repository, tooling, and credentials. Update the automation prompt with links to runbooks or dashboards Droid should use first.
   </Accordion>
 
   <Accordion title="The RCA is too generic">
@@ -206,6 +157,7 @@ The `incident-guidelines` runbook is stored locally at `.factory/skills/incident
 
 ## See also
 
+- [Automations](/web/automations) -- Create and manage automations across your software delivery lifecycle.
 - [Slack integration](/integrations/slack) -- Connect Factory to Slack and invite Factory to channels.
 - [Autonomy Level](/cli/user-guides/auto-run) -- Understand how Droid runs work without repeated approvals.
 - [Droid Computers](/cli/features/droid-computers) -- Configure persistent environments for investigations.
