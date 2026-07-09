@@ -24,9 +24,45 @@ keywords:
 
 OS-level sandboxing lets users set filesystem and network boundaries for Droid. In the Beta version, all shell commands initiated by Droid run in a separate process that is limited to the filesystem and network boundaries configured by users and enforced at the OS kernel level.
 
-Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp on Linux, and an HTTP/SOCKS proxy for domain-level network filtering. Windows is supported via WSL2.
+## How OS-level isolation works
 
-## Default access policies (when sandbox is enabled)
+Sandbox enforces its filesystem and network boundaries with the same operating-system primitives the OS uses to confine untrusted software, so a blocked read, write, or connection is denied by the kernel rather than relying on Droid to police itself:
+
+- **macOS** -- Seatbelt (the built-in macOS sandbox) profiles restrict filesystem and process access.
+- **Linux and WSL2** -- [bubblewrap](https://github.com/containers/bubblewrap) with a seccomp filter provides the same confinement.
+- **Network (all platforms)** -- outbound traffic is routed through an HTTP/SOCKS filtering proxy that permits only the allowed domains (Factory's own domains are always allowed).
+
+Because Sandbox relies on these host primitives, it blocks rather than running without isolation when they are unavailable.
+
+## Isolation modes
+
+The `sandbox.mode` setting selects *what* is placed inside the OS boundary. Both modes enforce the same default policies and configuration; they differ only in scope.
+
+|                                   | `per-command` (default)                          | `whole-process`                            |
+| --------------------------------- | ------------------------------------------------ | ------------------------------------------ |
+| **Runs inside the OS sandbox**    | Each shell command and its child processes       | The entire Droid process                   |
+| **MCP servers, hooks, subagents** | Wrapped or checked against your policy per call  | Isolated inside the process boundary       |
+| **Main Droid process**            | Not isolated                                     | Isolated                                   |
+| **If isolation is unavailable**   | The affected command or hook is blocked          | Droid refuses to start                     |
+
+- **`per-command`** runs each Droid-initiated action through the sandbox individually. Shell commands (and their child processes) are confined at the OS level; other tools are mediated by policy checks before each call. The main Droid process itself is not isolated.
+- **`whole-process`** launches the entire Droid process inside the OS sandbox, so the main process and everything it spawns (MCP transports, subagents) is isolated too. Its own network requests -- not just those from the Execute tool -- are filtered against `allowedDomains`, with interactive domain prompts in TUI mode. If the sandbox cannot be established at startup (unsupported platform or a failed isolation check), Droid refuses to start rather than running unsandboxed.
+
+## Enable and configure the sandbox
+
+Set `sandbox.enabled` to `true` in your settings to turn on the sandbox:
+
+```jsonc
+{
+  "sandbox": {
+    "enabled": true
+  }
+}
+```
+
+Once enabled, the default policies below apply immediately -- no other configuration is required to start. Settings resolve across the hierarchy (org > project > user), so you can enable the sandbox for yourself (user settings), a repository (project settings), or everyone (organization settings).
+
+### Default access policies
 
 | Resource        | Default policy                                                                                                            | Configurable via                                                |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -34,70 +70,7 @@ Under the hood, Sandbox uses Seatbelt profiles on macOS, bubblewrap with seccomp
 | **File writes** | Deny all except **CWD** (current working directory). Additional paths can be allowed. `denyWrite` overrides `allowWrite`. | `sandbox.filesystem.allowWrite`, `sandbox.filesystem.denyWrite` |
 | **Network**     | Deny all except Factory's own domains (always allowed by default). Additional domains must be explicitly allowed.          | `sandbox.network.allowedDomains`                                |
 
-## Sandbox modes
-
-The `sandbox.mode` setting selects how isolation is applied:
-
-- **`per-command`** (default) -- only Droid-initiated shell commands and tool operations are sandboxed.
-- **`whole-process`** -- the entire Droid process is launched inside the OS sandbox, extending isolation to the main process, MCP stdio transports, and subagents.
-
-## What's included
-
-**Per-command sandbox mode** (`mode: "per-command"`, default when enabled):
-
-- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- checked before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes
-- **Execute tool** -- shell commands run inside the OS sandbox, with network routed through a filtering proxy for domain-level control
-- **FetchUrl** -- `checkNetworkAccess()` against `allowedDomains`
-- **WebSearch** -- `checkNetworkAccess()` against `allowedDomains`
-- **MCP tools** -- still enforced, but mediated by argument inspection rather than blanket-denied. Before the call runs, each argument is checked: values that parse as `http(s)` URLs go through `checkNetworkAccess()` against `allowedDomains`, and values that look like filesystem paths (by argument name, `file://`, or path form) go through `checkFileAccess()` for read and/or write. The call proceeds only if every detected path and URL passes; any violation blocks it. MCP server transports also egress through the sandbox proxy and are filtered against `allowedDomains`. An MCP tool still fails closed if its sandbox side-effect metadata is missing or declares an effect with no handler.
-- **Subagents (Task tool)** -- delegated subagents inherit the parent sandbox policy
-- **Note** -- the main Droid process itself is not isolated in this mode. Use `whole-process` mode to isolate it.
-
-**Whole-process sandbox mode** (`mode: "whole-process"`):
-
-- At startup the entire Droid process is re-executed inside the OS sandbox, so the main process, MCP stdio transports, and subagent lifecycles all run within the configured filesystem and network boundaries
-- Network requests made directly by the Droid process (not only those from the Execute tool) are filtered against `allowedDomains`, with interactive domain prompts in TUI mode
-- **Fails closed** -- if the secure runtime cannot be established at startup (unsupported platform, missing sandbox support, or a failed isolation check), Droid refuses to start rather than running unsandboxed
-- Default access policies, filesystem and network configuration, and allow-always persistence behave the same as per-command mode
-
-**Tool policy (default-deny):**
-
-- When sandbox is enabled, a tool is allowed only if every effect it can have (filesystem, network, process, etc.) can be enforced by a sandbox policy (file access, network, or per-command Execute). Tools with an unknown or unenforceable effect are denied
-- Tools whose effects cannot be enforced locally -- such as connectors (external services) -- fail closed. MCP tools are the exception: they reach external services but are mediated by argument inspection (see above) rather than blanket-denied
-- These denials are **non-promptable**: user approval cannot bypass them, and they are not configurable via `allowWrite`/`allowedDomains`
-
-**Interactive permission prompts (TUI mode):**
-
-- Sandbox violations interrupt the agent loop with a TUI prompt, even at Auto (High) autonomy
-- Three options: **Allow once**, **Allow always** (persists to settings), **Deny**
-- For `denyWrite` violations: "Remove from deny list" option instead of "Allow always" (removes the entry from `denyWrite` in settings)
-- For `denyRead` violations: "Remove from deny list" option instead of "Allow always"
-- For Execute network violations: real-time domain prompts via SRT's proxy callback with 60s auto-deny timeout
-
-**Non-interactive mode (`droid exec`):**
-
-- Sandbox violations are auto-denied without prompting -- no hang, no user interaction required
-- The agent receives a denial message and reports it in the output
-
-**Allow-always persistence:**
-
-- File write violations (outside CWD): adds parent directory to `sandbox.filesystem.allowWrite` in user settings
-- `denyWrite` violations: removes the entry from `sandbox.filesystem.denyWrite`
-- `denyRead` violations: removes the entry from `sandbox.filesystem.denyRead`
-- Domain violations: adds domain (with wildcard for 3+ part domains, e.g. `registry.npmjs.org` -> `*.npmjs.org`) to `sandbox.network.allowedDomains`
-- Changes take effect immediately in the current session
-
-**Org-managed enforcement:**
-
-- Org-level `denyWrite`/`denyRead` settings cannot be overridden by user "Allow always"
-- Violation prompt shows "(organization policy)" when the deny comes from org settings
-
-**TUI indicators:**
-
-- `SANDBOX` status indicator in footer when sandbox is enabled
-- "Sandbox Violation" prompt with violation details (path, domain, reason)
-
-## Settings config
+### Full settings reference
 
 ```jsonc
 {
@@ -122,6 +95,57 @@ The `sandbox.mode` setting selects how isolation is applied:
 ```
 
 Settings merge across the hierarchy (org > project > user). `denyWrite`/`denyRead` use union merge -- org denies cannot be removed downstream.
+
+### Organization controls
+
+- Org-level `denyWrite`/`denyRead` settings cannot be overridden by user "Allow always"
+- Violation prompt shows "(organization policy)" when the deny comes from org settings
+- Admins can set the sandbox isolation mode (`per-command` or `whole-process`) org-wide from **Enterprise Controls**
+
+## Coverage and enforcement
+
+With the sandbox enabled, a tool runs only if the sandbox can check everything it might do against your filesystem and network rules. Tools whose actions can't be checked are blocked.
+
+- **File tools** (Read, Edit, Create, LS, Grep, Glob, ApplyPatch) -- checked before every operation, enforcing `denyRead` for reads and `allowWrite`/`denyWrite` for writes
+- **Execute tool** -- shell commands run inside the OS sandbox, with network routed through a filtering proxy for domain-level control
+- **FetchUrl** -- network requests are checked against `allowedDomains`
+- **WebSearch** -- network requests are checked against `allowedDomains`
+- **MCP tools** -- filesystem and network requests are checked; locally launched servers receive a minimal environment (ambient host environment variables are dropped, keeping only a safe operational allowlist plus keys set in `mcp.json`)
+- **Subagents (Task tool)** -- delegated subagents inherit the parent sandbox policy
+- **Hooks** -- hook commands (PreToolUse, PostToolUse, etc.) are wrapped by the sandbox and run with the same proxy/runtime env as the Execute tool; if the sandbox cannot be established the hook is blocked instead of running on the host
+
+### When something is blocked
+
+**Interactive permission prompts (TUI mode):**
+
+- Sandbox violations interrupt the agent loop with a TUI prompt, even at Auto (High) autonomy
+- Options: **Allow once**, **Allow always** (persists to settings), **Deny** -- for `denyRead`/`denyWrite` violations, "Remove from deny list" replaces "Allow always"
+- Execute network violations show a real-time domain prompt with a 60s auto-deny timeout
+
+**Non-interactive mode (`droid exec`):**
+
+- Sandbox violations are auto-denied without prompting -- no hang, no user interaction required
+- The agent receives a denial message and reports it in the output
+
+**Allow-always persistence:**
+
+- Choosing **Allow always** saves the exception to your user settings (for example, adding a domain to `allowedDomains` or a path to `allowWrite`) so it won't prompt again
+- Changes take effect immediately in the current session
+
+**TUI indicators:**
+
+- `SANDBOX` status indicator in footer when sandbox is enabled
+- "Sandbox Violation" prompt with violation details (path, domain, reason)
+
+## Security limitations
+
+Sandboxing reduces the impact of a mistake or a prompt-injection attack, but it does not eliminate risk:
+
+- **Allowed network egress can still leak data.** Every domain in `allowedDomains` is a channel through which data the agent can read might leave. Keep the allowlist as narrow as your workflow permits.
+- **A writable path can still be modified.** The sandbox limits *where* writes land, not *what* is written within the allowed paths -- including your own project code under the working directory.
+- **Your settings files are protected.** Sandboxed tool processes cannot write to Droid's own configuration files (e.g. `settings.json`), so they cannot silently change sandbox policy.
+
+Treat Sandbox as defense in depth alongside [Autonomy Level](/cli/user-guides/auto-run) approvals and human review, not as a hard boundary around untrusted code. To evaluate code you do not trust, run Droid inside a container or a dedicated virtual machine.
 
 ## Related
 
