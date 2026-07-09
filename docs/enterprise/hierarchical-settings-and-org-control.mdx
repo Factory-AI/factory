@@ -89,6 +89,30 @@ Below is the full schema for org-managed settings. These are configured by org a
   Autonomy level applied to subagents spawned by the Task tool. One of `inherit`, `off`, `low`, `medium`, `high`. Defaults to `inherit`, which falls back to the parent session's autonomy level. An explicit level is clamped to `maxAutonomyLevel` so it can never exceed the enterprise cap.
 </ResponseField>
 
+<ResponseField name="subagentModelSettings" type="object">
+  Complexity→model routing for [subagents](/cli/configuration/custom-droids). Applies when a subagent's droid uses `model: inherit` and the parent passes a complexity tier.
+  <Expandable title="properties">
+    <ResponseField name="lightModel" type="string">
+      Model used for `light` complexity tasks. A model identifier, or omit to inherit the spawning session's model.
+    </ResponseField>
+    <ResponseField name="lightReasoningEffort" type="string">
+      Reasoning effort for the light tier. Same values as `reasoningEffort`.
+    </ResponseField>
+    <ResponseField name="mediumModel" type="string">
+      Model used for `medium` complexity tasks. A model identifier, or omit to inherit the spawning session's model.
+    </ResponseField>
+    <ResponseField name="mediumReasoningEffort" type="string">
+      Reasoning effort for the medium tier. Same values as `reasoningEffort`.
+    </ResponseField>
+    <ResponseField name="heavyModel" type="string">
+      Model used for `heavy` complexity tasks. A model identifier, or omit to inherit the spawning session's model.
+    </ResponseField>
+    <ResponseField name="heavyReasoningEffort" type="string">
+      Reasoning effort for the heavy tier. Same values as `reasoningEffort`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="cloudSessionSync" type="boolean">
   Whether sessions are synced to the cloud.
 </ResponseField>
@@ -333,6 +357,7 @@ Examples:
 - `sessionDefaultSettings.autonomyMode`
 - `maxAutonomyLevel`
 - `subagentAutonomyLevel`
+- `subagentModelSettings.*` (per-tier model and reasoning effort)
 
 This guarantees that org decisions (such as which models or autonomy levels are allowed) remain authoritative.
 

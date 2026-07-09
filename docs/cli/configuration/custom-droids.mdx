@@ -137,7 +137,21 @@ Set `reasoningEffort` (e.g., `low`, `medium`, `high`) in a droid's frontmatter f
 
 ---
 
-## 6 · Creating your own custom droid
+## 6 · Enterprise controls
+
+Administrators can govern subagent autonomy and models centrally through [organization-managed settings](/enterprise/hierarchical-settings-and-org-control). Org-level values win over user, project, and folder settings and cannot be weakened downstream.
+
+- **`subagentAutonomyLevel`** – pin the autonomy level for all Task-launched subagents (`off`, `low`, `medium`, `high`, or `inherit`).
+- **`maxAutonomyLevel`** – caps autonomy for every session and subagent. The resolved subagent level is always clamped to this maximum, so a user or project setting can never exceed the org cap.
+- **`subagentModelSettings`** – pin the complexity→model routing per tier (`lightModel`, `mediumModel`, `heavyModel`, each with an optional reasoning effort) so subagents run on approved models.
+- **Model policy** – a droid that pins a model blocked by org policy falls back to the parent's model rather than running the disallowed model.
+- **Tool and MCP policy** – Droid tool policy and the [enterprise MCP policy](/cli/configuration/mcp#enterprise-mcp-policy) still apply to subagents; servers or tools blocked at the org level stay unavailable even if a droid lists them.
+
+See [Hierarchical Settings & Org Control](/enterprise/hierarchical-settings-and-org-control) for the full managed-settings schema and precedence rules.
+
+---
+
+## 7 · Creating your own custom droid
 
 1. Run `/droids` to launch the Droids menu.
 2. Choose **Create a new Droid**, pick a storage location (project or personal), then follow the wizard to set:
@@ -169,7 +183,7 @@ This is the fastest way to scaffold a new droid; you can always open the generat
 
 ---
 
-## 7 · Configuration
+## 8 · Configuration
 
 Each droid file is Markdown with YAML frontmatter.
 
@@ -272,7 +286,7 @@ Notes:
 
 ---
 
-## 8 · Managing droids in the UI
+## 9 · Managing droids in the UI
 
 `/droids` opens a modal displaying:
 
@@ -291,7 +305,7 @@ Notes:
 
 ---
 
-## 8.5 · Importing Claude Code subagents
+## 9.5 · Importing Claude Code subagents
 
 You can import agents created in Claude Code as custom droids. This lets you reuse your existing Claude Code agents with the Droids system.
 
@@ -402,7 +416,7 @@ Common unmapped tools:
 
 ---
 
-## 9 · Using subagents effectively
+## 10 · Using subagents effectively
 
 - **Invoke via the Task tool** – droid may call custom droids autonomously, or you can request it directly ("Use the subagent `security-auditor` on this change").
 - **Choose models strategically** – use `inherit` to match the parent session, or specify a different model for specialized tasks:
@@ -419,7 +433,7 @@ Common unmapped tools:
 
 ---
 
-## 10 · Examples
+## 11 · Examples
 
 ### Code reviewer (project scope)
 
