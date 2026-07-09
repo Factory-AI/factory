@@ -1,37 +1,143 @@
 ---
-title: Custom Droids (Subagents)
-description: Create specialized subagents with their own prompts, tool access, and models that droid can delegate work to.
-keywords: ['custom droids', 'subagents', 'agents', 'specialized agents', 'delegation', 'task agent', 'custom agent']
+title: Subagents
+description: Delegate focused work to subagents that run in their own context window, with their own prompts, tools, models, and autonomy.
+keywords: ['subagents', 'custom droids', 'agents', 'specialized agents', 'delegation', 'task tool', 'background tasks', 'worker', 'explorer']
 ---
 
-Custom droids are reusable subagents defined in Markdown. Each droid carries its own system prompt, model preference, and tooling policy so you can hand off focused tasks—like code review, security checks, or research—without re-typing instructions.
+A **subagent** is a separate agent that Droid launches through the **Task** tool to handle a focused piece of work. Each subagent runs in its own context window and its own session, with its own system prompt, tool policy, model, and autonomy level. When it finishes, it returns a single final message to the parent agent.
+
+Subagents come in two flavors:
+
+- **Built-in subagents** – `worker` and `explorer`, available out of the box.
+- **Custom droids** – reusable subagents you define as Markdown files, so you can capture team-specific review, testing, research, or release checklists as code and hand them off with a single call.
 
 ---
 
-## 1 · What are custom droids?
+## 1 · What subagents are
 
-Custom droids live as `.md` files under either your project's `.factory/droids/` or your personal `~/.factory/droids/` directory. The CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the **Task** tool. This lets the primary assistant spin up purpose-built helpers mid-session.
+Subagents let the primary assistant delegate heavy or parallelizable work without polluting its own context window. The parent describes a task; the subagent executes it in isolation and reports back.
+
+- **Context isolation** – each subagent runs with a fresh context window, so the parent stays focused and lean.
+- **Own tooling and autonomy** – a subagent can be restricted to read-only, edit-only, or a curated tool set, and runs at its own autonomy level.
+- **Own model** – a subagent can inherit the parent's model or use a different one tuned for the task.
+- **Single return value** – the subagent hands back one final message. Its result is not shown to the user unless the parent summarizes it.
 
 <Note>
-  Custom Droids are enabled by default. You can toggle them off in Settings (`/settings`) under the Experimental section if needed.
+  Subagents run **non-interactively**. The `AskUser` tool is disabled for subagents, and a subagent cannot spawn its own subagents (the `Task` tool is not available to it). If something is unclear or blocked, a subagent reports back instead of prompting.
 </Note>
+
+### Custom droids
+
+Custom droids live as `.md` files under either your project's `.factory/droids/` or your personal `~/.factory/droids/` directory. The CLI scans these folders (top-level files only), validates each definition, and exposes them as `subagent_type` targets for the Task tool.
 
 - **Project droids** sit in `<repo>/.factory/droids/` and are shared with teammates.
 - **Personal droids** live in `~/.factory/droids/` and follow you across workspaces.
 - Project definitions override personal ones when the names match.
 
----
-
-## 2 · Why use them?
-
-- **Faster delegation** – encode complex checklists once and reuse them with a single tool call.
-- **Stricter safety** – limit an agent to read-only, edit-only, or curated tool sets.
-- **Context isolation** – each subagent runs with a fresh context window, avoiding prompt bloat.
-- **Repeatable reviews** – capture team-specific review, testing, or release gates as code you can version.
+<Note>
+  Custom droids are enabled by default. You can toggle them off in Settings (`/settings`) under the Experimental section if needed.
+</Note>
 
 ---
 
-## 3 · Quick start
+## 2 · How subagents work
+
+The parent agent invokes a subagent with the **Task** tool. The key inputs are:
+
+| Input               | Notes                                                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `subagent_type`     | Required. The name of the built-in or custom droid to run (e.g., `worker`, `explorer`, `code-reviewer`).      |
+| `description`       | Required. A short 3–5 word label shown in the UI.                                                             |
+| `prompt`            | Required. The full task for the subagent to execute.                                                          |
+| `image_paths`       | Optional. Local image file paths to attach to the subagent (paths only, never base64).                       |
+| `complexity`        | Optional. `light`, `medium`, or `heavy`. Drives complexity→model routing (see "Controlling the model" below). |
+| `run_in_background` | Optional. When `true`, returns immediately with a `task_id` instead of blocking.                             |
+| `resume`            | Optional. A `task_id` from a previous invocation to continue with full prior context preserved.               |
+
+### Foreground vs. background
+
+- **Foreground (default)** – the parent waits for the subagent to finish. The Task tool streams live progress (tool calls, results, and TodoWrite updates) as the subagent runs, then returns the subagent's final message.
+- **Background (`run_in_background: true`)** – the Task tool returns immediately with a `task_id`, and the subagent keeps running independently. Use this when there is genuinely independent work to do in parallel. The parent is notified when it completes.
+
+### Checking back in on background tasks
+
+Once a subagent is backgrounded, the parent manages it with two companion tools:
+
+- **`TaskOutput`** – retrieve a background task's output. Use `block=true` to wait for completion and fetch the result, or `block=false` to poll current status without waiting. It accepts the `task_id` returned at launch.
+- **`TaskStop`** – stop a running background task by `task_id` (sends `SIGTERM`, then `SIGKILL` if needed).
+
+The parent is expected to fetch the result itself with `TaskOutput` rather than assuming the user will be notified later.
+
+### Resuming a previous subagent
+
+Pass `resume` with a prior `task_id` to send a follow-up turn to an existing subagent session. The subagent keeps its full prior context (transcript), and its autonomy level is re-aligned to the parent's current level for the new turn. This works for both foreground and background subagents.
+
+### Running subagents in parallel
+
+To run subagents concurrently, the parent issues multiple Task tool calls in the same turn (or launches several with `run_in_background: true` and collects results with `TaskOutput`).
+
+---
+
+## 3 · Built-in subagents
+
+Two general-purpose subagents ship with Droid and are always available (no configuration required):
+
+| Subagent   | Tools          | Default complexity | Use for                                                                       |
+| ---------- | -------------- | ------------------ | ----------------------------------------------------------------------------- |
+| `worker`   | All tools      | `medium`           | General-purpose delegation: non-trivial tasks, Q&A, research, analysis, edits |
+| `explorer` | Read-only      | `light`            | Fast codebase exploration: searching files, finding patterns, understanding structure. Cannot modify files or run commands. |
+
+Because the built-ins inherit the parent's model by default, their **default complexity** tier decides which model they route to when complexity→model routing is configured (worker → medium, explorer → light) unless the parent passes an explicit `complexity`.
+
+<Note>
+  A handful of additional built-in droids (e.g., `scrutiny-feature-reviewer`, `user-testing-flow-validator`) are written to `~/.factory/droids/` for use **within [Missions](/features/missions/overview)** validation and are not intended for general delegation.
+</Note>
+
+---
+
+## 4 · Controlling the autonomy level
+
+Subagents run at an autonomy level just like the main session (`Off`, `Low`, `Medium`, `High`; see [Autonomy Levels](/cli/user-guides/auto-run)). You control it with the **Subagent autonomy level** setting in `/settings` → **Subagents**:
+
+| Value               | Behavior                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------ |
+| `inherit` (default) | The subagent runs at the parent session's current autonomy level.                          |
+| `off`               | Read tools and allowlisted commands only.                                                  |
+| `low`               | File edits plus low-risk commands and MCP tools.                                           |
+| `medium`            | Adds reversible workspace changes (installs, local commits, builds).                       |
+| `high`              | Adds high-risk actions unless safety checks require approval.                              |
+
+Notes:
+
+- The resolved level is always **clamped to the organization's Maximum Autonomy Level** — an explicit setting can never exceed the enterprise cap.
+- When the parent session is in **Spec Mode**, subagents are restricted to read-only operations and low-risk shell commands; file edits, file creation, and spawning further subagents are disabled.
+- On `resume`, a subagent's autonomy level is realigned to the parent's current level for the follow-up turn.
+
+---
+
+## 5 · Controlling the model
+
+Each subagent's model is resolved from its droid config plus the parent's complexity routing:
+
+1. **Droid config `model`** – set `model` in the droid's frontmatter to pin a specific model, or `inherit` (the default) to defer to the parent.
+   - Built-in model IDs: e.g., `claude-sonnet-4-5-20250929`. See [Available Models](/models).
+   - Custom (BYOK) models: use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`.
+2. **Complexity → model routing** – when the droid's model is `inherit` and the parent passes a `complexity` tier, Droid maps that tier to a model using the routing you configure in `/settings` → **Subagents**:
+   - **Light task model**, **Medium task model**, and **Heavy task model** each map a complexity tier to a specific model (with an optional reasoning effort), or leave it on **Inherit** to use the spawning session's model. You can point a tier at a concrete model or at the Auto model router.
+3. **Inherit fallback** – if no explicit routing applies, the subagent uses the parent session's active model and reasoning effort.
+4. **Validation fallback** – if a droid pins a model that isn't allowed (e.g., blocked by org policy or a BYOK model that isn't configured), Droid falls back to the parent's model rather than failing.
+
+So the precedence is: **explicit droid `model`** → **complexity→model routing** (when `inherit` + `complexity`) → **parent's model**.
+
+<Note>
+  The built-in `worker` and `explorer` droids use `model: inherit`, so they follow complexity→model routing based on their default tier (medium and light) unless the parent overrides `complexity`.
+</Note>
+
+Set `reasoningEffort` (e.g., `low`, `medium`, `high`) in a droid's frontmatter for models that support it. It is ignored when `model` is `inherit` and must be compatible with the selected model.
+
+---
+
+## 6 · Creating your own custom droid
 
 1. Run `/droids` to launch the Droids menu.
 2. Choose **Create a new Droid**, pick a storage location (project or personal), then follow the wizard to set:
@@ -63,7 +169,7 @@ This is the fastest way to scaffold a new droid; you can always open the generat
 
 ---
 
-## 4 · Configuration
+## 7 · Configuration
 
 Each droid file is Markdown with YAML frontmatter.
 
@@ -166,7 +272,7 @@ Notes:
 
 ---
 
-## 5 · Managing droids in the UI
+## 8 · Managing droids in the UI
 
 `/droids` opens a modal displaying:
 
@@ -185,7 +291,7 @@ Notes:
 
 ---
 
-## 5.5 · Importing Claude Code subagents
+## 8.5 · Importing Claude Code subagents
 
 You can import agents created in Claude Code as custom droids. This lets you reuse your existing Claude Code agents with the Droids system.
 
@@ -296,7 +402,7 @@ Common unmapped tools:
 
 ---
 
-## 6 · Using custom droids effectively
+## 9 · Using subagents effectively
 
 - **Invoke via the Task tool** – droid may call custom droids autonomously, or you can request it directly ("Use the subagent `security-auditor` on this change").
 - **Choose models strategically** – use `inherit` to match the parent session, or specify a different model for specialized tasks:
@@ -304,14 +410,16 @@ Common unmapped tools:
   - Larger/more capable models for complex reasoning, code review, and multi-step analysis.
   - See the [Available Models](/models) for available model IDs.
 - **Limit tool access** – use explicit tool lists to restrict what a subagent can do, preventing unexpected shell commands or other dangerous operations.
-- **Leverage live updates** – the Task tool now streams live progress, showing tool calls, results, and TodoWrite updates in real time as the subagent executes.
+- **Leverage live updates** – the Task tool streams live progress, showing tool calls, results, and TodoWrite updates in real time as a foreground subagent executes.
+- **Background independent work** – launch long or parallelizable tasks with `run_in_background: true`, then collect results with `TaskOutput` (or stop them with `TaskStop`).
+- **Resume for follow-ups** – reuse an existing subagent's context by passing `resume` with its `task_id` instead of starting over.
 - **Structure output** – organize the prompt to emit sections like `Summary:` and `Findings:` so the Task tool UI can summarize results clearly.
 - **Share and collaborate** – check `.factory/droids/*.md` into your repo so teammates can use shared droids, and version-control prompt updates like code.
-- **Leverage Claude Code agents** – import your existing Claude Code agents (see section 5.5) to reuse them as custom droids in Factory.
+- **Leverage Claude Code agents** – import your existing Claude Code agents (see the "Importing Claude Code subagents" section below) to reuse them as custom droids in Factory.
 
 ---
 
-## 7 · Examples
+## 10 · Examples
 
 ### Code reviewer (project scope)
 
@@ -386,4 +494,4 @@ Keep the task list updated with completion status (pending, in_progress, complet
 
 ---
 
-With custom droids, you capture tribal knowledge as code. Compose specialized prompts once, assign the right tools and models, and let the primary assistant delegate heavy lifts to the subagents you design.
+With subagents, you capture tribal knowledge as code. Compose specialized prompts once, assign the right tools, models, and autonomy, and let the primary assistant delegate heavy lifts, in the foreground or background, to the subagents you design.
