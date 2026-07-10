@@ -53,11 +53,10 @@ This guide was last updated on Wednesday, June 3rd 2026.
 | 21   | **Droid Core (NVIDIA Nemotron 3 Ultra)** | Open-source, 0.4× multiplier, fast and cost-efficient model for high-frequency automations; no image support.                                               |
 | 22   | **Droid Core (MiniMax M3)**              | Open-source, 0.12× multiplier with multimodal image support and strong agentic capabilities; dependable workhorse for everyday tasks with extended context. |
 | 23   | **Droid Core (MiniMax M2.7)**            | Open-source, 0.12× multiplier with reasoning support (Low/Medium/High) and image support; cheapest model available.                                         |
-| 24   | **Droid Core (GLM-5.1)**                 | Open-source, 0.55× multiplier, newer GLM option for bulk automation and air-gapped environments; no image support.                                          |
-| 25   | **Droid Core (GLM-5)**                   | Open-source, 0.4× multiplier, stable choice for bulk automation and air-gapped environments; no image support.                                              |
-| 26   | **Droid Core (Kimi K2.7 Code)**          | Coding-specialized Kimi at 0.4× with optional High reasoning; strong agentic and tool use for cost-sensitive dev work.                                      |
-| 27   | **Droid Core (Kimi K2.6)**               | Open-source, 0.4× multiplier with image support and optional High reasoning; good for cost-sensitive work when you still want a thinking toggle.            |
-| 28   | **Droid Core (Kimi K2.5)**               | Open-source, 0.25× multiplier with image support; older Kimi option for cost-sensitive work.                                                                |
+| 24   | **Droid Core (GLM-5)**                   | Open-source, 0.4× multiplier, stable choice for bulk automation and air-gapped environments; no image support.                                              |
+| 25   | **Droid Core (Kimi K2.7 Code)**          | Coding-specialized Kimi at 0.4× with optional High reasoning; strong agentic and tool use for cost-sensitive dev work.                                      |
+| 26   | **Droid Core (Kimi K2.6)**               | Open-source, 0.4× multiplier with image support and optional High reasoning; good for cost-sensitive work when you still want a thinking toggle.            |
+| 27   | **Droid Core (Kimi K2.5)**               | Open-source, 0.25× multiplier with image support; older Kimi option for cost-sensitive work.                                                                |
 
 <sup>\*</sup> Anthropic requires all Mythos-class models comply with 30 day data retention for trust and safety, please see more information [here](https://support.claude.com/en/articles/15425996-data-retention-practices-for-mythos-class-models).
 
@@ -116,7 +115,6 @@ Tip: you can swap models mid-session with `/model` or by toggling in the setting
 - **Gemini 3 Flash**: Minimal / Low / Medium / High (default: High)
 - **Grok 4.5**: Low / Medium / High (default: Medium)
 - **Droid Core (GLM-5)**: None only (default: None; no image support)
-- **Droid Core (GLM-5.1)**: None only (default: None; no image support)
 - **Droid Core (Kimi K2.6)**: Off / High (default: High)
 - **Droid Core (Kimi K2.5)**: None only (default: None)
 - **Droid Core (MiniMax M2.7)**: Low / Medium / High (default: High)
@@ -133,14 +131,14 @@ Factory ships with managed Anthropic and OpenAI access. If you prefer to run aga
 
 ### Open-source models
 
-**Droid Core (GLM-5)**, **Droid Core (GLM-5.1)**, **Droid Core (Kimi K2.6)**, **Droid Core (Kimi K2.5)**, and **Droid Core (MiniMax M2.7)** are open-source alternatives available in the CLI. They're useful for:
+**Droid Core (GLM-5)**, **Droid Core (Kimi K2.6)**, **Droid Core (Kimi K2.5)**, and **Droid Core (MiniMax M2.7)** are open-source alternatives available in the CLI. They're useful for:
 
 - **Air-gapped environments** where external API calls aren't allowed
 - **Cost-sensitive projects** needing unlimited local inference
 - **Privacy requirements** where code cannot leave your infrastructure
 - **Experimentation** with open-source model capabilities
 
-**Note:** GLM-5 and GLM-5.1 do not support image attachments. Kimi K2.5, Kimi K2.6, and MiniMax M2.7 do support images. Kimi K2.6 adds an Off/High reasoning toggle, while MiniMax M2.7 (the cheapest model available, with 0.12× multiplier) supports Low/Medium/High reasoning. For image-based workflows, use Claude, GPT, Kimi, or MiniMax M2.7.
+**Note:** GLM-5 does not support image attachments. Kimi K2.5, Kimi K2.6, and MiniMax M2.7 do support images. Kimi K2.6 adds an Off/High reasoning toggle, while MiniMax M2.7 (the cheapest model available, with 0.12× multiplier) supports Low/Medium/High reasoning. For image-based workflows, use Claude, GPT, Kimi, or MiniMax M2.7.
 
 To use open-source models, you'll need to configure them via BYOK with a local inference server (like Ollama) or a hosted provider. See [BYOK documentation](/cli/byok/overview) for setup instructions.
 
