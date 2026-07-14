@@ -20,6 +20,7 @@ export OTEL_TELEMETRY_HEADERS="Authorization=Bearer <your-token>"
 | :------------------------ | :------- | :------------------------------------------------------------------------------------------------------------------- |
 | `OTEL_TELEMETRY_ENDPOINT` | Yes      | Base URL of your OTLP HTTP collector. Metrics are sent to `{endpoint}/v1/metrics`.                                   |
 | `OTEL_TELEMETRY_HEADERS`  | No       | Comma-separated `key=value` pairs sent as HTTP headers on every export. Values may contain `=` (e.g. base64 tokens). |
+| `OTEL_LOG_MESSAGE_CONTENT` | No      | Set to `true` or `1` to export message content (user/assistant messages, tool input/results) as trace spans to **your endpoint only** -- never to Factory. Requires `OTEL_TELEMETRY_ENDPOINT`; content is dropped if no endpoint is set. |
 
 ---
 
@@ -64,6 +65,33 @@ Every data point includes these attributes automatically:
 | `session.id`      | Current Droid session ID |
 
 Tool-specific attributes (`tool.name`, `mcp.server`, `skill.name`, etc.) are included where applicable. Resource attributes include `service.name` (`cli`) and `service.version`.
+
+---
+
+## Message content logging
+
+By default, telemetry export includes only metrics -- the text of prompts, model responses, and tool I/O is **not** exported. Metrics fan out to both Factory and your collector (see above); message content does not.
+
+To capture message content (for example, for session auditing), set:
+
+```bash
+export OTEL_LOG_MESSAGE_CONTENT=true   # or 1
+```
+
+When enabled, Droid emits message content as OTEL **trace spans** (on the `/v1/traces` path of your endpoint), covering:
+
+- User messages (`droid.message.user`)
+- Assistant responses (`droid.message.assistant`)
+- Tool calls and their inputs (`droid.tool.call`)
+- Tool results (`droid.tool.result`)
+
+<Note>
+  **Message content is sent only to the collector you configure and never reaches Factory.** Unlike metrics, content spans are routed exclusively to your `OTEL_TELEMETRY_ENDPOINT`; Factory's collector is never a destination for message content.
+
+  - A customer endpoint (`OTEL_TELEMETRY_ENDPOINT`) is **required**. If none is set, content is dropped rather than sent to Factory.
+  - If your endpoint resolves to the same URL as Factory's collector, content logging is automatically disabled.
+  - Metrics export is unaffected and continues to fan out to both Factory and your collector.
+</Note>
 
 ---
 
