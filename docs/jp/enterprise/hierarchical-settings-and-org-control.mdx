@@ -87,6 +87,18 @@ User        → ~/.factory/
   任意のユーザーまたはプロジェクトが設定できる最大自律レベル。`off`、`low`、`medium`、`high` のいずれか
 </ResponseField>
 
+<ResponseField name="builtInToolAutonomyOverrides" type="object">
+  組み込みネットワークツールを確認プロンプトなしで実行するために必要な、ツールごとの[自律レベル](/jp/cli/user-guides/auto-run)。組み込みツール名を `low`、`medium`、`high` にマッピングします。ツールは、セッションの自律レベルが設定された要件以上の場合にのみ自動実行され、それ以外の場合は Droid が承認を求めます。エントリのないツールはデフォルトで `low` になります。組織管理設定からのみ適用されるため、ユーザーおよびプロジェクト設定で弱めることはできません。Enterprise Controls の **Built-in Tool Autonomy** で設定します。
+  <Expandable title="properties">
+    <ResponseField name="WebSearch" type="string">
+      組み込みの Web Search ツールを実行するために必要な自律レベル。`low`、`medium`、`high` のいずれか。デフォルトは `low`。
+    </ResponseField>
+    <ResponseField name="FetchUrl" type="string">
+      組み込みの Fetch URL ツールを実行するために必要な自律レベル。`low`、`medium`、`high` のいずれか。デフォルトは `low`。
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="subagentAutonomyLevel" type="string">
   Task ツールによって起動されるサブエージェントに適用される自律レベル。`inherit`、`off`、`low`、`medium`、`high` のいずれか。デフォルトは `inherit` で、親セッションの自律レベルにフォールバックします。明示的なレベルは `maxAutonomyLevel` によって制限されるため、エンタープライズの上限を超えることはありません。
 </ResponseField>
@@ -467,6 +479,10 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
     "specModeReasoningEffort": "medium"
   },
   "maxAutonomyLevel": "high",
+  "builtInToolAutonomyOverrides": {
+    "WebSearch": "high",
+    "FetchUrl": "medium"
+  },
   "subagentAutonomyLevel": "inherit",
   "cloudSessionSync": true,
   "includeCoAuthoredByDroid": true,
@@ -552,6 +568,7 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
 - **AutoWiki Cloud Sync** (`wikiCloudSync`) – AutoWiki コンテンツを Factory App に生成・保存できるかどうかを制御します。無効にすると、すべての wiki API エンドポイントがブロックされ、CLI は Factory App への保存と GitHub wiki 同期をスキップします。デフォルトで有効です。詳しくは [AutoWiki](/jp/cli/features/wiki/overview#autowiki-cloud-sync) を参照してください。
 - **Cloud Session Sync** (`cloudSessionSync`) – セッションデータを Factory cloud に同期するかどうかを制御します。
 - **Hooks Policy** (`allowManagedHooksOnly`, `hooks`) – 組織管理者が組織管理フックを定義でき、「管理/プラグインフックのみ」を有効にすると、すべてのユーザーレベルおよびプロジェクトレベルのフックが解決時に破棄されます。組織管理フックは権威があり、メンバーがそれらを削除したり独自のフックを再導入したりすることはできません。[組織管理フック](/jp/reference/hooks-reference#org-managed-hooks) を参照してください。
+- **Built-in Tool Autonomy** (`builtInToolAutonomyOverrides`) – 組み込みネットワークツール（Web Search、Fetch URL）を確認プロンプトなしで実行するために必要な[自律レベル](/jp/cli/user-guides/auto-run)を設定します。エントリのないツールはデフォルトで `low` になります。組織設定からのみ適用されるため、ユーザーおよびプロジェクトで弱めることはできません。
 
 これらの制御は、[app.factory.ai](https://app.factory.ai) の **Enterprise Controls** セクションで組織管理者が管理します。
 

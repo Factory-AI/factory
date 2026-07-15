@@ -85,6 +85,18 @@ Below is the full schema for org-managed settings. These are configured by org a
   Maximum autonomy level any user or project can set. One of `off`, `low`, `medium`, `high`.
 </ResponseField>
 
+<ResponseField name="builtInToolAutonomyOverrides" type="object">
+  Per-tool [autonomy level](/cli/user-guides/auto-run) required to run a built-in network tool without a confirmation prompt. Map of built-in tool name to `low`, `medium`, or `high`. A tool auto-runs only when the session's Autonomy Level is at or above its configured requirement; otherwise Droid asks for approval. Tools without an entry default to `low`. Enforced from org-managed settings only, so user and project settings cannot weaken it. Configured under **Built-in Tool Autonomy** in Enterprise Controls.
+  <Expandable title="properties">
+    <ResponseField name="WebSearch" type="string">
+      Autonomy level required to run the built-in Web Search tool. One of `low`, `medium`, `high`. Defaults to `low`.
+    </ResponseField>
+    <ResponseField name="FetchUrl" type="string">
+      Autonomy level required to run the built-in Fetch URL tool. One of `low`, `medium`, `high`. Defaults to `low`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="subagentAutonomyLevel" type="string">
   Autonomy level applied to subagents spawned by the Task tool. One of `inherit`, `off`, `low`, `medium`, `high`. Defaults to `inherit`, which falls back to the parent session's autonomy level. An explicit level is clamped to `maxAutonomyLevel` so it can never exceed the enterprise cap.
 </ResponseField>
@@ -491,6 +503,10 @@ Again, users cannot override these rules; they can only choose safer personal de
     "specModeReasoningEffort": "medium"
   },
   "maxAutonomyLevel": "high",
+  "builtInToolAutonomyOverrides": {
+    "WebSearch": "high",
+    "FetchUrl": "medium"
+  },
   "subagentAutonomyLevel": "inherit",
   "cloudSessionSync": true,
   "includeCoAuthoredByDroid": true,
@@ -576,6 +592,7 @@ Beyond the general hierarchy, several features have dedicated org‑level toggle
 
 - **AutoWiki Cloud Sync** (`wikiCloudSync`) – Controls whether Wikis can be generated and stored in the Factory App. When disabled, all AutoWiki API endpoints are blocked and the Droid CLI skips Cloud Sync and GitHub Wiki sync. Enabled by default. See [AutoWiki](/cli/features/wiki/overview#autowiki-cloud-sync).
 - **Cloud Session Sync** (`cloudSessionSync`) – Controls whether session data is synced to Factory's cloud.
+- **Built-in Tool Autonomy** (`builtInToolAutonomyOverrides`) – Sets the [autonomy level](/cli/user-guides/auto-run) required to run built-in network tools (Web Search, Fetch URL) without a confirmation prompt. Omitted tools default to `low`. Enforced from org settings only, so users and projects cannot weaken it.
 
 These controls are managed by org administrators in the **Enterprise Controls** section at [app.factory.ai](https://app.factory.ai).
 
