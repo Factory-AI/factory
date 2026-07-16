@@ -1,0 +1,434 @@
+---
+title: Audit Log
+description: Organization-level audit events that record who did what in your Factory organization, including event structure, sources, and types.
+---
+
+The Factory audit log records organization-level events so you can track who did what in your organization. Each event captures **who** acted, **where** the action originated, **what** was affected, and structured details about the change.
+
+<Info>
+  **Enterprise Feature** — The audit log is available to **Enterprise organization owners only**. Owners can view the audit log in the Factory web app under Organization Settings, or via the public API. [Contact us](mailto:sales@factory.ai) to learn more.
+</Info>
+
+---
+
+## Event Structure
+
+Every audit event shares the following fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `eventType` | string | The category of event (see below). |
+| `actor` | object or null | The user or service principal who initiated the event. `null` when the event was system-initiated (no human or service principal involved). |
+| `source` | string | The surface that originated the event (see below). |
+| `target` | object | Identifiers for the affected entity (e.g. `userId`, `email`, `serviceAccountId`). |
+| `payload` | object or null | Structured, event-specific details. Contains only IDs and enum values, never secrets. `null` when the event has no structured payload. |
+| `createdAt` | string | ISO 8601 timestamp of the event. |
+
+### Actor
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `principalKind` | string | `"human"` or `"service"`. |
+| `principalId` | string | The actor's unique ID. |
+| `email` | string or null | Actor email, if available. |
+| `role` | string | Actor's organization role at the time of the event. |
+
+---
+
+## Event Sources
+
+The `source` field identifies where the event originated.
+
+| Source | Description |
+|--------|-------------|
+| `web_settings_usage` | Usage and billing settings page in the web app. |
+| `web_settings_members` | Members management page in the web app. |
+| `web_settings_api_keys` | API keys management page in the web app. |
+| `web_settings_service_accounts` | Service accounts management page in the web app. |
+| `web_settings_integrations` | Integrations management page in the web app. |
+| `web_settings_org` | Organization settings page in the web app. |
+| `web_settings_billing` | Billing and subscription page in the web app. |
+| `public_api_v0` | Public REST API (v0). |
+| `workos_event` | Directory sync or identity provider webhook event. |
+
+<Note>
+  For `workos_event` source events, the payload contains only a filtered projection of the original event (`workosEventType`, `role`, `status`). Raw identity provider data is never exposed in the audit log.
+</Note>
+
+---
+
+## Event Types
+
+### `user_limit_change`
+
+A per-user token usage limit was set, changed, or cleared for the organization.
+
+**Sources:** `web_settings_usage`, `public_api_v0`, `workos_event`
+
+**Target:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `userId` | string or null | The user whose limit changed. `null` for org-wide limit changes. |
+| `email` | string or null | The user's email. `null` for org-wide limit changes. |
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `scope` | string | `"global"` (org-wide limit) or `"individual"` (per-user limit). |
+| `toTokens` | number or null | The new standard-tier token limit. `null` when the limit was cleared. |
+
+**Example:**
+
+```json
+{
+  "eventType": "user_limit_change",
+  "source": "web_settings_usage",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "owner"
+  },
+  "target": { "userId": "user_xyz", "email": "dev@corp.com" },
+  "payload": { "scope": "individual", "toTokens": 500000 }
+}
+```
+
+---
+
+### `membership_change`
+
+A member's role, invitation status, or membership in the organization changed.
+
+**Sources:** `web_settings_members`, `public_api_v0`, `workos_event`
+
+**Target:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `userId` | string or null | The affected user's ID. `null` for pending invitations. |
+| `email` | string or null | The affected user's email. |
+
+**Payload (web app and public API sources):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `intent` | string | The specific membership action (see below). |
+| `fromRole` | string or null | Previous role. Present for `role_change`; omitted when no previous role existed. |
+| `toRole` | string | New role. Present for `invite` and `role_change`. |
+| `workosMembershipId` | string or null | Membership ID. `null` for invites (no membership exists yet). |
+
+**Intent values:**
+
+| Intent | Description |
+|--------|-------------|
+| `role_change` | A member's role was changed. |
+| `remove` | A member was removed from the organization. |
+| `invite` | An invitation was sent to a new user. |
+| `revoke_invite` | A pending invitation was revoked. |
+
+**Payload (`workos_event` source):** Contains a filtered projection of the original identity provider event (`workosEventType`, `role`, `status`) rather than the structured payload above.
+
+**Example:**
+
+```json
+{
+  "eventType": "membership_change",
+  "source": "web_settings_members",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "owner"
+  },
+  "target": { "userId": "user_xyz", "email": "dev@corp.com" },
+  "payload": {
+    "intent": "role_change",
+    "fromRole": "user",
+    "toRole": "manager",
+    "workosMembershipId": "mem_123"
+  }
+}
+```
+
+---
+
+### `api_key_lifecycle_change`
+
+A Factory API key was created or deleted.
+
+**Sources:** `web_settings_api_keys`, `web_settings_service_accounts`
+
+**Target:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `userId` | string | The key owner's user ID. |
+| `email` | string or null | The key owner's email. |
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `intent` | string | `"created"` or `"deleted"`. |
+| `apiKeyId` | string | The API key ID. |
+| `serviceAccountId` | string or null | Present only for service-account keys. Its presence distinguishes user keys from service-account keys. |
+
+**Example:**
+
+```json
+{
+  "eventType": "api_key_lifecycle_change",
+  "source": "web_settings_api_keys",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "dev@corp.com",
+    "role": "user"
+  },
+  "target": { "userId": "user_abc", "email": "dev@corp.com" },
+  "payload": { "intent": "created", "apiKeyId": "key_xyz" }
+}
+```
+
+---
+
+### `service_account_change`
+
+A service account was created, modified, deleted, or had its git credentials or act-as grants changed.
+
+**Sources:** `web_settings_service_accounts`
+
+**Target:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `serviceAccountId` | string | The service account ID. |
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `intent` | string | The specific service-account action (see below). |
+| `serviceAccountId` | string | The service account ID. |
+| `toStatus` | string or null | New status. Present for `status_changed` only. |
+| `integration` | string or null | Integration name. Present for git-credential intents only. |
+| `grantId` | string or null | Act-as grant ID. Present for `act_as_grant_minted` only. Never includes the grant's secret value. |
+
+**Intent values:**
+
+| Intent | Description |
+|--------|-------------|
+| `created` | A new service account was created. |
+| `status_changed` | The service account's status was changed (e.g. active or disabled). |
+| `deleted` | The service account was deleted. |
+| `git_credential_set` | A git credential was set for the service account. |
+| `git_credential_revoked` | A git credential was revoked for the service account. |
+| `act_as_grant_minted` | An act-as delegation grant was minted for the service account. |
+
+**Example:**
+
+```json
+{
+  "eventType": "service_account_change",
+  "source": "web_settings_service_accounts",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "manager"
+  },
+  "target": { "serviceAccountId": "sa_xyz" },
+  "payload": { "intent": "created", "serviceAccountId": "sa_xyz" }
+}
+```
+
+---
+
+### `integration_change`
+
+An integration was connected, disconnected, configured, or had its availability toggled.
+
+**Sources:** `web_settings_integrations`
+
+**Target:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `integration` | string | The integration type identifier. |
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `intent` | string | The specific integration action (see below). |
+| `integration` | string | The integration type identifier. |
+| `scope` | string | `"org"` (org-level connection) or `"user"` (single user's connection). |
+| `available` | boolean or null | New availability state. Present for `availability_changed` only. |
+
+**Intent values:**
+
+| Intent | Description |
+|--------|-------------|
+| `connected` | An integration was connected. |
+| `disconnected` | An integration was disconnected. |
+| `configured` | An integration was configured (e.g. GitLab Self-Hosted setup). |
+| `availability_changed` | An integration's availability was toggled on or off for the organization. |
+
+**Example:**
+
+```json
+{
+  "eventType": "integration_change",
+  "source": "web_settings_integrations",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "dev@corp.com",
+    "role": "user"
+  },
+  "target": { "integration": "github_personal" },
+  "payload": {
+    "intent": "disconnected",
+    "integration": "github_personal",
+    "scope": "user"
+  }
+}
+```
+
+---
+
+### `organization_lifecycle_change`
+
+An organization was created or deactivated.
+
+**Sources:** `web_settings_org`
+
+**Target:** `{}` (the organization itself is the target).
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `intent` | string | `"created"` or `"deactivated"`. |
+| `workosOrgId` | string or null | The affected WorkOS organization ID, when known. |
+
+**Example:**
+
+```json
+{
+  "eventType": "organization_lifecycle_change",
+  "source": "web_settings_org",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "founder@corp.com",
+    "role": "owner"
+  },
+  "target": {},
+  "payload": { "intent": "created", "workosOrgId": "org_123" }
+}
+```
+
+---
+
+### `managed_settings_change`
+
+The organization's managed settings were updated.
+
+**Sources:** `web_settings_org`
+
+**Target:** `{}` (the organization itself is the target).
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `updatedKeys` | string[] | Top-level managed-settings keys included in the update. |
+| `revision` | number | The resulting managed-settings revision number. Links to an immutable per-revision snapshot for before/after diffing. |
+
+**Example:**
+
+```json
+{
+  "eventType": "managed_settings_change",
+  "source": "web_settings_org",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "manager"
+  },
+  "target": {},
+  "payload": { "updatedKeys": ["defaultModel", "allowedModels"], "revision": 5 }
+}
+```
+
+---
+
+### `analytics_settings_change`
+
+The organization's analytics settings were updated.
+
+**Sources:** `web_settings_org`
+
+**Target:** `{}` (the organization itself is the target).
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `defaultBillingPeriodOnly` | boolean | The new value for the org-wide "Current billing period only" toggle in the analytics overview. |
+
+**Example:**
+
+```json
+{
+  "eventType": "analytics_settings_change",
+  "source": "web_settings_org",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "owner@corp.com",
+    "role": "owner"
+  },
+  "target": {},
+  "payload": { "defaultBillingPeriodOnly": true }
+}
+```
+
+---
+
+### `voucher_redeemed`
+
+A voucher or promo code was redeemed for the organization.
+
+**Sources:** `web_settings_billing`
+
+**Target:** `{}` (the organization itself is the target).
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `voucherId` | string or null | The promotion or voucher ID. |
+| `toTier` | string or null | Resulting subscription tier after redemption, when the voucher changes it. |
+
+**Example:**
+
+```json
+{
+  "eventType": "voucher_redeemed",
+  "source": "web_settings_billing",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "owner"
+  },
+  "target": {},
+  "payload": { "voucherId": "promo_xyz", "toTier": "growth" }
+}
+```
