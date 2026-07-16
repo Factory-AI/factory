@@ -206,7 +206,7 @@ Configure [Missions](/features/missions/overview) — multi-agent orchestration 
 
 ## Subagent settings
 
-Configure subagents spawned by the Task tool. These appear in the **Subagents** tab of `/settings`.
+Configure the autonomy and models used by subagents spawned by the Task tool. These appear in the **Subagents** tab of `/settings`.
 
 | Setting                  | Type   | Options                                   | Default   | Description                                                                                                       |
 | ------------------------ | ------ | ----------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------- |
@@ -221,6 +221,26 @@ Configure subagents spawned by the Task tool. These appear in the **Subagents** 
 - **`low`**, **`medium`**, **`high`** – Pre-authorize subagent work at or below that risk level.
 
 An explicit level is still clamped to the org-managed `maxAutonomyLevel`, so it can never exceed the enterprise cap. Mission workers do not use this setting.
+
+### Subagent model settings
+
+Subagents are routed by a complexity tier (`light`, `medium`, `heavy`). Each tier can pin its own model and reasoning effort under `subagentModelSettings`.
+
+| Setting                                    | Type   | Options                                              | Default       | Description                                                                    |
+| ------------------------------------------ | ------ | --------------------------------------------------- | ------------- | ----------------------------------------------------------------------------- |
+| `subagentModelSettings.lightModel`         | string | Any [available model ID](/models) or `inherit`      | `inherit`     | Model for light-complexity subagents (e.g. the built-in `explorer`).          |
+| `subagentModelSettings.lightReasoningEffort`  | string | `off`, `none`, `low`, `medium`, `high`           | Model default | Reasoning effort for light-complexity subagents.                              |
+| `subagentModelSettings.mediumModel`        | string | Any [available model ID](/models) or `inherit`      | `inherit`     | Model for medium-complexity subagents (e.g. the built-in `worker`).           |
+| `subagentModelSettings.mediumReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high`           | Model default | Reasoning effort for medium-complexity subagents.                             |
+| `subagentModelSettings.heavyModel`         | string | Any [available model ID](/models) or `inherit`      | `inherit`     | Model for heavy-complexity subagents.                                         |
+| `subagentModelSettings.heavyReasoningEffort`  | string | `off`, `none`, `low`, `medium`, `high`           | Model default | Reasoning effort for heavy-complexity subagents.                             |
+
+How the tiers are chosen:
+
+- The built-in `worker` subagent runs at `medium` complexity and `explorer` at `light`. Custom droids and the Task tool can request a specific tier.
+- **`inherit`** (the default) means the subagent uses the spawning session's model. Upgrading the parent session's model does not retroactively change a tier pinned to a specific model.
+- A custom droid with an explicit `model` in its configuration uses that model directly and bypasses complexity routing.
+- Reasoning effort defaults to the chosen model's default and is clamped to what that model supports.
 
 ## Context and compaction
 
