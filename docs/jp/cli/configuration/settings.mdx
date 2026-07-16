@@ -215,7 +215,7 @@ droidがターミナルでコンテンツをどのように描画するかを調
 
 ## サブエージェント設定
 
-Task ツールによって起動されるサブエージェントを設定します。これらは `/settings` の **Subagents** タブに表示されます。
+Task ツールによって起動されるサブエージェントの自律性とモデルを設定します。これらは `/settings` の **Subagents** タブに表示されます。
 
 | 設定 | 型 | オプション | デフォルト | 説明 |
 | ------- | ------ | ------- | ------- | ----------- |
@@ -230,6 +230,26 @@ Task ツールによって起動されるサブエージェントを設定しま
 - **`low`**, **`medium`**, **`high`** – そのリスクレベル以下のサブエージェント作業を事前承認します。
 
 明示的なレベルを設定しても、組織管理の `maxAutonomyLevel` によって制限されるため、エンタープライズの上限を超えることはありません。ミッションワーカーにはこの設定は適用されません。
+
+### サブエージェントのモデル設定
+
+サブエージェントは複雑度ティア（`light`、`medium`、`heavy`）によってルーティングされます。各ティアは `subagentModelSettings` の下で独自のモデルと推論努力を固定できます。
+
+| 設定 | 型 | オプション | デフォルト | 説明 |
+| ------- | ------ | ------- | ------- | ----------- |
+| `subagentModelSettings.lightModel` | string | 任意の[利用可能なモデルID](/jp/models) または `inherit` | `inherit` | light 複雑度のサブエージェント（例：組み込みの `explorer`）が使用するモデル。 |
+| `subagentModelSettings.lightReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high` | モデルのデフォルト | light 複雑度のサブエージェントの推論努力。 |
+| `subagentModelSettings.mediumModel` | string | 任意の[利用可能なモデルID](/jp/models) または `inherit` | `inherit` | medium 複雑度のサブエージェント（例：組み込みの `worker`）が使用するモデル。 |
+| `subagentModelSettings.mediumReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high` | モデルのデフォルト | medium 複雑度のサブエージェントの推論努力。 |
+| `subagentModelSettings.heavyModel` | string | 任意の[利用可能なモデルID](/jp/models) または `inherit` | `inherit` | heavy 複雑度のサブエージェントが使用するモデル。 |
+| `subagentModelSettings.heavyReasoningEffort` | string | `off`, `none`, `low`, `medium`, `high` | モデルのデフォルト | heavy 複雑度のサブエージェントの推論努力。 |
+
+ティアの選択方法：
+
+- 組み込みの `worker` サブエージェントは `medium` 複雑度、`explorer` は `light` 複雑度で実行されます。カスタム droid や Task ツールは特定のティアを要求できます。
+- **`inherit`**（デフォルト）は、サブエージェントが起動元セッションのモデルを使用することを意味します。親セッションのモデルをアップグレードしても、特定のモデルに固定されたティアが遡って変更されることはありません。
+- 設定に明示的な `model` を持つカスタム droid はそのモデルを直接使用し、複雑度ルーティングをバイパスします。
+- 推論努力は選択したモデルのデフォルトになり、そのモデルがサポートする範囲に制限されます。
 
 ## コンテキストとコンパクション
 
