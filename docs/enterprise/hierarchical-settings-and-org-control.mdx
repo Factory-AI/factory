@@ -133,6 +133,10 @@ Below is the full schema for org-managed settings. These are configured by org a
   Whether AutoWiki content can be stored in the Factory App and synced to GitHub wikis.
 </ResponseField>
 
+<ResponseField name="disableWeeklyUsageSummary" type="boolean">
+  Controls the weekly email to organization Managers and Owners that lists users and active service accounts at or above 80% of their monthly credit cap. The summary is sent when this setting is omitted or `false`; set it to `true` to stop the summary.
+</ResponseField>
+
 <ResponseField name="includeCoAuthoredByDroid" type="boolean">
   Include a `Co-authored-by: Droid` trailer in git commits.
 </ResponseField>
@@ -557,6 +561,7 @@ Again, users cannot override these rules; they can only choose safer personal de
     "allowedBaseUrls": ["https://llm-gateway.internal.example.com/v1"],
     "allowAllFactoryModels": false
   },
+  "disableWeeklyUsageSummary": false,
   "userModelPolicies": {
     "user-abc-123": {
       "allowedModelIds": ["claude-opus-4-6"],

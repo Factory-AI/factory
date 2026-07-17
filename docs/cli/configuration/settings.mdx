@@ -273,7 +273,7 @@ System-level settings for status line, worktrees, and request timeouts.
 ## Enterprise and org-level settings
 
 <Note>
-**Enterprise / Org-level.** The settings below are typically managed by an organization administrator and pushed to members through the Factory web app or a managed `settings.json`. Individual users generally do not set these directly.
+**Enterprise / Org-level.** The settings below are typically managed by an organization administrator and pushed to members through the Factory App or a managed `settings.json`. Individual users generally do not set these directly. The exception is `disableUsageLimitAlerts`, a personal preference stored in each user's Factory App profile. It cannot be configured in `settings.json`.
 </Note>
 
 | Setting                              | Type    | Options                                                                                                                | Default      | Description                                                                                                                          |
@@ -290,6 +290,8 @@ System-level settings for status line, worktrees, and request timeouts.
 | `wikiCloudSync`                      | boolean | `true`, `false`                                                                                                        | `true`       | **Org-level.** Sync generated [Wiki](/cli/features/wiki/overview) content to Factory cloud.                                                                |
 | `managedComputersEnabled`            | boolean | `true`, `false`                                                                                                        | `false`      | **Enterprise.** Enable Factory-managed remote computers for the org.                                                                 |
 | `byomComputersEnabled`               | boolean | `true`, `false`                                                                                                        | `false`      | **Enterprise.** Allow members to register their own machines via `droid computer register` (BYOM).                                   |
+| `disableUsageLimitAlerts`            | boolean | `true`, `false`                                                                                                        | `false` (alerts on) | **Enterprise user preference.** Opt out of emails sent when you reach 80% and 100% of your monthly credit cap. Set `true` to stop these alerts. |
+| `disableWeeklyUsageSummary`          | boolean | `true`, `false`                                                                                                        | `false` (summary on) | **Enterprise/org-level.** Opt out of the weekly email to organization Managers and Owners that lists users and active service accounts at or above 80% of their monthly credit cap. Set `true` to stop the summary. |
 
 ## Example configuration
 
