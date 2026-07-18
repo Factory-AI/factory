@@ -15,12 +15,76 @@ curl -fsSL https://app.factory.ai/cli | sh
 irm https://app.factory.ai/cli/windows | iex
 ```
 
+```bash npm
+npm install -g droid
+```
+
 </CodeGroup>
 
 The Droid CLI operates in two modes:
 
 - **Interactive (`droid`)** - Chat-first REPL with slash commands
 - **Non-interactive (`droid exec`)** - Single-shot execution for automation and scripting
+
+### Installing a specific version
+
+Pin a version when upgrades must be reviewed and applied intentionally, such as in CI runners,
+provisioned development environments, or other reproducible systems.
+
+#### npm
+
+Specify an exact package version:
+
+```bash
+npm install -g droid@0.174.0
+```
+
+The binaries published through npm have auto-updates disabled at build time, so the installed
+version remains pinned. To upgrade, install the new version explicitly with npm.
+
+#### Built-in updater
+
+After installing Droid through the standalone installer, select a version with:
+
+```bash
+droid update --version 0.174.0
+```
+
+This command can also roll back to an older version. Use `droid update --check` to check for an
+available update without installing it.
+
+<Note>
+  Standalone installations enable automatic updates by default. After selecting a version, follow
+  the [auto-update guidance](#auto-updates) to keep it pinned.
+</Note>
+
+#### Direct binary download
+
+Release binaries and their SHA256 checksums use the following paths:
+
+```text
+https://downloads.factory.ai/factory-cli/releases/<version>/<platform>/<arch>/<binary>
+https://downloads.factory.ai/factory-cli/releases/<version>/<platform>/<arch>/<binary>.sha256
+```
+
+- `<platform>`: `linux`, `darwin`, or `windows`
+- `<arch>`: `x64`, `arm64`, or `x64-baseline`
+- `<binary>`: `droid` on Linux and macOS, or `droid.exe` on Windows
+
+For example, download and verify the Linux x64 binary:
+
+```bash
+VERSION=0.174.0
+BASE_URL="https://downloads.factory.ai/factory-cli/releases/${VERSION}/linux/x64"
+
+curl -fsSLO "${BASE_URL}/droid"
+curl -fsSLO "${BASE_URL}/droid.sha256"
+echo "$(awk '{print $1}' droid.sha256)  droid" | sha256sum --check
+chmod +x droid
+```
+
+Move the verified binary to a directory on `PATH`. The download URL layout is an implementation
+detail, so always pin a version and verify its checksum.
 
 ## Droid CLI commands
 
@@ -301,6 +365,13 @@ droid --worktree feature-b &
 
 In addition to the global flags above, several `droid` subcommands accept their own flags.
 
+#### `droid update` flags
+
+| Flag                      | Description                                        | Example                      |
+| :------------------------ | :------------------------------------------------- | :--------------------------- |
+| `-c, --check`             | Check for updates without installing               | `droid update --check`       |
+| `-v, --version <version>` | Update to or roll back to a specific version       | `droid update -v 0.174.0`    |
+
 #### `droid search` flags
 
 | Flag                  | Description                                                              | Example                                  |
@@ -375,6 +446,33 @@ set FACTORY_API_KEY=fk-...
 <Warning>
   Never commit API keys to source control. Use environment variables or secure secret management.
 </Warning>
+
+## Auto-updates
+
+Standalone Droid installations check for and install CLI updates automatically. Run `droid update`
+to trigger an update on demand.
+
+To keep a standalone installation pinned, disable its in-process updater:
+
+```bash
+export FACTORY_DROID_AUTO_UPDATE_ENABLED=false
+```
+
+With this variable set, automatic updates are disabled and `droid update` does not install another
+version. Set it in the environment that launches every Droid process, including `droid daemon`.
+
+The npm distribution has auto-updates disabled at build time and does not require this variable.
+Running `droid update` from an npm installation reports that auto-update is unavailable. Setting
+`FACTORY_DROID_AUTO_UPDATE_ENABLED=true` explicitly overrides the npm build default.
+
+Enterprise administrators can disable CLI auto-updates for all organization members with the
+`disableAutoUpdate` organization setting. See the [release notes](/changelog/release-notes) and
+[enterprise control change history API](/api-reference/organization/list-enterprise-control-change-history).
+
+<Tip>
+  Pin the CLI and disable auto-updates in reproducible environments. For local developer
+  installations, leave auto-updates enabled to receive fixes and security updates.
+</Tip>
 
 ## Exit codes
 
