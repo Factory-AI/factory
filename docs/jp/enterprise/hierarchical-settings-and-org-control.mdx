@@ -111,6 +111,10 @@ User        → ~/.factory/
   AutoWiki コンテンツを Factory App に保存し、GitHub wiki に同期できるかどうか
 </ResponseField>
 
+<ResponseField name="disableWeeklyUsageSummary" type="boolean">
+  月間クレジット上限の80%以上に達したユーザーと有効なサービスアカウントを一覧にした週次メールを、組織のマネージャーおよびオーナーへ送信するかどうかを制御します。未設定または `false` の場合は送信され、`true` に設定すると停止します。
+</ResponseField>
+
 <ResponseField name="includeCoAuthoredByDroid" type="boolean">
   git コミットに `Co-authored-by: Droid` トレーラーを含めるかどうか
 </ResponseField>
@@ -533,6 +537,7 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
     "allowedBaseUrls": ["https://llm-gateway.internal.example.com/v1"],
     "allowAllFactoryModels": false
   },
+  "disableWeeklyUsageSummary": false,
   "userModelPolicies": {
     "user-abc-123": {
       "allowedModelIds": ["claude-opus-4-6"],
