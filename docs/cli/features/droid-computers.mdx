@@ -87,7 +87,7 @@ The `ssh` subcommand supports the following flags:
 
 `droid computer port-forward <name> <mappings...>` forwards local TCP ports to a Droid Computer over the same relay tunnel used by `droid computer ssh` — no direct port exposure is required. Managed Droid Computers are woken automatically before the connection is established.
 
-Mappings are kubectl-style and you can pass multiple in one command:
+Mappings can be passed multiple at a time in one command:
 
 - `LOCAL:REMOTE` — bind `LOCAL` locally and forward to `REMOTE` (e.g. `8080:80`)
 - `REMOTE` — use the same port on both sides (e.g. `5432`)
@@ -103,7 +103,7 @@ The `port-forward` subcommand supports the following flags:
 - `--address <addr>` — Local address to bind (default: `127.0.0.1`)
 - `--debug` — Enable debug output
 
-Only TCP is supported, matching kubectl `port-forward`.
+Only TCP is supported.
 
 ## Monitoring
 
