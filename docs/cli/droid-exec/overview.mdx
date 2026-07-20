@@ -378,16 +378,20 @@ droid exec --auto medium --disabled-tools execute-cli "run edits only"
 
 ### Skill controls
 
-Use `--disable-builtin-skills` when an integration should expose only skills supplied outside the Droid CLI:
+Use `--disable-builtin-skills` when an interactive or non-interactive session should expose only skills supplied outside the Droid CLI:
 
 ```bash
+# Start the interactive TUI without builtin skills
+droid --disable-builtin-skills
+
+# Run one non-interactive session without builtin skills
 droid exec --disable-builtin-skills "analyze this repository"
 ```
 
-This removes Factory-provided builtin skills for the session while preserving user, project, plugin, automation, mission, runtime, and dynamically supplied skills. The restriction is inherited by child sessions, including subagents and mission workers.
+This removes Factory-provided builtin skills while preserving user, project, plugin, automation, mission, runtime, and dynamically supplied skills. For an interactive launch, the restriction remains active when you create, resume, or switch sessions. It is also inherited by child sessions, including subagents and mission workers.
 
 <Note>
-  The flag is not supported in Agent Client Protocol (ACP) mode. Use it with standard `droid exec`, or set `disableBuiltinSkills` on `droid.initialize_session` and `droid.load_session` requests in stream JSON-RPC mode.
+  The flag is not supported in Agent Client Protocol (ACP) mode. Use it with standard `droid` or `droid exec`, or set `disableBuiltinSkills` on `droid.initialize_session` and `droid.load_session` requests in stream JSON-RPC mode.
 </Note>
 
 ### Custom models
