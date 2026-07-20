@@ -45,6 +45,7 @@ CLIは2つのモードで動作します：
 | `droid computer remove`              | このマシンの BYOM 登録を削除                                                | `droid computer remove`                        |
 | `droid computer list`                | 登録済みの BYOM コンピューターを一覧表示                                      | `droid computer list`                          |
 | `droid computer ssh <name>`          | 登録済みの BYOM コンピューターに SSH 接続                                    | `droid computer ssh laptop`                    |
+| `droid computer port-forward <name> <mappings...>` | ローカルポートをリレー経由でコンピューターに転送             | `droid computer port-forward laptop 8080:80`   |
 | `droid daemon`                       | Factory デーモンサーバーを実行                                              | `droid daemon`                                 |
 | `droid update`                       | CLIを最新バージョンに手動更新                                                | `droid update`                                 |
 
@@ -333,6 +334,15 @@ droid --worktree feature-b &
 | フラグ        | 説明                                                       | 例                                    |
 | :----------- | :-------------------------------------------------------- | :----------------------------------- |
 | `-y, --yes`  | 対話プロンプトをスキップして登録のデフォルトを受け入れる            | `droid computer register laptop -y`  |
+
+#### `droid computer port-forward` のフラグ
+
+マッピングは kubectl 形式です: `LOCAL:REMOTE`（例: `8080:80`）、単一の `REMOTE`（両側で同じポート）、または `:REMOTE`（空いているローカルポートをランダムに使用）。
+
+| フラグ             | 説明                                        | 例                                                          |
+| :---------------- | :----------------------------------------- | :--------------------------------------------------------- |
+| `--address <addr>` | バインドするローカルアドレス（デフォルト: `127.0.0.1`） | `droid computer port-forward laptop 8080:80 --address 0.0.0.0` |
+| `--debug`         | デバッグ出力を有効化                            | `droid computer port-forward laptop 8080:80 --debug`      |
 
 ### MCPコマンドリファレンス
 

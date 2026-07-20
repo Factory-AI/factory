@@ -111,6 +111,7 @@ detail, so always pin a version and verify its checksum.
 | `droid computer remove`              | Remove this machine's BYOM registration                                | `droid computer remove`                        |
 | `droid computer list`                | List registered BYOM computers                                         | `droid computer list`                          |
 | `droid computer ssh <name>`          | SSH into a registered BYOM computer                                    | `droid computer ssh laptop`                    |
+| `droid computer port-forward <name> <mappings...>` | Forward local ports to a computer over the relay        | `droid computer port-forward laptop 8080:80`   |
 | `droid daemon`                       | Run the Factory daemon server                                          | `droid daemon`                                 |
 | `droid update`                       | Manually update the CLI to latest version                              | `droid update`                                 |
 
@@ -404,6 +405,15 @@ In addition to the global flags above, several `droid` subcommands accept their 
 | Flag         | Description                                              | Example                              |
 | :----------- | :------------------------------------------------------- | :----------------------------------- |
 | `-y, --yes`  | Skip interactive prompts and accept registration defaults | `droid computer register laptop -y`  |
+
+#### `droid computer port-forward` flags
+
+Mappings are kubectl-style: `LOCAL:REMOTE` (e.g. `8080:80`), bare `REMOTE` (same port on both sides), or `:REMOTE` (a random free local port).
+
+| Flag              | Description                                    | Example                                                     |
+| :---------------- | :--------------------------------------------- | :--------------------------------------------------------- |
+| `--address <addr>` | Local address to bind (default: `127.0.0.1`) | `droid computer port-forward laptop 8080:80 --address 0.0.0.0` |
+| `--debug`         | Enable debug output                            | `droid computer port-forward laptop 8080:80 --debug`      |
 
 ### MCP command reference
 

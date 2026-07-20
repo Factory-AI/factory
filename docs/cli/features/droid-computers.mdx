@@ -66,6 +66,7 @@ Once provisioning completes, the Droid Computer status changes to **Active** and
 |---------|-------------|
 | `droid computer list` | List all Droid Computers (shows name, ID, status; marks current machine) |
 | `droid computer ssh <name>` | Open an interactive SSH session to any Droid Computer |
+| `droid computer port-forward <name> <mappings...>` | Forward local ports to a Droid Computer over the relay |
 
 ### BYOM setup
 
@@ -81,6 +82,28 @@ The `ssh` subcommand supports the following flags:
 - `--proxy` — Run as a stdio proxy (for use as a `ProxyCommand`)
 - `--port <port>` — Target port on the remote machine (default: 22)
 - `--debug` — Enable verbose connection logging
+
+## Port forwarding
+
+`droid computer port-forward <name> <mappings...>` forwards local TCP ports to a Droid Computer over the same relay tunnel used by `droid computer ssh` — no direct port exposure is required. Managed Droid Computers are woken automatically before the connection is established.
+
+Mappings are kubectl-style and you can pass multiple in one command:
+
+- `LOCAL:REMOTE` — bind `LOCAL` locally and forward to `REMOTE` (e.g. `8080:80`)
+- `REMOTE` — use the same port on both sides (e.g. `5432`)
+- `:REMOTE` — pick a random free local port (e.g. `:9000`)
+
+```
+# Forward local 8080 to remote 80, and local 5432 to remote 5432
+droid computer port-forward mycomputer 8080:80 5432
+```
+
+The `port-forward` subcommand supports the following flags:
+
+- `--address <addr>` — Local address to bind (default: `127.0.0.1`)
+- `--debug` — Enable debug output
+
+Only TCP is supported, matching kubectl `port-forward`.
 
 ## Monitoring
 
