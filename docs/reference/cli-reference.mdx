@@ -60,7 +60,8 @@ Customize droid's behavior with command-line flags:
 | `-m, --model <id>`                | Select a specific [model ID](/models)                              | `droid exec -m claude-opus-4-7`                              |
 | `-s, --session-id <id>`           | Continue an existing session                                       | `droid exec -s session-abc123`                               |
 | `--auto <level>`                  | Set [autonomy level](#autonomy-levels) (`low`, `medium`, `high`)   | `droid exec --auto medium "run tests"`                       |
-| `--enabled-tools <ids>`           | Force-enable specific tools (comma or space separated)             | `droid exec --enabled-tools ApplyPatch,Bash`                 |
+| `--restrict-tools <ids>`          | Restrict the run to only the specified tools (comma or space separated) | `droid exec --restrict-tools ApplyPatch,Bash`           |
+| `--additional-tools <ids>`        | Force-enable additional tools beyond the defaults (comma or space separated) | `droid exec --additional-tools ApplyPatch,Bash`    |
 | `--disabled-tools <ids>`          | Disable specific tools for this run                                | `droid exec --disabled-tools execute-cli`                    |
 | `--list-tools`                    | Print available tools and exit                                     | `droid exec --list-tools`                                    |
 | `-o, --output-format <format>`    | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)    | `droid exec -o json "document API"`                          |

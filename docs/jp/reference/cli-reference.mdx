@@ -58,7 +58,8 @@ CLIは2つのモードで動作します：
 | `-m, --model <id>`                   | 特定の[モデルID](/jp/models)を選択                                                                       | `droid exec -m claude-opus-4-7`                            |
 | `-s, --session-id <id>`              | 既存セッションを継続                                                                                 | `droid exec -s session-abc123`                             |
 | `--auto <level>`                     | [自律レベル](#autonomy-levels)を設定（`low`、`medium`、`high`）                                             | `droid exec --auto medium "run tests"`                     |
-| `--enabled-tools <ids>`              | 特定のツールを強制有効化（カンマまたはスペース区切り）                                                       | `droid exec --enabled-tools ApplyPatch,Bash`               |
+| `--restrict-tools <ids>`             | 指定したツールのみに制限（カンマまたはスペース区切り）                                                       | `droid exec --restrict-tools ApplyPatch,Bash`             |
+| `--additional-tools <ids>`           | 既定に加えて追加のツールを強制有効化（カンマまたはスペース区切り）                                                 | `droid exec --additional-tools ApplyPatch,Bash`           |
 | `--disabled-tools <ids>`             | この実行で特定のツールを無効化                                                                          | `droid exec --disabled-tools execute-cli`                  |
 | `--list-tools`                       | 利用可能なツールを表示して終了                                                                               | `droid exec --list-tools`                                  |
 | `-o, --output-format <format>`       | 出力形式（`text`、`json`、`stream-json`、`stream-jsonrpc`）                                              | `droid exec -o json "document API"`                        |
