@@ -42,7 +42,7 @@ https://app.factory.ai
 Retrieves readiness reports for your organization.
 
 ```
-GET /api/organization/maturity-level-reports
+GET /api/organization/agent-readiness-reports
 ```
 
 #### Query Parameters
@@ -99,7 +99,7 @@ GET /api/organization/maturity-level-reports
 #### Example Request
 
 ```bash
-curl -X GET "https://app.factory.ai/api/organization/maturity-level-reports?limit=10" \
+curl -X GET "https://app.factory.ai/api/organization/agent-readiness-reports?limit=10" \
   -H "Authorization: Bearer fk-your-api-key"
 ```
 
@@ -156,10 +156,10 @@ For large result sets, use cursor-based pagination:
 
 ```bash
 # First page
-curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10"
+curl "https://app.factory.ai/api/organization/agent-readiness-reports?limit=10"
 
 # Next page (using last reportId from previous response)
-curl "https://app.factory.ai/api/organization/maturity-level-reports?limit=10&startAfter=550e8400-e29b-41d4-a716-446655440000"
+curl "https://app.factory.ai/api/organization/agent-readiness-reports?limit=10&startAfter=550e8400-e29b-41d4-a716-446655440000"
 ```
 
 ---
@@ -172,7 +172,7 @@ Track readiness scores over time by fetching reports after each evaluation:
 
 ```bash
 # Get latest report for a specific repository
-curl "https://app.factory.ai/api/organization/maturity-level-reports?repoId=123&limit=1" \
+curl "https://app.factory.ai/api/organization/agent-readiness-reports?repoId=123&limit=1" \
   -H "Authorization: Bearer $FACTORY_API_KEY"
 ```
 
@@ -182,7 +182,7 @@ Build internal dashboards by fetching all reports and calculating aggregate metr
 
 ```javascript
 const response = await fetch(
-  "https://app.factory.ai/api/organization/maturity-level-reports",
+  "https://app.factory.ai/api/organization/agent-readiness-reports",
   { headers: { Authorization: `Bearer ${apiKey}` } }
 );
 const { reports } = await response.json();
@@ -198,7 +198,7 @@ Set up alerts when readiness scores drop below thresholds:
 
 ```bash
 # Fetch recent reports and check for regressions
-reports=$(curl -s "https://app.factory.ai/api/organization/maturity-level-reports?limit=50" \
+reports=$(curl -s "https://app.factory.ai/api/organization/agent-readiness-reports?limit=50" \
   -H "Authorization: Bearer $FACTORY_API_KEY")
 
 # Process and alert on regressions...
