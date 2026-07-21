@@ -395,36 +395,4 @@ The organization's analytics settings were updated.
 }
 ```
 
----
 
-### `voucher_redeemed`
-
-A voucher or promo code was redeemed for the organization.
-
-**Sources:** `web_settings_billing`
-
-**Target:** `{}` (the organization itself is the target).
-
-**Payload:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `voucherId` | string or null | The promotion or voucher ID. |
-| `toTier` | string or null | Resulting subscription tier after redemption, when the voucher changes it. |
-
-**Example:**
-
-```json
-{
-  "eventType": "voucher_redeemed",
-  "source": "web_settings_billing",
-  "actor": {
-    "principalKind": "human",
-    "principalId": "user_abc",
-    "email": "admin@corp.com",
-    "role": "owner"
-  },
-  "target": {},
-  "payload": { "voucherId": "promo_xyz", "toTier": "growth" }
-}
-```
