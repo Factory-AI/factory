@@ -130,6 +130,15 @@ When enabled, Droid emits message content as OTEL **trace spans** (on the `/v1/t
     export OTEL_TELEMETRY_HEADERS="x-honeycomb-team=<your-api-key>,x-honeycomb-dataset=droid-metrics"
     ```
   </Accordion>
+
+  <Accordion title="Oodle">
+    ```bash
+    export OTEL_TELEMETRY_ENDPOINT="https://<INSTANCE_ID>-otlp.collector.oodle.ai"
+    export OTEL_TELEMETRY_HEADERS="X-API-KEY=<API_KEY>,X-OODLE-INSTANCE=<INSTANCE_ID>"
+    ```
+
+    Get your `<INSTANCE_ID>` and `<API_KEY>` from the Factory Droid tile under **Settings → Integrations → AI Observability** in the Oodle UI. Droid appends `/v1/metrics` to the endpoint. Once telemetry is flowing, view it under **AI Cost Management → Factory Droid** in the Oodle sidebar. See the [Oodle Factory Droid guide](https://docs.oodle.ai/ai-cost-management/factory) for details.
+  </Accordion>
 </AccordionGroup>
 
 ---
