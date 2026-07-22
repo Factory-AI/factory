@@ -134,17 +134,19 @@ The Droid Computer detail page displays the running daemon version alongside the
 
 ### VS Code Remote-SSH
 
-You can use `droid computer ssh` as a `ProxyCommand` for VS Code Remote-SSH:
+You can use `droid computer ssh` as a `ProxyCommand` for VS Code Remote-SSH. Add the following to your `~/.ssh/config`:
 
 ```
-Host factory-mycomputer
-  ProxyCommand droid computer ssh mycomputer --proxy
+Host factory-*
+  ProxyCommand droid computer ssh %h --proxy
   User factory-user
+  StrictHostKeyChecking accept-new
+  UserKnownHostsFile ~/.factory/.ssh/known_hosts
   IdentityFile ~/.factory/.ssh/id_ed25519
   IdentitiesOnly yes
-  StrictHostKeyChecking no
-  UserKnownHostsFile /dev/null
 ```
+
+The wildcard `factory-*` host applies to every Droid Computer, and `%h` passes the host name through to the CLI, so you connect to `factory-<computer-name>` (for example, `factory-mycomputer`) without adding a stanza per computer. Host keys are recorded on first connect (`StrictHostKeyChecking accept-new`) in a dedicated `~/.factory/.ssh/known_hosts` file, so a changed key surfaces an SSH warning instead of being accepted silently.
 
 This lets you open a full VS Code remote session on your Droid Computer.
 
