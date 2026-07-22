@@ -1,7 +1,6 @@
 ---
 title: Sandbox
-tag: "Beta"
-description: OS-level sandboxing isolates Droid from your filesystem and network using kernel-enforced policies (Beta).
+description: OS-level sandboxing isolates Droid from your filesystem and network using kernel-enforced policies.
 keywords:
   [
     "sandbox",
@@ -17,12 +16,7 @@ keywords:
   ]
 ---
 
-<Note>
-  **Beta** — OS-level Sandbox is opt-in and under active development. Behavior,
-  settings, and platform support may change between releases.
-</Note>
-
-OS-level sandboxing lets users set filesystem and network boundaries for Droid. In the Beta version, all shell commands initiated by Droid run in a separate process that is limited to the filesystem and network boundaries configured by users and enforced at the OS kernel level.
+OS-level sandboxing lets users set filesystem and network boundaries for Droid. All shell commands initiated by Droid run in a separate process that is limited to the filesystem and network boundaries configured by users and enforced at the OS kernel level.
 
 ## How OS-level isolation works
 
@@ -30,7 +24,7 @@ Sandbox enforces its filesystem and network boundaries with the same operating-s
 
 - **macOS** -- Seatbelt (the built-in macOS sandbox) profiles restrict filesystem and process access.
 - **Linux and WSL2** -- [bubblewrap](https://github.com/containers/bubblewrap) with a seccomp filter provides the same confinement.
-- **Network (all platforms)** -- outbound traffic is routed through an HTTP/SOCKS filtering proxy that permits only the allowed domains (Factory's own domains are always allowed).
+- **Network (all platforms)** -- outbound traffic is routed through an HTTP/SOCKS filtering proxy that permits only the allowed domains. Factory service domains and WorkOS authentication domains are always allowed.
 
 Because Sandbox relies on these host primitives, it blocks rather than running without isolation when they are unavailable.
 
@@ -68,7 +62,7 @@ Once enabled, the default policies below apply immediately -- no other configura
 | --------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | **File reads**  | Allow all. Only explicit `denyRead` entries are blocked.                                                                  | `sandbox.filesystem.denyRead`                                   |
 | **File writes** | Deny all except **CWD** (current working directory). Additional paths can be allowed. `denyWrite` overrides `allowWrite`. | `sandbox.filesystem.allowWrite`, `sandbox.filesystem.denyWrite` |
-| **Network**     | Deny all except Factory's own domains (always allowed by default). Additional domains must be explicitly allowed.          | `sandbox.network.allowedDomains`                                |
+| **Network**     | Deny all except Factory service domains and WorkOS authentication domains (always allowed by default). Additional domains must be explicitly allowed. | `sandbox.network.allowedDomains`                                |
 
 ### Full settings reference
 
@@ -87,7 +81,7 @@ Once enabled, the default policies below apply immediately -- no other configura
       "denyRead": ["~/.aws/credentials", "~/.ssh/id_rsa"]
     },
     "network": {
-      // Only these domains are reachable (Factory's own domains always included)
+      // Only these domains are reachable (Factory service domains and WorkOS auth domains always included)
       "allowedDomains": ["github.com", "*.npmjs.org"]
     }
   }
