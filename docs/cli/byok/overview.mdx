@@ -59,6 +59,7 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 | `noImageSupport` | `boolean` | | Set to `true` to disable image inputs for this model |
 | `extraArgs` | `object` | | Additional provider-specific arguments to include in API requests |
 | `extraHeaders` | `object` | | Additional HTTP headers to send with requests |
+| `bedrock` | `object` | | AWS Bedrock routing options (`awsRegion`, `awsProfile`, `bedrockBaseUrl`, `awsAuthRefresh`, `awsCredentialExport`). See [AWS Bedrock](#aws-bedrock). |
 
 ### Using extraArgs
 
@@ -103,6 +104,67 @@ Add custom HTTP headers to API requests:
   ]
 }
 ```
+
+---
+
+## AWS Bedrock
+
+To route an Anthropic or OpenAI custom model through AWS Bedrock, add a `bedrock` object to the model config. Credentials are resolved through the standard AWS SDK provider chain (environment variables, shared config/credentials files, or an SSO/IAM profile).
+
+```json
+{
+  "customModels": [
+    {
+      "model": "anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "displayName": "Sonnet 4.5 [Bedrock]",
+      "provider": "anthropic",
+      "apiKey": "not-used-for-bedrock",
+      "bedrock": {
+        "awsRegion": "${AWS_REGION}",
+        "awsProfile": "${AWS_PROFILE}"
+      }
+    }
+  ]
+}
+```
+
+### Bedrock fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `awsRegion` | `string` | AWS region for Bedrock requests. Optional; when omitted, Droid falls back to the AWS default region chain. Supports `${VAR_NAME}` interpolation. |
+| `awsProfile` | `string` | AWS profile name to resolve credentials and (as a last resort) a region. Supports `${VAR_NAME}` interpolation. |
+| `bedrockBaseUrl` | `string` | Explicit Bedrock endpoint override. Accepts a full URL or a `${VAR_NAME}` reference that expands to one. |
+| `awsAuthRefresh` | `string` | Shell command run to refresh AWS credentials before requests. |
+| `awsCredentialExport` | `string` | Shell command whose output exports AWS credentials into the request environment. |
+
+### Environment variable interpolation
+
+Like `apiKey`, the `awsRegion`, `awsProfile`, and `bedrockBaseUrl` fields support `${VAR_NAME}` references in `settings.json`/`settings.local.json`, expanded per workspace at parse time. This lets a single centrally-distributed `customModels` config resolve to the correct value in each environment:
+
+```json
+{
+  "bedrock": {
+    "awsRegion": "${AWS_REGION}"
+  }
+}
+```
+
+If a referenced variable is not set, Droid fails fast with a clear error naming the missing variable instead of sending the literal `${VAR_NAME}` to AWS.
+
+<Note>
+  `awsAuthRefresh` and `awsCredentialExport` are **not** expanded by the settings parser. They run through a shell, so `${VAR}` in those commands is substituted by the shell at run time against the child process environment.
+</Note>
+
+### Region resolution
+
+When `awsRegion` is omitted, Droid resolves the region using the AWS default chain, in order:
+
+1. `AWS_REGION`
+2. `AWS_DEFAULT_REGION`
+3. The `region` set on the resolved AWS profile in `~/.aws/config`
+
+If none of these supply a region, Droid fails fast with a clear error rather than silently defaulting, so requests never target a region the workspace did not choose (important for VPC-endpoint region affinity).
 
 ---
 
