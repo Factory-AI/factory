@@ -59,6 +59,7 @@ Factory管理モデルと倍率については、[利用可能なモデル](/jp/
 | `noImageSupport` | `boolean` | | このモデルで画像入力を無効にするには`true`に設定 |
 | `extraArgs` | `object` | | APIリクエストに含める追加のプロバイダー固有の引数 |
 | `extraHeaders` | `object` | | リクエストと共に送信する追加のHTTPヘッダー |
+| `bedrock` | `object` | | AWS Bedrockへのルーティングオプション（`awsRegion`、`awsProfile`、`bedrockBaseUrl`、`awsAuthRefresh`、`awsCredentialExport`）。[AWS Bedrock](#aws-bedrock)を参照してください。 |
 
 ### extraArgsの使用
 
@@ -103,6 +104,67 @@ APIリクエストにカスタムHTTPヘッダーを追加します：
   ]
 }
 ```
+
+---
+
+## AWS Bedrock
+
+AnthropicまたはOpenAIのカスタムモデルをAWS Bedrock経由でルーティングするには、モデル設定に`bedrock`オブジェクトを追加します。認証情報は、標準のAWS SDKプロバイダーチェーン（環境変数、共有config/credentialsファイル、またはSSO/IAMプロファイル）を通じて解決されます。
+
+```json
+{
+  "customModels": [
+    {
+      "model": "anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "displayName": "Sonnet 4.5 [Bedrock]",
+      "provider": "anthropic",
+      "apiKey": "not-used-for-bedrock",
+      "bedrock": {
+        "awsRegion": "${AWS_REGION}",
+        "awsProfile": "${AWS_PROFILE}"
+      }
+    }
+  ]
+}
+```
+
+### Bedrockフィールド
+
+| フィールド | タイプ | 説明 |
+|-------|------|-------------|
+| `awsRegion` | `string` | Bedrockリクエスト用のAWSリージョン。省略可能で、省略時はDroidがAWSのデフォルトリージョンチェーンにフォールバックします。`${VAR_NAME}`補間をサポートします。 |
+| `awsProfile` | `string` | 認証情報と（最終手段として）リージョンを解決するためのAWSプロファイル名。`${VAR_NAME}`補間をサポートします。 |
+| `bedrockBaseUrl` | `string` | Bedrockエンドポイントを明示的に上書きします。完全なURL、またはそれに展開される`${VAR_NAME}`参照を指定できます。 |
+| `awsAuthRefresh` | `string` | リクエスト前にAWS認証情報を更新するために実行されるシェルコマンド。 |
+| `awsCredentialExport` | `string` | 出力を通じてリクエスト環境にAWS認証情報をエクスポートするシェルコマンド。 |
+
+### 環境変数補間
+
+`apiKey`と同様に、`awsRegion`、`awsProfile`、`bedrockBaseUrl`フィールドは`settings.json`/`settings.local.json`内で`${VAR_NAME}`参照をサポートし、パース時にワークスペースごとに展開されます。これにより、一元配布された単一の`customModels`設定でも、各環境で正しい値に解決できます。
+
+```json
+{
+  "bedrock": {
+    "awsRegion": "${AWS_REGION}"
+  }
+}
+```
+
+参照された変数が設定されていない場合、Droidは`${VAR_NAME}`という文字列をそのままAWSに送信する代わりに、不足している変数名を明示したわかりやすいエラーですぐに失敗します。
+
+<Note>
+  `awsAuthRefresh`と`awsCredentialExport`は**設定パーサーでは展開されません**。これらはシェル経由で実行されるため、それらのコマンド内の`${VAR}`は子プロセス環境に対して実行時にシェルが置換します。
+</Note>
+
+### リージョン解決
+
+`awsRegion`を省略した場合、Droidは次の順序でAWSのデフォルトチェーンを使ってリージョンを解決します。
+
+1. `AWS_REGION`
+2. `AWS_DEFAULT_REGION`
+3. `~/.aws/config`内で解決されたAWSプロファイルに設定された`region`
+
+これらのいずれでもリージョンが提供されない場合、Droidは暗黙のデフォルトを使わず、明確なエラーですぐに失敗します。これにより、リクエストがワークスペースで選択していないリージョンを誤ってターゲットにすることを防ぎます（VPCエンドポイントのリージョンアフィニティにとって重要です）。
 
 ---
 

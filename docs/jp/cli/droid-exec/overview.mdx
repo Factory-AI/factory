@@ -65,6 +65,7 @@ Options:
   --restrict-tools <ids>                Restrict the run to only the specified tools (comma or space separated list)
   --additional-tools <ids>              Enable additional tools beyond the defaults (comma or space separated list)
   --disabled-tools <ids>                Disable specific tools (comma or space separated list)
+  --disable-builtin-skills              Disable Factory-provided builtin skills for this session
   --list-tools                          List available tools for the selected model and exit
   --cwd <path>                          Working directory path
   -w, --worktree [name]                 Run in a git worktree
@@ -275,6 +276,15 @@ stdin の各行は 1 つの JSON-RPC リクエストです。stdout の各行は
 - ツール権限リクエストを承認、拒否、変換、監査するポリシーレイヤー
 - Droid イベントを独自のプロトコル、メッセージバス、telemetry、ストレージ層へ橋渡しするブリッジ
 
+Factory 提供の組み込みスキルを無効化するには、セッションの初期化または読み込み時に `disableBuiltinSkills` を設定します：
+
+```json
+{"jsonrpc":"2.0","id":"1","method":"droid.initialize_session","params":{"machineId":"my-machine","cwd":"/workspace","disableBuiltinSkills":true}}
+{"jsonrpc":"2.0","id":"2","method":"droid.load_session","params":{"sessionId":"session-123","disableBuiltinSkills":true}}
+```
+
+stream JSON-RPC モードでは、`--disable-builtin-skills` CLI フラグの代わりにリクエストフィールドを使用します。TypeScript SDK でも、`createSession({ disableBuiltinSkills: true })` と `resumeSession(sessionId, { disableBuiltinSkills: true })` を通じて同じオプションを利用できます。
+
 プロトコルのリファレンスと実装パターンについては、[TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript) の low-level client と process transport を参照してください。
 
 可能であれば SDK を優先してください：
@@ -335,6 +345,25 @@ droid exec --additional-tools ApplyPatch "refactor files"
 # Disable specific tools
 droid exec --auto medium --disabled-tools execute-cli "run edits only"
 ```
+
+### スキル制御
+
+インタラクティブまたは非インタラクティブなセッションで、Droid CLI の外部から提供されたスキルだけを公開したい場合は、`--disable-builtin-skills` を使用します：
+
+```bash
+# Start the interactive TUI without builtin skills
+droid --disable-builtin-skills
+
+# Run one non-interactive session without builtin skills
+droid exec --disable-builtin-skills "analyze this repository"
+```
+
+これにより、Factory 提供の組み込みスキルは無効化されますが、ユーザー、プロジェクト、プラグイン、自動化、mission、runtime、および動的に提供されるスキルは保持されます。インタラクティブ起動では、この制限はセッションの作成、再開、切り替え後も有効なままです。また、subagent や mission worker を含む子セッションにも継承されます。
+
+<Note>
+  このフラグは Agent Client Protocol (ACP) モードではサポートされません。通常の `droid` または `droid exec` で使用するか、stream JSON-RPC モードの `droid.initialize_session` および `droid.load_session` リクエストで `disableBuiltinSkills` を設定してください。
+</Note>
+
 ### カスタムモデル
 
 `~/.factory/settings.json`ファイルにカスタムモデルを追加することで、`droid exec`で使用するカスタムモデルを設定できます：
