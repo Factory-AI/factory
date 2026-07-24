@@ -88,19 +88,43 @@ User        → ~/.factory/
 </ResponseField>
 
 <ResponseField name="builtInToolAutonomyOverrides" type="object">
-  組み込みネットワークツールを確認プロンプトなしで実行するために必要な、ツールごとの[自律レベル](/jp/cli/user-guides/auto-run)。組み込みツール名を `low`、`medium`、`high` にマッピングします。ツールは、セッションの自律レベルが設定された要件以上の場合にのみ自動実行され、それ以外の場合は Droid が承認を求めます。エントリのないツールはデフォルトで `low` になります。組織管理設定からのみ適用されるため、ユーザーおよびプロジェクト設定で弱めることはできません。Enterprise Controls の **Built-in Tool Autonomy** で設定します。
-  <Expandable title="properties">
+  組み込みのネットワークツールを確認プロンプトなしで実行するために必要な、ツールごとの [自律レベル](/jp/cli/user-guides/auto-run)。組み込みツール名から `low`、`medium`、`high` へのマップです。ツールは、セッションの自律レベルが設定された要件以上の場合にのみ自動実行され、それ以外では Droid が承認を求めます。エントリがないツールは `low` がデフォルトです。組織管理設定からのみ強制されるため、ユーザー設定やプロジェクト設定でこれを緩和することはできません。Enterprise Controls の **Built-in Tool Autonomy** で設定します。
+  <Expandable title="プロパティ">
     <ResponseField name="WebSearch" type="string">
-      組み込みの Web Search ツールを実行するために必要な自律レベル。`low`、`medium`、`high` のいずれか。デフォルトは `low`。
+      組み込みの Web Search ツールを実行するために必要な自律レベル。`low`、`medium`、`high` のいずれか。デフォルトは `low` です。
     </ResponseField>
     <ResponseField name="FetchUrl" type="string">
-      組み込みの Fetch URL ツールを実行するために必要な自律レベル。`low`、`medium`、`high` のいずれか。デフォルトは `low`。
+      組み込みの Fetch URL ツールを実行するために必要な自律レベル。`low`、`medium`、`high` のいずれか。デフォルトは `low` です。
     </ResponseField>
   </Expandable>
 </ResponseField>
 
 <ResponseField name="subagentAutonomyLevel" type="string">
   Task ツールによって起動されるサブエージェントに適用される自律レベル。`inherit`、`off`、`low`、`medium`、`high` のいずれか。デフォルトは `inherit` で、親セッションの自律レベルにフォールバックします。明示的なレベルは `maxAutonomyLevel` によって制限されるため、エンタープライズの上限を超えることはありません。
+</ResponseField>
+
+<ResponseField name="subagentModelSettings" type="object">
+  [サブエージェント](/jp/cli/configuration/custom-droids) 向けの複雑さ → モデルのルーティングです。サブエージェントの droid が `model: inherit` を使い、親が complexity ティアを渡したときに適用されます。
+  <Expandable title="プロパティ">
+    <ResponseField name="lightModel" type="string">
+      `light` complexity タスクで使用するモデル。モデル識別子を指定するか、省略して起動元セッションのモデルを継承します。
+    </ResponseField>
+    <ResponseField name="lightReasoningEffort" type="string">
+      light tier の reasoning effort。`reasoningEffort` と同じ値を使用します。
+    </ResponseField>
+    <ResponseField name="mediumModel" type="string">
+      `medium` complexity タスクで使用するモデル。モデル識別子を指定するか、省略して起動元セッションのモデルを継承します。
+    </ResponseField>
+    <ResponseField name="mediumReasoningEffort" type="string">
+      medium tier の reasoning effort。`reasoningEffort` と同じ値を使用します。
+    </ResponseField>
+    <ResponseField name="heavyModel" type="string">
+      `heavy` complexity タスクで使用するモデル。モデル識別子を指定するか、省略して起動元セッションのモデルを継承します。
+    </ResponseField>
+    <ResponseField name="heavyReasoningEffort" type="string">
+      heavy tier の reasoning effort。`reasoningEffort` と同じ値を使用します。
+    </ResponseField>
+  </Expandable>
 </ResponseField>
 
 <ResponseField name="cloudSessionSync" type="boolean">
@@ -112,7 +136,7 @@ User        → ~/.factory/
 </ResponseField>
 
 <ResponseField name="disableWeeklyUsageSummary" type="boolean">
-  月間クレジット上限の80%以上に達したユーザーと有効なサービスアカウントを一覧にした週次メールを、組織のマネージャーおよびオーナーへ送信するかどうかを制御します。未設定または `false` の場合は送信され、`true` に設定すると停止します。
+  月間クレジット上限の80%以上に達したユーザーと有効なサービスアカウントを一覧にした週次メールを、組織のマネージャーおよびオーナーへ送信するかどうかを制御します。この設定を省略するか `false` にするとサマリーが送信され、停止するには `true` に設定します。
 </ResponseField>
 
 <ResponseField name="includeCoAuthoredByDroid" type="boolean">
@@ -352,6 +376,7 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
 - `sessionDefaultSettings.autonomyMode`
 - `maxAutonomyLevel`
 - `subagentAutonomyLevel`
+- `subagentModelSettings.*`（tier ごとのモデルと reasoning effort）
 
 これにより、組織の決定（どのモデルや自律レベルが許可されているかなど）が権威を保持することが保証されます。
 
@@ -572,8 +597,7 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
 
 - **AutoWiki Cloud Sync** (`wikiCloudSync`) – AutoWiki コンテンツを Factory App に生成・保存できるかどうかを制御します。無効にすると、すべての wiki API エンドポイントがブロックされ、CLI は Factory App への保存と GitHub wiki 同期をスキップします。デフォルトで有効です。詳しくは [AutoWiki](/jp/cli/features/wiki/overview#autowiki-cloud-sync) を参照してください。
 - **Cloud Session Sync** (`cloudSessionSync`) – セッションデータを Factory cloud に同期するかどうかを制御します。
-- **Hooks Policy** (`allowManagedHooksOnly`, `hooks`) – 組織管理者が組織管理フックを定義でき、「管理/プラグインフックのみ」を有効にすると、すべてのユーザーレベルおよびプロジェクトレベルのフックが解決時に破棄されます。組織管理フックは権威があり、メンバーがそれらを削除したり独自のフックを再導入したりすることはできません。[組織管理フック](/jp/reference/hooks-reference#org-managed-hooks) を参照してください。
-- **Built-in Tool Autonomy** (`builtInToolAutonomyOverrides`) – 組み込みネットワークツール（Web Search、Fetch URL）を確認プロンプトなしで実行するために必要な[自律レベル](/jp/cli/user-guides/auto-run)を設定します。エントリのないツールはデフォルトで `low` になります。組織設定からのみ適用されるため、ユーザーおよびプロジェクトで弱めることはできません。
+- **Built-in Tool Autonomy** (`builtInToolAutonomyOverrides`) – 組み込みのネットワークツール（Web Search、Fetch URL）を確認プロンプトなしで実行するために必要な [自律レベル](/jp/cli/user-guides/auto-run) を設定します。省略されたツールのデフォルトは `low` です。これは組織設定からのみ強制されるため、ユーザーやプロジェクトで緩和することはできません。
 
 これらの制御は、[app.factory.ai](https://app.factory.ai) の **Enterprise Controls** セクションで組織管理者が管理します。
 

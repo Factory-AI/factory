@@ -20,6 +20,7 @@ export OTEL_TELEMETRY_HEADERS="Authorization=Bearer <your-token>"
 | :------------------------ | :------- | :------------------------------------------------------------------------------------------------------------------- |
 | `OTEL_TELEMETRY_ENDPOINT` | Yes      | OTLP HTTPコレクターのベースURL。メトリクスは`{endpoint}/v1/metrics`に送信されます。                                   |
 | `OTEL_TELEMETRY_HEADERS`  | No       | すべてのエクスポートでHTTPヘッダーとして送信されるカンマ区切りの`key=value`ペア。値には`=`を含めることができます（例：base64トークン）。 |
+| `OTEL_LOG_MESSAGE_CONTENT` | No      | `true`または`1`に設定すると、メッセージ内容（ユーザー / アシスタントのメッセージ、ツールの入力 / 結果）がOTELトレーススパンとして**お客様のエンドポイントにのみ**エクスポートされ、Factoryには送信されません。`OTEL_TELEMETRY_ENDPOINT`が必要で、エンドポイントが設定されていない場合は内容は破棄されます。 |
 
 ---
 
@@ -64,6 +65,33 @@ export OTEL_TELEMETRY_HEADERS="Authorization=Bearer <your-token>"
 | `session.id`      | 現在のDroidセッションID |
 
 ツール固有の属性（`tool.name`、`mcp.server`、`skill.name`など）は該当する場合に含まれます。リソース属性には`service.name`（`cli`）と`service.version`が含まれます。
+
+---
+
+## メッセージ内容のロギング
+
+デフォルトでは、テレメトリエクスポートに含まれるのはメトリクスのみで、プロンプトのテキスト、モデルの応答、ツールI/Oは**エクスポートされません**。メトリクスはFactoryとお客様のコレクターの両方にファンアウトされますが（上記参照）、メッセージ内容はそうではありません。
+
+メッセージ内容（たとえばセッション監査用）を取得するには、次を設定します。
+
+```bash
+export OTEL_LOG_MESSAGE_CONTENT=true   # または 1
+```
+
+有効にすると、Droidはメッセージ内容をOTELの**トレーススパン**として（お客様のエンドポイントの`/v1/traces`パスへ）出力し、次を対象にします。
+
+- ユーザーメッセージ（`droid.message.user`）
+- アシスタントの応答（`droid.message.assistant`）
+- ツール呼び出しとその入力（`droid.tool.call`）
+- ツールの結果（`droid.tool.result`）
+
+<Note>
+  **メッセージ内容は、設定したコレクターにのみ送信され、Factoryに届くことはありません。** メトリクスとは異なり、内容スパンは`OTEL_TELEMETRY_ENDPOINT`にのみルーティングされ、Factoryのコレクターが送信先になることはありません。
+
+  - お客様のエンドポイント（`OTEL_TELEMETRY_ENDPOINT`）が**必須**です。設定されていない場合、内容はFactoryへ送信されるのではなく破棄されます。
+  - エンドポイントがFactoryのコレクターと同じURLに解決される場合、内容のロギングは自動的に無効になります。
+  - メトリクスのエクスポートは影響を受けず、引き続きFactoryとお客様のコレクターの両方へファンアウトされます。
+</Note>
 
 ---
 

@@ -1,0 +1,101 @@
+---
+title: "GitHub Enterprise Server"
+description: "お使いの GitHub Enterprise Server インスタンスに Factory を接続するための包括的なガイド"
+---
+
+Factory は OAuth を使ってセルフホスト版の GitHub Enterprise Server（GHES）インスタンスに接続でき、組織の GHES リポジトリを Factory 内で利用できるようになります。設定はセルフサービス方式です。管理者が GHES インスタンス上で OAuth App を登録し、その認証情報を Factory に入力します。
+
+このガイドでは、一度だけ行う**管理者設定**と、エンドユーザー向けの**日常的な使い方**の両方を説明します。
+
+> GitHub Enterprise Server インスタンスへの接続は、Enterprise プランでのみサポートされています。
+
+## パート1: 管理者設定（一度だけ）
+
+### 前提条件
+
+- Factory 組織で **Owner/Manager** であること（統合の設定には特権ロールが必要です）。
+- GHES インスタンス上で **OAuth App** を作成できること。
+- GHES インスタンスは**パブリックに到達可能なドメイン**を持ち、パブリックインターネット経由でアクセス可能である必要があります。Factory はサーバードメインがパブリック IP アドレスに解決されることを検証します。*(注: インスタンスがプロキシやファイアウォールの背後にある場合は、許可リストに追加する必要がある Factory の具体的な IP アドレスを取得するため、Factory サポートにお問い合わせください。)*
+
+### ステップ1: GHES で OAuth App を作成する
+
+<Steps>
+  <Step title="Developer Settings に移動する">
+    GHES で **Settings \> Developer settings \> OAuth Apps \> New OAuth App** に移動します（個人アカウント配下、または自分が所有する組織配下のどちらにも作成できます）。
+  </Step>
+  <Step title="アプリケーションの詳細を入力する">
+    - **Application name**: 例 `Factory Integration`
+    - **Homepage URL**: ご利用中の Factory URL（例: `https://app.factory.ai`）
+    - **Authorization callback URL**: `https://<your-factory-api-domain>/api/integrations/redirect/github-es/callback`
+      *(注: Factory control plane を使用している場合、API ドメインは `api.factory.ai` です)*
+  </Step>
+  <Step title="認証情報を生成する">
+    アプリを登録し、**Client ID** をコピーして **Client Secret** を生成します。Client Secret は安全に保管してください。
+  </Step>
+</Steps>
+
+### ステップ2: Factory で統合を設定する
+
+<Steps>
+  <Step title="サーバー情報を入力する">
+    Factory で **Settings \> Integrations** を開き、**GitHub Enterprise Server** を選択します。次の GHES 情報を入力します。
+    - **Server domain**（例: `https://github.your-company.com`）
+    - **Client ID**
+    - **Client Secret**
+  </Step>
+  <Step title="設定を保存する">
+    設定を保存します。Factory がドメインを正規化して検証します。
+  </Step>
+</Steps>
+
+### ステップ3: 認可する
+
+<Steps>
+  <Step title="接続を開始する">
+    統合の認可をクリックします。GHES インスタンスにリダイレクトされ、OAuth App の認可を行います。
+    *(要求されるスコープ: **`repo`** と **`read:org`**)*
+  </Step>
+  <Step title="リポジトリをインポートする">
+    承認すると、認可を行ったアカウントがアクセスできるリポジトリが Factory にインポートされます。Factory が公開するのは**組織レベルのリポジトリのみ**であり、ユーザーレベル（個人）のリポジトリは対象外である点に注意してください。
+  </Step>
+</Steps>
+
+### 管理者向けの重要なセキュリティに関する注意事項
+
+- **1 回の認可で組織全体に適用されます。** 接続した管理者の OAuth 認可は組織レベルで保存され、Factory における組織のすべての GHES 操作に使われます。
+- **接続する管理者には専用のサービスアカウントを使用してください。** 個人の従業員アカウントではなく専用アカウントを使うことで、組織全体のアクセスを特定の個人のアカウントライフサイクルに結び付けずに済み、公開するリポジトリの範囲も制御しやすくなります。
+- **リポジトリの範囲。** Factory が公開するのは組織レベルのリポジトリのみです。認可したアカウントがアクセスできる個人（ユーザーレベル）のリポジトリは Factory にインポートされません。
+- **トークンのライフサイクル。** OAuth App が有効期限付きトークンを発行する場合、Factory は自動的に更新します。有効期限のないトークンを発行する場合、その認可は長期間有効です。認可を取り消すか Client Secret をローテーションすると、組織全体の統合が切断されます。
+- **ネットワーク到達性。** Factory は GHES へのリクエストに対して解決済みのパブリック IP を検証して固定化します（SSRF 保護）。そのため、インスタンスにはパブリックに到達可能なドメインがあり、パブリックに名前解決できる必要があります。組織でプロキシを使用している場合は、許可リストに必要な IP アドレスについて Factory サポートにお問い合わせください。
+
+---
+
+## パート2: エンドユーザーガイド
+
+### 利用できるようになるもの
+
+管理者が GHES を接続すると、組織の GHES リポジトリが他のリポジトリと並んで Factory に表示され、他のリポジトリと同じようにセッションで利用できるようになります。
+
+### GHES リポジトリへのアクセス
+
+- GHES アクセスは**組織レベル**で有効になります。各ユーザーが個別に GHES を認可する必要は**ありません**。
+- リポジトリは、GHES 統合が有効になっている Factory 組織のメンバーに対して利用可能です。
+
+### トラブルシューティング
+
+- **想定していたリポジトリが表示されない。** 接続に使用したアカウントの可視範囲にその所有者または組織が含まれていないため除外されているか、Factory が公開しない個人（ユーザーレベル）のリポジトリである可能性があります。管理者に確認してください。
+- **GHES リポジトリが突然消えた、または認証に失敗する。** 組織の GHES 認可が期限切れになったか、取り消された可能性があります。管理者に統合の再接続を依頼してください。
+
+---
+
+## FAQ
+
+**各ユーザーが個別に GHES を認可しますか？**
+いいえ。1 人の管理者による認可が組織全体で共有され、アクセスは組織レベルで制御されます。
+
+**Factory はどの権限を要求しますか？**
+OAuth スコープの `repo` と `read:org` です。
+
+<Card title="セキュリティとコンプライアンス" icon="shield-check" href="https://trust.factory.ai">
+  コンプライアンス資料、認証、セキュリティリソースについては Factory の Trust Center をご覧ください
+</Card>

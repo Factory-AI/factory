@@ -1,0 +1,61 @@
+---
+title: "GitLab セルフホスト"
+description: "セルフホスト版 GitLab インスタンスに Factory を接続するための包括的なガイド"
+---
+
+このガイドでは、Factory をセルフホスト版 GitLab インスタンスと統合するための詳細な手順を説明します。これにより、Factory プラットフォームはオンプレミスのリポジトリに安全にアクセスして作業できるようになります。
+
+> セルフホスト版 GitLab インスタンスへの接続は、Enterprise プランでのみサポートされています。
+
+## 前提条件
+
+- セルフホスト版 GitLab インスタンスへの管理者アクセス権
+- Enterprise プランで管理者権限を持つ Factory アカウント
+
+## 統合手順
+
+<Steps>
+  <Step title="GitLab アプリケーションを作成する">
+    1. GitLab インスタンスで、Admin Area \> Applications に移動します。
+    2. "Add new application" をクリックし、以下の内容を入力します。
+        - Name: `Factory Integration`
+        - Redirect URI: `https://api.factory.ai/api/integrations/redirect/gitlab-sh/callback`
+        - Trusted: yes
+        - Confidential: yes
+        - Scopes:
+          - `api`
+          - `read_api`
+          - `read_user`
+          - `read_repository`
+          - `write_repository`
+          - `read_observability`
+          - `write_observability`
+    3. アプリケーションを保存し、Application ID と Secret を控えておきます。
+  </Step>
+  <Step title="Factory Droid ユーザーアカウントを作成する">
+    1. GitLab インスタンスで、Admin Area \> Users に移動します。
+    2. "New User" をクリックし、以下の内容を入力します。
+        - Name: `Factory Droid`
+        - Username: `factory-droid`
+        - Email: [任意]
+    3. ユーザーを作成したら、次の手順に進む前に、そのユーザーとしてログインするか "Impersonate" を使用してください。
+  </Step>
+  <Step title="Factory で GitLab セルフホストを設定する">
+    1. https://app.factory.ai/settings/integrations にアクセスし、GitLab の横にある "Connect" をクリックして、左下の "Self-Hosted" を有効にします。
+    2. Self-Hosted Setup パネルで、GitLab Self-Hosted Application の詳細を入力します。
+        - **Domain:** `https://gitlab.example.com` のような GitLab インスタンスの URL。内部用ドメインと外部用ドメインが分かれている場合は、外部用ドメインを入力してください。
+        - **Application ID:** 前の手順で作成したアプリケーションの値。
+        - **Secret:** 前の手順で作成したアプリケーションの値。
+    3. 設定を保存します。
+    4. 右上の "Manage GitLab Self-Hosted Permissions" をクリックします。認可用のポップアップウィンドウが開きます。重要: この手順を実行する前に、必ず `factory-droid` ユーザーとしてログインしているか、そのユーザーを "Impersonate" している必要があります。
+    5. これで Repository Selection パネルにリポジトリが表示されるはずです。そこへ移動し、Factory で使用するリポジトリを有効にしてください。
+  </Step>
+</Steps>
+
+## サポート
+
+個別の問題や詳細なサポートが必要な場合は、指定されたサポートチャネルを通じて Factory チームにお問い合わせください。
+
+<Card title="セキュリティとコンプライアンス" icon="shield-check" href="https://trust.factory.ai">
+  Factory の Trust Center でコンプライアンス資料、認証、セキュリティリソースを確認する
+</Card>

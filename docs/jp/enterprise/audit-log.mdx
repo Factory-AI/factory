@@ -1,0 +1,396 @@
+---
+title: 監査ログ
+description: Factory組織で誰が何をしたかを記録する組織レベルの監査イベント。イベント構造、ソース、タイプを含みます。
+---
+
+Factoryの監査ログは組織レベルのイベントを記録し、組織内で誰が何をしたかを追跡できるようにします。各イベントには、**誰が**操作したか、**どこ**から操作が行われたか、**何**に影響したか、および変更に関する構造化された詳細が含まれます。
+
+<Info>
+  **Enterprise機能** — 監査ログは **Enterprise組織のオーナーのみ** が利用できます。オーナーはFactory WebアプリのTeam Settings、または公開API経由で監査ログを表示できます。
+</Info>
+
+---
+
+## イベント構造
+
+すべての監査イベントには次の共通フィールドがあります。
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `eventType` | string | イベントのカテゴリ（下記参照）。 |
+| `actor` | object or null | イベントを開始したユーザーまたはサービスプリンシパル。システムによって開始されたイベント（人間またはサービスプリンシパルが関与しない場合）は `null` です。 |
+| `source` | string | イベントの発生元となったサーフェス（下記参照）。 |
+| `target` | object | 影響を受けたエンティティの識別子（例: `userId`、`email`、`serviceAccountId`）。 |
+| `payload` | object or null | イベント固有の構造化された詳細。IDとenum値のみを含み、秘密情報は含みません。構造化ペイロードがないイベントでは `null` です。 |
+| `createdAt` | string | イベントの ISO 8601 タイムスタンプ。 |
+
+### 実行者
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `principalKind` | string | `"human"` または `"service"`。 |
+| `principalId` | string | 実行者の一意なID。 |
+| `email` | string or null | 利用可能な場合の実行者のメールアドレス。 |
+| `role` | string | イベント発生時点での実行者の組織ロール。 |
+
+---
+
+## イベントソース
+
+`source` フィールドはイベントの発生元を示します。
+
+| ソース | 説明 |
+|--------|-------------|
+| `web_settings_usage` | Webアプリの利用状況と請求の設定ページ。 |
+| `web_settings_members` | Webアプリのメンバー管理ページ。 |
+| `web_settings_api_keys` | WebアプリのAPIキー管理ページ。 |
+| `web_settings_service_accounts` | Webアプリのサービスアカウント管理ページ。 |
+| `web_settings_integrations` | Webアプリのインテグレーション管理ページ。 |
+| `web_settings_org` | Webアプリの組織設定ページ。 |
+| `web_settings_billing` | Webアプリの請求とサブスクリプションのページ。 |
+| `public_api_v0` | 公開REST API（v0）。 |
+| `workos_event` | ディレクトリ同期またはIDプロバイダーのWebhookイベント。 |
+
+---
+
+## イベントタイプ
+
+### `user_limit_change`
+
+組織のユーザーごとのトークン使用上限が設定、変更、または解除されました。
+
+**ソース:** `web_settings_usage`, `public_api_v0`, `workos_event`
+
+**対象:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `userId` | string or null | 上限が変更されたユーザーのID。組織全体の上限変更では `null` です。 |
+| `email` | string or null | ユーザーのメールアドレス。組織全体の上限変更では `null` です。 |
+
+**ペイロード:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `scope` | string | `"global"`（組織全体の上限）または `"individual"`（ユーザーごとの上限）。 |
+| `toTokens` | number or null | 新しい標準ティアのトークン上限。上限が解除された場合は `null` です。 |
+
+**例:**
+
+```json
+{
+  "eventType": "user_limit_change",
+  "source": "web_settings_usage",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "owner"
+  },
+  "target": { "userId": "user_xyz", "email": "dev@corp.com" },
+  "payload": { "scope": "individual", "toTokens": 500000 }
+}
+```
+
+---
+
+### `membership_change`
+
+メンバーのロール、招待ステータス、または組織内のメンバーシップが変更されました。
+
+**ソース:** `web_settings_members`, `public_api_v0`, `workos_event`
+
+**対象:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `userId` | string or null | 影響を受けたユーザーのID。保留中の招待では `null` です。 |
+| `email` | string or null | 影響を受けたユーザーのメールアドレス。 |
+
+**ペイロード（Webアプリおよび公開APIソース）:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `intent` | string | 具体的なメンバーシップ操作（下記参照）。 |
+| `fromRole` | string or null | 以前のロール。`role_change` の場合に存在し、以前のロールがなかった場合は省略されます。 |
+| `toRole` | string | 新しいロール。`invite` と `role_change` の場合に存在します。 |
+| `workosMembershipId` | string or null | メンバーシップID。招待では（まだメンバーシップが存在しないため）`null` です。 |
+
+**intent 値:**
+
+| Intent | 説明 |
+|--------|-------------|
+| `role_change` | メンバーのロールが変更されました。 |
+| `remove` | メンバーが組織から削除されました。 |
+| `invite` | 新しいユーザーに招待が送信されました。 |
+| `revoke_invite` | 保留中の招待が取り消されました。 |
+
+**ペイロード（`workos_event` ソース）:** 上記の構造化ペイロードではなく、元のIDプロバイダーイベントのフィルタ済みの抜粋（`workosEventType`、`role`、`status`）を含みます。
+
+**例:**
+
+```json
+{
+  "eventType": "membership_change",
+  "source": "web_settings_members",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "owner"
+  },
+  "target": { "userId": "user_xyz", "email": "dev@corp.com" },
+  "payload": {
+    "intent": "role_change",
+    "fromRole": "user",
+    "toRole": "manager",
+    "workosMembershipId": "mem_123"
+  }
+}
+```
+
+---
+
+### `api_key_lifecycle_change`
+
+Factory APIキーが作成または削除されました。
+
+**ソース:** `web_settings_api_keys`, `web_settings_service_accounts`
+
+**対象:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `userId` | string | キー所有者のユーザーID。 |
+| `email` | string or null | キー所有者のメールアドレス。 |
+
+**ペイロード:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `intent` | string | `"created"` または `"deleted"`。 |
+| `apiKeyId` | string | APIキーID。 |
+| `serviceAccountId` | string or null | サービスアカウントキーの場合にのみ存在します。この有無でユーザーキーとサービスアカウントキーを区別します。 |
+
+**例:**
+
+```json
+{
+  "eventType": "api_key_lifecycle_change",
+  "source": "web_settings_api_keys",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "dev@corp.com",
+    "role": "user"
+  },
+  "target": { "userId": "user_abc", "email": "dev@corp.com" },
+  "payload": { "intent": "created", "apiKeyId": "key_xyz" }
+}
+```
+
+---
+
+### `service_account_change`
+
+サービスアカウントが作成、変更、削除されたか、Git認証情報または act-as グラントに変更がありました。
+
+**ソース:** `web_settings_service_accounts`
+
+**対象:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `serviceAccountId` | string | サービスアカウントID。 |
+
+**ペイロード:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `intent` | string | 具体的なサービスアカウント操作（下記参照）。 |
+| `serviceAccountId` | string | サービスアカウントID。 |
+| `toStatus` | string or null | 新しいステータス。`status_changed` の場合にのみ存在します。 |
+| `integration` | string or null | インテグレーション名。Git認証情報関連の intent の場合にのみ存在します。 |
+| `grantId` | string or null | act-as グラントID。`act_as_grant_minted` の場合にのみ存在します。グラントのシークレット値は含まれません。 |
+
+**intent 値:**
+
+| Intent | 説明 |
+|--------|-------------|
+| `created` | 新しいサービスアカウントが作成されました。 |
+| `status_changed` | サービスアカウントのステータスが変更されました（例: active または disabled）。 |
+| `deleted` | サービスアカウントが削除されました。 |
+| `git_credential_set` | サービスアカウントのGit認証情報が設定されました。 |
+| `git_credential_revoked` | サービスアカウントのGit認証情報が取り消されました。 |
+| `act_as_grant_minted` | サービスアカウント用に act-as 委任グラントが発行されました。 |
+
+**例:**
+
+```json
+{
+  "eventType": "service_account_change",
+  "source": "web_settings_service_accounts",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "manager"
+  },
+  "target": { "serviceAccountId": "sa_xyz" },
+  "payload": { "intent": "created", "serviceAccountId": "sa_xyz" }
+}
+```
+
+---
+
+### `integration_change`
+
+インテグレーションが接続、切断、設定されたか、利用可否が切り替えられました。
+
+**ソース:** `web_settings_integrations`
+
+**対象:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `integration` | string | インテグレーション種別の識別子。 |
+
+**ペイロード:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `intent` | string | 具体的なインテグレーション操作（下記参照）。 |
+| `integration` | string | インテグレーション種別の識別子。 |
+| `scope` | string | `"org"`（組織レベルの接続）または `"user"`（単一ユーザーの接続）。 |
+| `available` | boolean or null | 新しい利用可否の状態。`availability_changed` の場合にのみ存在します。 |
+
+**intent 値:**
+
+| Intent | 説明 |
+|--------|-------------|
+| `connected` | インテグレーションが接続されました。 |
+| `disconnected` | インテグレーションが切断されました。 |
+| `configured` | インテグレーションが設定されました（例: GitLab Self-Hosted のセットアップ）。 |
+| `availability_changed` | 組織に対するインテグレーションの利用可否がオンまたはオフに切り替えられました。 |
+
+**例:**
+
+```json
+{
+  "eventType": "integration_change",
+  "source": "web_settings_integrations",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "dev@corp.com",
+    "role": "user"
+  },
+  "target": { "integration": "github_personal" },
+  "payload": {
+    "intent": "disconnected",
+    "integration": "github_personal",
+    "scope": "user"
+  }
+}
+```
+
+---
+
+### `organization_lifecycle_change`
+
+組織が作成または無効化されました。
+
+**ソース:** `web_settings_org`
+
+**対象:** `{}`（対象は組織自体です）。
+
+**ペイロード:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `intent` | string | `"created"` または `"deactivated"`。 |
+| `workosOrgId` | string or null | 把握できる場合の、影響を受けたWorkOS組織ID。 |
+
+**例:**
+
+```json
+{
+  "eventType": "organization_lifecycle_change",
+  "source": "web_settings_org",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "founder@corp.com",
+    "role": "owner"
+  },
+  "target": {},
+  "payload": { "intent": "created", "workosOrgId": "org_123" }
+}
+```
+
+---
+
+### `managed_settings_change`
+
+組織の管理設定が更新されました。
+
+**ソース:** `web_settings_org`
+
+**対象:** `{}`（対象は組織自体です）。
+
+**ペイロード:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `updatedKeys` | string[] | 更新に含まれたトップレベルの管理設定キー。 |
+| `revision` | number | 更新後の管理設定リビジョン番号。変更前後の差分確認に使える、リビジョンごとの不変スナップショットにリンクします。 |
+
+**例:**
+
+```json
+{
+  "eventType": "managed_settings_change",
+  "source": "web_settings_org",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "manager"
+  },
+  "target": {},
+  "payload": { "updatedKeys": ["defaultModel", "allowedModels"], "revision": 5 }
+}
+```
+
+---
+
+### `analytics_settings_change`
+
+組織のアナリティクス設定が更新されました。
+
+**ソース:** `web_settings_org`
+
+**対象:** `{}`（対象は組織自体です）。
+
+**ペイロード:**
+
+| フィールド | 型 | 説明 |
+|-------|------|-------------|
+| `defaultBillingPeriodOnly` | boolean | アナリティクス概要の組織全体の「Current billing period only」トグルの新しい値。 |
+
+**例:**
+
+```json
+{
+  "eventType": "analytics_settings_change",
+  "source": "web_settings_org",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "owner@corp.com",
+    "role": "owner"
+  },
+  "target": {},
+  "payload": { "defaultBillingPeriodOnly": true }
+}
+```

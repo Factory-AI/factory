@@ -13,12 +13,71 @@ curl -fsSL https://app.factory.ai/cli | sh
 ```powershell Windows
 irm https://app.factory.ai/cli/windows | iex
 ```
+
+```bash npm
+npm install -g droid
+```
 </CodeGroup>
 
 CLIは2つのモードで動作します：
 
 - **インタラクティブ（`droid`）** - スラッシュコマンド付きのチャット中心REPL
 - **非インタラクティブ（`droid exec`）** - 自動化とスクリプト用の単発実行
+
+### 特定バージョンのインストール
+
+CI runner、プロビジョニング済みの開発環境、その他の再現可能なシステムなど、アップグレードをレビューしたうえで意図的に適用する必要がある場合は、バージョンを固定してください。
+
+#### npm
+
+正確なパッケージバージョンを指定します：
+
+```bash
+npm install -g droid@0.174.0
+```
+
+npm で公開されるバイナリはビルド時に自動更新が無効化されているため、インストールしたバージョンは固定されたままです。アップグレードするには、新しいバージョンを npm で明示的にインストールしてください。
+
+#### 組み込みアップデーター
+
+スタンドアロンインストーラーで Droid をインストールした後、次のコマンドでバージョンを選択できます：
+
+```bash
+droid update --version 0.174.0
+```
+
+このコマンドでは古いバージョンへのロールバックも行えます。インストールせずに利用可能な更新を確認するには、`droid update --check` を使用してください。
+
+<Note>
+  スタンドアロンインストールではデフォルトで自動更新が有効です。バージョンを選択した後は、固定を維持するために[自動更新のガイダンス](#auto-updates)に従ってください。
+</Note>
+
+#### バイナリの直接ダウンロード
+
+リリースバイナリとその SHA256 チェックサムは、次のパスで提供されます：
+
+```text
+https://downloads.factory.ai/factory-cli/releases/<version>/<platform>/<arch>/<binary>
+https://downloads.factory.ai/factory-cli/releases/<version>/<platform>/<arch>/<binary>.sha256
+```
+
+- `<platform>`: `linux`、`darwin`、または `windows`
+- `<arch>`: `x64`、`arm64`、または `x64-baseline`
+- `<binary>`: Linux と macOS では `droid`、Windows では `droid.exe`
+
+例として、Linux x64 バイナリをダウンロードして検証する手順は次のとおりです：
+
+```bash
+VERSION=0.174.0
+BASE_URL="https://downloads.factory.ai/factory-cli/releases/${VERSION}/linux/x64"
+
+curl -fsSLO "${BASE_URL}/droid"
+curl -fsSLO "${BASE_URL}/droid.sha256"
+echo "$(awk '{print $1}' droid.sha256)  droid" | sha256sum --check
+chmod +x droid
+```
+
+検証済みのバイナリを `PATH` 上のディレクトリに移動してください。ダウンロード URL の構成は実装の詳細であるため、必ずバージョンを固定し、チェックサムを検証してください。
 
 ## CLIコマンド
 
@@ -45,7 +104,7 @@ CLIは2つのモードで動作します：
 | `droid computer remove`              | このマシンの BYOM 登録を削除                                                | `droid computer remove`                        |
 | `droid computer list`                | 登録済みの BYOM コンピューターを一覧表示                                      | `droid computer list`                          |
 | `droid computer ssh <name>`          | 登録済みの BYOM コンピューターに SSH 接続                                    | `droid computer ssh laptop`                    |
-| `droid computer port-forward <name> <mappings...>` | ローカルポートをリレー経由でコンピューターに転送             | `droid computer port-forward laptop 8080:80`   |
+| `droid computer port-forward <name> <mappings...>` | ローカルポートをリレー経由でコンピューターに転送 | `droid computer port-forward laptop 8080:80`   |
 | `droid daemon`                       | Factory デーモンサーバーを実行                                              | `droid daemon`                                 |
 | `droid update`                       | CLIを最新バージョンに手動更新                                                | `droid update`                                 |
 
@@ -59,9 +118,10 @@ CLIは2つのモードで動作します：
 | `-m, --model <id>`                   | 特定の[モデルID](/jp/models)を選択                                                                       | `droid exec -m claude-opus-4-7`                            |
 | `-s, --session-id <id>`              | 既存セッションを継続                                                                                 | `droid exec -s session-abc123`                             |
 | `--auto <level>`                     | [自律レベル](#autonomy-levels)を設定（`low`、`medium`、`high`）                                             | `droid exec --auto medium "run tests"`                     |
-| `--restrict-tools <ids>`             | 指定したツールのみに制限（カンマまたはスペース区切り）                                                       | `droid exec --restrict-tools ApplyPatch,Bash`             |
-| `--additional-tools <ids>`           | 既定に加えて追加のツールを強制有効化（カンマまたはスペース区切り）                                                 | `droid exec --additional-tools ApplyPatch,Bash`           |
+| `--restrict-tools <ids>`             | 実行を指定したツールのみに制限（カンマまたはスペース区切り）                                                  | `droid exec --restrict-tools ApplyPatch,Bash`              |
+| `--additional-tools <ids>`           | デフォルトに加えて特定のツールを強制有効化（カンマまたはスペース区切り）                                      | `droid exec --additional-tools ApplyPatch,Bash`            |
 | `--disabled-tools <ids>`             | この実行で特定のツールを無効化                                                                          | `droid exec --disabled-tools execute-cli`                  |
+| `--disable-builtin-skills`           | インタラクティブまたは exec セッションで Factory 提供の組み込みスキルを無効化し、他のスキルソースは保持       | `droid --disable-builtin-skills`                           |
 | `--list-tools`                       | 利用可能なツールを表示して終了                                                                               | `droid exec --list-tools`                                  |
 | `-o, --output-format <format>`       | 出力形式（`text`、`json`、`stream-json`、`stream-jsonrpc`）                                              | `droid exec -o json "document API"`                        |
 | `--input-format <format>`            | 入力形式（マルチターン用の`stream-jsonrpc`）                                                               | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
@@ -126,7 +186,7 @@ droid exec --auto high "Run tests, commit, and push changes"
 
 `-m, --model`または`--spec-model`には、任意の[利用可能なモデルID](/jp/models)を使用できます。カスタムモデルについては、[Bring Your Own Key (BYOK)](/jp/cli/byok/overview)を参照してください。
 
-どのモデルをどのタスクに使用するかの詳細なガイダンスについては、[モデルの選択](/jp/cli/user-guides/choosing-your-model)をご覧ください。
+どのモデルをどのタスクに使用するかのガイダンスについては、[利用可能なモデル](/jp/models)をご覧ください。
 
 ## インタラクティブモードの機能
 
@@ -304,6 +364,13 @@ droid --worktree feature-b &
 
 上記のグローバルフラグに加えて、いくつかの `droid` サブコマンドは独自のフラグを受け付けます。
 
+#### `droid update` のフラグ
+
+| フラグ                    | 説明                                      | 例                         |
+| :------------------------ | :---------------------------------------- | :------------------------- |
+| `-c, --check`             | インストールせずに更新を確認              | `droid update --check`     |
+| `-v, --version <version>` | 特定バージョンに更新またはロールバック    | `droid update -v 0.174.0`  |
+
 #### `droid search` のフラグ
 
 | フラグ                  | 説明                                                                                | 例                                       |
@@ -375,6 +442,28 @@ set FACTORY_API_KEY=fk-...
   APIキーをソース管理にコミットしないでください。環境変数またはセキュアなシークレット管理を使用してください。
 </Warning>
 
+<a id="auto-updates"></a>
+
+## 自動更新
+
+スタンドアロンの Droid インストールでは、CLI の更新が自動的に確認・インストールされます。必要に応じて更新を実行するには `droid update` を実行してください。
+
+スタンドアロンインストールを固定したままにするには、組み込みアップデーターを無効にしてください：
+
+```bash
+export FACTORY_DROID_AUTO_UPDATE_ENABLED=false
+```
+
+この変数を設定すると、自動更新は無効になり、`droid update` を実行しても別のバージョンはインストールされません。`droid daemon` を含め、すべての Droid プロセスを起動する環境でこの変数を設定してください。
+
+npm 配布版はビルド時に自動更新が無効化されているため、この変数は不要です。npm インストールから `droid update` を実行すると、自動更新を利用できないことが報告されます。`FACTORY_DROID_AUTO_UPDATE_ENABLED=true` を明示的に設定すると、npm ビルドのデフォルト設定を上書きできます。
+
+Enterprise 管理者は、組織設定 `disableAutoUpdate` により、組織メンバー全員の CLI 自動更新を無効にできます。詳細は[リリースノート](/jp/changelog/release-notes)および[エンタープライズ制御変更履歴 API](/api-reference/organization/list-enterprise-control-change-history)を参照してください。
+
+<Tip>
+  再現可能な環境では CLI を固定し、自動更新を無効にしてください。ローカルの開発者インストールでは、修正やセキュリティアップデートを受け取るために自動更新を有効のままにしておくことを推奨します。
+</Tip>
+
 ## 終了コード
 
 | コード | 意味                           |
@@ -442,7 +531,7 @@ wait
 
 - [クイックスタートガイド](/jp/cli/getting-started/quickstart) - Droid CLIの使い始め
 - [インタラクティブモード](/jp/cli/getting-started/quickstart) - ショートカット、入力モード、機能
-- [モデルの選択](/jp/cli/user-guides/choosing-your-model) - モデル選択のガイダンス
+- [利用可能なモデル](/jp/models) - モデル選択のガイダンス
 - [設定](/jp/cli/configuration/settings) - 設定オプション
 - [カスタムコマンド](/jp/cli/configuration/custom-slash-commands) - 独自のショートカットを作成
 - [カスタムDroid](/jp/cli/configuration/custom-droids) - 専門的なエージェントを構築
