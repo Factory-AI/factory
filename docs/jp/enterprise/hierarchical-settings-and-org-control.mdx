@@ -195,8 +195,25 @@ User        → ~/.factory/
     <ResponseField name="baseUrl" type="string" required>
       モデル API エンドポイントのベース URL
     </ResponseField>
-    <ResponseField name="apiKey" type="string" required>
-      プロバイダーとの認証用 API キー
+    <ResponseField name="apiKey" type="string">
+      プロバイダーとの認証用 API キー。オプション — 認証不要のエンドポイント（ローカルモデルや認証が不要なゲートウェイなど）では省略できます。`settings.json`/`settings.local.json` で `${VAR_NAME}` をサポートします（例：`${PROVIDER_API_KEY}` は `PROVIDER_API_KEY` 環境変数を使用します）。
+
+      <Warning>
+        **静的 API キーは新規の組織管理モデルではブロックされます。** 管理設定エンドポイントは、静的 `apiKey` 値を含む新規カスタムモデルを 400 エラーで拒否します。既存の静的キーエントリは保持およびローテーション可能ですが、新規エントリには以下のいずれかを使用してください：
+
+        - **`apiKeyHelper`** — リクエスト時に短期認証情報を生成するシェルコマンド（ゲートウェイやトークン発行システムに推奨）。
+        - **環境変数参照** — `apiKey` を `${VAR_NAME}` の全体参照に設定（例：`"apiKey": "${INTERNAL_MODEL_API_KEY}"`）。実行時にマシン環境から解決されます。
+        - **システム管理 (MDM) 設定ファイル** — 静的キーが必要なデプロイメントでは、IT/MDM が各マシンに配置する[システム管理設定ファイル](#システム管理-settingsjson-ファイル)を使用します。これにより管理設定エンドポイントが完全にバイパスされます。
+      </Warning>
+    </ResponseField>
+    <ResponseField name="apiKeyHelper" type="string">
+      プロバイダー/ゲートウェイトークンを標準出力に出力するシェルコマンド。リクエスト時に解決され、静的 `apiKey` の代わりに使用されます。組織管理（信頼済み）設定からのみ適用され、ユーザー/プロジェクト/フォルダソースからは除外されます。
+    </ResponseField>
+    <ResponseField name="apiKeyHelperTtlMs" type="number">
+      `apiKeyHelper` 出力の更新間隔（ミリ秒）。期限切れまでキャッシュされたトークンが再利用され、その後ヘルパーコマンドが再実行されます。
+    </ResponseField>
+    <ResponseField name="authMode" type="string">
+      設定された認証情報の認証モード。`"bearer"` は Anthropic SDK の `authToken` パスを使用し、省略または `"provider-default"` はネイティブプロバイダー認証を維持します。
     </ResponseField>
     <ResponseField name="provider" type="string" required>
       プロバイダータイプ。`anthropic`、`openai`、`generic-chat-completion-api`、`factory`、`google`、`xai`、`voyage` のいずれか
@@ -516,7 +533,8 @@ Factoryは、従来の「上書き」動作ではなく、**拡張のみ**のセ
       "id": "custom:my-internal-model-v1",
       "index": 0,
       "baseUrl": "https://llm-gateway.internal.example.com/v1",
-      "apiKey": "${INTERNAL_MODEL_API_KEY}",
+      "apiKeyHelper": "mint-token.sh",
+      "apiKeyHelperTtlMs": 300000,
       "provider": "generic-chat-completion-api",
       "displayName": "Internal Model v1",
       "maxContextLimit": 128000,

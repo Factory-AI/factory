@@ -53,7 +53,7 @@ Factory管理モデルと倍率については、[利用可能なモデル](/jp/
 | `model` | `string` | ✓ | API経由で送信されるモデル識別子（例：`claude-sonnet-4-5-20250929`、`gpt-5-codex`、`qwen3:4b`） |
 | `displayName` | `string` | | モデルセレクターに表示される人間が読みやすい名前 |
 | `baseUrl` | `string` | ✓ | APIエンドポイントのベースURL |
-| `apiKey` | `string` | ✓ | プロバイダー用のAPIキー。空にはできません。`settings.json`/`settings.local.json`での`${VAR_NAME}`をサポートします（例：`${PROVIDER_API_KEY}`は`PROVIDER_API_KEY`環境変数を使用します）。 |
+| `apiKey` | `string` | | プロバイダー用のAPIキー。オプション — 認証不要のエンドポイント（ローカルモデルや認証が不要なゲートウェイなど）では省略できます。`settings.json`/`settings.local.json`での`${VAR_NAME}`をサポートします（例：`${PROVIDER_API_KEY}`は`PROVIDER_API_KEY`環境変数を使用します）。 |
 | `provider` | `string` | ✓ | 次のいずれか：`anthropic`、`openai`、または`generic-chat-completion-api` |
 | `maxOutputTokens` | `number` | | モデルレスポンスの最大出力トークン数 |
 | `noImageSupport` | `boolean` | | このモデルで画像入力を無効にするには`true`に設定 |

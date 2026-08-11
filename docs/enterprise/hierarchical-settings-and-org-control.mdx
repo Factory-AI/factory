@@ -217,8 +217,25 @@ Below is the full schema for org-managed settings. These are configured by org a
     <ResponseField name="baseUrl" type="string" required>
       Base URL of the model API endpoint.
     </ResponseField>
-    <ResponseField name="apiKey" type="string" required>
-      API key for authenticating with the provider.
+    <ResponseField name="apiKey" type="string">
+      API key for authenticating with the provider. Optional — omit for keyless endpoints (e.g. local models or gateways that don't require authentication). Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g. `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable).
+
+      <Warning>
+        **Static API keys are blocked for new org-managed models.** The managed-settings endpoint rejects any net-new custom model that includes a static `apiKey` value with a 400 error. Existing entries with a static key can be kept and rotated, but new entries must use one of the following instead:
+
+        - **`apiKeyHelper`** — a shell command that mints short-lived credentials at request time (recommended for gateways and token-issuing systems).
+        - **Environment variable reference** — set `apiKey` to a whole-value `${VAR_NAME}` reference (e.g. `"apiKey": "${INTERNAL_MODEL_API_KEY}"`); the key is resolved from the machine's environment at runtime.
+        - **System-managed (MDM) settings file** — for deployments that require a static key, use the [system-managed settings file](#system-managed-settings-file) dropped on each machine by IT/MDM, which bypasses the managed-settings endpoint entirely.
+      </Warning>
+    </ResponseField>
+    <ResponseField name="apiKeyHelper" type="string">
+      Shell command that prints a provider/gateway token to stdout. Resolved at request time and used in place of the static `apiKey`. Only honored from org-managed (trusted) settings; the settings-resolution layer strips it from user, project, and folder sources so an untrusted repo cannot run arbitrary commands.
+    </ResponseField>
+    <ResponseField name="apiKeyHelperTtlMs" type="number">
+      Refresh interval for `apiKeyHelper` output, in milliseconds. The cached token is reused until it expires, then the helper command runs again.
+    </ResponseField>
+    <ResponseField name="authMode" type="string">
+      Authentication mode for the configured credential. `"bearer"` uses the Anthropic SDK `authToken` path; omitted or `"provider-default"` preserves native provider authentication.
     </ResponseField>
     <ResponseField name="provider" type="string" required>
       Provider type. One of `anthropic`, `openai`, `generic-chat-completion-api`, `factory`, `google`, `xai`, `voyage`.
@@ -540,7 +557,8 @@ Again, users cannot override these rules; they can only choose safer personal de
       "id": "custom:my-internal-model-v1",
       "index": 0,
       "baseUrl": "https://llm-gateway.internal.example.com/v1",
-      "apiKey": "${INTERNAL_MODEL_API_KEY}",
+      "apiKeyHelper": "mint-token.sh",
+      "apiKeyHelperTtlMs": 300000,
       "provider": "generic-chat-completion-api",
       "displayName": "Internal Model v1",
       "maxContextLimit": 128000,

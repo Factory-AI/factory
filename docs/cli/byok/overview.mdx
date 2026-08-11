@@ -53,7 +53,7 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 | `model` | `string` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
 | `displayName` | `string` | | Human-friendly name shown in model selector |
 | `baseUrl` | `string` | ✓ | API endpoint base URL |
-| `apiKey` | `string` | ✓ | Your API key for the provider. Can't be empty. Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g., `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable). |
+| `apiKey` | `string` | | Your API key for the provider. Optional — omit for keyless endpoints (e.g. local models, or gateways that don't require authentication). Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g., `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable). |
 | `provider` | `string` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
 | `maxOutputTokens` | `number` | | Maximum output tokens for model responses |
 | `noImageSupport` | `boolean` | | Set to `true` to disable image inputs for this model |
