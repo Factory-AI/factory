@@ -43,6 +43,10 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 </Tip>
 
 <Note>
+  `apiKey` is optional for HTTP custom models. Omit it entirely for **keyless** endpoints (for example, a gateway that authenticates via `extraHeaders` or network-level trust), or use [`apiKeyHelper`](#dynamic-credentials-with-apikeyhelper) to mint a short-lived token at request time. For non-Bedrock models, `baseUrl` is always required.
+</Note>
+
+<Note>
   **Legacy support**: Custom models in `~/.factory/config.json` using snake_case field names (`custom_models`, `base_url`, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with `settings.json` taking priority. Env var expansion for `apiKey` applies to `settings.json`/`settings.local.json` and not to legacy `config.json`.
 </Note>
 
@@ -52,8 +56,10 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 |-------|------|----------|-------------|
 | `model` | `string` | ✓ | Model identifier sent via API (e.g., `claude-sonnet-4-5-20250929`, `gpt-5-codex`, `qwen3:4b`) |
 | `displayName` | `string` | | Human-friendly name shown in model selector |
-| `baseUrl` | `string` | ✓ | API endpoint base URL |
-| `apiKey` | `string` | ✓ | Your API key for the provider. Can't be empty. Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g., `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable). |
+| `baseUrl` | `string` | ✓ | API endpoint base URL. Required for all non-Bedrock HTTP models. |
+| `apiKey` | `string` | | Your API key for the provider. Optional: omit it for a keyless endpoint, or use `apiKeyHelper` instead. If set, it can't be empty. Supports `${VAR_NAME}` in `settings.json`/`settings.local.json` (e.g., `${PROVIDER_API_KEY}` uses the `PROVIDER_API_KEY` environment variable). |
+| `apiKeyHelper` | `string` | | Shell command whose stdout is used as the API key, resolved at request time and refreshed on a TTL and after a `401`. Takes precedence over `apiKey`. **Org-managed settings only** (see [Dynamic credentials](#dynamic-credentials-with-apikeyhelper)). |
+| `apiKeyHelperTtlMs` | `number` | | Refresh interval for `apiKeyHelper` output, in milliseconds. Defaults to 5 minutes; the `FACTORY_API_KEY_HELPER_TTL_MS` environment variable overrides it. |
 | `provider` | `string` | ✓ | One of: `anthropic`, `openai`, or `generic-chat-completion-api` |
 | `maxOutputTokens` | `number` | | Maximum output tokens for model responses |
 | `noImageSupport` | `boolean` | | Set to `true` to disable image inputs for this model |
@@ -103,6 +109,42 @@ Add custom HTTP headers to API requests:
   ]
 }
 ```
+
+### Dynamic credentials with apiKeyHelper
+
+Some gateways issue short-lived tokens (for example, an internal LLM gateway fronted by an identity provider) rather than a long-lived static key. Instead of a static `apiKey`, point the model at an `apiKeyHelper` command whose standard output is the token. Droid runs it at request time, caches the result, and refreshes automatically.
+
+```json
+{
+  "customModels": [
+    {
+      "model": "your-model",
+      "displayName": "Gateway Model",
+      "baseUrl": "https://llm-gateway.internal.example.com/v1",
+      "provider": "generic-chat-completion-api",
+      "apiKeyHelper": "/usr/local/bin/mint-gateway-token.sh",
+      "apiKeyHelperTtlMs": 300000
+    }
+  ]
+}
+```
+
+Behavior:
+
+- The command's trimmed stdout is used as the credential (sent as the provider-appropriate auth header). `apiKeyHelper` takes precedence over any static `apiKey`.
+- The token is cached and re-minted when it expires. TTL resolution order: the `FACTORY_API_KEY_HELPER_TTL_MS` environment variable, then the per-model `apiKeyHelperTtlMs`, then a 5-minute default.
+- The token is also refreshed once after a `401` response. If the command fails, it enters a short cooldown and fails fast rather than retrying on every request.
+- The token, command output, and command text are never logged.
+
+<Warning>
+  `apiKeyHelper` runs a shell command, so it is only honored from **org-managed (trusted) settings**. It is stripped from user, project, and folder settings so an untrusted repository cannot execute commands on your machine.
+</Warning>
+
+<Note>
+  When adding custom models through **org-managed settings**, net-new models cannot use a static `apiKey` — use `apiKeyHelper`, a keyless endpoint, or a Bedrock model instead. Existing static-key models continue to work and can still rotate their key.
+</Note>
+
+This mirrors Claude Code's `apiKeyHelper` (the `FACTORY_API_KEY_HELPER_TTL_MS` variable is the analog of `CLAUDE_CODE_API_KEY_HELPER_TTL_MS`).
 
 ---
 
@@ -188,6 +230,7 @@ Custom models display with the name you set in `displayName`, making it easy to 
 - Verify your API key is valid and has available credits
 - Check that the API key has proper permissions
 - Confirm the base URL matches your provider's documentation
+- If using `apiKeyHelper`: run the command yourself and confirm it exits `0` and prints a valid token to stdout. A failed helper enters a short cooldown, and `apiKeyHelper` is only honored from org-managed settings.
 
 ### Local model won't connect
 - Ensure your local server is running (e.g., `ollama serve`)
