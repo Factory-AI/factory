@@ -25,16 +25,17 @@ Droid scores below are the best full finished runs (all 88–89 tasks) and the m
 
 ![Terminal Bench 2.1 accuracy versus cost per task](/images/terminal-bench-2-1-cost-score.png)
 
-Each point is one finished full Droid run (88–89 tasks); color identifies the model. Cost per task is the Factory Standard Credits billed for that run, converted with the standard credit rate, divided by the number of tasks. The dashed line marks the observed Pareto frontier: the highest accuracy reachable at or below a given cost.
+Each point is one finished full Droid run (88–89 tasks); color identifies the model. Cost per task is the billed model usage for that run's sessions, converted at the standard credit rate, divided by the number of tasks. The dashed line marks the observed Pareto frontier: the highest accuracy reachable at or below a given cost.
 
-The frontier is dominated by **GPT-5.6 Sol**, which reaches **93.2% at roughly $0.70/task** — the highest score on this page at a mid-range cost. **Grok 4.6** (82.0% at ~$0.40/task) and **GLM-5.2** (up to 76.4% at ~$0.39/task) form the value corner: a useful score for less than half of Sol's cost. **Gemini 3.6 Flash** sits off the frontier — its best run (81.8%) costs ~$5.19/task, roughly 7x Sol per task for a lower score. This is an observation about these specific runs, not a general statement about a model's efficiency across workloads.
+The frontier is dominated by **GPT-5.6 Sol**, which reaches **93.2% at about $0.70/task** — the highest score on this page at a mid-range cost. **Grok 4.6** (82.0% at ~$0.40/task) and **GLM-5.2** (up to 76.4% at ~$0.39/task) form the value corner: a useful score for less than half of Sol's cost. **Gemini 3.6 Flash** (81.8% at ~$1.03/task) and **Claude Opus 5** (86.5% at ~$1.32/task) sit above the frontier at higher cost per task. This is an observation about these specific runs, not a general statement about a model's efficiency across workloads.
 
 <Info>
-  Cost is Factory Standard Credits billed for the Droid run (including agent
-  tool and model usage), not the underlying model's list price. Credits
-  convert to USD at the standard credit rate used across the platform
-  ($2.50 per 1M credits). Runs before credit recording are excluded from the
-  plot but included in the table above.
+  Cost is the billed model usage for the Droid run (including agent tool and
+  model usage) from the per-session billing ledger, converted to USD at the
+  standard credit rate used across the platform ($2.50 per 1M credits). This is
+  an internal accounting rate, not the underlying model's list price. A small
+  number of runs predate session-level billing and use Harbor record-keeping
+  at the same rate instead.
 </Info>
 
 ### What the numbers show
