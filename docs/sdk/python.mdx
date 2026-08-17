@@ -5,26 +5,40 @@ description: "Use the Factory Droid SDK for Python to build custom agents, workf
 keywords: ["Droid SDK", "Python", "agents", "automation", "MCP"]
 ---
 
-Install the package as `droid-sdk` and import it as `droid_sdk`.
+The Droid SDK lets you run the same agent harness that powers Factory's CLI, desktop application, and web platform from your own code. It manages conversation context, tool execution, permissions, streaming, model selection, and multi-step execution.
+
+Your application decides when Droid runs, which tools and models it can use, and what happens to the result.
 
 ## Overview
 
-The SDK runs a local `droid` subprocess and exposes two ways to run a turn:
+The Python SDK runs a local `droid` subprocess and provides one-shot runs, persistent sessions, streaming, and session discovery.
+
+### Choose an API
 
 | Goal | API |
 | --- | --- |
-| Run one turn and return its result | `await run(...)` |
-| Run turns in an existing session | `session.stream(...)` |
+| Run one prompt and return its result | `await run(...)` |
+| Keep context across prompts | `Session(...)` |
+| Continue a saved session | `Session.resume(...)` |
+| Find saved sessions | `await list_sessions(...)` |
 
 Use `Session` when prompts need shared history or session operations such as
 interruption, compaction, or rewind. There is no `session.run()`; every
 session turn goes through `stream()`.
 
+### What you can build
+
+Invoke Droid when a pull request opens, a support ticket is escalated, an incident is created, or scheduled repository maintenance is due. The agent does not need a chat interface.
+
 ## Install and authenticate
+
+Install the `droid-sdk` package and import it as `droid_sdk`:
 
 ```bash
 pip install droid-sdk
 ```
+
+The package provides an async API for running Droid locally.
 
 Requirements:
 
@@ -39,7 +53,7 @@ logs, or exception messages.
 
 ## Quick start
 
-### Run one turn
+### Run one prompt
 
 ```python
 import asyncio
@@ -95,41 +109,19 @@ The second turn includes context from the first. Exiting the session closes
 the subprocess and session-owned resources. See
 [Default stream types](#default-stream-types) for every yielded value.
 
-### Stream partial events
+## Core concepts
 
-```python
-from droid_sdk import Session, TextDelta
-
-async with Session() as session:
-    async with session.stream(
-        "Explain the failing test.",
-        include_partial_messages=True,
-    ) as stream:
-        async for event in stream:
-            if isinstance(event, TextDelta):
-                print(event.text, end="", flush=True)
-
-    print()
-    if not stream.result.success:
-        print(f"Turn ended: {stream.result.subtype}")
-```
-
-The default stream yields complete messages. Set
-`include_partial_messages=True` to add deltas and operational events. Both
-modes yield the terminal result and cache it in `stream.result`. See
-[Partial stream types](#partial-stream-types) for the complete event union.
-
-## Core contract
-
-### Sessions and turns
+### Session
 
 A `Session` owns conversation history, settings, a working directory, and one
 Droid connection. It accepts one active turn at a time.
 
+### Turn
+
 A turn begins with `session.stream(prompt)` and ends when the stream yields a
 `RunResult`. Create separate sessions for parallel work.
 
-### Results and exceptions
+### Result
 
 A turn's outcome is a value, not an exception: `RunSuccess`,
 `RunInterrupted`, or `RunFailure`. Interrupted turns, execution failures, and
@@ -137,7 +129,7 @@ structured-output failures do not raise. Failures in the machinery around a
 turn (setup, connection, process, protocol, timeout, and cancellation) raise
 exceptions.
 
-### Ownership
+### Ownership and cleanup
 
 | Object | Owner |
 | --- | --- |
@@ -161,136 +153,11 @@ models are immutable dataclasses.
 | Partial `session.stream(...)` | `RunStream[T, StreamEvent[T]]` |
 | `stream.result` | `RunResult[T]` |
 
-## Models
-
-Model IDs are strings because availability depends on account and
-organization policy. Omit `model` to use the configured default, which
-lives in `~/.factory/settings.json` under `sessionDefaultSettings`.
-An unknown model ID is rejected by the backend: the turn returns
-`RunFailure(subtype="error_during_execution")` with the rejection message
-in `error.message`.
-
-### Select a model
-
-```python
-from droid_sdk import ReasoningEffort, run
-
-result = await run(
-    "Review this repository.",
-    model="model-id",
-    reasoning_effort=ReasoningEffort.HIGH,
-)
-```
-
-Omit `reasoning_effort` to use the model default.
-
-Change the model for later turns:
-
-```python
-await session.update_settings(
-    model="model-id",
-    reasoning_effort=ReasoningEffort.HIGH,
-)
-```
-
-See [Update settings](#update-settings) for the full `update_settings()`
-contract.
-
-### Use the Factory Router
-
-The model ID `auto` selects the
-[Factory Router](/web/factory-router),
-which routes each task to the model with the best balance of quality,
-latency, and cost. Some product surfaces label it Auto Model; the model
-ID is `auto` everywhere.
-
-```python
-from droid_sdk import run
-
-result = await run("Review this repository.", model="auto")
-```
-
-Pin a session to the router the same way:
-
-```python
-async with Session(model="auto") as session:
-    ...
-```
-
-Move a live session onto the router:
-
-```python
-await session.update_settings(model="auto")
-```
-
-Omit `reasoning_effort`; the router chooses the effort along with the
-model and ignores a supplied value. `session.settings.model` reports
-`auto`; the underlying model can differ per response.
-
-The model ID `auto` is unrelated to `Mode.AUTO`, the default interaction
-mode, and to `Autonomy`, the permission level.
-
-#### See which model handled a response
-
-Assistant messages in the wire `create_message` notification carry the
-underlying model in `modelId`; `routerId` is `"auto"` when the router
-made the choice. High-level messages omit these fields. Subscribe with
-[`on_notification()`](#subscribe-to-raw-notifications):
-
-```python
-from collections.abc import Mapping
-
-
-def report_routing(notification: Mapping[str, object]) -> None:
-    message = notification.get("message")
-    if isinstance(message, Mapping) and message.get("role") == "assistant":
-        print(message.get("modelId"), message.get("routerId"))
-
-
-unsubscribe = session.on_notification(report_routing, type="create_message")
-```
-
-Wire payloads use camelCase keys and evolve server-side; treat absent
-keys as normal.
-
-### Configure mode-specific models
-
-```python
-from droid_sdk import Mode, ReasoningEffort, Session, SessionConfig
-
-config = SessionConfig(
-    mode=Mode.SPEC,
-    spec_model="model-id",
-    spec_reasoning_effort=ReasoningEffort.HIGH,
-)
-
-async with Session(model="model-id", config=config) as session:
-    async with session.stream("Draft an implementation plan.") as stream:
-        async for _ in stream:
-            pass
-```
-
-The primary model handles Auto turns. `spec_model` handles Spec turns.
-Switch modes on a live session with `enter_spec()` and `leave_spec()`; see
-[Modes](#modes).
-
-### Model configuration contract
-
-| Field | Type | Used by |
-| --- | --- | --- |
-| `model` | `str \| None` | `run()`, `Session`, `update_settings()` |
-| `reasoning_effort` | `ReasoningEffort \| None` | Same |
-| `spec_model` | `str \| None` | `SessionConfig`, `update_settings()` |
-| `spec_reasoning_effort` | `ReasoningEffort \| None` | Same |
-
-`None` uses the configured default. Setting a Spec field to `None` through
-`update_settings()` clears it.
-
 ## Sessions
 
 Use a session when turns share history.
 
-### Open a session
+### Create and use a session
 
 `Session` is lazy. It creates the subprocess and session on entry:
 
@@ -353,7 +220,7 @@ async with Session.resume(
     interactions=InteractionHandlers(on_question=answer),
     disabled_tools={"Execute"},
 ) as session:
-    async with session.stream("Continue the previous task.") as stream:
+    async with session.stream("Continue from the previous prompt.") as stream:
         async for _ in stream:
             pass
 ```
@@ -364,39 +231,6 @@ Get a session ID from `session.id`, `result.session_id`, or
 Resume restores conversation history, working directory, title, and settings;
 runtime concerns such as handlers and MCP servers must be attached again (see
 the table below). It does not accept a new working directory or model.
-
-### What persists
-
-| Restored | Attach again |
-| --- | --- |
-| Conversation history | Interaction handlers |
-| Working directory | Session-scoped MCP servers |
-| Title | Observability sinks |
-| Session settings | |
-
-### Open and close manually
-
-```python
-session = Session()
-await session.open()
-
-try:
-    async with session.stream("Review the project.") as stream:
-        async for _ in stream:
-            pass
-finally:
-    await session.close()
-```
-
-`open()` and `close()` are idempotent, but a closed session cannot be
-reopened. Calling an active method before `open()` raises
-`SessionNotOpenError`.
-
-Concurrent `open()` calls share one startup attempt. If one waiter is
-cancelled, startup continues for the others. Cancelling the final waiter
-cancels startup and completes resource cleanup before the session becomes
-retryable. `close()` racing startup waits for startup cleanup and leaves the
-session closed.
 
 ### Read session state
 
@@ -410,7 +244,7 @@ print(session.settings.mode)
 These properties are read-only. `settings` is an immutable snapshot, replaced
 when Droid reports a settings change.
 
-### Update settings
+### Update session settings
 
 ```python
 await session.update_settings(
@@ -452,19 +286,6 @@ await session.rename("Authentication review")
 
 `rename(title: str)` returns `None`.
 
-### Subscribe to raw notifications
-
-```python
-unsubscribe = session.on_notification(handle_notification, type="custom_type")
-try:
-    ...
-finally:
-    unsubscribe()
-```
-
-High-level streams ignore unknown notifications. `on_notification()` exposes
-them without creating a second client.
-
 ### List saved sessions
 
 ```python
@@ -479,75 +300,51 @@ Pass `all_workspaces=True` to list sessions across working directories.
 `list_sessions()` reads local files without starting Droid. Results are newest
 first. Timestamps are timezone-aware.
 
-### Session construction contract
+### What persists
 
-`Session(...)` accepts:
-
-| Argument | Type |
+| Restored | Attach again |
 | --- | --- |
-| `cwd` | `str \| Path \| None` |
-| `model` | `str \| None` |
-| `reasoning_effort` | `ReasoningEffort \| None` |
-| `config` | `SessionConfig \| None` |
-| `interactions` | `InteractionHandlers \| None` |
-| `runtime` | `Runtime \| None` |
-| `api_key` | `str \| None` |
+| Conversation history | Interaction handlers |
+| Working directory | Session-scoped MCP servers |
+| Title | Observability sinks |
+| Session settings | |
 
-`SessionConfig` fields:
+### Close sessions safely
 
-| Field | Type |
-| --- | --- |
-| `mode` | `Mode \| None` |
-| `autonomy` | `Autonomy \| None` |
-| `spec_model` | `str \| None` |
-| `spec_reasoning_effort` | `ReasoningEffort \| None` |
-| `mcp_servers` | `Sequence[McpServerConfig]` |
-| `machine_id` | `str \| None` |
-| `tags` | `Sequence[SessionTag]` |
-| `session_source` | `SessionSource \| None` |
-| `auto_reject_permission_requests` | `bool \| None` |
-| `disable_builtin_skills` | `bool \| None` |
-| `additional_tools` | `Iterable[str] \| None` |
-| `enabled_tools` | `Iterable[str] \| None` |
-| `disabled_tools` | `Iterable[str] \| None` |
-| `restrict_tools` | `Iterable[str] \| None` |
+```python
+session = Session()
+await session.open()
 
-`Session.resume(session_id, ...)` accepts only values that can be reattached:
+try:
+    async with session.stream("Review the project.") as stream:
+        async for _ in stream:
+            pass
+finally:
+    await session.close()
+```
 
-| Argument | Type |
-| --- | --- |
-| `session_id` | `str` |
-| `interactions` | `InteractionHandlers \| None` |
-| `mcp_servers` | `Sequence[McpServerConfig]` |
-| `runtime` | `Runtime \| None` |
-| `api_key` | `str \| None` |
-| `disabled_tools` | `Iterable[str] \| None` |
-| `auto_reject_permission_requests` | `bool \| None` |
-| `disable_builtin_skills` | `bool \| None` |
-| `session_source` | `SessionSource \| None` |
+`open()` and `close()` are idempotent, but a closed session cannot be
+reopened. Calling an active method before `open()` raises
+`SessionNotOpenError`.
 
-### Session state schemas
+Concurrent `open()` calls share one startup attempt. If one waiter is
+cancelled, startup continues for the others. Cancelling the final waiter
+cancels startup and completes resource cleanup before the session becomes
+retryable. `close()` racing startup waits for startup cleanup and leaves the
+session closed.
 
-| Type | Fields |
-| --- | --- |
-| `SessionSettings` | `model`, `reasoning_effort`, `mode`, `autonomy`, `spec_model`, `spec_reasoning_effort`, `tags`, `sandbox`, `additional_tools`, `enabled_tools`, `disabled_tools`, `restrict_tools` |
-| `SessionSettingsUpdate` | `model`, `reasoning_effort`, `mode`, `autonomy`, `spec_model`, `spec_reasoning_effort`, `tags`, `additional_tools`, `enabled_tools`, `disabled_tools`, `restrict_tools`, `compaction_threshold_check_enabled` |
-| `SandboxSettings` | `enabled: bool`, `mode: str \| None = None` |
-| `SessionTag` | `name`, `metadata` |
-| `SavedSession` | `id`, `title`, `owner`, `message_count`, `modified_at`, `created_at`, `cwd`, `is_favorite` |
+### Subscribe to raw notifications
 
-Every `SessionSettingsUpdate` field defaults to `None`. Its field types
-match the `update_settings()` table above.
+```python
+unsubscribe = session.on_notification(handle_notification, type="custom_type")
+try:
+    ...
+finally:
+    unsubscribe()
+```
 
-`list_sessions()` returns `list[SavedSession]`. Its filters are `cwd`,
-`all_workspaces`, and `limit`.
-
-`on_notification(callback, type=None)` passes
-`Mapping[str, object]` to the callback and returns an unsubscribe function.
-
-`SessionSource` requires `platform: SessionPlatform`; every other attribution
-field is optional and defaults to `None`. Required combinations are validated
-when converted to the wire protocol.
+High-level streams ignore unknown notifications. `on_notification()` exposes
+them without creating a second client.
 
 ## Streaming and results
 
@@ -565,7 +362,7 @@ Use top-level `run()` when only the result matters. Session turns always use
 | `timeout` | `float \| None` |
 | `include_partial_messages` | `bool` |
 
-### Complete messages by default
+### Complete messages
 
 ```python
 from droid_sdk import AssistantMessage
@@ -604,7 +401,29 @@ StreamMessage[T] = (
 
 Values appear in delivery order. `RunResult[T]` is always last.
 
-### Include partial events
+### Partial events
+
+```python
+from droid_sdk import Session, TextDelta
+
+async with Session() as session:
+    async with session.stream(
+        "Explain the failing test.",
+        include_partial_messages=True,
+    ) as stream:
+        async for event in stream:
+            if isinstance(event, TextDelta):
+                print(event.text, end="", flush=True)
+
+    print()
+    if not stream.result.success:
+        print(f"Turn ended: {stream.result.subtype}")
+```
+
+The default stream yields complete messages. Set
+`include_partial_messages=True` to add deltas and operational events. Both
+modes yield the terminal result and cache it in `stream.result`. See
+[Partial stream types](#partial-stream-types) for the complete event union.
 
 ```python
 from droid_sdk import RunResult, TextDelta
@@ -741,7 +560,7 @@ concatenate both.
 `stream.result.messages` is the ordered tuple of complete `Message` values
 emitted before the result. It excludes the result and partial events.
 
-### Read the result
+### Handle the result
 
 The terminal `RunResult` is yielded by the iterator and cached on the stream:
 
@@ -823,7 +642,7 @@ print(context.used, context.remaining, context.limit, context.accuracy)
 | `Usage` | `input_tokens`, `output_tokens`, `cache_creation_tokens`, `cache_read_tokens`, `thinking_tokens`, `factory_credits` |
 | `ContextUsage` | `used`, `remaining`, `limit`, `accuracy`, `updated_at` |
 
-### Failures and exceptions
+### Errors
 
 ```python
 async with session.stream("Run the tests.") as stream:
@@ -841,7 +660,7 @@ Setup, connection, process, protocol, and timeout failures raise
 `DroidError` subclasses. Python programming errors use normal built-in
 exceptions. `asyncio.CancelledError` is never wrapped.
 
-### Concurrency
+### Stream concurrency
 
 A session may have one active stream. Starting another raises
 `SessionBusyError`.
@@ -869,7 +688,7 @@ await session.interrupt()
 The active stream yields an interrupted result if its consumer remains
 attached. The session stays open.
 
-### Cancellation and early exit
+### Cancellation and interruption
 
 Cancelling the task running a turn sends a best-effort interrupt, releases the
 subscription, then re-raises `asyncio.CancelledError`.
@@ -888,9 +707,134 @@ guarantee immediate cleanup on `break`.
 `await stream.aclose()` explicitly interrupts and detaches an unfinished
 stream; it is idempotent.
 
+## Models
+
+Model IDs are strings because availability depends on account and
+organization policy. Omit `model` to use the configured default, which
+lives in `~/.factory/settings.json` under `sessionDefaultSettings`.
+An unknown model ID is rejected by the backend: the turn returns
+`RunFailure(subtype="error_during_execution")` with the rejection message
+in `error.message`.
+
+### Select a model
+
+```python
+from droid_sdk import ReasoningEffort, run
+
+result = await run(
+    "Review this repository.",
+    model="model-id",
+    reasoning_effort=ReasoningEffort.HIGH,
+)
+```
+
+Omit `reasoning_effort` to use the model default.
+
+Change the model for later turns:
+
+```python
+await session.update_settings(
+    model="model-id",
+    reasoning_effort=ReasoningEffort.HIGH,
+)
+```
+
+See [Update session settings](#update-session-settings) for the full `update_settings()`
+contract.
+
+### Use the Factory Router
+
+The model ID `auto` selects the
+[Factory Router](/web/factory-router),
+which routes each prompt to the model with the best balance of quality,
+latency, and cost. Some product surfaces label it Auto Model; the model
+ID is `auto` everywhere.
+
+```python
+from droid_sdk import run
+
+result = await run("Review this repository.", model="auto")
+```
+
+Pin a session to the router the same way:
+
+```python
+async with Session(model="auto") as session:
+    ...
+```
+
+Move a live session onto the router:
+
+```python
+await session.update_settings(model="auto")
+```
+
+Omit `reasoning_effort`; the router chooses the effort along with the
+model and ignores a supplied value. `session.settings.model` reports
+`auto`; the underlying model can differ per response.
+
+The model ID `auto` is unrelated to `Mode.AUTO`, the default interaction
+mode, and to `Autonomy`, the permission level.
+
+#### See which model handled a response
+
+Assistant messages in the wire `create_message` notification carry the
+underlying model in `modelId`; `routerId` is `"auto"` when the router
+made the choice. High-level messages omit these fields. Subscribe with
+[`on_notification()`](#subscribe-to-raw-notifications):
+
+```python
+from collections.abc import Mapping
+
+
+def report_routing(notification: Mapping[str, object]) -> None:
+    message = notification.get("message")
+    if isinstance(message, Mapping) and message.get("role") == "assistant":
+        print(message.get("modelId"), message.get("routerId"))
+
+
+unsubscribe = session.on_notification(report_routing, type="create_message")
+```
+
+Wire payloads use camelCase keys and evolve server-side; treat absent
+keys as normal.
+
+### Configure mode-specific models
+
+```python
+from droid_sdk import Mode, ReasoningEffort, Session, SessionConfig
+
+config = SessionConfig(
+    mode=Mode.SPEC,
+    spec_model="model-id",
+    spec_reasoning_effort=ReasoningEffort.HIGH,
+)
+
+async with Session(model="model-id", config=config) as session:
+    async with session.stream("Draft an implementation plan.") as stream:
+        async for _ in stream:
+            pass
+```
+
+The primary model handles Auto turns. `spec_model` handles Spec turns.
+Switch modes on a live session with `enter_spec()` and `leave_spec()`; see
+[Spec mode](#spec-mode).
+
+### Model configuration contract
+
+| Field | Type | Used by |
+| --- | --- | --- |
+| `model` | `str \| None` | `run()`, `Session`, `update_settings()` |
+| `reasoning_effort` | `ReasoningEffort \| None` | Same |
+| `spec_model` | `str \| None` | `SessionConfig`, `update_settings()` |
+| `spec_reasoning_effort` | `ReasoningEffort \| None` | Same |
+
+`None` uses the configured default. Setting a Spec field to `None` through
+`update_settings()` clears it.
+
 ## Inputs and outputs
 
-### Images and files
+### Images and documents
 
 Attach images and files to a turn with the `images` and `files` options:
 
@@ -938,7 +882,9 @@ PDFs to `MAX_PDF_ATTACHMENT_BYTES` (3 MiB).
 Wire payloads use canonical `mediaType` fields. The optional `mime` hint on
 text documents is forwarded with the document.
 
-### Return a Pydantic model
+### Structured output
+
+#### Return a Pydantic model
 
 ```python
 from typing import Literal
@@ -979,7 +925,7 @@ Missing or invalid output turns the result into `RunFailure` with subtype
 `error_structured_output`; the failure keeps the text, messages, usage, raw
 `structured_output`, and `output_validation_error` for inspection.
 
-### Use raw JSON Schema
+#### Use raw JSON Schema
 
 ```python
 from droid_sdk import JsonObject, JsonSchema, RunResult, run
@@ -1058,7 +1004,7 @@ config = SessionConfig(autonomy=Autonomy.LOW)
 
 Autonomy does not select Auto or Spec mode. `Mode` controls that.
 
-### Handle permission requests
+### Permission handler
 
 ```python
 from droid_sdk import (
@@ -1092,7 +1038,7 @@ An absent handler, an invalid response, or a handler exception cancels the
 request. Handler failures appear as `ErrorEvent` values; they do not raise
 through the active stream.
 
-### Answer questions from Droid
+### AskUser handler
 
 ```python
 from droid_sdk import QuestionRequest, QuestionResponse
@@ -1206,7 +1152,7 @@ questionnaire details. `ApplyPatchFile` requires `file_path`, `file_name`, and
 
 Only outcomes present in `PermissionRequest.options` are valid.
 
-### Control native tools
+### Tool controls
 
 ```python
 config = SessionConfig(
@@ -1240,7 +1186,7 @@ list, or tuple. Passing a bare string raises `TypeError`.
 | `ToolInfo` | `id`, `display_name`, `description`, `category`, `default_allowed`, `allowed` |
 | `ListToolsOptions` | `model`, `mode`, `autonomy`, `spec_model`, `additional_tools`, `enabled_tools`, `disabled_tools`, `restrict_tools`, `skip_permissions_unsafe` |
 
-## Tools and extensions
+## Extensions
 
 | Extension | Use it for |
 | --- | --- |
@@ -1515,14 +1461,12 @@ source with its attached policies and retires the detached successor. If
 source restoration fails, the SDK closes the connection rather than leaving
 an ambiguous owner.
 
-## Modes
-
-### Spec mode
+## Spec mode
 
 Spec mode lets Droid inspect a codebase and propose a plan without changing
 files.
 
-#### Enter Spec mode
+### Enter Spec mode
 
 ```python
 await session.enter_spec(
@@ -1533,7 +1477,7 @@ await session.enter_spec(
 
 Start directly in Spec mode with `SessionConfig(mode=Mode.SPEC)`.
 
-#### Leave without approving
+### Leave without approving a plan
 
 ```python
 await session.leave_spec()
@@ -1542,7 +1486,7 @@ await session.leave_spec()
 This changes the mode only. It does not approve the plan or start
 implementation.
 
-#### Approve a plan
+### Approve a plan
 
 Plan approval arrives through the permission handler:
 
@@ -1570,7 +1514,7 @@ Entering or leaving Spec mode only changes settings. Plan approval is an
 `ExitSpecModeAction` permission request, and only an offered
 `ToolConfirmationOutcome` is valid.
 
-## Operations
+## Observability and advanced APIs
 
 ### Observability
 
@@ -1637,7 +1581,30 @@ starts Droid.
 | `env` | `Mapping[str, str]` |
 | `observability` | `Observability \| None` |
 
-## API index
+## Examples
+
+Run commands from the repository root:
+
+| Example | Command | Expected result |
+| --- | --- | --- |
+| [Attachments](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/attachments.py) | `uv run python examples/attachments.py` | Live image, text, and PDF turn |
+| [Factory Router](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/factory_router.py) | `uv run python examples/factory_router.py` | Live routed turns with per-response model IDs |
+| [Interaction helpers](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/interaction_helpers.py) | `uv run python examples/interaction_helpers.py` | Offline typed responses |
+| [Interactions](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/interactions.py) | `uv run python examples/interactions.py` | Live permission/question turn |
+| [Interactive session](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/interactive_session.py) | `uv run python examples/interactive_session.py` | Two live turns sharing history |
+| [Saved sessions](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/list_saved_sessions.py) | `uv run python examples/list_saved_sessions.py` | Local saved-session count |
+| [Observability](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/observability.py) | `uv run python examples/observability.py` | Offline isolated sink counts |
+| [One-shot run](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/one_shot.py) | `uv run python examples/one_shot.py` | Live one-turn result |
+| [Resume](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/resume_session.py) | `uv run python examples/resume_session.py --session-id ID` | Live resumed turn |
+| [SDK MCP](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/sdk_mcp.py) | `uv run python examples/sdk_mcp.py` | Live in-process MCP result |
+| [Session operations](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/session_operations.py) | `uv run python examples/session_operations.py` | Live settings, discovery, fork, and compact |
+| [Stream events](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/stream_events.py) | `uv run python examples/stream_events.py` | Live tour of every stream event type |
+| [Structured output](https://github.com/Factory-AI/droid-sdk-python/blob/main/examples/structured_output_model.py) | `uv run python examples/structured_output_model.py` | Live validated model output |
+
+Live examples require an authenticated local Droid CLI or `FACTORY_API_KEY`;
+every model call uses a finite timeout.
+
+## API reference
 
 ### Root constants and supporting types
 
@@ -1788,28 +1755,77 @@ Exception constructor metadata is public:
 | `DroidProcessError(message, ...)` | `exit_code`, `signal` |
 | `DroidProtocolError(message, ...)` | `code`, `data` |
 
-## Runnable examples
+### Detailed session contracts
 
-Run commands from the repository root:
+#### Session construction contract
 
-| Example | Command | Expected result |
-| --- | --- | --- |
-| Attachments | `uv run python examples/attachments.py` | Live image, text, and PDF turn |
-| Factory Router | `uv run python examples/factory_router.py` | Live routed turns with per-response model IDs |
-| Interaction helpers | `uv run python examples/interaction_helpers.py` | Offline typed responses |
-| Interactions | `uv run python examples/interactions.py` | Live permission/question turn |
-| Interactive session | `uv run python examples/interactive_session.py` | Two live turns sharing history |
-| Saved sessions | `uv run python examples/list_saved_sessions.py` | Local saved-session count |
-| Observability | `uv run python examples/observability.py` | Offline isolated sink counts |
-| One-shot run | `uv run python examples/one_shot.py` | Live one-turn result |
-| Resume | `uv run python examples/resume_session.py --session-id ID` | Live resumed turn |
-| SDK MCP | `uv run python examples/sdk_mcp.py` | Live in-process MCP result |
-| Session operations | `uv run python examples/session_operations.py` | Live settings, discovery, fork, and compact |
-| Stream events | `uv run python examples/stream_events.py` | Live tour of every stream event type |
-| Structured output | `uv run python examples/structured_output_model.py` | Live validated model output |
+`Session(...)` accepts:
 
-Live examples require an authenticated local Droid CLI or `FACTORY_API_KEY`;
-every model call uses a finite timeout.
+| Argument | Type |
+| --- | --- |
+| `cwd` | `str \| Path \| None` |
+| `model` | `str \| None` |
+| `reasoning_effort` | `ReasoningEffort \| None` |
+| `config` | `SessionConfig \| None` |
+| `interactions` | `InteractionHandlers \| None` |
+| `runtime` | `Runtime \| None` |
+| `api_key` | `str \| None` |
+
+`SessionConfig` fields:
+
+| Field | Type |
+| --- | --- |
+| `mode` | `Mode \| None` |
+| `autonomy` | `Autonomy \| None` |
+| `spec_model` | `str \| None` |
+| `spec_reasoning_effort` | `ReasoningEffort \| None` |
+| `mcp_servers` | `Sequence[McpServerConfig]` |
+| `machine_id` | `str \| None` |
+| `tags` | `Sequence[SessionTag]` |
+| `session_source` | `SessionSource \| None` |
+| `auto_reject_permission_requests` | `bool \| None` |
+| `disable_builtin_skills` | `bool \| None` |
+| `additional_tools` | `Iterable[str] \| None` |
+| `enabled_tools` | `Iterable[str] \| None` |
+| `disabled_tools` | `Iterable[str] \| None` |
+| `restrict_tools` | `Iterable[str] \| None` |
+
+`Session.resume(session_id, ...)` accepts only values that can be reattached:
+
+| Argument | Type |
+| --- | --- |
+| `session_id` | `str` |
+| `interactions` | `InteractionHandlers \| None` |
+| `mcp_servers` | `Sequence[McpServerConfig]` |
+| `runtime` | `Runtime \| None` |
+| `api_key` | `str \| None` |
+| `disabled_tools` | `Iterable[str] \| None` |
+| `auto_reject_permission_requests` | `bool \| None` |
+| `disable_builtin_skills` | `bool \| None` |
+| `session_source` | `SessionSource \| None` |
+
+#### Session state schemas
+
+| Type | Fields |
+| --- | --- |
+| `SessionSettings` | `model`, `reasoning_effort`, `mode`, `autonomy`, `spec_model`, `spec_reasoning_effort`, `tags`, `sandbox`, `additional_tools`, `enabled_tools`, `disabled_tools`, `restrict_tools` |
+| `SessionSettingsUpdate` | `model`, `reasoning_effort`, `mode`, `autonomy`, `spec_model`, `spec_reasoning_effort`, `tags`, `additional_tools`, `enabled_tools`, `disabled_tools`, `restrict_tools`, `compaction_threshold_check_enabled` |
+| `SandboxSettings` | `enabled: bool`, `mode: str \| None = None` |
+| `SessionTag` | `name`, `metadata` |
+| `SavedSession` | `id`, `title`, `owner`, `message_count`, `modified_at`, `created_at`, `cwd`, `is_favorite` |
+
+Every `SessionSettingsUpdate` field defaults to `None`. Its field types
+match the `update_settings()` table above.
+
+`list_sessions()` returns `list[SavedSession]`. Its filters are `cwd`,
+`all_workspaces`, and `limit`.
+
+`on_notification(callback, type=None)` passes
+`Mapping[str, object]` to the callback and returns an unsubscribe function.
+
+`SessionSource` requires `platform: SessionPlatform`; every other attribution
+field is optional and defaults to `None`. Required combinations are validated
+when converted to the wire protocol.
 
 ## Known limitations
 
