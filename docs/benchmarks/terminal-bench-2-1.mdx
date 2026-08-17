@@ -10,16 +10,18 @@ keywords: ['benchmarks', 'terminal bench', 'terminal bench 2.1', 'droid', 'ai co
 
 Droid scores below are the best full finished runs (all 88–89 tasks) and the mean across full runs. External columns are pass@1 on the same benchmark.
 
-| Model | Droid best | Droid mean (full runs) | Artificial Analysis | Vals (Terminus 2) |
-| --- | ---: | ---: | ---: | ---: |
-| **GPT-5.6 Sol** | **93.2%** (15 runs) | 85.4% | 89.5% (xhigh) / 88.0% (max) | 85.8% ±1.35 |
-| **Claude Opus 5** | **86.5%** (6 runs) | 84.2% | 89.1% (max) | 84.6% ±0.99 |
-| **Kimi K3** | **85.4%** (5 runs) | 79.5% | 85.0% (max) | 80.9% ±0.65 |
-| **Grok 4.6** | **82.0%** (3 runs) | 81.2% | 88.4% (high) | 78.3% ±2.08 |
-| **Gemini 3.6 Flash** | **81.8%** (4 runs) | 79.9% | 77.5% | 73.8% ±1.63 |
-| **GLM-5.2** | **76.4%** (11 runs) | 69.5% | 77.9% (max) | — |
+| Model | Droid best | Droid mean (full runs) | Droid reasoning effort | Artificial Analysis | Vals (Terminus 2) |
+| --- | ---: | ---: | :---: | ---: | ---: |
+| **GPT-5.6 Sol** | **93.2%** (15 runs) | 85.4% | high | 89.5% (xhigh) / 88.0% (max) | 85.8% ±1.35 |
+| **Claude Opus 5** | **86.5%** (6 runs) | 84.2% | high | 89.1% (max) | 84.6% ±0.99 |
+| **Kimi K3** | **85.4%** (5 runs) | 79.5% | max | 85.0% (max) | 80.9% ±0.65 |
+| **Grok 4.6** | **82.0%** (3 runs) | 81.2% | medium | 88.4% (high) | 78.3% ±2.08 |
+| **Gemini 3.6 Flash** | **81.8%** (4 runs) | 79.9% | high | 77.5% | 73.8% ±1.63 |
+| **GLM-5.2** | **76.4%** (11 runs) | 69.5% | high | 77.9% (max) | — |
 
 *Last updated: August 2026.*
+
+Reasoning effort is the value recorded on Droid's model calls for the featured runs (from session records); it is the budget Droid used, independent of what each public lab selected. Public labs report their own settings in parentheses. One caveat: our Grok 4.6 runs used `medium` effort, while Artificial Analysis reports Grok 4.6 at `high` (88.4%) — so the gap between our 82.0% and AA's number partly reflects reasoning configuration rather than model capability.
 
 ### Accuracy vs cost
 
