@@ -12,8 +12,8 @@ Droid scores below are the best full finished runs (all 88–89 tasks) and the m
 
 | Model | Droid best | Droid mean (full runs) | Droid reasoning effort | Artificial Analysis | Vals (Terminus 2) |
 | --- | ---: | ---: | :---: | ---: | ---: |
-| **GPT-5.6 Sol** | **93.2%** (15 runs) | 85.4% | high | 89.5% (xhigh) / 88.0% (max) | 85.8% ±1.35 |
-| **Claude Opus 5** | **86.5%** (6 runs) | 84.2% | high | 89.1% (max) | 84.6% ±0.99 |
+| **GPT-5.6 Sol** | **93.2%** (18 runs) | 85.8% | high (+ xhigh reruns) | 89.5% (xhigh) / 88.0% (max) | 85.8% ±1.35 |
+| **Claude Opus 5** | **86.5%** (8 runs) | 84.5% | high (+ max reruns) | 89.1% (max) | 84.6% ±0.99 |
 | **Kimi K3** | **85.4%** (2 runs) | 85.4% | max | 85.0% (max) | 80.9% ±0.65 |
 | **Grok 4.6** | **82.0%** (3 runs) | 81.2% | medium | 88.4% (high) | 78.3% ±2.08 |
 | **Gemini 3.6 Flash** | **81.8%** (4 runs) | 79.9% | high | 77.5% | 73.8% ±1.63 |
@@ -25,6 +25,8 @@ Reasoning effort is the value recorded on Droid's model calls for the featured r
 
 Kimi K3's three July 29 runs (65–69/89) used an older untagged Droid build at `high` reasoning effort; the two later runs (August 13 at `max`, August 15 on build 0.195.0) both independently reproduced **76/89** under the current configuration. The table, plots, and means below count only the two current-configuration runs, so the Kimi row is not diluted by the stale cohort.
 
+**Effort-matched reruns (August 16–17, three full runs each).** We re-ran the models where public labs used a higher budget than our default. GPT-5.6 Sol at `xhigh` pooled **87.6%** (234/267) — +2.5 points over its high-effort mean, now above Vals (85.8%) but still 1.9 points below Artificial Analysis' 89.5, so the residual gap is agent harness rather than thinking budget. Claude Opus 5 at `max` pooled **84.6%** (226/267) — statistically identical to its high-effort baseline, meaning Droid realizes no effort headroom on Opus 5 and the gap to AA's 89.1 is essentially harness. Claude Opus 4.8 at `high` pooled **82.4%** (220/267) — within noise of DeepSeek's 85.0 report. Matched-effort runs for Kimi K3, Grok 4.6, and GLM-5.2 are in flight; their results will land on this page when complete.
+
 ### Accuracy vs cost
 
 ![Terminal Bench 2.1 accuracy versus cost per task](/images/terminal-bench-2-1-cost-score.png)
@@ -33,7 +35,7 @@ Each point is one finished full Droid run (88–89 tasks); color identifies the 
 
 ![Terminal Bench 2.1 per-model mean accuracy versus mean cost](/images/terminal-bench-2-1-cost-score-mean.png)
 
-The second view averages the full runs per model and recomputes the frontier on those means, with the underlying run points shown translucent for context. Error bars are 95% confidence intervals on each model's pooled pass@1 (Wilson interval), so they reflect run-to-run variation; with only 2–15 full runs per model they are wide, and the exact frontier ordering should not be over-read. On means the frontier is **Grok 4.6 → Kimi K3**, but the top of the field is a statistical tie: Kimi (85.4%, 95% CI 80–90), GPT-5.6 Sol (85.4%, CI 83–87), and Claude Opus 5 (84.2%, CI 81–87) all overlap, so the defensible read is a close top tier rather than a single winner. GLM-5.2 (69.5%, CI 67–72) is the only model clearly below the rest; Grok (81.2%, CI 76–85) and Gemini 3.6 Flash (79.9%, CI 75–84) sit in between at the cheapest and among the most expensive cost per task, respectively.
+The second view averages the full runs per model and recomputes the frontier on those means, with the underlying run points shown translucent for context. The whiskers span each model's full-run range (minimum to maximum accuracy across its runs) — a spread indicator, not a confidence interval; the marker is the mean. Points and means include the effort-matched reruns for GPT-5.6 Sol (xhigh) and Claude Opus 5 (max) alongside their default high-effort runs; Kimi K3 has only two identical current-config runs, so its whisker is zero-width. On means the frontier is **Grok 4.6 → GPT-5.6 Sol**, but the top of the field is a statistical tie: on a 95% confidence interval for the pooled pass rate, Kimi (85.4%, CI 80–90), GPT-5.6 Sol (85.8%, CI 84–87), and Claude Opus 5 (84.5%, CI 82–87) all overlap, so the defensible read is a close top tier rather than a single winner. GLM-5.2 (69.5%, CI 67–72) is the only model clearly below the rest; Grok (81.2%) and Gemini 3.6 Flash (79.9%) sit in between at the cheapest and among the most expensive cost per task, respectively.
 
 The best single run belongs to **GPT-5.6 Sol**, at **93.2% for about `$0.70`/task** — the highest score on this page at a mid-range cost. **Grok 4.6** (82.0% at ~`$0.40`/task) and **GLM-5.2** (up to 76.4% at ~`$0.39`/task) form the value corner: a useful score for less than half of Sol's cost. **Gemini 3.6 Flash** (81.8% at ~`$1.03`/task) and **Claude Opus 5** (86.5% at ~`$1.32`/task) sit above the frontier at higher cost per task. This is an observation about these specific runs, not a general statement about a model's efficiency across workloads. Run counts are small (2–15 per model), so the frontier and means are directional rather than statistically conclusive.
 
@@ -48,7 +50,7 @@ The best single run belongs to **GPT-5.6 Sol**, at **93.2% for about `$0.70`/tas
 
 ### What the numbers show
 
-- **GPT-5.6 Sol has the best single run at 93.2%**, above every published number for the model (AA 89.5% at xhigh, 88.0% at max; Vals 85.8%), and is the most-measured configuration on this page (15 full runs). On mean accuracy it is statistically tied with Kimi K3 and Claude Opus 5 (their 95% confidence intervals overlap), so the trend to report is a close top tier, not a single winner.
+- **GPT-5.6 Sol has the best single run at 93.2%**, above every published number for the model (AA 89.5% at xhigh, 88.0% at max; Vals 85.8%), and is the most-measured configuration on this page (18 full runs). On mean accuracy it is statistically tied with Kimi K3 and Claude Opus 5 (their 95% confidence intervals overlap), so the trend to report is a close top tier, not a single winner.
 - **Gemini 3.6 Flash and Kimi K3 run at or above public reports.** We measure 81.8% for Gemini 3.6 Flash (AA 77.5%, Vals 73.8%) and 85.4% for Kimi K3 (AA 85.0%, Vals 80.9%).
 - **Claude Opus 5 and GLM-5.2 are within a few points of the best public report.** Our Opus 5 result (86.5%) is measured without a refusal fallback; Vals' 84.6% includes one (see below).
 - **Grok 4.6 sits between the two public labs.** Public reports for it are unusually scattered (AA 88.4% at high reasoning vs Vals 78.3%), and our 82.0% lands between them.
