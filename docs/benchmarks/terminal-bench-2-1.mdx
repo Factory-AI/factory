@@ -27,7 +27,11 @@ Reasoning effort is the value recorded on Droid's model calls for the featured r
 
 ![Terminal Bench 2.1 accuracy versus cost per task](/images/terminal-bench-2-1-cost-score.png)
 
-Each point is one finished full Droid run (88–89 tasks); color identifies the model. Cost per task is the billed model usage for that run's sessions, converted at the standard credit rate, divided by the number of tasks. The dashed line marks the observed Pareto frontier: the highest accuracy reachable at or below a given cost.
+Each point is one finished full Droid run (88–89 tasks); color identifies the model. Cost per task is the billed model usage for that run's sessions, converted at the standard credit rate, divided by the number of tasks. The dashed line marks the observed Pareto frontier: the highest accuracy reachable at or below a given cost. Every run is included, so a model earns a frontier point only if at least one of its runs beats everything cheaper.
+
+![Terminal Bench 2.1 per-model mean accuracy versus mean cost](/images/terminal-bench-2-1-cost-score-mean.png)
+
+The second view averages the full runs per model and recomputes the frontier on those means, with the underlying run points shown translucent for context. It answers "which model is best on average per dollar" rather than "which model's best run is best." On means, the frontier is **Grok 4.6 → GPT-5.6 Sol**: Grok averages 81.2% at $0.36/task, and Sol averages 85.4% at $0.80/task. Claude Opus 5 (84.2% mean at $1.70/task), Gemini 3.6 Flash (79.9% at $1.25/task), Kimi K3 (79.5% at $0.52/task), and GLM-5.2 (69.5% at $0.41/task) trail the frontier on average, driven by mean-inflating runs and higher per-task spend.
 
 The frontier is dominated by **GPT-5.6 Sol**, which reaches **93.2% at about $0.70/task** — the highest score on this page at a mid-range cost. **Grok 4.6** (82.0% at ~$0.40/task) and **GLM-5.2** (up to 76.4% at ~$0.39/task) form the value corner: a useful score for less than half of Sol's cost. **Gemini 3.6 Flash** (81.8% at ~$1.03/task) and **Claude Opus 5** (86.5% at ~$1.32/task) sit above the frontier at higher cost per task. This is an observation about these specific runs, not a general statement about a model's efficiency across workloads.
 
