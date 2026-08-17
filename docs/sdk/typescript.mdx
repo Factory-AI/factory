@@ -1,0 +1,1391 @@
+---
+title: "Droid TypeScript SDK"
+sidebarTitle: "TypeScript"
+description: "Use the Factory Droid SDK for TypeScript to build custom agents, workflows, and product integrations."
+keywords: ["Droid SDK", "TypeScript", "Node.js", "agents", "automation", "MCP"]
+---
+
+Use the Factory TypeScript SDK to run Droid from Node.js.
+
+The public npm package is `@factory/droid-sdk`.
+
+This guide covers the high-level public API. The package's exported TypeScript
+declarations define the complete compile-time API.
+
+## Overview
+
+Import the SDK from `@factory/droid-sdk/node`. It starts a Droid CLI subprocess
+and provides session management, streaming, local session discovery, and
+in-process MCP tool APIs.
+
+### Choose an API
+
+| Goal                                    | API               |
+| --------------------------------------- | ----------------- |
+| Run one prompt and get the final result | `run()`           |
+| Keep context across prompts             | `createSession()` |
+| Continue a saved session                | `resumeSession()` |
+| Find saved sessions                     | `listSessions()`  |
+
+Start with `run()` for one prompt. Use a session when later prompts need the
+same conversation history.
+
+## Install and authenticate
+
+Install the package:
+
+```bash
+npm install @factory/droid-sdk
+```
+
+The SDK requires Node.js 18 or later.
+
+By default, the SDK starts the `droid` CLI from `PATH`. Pass `execPath` to use a
+different `droid` executable.
+
+Set an API key:
+
+```bash
+export FACTORY_API_KEY="your-key"
+```
+
+The SDK reads `FACTORY_API_KEY` from the process environment by default. You
+can also pass `apiKey` to `run()`, `createSession()`, or `resumeSession()`.
+
+## Quick start
+
+### Run one prompt
+
+```ts
+import { run } from '@factory/droid-sdk/node';
+
+const result = await run('Summarize this repository.');
+
+if (!result.success) {
+  throw new Error(result.error?.message ?? `Run failed: ${result.subtype}`);
+}
+
+console.log(result.text);
+```
+
+`run()` creates a session, consumes its complete message stream, returns the
+terminal `DroidResult`, and closes the session.
+
+### Continue a conversation
+
+```ts
+import { createSession, DroidMessageType } from '@factory/droid-sdk/node';
+
+const session = await createSession();
+
+try {
+  for await (const message of session.stream('What does this project do?')) {
+    if (message.type === DroidMessageType.Assistant) {
+      console.log(message.text);
+    }
+  }
+
+  for await (const message of session.stream('What should I test first?')) {
+    if (message.type === DroidMessageType.Assistant) {
+      console.log(message.text);
+    }
+  }
+} finally {
+  await session.close();
+}
+```
+
+In the above example, the second prompt uses context from the first turn.
+Remember to close sessions that your code creates.
+
+## Core concepts
+
+### Session
+
+A session holds conversation history, settings, and a working directory. Create
+one with `createSession()` or load a saved session with `resumeSession()`.
+
+### Turn
+
+A turn starts when you send one prompt with `session.stream()`. A session can
+run one turn at a time.
+
+### Stream message
+
+`session.stream()` returns an async iterable of complete messages. Narrow each
+message by its `type`. Messages can report user input, assistant output, tool
+activity, hooks, errors, and a terminal `DroidResult`.
+
+### Result
+
+A normally completed turn ends with a `DroidResult`. `run()` consumes the stream and returns that same result type. See [Streaming and results](#streaming-and-results) for result handling, errors, token usage, and cancellation.
+
+### Ownership and cleanup
+
+Cleanup depends on how the session was created.
+
+| API               | Cleanup                          |
+| ----------------- | -------------------------------- |
+| `run()`           | Closes its session automatically |
+| `createSession()` | Call `await session.close()`     |
+| `resumeSession()` | Call `await session.close()`     |
+
+Use `finally` blocks so cleanup also runs after an error.
+
+## Models
+
+Model IDs are strings because availability depends on the account,
+organization policy, and daemon configuration. Omit `modelId` to use the Droid
+default.
+
+### Discover available models
+
+**Runtime: Node.js**
+
+```ts
+import { listModels } from '@factory/droid-sdk/node';
+
+const models = await listModels();
+const catalog = await listModels({ includeDisabled: true });
+```
+
+The Node helper starts a one-shot Droid process, requests the catalog without
+creating a session, and closes the process before returning.
+
+**Runtime: Daemon** (`droid` is a client returned by `connectToDaemon()`)
+
+```ts
+const models = await droid.models.list();
+const catalog = await droid.models.list({ includeDisabled: true });
+
+for (const model of models) {
+  console.log(model.id, model.supportedReasoningEfforts);
+}
+```
+
+`includeDisabled` defaults to `false`, so both APIs return only selectable
+models when options are omitted. When disabled models are requested, every
+disabled entry includes a `disabledReason` for display. Regular organization
+members cannot enable these models. An organization manager may be able to
+change the model policy or complete a required opt-in.
+
+Each available model includes:
+
+| Field                       | Meaning                                        |
+| --------------------------- | ---------------------------------------------- |
+| `id`                        | Value accepted by `modelId`                    |
+| `displayName`               | Full display name                              |
+| `shortDisplayName`          | Compact display name                           |
+| `modelProvider`             | Model provider                                 |
+| `supportedReasoningEfforts` | Reasoning levels accepted by the model         |
+| `defaultReasoningEffort`    | Reasoning level used when none is supplied     |
+| `isCustom`                  | Whether the model is user-configured           |
+| `disabled`                  | Whether policy prevents selecting the model    |
+| `disabledReason`            | Required explanation when `disabled` is `true` |
+| `noImageSupport`            | Whether image input is unavailable             |
+| `supportsImageGeneration`   | Whether the model can generate images          |
+| `kind`                      | Model or router classification, when present   |
+
+Other optional fields provide tier, token multiplier, and display badges.
+
+### Node and daemon discovery
+
+| Runtime | Discovery API         | Lifecycle                                |
+| ------- | --------------------- | ---------------------------------------- |
+| Node    | `listModels(options)` | Uses and closes a one-shot Droid process |
+| Daemon  | `droid.models.list()` | Reuses the connected daemon client       |
+
+Both APIs return the same `ModelInfo[]` type and include built-in models plus
+configured custom models.
+
+### Select a model
+
+Pass a configured model ID when creating a session or running one prompt.
+
+```ts
+import {
+  createSession,
+  DroidMessageType,
+  ReasoningEffort,
+} from '@factory/droid-sdk/node';
+
+const session = await createSession({
+  modelId: 'model-id',
+  reasoningEffort: ReasoningEffort.High,
+});
+
+try {
+  for await (const message of session.stream('Review this repository.')) {
+    if (message.type === DroidMessageType.Assistant) {
+      console.log(message.text);
+    }
+  }
+} finally {
+  await session.close();
+}
+```
+
+For an existing session, call `updateSettings()`:
+
+```ts
+await session.updateSettings({
+  modelId: 'model-id',
+  reasoningEffort: ReasoningEffort.High,
+});
+```
+
+Set `reasoningEffort` only to a level supported by the selected model. Omit it
+to use the model's configured default.
+
+### Use Auto Router
+
+Set `modelId` to `"auto"` to let Factory choose a model for each turn.
+
+```ts
+import { run } from '@factory/droid-sdk/node';
+
+const result = await run('Find the cause of the failing tests.', {
+  modelId: 'auto',
+});
+
+if (!result.success) {
+  throw new Error(result.error?.message ?? `Run failed: ${result.subtype}`);
+}
+
+console.log(result.text);
+```
+
+The selected model can change between turns. Choose a fixed model ID when runs must use the same model.
+
+### Choose a spec-mode model
+
+The primary model handles normal turns. The spec-mode model handles turns in
+spec mode.
+
+```ts
+import {
+  createSession,
+  DroidInteractionMode,
+  ReasoningEffort,
+} from '@factory/droid-sdk/node';
+
+const session = await createSession({
+  modelId: 'auto',
+  interactionMode: DroidInteractionMode.Spec,
+  specModeModelId: 'model-id',
+  specModeReasoningEffort: ReasoningEffort.High,
+});
+
+try {
+  for await (const _message of session.stream(
+    'Draft an implementation plan.'
+  )) {
+    // Consume messages.
+  }
+} finally {
+  await session.close();
+}
+```
+
+You can also choose the model when entering spec mode:
+
+```ts
+await session.enterSpecMode({
+  specModeModelId: 'model-id',
+  specModeReasoningEffort: ReasoningEffort.High,
+});
+```
+
+### Use a custom model
+
+Configure custom models in `~/.factory/settings.json`. See [Custom Models (BYOK)](/cli/byok/overview) for provider, credential, and model settings.
+
+After configuration, pass the custom model ID anywhere the SDK accepts `modelId`. The ID uses `custom:` followed by the configured `model` value.
+
+```ts
+import { run } from '@factory/droid-sdk/node';
+
+const result = await run('Summarize this repository.', {
+  modelId: 'custom:gpt-4o-mini',
+});
+
+if (!result.success) {
+  throw new Error(result.error?.message ?? `Run failed: ${result.subtype}`);
+}
+
+console.log(result.text);
+```
+
+## Sessions
+
+Use a session when prompts need shared conversation history. A session owns its working directory, settings, and one active turn at a time.
+
+### Create and use a session
+
+```ts
+import { createSession, DroidMessageType } from '@factory/droid-sdk/node';
+
+const session = await createSession({
+  cwd: process.cwd(),
+});
+
+async function send(prompt: string) {
+  for await (const message of session.stream(prompt)) {
+    if (message.type === DroidMessageType.Assistant) {
+      console.log(message.text);
+    }
+  }
+}
+
+try {
+  await send('What does this project do?');
+  await send('What should I test first?');
+} finally {
+  await session.close();
+}
+```
+
+The second turn uses context from the first. `cwd` defaults to `process.cwd()`. Model and reasoning defaults come from Droid settings.
+
+Runnable example:
+[`examples/node/multi-turn-session.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/multi-turn-session.ts)
+
+### Resume a saved session
+
+```ts
+import { DroidMessageType, resumeSession } from '@factory/droid-sdk/node';
+
+async function continueSession(sessionId: string) {
+  const session = await resumeSession(sessionId);
+
+  try {
+    for await (const message of session.stream(
+      'Continue from the last conversation.'
+    )) {
+      if (message.type === DroidMessageType.Assistant) {
+        console.log(message.text);
+      }
+    }
+  } finally {
+    await session.close();
+  }
+}
+```
+
+`resumeSession()` restores the saved conversation, working directory, and session settings. It does not accept `cwd`, `modelId`, or reasoning options.
+
+Resume options can provide new permission and AskUser handlers, disabled tools, MCP servers, an abort signal, and observability sinks.
+
+### Read session state
+
+Each handle exposes its ID, current working directory, and current settings.
+
+```ts
+console.log(session.id);
+console.log(session.cwd);
+console.log(session.settings.modelId);
+console.log(session.settings.reasoningEffort);
+console.log(session.settings.interactionMode);
+```
+
+`settings` is read-only. The SDK updates `settings` and `cwd` when Droid reports a change.
+
+Runnable example: [`examples/node/init-metadata.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/init-metadata.ts)
+
+### Update active-session settings
+
+Use `updateSettings()` for changes that should apply to later turns in the current session.
+
+```ts
+import { AutonomyLevel, ReasoningEffort } from '@factory/droid-sdk/node';
+
+await session.updateSettings({
+  modelId: 'model-id',
+  reasoningEffort: ReasoningEffort.High,
+  autonomyLevel: AutonomyLevel.Low,
+  disabledToolIds: ['Execute'],
+});
+```
+
+Updatable settings include:
+
+- model and reasoning effort
+- interaction mode and autonomy level
+- spec-mode model settings
+- tool availability overrides
+
+Interaction mode controls whether Droid operates normally in Auto mode or produces a read-only plan in Spec mode. Autonomy level controls which actions require approval while Droid is in Auto mode. Tool availability overrides can enable, disable, or restrict the tools available to the session.
+
+When only changing interaction modes, use `enterSpecMode()` and `exitSpecMode()` instead of setting `interactionMode` directly.
+
+The updated values are available through `session.settings`.
+
+Runnable example: [`examples/node/session-settings.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/session-settings.ts)
+
+### Rename a session
+
+Use `rename()` after the first turn to replace the generated title.
+
+```ts
+await session.rename({ title: 'Authentication review' });
+```
+
+Runnable example:
+[`examples/node/rename-session.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/rename-session.ts)
+
+### List saved sessions
+
+`listSessions()` reads local Droid session storage. It does not start Droid or
+call the Factory API.
+
+List sessions for the current working directory:
+
+```ts
+import { listSessions } from '@factory/droid-sdk/node';
+
+const sessions = await listSessions({ limit: 10 });
+
+for (const session of sessions) {
+  console.log(session.id, session.title, session.modifiedTime);
+}
+```
+
+List sessions across all working directories:
+
+```ts
+const sessions = await listSessions({
+  fetchOutsideCWD: true,
+  limit: 10,
+});
+```
+
+Results are sorted by `modifiedTime`, newest first. Each item includes its ID, title, owner, message count, creation time, modification time, and working directory when available.
+
+Runnable example: [`examples/node/list-sessions.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/list-sessions.ts)
+
+### What persists
+
+Droid saves the session data needed to continue later.
+
+| Restored from the saved session | Attach again when resuming |
+| ------------------------------- | -------------------------- |
+| Conversation history            | Permission handler         |
+| Working directory               | AskUser handler            |
+| Title                           | SDK MCP servers            |
+| Session settings                | Observability sinks        |
+|                                 | Abort signal               |
+
+Session settings include model, reasoning, Auto or Spec interaction mode, autonomy, spec-mode model settings, and tool availability overrides.
+
+Handlers, observability sinks, abort signals, and SDK MCP servers are runtime objects. Droid cannot serialize them with the session, so attach them again when calling `resumeSession()`. They do not need to be the same object instances or implementations used when the session was created.
+
+### Close sessions safely
+
+Call `close()` in `finally` when your code creates or resumes a session.
+Closing releases the subprocess, subscriptions, and SDK-owned MCP servers.
+
+```ts
+const session = await createSession();
+
+try {
+  // Use the session.
+} finally {
+  await session.close();
+}
+```
+
+## Streaming and results
+
+Each call to `session.stream()` starts one turn and returns an async iterable.
+
+By default, it yields complete messages and ends with a terminal `DroidResult`.
+
+### Complete messages
+
+```ts
+for await (const message of session.stream('Find the failing test.')) {
+  switch (message.type) {
+    case DroidMessageType.Assistant:
+      console.log(message.text);
+      break;
+    case DroidMessageType.ToolCall:
+      console.log(`Tool: ${message.name}`);
+      break;
+    case DroidMessageType.Result:
+      console.log(message.subtype);
+      break;
+  }
+}
+```
+
+Default message types:
+
+| Type          | Purpose                              |
+| ------------- | ------------------------------------ |
+| `assistant`   | Complete assistant message           |
+| `user`        | User message recorded by the session |
+| `tool_call`   | Complete tool request                |
+| `tool_result` | Complete tool result                 |
+| `hook`        | Hook execution                       |
+| `error`       | Runtime error event                  |
+| `result`      | Terminal `DroidResult`               |
+
+Runnable example: [`examples/node/session-stream.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/session-stream.ts)
+
+### Handle the result
+
+`DroidResult` is a discriminated union. Check `subtype` or `success` before using the response.
+
+```ts
+const result = await run('Run the test suite.');
+
+switch (result.subtype) {
+  case 'success':
+    console.log(result.text);
+    break;
+  case 'interrupted':
+    console.log('The run was interrupted.');
+    break;
+  case 'error_during_execution':
+  case 'error_structured_output':
+    console.error(
+      result.structuredOutputError?.message ??
+        result.error?.message ??
+        'Unknown error'
+    );
+    break;
+}
+```
+
+| Subtype                   | Meaning                                           |
+| ------------------------- | ------------------------------------------------- |
+| `success`                 | The turn completed successfully                   |
+| `interrupted`             | The turn was cancelled or permission declined     |
+| `error_during_execution`  | Droid could not complete the requested work       |
+| `error_structured_output` | Structured-output generation or validation failed |
+
+Every result includes:
+
+```ts
+console.log(result.sessionId);
+console.log(result.durationMs);
+console.log(result.turnCount);
+console.log(result.messages);
+console.log(result.text);
+console.log(result.tokenUsage);
+```
+
+`run()` returns the terminal result directly. When consuming `session.stream()`, handle the message whose type is `DroidMessageType.Result`.
+
+Runnable example: [`examples/node/result-metadata.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/result-metadata.ts)
+
+### Partial events
+
+Enable partial events only when the application needs live text, thinking, tool progress, token usage, or state updates.
+
+```ts
+for await (const event of session.stream('Explain the test failure.', {
+  includePartialMessages: true,
+})) {
+  if (event.type === DroidMessageType.AssistantTextDelta) {
+    process.stdout.write(event.text);
+  }
+}
+```
+
+Partial streams can also include thinking deltas, tool-call deltas, tool
+progress, token updates, permission results, settings changes, working-state
+changes, and MCP status.
+
+### Token and context usage
+
+`DroidResult.tokenUsage` reports raw token counts for the current SDK turn and,
+when available, the Factory Service Credits (FSC) charged for that turn. One
+turn is one `run()` or `session.stream()` call. This is not the session's
+lifetime total.
+
+```ts
+if (result.tokenUsage) {
+  console.log(`input: ${result.tokenUsage.inputTokens}`);
+  console.log(`output: ${result.tokenUsage.outputTokens}`);
+  console.log(`cache read: ${result.tokenUsage.cacheReadTokens}`);
+  console.log(`cache created: ${result.tokenUsage.cacheCreationTokens}`);
+  if (result.tokenUsage.factoryCredits !== undefined) {
+    console.log(`Factory Service Credits: ${result.tokenUsage.factoryCredits}`);
+  }
+}
+```
+
+| Field                 | What it measures during the turn                                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `inputTokens`         | Provider-reported input across model calls, which can include instructions, tools, conversation history, and the latest message |
+| `outputTokens`        | Output generated across model calls, not only the final visible response                                                        |
+| `cacheReadTokens`     | Input tokens reused from the prompt cache                                                                                       |
+| `cacheCreationTokens` | Input tokens written to the prompt cache                                                                                        |
+| `thinkingTokens`      | Reasoning tokens reported separately when available                                                                             |
+| `factoryCredits`      | Factory Service Credits charged, when available                                                                                 |
+
+One turn can make several model calls while Droid uses tools. Their usage is combined in the result, along with usage from delegated work. Earlier conversation can be counted again when it is included as input to a later turn. Cached input is also reported through the separate cache fields. `tokenUsage` is `null` when usage is unavailable.
+
+Partial streams can emit `DroidMessageType.TokenUsageUpdate`. Unlike the per-turn result, these events contain cumulative committed usage for the session.
+
+`getContextStats()` measures current context occupancy, not cumulative token usage:
+
+```ts
+const stats = await session.getContextStats();
+
+console.log(stats.used, stats.remaining, stats.limit, stats.accuracy);
+```
+
+| Field       | Meaning                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------------- |
+| `used`      | Estimated tokens currently occupied by prompts, tools, instructions, and conversation history         |
+| `limit`     | Active model's maximum input window; unresolved model IDs fall back to the effective compaction limit |
+| `remaining` | `Math.max(0, limit - used)`                                                                           |
+| `accuracy`  | Currently `estimated`, because Droid approximates tokens from character counts                        |
+
+`remaining` estimates room in the model's input window. It does not
+necessarily mean tokens remaining before compaction. Droid can compact at a
+lower configured threshold, commonly 250,000 tokens, even when the active
+model's input window is larger.
+
+### Errors
+
+An error event and a thrown exception mean different things:
+
+- An `error` message reports a runtime problem during the turn. A terminal `DroidResult` normally follows and describes the final outcome.
+- A failed `DroidResult` means the stream completed, but the requested work or structured output failed.
+- A thrown exception means the SDK operation itself could not finish, such as an abort, connection failure, protocol error, or concurrent stream attempt.
+
+Handle stream exceptions around the iteration:
+
+```ts
+try {
+  for await (const message of session.stream('Run the tests.')) {
+    if (message.type === DroidMessageType.Error) {
+      console.error(message.message);
+    }
+  }
+} catch (error) {
+  console.error('The stream could not finish:', error);
+}
+```
+
+`run()` follows the same distinction: agent failures are returned as failed results, while setup, transport, protocol, and abort failures are thrown.
+
+### Stream concurrency
+
+One session handle can have one active stream. Starting another active stream
+throws `ConcurrentStreamError`.
+
+### Cancellation and interruption
+
+Use an abort signal to cancel one turn:
+
+```ts
+const controller = new AbortController();
+
+setTimeout(
+  () => controller.abort(new Error('Timed out after 5 seconds')),
+  5_000
+);
+
+for await (const message of session.stream('Perform a long review.', {
+  abortSignal: controller.signal,
+})) {
+  // Handle messages.
+}
+```
+
+The stream interrupts the active turn and throws the abort reason.
+
+Use `session.interrupt()` when another part of the application needs to stop
+the active turn:
+
+```ts
+await session.interrupt();
+```
+
+The stream normally continues to a terminal result with subtype `interrupted`.
+The session remains available for later prompts.
+
+Breaking out of the stream also interrupts the active turn:
+
+```ts
+for await (const message of session.stream('Investigate every failing test.')) {
+  if (message.type === DroidMessageType.Assistant) {
+    console.log(message.text);
+
+    // Interrupt this turn instead of merely hiding its remaining output.
+    break;
+  }
+}
+```
+
+Breaking out of the loop before the turn finishes sends an interrupt request
+to Droid. This cancels the remaining model and tool work for that turn. The
+session remains open and can accept another prompt, but this loop does not
+receive the interrupted turn's terminal `DroidResult`.
+
+A session-level abort signal passed to `createSession()` closes the entire
+session when aborted.
+
+Runnable examples:
+
+- [`examples/node/abort-session-stream.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/abort-session-stream.ts)
+- [`examples/node/interrupt-session.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/interrupt-session.ts)
+
+## Inputs and outputs
+
+Pass images, documents, or an output schema in the options for the turn that should use them. Both `run()` and `session.stream()` accept these options.
+
+### Images
+
+```ts
+const result = await run('Describe this image.', {
+  images: [
+    {
+      type: 'base64',
+      data: base64Png,
+      mediaType: 'image/png',
+    },
+  ],
+});
+```
+
+`data` contains the base64-encoded image bytes. Supported media types are `image/jpeg`, `image/png`, `image/gif`, and `image/webp`.
+
+Runnable example: [`examples/node/image-attachment.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/image-attachment.ts)
+
+### Documents
+
+```ts
+const result = await run('Summarize this document.', {
+  files: [
+    {
+      type: 'text',
+      mediaType: 'text/plain',
+      data: report,
+      name: 'report.txt',
+    },
+  ],
+});
+```
+
+Document inputs support:
+
+| Source       | `type`   | `mediaType`       | `data`                        |
+| ------------ | -------- | ----------------- | ----------------------------- |
+| Plain text   | `text`   | `text/plain`      | The document text             |
+| PDF document | `base64` | `application/pdf` | Base64-encoded PDF file bytes |
+
+`name` is optional for both forms. Attach content through `data`; a filesystem path by itself is not a document upload.
+
+### Structured output
+
+Use `outputFormat` when another system needs a JSON object that follows a schema.
+
+```ts
+import { OutputFormatType, run } from '@factory/droid-sdk/node';
+
+const result = await run('Return the repository name and test command.', {
+  outputFormat: {
+    type: OutputFormatType.JsonSchema,
+    schema: {
+      type: 'object',
+      properties: {
+        repository: { type: 'string' },
+        testCommand: { type: 'string' },
+      },
+      required: ['repository', 'testCommand'],
+      additionalProperties: false,
+    },
+  },
+});
+
+if (!result.success) {
+  throw new Error(
+    result.structuredOutputError?.message ??
+      result.error?.message ??
+      `Structured output failed (${result.subtype}).`
+  );
+}
+
+if (!result.structuredOutput) {
+  throw new Error('No structured output was returned.');
+}
+
+console.log(JSON.stringify(result.structuredOutput, null, 2));
+```
+
+Invalid or missing schema output normally produces a failed result with subtype `error_structured_output`; `structuredOutputError` contains the available validation details.
+
+`structuredOutput` is typed as `unknown`, because a JSON Schema does not provide a TypeScript runtime validator. Check that it is present and validate or narrow its shape before reading fields or passing it to another system. A successful result can still omit structured output, so do not use `result.success` as the only check.
+
+Runnable example: [`examples/node/structured-output.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/structured-output.ts)
+
+## Permissions and user input
+
+### Autonomy
+
+Autonomy controls which actions require approval in Auto mode.
+
+```ts
+import { AutonomyLevel } from '@factory/droid-sdk/node';
+
+const session = await createSession({
+  autonomyLevel: AutonomyLevel.Off,
+});
+```
+
+| Level    | Behavior                                |
+| -------- | --------------------------------------- |
+| `Off`    | Ask before every action                 |
+| `Low`    | Allow file edits and read-only commands |
+| `Medium` | Allow reversible commands               |
+| `High`   | Allow commands without approval prompts |
+
+When omitted, Droid uses the configured default. Autonomy does not select Auto or Spec mode; `interactionMode` does that.
+
+### Permission handler
+
+Use `permissionHandler` to approve or reject requests that reach the client.
+The handler may be synchronous or asynchronous.
+
+```ts
+import {
+  ToolConfirmationOutcome,
+  ToolConfirmationType,
+} from '@factory/droid-sdk/node';
+
+const session = await createSession({
+  autonomyLevel: AutonomyLevel.Off,
+  permissionHandler({ toolUses, options }) {
+    const createsOnly =
+      toolUses.length > 0 &&
+      toolUses.every((use) => use.details.type === ToolConfirmationType.Create);
+
+    const desired = createsOnly
+      ? ToolConfirmationOutcome.ProceedOnce
+      : ToolConfirmationOutcome.Cancel;
+
+    const offered = options.find((option) => option.value === desired);
+    if (!offered) throw new Error(`Outcome not offered: ${desired}`);
+
+    return desired;
+  },
+});
+```
+
+`toolUses` describes the pending actions. `options` contains the outcomes available for this request. Return one of those values. Common outcomes are:
+
+| Outcome         | Effect                                  |
+| --------------- | --------------------------------------- |
+| `ProceedOnce`   | Approve this request                    |
+| `ProceedAlways` | Approve and persist the applicable rule |
+| `Cancel`        | Reject the request                      |
+
+The available outcomes vary by request. Returning an unavailable value, throwing from the handler, or omitting the handler cancels the request.
+
+Runnable example:
+[`examples/node/permission-handler.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/permission-handler.ts)
+
+### AskUser handler
+
+`askUserHandler` answers questions Droid asks during a turn. Connect it to a form, prompt, or other application UI.
+
+```ts
+const result = await run('Ask me which environment to deploy.', {
+  askUserHandler({ questions }) {
+    return {
+      answers: questions.map((question) => ({
+        index: question.index,
+        question: question.question,
+        answer: question.options[0] ?? 'none',
+      })),
+    };
+  },
+});
+```
+
+Each answer must copy the question's `index` and `question`. To decline the questionnaire:
+
+```ts
+return { cancelled: true, answers: [] };
+```
+
+Without a handler, AskUser requests are declined.
+
+Runnable example:
+[`examples/node/ask-user-elicitation.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/ask-user-elicitation.ts)
+
+### Tool controls
+
+Disable tools when creating, resuming, or updating a session:
+
+```ts
+const session = await createSession({
+  disabledToolIds: ['Execute'],
+});
+
+await session.updateSettings({
+  disabledToolIds: ['Execute', 'Edit'],
+});
+```
+
+Tool IDs are strings. Use `listTools()` to inspect the tools available to the current session.
+
+```ts
+const tools = await session.listTools();
+
+for (const tool of tools) {
+  console.log(tool.id, tool.allowed);
+}
+```
+
+The public SDK provides subtractive `disabledToolIds`. It does not expose a
+restrictive allowlist.
+
+Runnable example: [`examples/node/tool-controls.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/tool-controls.ts)
+
+## Tools and extensions
+
+Use the extension that matches the job:
+
+| Extension            | Use it for                                       |
+| -------------------- | ------------------------------------------------ |
+| Skills               | Reusable instructions and supporting files       |
+| SDK MCP tools        | In-process TypeScript functions exposed to Droid |
+| External MCP servers | Tools provided by another process or service     |
+| Hooks                | Commands that run at defined lifecycle events    |
+
+### Skills
+
+List the skills available to the session:
+
+```ts
+const { skills } = await session.listSkills();
+
+for (const skill of skills) {
+  console.log(skill.name, skill.enabled);
+}
+```
+
+Enable or disable a skill at the user or project level:
+
+```ts
+import { SettingsLevel } from '@factory/droid-sdk/node';
+
+await session.setSkillDisabled({
+  skillName: 'skill-name',
+  disabled: true,
+  settingsLevel: SettingsLevel.Project,
+});
+```
+
+Skills can come from project, personal, built-in, or automation settings.
+
+### SDK MCP tools
+
+Use `tool()` to define an in-process TypeScript function with a Zod input schema.
+
+```ts
+import { z } from 'zod';
+import {
+  createSdkMcpServer,
+  createSession,
+  tool,
+} from '@factory/droid-sdk/node';
+
+const server = createSdkMcpServer({
+  name: 'review-tools',
+  tools: [
+    tool(
+      'lookup_owner',
+      'Returns the owner of a file',
+      { path: z.string() },
+      ({ path }) => `Owner for ${path}: platform-team`
+    ),
+  ],
+});
+
+const session = await createSession({
+  mcpServers: [server],
+});
+
+try {
+  for await (const _message of session.stream(
+    'Find the owner of src/index.ts.'
+  )) {
+    // Consume messages.
+  }
+} finally {
+  await session.close();
+}
+```
+
+The SDK starts an authenticated loopback MCP server and closes it with the session.
+Tool calls still follow the session's autonomy and permission rules.
+Attach SDK MCP servers again when resuming a saved session because they are runtime objects, not persisted session data.
+
+Runnable example: [`examples/node/sdk-mcp-tool.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/sdk-mcp-tool.ts)
+
+### External MCP servers
+
+Pass external MCP configuration when creating or resuming a session:
+
+```ts
+const session = await createSession({
+  mcpServers: [
+    {
+      name: 'docs',
+      type: 'http',
+      url: 'https://example.com/mcp',
+      headers: [],
+    },
+  ],
+});
+```
+
+Supported session configuration:
+
+| Transport     | `type` field | Required configuration |
+| ------------- | ------------ | ---------------------- |
+| Local process | Omit         | `command` and `args`   |
+| HTTP          | `http`       | `url` and `headers`    |
+| SSE           | `sse`        | `url` and `headers`    |
+
+Inspect server status and discovered tools:
+
+```ts
+try {
+  const { servers, summary } = await session.listMcpServers();
+  const tools = await session.listMcpTools();
+
+  console.log(servers, summary, tools);
+} finally {
+  await session.close();
+}
+```
+
+`addMcpServer()`, `removeMcpServer()`, and `toggleMcpServer()` change the user's Droid configuration.
+Use `authenticateMcpServer({ serverName })` when a server requires authentication.
+
+### Hooks
+
+Hooks run shell commands at defined lifecycle events.
+Configure them in `.factory/hooks.json`:
+
+```json
+{
+  "PreToolUse": [
+    {
+      "matcher": "Execute",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo before Execute"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Hooks can run before or after tools, when prompts are submitted, when notifications arrive, during compaction, and when sessions or subagents stop.
+
+Hook events are available in the stream:
+
+```ts
+for await (const message of session.stream('Run the tests.')) {
+  if (message.type === DroidMessageType.Hook) {
+    console.log(message.status, message.command);
+  }
+}
+```
+
+The SDK exposes hook schemas and stream events, but it does not provide a programmatic hook-registration API.
+
+Runnable example: [`examples/node/hook-execution.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/hook-execution.ts)
+
+## Session lifecycle
+
+### Replacement handles
+
+`fork()` returns a ready successor handle. `compact()` and `rewind()` return
+outcome objects containing a ready successor in `session`. Each operation
+retires its source wrapper.
+
+```ts
+const forked = await session.fork();
+
+const { session: compacted, removedCount } = await forked.compact();
+
+const {
+  session: rewound,
+  restoredCount,
+  deletedCount,
+} = await compacted.rewind({
+  messageId,
+  filesToRestore,
+  filesToDelete,
+  forkTitle: 'Before the failed change',
+});
+```
+
+After a successful replacement, active operations on the source wrapper throw
+`SessionReplacedError`. Its `id`, `settings`, and `cwd` remain readable, and
+`close()` is a no-op. The persisted source session can still be loaded later
+with `resumeSession(sourceId)`.
+
+Do not replace a session while it has an active stream.
+
+## Spec mode
+
+Spec mode lets Droid inspect the codebase and propose a plan without changing files. Start a session in Spec mode or switch an existing session with `enterSpecMode()`:
+
+```ts
+const session = await createSession({
+  interactionMode: DroidInteractionMode.Spec,
+});
+
+// Or switch an existing Auto session.
+await session.enterSpecMode();
+```
+
+`enterSpecMode()` can also set the model used for planning:
+
+```ts
+await session.enterSpecMode({
+  specModeModelId: 'model-id',
+  specModeReasoningEffort: ReasoningEffort.High,
+});
+```
+
+### Leave without approving a plan
+
+Call `exitSpecMode()` to return the session to Auto mode without approving a plan or starting implementation:
+
+```ts
+await session.enterSpecMode();
+
+// Return to Auto mode without approving or implementing the plan.
+await session.exitSpecMode();
+```
+
+`exitSpecMode()` changes the interaction mode only. It does not select a `ToolConfirmationOutcome` or approve an `ExitSpecMode` permission request.
+
+The method is available on Node `DroidSession` handles returned by `createSession()`, `resumeSession()`, and replacement operations such as `fork()`, `compact()`, and `rewind()`. Daemon clients continue to change the mode with `droid.sessions.updateSettings()`.
+
+### Approve a plan
+
+When the plan is ready, Droid sends an `ExitSpecMode` permission request. Its
+details contain the plan. Unlike calling `exitSpecMode()`, approving it with `ProceedOnce` accepts the completed plan, returns to Auto mode, and continues implementation in the same session:
+
+```ts
+import {
+  AutonomyLevel,
+  createSession,
+  DroidInteractionMode,
+  DroidMessageType,
+  ToolConfirmationOutcome,
+  ToolConfirmationType,
+} from '@factory/droid-sdk/node';
+
+const session = await createSession({
+  interactionMode: DroidInteractionMode.Auto,
+  autonomyLevel: AutonomyLevel.Low,
+  permissionHandler({ toolUses }) {
+    const request = toolUses.find(
+      ({ details }) => details.type === ToolConfirmationType.ExitSpecMode
+    );
+
+    if (request?.details.type === ToolConfirmationType.ExitSpecMode) {
+      console.log(request.details.plan);
+
+      return ToolConfirmationOutcome.ProceedOnce;
+    }
+
+    return ToolConfirmationOutcome.Cancel;
+  },
+});
+
+try {
+  await session.enterSpecMode();
+
+  for await (const message of session.stream('Plan and update README.md.')) {
+    if (message.type === DroidMessageType.Result) {
+      console.log(message.subtype);
+    }
+  }
+} finally {
+  await session.close();
+}
+```
+
+The handler can be asynchronous. An interactive application should display the plan and wait for the user's decision before returning.
+
+Return `Cancel` to reject the plan. The turn ends with an `interrupted` result, and the session remains available for another prompt.
+
+Some `ExitSpecMode` requests offer `ProceedNewSession` variants. Return one of those offered values to hand implementation to a new session. Return only values present in the request's `options`.
+
+Runnable example:
+[`examples/node/enter-spec-mode.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/enter-spec-mode.ts)
+
+## Operations
+
+### Observability
+
+```ts
+import { run } from '@factory/droid-sdk/node';
+
+const result = await run('Check the repository status.', {
+  observability: {
+    logger: {
+      log(event) {
+        console.log(event.level, event.name, event.attributes);
+      },
+    },
+  },
+});
+
+if (!result.success) {
+  throw new Error(result.error?.message ?? `Run failed: ${result.subtype}`);
+}
+```
+
+Pass `logger`, `metrics`, or `tracing` sinks through `observability`.
+Sink methods must not throw.
+The SDK excludes prompts, messages, tool inputs, raw output, and stack traces from observability events.
+Process startup emits telemetry before the first turn, and `close()` emits a request log.
+To verify turn-specific logs, snapshot the count after creating the session and check it before closing.
+
+Runnable example:
+[`examples/node/observability.ts`](https://github.com/Factory-AI/droid-sdk-typescript/blob/main/examples/node/observability.ts)
+
+### Low-level APIs
+
+Use the high-level APIs unless your application owns the transport or protocol lifecycle.
+
+| Need                         | Preferred API      | Low-level alternative |
+| ---------------------------- | ------------------ | --------------------- |
+| Run a session                | `createSession()`  | `DroidClient`         |
+| Consume typed session events | `session.stream()` | Raw notifications     |
+
+The `/node` entrypoint exports `DroidClient` for direct JSON-RPC integrations.
+Low-level methods return response envelopes, so successful payloads are under `response.result`.
+
+Use `onNotification()` only when `session.stream()` does not expose the event you need:
+
+```ts
+const unsubscribe = session.onNotification(
+  (notification) => console.log(notification.type),
+  { type: 'settings_updated' }
+);
+
+unsubscribe();
+```
+
+## API reference
+
+### Entrypoint
+
+Import functions, classes, enums, and types from `@factory/droid-sdk/node`.
+
+### Functions
+
+| API                                  | Returns                      |
+| ------------------------------------ | ---------------------------- |
+| `run(prompt, options?)`              | `Promise<DroidResult>`       |
+| `createSession(options?)`            | `Promise<DroidSession>`      |
+| `resumeSession(sessionId, options?)` | `Promise<DroidSession>`      |
+| `listSessions(options?)`             | `Promise<SessionMetadata[]>` |
+| `listModels(options?)`               | `Promise<ModelInfo[]>`       |
+| `createSdkMcpServer(options)`        | `SdkMcpServer`               |
+| `tool(...)`                          | `DroidTool`                  |
+
+### `DroidSession`
+
+| Member                    | Purpose                                      |
+| ------------------------- | -------------------------------------------- |
+| `id`                      | Session ID                                   |
+| `cwd`                     | Live working directory                       |
+| `settings`                | Live read-only settings                      |
+| `stream()`                | Run one turn                                 |
+| `interrupt()`             | Stop the active turn                         |
+| `updateSettings()`        | Update session settings                      |
+| `enterSpecMode()`         | Change to spec mode                          |
+| `exitSpecMode()`          | Return to Auto mode without approving a plan |
+| `listTools()`             | List normalized tools                        |
+| `listSkills()`            | List skills                                  |
+| `setSkillDisabled()`      | Enable or disable a skill                    |
+| `addMcpServer()`          | Add an MCP server                            |
+| `removeMcpServer()`       | Remove an MCP server                         |
+| `toggleMcpServer()`       | Enable or disable an MCP server              |
+| `listMcpServers()`        | List MCP servers                             |
+| `listMcpTools()`          | List MCP tools                               |
+| `authenticateMcpServer()` | Start MCP authentication                     |
+| `getContextStats()`       | Read context usage                           |
+| `getRewindInfo()`         | Inspect rewindable file changes              |
+| `rewind()`                | Create a rewound successor                   |
+| `compact()`               | Create a compacted successor                 |
+| `fork()`                  | Create a forked successor                    |
+| `rename()`                | Change the session title                     |
+| `onNotification()`        | Subscribe to raw notifications               |
+| `close()`                 | Close the session and owned resources        |
+
+### Stream and model types
+
+| Type                 | Purpose                                           |
+| -------------------- | ------------------------------------------------- |
+| `DroidStreamMessage` | Complete messages returned by the default stream  |
+| `DroidStreamEvent`   | Complete messages plus partial events             |
+| `DroidResult`        | Terminal result returned by `run()`               |
+| `DroidMessageType`   | Runtime constants for narrowing stream messages   |
+| `TokenUsage`         | Token counts and optional Factory Service Credits |
+| `ModelInfo`          | Model catalog entry returned by discovery APIs    |
+
+`session.stream()` yields `DroidStreamMessage` by default and `DroidStreamEvent` when `includePartialMessages` is `true`.
+
+### Result states
+
+| Subtype                   | `success` | `interrupted` | Meaning                   |
+| ------------------------- | --------- | ------------- | ------------------------- |
+| `success`                 | `true`    | `false`       | Turn completed            |
+| `interrupted`             | `false`   | `true`        | Turn was stopped          |
+| `error_during_execution`  | `false`   | `false`       | Runtime failure           |
+| `error_structured_output` | `false`   | `false`       | Structured-output failure |
+
+Every result includes `sessionId`, `durationMs`, `tokenUsage`, `messages`, `text`, and `turnCount`.
+Check `success` before using successful output.
+
+### Main enums
+
+| Enum                   | Values                                                                           |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `AutonomyLevel`        | `Off`, `Low`, `Medium`, `High`                                                   |
+| `DroidInteractionMode` | `Auto`, `Spec`                                                                   |
+| `ReasoningEffort`      | `None`, `Dynamic`, `Off`, `Minimal`, `Low`, `Medium`, `High`, `ExtraHigh`, `Max` |
+| `OutputFormatType`     | `JsonSchema`                                                                     |
+
+Model IDs and tool IDs are strings rather than closed enums.
+
+### Main errors
+
+| Error                     | Meaning                                       |
+| ------------------------- | --------------------------------------------- |
+| `ConcurrentStreamError`   | A session handle already has an active stream |
+| `SessionReplacedError`    | A source wrapper was replaced                 |
+| `SessionReplacementError` | Successor loading or rollback failed          |
+| `DroidClientError`        | Base client error                             |
+| `ConnectionError`         | Droid process connection failed               |
+| `TimeoutError`            | A request timed out                           |
+| `ProtocolError`           | Protocol or API response failed               |
+| `SessionError`            | Base session error                            |
+| `SessionNotFoundError`    | Saved session was not found                   |
+| `InvalidSessionCwdError`  | Saved working directory is invalid            |
+| `ProcessExitError`        | Droid subprocess exited unexpectedly          |
+
+## Known limitations
+
+- New-session spec handoff IDs require raw notification inspection.
