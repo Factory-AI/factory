@@ -1,0 +1,51 @@
+---
+title: "Terminal Bench 2.1"
+description: "Factory Droid results on Terminal Bench 2.1, compared with public leaderboard reports."
+keywords: ['benchmarks', 'terminal bench', 'terminal bench 2.1', 'droid', 'ai coding agents']
+---
+
+[Terminal Bench 2.1](https://www.tbench.ai) is an open-source agentic benchmark of 89 real terminal tasks across software engineering, system administration, data processing, and security. Each task runs in its own sandboxed environment and is verified with deterministic tests. This page reports Factory Droid results on the benchmark and compares them with public leaderboard reports from [Artificial Analysis](https://artificialanalysis.ai/evaluations/terminalbench-v2-1) and [Vals](https://www.vals.ai/benchmarks/terminal-bench-2-1).
+
+### Results
+
+Droid scores below are the best full finished runs (all 88–89 tasks) and the mean across full runs. External columns are pass@1 on the same benchmark.
+
+| Model | Droid best | Droid mean (full runs) | Artificial Analysis | Vals (Terminus 2) |
+| --- | ---: | ---: | ---: | ---: |
+| **GPT-5.6 Sol** | **93.2%** (15 runs) | 85.4% | 89.5% (xhigh) / 88.0% (max) | 85.8% ±1.35 |
+| **Claude Opus 5** | **86.5%** (6 runs) | 84.2% | 89.1% (max) | 84.6% ±0.99 |
+| **Kimi K3** | **85.4%** (5 runs) | 79.5% | 85.0% (max) | 80.9% ±0.65 |
+| **Grok 4.6** | **82.0%** (3 runs) | 81.2% | 88.4% (high) | 78.3% ±2.08 |
+| **Gemini 3.6 Flash** | **81.8%** (4 runs) | 79.9% | 77.5% | 73.8% ±1.63 |
+| **GLM-5.2** | **76.4%** (11 runs) | 69.5% | 77.9% (max) | — |
+
+*Last updated: August 2026.*
+
+### What the numbers show
+
+- **GPT-5.6 Sol is our top configuration at 93.2%**, above every published number for the model (AA 89.5% at xhigh, 88.0% at max; Vals 85.8%). Sol is also the most-measured configuration on this page (15 full runs).
+- **Gemini 3.6 Flash and Kimi K3 run at or above public reports.** We measure 81.8% for Gemini 3.6 Flash (AA 77.5%, Vals 73.8%) and 85.4% for Kimi K3 (AA 85.0%, Vals 80.9%).
+- **Claude Opus 5 and GLM-5.2 are within a few points of the best public report.** Our Opus 5 result (86.5%) is measured without a refusal fallback; Vals' 84.6% includes one (see below).
+- **Grok 4.6 sits between the two public labs.** Public reports for it are unusually scattered (AA 88.4% at high reasoning vs Vals 78.3%), and our 82.0% lands between them.
+
+### Refusal fallback
+
+Vals reports Claude Opus 5 and Claude Fable 5 **with Claude Opus 4.8 as a refusal fallback**: when the model refuses a task, the harness retries with Opus 4.8. Counting Opus 5's nine affected passes as failures lowers its published score from 84.6% to 81.3%. The Droid runs on this page do **not** enable a refusal fallback, so the Claude results above are conservative relative to fallback-enabled public numbers.
+
+### Methodology
+
+| Category | Description |
+| --- | --- |
+| **Dataset** | `terminal-bench/terminal-bench-2-1` (v6); 89 tasks, deterministic pytest verification |
+| **Agent** | Factory Droid harness, single pass@1 attempt per task |
+| **Included runs** | Finished runs covering all 88–89 tasks, with recorded score and token totals |
+| **Excluded runs** | Test, smoke, partial-coverage, and non-Droid-harness runs (for example Claude Code runner rows) |
+| **External reports** | Artificial Analysis (Terminus 2 harness, e2b sandbox, pass@1 averaged over 3 repeats) and Vals (Terminus 2 harness, pass@1) |
+
+<Card title="Terminal Bench 2.1 leaderboard" icon="trophy" href="https://www.tbench.ai/leaderboard/terminal-bench/2.1">
+  View the official benchmark and submit your own agent
+</Card>
+
+<Card title="Independent reports" icon="chart-bar" href="https://artificialanalysis.ai/evaluations/terminalbench-v2-1">
+  Artificial Analysis and Vals leaderboards for Terminal Bench v2.1
+</Card>
