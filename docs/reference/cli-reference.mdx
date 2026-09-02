@@ -92,7 +92,9 @@ detail, so always pin a version and verify its checksum.
 | :----------------------------------- | :--------------------------------------------------------------------- | :--------------------------------------------- |
 | `droid`                              | Start interactive REPL                                                 | `droid`                                        |
 | `droid "query"`                      | Start REPL with initial prompt                                         | `droid "explain this project"`                 |
-| `droid --resume [sessionId]`         | Resume a session (defaults to last modified). Alias: `-r`              | `droid --resume`                               |
+| `droid resume [sessionId]`           | Open the session picker, or resume the specified session directly     | `droid resume`                                 |
+| `droid --resume [sessionId]`         | Equivalent flag form of `droid resume`. Alias: `-r`                    | `droid --resume session-abc123`                |
+| `droid resume --last`                | Resume the most recent session in the current folder without the picker | `droid resume --last`                         |
 | `droid --fork <sessionId>`           | Fork and resume a session in a new copy                                | `droid --fork session-abc123`                  |
 | `droid exec "query"`                 | Execute task without interactive mode                                  | `droid exec "summarize src/auth"`              |
 | `droid exec -f prompt.md`            | Load prompt from file                                                  | `droid exec -f .factory/prompts/review.md`     |
@@ -132,7 +134,8 @@ Customize droid's behavior with command-line flags:
 | `--list-tools`                    | Print available tools and exit                                     | `droid exec --list-tools`                                    |
 | `-o, --output-format <format>`    | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)    | `droid exec -o json "document API"`                          |
 | `--input-format <format>`         | Input format (`stream-jsonrpc` for multi-turn)                    | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
-| `-r, --resume [sessionId]`        | Resume a previous session. In interactive mode, `-r` is `--resume`; in `droid exec`, `-r` is `--reasoning-effort`. | `droid -r`                                                   |
+| `-r, --resume [sessionId]`        | Open the session picker, or resume the specified session directly. In `droid exec`, `-r` is `--reasoning-effort`. | `droid -r`                                                   |
+| `--last`                         | With a bare resume, skip the picker and resume the most recent session in the current folder | `droid --resume --last`                                     |
 | `-r, --reasoning-effort <level>`  | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`). In `droid exec`, `-r` maps to this flag. | `droid exec -r high "debug flaky test"`                      |
 | `--spec-model <id>`               | Use a different [model ID](/models) for specification planning     | `droid exec --spec-model claude-opus-4-7`                    |
 | `--spec-reasoning-effort <level>` | Override reasoning effort for spec mode                            | `droid exec --use-spec --spec-reasoning-effort high`         |
@@ -367,6 +370,29 @@ droid --worktree feature-b &
 ### Subcommand flags
 
 In addition to the global flags above, several `droid` subcommands accept their own flags.
+
+#### `droid resume` flags
+
+| Flag     | Description                                                           | Example                                  |
+| :------- | :-------------------------------------------------------------------- | :--------------------------------------- |
+| `--last` | Skip the picker and select the most recent session in the current folder | `droid resume --last`                  |
+| `--fork` | Fork the selected session and resume the new copy                     | `droid resume session-abc123 --fork`     |
+
+```bash
+# Choose a session from the interactive picker
+droid resume
+
+# Resume a specific session directly
+droid resume session-abc123
+
+# Resume the most recent session in the current folder without the picker
+droid resume --last
+
+# Fork the most recent session, then resume the new copy
+droid resume --last --fork
+```
+
+The `droid --resume` flag form supports the same picker, session ID, and `--last` behavior.
 
 #### `droid update` flags
 
