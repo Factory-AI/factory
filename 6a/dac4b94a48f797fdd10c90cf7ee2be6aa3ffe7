@@ -1,0 +1,986 @@
+apps/cli/src/entrypoints/tui.ts
+  0f5fe03ccf1ef581 270-272,390-393,467,470,495
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.2",
+  "base_commit_sha": "6adac4b94a48f797fdd10c90cf7ee2be6aa3ffe7",
+  "prompts": {
+    "0f5fe03ccf1ef581": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "d47c12ba-6ac4-4de6-901c-5dc30c14ece1",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "factory-davidgu",
+      "messages": [],
+      "total_additions": 12,
+      "total_deletions": 44,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    },
+    "e65b5a98a925b397": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "c21e8900-050f-42f8-b1ff-ee756284f5a9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "factory-davidgu",
+      "messages": [
+        {
+          "type": "user",
+          "text": "<system-reminder>\nThe tools listed below are available in this environment, but their schemas may be omitted from the current tool list to save context.\nOnly use ToolSearch for tools that appear in the Deferred tools list below. The only valid ToolSearch names are the exact strings before the colon on each list entry. Use query \"select:<name>[,<name>...]\" to load one or more of those listed tools before calling them.\nDo NOT call ToolSearch for tools that are already present in the current tool list, including core tools like Read, Grep, Glob, LS, Execute, ApplyPatch, AskUser, Create, Edit, TodoWrite, or ExitSpecMode. Call available tools directly.\nDo NOT guess tool names or use aliases, invent MCP namespaces, or search for tools not shown in the Deferred tools list. If a needed tool is neither currently available nor listed below, it is unavailable in this session; do not retry ToolSearch for it. Calling an omitted tool directly will fail with InputValidationError.\n\nIMPORTANT: When a user's task matches one of these tools and the tool is absent from the current tool list, load and use it rather than routing around it via Execute. Examples of routing violations to avoid:\n- Using curl, wget, or gh pr view <url> instead of loading and calling FetchUrl\n- Using gh search or scraping search engines instead of loading and calling WebSearch\n- Hitting MCP server HTTP endpoints via curl instead of the corresponding MCP tool\n\nDeferred tools:\nGenerateDroid: Generate a custom droid configuration based on your description using AI | Inputs (* required): description* (string): Comprehensive description of what this droid should do and when it should be us…; location (string): Where to save the droid: project (.factory/droids) or personal (~/.factory/droi…\n</system-reminder>",
+          "timestamp": "2026-05-19T13:59:54.273Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\nAvailable skills for the Skill tool are listed below. The Skill tool definition relies on this system reminder for valid skill names.\n\nSkills instructions:\nWhen users ask you to perform tasks, check if any available skill can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.\n\nHow to use skills:\n- Invoke skills using the Skill tool with the skill name only.\n- The skill's prompt will expand and provide detailed instructions on how to complete the task.\n- Only use skills listed in the available-skills system reminders or dynamic skill-discovery reminders.\n- Do not invoke a skill that is already running.\n\nAvailable skills:\nagent-browser: Automates browsers and Electron desktop apps (VS Code, Slack, Discord, Figma, Notion, Spotify, etc.) for testing, form filling, screenshots, and data extraction. Use when the user needs to navigate, interact with, test, or extract data from any website or Electron desktop app.\ntuistory: Automates terminal user interface (TUI) testing. Use when you need to launch, interact with, test, or debug terminal applications, capture TUI snapshots, or automate terminal inputs.\nfigma-mcp-promotion: Promote and assist with Figma MCP integration. ACTIVATE when the user shares a Figma URL (figma.com), mentions Figma designs or components, shares PNG images that may originate from Figma, or when Figma MCP tools are already connected and being used. Handles installation encouragement, conversational promotion, and push-back-to-Figma flows.\ninstall-code-review: Install and configure Factory Droid for automated code review on GitHub or GitLab. Supports single-repo setup or org/group-wide rollout across hundreds of repos. Use when a user wants to set up Droid review on their repositories.\nreview: Review code changes and identify high-confidence, actionable bugs. Use when the user wants to: - Review a pull request or branch diff - Find bugs, security issues, or correctness problems in code changes - Get a structured summary of review findings\nsimplify: Review changed code for reuse, quality, and efficiency, then fix any issues found.\nsession-navigation: Navigate, search, and manage Droid sessions. Use when the user wants to: - List recent sessions - Search session history for specific topics or patterns - Resume a previous session - Get details about what was accomplished in a session - Find sessions by project, date, or content\ninstall-qa: Set up automated QA testing for this project. Performs deep codebase analysis, asks targeted questions, and generates a modular QA skill with sub-skills per app, a GitHub Actions workflow, and a report template. This is a complex, multi-phase process -- quality assurance is foundational and we take the time to get it right.\nsecurity-review: Security-focused code review using STRIDE, OWASP Top 10, OWASP LLM Top 10, and supply chain analysis. Use when: - Reviewing a PR for security vulnerabilities - Performing a security audit of code changes - Identifying injection, auth, data exposure, and other security issues - Running a full-project security audit reviewing every source file\ndeep-security-review: Correctness-first, depth-first security audit of a single repository. Invoked by /security-review when the user opts into \"thorough\" mode. Uses a heterogeneous multi-model jury (latest Opus + latest GPT + latest Gemini). A mandatory 3-pass floor (line-anchor verification, vendor prior-art, deep prior-art) runs against every Pass 0 lieutenant-seeded candidate; a conditional escalation tier (dataflow + reachability, exploit construction, adversarial red-team disprove) fires on per-finding triggers. Produces FINDINGS.md, JUDGE.md, STATUS.md, severity-sorted master list, and optional PoC + evidence artifacts for that repo. Never uploads or submits anything; all outputs local.\nwiki: Generate comprehensive codebase documentation for a repository. Uploads the wiki to view in the Factory app.\ninstall-wiki: Install a CI action that automatically refreshes the Factory Wiki on each push to the default branch. Use when the user wants to set up automated wiki generation, install wiki CI, or configure wiki refresh.\nbrowse-wiki: Search and read wiki documentation for a repository\nincident: RCA runbook for alerts. Given an alert link (or prompted to provide one), identifies the alert type, verifies tooling/auth, and walks through root cause analysis using deep research. Persists learnings to incident-guidelines for future reuse.\nfraud-monitor-daily: Analyze onboarding activity and voucher redemptions from the Fraud Monitor Axiom dashboard for abusive free-trial signup and voucher-abuse patterns over the last 24h. Use when running the daily fraud report, auditing trial abuse, or investigating a spike in free-trial signups or voucher redeems.\napi-abuse-scanner: Scan the last 24h of Factory /api/* traffic for security, spam, and abuse patterns (4xx/5xx offenders by IP, route pattern, and org). Use when auditing bad actors attacking the API, investigating credential stuffing or endpoint discovery, or running the daily API abuse report.\ncapture: Background knowledge for droid-control workflows -- not invoked directly. Recording lifecycle for terminal and browser sessions.\nverify: Background knowledge for droid-control workflows -- not invoked directly. Deliverable verification against commitments.\ndroid-cli: Background knowledge for droid-control workflows -- not invoked directly. Droid CLI target patterns, shortcuts, modes, and launch helpers.\ncompose: Background knowledge for droid-control workflows -- not invoked directly. Video assembly via Remotion — title cards, layout, transitions, effects, and showcase polish.\npty-capture: Background knowledge for droid-control workflows -- not invoked directly. Capture ground-truth byte sequences from real terminal emulators.\ndroid-control: Control terminal TUIs and web/Electron apps for testing, demos, QA, and computer-use tasks. Use when you need to automate a CLI, drive a browser, record a demo, or capture proof artifacts.\nshowcase: Background knowledge for droid-control workflows -- not invoked directly. Visual polish for videos via Remotion-powered window chrome, animations, and branded backgrounds.\ntrue-input: Background knowledge for droid-control workflows -- not invoked directly. True-input driver mechanics for real terminal emulator automation via headless Wayland compositor.\nthreat-model-generation: Generate a STRIDE-based security threat model for a repository. Use when setting up security monitoring, after architecture changes, or for security audits.\ncommit-security-scan: Analyze code changes for security vulnerabilities using LLM reasoning and threat model patterns. Use for PR reviews, pre-commit checks, or branch comparisons.\nvulnerability-validation: Validate security findings from commit-security-scan by assessing exploitability, filtering false positives, and generating proof-of-concept exploits. Use after running commit-security-scan to confirm vulnerabilities.\nsecurity-patch-generation: Generate security patches and tests for confirmed vulnerabilities from vulnerability-validation. Use after validating findings to create fixes, security tests, and PR documentation.\ndocs-feature-scraper: Download public documentation from a website and generate a detailed markdown file listing all features with short descriptions. Use when the user wants to catalog features from a competitor's docs or any public documentation site.\nmake-release-pr: Create a release PR with version bumps. Supports daily releases (from dev) and cherry-pick releases (specific PRs onto main). Use when asked to make a release, bump versions, or cherry-pick commits for a release.\nci-workflow-worker: Implement and modify GitHub Actions workflows, custom actions, and CI/CD automation.\nbenchmark-reflection: Analyze failed benchmark tasks to improve Droid's system prompts, guidelines, and validation hooks. Use when asked to tune prompts based on benchmark failures, reflect on benchmark runs, or improve agent performance.\nlinear-ticket-triage: Triage Linear tickets by analyzing content, detecting duplicates, routing to the right pod/engineer, setting priority, assessing droid-solvability, and suggesting reviewers. Use when asked to triage tickets, analyze backlogs, or determine if a ticket is suitable for droid automation.\npr-triage: Triage a single open PR in factory-mono by evaluating it against a standardized checklist, detecting superseded changes, posting a comment, and assigning reviewers. Use when asked to review, triage, or clean up an open PR.\nlinear: Query and manage Linear issues, projects, and teams. Use when the user asks to create, update, list, or search Linear issues, link issues to PRs, manage projects, or query Linear data.\nfix-pr: Follow up on an existing PR by rebasing on dev, addressing reviewer comments, fixing CI issues, and pushing updates. Use when the user provides a PR URL or number and wants to get it ready for merge.\nrun-evals: Submit, monitor, and check results for terminal-bench and legacy-bench eval runs. Use when the user asks to run evals, queue benchmark runs, check eval worker status, or review eval results.\ncreate-pr: Create a pull request for the factory-mono monorepo. Use when the user asks to create a PR, open a PR, submit changes for review, or put code up for review.\nstatsig-ops: Inspect and update Statsig gates and dynamic configs with Siggy for factory-mono. Use when auditing rollout state, validating live Statsig values, or making approved Statsig changes.\naws-sso-user-provisioner: Add users to AWS SSO with a specified role. Use when asked to grant AWS SSO access, add someone to AWS, or give AWS permissions to a team member.\norg-migration: Write, test, and run Firestore organization document migrations using the apps/scripts migration framework. Use when backfilling fields on org docs, migrating data between collections, or running bulk updates across all organizations.\nclean-feature-flags: Audit and retire entries in `packages/common/src/feature-flags/constants.ts` against live Statsig state. Use when sweeping launched/abandoned flags, draining the registry, or producing a per-flag cleanup PR with surgical, hermetic commits.\nautomated-qa-prod: Automated QA testing for the Factory web app PROD/PREPROD environments. Use when you want to run a smoke test of the preprod or production environment. For dev environment QA, use the automated-qa-dev skill instead.\nplaywright-e2e-mcp: Create Playwright e2e tests for apps/web using Chrome DevTools MCP.\nqa-web: QA tests for the Factory web app. Covers login, signup, onboarding, session creation, settings, billing, and navigation flows. Invoked by the qa orchestrator when web-related files change.\nqa-backend: QA tests for the Factory backend API. Covers API endpoint validation, health checks, authentication flows, and API response verification. Invoked by the qa orchestrator when backend files change.\nqa-cli: QA tests for the Factory CLI (Droid). Covers CLI startup, slash commands, interactive TUI, session management, and command execution. Invoked by the qa orchestrator when CLI-related files change.\nqa: Run QA tests for Factory. Analyzes git diff to determine affected areas, runs configured test flows with multiple personas, and generates diff-targeted tests. Use when testing PRs, releases, or smoke testing environments.\nautomated-qa-dev: Automated QA testing for the Factory web app DEV environment only. Use when you want to run a full E2E smoke test of the dev environment. For production/preprod QA, use the automated-qa-prod skill instead.\nlocal-web-debug: Reproduce and debug web app bugs on the local dev environment. Use when a user reports a bug and you need to reproduce it locally, inspect logs, identify root cause, and optionally apply a fix.\ncli-e2e-testing: Writes end-to-end tests for Factory CLI using @factory/tui-test. Use when writing e2e tests, debugging test failures, or testing terminal interactions.\ncli-resource-analysis: Diagnose CLI runtime performance -- CPU hotspots, memory/RSS, render latency, benchmark regressions. Use when TUI is slow, RSS is high, a benchmark regresses, refreshing PR profiling evidence, or validating a performance fix.\nbigquery-platform-analytics: Query Factory's BigQuery platform analytics dataset (`factory-production.analytics`) for org usage, tokens, billing, sessions, users, trials, OTEL telemetry, and platform metrics. Use when investigating customer usage, billing questions, session analytics, user activity, trial conversions, or platform KPIs. Do NOT use for eval/benchmark data -- see `evals-investigation` for eval runs, harbor trials, saas-bench results, and GKE eval dataplane logs.\nmemory-leak-analysis: Analyze V8 heap snapshots to identify memory leaks in Factory CLI. Use when investigating high memory usage, analyzing .heapsnapshot files, or debugging memory issues.\nsentry-debug: Deep-dive debugging of a Sentry issue by cross-referencing with Axiom logs and Firestore entity state. Use when a user shares a Sentry URL and needs full-stack root cause analysis.\naxiom-dashboard-ops: Audit, revamp, and operate Axiom dashboards in the factory-ai-hgct org. Use when asked to fix, restructure, or extend an Axiom dashboard (Continuous Learning, LLM Traffic, Assembly API, Daemon, etc.), debug a chart rendering as a table instead of a time series, repoint dataset references after a telemetry migration, or wire env/org SmartFilters across panels. Sibling skills `continuous-learning-dashboard` and `llm-traffic-dashboard` cover dashboard-specific quirks; everything general lives here.\ndaily-platform-metrics: Fetch daily platform health metrics from Axiom, Sentry, and GitHub Actions. Use when running the daily metrics check or investigating platform reliability.\ndaily-cli-bug-report: Analyze recent CLI bug reports from Axiom and S3. Use when asked to analyze CLI bug reports, investigate CLI errors, or create a bug report summary.\naxiom: Query Axiom datasets for CLI/TUI logs and metrics, frontend logs and metrics, server metrics, and API logs. Use when investigating CLI errors, user issues, platform-specific problems, analyzing CLI usage patterns, or debugging frontend issues.\noncall-alert-triage: Investigate and triage oncall Axiom/Sentry alerts. Use when the user provides alert data for their oncall week and needs help investigating root causes, classifying severity, and documenting findings.\nworkos-lookup-user: Look up a WorkOS user by email address. Use when asked to find a user ID, look up a user, or resolve an email to a WorkOS user. Supports both dev and prod environments.\nfirestore-debug: Query and inspect Firestore data in dev or prod for debugging. Use when investigating user data, session state, org config, or any Firestore document lookup.\nevals-investigation: Investigate Factory eval runs using BigQuery (`factory-production.factory_evals`) and persisted GKE dataplane logs. Use when analyzing eval/benchmark results, comparing models on terminal-bench v1/v2 or factory-legacy-bench, investigating trial failures, inspecting Harbor runner logs, computing pass rates, or aggregating tokens/cost across trials.\ncontinuous-learning-dashboard: Operate the Axiom \"Continuous Learning\" dashboard. Use when asked to add/modify panels for skills, custom droids, or Signal Health; debug stale data; or update the skill/droid categorization. For general Axiom dashboard operations, see sibling skill `axiom-dashboard-ops`.\nllm-traffic-dashboard: Operate the Axiom \"LLM Traffic\" dashboard. Use when asked to add/modify panels for LLM provider traffic, error categorization, model-family breakdowns, or 429 attribution. For general Axiom dashboard operations, see sibling skill `axiom-dashboard-ops`.\nhttp-toolkit-intercept: Intercept and debug Droid CLI HTTP traffic using HTTP Toolkit. Use when you need to inspect LLM API calls, Factory API requests, auth flows, or debug network-level issues in the Droid CLI.\nsentry-error-cleanup: Evaluate a batch of Sentry errors from a production alert view, classify each into a remediation strategy (code fix, manual resolve, or escalate), and either implement fixes or produce a triage report.\ne2b-remote-debugging: Pull and analyze droid logs from E2B sandboxes, and push code changes to sandboxes for debugging.\nmodel-partner-feedback: Analyze benchmark evaluation runs for a model and produce a polished feedback document for an external model provider team. Use when preparing behavioral feedback for NVIDIA, MiniMax, DeepSeek, or other model partners based on Terminal Bench results.\ndebug-overview: Route debugging requests to the appropriate sub-skill(s). Use as the default entry point for any debugging task.\nreproduce-llm-errors: Reproduce production LLM errors locally. Use when you need to confirm a bug exists before fixing, verify a fix resolves it, or create a regression test for an LLM proxy/converter error.\nclean-model-registry: Clean up the LLM model registry by removing feature flags from fully-launched models and deleting deprecated/EAP models. Use when asked to clean up models, remove feature flags from launched models, or remove deprecated EAP preview models.\nadd-llm-model: Add a new LLM model to the codebase. Use when integrating new models from Anthropic, OpenAI, Google, or other providers, including EAP/preview models with secret checkpoints.\nllm-error-triage: Triage production LLM streaming errors from Axiom logs. Use when investigating LLM failures, elevated error rates, or performing periodic error audits across all model providers.\nprompt-tuning-end-to-end: Run a session-replay prompt optimization end-to-end (plan spec, validate it, execute the optimizer, and write an analysis report). Use when tuning a Factory CLI prompt/tool/system prompt from historical sessions.\ndebug-llm-errors: Debug and root-cause production LLM errors reported via Linear tickets, Axiom alerts, or ad-hoc reports. Use when investigating a specific LLM proxy error through the full stack.\nllm-integration-testing: Add new LLM integration test scenarios and fixtures. Use when testing API behavior for thinking/effort modes, validating guard logic, or adding coverage for edge cases in useLLMStreaming.\nfrontend-ui-development: Build frontend features for apps/web, apps/desktop, packages/frontend, packages/core-ui, and packages/component-library. ACTIVATE when editing any file in packages/frontend/, packages/core-ui/, or packages/component-library/.\nfix-knip-unused-exports: Fix knip \"Unused exports\" violations. Use when `npm run knip` reports unused exports.\nban-type-assertions: Ban `as` type assertions in a package via the `@typescript-eslint/consistent-type-assertions` lint rule, replacing them with compiler-verified type-safe alternatives. Use when enabling the assertion ban in a new package or fixing violations in an existing one.\nprocess-env-migration: Migrate from disallowed usage of process.env to the strongly-typed @factory/environment system. Use when you see lint warnings or errors for `no-direct-process-env`.\nno-use-effect: Enforce the no-useEffect rule when writing or reviewing React code. ACTIVATE when writing React components, refactoring existing useEffect calls, reviewing PRs with useEffect, or when an agent adds useEffect \"just in case.\"\ndavidgu-pr-review: Review PRs with five lenses: stability, performance, product sense, maintainability, and type safety. Focuses on CLI as primary area but covers all repo areas. Outputs inline comments at two severity levels: [request] (blocking) and [non-blocking] (high-bar only). Actively searches codebase for existing patterns before flagging duplication. Use when reviewing a PR or when asked to review code changes.\nask: Use this when you are exploring the codebase. It lets you ask the AI who wrote code questions about how things work and why they chose to build things the way they did. Think of it as asking the engineer who wrote the code for help understanding it.\nprompt-analysis: Analyze AI prompting patterns and acceptance rates\ngit-ai-search: Search and restore AI conversation context from git history\nfeng-shui: Architectural harmony assessment for your codebase.\nperformance-review: Annual performance review for your codebase.\ntherapy-session: Guided counseling session for your codebase.\ncobol-converter: COBOL migration plan with translated output.\nroast: Candid code review from an industry expert perspective.\nagent-repellent: Assess your codebase's resistance to AI-assisted development tools.\nobituary: Retrospective on deprecated and end-of-life code.\nblame: Git history investigation surfacing patterns and anomalies.\ndating-profile: Compatibility profile based on technology stack and architecture.\nship-ritual: Pre-deployment blessing for your next release.\n\nProactively invoke a listed skill when the user's request warrants specialized instructions or would benefit from that skill's domain knowledge.\n</system-reminder>",
+          "timestamp": "2026-05-19T13:59:54.273Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\n\nUser system info (darwin 25.4.0)\n\nModel: Claude Opus 4.6\nToday's date: 2026-05-19\nUser language: en\n\n# The commands below were executed at the start of all sessions to gather context about the environment.\n# You do not need to repeat them, unless you think the environment has changed.\n# Remember: They are not necessarily related to the current conversation, but may be useful for context.\n\n% pwd\n/Users/david/Desktop/dev/factory/factory-mono-delta\n\n% ls\nAGENTS.md\napps\ndocs\nevals\nfirebase.json\nfirestore.indexes.json\nfirestore.rules\ninfra\ninternal\njustfile\nknip.json\nnode_modules\npackage-lock.json\npackage.json\npackages\nqa-evidence\nREADME.md\nstorage.rules\ntsconfig.json\ntsconfig.next.json\n... [truncated]\n\n% git status -b --porcelain | head -n1\ndev\n\n% git status --porcelain\n M .factory/settings.json\n?? justfile\n\n% git log --oneline -5\n2dcc844ad8 fix(cli): support Linux image paste (#13700)\ne8571964da fix(cli): add image paste fallback (#13699)\n997a389455 fix(cli): defer agent effectiveness entitlement check (#13596)\n67193d3f7d fix(cli): preserve startup hook source (#13672)\ncfbcf97bc9 feat(analytics): add certification column to users table (#13709)\n\n% git symbolic-ref refs/remotes/origin/HEAD\nrefs/remotes/origin/dev\n\n# Codebase and user instructions are shown below. Instructions from files closest to your current directory take precedence over those further up the hierarchy.\n## Project Instructions:\n% cat /Users/david/Desktop/dev/factory/factory-mono-delta/AGENTS.md\n<coding_guidelines>\n# Agents Guidelines for Factory Monorepo\n\n## Critical Requirements\n\n- **packages/frontend work**: Follow [`docs/ui-development.md`](./docs/ui-development.md) - always use `@factory/core-ui` components\n- **API endpoints**: Define types in `@factory/common/src/api/{service}/types.ts` - see [`docs/examples/api-type-conventions.md`](./docs/examples/api-type-conventions.md)\n\n---\n\n## Reference Docs (check when relevant)\n\n- [`/docs/examples/`](./docs/examples/) - End-to-end implementation patterns\n- [`/memories/`](./memories/) - Session context and notes from previous work\n- [`docs/frontend.md`](./docs/frontend.md) - Frontend architecture\n- [`docs/feature-flags.md`](./docs/feature-flags.md) - Statsig feature flags\n- [`docs/error-handling.md`](./docs/error-handling.md) - Error patterns\n- [`docs/unit-tests.md`](./docs/unit-tests.md) - Testing conventions\n- [`docs/playwright-e2e-testing.md`](./docs/playwright-e2e-testing.md) - Playwright E2E testing for apps/web\n- [`docs/pre-pr-checklist.md`](./docs/pre-pr-checklist.md) - PR quality checklist (read before creating PRs)\n- [`docs/services-environment.md`](./docs/services-environment.md) - How env vars flow into service DI configs (read before adding env vars to a service)\n\n---\n\n## Commands\n\n```bash\nnpm run fix        # Lint + format (preferred over npm run lint)\nnpm run test       # Run all tests\nnpm run typecheck  # TypeScript checking\nnpm run knip       # Detect unused exports\nnpm run build      # Build all packages\nnpm run dev:web    # Start backend, web, storybook, admin, daemon (works over SSH)\nnpm run dev:desktop # Start backend, web, storybook, admin, desktop (local only)\nnpm run clean      # Clear all caches\n```\n\n**Do NOT use `npm run dev`** at the root — it is intentionally disabled. Use `dev:web` or `dev:desktop` above.\n\nFor CLI dev, run `droid-dev` (hosted) or `droid-local` (local API) separately after `cd apps/cli && npm run setup`.\n\n**Dev server logs:** When running `dev:web` or `dev:desktop`, each app streams its output to both console and a log file on disk. You can inspect logs at any time:\n\n| App     | Log file                       |\n| ------- | ------------------------------ |\n| backend | `/tmp/factory-dev-backend.log` |\n| admin   | `/tmp/factory-dev-admin.log`   |\n| desktop | `/tmp/factory-dev-desktop.log` |\n| daemon  | `/tmp/factory-dev-daemon.log`  |\n\nUse `tail -f /tmp/factory-dev-backend.log` to live-stream, or `cat` / `grep` the file to search for errors.\n\n**Filtering to specific packages (IMPORTANT):** You **must** use `--` before `--filter`, otherwise npm eats the flag and turbo runs ALL packages. A full unfiltered `npm run test` consumes ~9 GB of RAM.\n\n```bash\n# CORRECT - filter is passed through to turbo:\nnpm run test -- --filter=@factory/common --filter=@factory/daemon-core\n\n# WRONG - npm eats --filter, turbo runs everything:\nnpm run test --filter=@factory/common --filter=@factory/daemon-core\n```\n\nThis applies to all turbo-based scripts: `test`, `typecheck`, `lint`, `fix`, `build`.\n\n---\n\n## Architecture\n\nSee [`docs/repo-overview.md`](./docs/repo-overview.md) for the full apps/packages catalog.\n\n**Key apps:**\n\n- `apps/web` - Main web application (Vite + React)\n- `apps/desktop` - Electron desktop app\n- `apps/cli` (daemon mode) - Background daemon service (`droid daemon`)\n- `apps/cli` - Droid CLI\n- `apps/backend` - Backend API only (web UI deprecated)\n\n**Key packages:**\n\n- `@factory/core-ui` - Design system (mandatory for UI)\n- `@factory/common` - Shared types, enums, API contracts\n- `@factory/frontend` - Shared frontend features\n- `@factory/droid-core` - AI agent core library\n\n### Client <-> daemon protocol\n\n- Shared JSON-RPC envelope/base protocol schemas live in `packages/common/src/shared/schemas.ts`\n- Daemon-side protocol schemas and exported types live under `packages/common/src/daemon/`\n- Client-side protocol schemas and exported types live under `packages/common/src/droid/`\n- `FACTORY_PROTOCOL_VERSION` lives in `packages/common/src/droid/schemas/constants.ts`\n- Protocol manifest CI enforcement lives in `apps/scripts/src/protocol-manifest/`; see `apps/scripts/src/protocol-manifest/README.md` before changing protocol schemas or protocol versioning rules\n\n---\n\n## Code Conventions\n\n- New API endpoints need types in `@factory/common/src/api/{service}/types.ts`\n- New UI components must use `@factory/core-ui` primitives (no raw `<div>`, `<button>`, `<input>`)\n- No hardcoded colors (use `colors.semantics`)\n- Extend existing abstractions rather than adding workaround logic in callers\n- Extract shared utilities instead of duplicating transformations across files\n- Don't remove safeguards (`.strict()`, assertions, validation) without documenting why\n- Search for existing patterns before creating new ones: `rg \"keyword\" --type ts`\n- Do not log user-generated content (session titles, message content, file contents, tool call params/results) in telemetry — CMEK-encrypted orgs expect this data to be opaque to the platform. See `packages/logging/src/metadata/types.ts` for the full policy.\n\n---\n\n## Testing\n\n- Do **not** run `npm run test`, `npm run typecheck`, or `npm run fix` unless explicitly requested\n- Prefer targeted checks where possible and ask before running repo-wide validators\n- For CLI unit tests, prefer `npm run test` / filtered `npm run test -- --filter=@factory/cli`. If you bypass npm scripts and invoke the runner directly, use `npx vitest` instead of `npx jest`; Jest-named helpers in CLI tests are compatibility shims for the Vitest runner.\n- For `infra/` validation, use OpenTofu (`tofu init` / `tofu validate` / `tofu fmt`) instead of Terraform\n- See each app's README.md for app-specific testing details and conventions\n\n---\n\n## Debugging\n\nSee [`docs/debugging-daemon.md`](./docs/debugging-daemon.md) for the full guide.\n\n**Quick checklist:**\n\n- Rebuilt CLI after changes (`cd apps/cli && npm run setup`)\n- Restarted daemon process\n- Started new session (not reusing old one)\n- Checking correct log directory (`~/.factory-dev/` for dev)\n\n---\n\n## PR Conventions\n\nFollow the template in `.github/pull_request_template.md` and review [`docs/pre-pr-checklist.md`](./docs/pre-pr-checklist.md) before submitting.\n\n- **Title**: Conventional Commits format - `type(scope): description`\n  - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`\n  - Scope: workspace name from `apps/*` or `packages/*`, or `monorepo`\n- **Description**: Must include Linear ticket (e.g., `Closes FAC-1234`)\n</coding_guidelines>\n\n\n\nIMPORTANT:\n- Double check the tools installed in the environment before using them.\n- Never call a file editing tool for the same file in parallel.\n- Always prefer the Grep, Glob and LS tools over shell commands like find, grep, or ls for codebase exploration.\n- Always prefer using the absolute paths when using tools, to avoid any ambiguity.\n- To enter a mission, the user needs to run the `/missions` slash command.\n\n</system-reminder>",
+          "timestamp": "2026-05-19T13:59:54.273Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>IMPORTANT: TodoWrite was not called yet. You must call it for any non-trivial task requested by the user. It would benefit overall performance. Make sure to keep the todo list up to date to the state of the conversation. Performance tip: call the TodoWrite tool in parallel to the main flow related tool calls to save user's time and tokens.</system-reminder>",
+          "timestamp": "2026-05-19T13:59:54.273Z"
+        },
+        {
+          "type": "user",
+          "text": "Hey, we're seeing timeouts to Droid. Whenever starting a new session (on any model, including BYOK) I see this:\n●  Failed to create session. Check the logs for details.\n\n●  Failed to send message. Please try again.Some logs from ~/.factory/logs/droid-log-single.log in the thread (edited) \n1 replyAlexander Grooff  [6:26 AM]\nMoving the logs to this thread to keep the channel readable\n[2026-05-19T13:07:01.937Z] ERROR: [useDaemonAgent] Failed to create session\nTimeoutError: Send request timed out\n    at <anonymous> (../../packages/droid-sdk/src/client.ts:1096:21) | Context: {\"requestId\":\"8ca03875-a6ff-4cfd-b068-823fcf1cddad\",\"method\":\"droid.initialize_session\",\"timeout\":60000,\"error\":\"TimeoutError: Send request timed out\",\"tags\":{\"clientType\":\"cli\",\"platform\":\"darwin\",\"environment\":\"production\",\"version\":\"0.128.0\",\"os\":\"darwin 25.4.0\",\"terminal\":\"iTerm.app\",\"terminalVersion\":\"3.6.10\",\"clientMode\":\"tui\",\"droidMode\":\"terminal-ui\",\"sessionId\":\"4a7de14f-4f8c-41c8-b6b0-2096153b3217\",\"isDroidExec\":\"false\",\"isStreamJsonRpcWorker\":\"false\",\"callingSessionIdPresent\":\"false\",\"isInteractiveTty\":\"true\",\"droidInstallationId\":\"e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d\",\"factoryTier\":\"enterprise\"}}\n--\n[2026-05-19T13:08:44.804Z] ERROR: [useDaemonAgent] Failed to create session\nTimeoutError: Send request timed out\n    at <anonymous> (../../packages/droid-sdk/src/client.ts:1096:21) | Context: {\"requestId\":\"426b0d8a-b803-4b6f-899c-1d19ef2d688c\",\"method\":\"droid.initialize_session\",\"timeout\":60000,\"error\":\"TimeoutError: Send request timed out\",\"tags\":{\"clientType\":\"cli\",\"platform\":\"darwin\",\"environment\":\"production\",\"version\":\"0.128.0\",\"os\":\"darwin 25.4.0\",\"terminal\":\"iTerm.app\",\"terminalVersion\":\"3.6.10\",\"clientMode\":\"tui\",\"droidMode\":\"terminal-ui\",\"sessionId\":\"35ccafc9-d5ff-46aa-9038-ef75c770bb9c\",\"isDroidExec\":\"false\",\"isStreamJsonRpcWorker\":\"false\",\"callingSessionIdPresent\":\"false\",\"isInteractiveTty\":\"true\",\"droidInstallationId\":\"e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d\",\"factoryTier\":\"enterprise\"}}\n--\n[2026-05-19T13:12:05.006Z] ERROR: [useDaemonAgent] Failed to create session\nTimeoutError: Send request timed out\n    at <anonymous> (../../packages/droid-sdk/src/client.ts:1096:21) | Context: {\"requestId\":\"2a5212e2-7cdf-48bb-b3f6-ec9171b33da4\",\"method\":\"droid.initialize_session\",\"timeout\":60000,\"error\":\"TimeoutError: Send request timed out\",\"tags\":{\"clientType\":\"cli\",\"platform\":\"darwin\",\"environment\":\"production\",\"version\":\"0.128.0\",\"os\":\"darwin 25.4.0\",\"terminal\":\"iTerm.app\",\"terminalVersion\":\"3.6.10\",\"clientMode\":\"tui\",\"droidMode\":\"terminal-ui\",\"sessionId\":\"b426b614-87fc-4503-8daa-ea96228eb6ef\",\"isDroidExec\":\"false\",\"isStreamJsonRpcWorker\":\"false\",\"callingSessionIdPresent\":\"false\",\"isInteractiveTty\":\"true\",\"droidInstallationId\":\"e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d\",\"factoryTier\":\"enterprise\"}}\n--\n[2026-05-19T13:17:33.662Z] ERROR: [useDaemonAgent] Failed to create session\nTimeoutError: Send request timed out\n    at <anonymous> (../../packages/droid-sdk/src/client.ts:1096:21) | Context: {\"requestId\":\"21065bae-4753-4f51-8a70-03170b1aa407\",\"method\":\"droid.initialize_session\",\"timeout\":60000,\"error\":\"TimeoutError: Send request timed out\",\"tags\":{\"clientType\":\"cli\",\"platform\":\"darwin\",\"environment\":\"production\",\"version\":\"0.128.0\",\"os\":\"darwin 25.4.0\",\"terminal\":\"iTerm.app\",\"terminalVersion\":\"3.6.10\",\"clientMode\":\"tui\",\"droidMode\":\"terminal-ui\",\"sessionId\":\"6fcf4175-2b0f-4990-9a9d-7ccbc3a60e2f\",\"isDroidExec\":\"false\",\"isStreamJsonRpcWorker\":\"false\",\"callingSessionIdPresent\":\"false\",\"isInteractiveTty\":\"true\",\"droidInstallationId\":\"e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d\",\"factoryTier\":\"enterprise\"}}\n\nwhy is this hapening? why is the user using `useDaemonAgent` droid-sdk etc if they are using the TUI???",
+          "timestamp": "2026-05-19T13:59:54.274Z"
+        },
+        {
+          "type": "assistant",
+          "text": "The user is asking about why the error logs show `useDaemonAgent` and `droid-sdk` when the user is using the TUI (Terminal UI). They want to understand the architecture - why would a TUI client be going through `droid-sdk` and `useDaemonAgent`.\n\nLet me investigate the codebase to understand the architecture of how the CLI/TUI communicates with the daemon, and why `useDaemonAgent` and `droid-sdk` are involved.",
+          "timestamp": "2026-05-19T14:00:01.002Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "output_mode": "file_paths",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta",
+            "pattern": "useDaemonAgent"
+          },
+          "timestamp": "2026-05-19T14:00:01.002Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "output_mode": "file_paths",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta",
+            "pattern": "droid\\.initialize_session"
+          },
+          "timestamp": "2026-05-19T14:00:01.002Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/hooks/useDaemonAgent.ts"
+          },
+          "timestamp": "2026-05-19T14:00:05.941Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 5,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/droid-sdk/src/client.ts",
+            "pattern": "initialize_session"
+          },
+          "timestamp": "2026-05-19T14:00:05.941Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I understand the architecture. Let me look at the `droid-sdk` client to understand the timeout at line 1096:",
+          "timestamp": "2026-05-19T14:00:12.661Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 10,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/droid-sdk/src/client.ts",
+            "pattern": "Send request timed out"
+          },
+          "timestamp": "2026-05-19T14:00:12.661Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 5,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/droid-sdk/src",
+            "pattern": "initializeTuiSession"
+          },
+          "timestamp": "2026-05-19T14:00:12.661Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "output_mode": "file_paths",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/daemon-core/src",
+            "pattern": "initializeTuiSession|initialize_session"
+          },
+          "timestamp": "2026-05-19T14:00:16.182Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 3,
+            "head_limit": 30,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/daemon-core/src",
+            "pattern": "initialize_session"
+          },
+          "timestamp": "2026-05-19T14:00:20.317Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "output_mode": "file_paths",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages",
+            "pattern": "initializeTuiSession"
+          },
+          "timestamp": "2026-05-19T14:00:20.317Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "output_mode": "file_paths",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta",
+            "pattern": "initializeTuiSession"
+          },
+          "timestamp": "2026-05-19T14:00:23.857Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 15,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/services/daemon/TuiDaemonAdapter.ts",
+            "pattern": "initializeTuiSession"
+          },
+          "timestamp": "2026-05-19T14:00:27.948Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/services/daemon/TuiDaemonAdapter.ts",
+            "limit": 60,
+            "offset": 878
+          },
+          "timestamp": "2026-05-19T14:00:31.175Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I have a clear picture of the architecture. Here's the answer:\n\n**The TUI user IS using `useDaemonAgent` and `droid-sdk` — that's by design.** The architecture is:\n\n```\nTUI (React/Ink app) → useDaemonAgent hook → TuiDaemonAdapter → DaemonSessionController (droid-sdk client) → Daemon process (via JSON-RPC over WebSocket)\n```\n\nThe CLI/TUI doesn't talk to the Factory backend directly. Instead, it communicates with a local **daemon** process (`droid daemon`) that runs in the background. The `droid-sdk` package provides the JSON-RPC client that the TUI uses to send requests to this daemon. `useDaemonAgent` is a React hook inside `apps/cli` that orchestrates the TUI ↔ daemon communication.\n\nThe `droid.initialize_session` method is sent from the TUI to the **local daemon** (not the remote API). The 60-second timeout means the daemon received the request but never responded — it's likely hanging during session initialization. This could be caused by:\n\n1. The daemon itself is blocked trying to reach the Factory backend (e.g., auth token exchange, session creation API call)\n2. The daemon child process (droid worker) failed to spawn or is stuck during startup\n3. Resource exhaustion on the local machine (the daemon is overloaded)\n\nThe investigation should focus on the **daemon logs** (not just the TUI logs) — check `~/.factory/logs/` for daemon-specific logs to see what's blocking the `initialize_session` handler from responding within 60 seconds.",
+          "timestamp": "2026-05-19T14:00:42.860Z"
+        },
+        {
+          "type": "user",
+          "text": "the TUI does NOT communicate with a separate damon process - confirm that in the code",
+          "timestamp": "2026-05-19T15:30:52.041Z"
+        },
+        {
+          "type": "assistant",
+          "text": "The user is saying the TUI does NOT communicate with a separate daemon process. Let me look more carefully at how the TuiDaemonAdapter works - specifically whether it's connecting to an external daemon or running one in-process.",
+          "timestamp": "2026-05-19T15:30:57.967Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 5,
+            "head_limit": 50,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/services/daemon/TuiDaemonAdapter.ts",
+            "pattern": "inProcessClient|in-process|InProcess"
+          },
+          "timestamp": "2026-05-19T15:30:57.967Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/services/daemon/InProcessDaemonClient.ts"
+          },
+          "timestamp": "2026-05-19T15:31:01.084Z"
+        },
+        {
+          "type": "assistant",
+          "text": "You're right. I can confirm from the code that **the TUI does NOT communicate with a separate daemon process**. Here's what's actually happening:\n\nThe `TuiDaemonAdapter` uses an **`InProcessDaemonClient`** (see `apps/cli/src/services/daemon/InProcessDaemonClient.ts`), whose doc comment explicitly states:\n\n> \"Instead of connecting to an external daemon process over WebSocket, this client manages DroidClient+ProcessTransport instances directly in the TUI process.\"\n\nThe architecture is:\n\n```\nTUI process (single process)\n  └─ useDaemonAgent (React hook)\n       └─ TuiDaemonAdapter\n            └─ DaemonSessionController\n                 └─ InProcessDaemonClient (implements IDaemonClient)\n                      └─ DroidClient + ProcessTransport → spawns a child droid process\n```\n\nThe `InProcessDaemonClient` spawns **child processes** (via `ProcessTransport`) for each session — these are the actual droid worker processes that run the agent loop. But the \"daemon\" logic (session management, routing, registry) runs **in-process** within the TUI itself.\n\nSo when the timeout fires at `droid-sdk/src/client.ts:1096`, it's the **DroidClient** (which wraps the `ProcessTransport` to the child droid process) timing out on `initializeSession`. The 60s timeout means the **child droid process** that was spawned never responded to the `initialize_session` JSON-RPC call — likely it's stuck during startup (connecting to the Factory API, authenticating, loading session state, etc.) or failed to spawn entirely.\n\nThe `droid-sdk` naming is a misnomer in this context — it's used as a JSON-RPC client library for communicating with child processes, not with a remote daemon.",
+          "timestamp": "2026-05-19T15:31:15.691Z"
+        },
+        {
+          "type": "user",
+          "text": "with this in mind... how is the error in the beginning happening?",
+          "timestamp": "2026-05-19T15:40:42.187Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Let me re-read the error carefully:\n\n```\n[2026-05-19T13:07:01.937Z] ERROR: [useDaemonAgent] Failed to create session\nTimeoutError: Send request timed out\n    at <anonymous> (../../packages/droid-sdk/src/client.ts:1096:21) | Context: {\"requestId\":\"8ca03875-a6ff-4cfd-b068-823fcf1cddad\",\"method\":\"droid.initialize_session\",\"timeout\":60000,...}\n```\n\nSo the error is logged by `useDaemonAgent` with the message \"Failed to create session\". \n\nNow I'm tracing through the code path. In `useDaemonAgent.ts`, the `ensureDaemonSession` function has a catch block that logs this exception and displays an error message to the user when `adapter.initializeTuiSession(...)` fails. The error is being thrown from `TuiDaemonAdapter.initializeTuiSession`, which is where the actual session initialization happens.\n\nLooking at how the adapter sets up its controller, I see it configures the `DaemonSessionController` with different clients depending on the transport mode. For the default `'parent'` mode used in TUI, it uses the `InProcessDaemonClient`. But the stack trace is pointing to `packages/droid-sdk/src/client.ts:1096` in the `DroidClient` class, which suggests the error is actually coming from a different client than I'd expect.\n\nTracing through `InProcessDaemonClient.doInitializeSession`, it creates a `ProcessTransport`, instantiates a `DroidClient` with that transport, connects to spawn the child process, and then invokes `client.initializeSession(...)`. The `DroidClient` sends a JSON-RPC request to the child process and waits for a response — the timeout at line 1096 is in the `sendRequest` method where it sets a 60-second timer that rejects with `TimeoutError` if the child process doesn't respond in time. The child process has 60 seconds to respond, but if it's waiting on the Factory API to authenticate and create or load a session on the backend, a slow or unresponsive API would cause the child to hang indefinitely and never send back the JSON-RPC response, triggering the timeout error.",
+          "timestamp": "2026-05-19T15:41:14.231Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Looking at the error again with the correct architecture in mind:\n\n```\nTimeoutError: Send request timed out\n    at <anonymous> (../../packages/droid-sdk/src/client.ts:1096:21)\n    method: \"droid.initialize_session\", timeout: 60000\n```\n\nThe flow is:\n\n1. User opens TUI, triggers first interaction\n2. `useDaemonAgent.ensureDaemonSession()` → `TuiDaemonAdapter.initializeTuiSession()` → `InProcessDaemonClient.doInitializeSession()`\n3. `createAndRegisterClient()` spawns a **child droid process** via `ProcessTransport`\n4. The `DroidClient` sends `droid.initialize_session` JSON-RPC to that child process over stdio/IPC\n5. The child process has 60 seconds to respond\n6. **It never responds** → `TimeoutError` at `client.ts:1096`\n\nSo the child droid process was spawned but is **stuck during its own initialization**. The child process receives the `droid.initialize_session` request and then presumably tries to:\n- Authenticate with the Factory backend API\n- Create/register the session server-side\n- Load entitlements, settings, MCP servers, etc.\n\nIf the Factory backend (or any upstream service it depends on) is unreachable or slow, the child process hangs indefinitely and never sends back the JSON-RPC response to the parent TUI process.\n\nThe timeout isn't a network timeout to a remote daemon — it's the TUI's patience for its own spawned child process to finish initializing. The root cause is almost certainly the child process blocking on an outbound HTTP call to the Factory API that's timing out or hanging.",
+          "timestamp": "2026-05-19T15:41:14.231Z"
+        },
+        {
+          "type": "user",
+          "text": "was there a spike in latency during init phase? or how come it was slow to initialize??",
+          "timestamp": "2026-05-19T15:45:47.614Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Skill",
+          "input": {
+            "skill": "axiom"
+          },
+          "timestamp": "2026-05-19T15:45:51.618Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where message contains 'initialize_session' or message contains 'Failed to create session' or message contains 'initializeTuiSession' | where _time >= datetime('2026-05-19T12:50:00Z') and _time <= datetime('2026-05-19T13:30:00Z') | project _time, level, message, ['tags.version'], ['tags.userId'], ['fields.durationMs'] | order by _time asc | take 30\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to investigate production logs.",
+            "summary": "Query Axiom for init session errors",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:45:58.323Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where level == 'error' and (message contains 'initialize_session' or message contains 'Failed to create session' or message contains 'timed out') | where _time >= datetime('2026-05-19T12:50:00Z') and _time <= datetime('2026-05-19T13:30:00Z') | summarize errors=count() by bin(_time, 5m) | order by _time asc\" --start-time \"-12h\" -f tabular",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to check error rate during incident window.",
+            "summary": "Query init session errors over time",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:09.341Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-vercel'] | where ['vercel.environment'] =~ 'production' | where ['vercel.route'] contains 'session' or ['vercel.route'] contains 'init' | where _time >= datetime('2026-05-19T12:50:00Z') and _time <= datetime('2026-05-19T13:30:00Z') | summarize avg_latency=avg(toreal(['vercel.duration'])), p95=percentile(toreal(['vercel.duration']), 95), total=count(), errors=countif(toint(['request.statusCode']) >= 500) by bin(_time, 5m) | order by _time asc\" --start-time \"-12h\" -f tabular",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to check backend latency during incident window.",
+            "summary": "Check backend session API latency",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:09.341Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-vercel'] | where ['vercel.environment'] =~ 'production' | where ['vercel.route'] contains 'session' | where _time >= datetime('2026-05-19T12:50:00Z') and _time <= datetime('2026-05-19T13:30:00Z') | take 1\" --start-time \"-12h\" -f json 2>&1 | head -80",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to discover available fields.",
+            "summary": "Check vercel session route fields",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:17.389Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where message contains 'session' and message contains 'duration' | where _time >= datetime('2026-05-19T13:00:00Z') and _time <= datetime('2026-05-19T13:20:00Z') | take 5\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to find duration metrics.",
+            "summary": "Check for session duration logs",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:17.389Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-vercel'] | where ['vercel.environment'] =~ 'production' | where ['vercel.route'] contains 'session' | where _time >= datetime('2026-05-19T12:50:00Z') and _time <= datetime('2026-05-19T13:30:00Z') | summarize total=count(), errors=countif(toint(['vercel.statusCode']) >= 500) by bin(_time, 5m), ['vercel.route'] | order by _time asc\" --start-time \"-12h\" -f tabular",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to check backend error rates.",
+            "summary": "Check backend session route errors",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:28.244Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['fields.metric'] contains 'session' or ['fields.metric'] contains 'init' | where _time >= datetime('2026-05-19T12:50:00Z') and _time <= datetime('2026-05-19T13:30:00Z') | summarize count() by ['fields.metric'] | order by count_ desc | take 20\" --start-time \"-12h\" -f tabular",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to find relevant session metrics.",
+            "summary": "Check TUI metrics related to sessions",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:28.244Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where level == 'error' and message contains 'timed out' | where _time >= datetime('2026-05-19T12:50:00Z') and _time <= datetime('2026-05-19T13:30:00Z') | take 3\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to see specific timeout error details.",
+            "summary": "Get sample timeout errors",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:39.197Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KRFQTXH9PSFMRVJ33WNKMZW3' | where _time >= datetime('2026-05-19T13:05:00Z') and _time <= datetime('2026-05-19T13:20:00Z') | where level == 'error' or level == 'warn' or message contains 'initialize' or message contains 'session' | project _time, level, message | order by _time asc | take 30\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to trace the affected user's session lifecycle.",
+            "summary": "Check affected user session logs",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:39.197Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Interesting - the affected user (`user_01KRFQTXH9PSFMRVJ33WNKMZW3`) seems to have sessions that are working during that time window (I can see session initialization, thinking blocks, etc.). But the original error from the Slack thread was from `droidInstallationId: e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d` - let me look for that specific installation ID.\n\nWait, the initial logs from the user show:\n- version 0.128.0\n- droidInstallationId: e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d\n\n\nLooking at those timeout timestamps (13:07, 13:08, 13:12, 13:17), I need to understand what's happening during session initialization in the child process that could be causing these delays. The real question is what the child droid process executes when it receives the initialize_session command that might be taking over 60 seconds.",
+          "timestamp": "2026-05-19T15:46:54.022Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['fields.droidInstallationId'] == 'e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d' or message contains 'e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d' | where _time >= datetime('2026-05-19T13:00:00Z') and _time <= datetime('2026-05-19T13:20:00Z') | project _time, level, message | order by _time asc | take 40\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to trace the specific affected user's installation.",
+            "summary": "Query specific droid installation logs",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:46:54.022Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "output_mode": "file_paths",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/droid-core/src",
+            "pattern": "initialize_session|initializeSession"
+          },
+          "timestamp": "2026-05-19T15:46:54.022Z"
+        },
+        {
+          "type": "user",
+          "text": "look for error messages of this particular user alexander.grooff@adyen.com",
+          "timestamp": "2026-05-19T15:46:54.986Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where message contains 'e8e6c408-5635-4fe9-8dc8-7fd4b1fb704d' | where _time >= datetime('2026-05-19T13:00:00Z') and _time <= datetime('2026-05-19T13:20:00Z') | take 5\" --start-time \"-12h\" -f json 2>&1 | head -5",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to find logs by installation ID.",
+            "summary": "Search by installation ID in messages",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:47:01.173Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Skill",
+          "input": {
+            "skill": "workos-lookup-user"
+          },
+          "timestamp": "2026-05-19T15:47:01.173Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "cd /Users/david/Desktop/dev/factory/factory-mono-delta && npx tsx apps/scripts/src/workos-lookup-user/index.ts --prod alexander.grooff@adyen.com",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only lookup of user information from WorkOS API.",
+            "summary": "Look up user by email in WorkOS",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:47:07.866Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:00:00Z') and _time <= datetime('2026-05-19T13:20:00Z') | where level == 'error' or level == 'warn' | project _time, level, message | order by _time asc | take 50\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to find user's specific error logs.",
+            "summary": "Query Alexander's error and warn logs",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:47:17.796Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:00:00Z') and _time <= datetime('2026-05-19T13:20:00Z') | where message contains 'LLM error' or message contains 'Retry' | project _time, level, message, ['fields.error'], ['fields.cause'], ['fields.statusCode'] | order by _time asc | take 20\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to get error details.",
+            "summary": "Get LLM error details for user",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:47:24.722Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I see the issue. Alexander Grooff's user is on v0.128.0 and his session is getting repeated **429 Rate limit exceeded** errors from his BYOK API key. The error is:\n\n```\n429 Rate limit exceeded for api_key: 8eae8fc575354a0839101e3c9e85dc1a7592ee0d643ab411a9caee103aef3a1c. Limit type: tokens. Current limit: 500000, Remaining: 0. Limit resets at: 2026-05-19 13:01:00 UTC\n\n\n```\n\nBut the original complaint was about `initialize_session` timing out, not LLM errors. The 429s are happening between 13:00-13:04, while the timeout errors don't start until 13:07. I'm wondering if the retry logic for these rate limit errors is somehow blocking the session initialization.\n\nLet me reconsider the timeline here. The user reported timeouts on `droid.initialize_session`, but looking at the logs, between 13:00-13:04 there are continuous 429s from the BYOK key. Then at 13:03:55 there's a burst of YAML parsing failures and initialization-like activity - loading commands, skills, and so on.\n\nThe real issue is that these `useLLMStreaming` errors are happening in the child droid process, the worker running the agent loop. That child process is stuck in a retry loop against a rate-limited BYOK API key. But here's what's interesting about the timing: the 429s with retries are from an already-running session, then at 13:03:55 there's initialization activity, and finally at 13:07 the first `initialize_session` timeout gets reported. So the question is whether that retry loop is blocking the initialization from completing.\n\n```\nActually, I need to think about this more carefully. Are the 429 errors coming from the same child process or different ones? If there's an old session still running and retrying while the user tries to start a new one, could that old session's retry loop be consuming resources or connections that prevent the new initialization from responding?\n```\nLooking at the API key and rate limit details, this user is hitting their own BYOK key's token limit. But the `initialize_session` timeout is separate. I'm wondering if the session initialization itself makes an LLM call—maybe for generating a session title or system prompt—that's also getting rate-limited by the same key. If that LLM call is stuck in a retry loop without a timeout, it could block the entire initialization indefinitely.\n\nSo the child process hangs because it's stuck retrying a rate-limited LLM call during setup. Let me check the logs around 13:05-13:08 to see what the child process was actually doing at that point.",
+          "timestamp": "2026-05-19T15:47:54.931Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:03:50Z') and _time <= datetime('2026-05-19T13:08:00Z') | project _time, level, message | order by _time asc | take 80\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to trace exactly what happened during the timeout.",
+            "summary": "Check user logs during timeout window",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:47:54.931Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:03:56Z') and _time <= datetime('2026-05-19T13:08:00Z') | where message contains 'droid' or message contains 'session' or message contains 'initialize' or message contains 'MCP' or message contains 'spawn' or message contains 'timeout' or message contains 'connect' or level == 'error' | project _time, level, message | order by _time asc | take 50\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to trace what happened after child process spawn.",
+            "summary": "Trace child process init after spawn",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:48:02.483Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:03:59Z') and _time <= datetime('2026-05-19T13:08:00Z') | project _time, level, message | order by _time asc | take 80\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to trace what happens after MCP servers initialize.",
+            "summary": "Continue tracing after MCP init",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:48:09.342Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:04:00Z') and _time <= datetime('2026-05-19T13:08:00Z') | where not (message contains 'YAML parsing') and not (message contains 'MCP config unchanged') | project _time, level, message | order by _time asc | take 60\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query filtering out noise to find meaningful events.",
+            "summary": "Filter noise and trace init completion",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:48:16.376Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I can see what happened. Let me trace through the timeline:\n\n1. **13:03:55** - TUI process starts up (CLI telemetry initialized, auth validated)\n2. **13:03:56.591** - `[droid process] Spawning` - child process is spawned\n3. **13:03:56.593** - `[DroidClient] [daemon -> droid] sending request` - the `initialize_session` request is sent to the child process\n4. **13:03:57-58** - Child process starts up (MCP config, telemetry, host identity, settings)\n\n\n5. **13:03:58.32** - MCP servers begin initialization on the child side\n6. **13:03:58.335** - The child process receives and starts handling the initialization request\n7. **13:03:58.385** - MCP tools get registered (youtrack and qmd servers come online)\n8. **13:03:58.656** - An existing session is found locally and loaded instead of creating a new one\n9. **13:03:59+** - The system encounters a cascade of YAML parsing failures while trying to load skills and commands from disk\n10. **13:04:07** - Another 429 rate limit error hits\n11. **13:04:21** - The user closes the TUI, triggering cleanup and process termination\n\nThen at 13:04:40 there's still activity from what looks like a different session—probably the earlier rate-limited one that finally got through. The session that started at 13:03:55 appears to have loaded successfully but was closed by the user at 13:04:21.\n\nNow I need to look at what's happening after 13:05 when the user tries again. But I'm realizing I should double-check something—the original Slack error was from a different user with a different droidInstallationId on version 0.128.0. Let me verify if this is the same person. The user `alexander.grooff@adyen.com` maps to `user_01KERS79RWZ8WF06SME2WHZWBZ`. Looking back at the initial error timestamps from the Slack thread, those errors occurred at 13:07:01, 13:08:44, 13:12:05—so I need to check what the logs show around those times.\n\nThese timestamps are from the client-side log file at `~/.factory/logs/droid-log-single.log`, which might not be sent to Axiom or could be from a different session entirely. Let me focus on examining the logs between 13:05 and 13:08 for this user.",
+          "timestamp": "2026-05-19T15:48:42.430Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:04:22Z') and _time <= datetime('2026-05-19T13:18:00Z') | where not (message contains 'YAML parsing') and not (message contains 'MCP config unchanged') and not (message contains 'Automation directory') | project _time, level, message | order by _time asc | take 80\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to trace what happened during the actual timeout window.",
+            "summary": "Trace user activity during timeout period",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:48:42.430Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Interesting. At 13:04:22, the user's first TUI session shut down (OTEL flush). But then at 13:04:40, there's still activity - tool execution, LLM calls, etc. This is from a DIFFERENT session (maybe a different terminal window).\n\nBut there are NO logs at all from 13:07-13:18 for this user! The timeout errors in the original Slack post (13:07, 13:08, 13:12, 13:17) don't appear in Axiom at all. This could mean:\n1. The OTEL client was shut down before those errors occurred (since the TUI closes at 13:04:21 and flushes at 13:04:22)\n\n\n2. Those errors are from a separate TUI instance that has telemetry problems\n3. The logs are from the local file (`~/.factory/logs/droid-log-single.log`) but never got shipped to Axiom\n\nLooking at the error context more carefully, I see version 0.128.0 and a specific droidInstallationId. This matches the session I traced in Axiom at 13:03, and the successful init happened at 13:03:58.\n\nSo the real puzzle is why the same user (or possibly multiple terminal instances) hit timeouts between 13:07-13:17 when the 13:03 session worked fine. The 429 rate limit errors are the smoking gun—the user's BYOK OpenAI key is getting rate limited. I'm wondering if the `initialize_session` flow in child processes makes an LLM call that gets stuck retrying those 429s indefinitely. The successful session at 13:03:58 just loaded existing settings and restored token usage from a cached session file, but the later timeouts might indicate the user was attempting a fresh initialization when they hit the rate limit wall.",
+          "timestamp": "2026-05-19T15:49:04.621Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:05:00Z') and _time <= datetime('2026-05-19T13:20:00Z') | where not (message contains 'YAML parsing') and not (message contains 'MCP config unchanged') and not (message contains 'Automation directory') and not (message contains 'Inactivity timeout') | where level == 'error' or message contains 'Spawning' or message contains 'initialize' or message contains 'timed out' or message contains 'Failed' or message contains 'startup' or message contains 'Telemetry' | project _time, level, message | order by _time asc | take 40\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to find session creation attempts during the timeout window.",
+            "summary": "Find spawning and errors after 13:05",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:49:04.621Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:06:03Z') and _time <= datetime('2026-05-19T13:09:00Z') | where not (message contains 'YAML parsing') and not (message contains 'MCP config unchanged') and not (message contains 'Automation directory') and not (message contains 'Inactivity timeout') and not (message contains 'Failed to load commands') | project _time, level, message | order by _time asc | take 80\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to trace why the child process doesn't respond to init.",
+            "summary": "Trace what blocks init_session response",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:49:12.243Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I'm seeing a clearer picture:\n\n1. At 13:06:01, a NEW child process was spawned (`[droid process] Spawning`)\n2. At 13:06:02.931, the child process RECEIVED `[JsonRpc] Handling initialize_session`\n3. At 13:06:03.284, `[Session] Session already exists locally, loading instead` - it loaded successfully\n4. At 13:06:03.306, hooks executed\n5. At 13:06:03.548, `MCP servers reload completed`\n6. Then at 13:06:04+, the agent is already running, making LLM calls, executing tools...\n\n\n7. This session at 13:06 initialized successfully, but the user actually has two concurrent TUI sessions running - one that's been working fine with OpenAI models, and another that keeps timing out. The timeout errors from the Slack report (13:07, 13:08, 13:12, 13:17) are from v0.128.0, while this successful initialization at 13:06 came from the child process, and the original TUI that started at 13:03:55 was also v0.128.0.\n\nLooking more carefully, those successful initialization logs might be from a completely different terminal instance. The actual timeout errors from the original Slack thread aren't showing up in Axiom at all - I need to figure out if parent-process-level errors are even being shipped there or if only child process logs are captured. The local log file shows the parent TUI sent `droid.initialize_session` to the child process but got no response within the 60-second timeout window, which is what triggered the `[useDaemonAgent] Failed to create session` error.\n\nSo the child process either never spawned, crashed before responding, or got stuck during initialization. I see successful spawn and initialization logs in Axiom at 13:06, but that could be from a different TUI instance that actually worked. The one timing out might not be logging to Axiom because the child crashed before telemetry initialized or hung indefinitely partway through startup. The timeout timestamp from the Slack thread is 13:07:01, which is exactly 60 seconds after the request would've been sent.\n\nNow I'm realizing these Axiom logs might be from two separate TUI instances from the same user—the agent activity from 13:04:40 onwards is probably from an already-running session in another terminal, while the droid spawn at 13:06:01 is the new one the user is trying to create. The real question is what happens between when the session loads at 13:06:03 and when the timeout fires at 13:07:01.\n\nLooking at the successful session from 13:03:55, the child process received the initialize_session request about 1.7 seconds after spawn and immediately loaded the existing session. But in the 13:06 attempt, something's preventing that response from making it back to the parent within the 60-second window.\n\nThe logs show the child process completed all its initialization steps by 13:06:03.548 — session loaded, settings restored, MCP servers reloaded — but then there's silence until 13:06:21 when a JSON-RPC handler error appears saying no active session was found. That's the key issue: the session initialization completed on the child side, but the parent never received confirmation, so when it tried to process the update request, the session didn't exist in its view.\n\nI'm wondering if there are actually two separate session attempts happening here — one that succeeded (the logs I'm seeing) and another from a different TUI instance that's timing out because the child process never even started properly. Or maybe the user is running `droid` as a command rather than in daemon mode, which could explain why the error is coming from version 0.128.0 while the successful session logs are from a different context entirely.\n\nLooking at this more directly, the pattern suggests the user is hitting rate limiting issues. Looking at the specific timeout timestamps from the logs...",
+          "timestamp": "2026-05-19T15:49:56.029Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:06:20Z') and _time <= datetime('2026-05-19T13:10:00Z') | where not (message contains 'YAML parsing') and not (message contains 'MCP config unchanged') and not (message contains 'Automation directory') and not (message contains 'Inactivity timeout') and not (message contains 'Failed to load commands') and not (message contains 'filterDecompTools') and not (message contains 'Normal session') | project _time, level, message | order by _time asc | take 80\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to see what happens at the exact moment of timeout.",
+            "summary": "Check logs around exact timeout time",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:49:56.029Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I'm seeing a clearer picture! At 13:06:20, there's a second TUI instance connecting to the **daemon** (external daemon, not in-process):\n\n```\n13:06:20 - Daemon authenticate method called\n13:06:21 - Client credential verified\n13:06:21 - User authenticated successfully  \n13:06:21 - Connection authenticated and cached\n13:06:21 - [Daemon] UpdateSessionSettings received\n13:06:21 - ERROR: No active session found for ID  (tries to update settings for a session that doesn't exist yet)\n13:06:21 - Droid InitializeSession method called\n\n\n```\n\nThen the droid process spawns and the daemon sends a request to it. This is puzzling though—the user is on v0.128.0 which should use in-process mode, so either they have a separate daemon running alongside their CLI, or maybe a Desktop app or web session is connecting to an external daemon while the CLI uses in-process mode.\n\nLooking at the sequence, the client authenticates with the daemon, tries to update settings for a nonexistent session and gets an error, then calls InitializeSession which spawns the droid process and sends the initialize_session request to it. The child process then initializes its components—CLI telemetry, auth validation, host identity, settings service, MCP hub—and starts handling the initialize_session request around 13:06:23.618, with session creation beginning shortly after at 13:06:23.943. The session saves its settings at 13:06:23.946, so the child should respond with the session ID next. I need to check what happens after this point to see if there's an issue with that response.\n\n```\nWait, I'm realizing there might be a different problem here. The timeout errors the user reported from their local logs at 13:07, 13:08, 13:12, and 13:17 are actually from a third instance—a TUI running in in-process mode with `clientMode: \"tui\"`—which is separate from the two sessions I've been tracking: the TUI that started at 13:03 (v0.128.0, which succeeded) and the daemon-connected session at 13:06. Looking back at the initial error message more carefully, the tags show `\"clientMode\":\"tui\",\"droidMode\":\"terminal-ui\"`, which indicates this is from the TUI process itself, and it also includes `factoryTier: enterprise` and `isDroid`...\n```\n\ntypescript\nExec: false\n```\n\nNow I need to check whether version 0.128.0 actually uses in-process mode or daemon mode. The `TuiDaemonAdapter` has logic that determines the transport mode—when `shouldUseIpcTransport()` returns true, it uses `'ipc-child'` for connecting to an external daemon, otherwise it uses `'parent'` for in-process mode with `InProcessDaemonClient`. But the error stack trace points to `packages/droid-sdk/src/client.ts:1096` in the `DroidClient` class, which suggests this is happening in the in-process path...\n\nActually, looking at the daemon logs more carefully, the parent sends `droid.initialize_session` to the child at 13:06:21.52, and the child starts processing it at 13:06:23.618, then creates the session and saves settings by 13:06:23.946. If the timeout fires 60 seconds after the initial request at 13:06:21, that would be 13:07:21, which is close to the reported error time of 13:07:01—though that's only about 40 seconds, not exactly 60.\n\nLet me reconsider the timing. The first timeout in the user's log is at 13:07:01, which is 60 seconds before 13:06:01. And I can see `[droid process] Spawning` at 13:06:01, so the sequence would be: process spawned and `initialize_session` sent at 13:06:01, child receives it at 13:06:02.931, session and settings loaded by 13:06:03, MCP servers reload completed—but then the child never sends a response back, and the timeout fires at 13:07:01 on the parent side.\n\nBut wait, looking more carefully at the spawn events, there are actually multiple `[droid process] Spawning` calls in the logs: one at 13:03:56.591 (first TUI that closed at 13:04:21), another at 13:06:01, and a third at 13:06:21.51 from the daemon path. So there are two spawns happening very close together around 13:06, which suggests the user might be running both an in-process mode and a daemon simultaneously.\n\nThe `subcommand: \"daemon\"` visible in the first timeout error and the `Daemon authenticate method called` at 13:06:20 confirm this architecture: the TUI client connects to a daemon process via WebSocket, and the daemon then spawns a child droid process. The timeout is occurring between the daemon and its child process through the `DroidClient` running inside the daemon.\n\nThe child process received `initialize_session` at 13:06:02.931 and completed initialization by 13:06:03.306 with the hook configs message, so the real question is what's preventing it from sending the response back.\n\nActually, looking more carefully at the timestamps: the session that spawned at 13:06:01 already succeeded—I can see `[Agent] Streaming result` and tool execution happening at 13:06:04+, which means that session initialized and the agent loop started running. So the timeout at 13:07:01 must be from a completely different session attempt, likely the user's new session from the TUI connecting to the daemon.",
+          "timestamp": "2026-05-19T15:50:43.844Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:06:24Z') and _time <= datetime('2026-05-19T13:07:30Z') | where not (message contains 'YAML parsing') and not (message contains 'MCP config unchanged') and not (message contains 'Failed to load commands') and not (message contains 'Failed to stat git') and not (message contains 'filterDecompTools') and not (message contains 'Normal session') | project _time, level, message | order by _time asc | take 80\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to see what happens right before the 13:07 timeout.",
+            "summary": "Trace final init steps before timeout",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:50:43.844Z"
+        },
+        {
+          "type": "assistant",
+          "text": "NOW I have the full picture! Let me trace through the timeline:\n\n1. **13:06:21.503** - `Droid InitializeSession method called` (the daemon receives the request from the TUI client)\n2. **13:06:21.51** - `[droid process] Spawning` (daemon spawns a child process)\n3. **13:06:21.52** - `[DroidClient] [daemon -> droid] sending request` (daemon sends `droid.initialize_session` to child)\n4. **13:06:22-23** - Child process starts up (telemetry, auth, settings, MCP hub)\n\n\n5. **13:06:23.618** - Child receives the initialization request and starts processing it\n6. **13:06:23.946** - Session settings are being persisted\n7. **13:06:24.437** - Session is now written to disk\n8. **13:06:24.454** - Child finishes initialization and sends the response back\n9. **13:06:26.589** - Then we hit an LLM error with a 429 rate limit response\n10. **13:06:55.395** - Another 429 error occurs\n11. **13:07:01.415** - The child process receives a termination signal and starts cleanup\n12. **13:07:01.526** - MCP servers begin shutting down\n13. **13:07:01.937** - Session initialization fails and the daemon reports a timeout error\n\nSo the child successfully completed the session setup and responded, but then rate limiting kicked in, and eventually the process got killed before it could recover.\n\nNow I'm looking at the timing more carefully. The process spawned at 13:06:21.51, and the timeout fires at 13:07:01.937 - that's about 40 seconds, not the full 60-second timeout I'd expect. The timeout might have started earlier in the TUI initialization sequence rather than when the process itself spawned. So the `DroidClient` in the parent process is timing out when sending `droid.initialize_session` to the child. The child actually responds after about 3 seconds at 13:06:24, but something happens after 13:07 that's causing the issue.\n\nLooking at the timeline, the child gets killed at 13:07:01.415 right when the timeout fires in the parent at 13:07:01.937. The response from the child never makes it back to the parent, even though the child successfully initialized the session. Between the successful response and the timeout, there are 429 rate limit errors from `useLLMStreaming` appearing in the logs around 13:06:26 and 13:06:55 — but that's odd because `useLLMStreaming` shouldn't be coming from the child process itself.\n\nI'm realizing the initialization flow might include an LLM call as part of startup (like a warmup or cache priming), and that call is hitting rate limits. The `[JsonRpc] Session initialized` log might just be a local event, but the actual response can't be sent back to the parent until this LLM call completes successfully. to the parent hasn't been sent yet because the warmup LLM call is blocking it. Let me check if there's a warmup or cache initialization happening during the setup flow.",
+          "timestamp": "2026-05-19T15:51:23.613Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I can see the full picture. Let me check one more thing - whether `initialize_session` involves an LLM warmup call that blocks the response:",
+          "timestamp": "2026-05-19T15:51:23.613Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "output_mode": "file_paths",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src",
+            "pattern": "warmup|cache.*warm|useLLMStreaming"
+          },
+          "timestamp": "2026-05-19T15:51:23.613Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 10,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta",
+            "pattern": "Session initialized",
+            "type": "ts"
+          },
+          "timestamp": "2026-05-19T15:51:23.613Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/exec/streamingJsonRpcExecRunner.ts",
+            "limit": 60,
+            "offset": 1180
+          },
+          "timestamp": "2026-05-19T15:51:28.266Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/exec/streamingJsonRpcExecRunner.ts",
+            "limit": 80,
+            "offset": 1100
+          },
+          "timestamp": "2026-05-19T15:51:32.350Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 15,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/exec/streamingJsonRpcExecRunner.ts",
+            "pattern": "availableModelsPromise"
+          },
+          "timestamp": "2026-05-19T15:51:37.308Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "output_mode": "file_paths",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src",
+            "pattern": "getAvailableModelsForResponse"
+          },
+          "timestamp": "2026-05-19T15:51:40.865Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 30,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/models/availability.ts",
+            "pattern": "export.*getAvailableModelsForResponse"
+          },
+          "timestamp": "2026-05-19T15:51:45.009Z"
+        },
+        {
+          "type": "assistant",
+          "text": "OK so `getAvailableModelsForResponse()` involves `getRegion(getRuntimeAuthConfig())` which is an async call that fetches the region. This is an HTTP call to the Factory backend. Let me check if this could be what's hanging.\n\nBut wait - looking at the Axiom logs more carefully:\n- 13:06:24.454 - `[JsonRpc] Session initialized` - this log appears AFTER `emitResponse` which means the response WAS sent to the parent.\n\nLet me re-read the code:\n```typescript\nthis.protocolAdapter.emitResponse(request.id, {...});  // <-- sends response at line ~1182\n\n\n```\n\nSo the response IS emitted BEFORE the log message. The child DID respond. But the parent never received it?\n\nWait, there's a different angle. Let me look at what the `13:07:01.937` timeout error is about. Looking at the Axiom logs:\n- 13:06:24.454 - `[JsonRpc] Session initialized` - this is from the child spawned at 13:06:21.51\n- 13:07:01.937 - `[useDaemonAgent] Failed to create session` - this is from the parent timing out\n\nSo the child initialized successfully but the parent never got the response message. The response was emitted but something broke in the communication channel between child and parent.\n\nActually, wait. I'm seeing `Cleaning up after receiving signal` at 13:07:01.415 from the child. The parent's timeout fires at 13:07:01.937, but the child is already being killed at 13:07:01.415. That means the parent started terminating the child before logging the timeout error.\n\nBut here's the puzzle: the child responded at 13:06:24, which is 57 seconds before the timeout would normally fire. So why is the timeout triggering at all? Unless... the child that responded at 13:06:24 is actually a different child process than the one timing out.\n```\nLet me trace through the spawns more carefully. There's the first TUI spawn at 13:03:56.591 that closes quickly at 13:04:21. Then at 13:06:01 there's another spawn from a TUI that was already running. And at 13:06:21.51 there's a third spawn from a daemon client. The second spawn shows init received at 13:06:02.931, session loaded at 13:06:03.284, and MCP completed at 13:06:03.548. But I'm not seeing the `[JsonRpc] Session initialized` message from that spawn in the logs.\n```\nThe third spawn is clearer - init at 13:06:23.618, session saved at 13:06:23.946, session created at 13:06:24.437, and then `[JsonRpc] Session initialized` at 13:06:24.454. So spawn #3 did respond properly. But spawn #2 received the initialize_session call at 13:06:02.931 and never logged that session initialized message. The timeout error at 13:07:01.937 is exactly 60 seconds after spawn #2 started at 13:06:01, which means the in-process TUI's DroidClient is timing out because spawn #2 never completed its initialization.\n```\nLooking at spawn #2's actual timeline, it handled the initialize_session request at 13:06:02.931, then loaded an existing session at 13:06:03.284, loaded settings at 13:06:03.285, and finished the MCP servers reload at 13:06:03.548. After that there were hook and settings refreshes, but then I see LLM errors starting at 13:06:18 with a 429 error, and another one at 13:06:26. The session initialized log never appears though - something must have failed silently after the settings refresh.\n```\nActually, wait - I'm noticing something about how existing sessions are loaded. When the session already exists locally, the code takes a different path than a fresh initialization. The init response gets emitted before the \"Session initialized\" log, so if tool execution started at 13:06:04, that's only a second after the session loaded. The session had pending work that was already queued up.\n```\n[JsonRpc] initialize_session failed before load_session; continuing\n```\n\nThis tells me that when `initialize_session` is called but the session already exists, it falls through to the `load_session` logic instead. The timing and response behavior might be different in that path, so I need to trace through what happens when loading an existing session versus creating a new one.",
+          "timestamp": "2026-05-19T15:52:19.948Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src/exec/streamingJsonRpcExecRunner.ts",
+            "limit": 80,
+            "offset": 1240
+          },
+          "timestamp": "2026-05-19T15:52:19.948Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 20,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/apps/cli/src",
+            "pattern": "Session already exists locally"
+          },
+          "timestamp": "2026-05-19T15:52:24.274Z"
+        },
+        {
+          "type": "assistant",
+          "text": "OK, so when the session already exists locally, `createSession` calls `loadSession` internally. This is from the `SessionService` layer, not the JSON-RPC handler. Let me go back and look at the `handleInitializeSession` flow more carefully.\n\nLet me look at the `handleInitializeSession` method to trace the exact flow when a session already exists. The key question is: can the initialization flow get stuck AFTER the session is \"loaded\" but BEFORE the response is emitted?Looking at the code flow:1. `handleInitializeSession` is called2. `createSession` starts (line 1098-1138)3. \n\nInside `createSession`, when it detects the session already exists, it calls `loadSession` instead. Then at line 1140, both the available models promise and the session promise are resolved together with `Promise.all`. After that comes tool selection and snapshot service initialization, followed by `emitResponse` sending the response and logging the session initialized message. So the `sessionPromise` has to resolve first, and `getAvailableModelsForResponse` also needs to complete. Since `getAvailableModelsForResponse` makes an HTTP call to get the region via `getRegion(getRuntimeAuthConfig())`, if that HTTP call hangs, the entire `Promise.all` gets blocked and the response never gets sent.\n\nLooking at the logs for spawn #2, I can see `[Session] Session already exists locally, loading instead` at 13:06:03.284, which means `sessionPromise` resolved. Then `MCP servers reload completed` appears at 13:06:03.548, followed by hooks and settings refreshes between 13:06:03.752-803. But I never see `[JsonRpc] Session initialized` logged for this spawn. So something between `sessionPromise` resolving and the response being emitted is blocking—either `availableModelsPromise` is hanging because the `getRegion()` HTTP call is slow, or it's the tool selection or snapshot service initialization that's stuck.\n\nBut here's the thing: spawn #3 (13:06:21) also calls `getAvailableModelsForResponse` and completes quickly, reaching `[JsonRpc] Session initialized` by 13:06:24.454. So the `getRegion` call itself isn't the problem. The difference is that spawn #2 is loading an existing session while spawn #3 is creating a new one—the load path might behave differently than the create path.\n\nLooking at `handleInitializeSession`, it uses `Promise.all` to wait for both the available models and the session promise. When the session already exists, `createSession` calls `loadSession`, which could be doing things like reading session messages from disk, syncing with the backend, or even resuming an agent loop for pending messages. If `loadSession` is blocking on a retry loop from that 429 error, that could be what's holding up the init response.\n\nBut looking at the spawn #2 timeline more carefully — the session loads at 13:06:03.284, then immediately at 13:06:04.296 the agent starts streaming results. The key issue is that `[JsonRpc] Session initialized` never gets logged, which means the agent loop is starting before the init response is even sent back to the client.\n\nThe problem might be in `handleInitializeSession` where it waits for both available models and the session to be ready. If `createSession` calls `loadSession` and that triggers some blocking operation — maybe a warmup LLM call or something that depends on the agent loop completing — then the init response gets stuck waiting while the agent loop is already running and potentially hitting 429 retries. So the initialization chain flows through `initializeTuiSession` → `controller.initializeSession` → `inProcessClient.initializeSession`, which eventually sends a JSON-RPC request that the child process handles. The 60-second timeout is on that `DroidClient.sendRequest()` call waiting for the response from the child process.\n\nIn the child, if step 2 (processing the request and creating/loading the session) hangs, the response never gets sent back. I'm wondering if `loadSession` is the culprit—maybe it's parsing a massive session file with lots of messages from the long-running session that kept hitting 429 errors, which could explain the delay. Or maybe `getRegion()` is making an HTTP call to the Factory backend that's timing out or running slowly.",
+          "timestamp": "2026-05-19T15:53:06.627Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 15,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages",
+            "pattern": "export.*function getRegion|export.*getRegion"
+          },
+          "timestamp": "2026-05-19T15:53:06.627Z"
+        },
+        {
+          "type": "assistant",
+          "text": "OK so `getRegion()` calls `getCachedUser()` which may make an HTTP call to the Factory backend (a \"whoami\" endpoint). If this call hangs, it would block `getAvailableModelsForResponse()` which would block the `Promise.all`, which would prevent the init response from being sent.\n\nBut wait - looking at the code, it says \"Triggers a `getCachedUser` populate when the cache is missing or pinned to a different token.\" If the cache is already populated, `getCachedUser` should return immediately. For a user who already had an active session running (the 429 session), the cache should already be populated.\n \nLet me trace through what actually happened in spawn #2 based on the logs. The child process got the initialize request at 13:06:02.931, then `SessionService.createSession()` found an existing session and called `loadSession`. That completed around 13:06:03.285 with settings and token usage restored, MCP reload finished by 13:06:03.548, and then agent activity started at 13:06:04 with tool execution and LLM calls.\n\nBut I'm not seeing the `[JsonRpc] Session initialized` message anywhere, which means `handleInitializeSession` got stuck between creating the session and sending the response. The issue is likely in `Promise.all([availableModelsPromise, sessionPromise])` at line 1140 — the session promise resolved fine, but `availableModelsPromise` calls `getAvailableModelsForResponse()` which calls `getRegion()`, and that HTTP call to the Factory backend probably timed out. The third spawn recovered fine, so the backend latency was temporary. Though I'm wondering if that agent activity at 13:06:04 might actually be from a different child process.\n\nSince all logs from the same user get merged in Axiom, I can't tell which child process each line came from. But the most likely scenario is that `getRegion()` made an HTTP call that hung for the full 60-second timeout, the parent's `DroidClient` timeout fired, and then the parent killed the child process — which explains the \"Cleaning up after receiving signal\" message at 13:07:01. I should check if there were backend latency spikes around that time. Wait, I'm also noticing those 429 errors in the `useLLMStreaming` logs.\n\nThe 429s are coming from the user's BYOK OpenAI key, and they're retrying every minute from 13:00 through 13:06. The user's key has a 500,000 token limit that resets every minute but gets exhausted immediately. If the child process from spawn #2 loaded an existing session with an active agent loop already running, and if `loadSession` awaited those pending LLM calls to drain, that could explain the hang. But looking at `handleInitializeSession`, it doesn't actually await any agent loop — it just creates or loads the session, gets available models, applies tool selection, initializes the snapshot, and emits the response.\n\nMaybe `getAvailableModelsForResponse()` is the culprit. I should check what `getCachedUser` does when it needs to make an HTTP call.",
+          "timestamp": "2026-05-19T15:53:31.536Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/runtime/auth/src/auth/common/cache.ts",
+            "limit": 100,
+            "offset": 100
+          },
+          "timestamp": "2026-05-19T15:53:31.536Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/runtime/auth/src/auth/common/cache.ts",
+            "limit": 80,
+            "offset": 200
+          },
+          "timestamp": "2026-05-19T15:53:35.400Z"
+        },
+        {
+          "type": "assistant",
+          "text": "OK, now I see. `getRegion()` → `getCachedUser()` → for WorkOS auth, if region is undefined, it calls `fetchRegionFromWhoami()` which does a `fetch()` to `/api/cli/whoami`. This is an HTTP call to the Factory backend.\n\nBut the code shows:\n```typescript\nif (cache && cache.tokenHash === tokenHash) {\n  return cache;  // <-- fast path, no HTTP call\n}\n```\n\nSo if the token hasn't changed and the cache is populated, it returns immediately. The cache is module-level, so within the same process, subsequent calls would hit the cache.\n\n\nThe problem is that spawn #2 is a completely new child process with no cache, so its first call to `getCachedUser` will need to fetch the region from the `/api/cli/whoami` endpoint. If that endpoint is slow or hanging, it'll block `getAvailableModelsForResponse()`. The `fetchRegionFromWhoami` function has error handling that catches failures and returns undefined, so it won't crash, but the delay would still occur.\n\nThe real issue is that Node.js `fetch()` has no default timeout — if the connection is established but the backend never responds, the fetch will hang indefinitely, blocking the entire `Promise.all` chain. I should also check if `getFreshTokenWithSource` makes HTTP calls that could similarly hang.\n\nFor this user on Adyen with a WorkOS token, the flow is straightforward: the JWT decoding is local and fast, but then it tries to fetch the region from `/api/cli/whoami`. If that endpoint hangs, the child process gets stuck waiting for a response that never comes.\n\nLooking at the backend health data, the session routes were healthy with no errors, but that doesn't tell us about `/api/cli/whoami` specifically—it could have been slow or there was a transient network issue between this user and the Factory backend. The pattern is clear: this user hit 429 rate limits on their OpenAI key repeatedly, then spawned four new session attempts across different timestamps, but each child process timed out after 60 seconds during initialization. The culprit is likely one of the HTTP calls in that initialization sequence.",
+          "timestamp": "2026-05-19T15:54:03.604Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-vercel'] | where ['vercel.environment'] =~ 'production' | where ['vercel.route'] contains 'whoami' | where _time >= datetime('2026-05-19T13:00:00Z') and _time <= datetime('2026-05-19T13:20:00Z') | summarize total=count(), errors=countif(toint(['request.statusCode']) >= 500), p50=percentile(toreal(['vercel.duration']), 50), p99=percentile(toreal(['vercel.duration']), 99) by bin(_time, 5m) | order by _time asc\" --start-time \"-12h\" -f tabular 2>&1",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to check if whoami endpoint had latency spikes.",
+            "summary": "Check whoami endpoint latency",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:54:03.604Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-vercel'] | where ['vercel.environment'] =~ 'production' | where ['vercel.route'] contains 'whoami' | where _time >= datetime('2026-05-19T13:05:00Z') and _time <= datetime('2026-05-19T13:08:00Z') | summarize total=count(), errors=countif(toint(['request.statusCode']) >= 500) by bin(_time, 1m) | order by _time asc\" --start-time \"-12h\" -f tabular",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to check whoami endpoint health during incident.",
+            "summary": "Check whoami endpoint errors per minute",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:54:09.807Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "axiom query \"['factory-tui-prod'] | where ['tags.userId'] == 'user_01KERS79RWZ8WF06SME2WHZWBZ' | where _time >= datetime('2026-05-19T13:06:01Z') and _time <= datetime('2026-05-19T13:07:02Z') | where message contains 'region' or message contains 'whoami' or message contains 'models' or message contains 'available' or message contains 'warmup' or message contains 'entitlement' or message contains 'fetch' | project _time, level, message | order by _time asc | take 30\" --start-time \"-12h\" -f json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only Axiom query to find specific initialization-related logs.",
+            "summary": "Check for region/whoami/models logs",
+            "timeout": 30
+          },
+          "timestamp": "2026-05-19T15:54:19.754Z"
+        },
+        {
+          "type": "assistant",
+          "text": "OK, I don't see a `[region]` log for this user. That's interesting. Let me think about what we know:\n\n1. Spawn #2 at 13:06:01:\n   - Child received `initialize_session` at 13:06:02.931\n   - Session loaded at 13:06:03.284\n   - MCP completed at 13:06:03.548\n   - No `[JsonRpc] Session initialized` ever logged for this spawn\n   - Timeout fires at 13:07:01.937 (exactly 60s after spawn)\n   \n\n\n2. Spawn #3 at 13:06:21 created a fresh session and succeeded with the `[JsonRpc] Session initialized` log appearing, whereas spawn #2 tried to reuse an existing local session but never got that initialization confirmation. So the issue seems to be in how `handleInitializeSession` behaves when a session already exists locally—it's calling `createSession` but something's going wrong in that code path.\n\nWhen the session already exists, `createSession` detects the existing file and calls `loadSession` instead, which resolves the `sessionPromise`. But then we're waiting on `availableModelsPromise`, which calls `getAvailableModelsForResponse`. That function chains through to `getAvailableModelsForResponseShared` and makes an HTTP call via `getRegion(getRuntimeAuthConfig())`.\n\nFor a fresh child process with no cache, the flow is: get the token, populate the user cache from scratch, and for WorkOS that means decoding the JWT locally then calling `fetchRegionFromWhoami`. This fetch uses Node.js without a timeout, so if it hangs, we're stuck. The `/api/cli/whoami` endpoint was handling thousands of requests per minute with no errors during this window, so the issue isn't widespread. It could be DNS resolution hanging, a TCP connection that established but never got a response, or something on the user's corporate network side.\n\nFor an enterprise customer like Adyen, they might be behind a corporate proxy that occasionally drops connections without sending a reset. The untimed `fetch()` would hang indefinitely in that scenario. Token refresh could also be the culprit, but given everything I'm seeing, the most likely explanation is that `fetchRegionFromWhoami` is hanging without a timeout in the child process, blocking the entire initialization flow and preventing the response from reaching the parent within 60 seconds. The root cause is probably a network-level issue, possibly related to their corporate infrastructure.\n\nThe solution would be adding a timeout to that HTTP call so initialization can still complete even if the network hangs, just with the region defaulting to Global.",
+          "timestamp": "2026-05-19T15:54:55.194Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Here's what the Axiom logs reveal for Alexander Grooff's specific timeline:\n\n**Timeline for the failing session (spawn at 13:06:01):**\n- `13:06:01` - `[droid process] Spawning` (parent sends `initialize_session`)\n- `13:06:02.931` - `[JsonRpc] Handling initialize_session` (child receives request)\n- `13:06:03.284` - `[Session] Session already exists locally, loading instead` (session files loaded from disk)\n- `13:06:03.548` - `MCP servers reload completed`\n- **...silence... no `[JsonRpc] Session initialized` ever appears...**\n- `13:07:01.415` - `Cleaning up after receiving signal` (child being killed)\n- `13:07:01.937` - `[useDaemonAgent] Failed to create session - TimeoutError`\n\nMeanwhile, a **different spawn at 13:06:21** (from a daemon-connected client) completes init in 3 seconds and logs `[JsonRpc] Session initialized` at 13:06:24.\n\n**Root cause:** The child process at 13:06:01 gets stuck in `handleInitializeSession` at this `Promise.all`:\n\n```typescript\nconst [availableModels, sessionId] = await Promise.all([\n  availableModelsPromise,  // <-- THIS hangs\n  sessionPromise,          // <-- this resolves fine\n]);\n```\n\n`availableModelsPromise` calls `getAvailableModelsForResponse()` → `getRegion()` → `getCachedUser()` → `fetchRegionFromWhoami()` which does a **`fetch(/api/cli/whoami)` with no timeout**:\n\n```typescript\nconst response = await fetch(`${baseUrl}/api/cli/whoami`, { ... });\n// ^^^ Node.js fetch has NO default timeout!\n```\n\nThe `/api/cli/whoami` endpoint was healthy (3900+ requests/minute, 0 errors) during this window, so it's not a server-side issue. This is almost certainly a **network-level hang** -- likely Adyen's corporate proxy/firewall dropping the TCP connection without sending a RST, causing the `fetch()` to wait indefinitely until the parent's 60s timeout kills the child process.\n\nThe fix would be adding an `AbortSignal.timeout()` to that fetch call so initialization can gracefully fall back to `FactoryRegion.Global` if the HTTP call hangs.",
+          "timestamp": "2026-05-19T15:54:55.194Z"
+        },
+        {
+          "type": "user",
+          "text": "how can we speed up whomai call?",
+          "timestamp": "2026-05-19T16:10:50.248Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/runtime/auth/src/auth/common/cache.ts",
+            "limit": 100,
+            "offset": 0
+          },
+          "timestamp": "2026-05-19T16:10:55.161Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I understand the full picture. The `fetchRegionFromWhoami` is called during session initialization in the child process. The issue is:\n\n1. No timeout on the `fetch()` call\n2. It's called in the critical path of `initialize_session` (blocks the response)\n3. This is a NEW child process with a cold cache, so it always needs to make the HTTP call\n\nWays to speed up / make it non-blocking:\n\n1. **Add a timeout to the fetch** - Use `AbortSignal.timeout(5000)` so it fails fast and falls back to Global region\n2. **Make the region fetch non-blocking** - Don't await it in the critical path; start it as a fire-and-forget and use Global as default until it resolves\n\n\n3. **Pass the region from the parent** - The parent process already has the region cached, so I can pass it directly to the child during spawn and skip the HTTP call entirely\n4. **Persist the cache to disk** - Write the region to a file so new child processes can read it without making an HTTP call\n\nOption 3 is the cleanest approach since the parent TUI or daemon already has the user's region resolved. I can pass it as a parameter to `initialize_session` so the child doesn't need to call `/api/cli/whoami` at all. Option 1 with a timeout is a solid fallback if the parent doesn't have it available.\n\nLooking at how `getAvailableModelsForResponse` uses the region for filtering, defaulting to Global and correcting later would cause the model list to be slightly inaccurate initially, but that's acceptable versus a 60-second timeout. The most practical fixes are adding a timeout to the whoami fetch and making it non-blocking—fire off the request in the background while using a default region immediately, then update the cache once the response arrives.",
+          "timestamp": "2026-05-19T16:11:20.372Z"
+        },
+        {
+          "type": "assistant",
+          "text": "The core issue isn't that `/api/cli/whoami` is slow -- it's that the `fetch()` has **no timeout** and sits in the critical path blocking `initialize_session` response. Here are the options, from simplest to most impactful:\n\n**1. Add a timeout (safety net, ~1 line fix):**\n```typescript\nconst response = await fetch(`${baseUrl}/api/cli/whoami`, {\n  signal: AbortSignal.timeout(5000), // fail fast, fall back to Global\n  ...\n});\n```\n\n**2. Make region resolution non-blocking (best UX):**\nDon't await `fetchRegionFromWhoami` in `getCachedUser`. Fire it in the background and let callers use `FactoryRegion.Global` until it resolves. The init response goes out immediately.\n\n**3. Pass region from parent process:**\nThe parent TUI already has the region cached (from its own startup). Thread it through `initialize_session` params so the child never needs to call whoami at all:\n```typescript\n// In InProcessDaemonClient.doInitializeSession:\nclient.initializeSession({ ..., regionHint: getCachedRegion() })\n```\n\n**4. Persist cache to disk:**\nWrite region to `~/.factory/region-cache.json` after first resolve. New child processes read it synchronously -- no HTTP needed.\n\n---\n\nMy recommendation: **do #1 + #3 together**. Pass the region from the parent (eliminates the call entirely for the happy path), and add a timeout as a safety net for edge cases where the parent doesn't have it. This makes init instant for 99% of cases and caps the worst case at 5s instead of 60s.",
+          "timestamp": "2026-05-19T16:11:20.372Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "AskUser",
+          "input": {
+            "questionnaire": "1. [question] Which approach should I implement for speeding up the whoami call during session init?\n[topic] Approach\n[option] #1 only: Add AbortSignal.timeout (minimal, safe)\n[option] #1 + #3: Timeout + pass region from parent (eliminates call entirely)\n[option] #2: Make region fetch non-blocking (fire-and-forget)\n[option] #1 + #2: Timeout + non-blocking (belt and suspenders)"
+          },
+          "timestamp": "2026-05-19T16:11:20.372Z"
+        },
+        {
+          "type": "user",
+          "text": "Continue.",
+          "timestamp": "2026-05-19T16:13:23.338Z"
+        },
+        {
+          "type": "assistant",
+          "text": "The user said \"Continue\" after I presented the options. They likely want me to just go ahead and implement the most reasonable approach. I'll go with #1 (add AbortSignal.timeout) as it's the simplest, safest fix that directly addresses the root cause. It's a minimal change that caps the worst case without any architectural changes.",
+          "timestamp": "2026-05-19T16:13:30.818Z"
+        },
+        {
+          "type": "assistant",
+          "text": "I'll implement the simplest fix -- adding `AbortSignal.timeout()` to the `fetchRegionFromWhoami` call:",
+          "timestamp": "2026-05-19T16:13:30.818Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/runtime/auth/src/auth/common/cache.ts",
+            "limit": 40,
+            "offset": 118
+          },
+          "timestamp": "2026-05-19T16:13:30.818Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/runtime/auth/src/auth/common/cache.ts",
+            "new_str": "    const response = await fetch(`${baseUrl}/api/cli/whoami`, {\n      method: 'GET',\n      headers: {\n        Authorization: `Bearer ${token}`,\n        'Content-Type': 'application/json',\n      },\n      signal: AbortSignal.timeout(5000),\n    });",
+            "old_str": "    const response = await fetch(`${baseUrl}/api/cli/whoami`, {\n      method: 'GET',\n      headers: {\n        Authorization: `Bearer ${token}`,\n        'Content-Type': 'application/json',\n      },\n    });"
+          },
+          "timestamp": "2026-05-19T16:13:35.782Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now let me also check `fetchUserFromApi` (the API key path) since it calls `verifyApiKey` which likely also does an HTTP call:",
+          "timestamp": "2026-05-19T16:13:45.920Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "context": 20,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/runtime/auth/src",
+            "pattern": "export.*function verifyApiKey"
+          },
+          "timestamp": "2026-05-19T16:13:45.920Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages/runtime/auth/src/auth/api-key/verify.ts",
+            "new_str": "    response = await fetch(`${baseUrl}/api/cli/whoami`, {\n      method: 'GET',\n      headers: { Authorization: `Bearer ${apiKey}` },\n      signal: AbortSignal.timeout(5000),\n    });",
+            "old_str": "    response = await fetch(`${baseUrl}/api/cli/whoami`, {\n      method: 'GET',\n      headers: { Authorization: `Bearer ${apiKey}` },\n    });"
+          },
+          "timestamp": "2026-05-19T16:13:51.108Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now let me verify the changes compile:",
+          "timestamp": "2026-05-19T16:14:01.021Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "cd /Users/david/Desktop/dev/factory/factory-mono-delta && npm run typecheck -- --filter=@factory/runtime-auth 2>&1 | tail -20",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only typecheck operation, no file modifications.",
+            "summary": "Typecheck runtime-auth package",
+            "timeout": 60
+          },
+          "timestamp": "2026-05-19T16:14:01.021Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "cd /Users/david/Desktop/dev/factory/factory-mono-delta && grep '\"name\"' packages/runtime/auth/package.json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only grep to find package name.",
+            "summary": "Find correct package name"
+          },
+          "timestamp": "2026-05-19T16:14:07.066Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Glob",
+          "input": {
+            "folder": "/Users/david/Desktop/dev/factory/factory-mono-delta/packages",
+            "patterns": [
+              "**/runtime/auth/package.json",
+              "**/runtime/**/package.json"
+            ]
+          },
+          "timestamp": "2026-05-19T16:14:13.408Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "cd /Users/david/Desktop/dev/factory/factory-mono-delta && grep '\"name\"' packages/runtime/package.json",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only grep for package name.",
+            "summary": "Get runtime package name"
+          },
+          "timestamp": "2026-05-19T16:14:17.802Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "cd /Users/david/Desktop/dev/factory/factory-mono-delta && npm run typecheck -- --filter=@factory/runtime 2>&1 | tail -20",
+            "riskLevel": "low",
+            "riskLevelReason": "Read-only typecheck operation.",
+            "summary": "Typecheck runtime package",
+            "timeout": 60
+          },
+          "timestamp": "2026-05-19T16:14:22.383Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Typechecks pass. Now let me also run the tests for this package:",
+          "timestamp": "2026-05-19T16:14:31.731Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "cd /Users/david/Desktop/dev/factory/factory-mono-delta && npm run test -- --filter=@factory/runtime 2>&1 | tail -30",
+            "riskLevel": "medium",
+            "riskLevelReason": "Running unit tests in the project directory, no external side effects.",
+            "summary": "Run runtime package tests",
+            "timeout": 60
+          },
+          "timestamp": "2026-05-19T16:14:31.731Z"
+        },
+        {
+          "type": "assistant",
+          "text": "All 159 tests pass. \n\nThe fix adds `AbortSignal.timeout(5000)` to both `/api/cli/whoami` fetch calls -- one in `fetchRegionFromWhoami` (WorkOS JWT path) and one in `verifyApiKey` (API key path). If either call hangs longer than 5 seconds, it aborts and the existing error handling gracefully falls back to `FactoryRegion.Global`. This caps the worst-case `initialize_session` latency from 60s (full timeout) to ~5s, after which the session continues with default region routing.",
+          "timestamp": "2026-05-19T16:14:42.398Z"
+        }
+      ],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
