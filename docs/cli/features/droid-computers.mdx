@@ -123,6 +123,23 @@ The detail page also shows the current **daemon version** and connection status.
 
 The Droid Computer detail page displays the running daemon version alongside the latest available version. When an update is available, an **Update** button appears. Clicking it triggers a remote update — the daemon downloads the new binary, restarts, and reconnects automatically.
 
+## Force Reboot
+
+Use **Force Reboot** when a managed Droid Computer becomes unresponsive or a session is stuck connecting. This reboots the computer, not just the current session.
+
+<Warning>
+Force Reboot stops all running processes and disconnects all active sessions on that computer. In-memory work and unflushed writes can be lost. Persisted files are kept.
+</Warning>
+
+1. Open the affected session in the Factory web or desktop app.
+2. Open the **…** menu beside the session title and select **Force Reboot**.
+3. In the **Force reboot computer** dialog, check the computer name and review the warning. Click **Force reboot** to confirm, or **Cancel** to leave the computer running.
+4. Wait while the dialog shows **Preparing recovery...** and **Rebooting...**. When recovery succeeds, the dialog closes and Factory shows **Computer recovered and daemon reconnected**.
+
+You can also start the same flow from a computer's actions menu in **Settings → Droid Computers**.
+
+Force Reboot is available for active, E2B-hosted managed Droid Computers, including template-backed computers accessed through a session. The session menu remains available when the computer is disconnected, but does not offer Force Reboot for read-only sessions. BYOM and other unsupported computer types do not offer this action.
+
 ## Git credentials
 
 - **BYOM** — Droid uses whatever git credentials are already configured on the machine.
