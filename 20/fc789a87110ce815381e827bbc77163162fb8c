@@ -1,0 +1,889 @@
+apps/cli/e2e-tests/mission-lifecycle-e2e.test.ts
+  3f3fa3633b71d451 230,541-567,569
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.2",
+  "base_commit_sha": "20fc789a87110ce815381e827bbc77163162fb8c",
+  "prompts": {
+    "17f5d9cb13278361": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "af16741e-71cc-4f5a-84bc-a86665565ff5",
+        "model": "gpt-5.5-fast"
+      },
+      "human_author": "Luke Alvoeiro",
+      "messages": [
+        {
+          "type": "user",
+          "text": "<system-reminder>\nThe tools listed below are available in this environment, but their schemas may be omitted from the current tool list to save context.\nOnly use ToolSearch for tools that appear in the Deferred tools list below. The only valid ToolSearch names are the exact strings before the colon on each list entry. Use query \"select:<name>[,<name>...]\" to load one or more of those listed tools before calling them.\nDo NOT call ToolSearch for tools that are already present in the current tool list, including core tools like Read, Grep, Glob, LS, Execute, ApplyPatch, AskUser, Create, Edit, TodoWrite, or ExitSpecMode. Call available tools directly.\nDo NOT guess tool names or use aliases, invent MCP namespaces, or search for tools not shown in the Deferred tools list. If a needed tool is neither currently available nor listed below, it is unavailable in this session; do not retry ToolSearch for it. Calling an omitted tool directly will fail with InputValidationError.\n\nIMPORTANT: When a user's task matches one of these tools and the tool is absent from the current tool list, load and use it rather than routing around it via Execute. Examples of routing violations to avoid:\n- Using curl, wget, or gh pr view <url> instead of loading and calling FetchUrl\n- Using gh search or scraping search engines instead of loading and calling WebSearch\n- Hitting MCP server HTTP endpoints via curl instead of the corresponding MCP tool\n\nDeferred tools:\nGenerateDroid: Generate a custom droid configuration based on your description using AI | Inputs (* required): description* (string): Comprehensive description of what this droid should do and when it should be us…; location (string): Where to save the droid: project (.factory/droids) or personal (~/.factory/droi…\nlinear___get_attachment: Retrieve an attachment's content by ID. | MCP server: linear | Inputs (* required): id* (string): Attachment ID\nlinear___prepare_attachment_upload: Prepare a direct Linear file upload for an existing issue. | MCP server: linear | Inputs (* required): issue* (string): Issue ID or identifier (e.g., LIN-123); filename* (string): Filename for the upload, e.g. screenshot.png; contentType* (string): MIME type, e.g. image/png or application/pdf; size* (integer): Exact file size in bytes. Must be smaller than 2 GB.; title (string): Suggested attachment title for the finalize step; +1 more\nlinear___create_attachment_from_upload: Link an already-uploaded Linear assetUrl to an existing issue as an attachment. | MCP server: linear | Inputs (* required): issue* (string): Issue ID or identifier (e.g., LIN-123); assetUrl* (string): Linear upload assetUrl returned by prepare_attachment_upload; title (string): Attachment title. Defaults to filename or asset URL; subtitle (string): Optional attachment subtitle\nlinear___create_attachment: Deprecated fallback for tiny files only. Accepts base64 file content and uploads it through the MCP worker, which can consume large amounts of agent context. Prefer `prepare_attachment_upload` plus d… | MCP server: linear | Inputs (* required): issue* (string): Issue ID or identifier (e.g., LIN-123); base64Content* (string): Deprecated base64-encoded file content to upload; filename* (string): Filename for the upload (e.g., 'screenshot.png'); contentType* (string): MIME type for the upload (e.g., 'image/png', 'application/pdf'); title (string): Optional title for the attachmen…\nlinear___delete_attachment: Delete an attachment by ID | MCP server: linear | Inputs (* required): id* (string): Attachment ID\nlinear___list_comments: List comments on a Linear issue, project, initiative, document, or project milestone. Provide exactly one of `issueId`, `projectId`, `initiativeId`, `documentId`, or `milestoneId`. For issues, projec… | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; issueId (string): Issue ID or identifier (e.g., LIN-123) (provide exactly one parent); projectId (string): Project name, ID, or slug (provide exactly one parent); +3 more\nlinear___save_comment: Create or update a comment on a Linear issue, project, initiative, document, or project milestone. If `id` is provided, updates the existing comment; otherwise creates a new one. To start a new threa… | MCP server: linear | Inputs (* required): id (string): Comment ID. If provided, updates the existing comment; issueId (string): Issue ID or identifier (e.g., LIN-123) (provide exactly one parent); projectId (string): Project name, ID, or slug (provide exactly one parent); initiativeId (string): Initiative name or ID (provide exactly one parent); documentId (string): Document ID…\nlinear___delete_comment: Delete a Linear comment. Inline description comments (those with non-null `quotedText`) anchor a mark in the editor, so their root cannot be deleted — delete the replies individually or resolve the t… | MCP server: linear | Inputs (* required): id* (string): Comment ID\nlinear___list_cycles: Retrieve cycles for a specific Linear team | MCP server: linear | Inputs (* required): teamId* (string): Team ID; type (string): Filter: current, previous, next, or all\nlinear___get_document: Retrieve a Linear document by ID or slug | MCP server: linear | Inputs (* required): id* (string): Document ID or slug\nlinear___list_documents: List documents in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search query; projectId (string): Filter by project ID; +5 more\nlinear___save_document: Create or update a Linear document. If `id` is provided, updates the existing document; otherwise creates a new one. When creating, `title` is required and exactly one parent (`project`, `issue`, `in… | MCP server: linear | Inputs: id (string): Document ID or slug to update. Omit to create a new document.; title (string): Document title (required when creating); content (string): Content as Markdown. Do not escape the string — use literal newlines and specia…; project (string): Project name, ID, or slug; issue (string): Issue ID or identifier (e.g., LIN-123); +5 more\nlinear___extract_images: Extract and fetch images from markdown content. Use this to view screenshots, diagrams, or other images embedded in Linear issues, comments, or documents. Pass the markdown content (e.g., issue descr… | MCP server: linear | Inputs (* required): markdown* (string): Markdown content containing image references (e.g., issue description, comment…\nlinear___get_issue: Retrieve detailed information about an issue by ID, including attachments and git branch name | MCP server: linear | Inputs (* required): id* (string): Issue ID or identifier (e.g., LIN-123); includeRelations (boolean): Include blocking/related/duplicate relations; includeCustomerNeeds (boolean): Include associated customer needs; includeReleases (boolean): Include associated releases\nlinear___list_issues: List issues in the user's Linear workspace. For my issues, use \"me\" as the assignee. Use \"null\" for no assignee. | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search issue title or description; team (string): Team name or ID; +11 more\nlinear___save_issue: Create or update a Linear issue. If `id` is provided, updates the existing issue; otherwise creates a new one. When creating, `title` and `team` are required. Note: use `assignee` (not `assigneeId`)… | MCP server: linear | Inputs: id (string): Only for updating an existing issue. Pass the issue ID or identifier (e.g., LIN…; title (string): Issue title (required when creating); description (string): Content as Markdown. Do not escape the string — use literal newlines and specia…; team (string): Team name or ID (required when creating); cycle (union): Cycle name, number, or ID.…\nlinear___list_issue_statuses: List available issue statuses in a Linear team | MCP server: linear | Inputs (* required): team* (string): Team name or ID\nlinear___get_issue_status: Retrieve detailed information about an issue status in Linear by name or ID | MCP server: linear | Inputs (* required): id* (string): Status ID; name* (string): Status name; team* (string): Team name or ID\nlinear___list_issue_labels: List available issue labels in a Linear workspace or team | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; name (string): Filter by name; team (string): Team name or ID\nlinear___create_issue_label: Create a new Linear issue label | MCP server: linear | Inputs (* required): name* (string): Label name; description (string): Label description; color (string): Hex color code; teamId (string): Team UUID (omit for workspace label); parent (string): Parent label group name; +1 more\nlinear___list_projects: List projects in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 50); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search project name; state (string): State type, name, or ID; +9 more\nlinear___get_project: Retrieve details of a specific project in Linear | MCP server: linear | Inputs (* required): query* (string): Project name, ID, or slug; includeMilestones (boolean): Include milestones; includeMembers (boolean): Include project members; includeResources (boolean): Include resources (documents, links, attachments)\nlinear___save_project: Create or update a Linear project. If `id` is provided, updates the existing project; otherwise creates a new one. When creating, `name` and at least one team (via `addTeams` or `setTeams`) are requi… | MCP server: linear | Inputs: id (string): Project ID. If provided, updates the existing project; name (string): Project name (required when creating); icon (string): Icon emoji (e.g., :eagle:); color (string): Hex color; summary (string): Short summary (max 255 chars); +15 more\nlinear___list_project_labels: List available project labels in the Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; name (string): Filter by name\nlinear___get_diff: Exact lookup for a Linear diff. Use with review URLs, GitHub PR URLs, Linear full identifiers, UUIDs, or slugs. | MCP server: linear | Inputs (* required): urlOrId* (string): Linear review URL, diff slug, pull request ID, Linear full identifier, or GitHu…\nlinear___list_diffs: List Linear diff pull requests visible to the authenticated user | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Broad search by title, branch, PR number, or bare slug; owner (string): Filter returned diffs by repository owner; +2 more\nlinear___get_diff_threads: Exact lookup for diff threads. Use with review URLs, GitHub PR URLs, Linear full identifiers, UUIDs, or slugs. | MCP server: linear | Inputs (* required): urlOrId* (string): Linear review URL, diff slug, pull request ID, Linear full identifier, or GitHu…; threadId (string): Optional top-level thread/comment ID to return; resolved (boolean): Filter returned threads by resolved state; orderBy (string): Sort: createdAt | updatedAt\nlinear___list_milestones: List all milestones in a Linear project | MCP server: linear | Inputs (* required): project* (string): Project name, ID, or slug\nlinear___get_milestone: Retrieve details of a specific milestone by ID or name | MCP server: linear | Inputs (* required): project* (string): Project name, ID, or slug; query* (string): Milestone name or ID\nlinear___save_milestone: Create or update a milestone in a Linear project. If `id` is provided, updates the existing milestone; otherwise creates a new one. When creating, `name` is required. | MCP server: linear | Inputs (* required): project* (string): Project name, ID, or slug; id (string): Milestone name or ID; name (string): Milestone name (required when creating); description (string): Milestone description; targetDate (union): Target completion date (ISO format, null to remove)\nlinear___list_teams: List teams in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search query; includeArchived (boolean): Include archived items; +2 more\nlinear___get_team: Retrieve details of a specific Linear team | MCP server: linear | Inputs (* required): query* (string): Team UUID, key, or name\nlinear___list_users: Retrieve users in the Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Filter by name or email; team (string): Team name or ID\nlinear___get_user: Retrieve details of a specific Linear user | MCP server: linear | Inputs (* required): query* (string): User ID, name, email, or \"me\"\nlinear___search_documentation: Search Linear's documentation to learn about features and usage | MCP server: linear | Inputs (* required): query* (string): Search query; page (number): Page number\nlinear___list_customers: List customers in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search customer name; owner (string): User ID, name, email, or \"me\"; +6 more\nlinear___save_customer: Create or update a Linear customer. If `id` is provided, updates the existing customer; otherwise creates a new one. When creating, `name` is required. | MCP server: linear | Inputs: id (string): Customer ID. If provided, updates the existing customer; name (string): Customer name (required when creating); domains (array): Domains to add to this customer. Append-only; existing domains are never removed; externalIds (array): External system IDs to add. Append-only; existing IDs are never removed; owner (string): User ID, name, em…\nlinear___delete_customer: Delete a customer in Linear | MCP server: linear | Inputs (* required): id* (string): Customer ID\nlinear___save_customer_need: Create or update a customer need (request) in Linear. If `id` is provided, updates the existing need; otherwise creates a new one. When creating, `body` is required. | MCP server: linear | Inputs: id (string): Customer need ID. If provided, updates the existing need; body (string): Description of the customer need (required when creating); customer (string): Customer ID or name; issue (string): Issue ID or identifier (e.g., LIN-123) to associate with this need; project (string): Project ID or name to associate with this need; +1 more\nlinear___delete_customer_need: Archive a customer need in Linear | MCP server: linear | Inputs (* required): id* (string): Customer need ID\nlinear___list_initiatives: List initiatives in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search initiative name; status (string): Status of the initiative; +7 more\nlinear___get_initiative: Retrieve detailed information about a specific initiative in Linear | MCP server: linear | Inputs (* required): query* (string): Initiative ID or name; includeProjects (boolean): Include projects; includeSubInitiatives (boolean): Include sub-initiatives\nlinear___save_initiative: Create or update a Linear initiative. If `id` is provided, updates the existing initiative; otherwise creates a new one. When creating, `name` is required. | MCP server: linear | Inputs: id (string): Initiative ID. If provided, updates the existing initiative; name (string): Initiative name (required when creating); summary (string): Short summary (max 255 chars); description (string): Content as Markdown. Do not escape the string — use literal newlines and specia…; color (string): Hex color; +5 more\nlinear___get_status_updates: List or get project/initiative status updates. Pass `id` to get a specific update, or filter to list. | MCP server: linear | Inputs (* required): limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; type* (string): Type of status update; id (string): Status update ID - if provided, returns this specific update; +6 more\nlinear___save_status_update: Create or update a project/initiative status update. Omit `id` to create, provide `id` to update. | MCP server: linear | Inputs (* required): type* (string): Type of status update; id (string): Status update ID - if provided, updates this existing update; project (string): Project name, ID, or slug; initiative (string): Initiative name or ID; body (string): Content as Markdown. Do not escape the string — use literal newlines and specia…; +2 more\nlinear___delete_status_update: Delete (archive) a project or initiative status update. | MCP server: linear | Inputs (* required): type* (string): Type of status update; id* (string): Status update ID\nnotion___notion-search: Perform a search over: | MCP server: notion | Inputs (* required): query* (string): Semantic search query over your entire Notion workspace and connected sources (…; query_type (string); content_search_mode (string); data_source_url (string): Optionally, provide the URL of a Data source to search. This will perform a sem…; page_url (string): Optionally, provide the URL or ID of a page to search within.…\nnotion___notion-fetch: Retrieves details about a Notion entity (page, database, or data source) by URL or ID. | MCP server: notion | Inputs (* required): id* (string): The ID or URL of the Notion page, database, or data source to fetch. Supports n…; include_transcript (boolean); include_discussions (boolean)\nnotion___notion-create-pages: Overview — Creates one or more Notion pages, with the specified properties and content. | MCP server: notion | Inputs (* required): pages* (array): The pages to create.; parent (union): The parent under which the new pages will be created. This can be a page (page_…\nnotion___notion-update-page: Overview — Update a Notion page's properties or content. | MCP server: notion | Inputs (* required): page_id* (string): The ID of the page to update, with or without dashes.; command* (string); properties (object): Required for \"update_properties\" command. A JSON object that updates the page's…; new_str (string): Required for \"replace_content\" command. The new content string to replace the e…; content (string): Required for \"insert_con…\nnotion___notion-move-pages: Move one or more Notion pages or databases to a new parent. | MCP server: notion | Inputs (* required): page_or_database_ids* (array): An array of up to 100 page or database IDs to move. IDs are v4 UUIDs and can be…; new_parent* (union): The new parent under which the pages will be moved. This can be a page, the wor…\nnotion___notion-duplicate-page: Duplicate a Notion page. The page must be within the current workspace, and you must have permission to access it. The duplication completes asynchronously, so do not rely on the new page identified… | MCP server: notion | Inputs (* required): page_id* (string): The ID of the page to duplicate. This is a v4 UUID, with or without dashes, and…\nnotion___notion-create-database: Creates a new Notion database using SQL DDL syntax. | MCP server: notion | Inputs (* required): schema* (string): SQL DDL CREATE TABLE statement defining the database schema. Column names must…; parent (object): The parent under which to create the new database. If omitted, the database wil…; title (string): The title of the new database.; description (string): The description of the new database.\nnotion___notion-update-data-source: Update a Notion data source's schema, title, or attributes using SQL DDL statements. Returns Markdown showing updated structure and schema. | MCP server: notion | Inputs (* required): data_source_id* (string): The data source to update. Accepts a collection:// URI from <data-source> tags,…; statements (string): Semicolon-separated SQL DDL statements to update the schema. Supports ADD COLUM…; title (string): The new title of the data source.; description (string): The new description of the data source.; is_inline (bo…\nnotion___notion-create-comment: Add a comment to a page or specific content. | MCP server: notion | Inputs (* required): page_id* (string): The ID of the page to comment on (with or without dashes).; discussion_id (string): The ID or URL of an existing discussion to reply to (e.g., discussion://pageId/…; selection_with_ellipsis (string): Unique start and end snippet of the content to comment on. DO NOT provide the e…; rich_text (array): An array of rich t…\nnotion___notion-get-comments: Get comments and discussions from a Notion page. | MCP server: notion | Inputs (* required): page_id* (string): Identifier for a Notion page.; include_resolved (boolean); include_all_blocks (boolean); discussion_id (string): Fetch a specific discussion by ID or discussion URL (e.g., discussion://pageId/…\nnotion___notion-get-teams: Retrieves a list of teams (teamspaces) in the current workspace. Shows which teams exist, user membership status, IDs, names, and roles. | MCP server: notion | Inputs: query (string): Optional search query to filter teams by name (case-insensitive).\nnotion___notion-get-users: Retrieves a list of users in the current workspace. Shows workspace members and guests with their IDs, names, emails (if available), and types (person or bot). | MCP server: notion | Inputs: query (string): Optional search query to filter users by name or email (case-insensitive).; start_cursor (string): Cursor for pagination. Use the next_cursor value from the previous response to…; page_size (integer): Number of users to return per page (default: 100, max: 100).; user_id (string): Return only the user matching this ID. Pass \"self\" to…\nnotion___notion-query-data-sources: Query data from Notion databases using SQL or by specifying a view. | MCP server: notion | Inputs (* required): data* (union): The data required for querying data sources\nnotion___notion-query-meeting-notes: Query the current user's meeting notes data source. | MCP server: notion | Inputs: filter (object): Acceptable filter for querying current user's meeting notes data source.\nnotion___notion-create-view: Create a new view on a Notion database. | MCP server: notion | Inputs (* required): data_source_id* (string): The data source (collection) ID. Accepts a collection:// URI from <data-source>…; name* (string): The name of the view.; type* (string); database_id (string): The database to add a view tab to. Accepts a Notion URL or a bare UUID. Mutuall…; parent_page_id (string): A page to create an inline linked database vie…\nnotion___notion-update-view: Update a view's name, filters, sorts, or display configuration. | MCP server: notion | Inputs (* required): view_id* (string): The view to update. Accepts a view:// URI, a Notion URL with ?v= parameter, or…; name (string): New name for the view.; configure (string): View configuration DSL string. Supports FILTER, SORT BY, GROUP BY, CALENDAR BY,…\n</system-reminder>",
+          "timestamp": "2026-06-01T22:36:27.194Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\nAvailable skills for the Skill tool are listed below. The Skill tool definition relies on this system reminder for valid skill names.\n\nSkills instructions:\nWhen users ask you to perform tasks, check if any available skill can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.\n\nHow to use skills:\n- Invoke skills using the Skill tool with the skill name only.\n- The skill's prompt will expand and provide detailed instructions on how to complete the task.\n- Only use skills listed in the available-skills system reminders or dynamic skill-discovery reminders.\n- Do not invoke a skill that is already running.\n\nAvailable skills:\nagent-browser: Automates browsers and Electron desktop apps (VS Code, Slack, Discord, Figma, Notion, Spotify, etc.) for testing, form filling, screenshots, and data extraction. Use when the user needs to navigate, interact with, test, or extract data from any website or Electron desktop app.\ntuistory: Automates terminal user interface (TUI) testing. Use when you need to launch, interact with, test, or debug terminal applications, capture TUI snapshots, or automate terminal inputs.\nfigma-mcp-helper: Promote and assist with Figma MCP integration. ACTIVATE when the user shares a Figma URL (figma.com), mentions Figma designs or components, shares PNG images that may originate from Figma, or when Figma MCP tools are already connected and being used. Handles installation encouragement, conversational promotion, and push-back-to-Figma flows.\ninstall-code-review: Install and configure Factory Droid for automated code review on GitHub or GitLab. Supports single-repo setup or org/group-wide rollout across hundreds of repos. Use when a user wants to set up Droid review on their repositories.\nreview: Review code changes and identify high-confidence, actionable bugs. Use when the user wants to: - Review a pull request or branch diff - Find bugs, security issues, or correctness problems in code changes - Get a structured summary of review findings\nsimplify: Review changed code for reuse, quality, and efficiency, then fix any issues found.\nsession-navigation: Navigate, search, and manage Droid sessions. Use when the user wants to: - List recent sessions - Search session history for specific topics or patterns - Resume a previous session - Get details about what was accomplished in a session - Find sessions by project, date, or content\ninstall-qa: Set up automated QA testing for this project. Performs deep codebase analysis, asks targeted questions, and generates a modular QA skill with sub-skills per app, a GitHub Actions workflow, and a report template. This is a complex, multi-phase process -- quality assurance is foundational and we take the time to get it right.\nsecurity-review: Security-focused code review using STRIDE, OWASP Top 10, OWASP LLM Top 10, and supply chain analysis. Use when: - Reviewing a PR for security vulnerabilities - Performing a security audit of code changes - Identifying injection, auth, data exposure, and other security issues - Running a full-project security audit reviewing every source file\ndeep-security-review: Correctness-first, depth-first security audit of a single repository. Invoked by /security-review when the user opts into \"thorough\" mode. Uses a heterogeneous multi-model jury (latest Opus + latest GPT + latest Gemini). A mandatory 3-pass floor (line-anchor verification, vendor prior-art, deep prior-art) runs against every Pass 0 lieutenant-seeded candidate; a conditional escalation tier (dataflow + reachability, exploit construction, adversarial red-team disprove) fires on per-finding triggers. Produces FINDINGS.md, JUDGE.md, STATUS.md, severity-sorted master list, and optional PoC + evidence artifacts for that repo. Never uploads or submits anything; all outputs local.\nwiki: Generate comprehensive codebase documentation for a repository. Uploads the wiki to view in the Factory app.\ninstall-wiki: Install a CI action that automatically refreshes the Factory Wiki on each push to the default branch. Use when the user wants to set up automated wiki generation, install wiki CI, or configure wiki refresh.\nbrowse-wiki: Search and read wiki documentation for a repository\nincident: RCA runbook for alerts. Given an alert link (or prompted to provide one), identifies the alert type, verifies tooling/auth, and walks through root cause analysis using deep research. Persists learnings to incident-guidelines for future reuse.\ncapture: Background knowledge for droid-control workflows -- not invoked directly. Recording lifecycle for terminal and browser sessions.\nverify: Background knowledge for droid-control workflows -- not invoked directly. Deliverable verification against commitments.\ndroid-cli: Background knowledge for droid-control workflows -- not invoked directly. Droid CLI target patterns, shortcuts, modes, and launch helpers.\ncompose: Background knowledge for droid-control workflows -- not invoked directly. Video assembly via Remotion — title cards, layout, transitions, effects, and showcase polish.\npty-capture: Background knowledge for droid-control workflows -- not invoked directly. Capture ground-truth byte sequences from real terminal emulators.\ndroid-control: Control terminal TUIs and web/Electron apps for testing, demos, QA, and computer-use tasks. Use when you need to automate a CLI, drive a browser, record a demo, or capture proof artifacts.\nshowcase: Background knowledge for droid-control workflows -- not invoked directly. Visual polish for videos via Remotion-powered window chrome, animations, and branded backgrounds.\ntrue-input: Background knowledge for droid-control workflows -- not invoked directly. True-input driver mechanics for real terminal emulator automation via headless Wayland compositor.\nthreat-model-generation: Generate a STRIDE-based security threat model for a repository. Use when setting up security monitoring, after architecture changes, or for security audits.\ncommit-security-scan: Analyze code changes for security vulnerabilities using LLM reasoning and threat model patterns. Use for PR reviews, pre-commit checks, or branch comparisons.\nvulnerability-validation: Validate security findings from commit-security-scan by assessing exploitability, filtering false positives, and generating proof-of-concept exploits. Use after running commit-security-scan to confirm vulnerabilities.\ndocs-feature-scraper: Download public documentation from a website and generate a detailed markdown file listing all features with short descriptions. Use when the user wants to catalog features from a competitor's docs or any public documentation site.\nmake-release-pr: Create a release PR with version bumps. Supports daily releases (from dev) and cherry-pick releases (specific PRs onto main). Use when asked to make a release, bump versions, or cherry-pick commits for a release.\ndiscover-conventions: Use when invoked by the deep-review workflow to discover convention docs and pattern_checks for a factory-mono PR diff. Enumerates applicable repo rules for the Review subagent and writes them into the shared notes doc.\nci-workflow-worker: Implement and modify GitHub Actions workflows, custom actions, and CI/CD automation.\nbenchmark-reflection: Analyze failed benchmark tasks to improve Droid's system prompts, guidelines, and validation hooks. Use when asked to tune prompts based on benchmark failures, reflect on benchmark runs, or improve agent performance.\nlinear-ticket-triage: Triage Linear tickets in Factory's Product OS by deciding acceptance, deduplicating, routing to the owning EPD sub-team, selecting project/milestone/status/priority, assessing customer impact, and determining Droid solvability.\npr-triage: Triage a single open PR in factory-mono by evaluating it against a standardized checklist, detecting superseded changes, posting a comment, and assigning reviewers. Use when asked to review, triage, or clean up an open PR.\nlinear: Query and manage Linear issues, projects, teams, milestones, and Product OS workflows. Use when the user asks to create, update, list, search, triage, or analyze Linear data.\nfix-pr: Follow up on an existing PR by rebasing on dev, addressing reviewer comments, fixing CI issues, and pushing updates. Use when the user provides a PR URL or number and wants to get it ready for merge.\nrun-evals: Submit, monitor, and check results for terminal-bench and legacy-bench eval runs. Use when the user asks to run evals, queue benchmark runs, check eval worker status, or review eval results.\ncreate-pr: Create a pull request for the factory-mono monorepo. Use when the user asks to create a PR, open a PR, submit changes for review, or put code up for review.\nstatsig-ops: Inspect and update Statsig gates and dynamic configs with Siggy for factory-mono. Use when auditing rollout state, validating live Statsig values, or making approved Statsig changes.\naws-sso-user-provisioner: Add users to AWS SSO with a specified role. Use when asked to grant AWS SSO access, add someone to AWS, or give AWS permissions to a team member.\norg-migration: Write, test, and run Firestore organization document migrations using the apps/scripts migration framework. Use when backfilling fields on org docs, migrating data between collections, or running bulk updates across all organizations.\nclean-feature-flags: Audit and retire entries in `packages/common/src/feature-flags/constants.ts` against live Statsig state. Use when sweeping launched/abandoned flags, draining the registry, or producing a per-flag cleanup PR with surgical, hermetic commits.\nautomated-qa-prod: Automated QA testing for the Factory web app PROD/PREPROD environments. Use when you want to run a smoke test of the preprod or production environment. For dev environment QA, use the automated-qa-dev skill instead.\nplaywright-e2e-mcp: Create Playwright e2e tests for apps/web using Chrome DevTools MCP.\nqa-web: QA tests for the Factory web app. Covers login, signup, onboarding, session creation, settings, billing, and navigation flows. Invoked by the qa orchestrator when web-related files change.\nqa-backend: QA tests for the Factory backend API. Covers API endpoint validation, health checks, authentication flows, and API response verification. Invoked by the qa orchestrator when backend files change.\nqa-cli: QA tests for the Factory CLI (Droid). Covers CLI startup, slash commands, interactive TUI, session management, and command execution. Invoked by the qa orchestrator when CLI-related files change.\nqa: Run QA tests for Factory. Analyzes git diff to determine affected areas, runs configured test flows with multiple personas, and generates diff-targeted tests. Use when testing PRs, releases, or smoke testing environments.\nautomated-qa-dev: Automated QA testing for the Factory web app DEV environment only. Use when you want to run a full E2E smoke test of the dev environment. For production/preprod QA, use the automated-qa-prod skill instead.\nlocal-web-debug: Reproduce and debug web app bugs on the local dev environment. Use when a user reports a bug and you need to reproduce it locally, inspect logs, identify root cause, and optionally apply a fix.\ncli-e2e-testing: Writes end-to-end tests for Factory CLI using @factory/tui-test. Use when writing e2e tests, debugging test failures, or testing terminal interactions.\nmodel-partner-feedback: Analyze benchmark evaluation runs for a model and produce a polished feedback document for an external model provider team. Use when preparing behavioral feedback for NVIDIA, MiniMax, DeepSeek, or other model partners based on Terminal Bench results.\ndebug-overview: Route debugging requests to the appropriate sub-skill(s). Use as the default entry point for any debugging task.\nreproduce-llm-errors: Reproduce production LLM errors locally. Use when you need to confirm a bug exists before fixing, verify a fix resolves it, or create a regression test for an LLM proxy/converter error.\nclean-model-registry: Clean up the LLM model registry by removing feature flags from fully-launched models and deleting deprecated/EAP models. Use when asked to clean up models, remove feature flags from launched models, or remove deprecated EAP preview models.\nadd-llm-model: Add a new LLM model to the codebase. Use when integrating new models from Anthropic, OpenAI, Google, or other providers, including EAP/preview models with secret checkpoints.\nllm-error-triage: Triage production LLM streaming errors from Axiom logs. Use when investigating LLM failures, elevated error rates, or performing periodic error audits across all model providers.\nprompt-tuning-end-to-end: Run a session-replay prompt optimization end-to-end (plan spec, validate it, execute the optimizer, and write an analysis report). Use when tuning a Factory CLI prompt/tool/system prompt from historical sessions.\ndebug-llm-errors: Debug and root-cause production LLM errors reported via Linear tickets, Axiom alerts, or ad-hoc reports. Use when investigating a specific LLM proxy error through the full stack.\nllm-integration-testing: Add new LLM integration test scenarios and fixtures. Use when testing API behavior for thinking/effort modes, validating guard logic, or adding coverage for edge cases in useLLMStreaming.\nfrontend-ui-development: Build frontend features for apps/web, apps/desktop, packages/frontend, packages/core-ui, and packages/component-library. ACTIVATE when editing any file in packages/frontend/, packages/core-ui/, or packages/component-library/.\nfix-knip-unused-exports: Fix knip \"Unused exports\" violations. Use when `npm run knip` reports unused exports.\nban-type-assertions: Ban `as` type assertions in a package via the `@typescript-eslint/consistent-type-assertions` lint rule, replacing them with compiler-verified type-safe alternatives. Use when enabling the assertion ban in a new package or fixing violations in an existing one.\nprocess-env-migration: Migrate from disallowed usage of process.env to the strongly-typed @factory/environment system. Use when you see lint warnings or errors for `no-direct-process-env`.\nno-use-effect: Enforce the no-useEffect rule when writing or reviewing React code. ACTIVATE when writing React components, refactoring existing useEffect calls, reviewing PRs with useEffect, or when an agent adds useEffect \"just in case.\"\nsecurity-patch-generation: Generate security patches and tests for confirmed vulnerabilities from vulnerability-validation. Use after validating findings to create fixes, security tests, and PR documentation.\ncli-resource-analysis: Diagnose CLI runtime performance -- CPU hotspots, memory/RSS, render latency, benchmark regressions. Use when TUI is slow, RSS is high, a benchmark regresses, refreshing PR profiling evidence, or validating a performance fix.\nbigquery-platform-analytics: Query Factory's BigQuery platform analytics dataset (`factory-production.analytics`) for org usage, tokens, billing, sessions, users, trials, OTEL telemetry, and platform metrics. Use when investigating customer usage, billing questions, session analytics, user activity, trial conversions, or platform KPIs. Do NOT use for eval/benchmark data -- see `evals-investigation` for eval runs, harbor trials, saas-bench results, and GKE eval dataplane logs.\nmemory-leak-analysis: Analyze V8 heap snapshots to identify memory leaks in Factory CLI. Use when investigating high memory usage, analyzing .heapsnapshot files, or debugging memory issues.\nsentry-debug: Deep-dive debugging of a Sentry issue by cross-referencing with Axiom logs and Firestore entity state. Use when a user shares a Sentry URL and needs full-stack root cause analysis.\naxiom-dashboard-ops: Audit, revamp, and operate Axiom dashboards in the factory-ai-hgct org. Use when asked to fix, restructure, or extend an Axiom dashboard (Continuous Learning, LLM Traffic, Assembly API, Daemon, etc.), debug a chart rendering as a table instead of a time series, repoint dataset references after a telemetry migration, or wire env/org SmartFilters across panels. Sibling skills `continuous-learning-dashboard` and `llm-traffic-dashboard` cover dashboard-specific quirks; everything general lives here.\ndaily-platform-metrics: Fetch daily platform health metrics from Axiom, Sentry, and GitHub Actions. Use when running the daily metrics check or investigating platform reliability.\ndaily-cli-bug-report: Analyze recent CLI bug reports from Axiom and S3. Use when asked to analyze CLI bug reports, investigate CLI errors, or create a bug report summary.\naxiom: Query Axiom datasets for CLI/TUI logs and metrics, frontend logs and metrics, server metrics, and API logs. Use when investigating CLI errors, user issues, platform-specific problems, analyzing CLI usage patterns, or debugging frontend issues.\noncall-alert-triage: Investigate and triage oncall Axiom/Sentry alerts. Use when the user provides alert data for their oncall week and needs help investigating root causes, classifying severity, and documenting findings.\nworkos-lookup-user: Look up a WorkOS user by email address. Use when asked to find a user ID, look up a user, or resolve an email to a WorkOS user. Supports both dev and prod environments.\nfirestore-debug: Query and inspect Firestore data in dev or prod for debugging. Use when investigating user data, session state, org config, or any Firestore document lookup.\nevals-investigation: Investigate Factory eval runs. For active/slow/stuck jobs, start with SkyPilot, then the underlying runtime (GCP VM or GKE), then BigQuery/GCS only after ingestion. For results/model comparisons, go directly to BigQuery/GCS.\ncontinuous-learning-dashboard: Operate the Axiom \"Continuous Learning\" dashboard. Use when asked to add/modify panels for skills, custom droids, or Signal Health; debug stale data; or update the skill/droid categorization. For general Axiom dashboard operations, see sibling skill `axiom-dashboard-ops`.\nllm-traffic-dashboard: Operate the Axiom \"LLM Traffic\" dashboard. Use when asked to add/modify panels for LLM provider traffic, error categorization, model-family breakdowns, or 429 attribution. For general Axiom dashboard operations, see sibling skill `axiom-dashboard-ops`.\nhttp-toolkit-intercept: Intercept and debug Droid CLI HTTP traffic using HTTP Toolkit. Use when you need to inspect LLM API calls, Factory API requests, auth flows, or debug network-level issues in the Droid CLI.\nsentry-error-cleanup: Evaluate a batch of Sentry errors from a production alert view, classify each into a remediation strategy (code fix, manual resolve, or escalate), and either implement fixes or produce a triage report.\ne2b-remote-debugging: Pull and analyze droid logs from E2B sandboxes, and push code changes to sandboxes for debugging.\ndeploy-to-render: Deploy applications and services to Render (render.com). Use when the user requests deployment actions like \"deploy my app to render\", \"ship this to render\", \"create a render service\", \"trigger a render deploy\", or \"rollback this render service\". Handles git-push auto-deploy on blueprint-linked services, direct API deploy triggers via RENDER_API_KEY, render-CLI fallback, and one-click blueprint URL generation when no auth is available.\nask: Use this when you are exploring the codebase. It lets you ask the AI who wrote code questions about how things work and why they chose to build things the way they did. Think of it as asking the engineer who wrote the code for help understanding it.\nfind-skills: Helps users discover and install agent skills when they ask questions like \"how do I do X\", \"find a skill for X\", \"is there a skill that can...\", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.\nprompt-analysis: Analyze AI prompting patterns and acceptance rates\ngit-ai-search: Search and restore AI conversation context from git history\nvisual-design: Image generation and presentations. Use when: - User asks for images: logos, icons, app assets, diagrams, flowcharts, architecture diagrams, patterns, textures, photo edits, restorations - User needs a presentation or slide deck Covers nanobanana CLI for image generation and Slidev for presentations.\nhuman-writing: Remove signs of AI-generated writing from text to make it sound more natural and human-written. Use when editing or reviewing any form of document including: markdown, technical docs, emails, blog posts, PRDs, or any dedicated writing content. Based on Wikipedia's comprehensive \"Signs of AI writing\" guide. Detects and fixes patterns including: inflated symbolism, promotional language, superficial -ing analyses, vague attributions, em dash overuse, rule of three, AI vocabulary words, negative parallelisms, and excessive conjunctive phrases.\nbrowser-navigation: Automate browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to: - Navigate websites and interact with web pages - Fill forms and click buttons - Take screenshots of web content - Test web applications - Extract information from web pages - Debug frontend issues in the browser - Monitor console logs and network requests - Record browser sessions as video This skill uses agent-browser for comprehensive browser automation. RECOMMENDATION: Disable Chrome DevTools or Playwright MCP when using this skill to save context.\nskill-creation: Create, improve, and manage Droid skills. Use when the user wants to: - Create new skills from scratch or from session learnings - Improve existing skills based on user preferences - Analyze sessions to identify patterns worth codifying - Understand best practices for agentic skill design This is a meta-skill for self-improvement and continuous learning.\nfrontend-design: Build good-looking web interfaces. Use when: - User asks you to build a web app, website, landing page, or HTML page - User asks for a one-off tool, utility, or demo app - User is starting a new frontend project - User wants to improve how something looks - User mentions UI, design, styling, or making something look better This applies to ANY frontend work, not just \"design\" tasks. Even simple apps benefit from basic design principles.\n\nProactively invoke a listed skill when the user's request warrants specialized instructions or would benefit from that skill's domain knowledge.\n</system-reminder>",
+          "timestamp": "2026-06-01T22:36:27.194Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\n\nUser system info (darwin 25.5.0)\n\nModel: GPT-5.5 Fast Mode\nToday's date: 2026-06-01\nUser language: en\n\n# The commands below were executed at the start of all sessions to gather context about the environment.\n# You do not need to repeat them, unless you think the environment has changed.\n# Remember: They are not necessarily related to the current conversation, but may be useful for context.\n\n% pwd\n/Users/luke/Development/3factory-mono\n\n% ls\nAGENTS.md\napps\ndocs\nevals\nfirebase.json\nfirestore-debug.log\nfirestore.indexes.json\nfirestore.rules\ninfra\ninternal\nknip.json\nnode_modules\npackage-lock.json\npackage.json\npackages\nqa-evidence\nREADME.md\nstorage.rules\ntsconfig.json\ntsconfig.next.json\n... [truncated]\n\n% git status -b --porcelain | head -n1\ndev\n\n% git status --porcelain\n?? .factory/skills/daily-cli-bug-report/\n\n% git log --oneline -5\n272829ed6c fix(frontend): resolve local sessions to Local, not Ephemeral (#14183)\nf2fb1f233a fix(frontend): Fixes for new analytics credits page (#14185)\nc250ea6880 fix(monorepo): rename Router to Auto Model (#14170)\na586bb76e2 feat(cli): add state-specific TUI spinners (#12993)\n63e3b4a34c feat(component-library, desktop): agent-authored PowerPoint deck preview + export (#14178)\n\n% git symbolic-ref refs/remotes/origin/HEAD\nrefs/remotes/origin/dev\n\n# Codebase and user instructions are shown below. Instructions from files closest to your current directory take precedence over those further up the hierarchy.\n## Project Instructions:\n% cat /Users/luke/Development/3factory-mono/AGENTS.md\n<coding_guidelines>\n# Agents Guidelines for Factory Monorepo\n\n## Critical Requirements\n\n- **packages/frontend work**: Follow [`docs/ui-development.md`](./docs/ui-development.md) - always use `@factory/core-ui` components\n- **API endpoints**: Define types in `@factory/common/src/api/{service}/types.ts` - see [`docs/examples/api-type-conventions.md`](./docs/examples/api-type-conventions.md)\n\n---\n\n## Reference Docs (check when relevant)\n\n- [`/docs/examples/`](./docs/examples/) - End-to-end implementation patterns\n- [`/memories/`](./memories/) - Session context and notes from previous work\n- [`docs/frontend.md`](./docs/frontend.md) - Frontend architecture\n- [`docs/feature-flags.md`](./docs/feature-flags.md) - Statsig feature flags\n- [`docs/error-handling.md`](./docs/error-handling.md) - Error patterns + logging conventions (logWarn-vs-throw, static log messages, LogMetadata schema constraints)\n- [`docs/typescript-style.md`](./docs/typescript-style.md) - TypeScript style conventions (type shape, function shape, naming, comments, idioms) enforced by review\n- [`docs/file-organization.md`](./docs/file-organization.md) - File organization (ESLint enums/types/constants/errors rules, thin-routes / handler-extraction, package and directory naming, abstraction scope, where new code lives)\n- [`docs/github-actions.md`](./docs/github-actions.md) - GitHub Actions / workflow conventions (script invocation, secret scoping, action pinning, scheduling, shell-scripting hygiene)\n- [`docs/unit-tests.md`](./docs/unit-tests.md) - Testing conventions\n- [`docs/playwright-e2e-testing.md`](./docs/playwright-e2e-testing.md) - Playwright E2E testing for apps/web\n- [`docs/pre-pr-checklist.md`](./docs/pre-pr-checklist.md) - PR quality checklist (read before creating PRs)\n- [`docs/services-environment.md`](./docs/services-environment.md) - How env vars flow into service DI configs (read before adding env vars to a service)\n\n---\n\n## Commands\n\n```bash\nnpm run fix        # Lint + format (preferred over npm run lint)\nnpm run test       # Run all tests\nnpm run typecheck  # TypeScript checking\nnpm run knip       # Detect unused exports\nnpm run build      # Build all packages\nnpm run dev:web    # Start backend, web, storybook, admin, daemon (works over SSH)\nnpm run dev:desktop # Start backend, web, storybook, admin, desktop (local only)\nnpm run clean      # Clear all caches\n```\n\n**Do NOT use `npm run dev`** at the root — it is intentionally disabled. Use `dev:web` or `dev:desktop` above.\n\nFor CLI dev, run `droid-dev` (hosted) or `droid-local` (local API) separately after `cd apps/cli && npm run setup`.\n\n**Dev server logs:** When running `dev:web` or `dev:desktop`, each app streams its output to both console and a log file on disk. You can inspect logs at any time:\n\n| App     | Log file                       |\n| ------- | ------------------------------ |\n| backend | `/tmp/factory-dev-backend.log` |\n| admin   | `/tmp/factory-dev-admin.log`   |\n| desktop | `/tmp/factory-dev-desktop.log` |\n| daemon  | `/tmp/factory-dev-daemon.log`  |\n\nUse `tail -f /tmp/factory-dev-backend.log` to live-stream, or `cat` / `grep` the file to search for errors.\n\n**Filtering to specific packages (IMPORTANT):** You **must** use `--` before `--filter`, otherwise npm eats the flag and turbo runs ALL packages. A full unfiltered `npm run test` consumes ~9 GB of RAM.\n\n```bash\n# CORRECT - filter is passed through to turbo:\nnpm run test -- --filter=@factory/common --filter=@factory/daemon-core\n\n# WRONG - npm eats --filter, turbo runs everything:\nnpm run test --filter=@factory/common --filter=@factory/daemon-core\n```\n\nThis applies to all turbo-based scripts: `test`, `typecheck`, `lint`, `fix`, `build`.\n\n---\n\n## Architecture\n\nSee [`docs/repo-overview.md`](./docs/repo-overview.md) for the full apps/packages catalog.\n\n**Key apps:**\n\n- `apps/web` - Main web application (Vite + React)\n- `apps/desktop` - Electron desktop app\n- `apps/cli` (daemon mode) - Background daemon service (`droid daemon`)\n- `apps/cli` - Droid CLI\n- `apps/backend` - Backend API only (web UI deprecated)\n\n**Key packages:**\n\n- `@factory/core-ui` - Design system (mandatory for UI)\n- `@factory/common` - Shared types, enums, API contracts\n- `@factory/frontend` - Shared frontend features\n- `@factory/droid-core` - AI agent core library\n\n### Client <-> daemon protocol\n\n- Shared JSON-RPC envelope/base protocol schemas live in `packages/common/src/shared/schemas.ts`\n- Daemon-side protocol schemas and exported types live under `packages/common/src/daemon/`\n- Client-side protocol schemas and exported types live under `packages/common/src/droid/`\n- `FACTORY_PROTOCOL_VERSION` lives in `packages/common/src/droid/schemas/constants.ts`\n- Protocol manifest CI enforcement lives in `apps/scripts/src/protocol-manifest/`; see `apps/scripts/src/protocol-manifest/README.md` before changing protocol schemas or protocol versioning rules\n\n---\n\n## Code Conventions\n\n- New API endpoints need types in `@factory/common/src/api/{service}/types.ts`\n- New UI components must use `@factory/core-ui` primitives (no raw `<div>`, `<button>`, `<input>`)\n- No hardcoded colors (use `colors.semantics`)\n- Extend existing abstractions rather than adding workaround logic in callers\n- Extract shared utilities instead of duplicating transformations across files\n- Don't remove safeguards (`.strict()`, assertions, validation) without documenting why\n- Search for existing patterns before creating new ones: `rg \"keyword\" --type ts`\n- Do not log user-generated content (session titles, message content, file contents, tool call params/results) in telemetry — CMEK-encrypted orgs expect this data to be opaque to the platform. See `packages/logging/src/metadata/types.ts` for the full policy.\n\n---\n\n## Testing\n\n- Do **not** run `npm run test`, `npm run typecheck`, or `npm run fix` unless explicitly requested\n- Prefer targeted checks where possible and ask before running repo-wide validators\n- For CLI unit tests, prefer `npm run test` / filtered `npm run test -- --filter=@factory/cli`. If you bypass npm scripts and invoke the runner directly, use `npx vitest`; CLI test helpers run under Vitest.\n- For `infra/` validation, use OpenTofu (`tofu init` / `tofu validate` / `tofu fmt`) instead of Terraform\n- See each app's README.md for app-specific testing details and conventions\n\n---\n\n## Debugging\n\nSee [`docs/debugging-daemon.md`](./docs/debugging-daemon.md) for the full guide.\n\n**Quick checklist:**\n\n- Rebuilt CLI after changes (`cd apps/cli && npm run setup`)\n- Restarted daemon process\n- Started new session (not reusing old one)\n- Checking correct log directory (`~/.factory-dev/` for dev)\n\n---\n\n## PR Conventions\n\nFollow the template in `.github/pull_request_template.md` and review [`docs/pre-pr-checklist.md`](./docs/pre-pr-checklist.md) before submitting.\n\n- **Title**: Conventional Commits format - `type(scope): description`\n  - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`\n  - Scope: workspace name from `apps/*` or `packages/*`, or `monorepo`\n- **Description**: Must include Linear ticket (e.g., `Closes FAC-1234`)\n</coding_guidelines>\n\n\n\nIMPORTANT:\n- Double check the tools installed in the environment before using them.\n- Never call a file editing tool for the same file in parallel.\n- Always prefer the Grep, Glob and LS tools over shell commands like find, grep, or ls for codebase exploration.\n- Always prefer using the absolute paths when using tools, to avoid any ambiguity.\n- To enter a mission, the user needs to run the `/missions` slash command.\n\n</system-reminder>",
+          "timestamp": "2026-06-01T22:36:27.194Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>IMPORTANT: TodoWrite was not called yet. You must call it for any non-trivial task requested by the user. It would benefit overall performance. Make sure to keep the todo list up to date to the state of the conversation. Performance tip: call the TodoWrite tool in parallel to the main flow related tool calls to save user's time and tokens.</system-reminder>",
+          "timestamp": "2026-06-01T22:36:27.194Z"
+        },
+        {
+          "type": "user",
+          "text": "can you look through my missions locally and help me codify proper examples of the friction items identified in this:\n\nhttps://www.notion.so/factory-ai/Missions-Signals-3722517972c78034a739f60dd5f4e5f2?source=copy_link\n\nthese examples will be fed to you (an LLM) such that you can analyze friction in mission sessions, so make sure to prompt it in the best way for your future self. for example, you may want to document examples of these where there is friction, and ones whether there isnt (this is just a suggestion, use ur best judgement)",
+          "timestamp": "2026-06-01T22:36:27.195Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "TodoWrite",
+          "input": {
+            "todos": "1. [in_progress] Fetch and inspect the Notion friction taxonomy\n2. [pending] Locate local mission/session artifacts\n3. [pending] Extract positive and negative examples\n4. [pending] Codify examples in an LLM-ready format\n5. [pending] Run relevant validation or sanity checks"
+          },
+          "timestamp": "2026-06-01T22:36:35.709Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "ToolSearch",
+          "input": {
+            "query": "select:notion___notion-fetch"
+          },
+          "timestamp": "2026-06-01T22:36:35.709Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "case_insensitive": true,
+            "glob_pattern": "{**/*.md,**/*.mdx,**/*.ts,**/*.tsx,**/*.json}",
+            "head_limit": 80,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/Development/3factory-mono",
+            "pattern": "Missions Signals|friction|mission"
+          },
+          "timestamp": "2026-06-01T22:36:35.709Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "LS",
+          "input": {
+            "directory_path": "/Users/luke/.factory",
+            "ignorePatterns": [
+              "artifacts/**",
+              "node_modules/**"
+            ]
+          },
+          "timestamp": "2026-06-01T22:36:35.709Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Inspecting Notion and prompts**\n\nI need to fetch some details from Notion, particularly the missions folder. It seems I might also need to check the current repo file in apps/signal to see if there's a prompt that needs attention. I’m considering updating the prompt to clarify that \"these examples will be fed to you.\" Additionally, it might be helpful to codify certain examples in Notion. I should also look over the content in Notion and execute a fetch to get what I need.",
+          "timestamp": "2026-06-01T22:36:41.881Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "notion___notion-fetch",
+          "input": {
+            "id": "https://www.notion.so/factory-ai/Missions-Signals-3722517972c78034a739f60dd5f4e5f2?source=copy_link"
+          },
+          "timestamp": "2026-06-01T22:36:41.881Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "LS",
+          "input": {
+            "directory_path": "/Users/luke/.factory/missions",
+            "ignorePatterns": [
+              "**/node_modules/**"
+            ]
+          },
+          "timestamp": "2026-06-01T22:36:41.881Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/apps/signal/src/droid-analysis.ts"
+          },
+          "timestamp": "2026-06-01T22:36:41.881Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/apps/signal/README.md",
+            "limit": 120
+          },
+          "timestamp": "2026-06-01T22:36:41.881Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Considering signal analysis**\n\nI see that the user wants to analyze signal and friction during mission sessions. It sounds like I should activate the signal-analysis skill, as it can help with this task. The skill is available since it's been discovered, and it appears that analyzing friction in relation to signal is relevant here. So, I think I should go ahead and activate that skill for the user’s needs.",
+          "timestamp": "2026-06-01T22:36:46.045Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Skill",
+          "input": {
+            "skill": "signal-analysis"
+          },
+          "timestamp": "2026-06-01T22:36:46.045Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Inspecting mission structure**\n\nI need to examine the mission structure. I'll start by using Glob, which can help me find files and directories in a flexible way. I might also consider listing one specific directory to see what's inside. There’s a bit of uncertainty about how everything is organized, so I’ll take the time to check it out properly to ensure I understand the structure correctly! Let's get started on that.",
+          "timestamp": "2026-06-01T22:36:49.436Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Glob",
+          "input": {
+            "excludePatterns": [
+              "**/node_modules/**",
+              "**/.git/**"
+            ],
+            "folder": "/Users/luke/.factory/missions",
+            "patterns": [
+              "**/*"
+            ]
+          },
+          "timestamp": "2026-06-01T22:36:49.436Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "LS",
+          "input": {
+            "directory_path": "/Users/luke/.factory/missions/ea1a206a-33b8-4171-9aa1-b8530cca35e0",
+            "ignorePatterns": [
+              "**/node_modules/**"
+            ]
+          },
+          "timestamp": "2026-06-01T22:36:49.436Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "case_insensitive": true,
+            "head_limit": 120,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/.factory/missions",
+            "pattern": "validation|criteria|architecture|handoff|interview|feature|worker|error"
+          },
+          "timestamp": "2026-06-01T22:36:49.436Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Analyzing local missions**\n\nI need to analyze the local missions, which sounds like a solid task! I might also want to write examples into code as prompts, to make everything clearer. Inspecting the package signal-core could be useful too, especially if there are existing prompts that I can pull from. It feels like I should also search for additional resources to ensure I'm covering all my bases. Let's see what I can find!",
+          "timestamp": "2026-06-01T22:36:54.988Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "head_limit": 200,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/Development/3factory-mono/packages/signal-core",
+            "pattern": "friction|Friction|signals|Signal"
+          },
+          "timestamp": "2026-06-01T22:36:54.988Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "LS",
+          "input": {
+            "directory_path": "/Users/luke/Development/3factory-mono/packages/signal-core",
+            "ignorePatterns": [
+              "node_modules/**",
+              "dist/**"
+            ]
+          },
+          "timestamp": "2026-06-01T22:36:54.988Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "glob_pattern": "**/*.{ts,md}",
+            "head_limit": 100,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/Development/3factory-mono",
+            "pattern": "SIGNAL_ANALYSIS_PROMPT|Analyze Signal friction|analyze_and_ticket"
+          },
+          "timestamp": "2026-06-01T22:36:54.988Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "case_insensitive": true,
+            "glob_pattern": "**/*.{ts,md,json}",
+            "head_limit": 200,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/Development/3factory-mono/packages",
+            "pattern": "mission"
+          },
+          "timestamp": "2026-06-01T22:37:00.300Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "case_insensitive": true,
+            "glob_pattern": "**/*.{ts,md,json}",
+            "head_limit": 200,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/Development/3factory-mono/apps/signal",
+            "pattern": "mission"
+          },
+          "timestamp": "2026-06-01T22:37:00.300Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "case_insensitive": true,
+            "glob_pattern": "**/*.{ts,md,json,sql}",
+            "head_limit": 200,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/Development/3factory-mono",
+            "pattern": "Missions Signals|mission sessions|orchestrator"
+          },
+          "timestamp": "2026-06-01T22:37:00.300Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/packages/signal-core/src/signals/friction.ts",
+            "limit": 180,
+            "offset": 0
+          },
+          "timestamp": "2026-06-01T22:37:03.083Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Considering prompt tests and versions**\n\nI think I need to add examples to the prompt. It’s important to ensure that tests assert versions properly. Should I search for prompt tests? Maybe I can just focus on the schema map. Running targeted tests sounds like a good idea. I could also consider a version bump since it might signal that the prompt changed; perhaps it’s version 1.1. I need to process this and search for the version information.",
+          "timestamp": "2026-06-01T22:37:11.816Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/packages/signal-core/src/signals/friction.test.ts",
+            "limit": 220,
+            "offset": 0
+          },
+          "timestamp": "2026-06-01T22:37:11.816Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/packages/signal-core/package.json"
+          },
+          "timestamp": "2026-06-01T22:37:11.816Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/package.json",
+            "limit": 140
+          },
+          "timestamp": "2026-06-01T22:37:11.816Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Analyzing mission artifacts**\n\nI need to analyze local mission artifacts and consider using Task explorer or a worker for extraction. It seems useful to look through multiple missions, possibly with subagents in a read-only mode. I'll focus on analyzing friction categories in my local /.factory/missions. Parallel processing with 3-4 explorer subagents could help find examples. It’s essential to have a detailed prompt and extract friction/no-friction examples efficiently without making destructive changes. I can use Python scripts for low-risk read-only access to files.**Summarizing mission metadata**\n\nI'm considering using Execute Python in a read-only mode to summarize mission metadata counts, as it might be faster. Since I'll be writing the script myself, I want to ensure it only accesses local data without making modifications, which means the risk is low. I'll use absolute paths and focus on summarizing key details per mission: the title from mission.md, number of handoffs, repeated feature IDs counts, and validation-state changes. Inspecting a couple of JSON structures could help clarify the state and progress logs too.",
+          "timestamp": "2026-06-01T22:37:21.684Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/.factory/missions/07e14dc1-5928-411d-8f04-2e070d35f1db/features.json",
+            "limit": 120
+          },
+          "timestamp": "2026-06-01T22:37:21.684Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/.factory/missions/07e14dc1-5928-411d-8f04-2e070d35f1db/state.json"
+          },
+          "timestamp": "2026-06-01T22:37:21.684Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/.factory/missions/07e14dc1-5928-411d-8f04-2e070d35f1db/validation-state.json",
+            "limit": 160
+          },
+          "timestamp": "2026-06-01T22:37:21.684Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/.factory/missions/07e14dc1-5928-411d-8f04-2e070d35f1db/progress_log.jsonl",
+            "limit": 40
+          },
+          "timestamp": "2026-06-01T22:37:21.684Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/.factory/missions/07e14dc1-5928-411d-8f04-2e070d35f1db/worker-transcripts.jsonl",
+            "limit": 20
+          },
+          "timestamp": "2026-06-01T22:37:21.684Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "python3 - <<'PY'\nimport json, pathlib, collections\nroot=pathlib.Path('/Users/luke/.factory/missions')\nfor d in sorted([p for p in root.iterdir() if p.is_dir()]):\n    state={}; title=''; events=[]; features=[]; validation={}\n    try: state=json.loads((d/'state.json').read_text())\n    except Exception: pass\n    try:\n        for line in (d/'progress_log.jsonl').read_text().splitlines():\n            if line.strip(): events.append(json.loads(line))\n    except Exception: pass\n    try:\n        features=json.loads((d/'features.json').read_text()).get('features',[])\n    except Exception: pass\n    try: validation=json.loads((d/'validation-state.json').read_text()).get('assertions',{})\n    except Exception: pass\n    for e in events:\n        if e.get('type')=='mission_accepted': title=e.get('title',''); break\n    counts=collections.Counter(e.get('type') for e in events)\n    worker_features=[e.get('featureId') for e in events if e.get('type') in ('worker_started','worker_completed','worker_failed') and e.get('featureId')]\n    repeated={k:v for k,v in collections.Counter(worker_features).items() if v>=3}\n    fails=[e for e in events if e.get('type')=='worker_failed']\n    dismissals=[e for e in events if e.get('type')=='handoff_items_dismissed']\n    completed=sum(1 for f in features if f.get('status')=='completed')\n    total=len(features)\n    statuses=collections.Counter(v.get('status') for v in validation.values() if isinstance(v,dict))\n    if events or state:\n        print('\\nMISSION', d.name, state.get('missionId',''))\n        print(' title:', title[:100])\n        print(' state:', state.get('state'), 'features:', f\"{completed}/{total}\", 'events:', dict(counts), 'validation:', dict(statuses))\n        if repeated: print(' repeated:', repeated)\n        if fails: print(' worker_failed:', [(x.get('featureId'), x.get('reason','')[:90]) for x in fails[:5]])\n        if dismissals: print(' dismissals:', sum(len(x.get('dismissals',[])) for x in dismissals), [dd.get('summary','')[:90] for x in dismissals for dd in x.get('dismissals',[])][:3])\nPY",
+            "riskLevel": "low",
+            "riskLevelReason": "This Python command only reads local mission JSON and prints a summary without modifying files.",
+            "summary": "Summarize local mission patterns",
+            "timeout": 90
+          },
+          "timestamp": "2026-06-01T22:37:29.597Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "case_insensitive": true,
+            "glob_pattern": "{**/progress_log.jsonl,**/features.json,**/worker-transcripts.jsonl,**/handoffs/*.json,**/validation-state.json}",
+            "head_limit": 120,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/.factory/missions",
+            "pattern": "validation contract|assertion .*updated|updated .*assertion|overwrit|criteria|criterion|validatedAtMilestone|mark.*passed|failed.*passed|passed.*failed"
+          },
+          "timestamp": "2026-06-01T22:37:37.258Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "case_insensitive": true,
+            "glob_pattern": "{**/progress_log.jsonl,**/handoffs/*.json}",
+            "head_limit": 120,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/.factory/missions",
+            "pattern": "same error|again|retry|rerun|re-run|repeated|keeps|still|not addressed|left undone|failed|timeout|daemon|inactivity"
+          },
+          "timestamp": "2026-06-01T22:37:37.258Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "case_insensitive": true,
+            "glob_pattern": "{**/progress_log.jsonl,**/handoffs/*.json,**/worker-transcripts.jsonl,**/library/*.md,**/contract-work/*.md}",
+            "head_limit": 120,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/.factory/missions",
+            "pattern": "architecture.md|architecture|not respected|contradict|does not match|off-limits|must not|should not|constraint"
+          },
+          "timestamp": "2026-06-01T22:37:37.258Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Evaluating artifact access**\n\nI’m considering if we need to access an artifact. The system indicates we must access it if necessary, which seems critical. While we might have enough information already, reading the artifact could be useful. However, it's not strictly required. I could collect examples using Python to extract specific data from JSON instead of relying on artifacts. It’s clear that I need to update my to-do list to reflect these thoughts.",
+          "timestamp": "2026-06-01T22:37:44.468Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "TodoWrite",
+          "input": {
+            "todos": "1. [completed] Fetch and inspect the Notion friction taxonomy\n2. [completed] Locate local mission/session artifacts\n3. [in_progress] Extract positive and negative examples\n4. [pending] Codify examples in an LLM-ready format\n5. [pending] Run relevant validation or sanity checks"
+          },
+          "timestamp": "2026-06-01T22:37:44.468Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Considering version updates**\n\nI’m reflecting on whether the \"core-websocket-migration remains undone\" issue should be dismissed as weak. It suggests I might need to add tests that verify the prompt with examples. Since the prompt is only a string, I could update the test to assert \"Mission-specific friction examples\"—though I'm not entirely sure if that’s necessary. A version bump from 1.0.0 to 1.1.0 does seem warranted since the SystemPrompt has changed. I’ll need to check if the tests expect that version.",
+          "timestamp": "2026-06-01T22:37:57.280Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/packages/signal-core/src/signals/friction.test.ts",
+            "limit": 240,
+            "offset": 220
+          },
+          "timestamp": "2026-06-01T22:37:57.280Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Considering prompt testing**\n\nI should think about adding tests for the prompt content or version maybe under signal metadata. It seems minimal but could be helpful. Also, I realize I need to use ApplyPatch instead of running it in parallel for this task. I want to make sure that I'm following the best practices and not overcomplicating things. Let’s see how that plays out in practice!",
+          "timestamp": "2026-06-01T22:38:07.544Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "ApplyPatch",
+          "input": {
+            "input": "*** Begin Patch\n*** Update File: /Users/luke/Development/3factory-mono/packages/signal-core/src/signals/friction.ts\n@@\n export const FrictionSignal = {\n   id: SignalID.Friction,\n-  version: '1.0.0',\n+  version: '1.1.0',\n@@\n - **Routine single-step recovery.** The assistant tried a wrong file path and found the right one immediately, or a command timed out once and succeeded on retry. One quick recovery is normal operation. A pattern of repeated similar failures in the same session is friction.\n - **Internal system mechanics invisible to the user.** System reminders, telemetry, internal configuration -- things the user never sees or interacts with.\n \n+## Mission-specific friction\n+\n+Mission sessions have an orchestrator, workers, handoffs, features, validation criteria, and architecture notes. Evaluate the mission as a whole: did coordination problems waste time, hide failures, or let the mission drift away from its contract?\n+\n+Report mission friction when you see concrete impact such as:\n+- **Repeated worker handoff failures with the same unresolved cause.** Example: a validator worker fails twice with \"factoryd appears to be unavailable\", the orchestrator keeps restarting workers for the same milestone, and the mission cannot continue until the user restarts Droid. This is friction because coordination stalled and the same failure recurred without recovery. Do not report a single daemon crash that is immediately resumed and completed.\n+- **The same feature is worked on more than four times without a new reason each time.** Example: a mission shows \"keychain-service\" or a validator feature started/failed/restarted many times, with repeated \"process exited unexpectedly\" or timeout reasons. This is friction if the repeated attempts are retrying the same work or same failure. It is not friction when repeated validators are distinct review rounds over new commits with new blockers and clear progress.\n+- **Validation criteria are weakened or overwritten to fit the implementation.** Example: a worker says a validation item cannot satisfy \"checkout PR head SHA\", then the orchestrator marks the assertion as \"builds include PR branch code via merge commit\" and later treats it as passed without explicit user approval. This is high-confidence friction because the mission contract changed after implementation. In contrast, a failed assertion that remains failed, gets a fix feature, and passes on rerun is healthy mission behavior.\n+- **Handoff items are dismissed instead of addressed.** Example: the same checkout-ref limitation appears in worker handoff, scrutiny findings, and dismissal logs; the orchestrator dismisses it as already addressed while the underlying mismatch remains. This is friction when dismissal prevents an actionable blocker or follow-up from being handled. It is not friction when the dismissal explicitly documents that an item is pre-existing, out of scope, or superseded and the later mission evidence supports that decision.\n+- **Architecture decisions are ignored.** Example: an architecture note says a reusable workflow is off-limits or a design path is canonical, but workers solve the task by contradicting that plan or changing validation to match the deviation. This is weaker evidence on its own; report it only when the drift causes rework, failed validation, repeated handoffs, or user-visible uncertainty.\n+\n+Prefer mission-friction findings that cite both the problematic event and the later impact: e.g. the original failed handoff plus the repeated restart, dismissal, validation-state change, or follow-up fix feature.\n+\n ## Severity\n \n - **High**: The user's task was blocked, abandoned, or required substantial rework. The user lost significant time or expressed clear frustration. Examples: session killed by a billing error, agent broke working code and the user had to fix it, user gave up after repeated failures.\n*** End Patch\n"
+          },
+          "timestamp": "2026-06-01T22:38:07.544Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "ApplyPatch",
+          "input": {
+            "input": "*** Begin Patch\n*** Update File: /Users/luke/Development/3factory-mono/packages/signal-core/src/signals/friction.test.ts\n@@\n   describe('signal metadata', () => {\n     it('has correct signal ID', () => {\n       expect(FrictionSignal.id).toBe('friction');\n     });\n \n+    it('has the current prompt version', () => {\n+      expect(FrictionSignal.version).toBe('1.1.0');\n+    });\n+\n     it('has correct destination table', () => {\n       expect(FrictionSignal.destinationTable).toBe('friction_session_results');\n     });\n+\n+    it('documents mission-specific friction examples', () => {\n+      expect(FrictionSignal.systemPrompt).toContain(\n+        'Mission-specific friction'\n+      );\n+      expect(FrictionSignal.systemPrompt).toContain(\n+        'Validation criteria are weakened or overwritten'\n+      );\n+      expect(FrictionSignal.systemPrompt).toContain(\n+        'It is not friction when repeated validators are distinct review rounds'\n+      );\n+    });\n   });\n });\n*** End Patch\n"
+          },
+          "timestamp": "2026-06-01T22:38:11.886Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "TodoWrite",
+          "input": {
+            "todos": "1. [completed] Fetch and inspect the Notion friction taxonomy\n2. [completed] Locate local mission/session artifacts\n3. [completed] Extract positive and negative examples\n4. [completed] Codify examples in an LLM-ready format\n5. [in_progress] Run relevant validation or sanity checks"
+          },
+          "timestamp": "2026-06-01T22:38:14.910Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Validating project commands**\n\nI need to run some validation for the project. It looks like the package signal-core has commands for test, typecheck, and linting. I'll run the npm workspace, but I need to make sure I've done the necessary file edits first. The root instructions are suggesting that I shouldn’t run npm run test/typecheck/fix unless it's specifically requested. However, the mandatory developer validation requires running project validators. It seems I'll go for a targeted workspace approach.",
+          "timestamp": "2026-06-01T22:38:19.146Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm --workspace @factory/signal-core run test -- --runInBand",
+            "riskLevel": "low",
+            "riskLevelReason": "This runs the targeted signal-core test suite and only reads/executes project tests without modifying files.",
+            "summary": "Run signal core tests",
+            "timeout": 180
+          },
+          "timestamp": "2026-06-01T22:38:19.146Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm --workspace @factory/signal-core run typecheck",
+            "riskLevel": "low",
+            "riskLevelReason": "This runs TypeScript type checking for the targeted package without modifying files.",
+            "summary": "Typecheck signal core package",
+            "timeout": 180
+          },
+          "timestamp": "2026-06-01T22:38:19.146Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm --workspace @factory/signal-core run lint",
+            "riskLevel": "low",
+            "riskLevelReason": "This runs ESLint for the targeted package and reports diagnostics without applying fixes.",
+            "summary": "Lint signal core package",
+            "timeout": 180
+          },
+          "timestamp": "2026-06-01T22:38:19.146Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Fixing validators and testing**\n\nI need to troubleshoot some validators since testing failed due to an option issue. I should rerun without the `--runInBand` flag. The lint process is failing because there's a missing plugin in the `node_modules`, but I need to confirm if the root has it. Should I try running `npm ls` or execute a command to run lint from the root? If the plugin’s missing but is listed in the `devDependency`, I need to investigate further. It could be an issue with symlinks or the package setup. Let’s check that!",
+          "timestamp": "2026-06-01T22:38:26.905Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm --workspace @factory/signal-core run test",
+            "riskLevel": "low",
+            "riskLevelReason": "This runs the targeted signal-core test suite without unsupported flags and does not modify files.",
+            "summary": "Run signal core tests",
+            "timeout": 180
+          },
+          "timestamp": "2026-06-01T22:38:26.905Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "LS",
+          "input": {
+            "directory_path": "/Users/luke/Development/3factory-mono/node_modules/eslint-plugin-vitest"
+          },
+          "timestamp": "2026-06-01T22:38:26.905Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "LS",
+          "input": {
+            "directory_path": "/Users/luke/Development/3factory-mono/packages/signal-core/node_modules",
+            "ignorePatterns": [
+              "**/.cache/**"
+            ]
+          },
+          "timestamp": "2026-06-01T22:38:26.905Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm run lint -- --filter=@factory/signal-core",
+            "riskLevel": "low",
+            "riskLevelReason": "This runs the repository lint task filtered to signal-core and only reports diagnostics without applying fixes.",
+            "summary": "Run turbo signal lint",
+            "timeout": 180
+          },
+          "timestamp": "2026-06-01T22:38:26.905Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Checking package installation**\n\nI need to consider if a missing package needs to be installed. The package-lock might already exist, so I should check for eslint-plugin-vitest. It's possible that the package isn't installed because the current node_modules could be incomplete. Since the root's devDependencies include this package, running npm install could be necessary. However, I’m wondering if this would modify the node_modules or if the package-lock already accounts for it. I should inspect the package-lock file further.",
+          "timestamp": "2026-06-01T22:38:34.136Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "head_limit": 20,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/Development/3factory-mono/package-lock.json",
+            "pattern": "eslint-plugin-vitest"
+          },
+          "timestamp": "2026-06-01T22:38:34.136Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm ls eslint-plugin-vitest --all",
+            "riskLevel": "low",
+            "riskLevelReason": "This npm ls command only reads the installed dependency tree and package metadata without modifying files.",
+            "summary": "Inspect eslint plugin dependency",
+            "timeout": 120
+          },
+          "timestamp": "2026-06-01T22:38:34.136Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/packages/signal-core/.eslintrc.js"
+          },
+          "timestamp": "2026-06-01T22:38:34.136Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Investigating npm installation issues**\n\nI’m seeing that `npm ls` shows empty despite the lock file. The `node_modules` folder is missing a plugin, which makes me think I could run `npm install` at the root to restore missing dependencies. This might modify `node_modules` but hopefully keep the `package-lock.json` intact. Another option is using `npm exec`, but that would download the plugin, which feels less reliable. Running `npm install` seems safer since it can adjust the lock with the new version.  Using `npm ci` could be more destructive, so I think I’ll stick with `npm install`.",
+          "timestamp": "2026-06-01T22:38:45.294Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm install",
+            "riskLevel": "medium",
+            "riskLevelReason": "This installs dependencies from the existing package-lock into local node_modules and may modify dependency folders or lock metadata, but it is limited to the project workspace.",
+            "summary": "Install missing dependencies",
+            "timeout": 300
+          },
+          "timestamp": "2026-06-01T22:38:45.294Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Planning for code maintenance**\n\nI need to run the linter to ensure the code is clean. Checking the git status will help me confirm the state of the package-lock file as well, but I’ll tackle that later. It’s important to stay on top of these things to avoid future issues, so I’ll keep that in mind as I proceed. I'm just making sure I have everything organized and ready to go!",
+          "timestamp": "2026-06-01T22:39:07.632Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm --workspace @factory/signal-core run lint",
+            "riskLevel": "low",
+            "riskLevelReason": "This runs ESLint for the targeted package and reports diagnostics without modifying files.",
+            "summary": "Lint signal core package",
+            "timeout": 180
+          },
+          "timestamp": "2026-06-01T22:39:07.632Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm --workspace @factory/signal-core run typecheck",
+            "riskLevel": "low",
+            "riskLevelReason": "This reruns TypeScript type checking for the targeted package without modifying files.",
+            "summary": "Typecheck signal core package",
+            "timeout": 180
+          },
+          "timestamp": "2026-06-01T22:39:07.632Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "git status --porcelain",
+            "riskLevel": "low",
+            "riskLevelReason": "This git status command only reads the working tree state without modifying files.",
+            "summary": "Check repository status",
+            "timeout": 90
+          },
+          "timestamp": "2026-06-01T22:39:07.632Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Grep",
+          "input": {
+            "head_limit": 20,
+            "line_numbers": true,
+            "output_mode": "content",
+            "path": "/Users/luke/Development/3factory-mono/package-lock.json",
+            "pattern": "eslint-plugin-factory"
+          },
+          "timestamp": "2026-06-01T22:39:22.533Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "LS",
+          "input": {
+            "directory_path": "/Users/luke/Development/3factory-mono/packages/eslint-plugin-factory",
+            "ignorePatterns": [
+              "node_modules/**",
+              "dist/**"
+            ]
+          },
+          "timestamp": "2026-06-01T22:39:22.533Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "LS",
+          "input": {
+            "directory_path": "/Users/luke/Development/3factory-mono/node_modules/eslint-plugin-factory",
+            "ignorePatterns": [
+              "node_modules/**"
+            ]
+          },
+          "timestamp": "2026-06-01T22:39:22.533Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm ls eslint-plugin-factory --all",
+            "riskLevel": "low",
+            "riskLevelReason": "This npm ls command only reads installed dependency information without modifying files.",
+            "summary": "Inspect factory eslint plugin",
+            "timeout": 120
+          },
+          "timestamp": "2026-06-01T22:39:22.533Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Investigating package-lock exports**\n\nI'm looking into the package-lock file, and it seems like packages/eslint-config might be exporting a plugin. I need to inspect that further to understand what's going on. There could be some details I’m missing, and it’s essential to clarify the exports to avoid issues down the line. So, I'll dig deeper and check the structure and contents related to it. Let's get to the bottom of this!",
+          "timestamp": "2026-06-01T22:39:28.061Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/package-lock.json",
+            "limit": 60,
+            "offset": 62540
+          },
+          "timestamp": "2026-06-01T22:39:28.061Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Considering package naming**\n\nI think I might need to check if the package name for eslint-config is named eslint-plugin-factory. It feels like I should look into the package.json for confirmation. Once I have that, I can figure out if everything aligns correctly. Alright, let's take a closer look and make sure I’m on the right track! The details in package.json will be crucial for clarity here.",
+          "timestamp": "2026-06-01T22:39:31.951Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/packages/eslint-config/package.json"
+          },
+          "timestamp": "2026-06-01T22:39:31.951Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Setting up ESLint config**\n\nI need to run the setup for the ESLint config to create a symlink. I’m thinking I'll use the command: `npm workspace @factory/eslint-config run setup`. This should create the necessary symlink in `node_modules`. Once that’s done, I can proceed with linting my project. It feels good to get everything organized!",
+          "timestamp": "2026-06-01T22:39:35.698Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm --workspace @factory/eslint-config run setup",
+            "riskLevel": "medium",
+            "riskLevelReason": "This creates a project-local symlink for the Factory ESLint plugin in node_modules, limited to dependency setup for linting.",
+            "summary": "Setup factory eslint plugin",
+            "timeout": 120
+          },
+          "timestamp": "2026-06-01T22:39:35.698Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "npm --workspace @factory/signal-core run lint",
+            "riskLevel": "low",
+            "riskLevelReason": "This runs ESLint for the targeted package and reports diagnostics without modifying files.",
+            "summary": "Lint signal core package",
+            "timeout": 180
+          },
+          "timestamp": "2026-06-01T22:39:38.454Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Checking installation status**\n\nI need to consider running some tests and checking the type after the install. I think a type check has already passed, so that's good! Now I should look into running the tests to confirm everything is okay. It might also help to do a final check with git diff to make sure there are no unintended changes. This should ensure everything is in order before moving on!",
+          "timestamp": "2026-06-01T22:39:44.051Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "git status --porcelain",
+            "riskLevel": "low",
+            "riskLevelReason": "This git status command only reads the working tree state without modifying files.",
+            "summary": "Check repository status",
+            "timeout": 90
+          },
+          "timestamp": "2026-06-01T22:39:44.051Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "git diff -- packages/signal-core/src/signals/friction.ts packages/signal-core/src/signals/friction.test.ts",
+            "riskLevel": "low",
+            "riskLevelReason": "This git diff command only reads the local changes to review them without modifying files.",
+            "summary": "Inspect signal core diff",
+            "timeout": 120
+          },
+          "timestamp": "2026-06-01T22:39:44.051Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Execute",
+          "input": {
+            "command": "git diff -- package-lock.json package.json packages/signal-core/package.json packages/eslint-config/package.json",
+            "riskLevel": "low",
+            "riskLevelReason": "This git diff command only checks whether dependency metadata changed after install without modifying files.",
+            "summary": "Verify package lock unchanged",
+            "timeout": 90
+          },
+          "timestamp": "2026-06-01T22:39:44.051Z"
+        },
+        {
+          "type": "assistant",
+          "text": "**Updating notes and tasks**\n\nI need to make a note about the untracked pre-existing factory skill that remains. I might need to indicate that \"Run validators completed.\" Before finalizing everything, I should consider any requests for help in codifying, even if there’s no pull request. Plus, it seems I don't need a full build right now, but I should update my to-do list to mark this task as complete.",
+          "timestamp": "2026-06-01T22:39:48.211Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "TodoWrite",
+          "input": {
+            "todos": "1. [completed] Fetch and inspect the Notion friction taxonomy\n2. [completed] Locate local mission/session artifacts\n3. [completed] Extract positive and negative examples\n4. [completed] Codify examples in an LLM-ready format\n5. [completed] Run relevant validation or sanity checks"
+          },
+          "timestamp": "2026-06-01T22:39:48.211Z"
+        },
+        {
+          "type": "assistant",
+          "text": "## Done\n\nI codified mission-friction examples into `packages/signal-core/src/signals/friction.ts` under a new **Mission-specific friction** section, with positive/negative guidance for:\n\n- repeated worker handoff failures\n- same feature worked >4 times\n- overwritten/softened validation criteria\n- dismissed handoff items\n- architecture drift\n\nI also bumped the friction signal prompt version to `1.1.0` and added tests in `friction.test.ts` to lock the new examples in.\n\n## Validation\n\nPassed:\n\n- `npm --workspace @factory/signal-core run test`\n- `npm --workspace @factory/signal-core run typecheck`\n- `npm --workspace @factory/signal-core run lint`\n\nNote: lint required restoring local deps with `npm install` and running `npm --workspace @factory/eslint-config run setup`; no package metadata changed. Pre-existing untracked `.factory/skills/daily-cli-bug-report/` was left untouched.",
+          "timestamp": "2026-06-01T22:39:52.749Z"
+        },
+        {
+          "type": "user",
+          "text": "<system-reminder>\nThe tools listed below are available in this environment, but their schemas may be omitted from the current tool list to save context.\nOnly use ToolSearch for tools that appear in the Deferred tools list below. The only valid ToolSearch names are the exact strings before the colon on each list entry. Use query \"select:<name>[,<name>...]\" to load one or more of those listed tools before calling them.\nDo NOT call ToolSearch for tools that are already present in the current tool list, including core tools like Read, Grep, Glob, LS, Execute, ApplyPatch, AskUser, Create, Edit, TodoWrite, or ExitSpecMode. Call available tools directly.\nDo NOT guess tool names or use aliases, invent MCP namespaces, or search for tools not shown in the Deferred tools list. If a needed tool is neither currently available nor listed below, it is unavailable in this session; do not retry ToolSearch for it. Calling an omitted tool directly will fail with InputValidationError.\n\nIMPORTANT: When a user's task matches one of these tools and the tool is absent from the current tool list, load and use it rather than routing around it via Execute. Examples of routing violations to avoid:\n- Using curl, wget, or gh pr view <url> instead of loading and calling FetchUrl\n- Using gh search or scraping search engines instead of loading and calling WebSearch\n- Hitting MCP server HTTP endpoints via curl instead of the corresponding MCP tool\n\nDeferred tools:\nGenerateDroid: Generate a custom droid configuration based on your description using AI | Inputs (* required): description* (string): Comprehensive description of what this droid should do and when it should be us…; location (string): Where to save the droid: project (.factory/droids) or personal (~/.factory/droi…\nlinear___get_attachment: Retrieve an attachment's content by ID. | MCP server: linear | Inputs (* required): id* (string): Attachment ID\nlinear___prepare_attachment_upload: Prepare a direct Linear file upload for an existing issue. | MCP server: linear | Inputs (* required): issue* (string): Issue ID or identifier (e.g., LIN-123); filename* (string): Filename for the upload, e.g. screenshot.png; contentType* (string): MIME type, e.g. image/png or application/pdf; size* (integer): Exact file size in bytes. Must be smaller than 2 GB.; title (string): Suggested attachment title for the finalize step; +1 more\nlinear___create_attachment_from_upload: Link an already-uploaded Linear assetUrl to an existing issue as an attachment. | MCP server: linear | Inputs (* required): issue* (string): Issue ID or identifier (e.g., LIN-123); assetUrl* (string): Linear upload assetUrl returned by prepare_attachment_upload; title (string): Attachment title. Defaults to filename or asset URL; subtitle (string): Optional attachment subtitle\nlinear___create_attachment: Deprecated fallback for tiny files only. Accepts base64 file content and uploads it through the MCP worker, which can consume large amounts of agent context. Prefer `prepare_attachment_upload` plus d… | MCP server: linear | Inputs (* required): issue* (string): Issue ID or identifier (e.g., LIN-123); base64Content* (string): Deprecated base64-encoded file content to upload; filename* (string): Filename for the upload (e.g., 'screenshot.png'); contentType* (string): MIME type for the upload (e.g., 'image/png', 'application/pdf'); title (string): Optional title for the attachmen…\nlinear___delete_attachment: Delete an attachment by ID | MCP server: linear | Inputs (* required): id* (string): Attachment ID\nlinear___list_comments: List comments on a Linear issue, project, initiative, document, or project milestone. Provide exactly one of `issueId`, `projectId`, `initiativeId`, `documentId`, or `milestoneId`. For issues, projec… | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; issueId (string): Issue ID or identifier (e.g., LIN-123) (provide exactly one parent); projectId (string): Project name, ID, or slug (provide exactly one parent); +3 more\nlinear___save_comment: Create or update a comment on a Linear issue, project, initiative, document, or project milestone. If `id` is provided, updates the existing comment; otherwise creates a new one. To start a new threa… | MCP server: linear | Inputs (* required): id (string): Comment ID. If provided, updates the existing comment; issueId (string): Issue ID or identifier (e.g., LIN-123) (provide exactly one parent); projectId (string): Project name, ID, or slug (provide exactly one parent); initiativeId (string): Initiative name or ID (provide exactly one parent); documentId (string): Document ID…\nlinear___delete_comment: Delete a Linear comment. Inline description comments (those with non-null `quotedText`) anchor a mark in the editor, so their root cannot be deleted — delete the replies individually or resolve the t… | MCP server: linear | Inputs (* required): id* (string): Comment ID\nlinear___list_cycles: Retrieve cycles for a specific Linear team | MCP server: linear | Inputs (* required): teamId* (string): Team ID; type (string): Filter: current, previous, next, or all\nlinear___get_document: Retrieve a Linear document by ID or slug | MCP server: linear | Inputs (* required): id* (string): Document ID or slug\nlinear___list_documents: List documents in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search query; projectId (string): Filter by project ID; +5 more\nlinear___save_document: Create or update a Linear document. If `id` is provided, updates the existing document; otherwise creates a new one. When creating, `title` is required and exactly one parent (`project`, `issue`, `in… | MCP server: linear | Inputs: id (string): Document ID or slug to update. Omit to create a new document.; title (string): Document title (required when creating); content (string): Content as Markdown. Do not escape the string — use literal newlines and specia…; project (string): Project name, ID, or slug; issue (string): Issue ID or identifier (e.g., LIN-123); +5 more\nlinear___extract_images: Extract and fetch images from markdown content. Use this to view screenshots, diagrams, or other images embedded in Linear issues, comments, or documents. Pass the markdown content (e.g., issue descr… | MCP server: linear | Inputs (* required): markdown* (string): Markdown content containing image references (e.g., issue description, comment…\nlinear___get_issue: Retrieve detailed information about an issue by ID, including attachments and git branch name | MCP server: linear | Inputs (* required): id* (string): Issue ID or identifier (e.g., LIN-123); includeRelations (boolean): Include blocking/related/duplicate relations; includeCustomerNeeds (boolean): Include associated customer needs; includeReleases (boolean): Include associated releases\nlinear___list_issues: List issues in the user's Linear workspace. For my issues, use \"me\" as the assignee. Use \"null\" for no assignee. | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search issue title or description; team (string): Team name or ID; +11 more\nlinear___save_issue: Create or update a Linear issue. If `id` is provided, updates the existing issue; otherwise creates a new one. When creating, `title` and `team` are required. Note: use `assignee` (not `assigneeId`)… | MCP server: linear | Inputs: id (string): Only for updating an existing issue. Pass the issue ID or identifier (e.g., LIN…; title (string): Issue title (required when creating); description (string): Content as Markdown. Do not escape the string — use literal newlines and specia…; team (string): Team name or ID (required when creating); cycle (union): Cycle name, number, or ID.…\nlinear___list_issue_statuses: List available issue statuses in a Linear team | MCP server: linear | Inputs (* required): team* (string): Team name or ID\nlinear___get_issue_status: Retrieve detailed information about an issue status in Linear by name or ID | MCP server: linear | Inputs (* required): id* (string): Status ID; name* (string): Status name; team* (string): Team name or ID\nlinear___list_issue_labels: List available issue labels in a Linear workspace or team | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; name (string): Filter by name; team (string): Team name or ID\nlinear___create_issue_label: Create a new Linear issue label | MCP server: linear | Inputs (* required): name* (string): Label name; description (string): Label description; color (string): Hex color code; teamId (string): Team UUID (omit for workspace label); parent (string): Parent label group name; +1 more\nlinear___list_projects: List projects in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 50); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search project name; state (string): State type, name, or ID; +9 more\nlinear___get_project: Retrieve details of a specific project in Linear | MCP server: linear | Inputs (* required): query* (string): Project name, ID, or slug; includeMilestones (boolean): Include milestones; includeMembers (boolean): Include project members; includeResources (boolean): Include resources (documents, links, attachments)\nlinear___save_project: Create or update a Linear project. If `id` is provided, updates the existing project; otherwise creates a new one. When creating, `name` and at least one team (via `addTeams` or `setTeams`) are requi… | MCP server: linear | Inputs: id (string): Project ID. If provided, updates the existing project; name (string): Project name (required when creating); icon (string): Icon emoji (e.g., :eagle:); color (string): Hex color; summary (string): Short summary (max 255 chars); +15 more\nlinear___list_project_labels: List available project labels in the Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; name (string): Filter by name\nlinear___get_diff: Exact lookup for a Linear diff. Use with review URLs, GitHub PR URLs, Linear full identifiers, UUIDs, or slugs. | MCP server: linear | Inputs (* required): urlOrId* (string): Linear review URL, diff slug, pull request ID, Linear full identifier, or GitHu…\nlinear___list_diffs: List Linear diff pull requests visible to the authenticated user | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Broad search by title, branch, PR number, or bare slug; owner (string): Filter returned diffs by repository owner; +2 more\nlinear___get_diff_threads: Exact lookup for diff threads. Use with review URLs, GitHub PR URLs, Linear full identifiers, UUIDs, or slugs. | MCP server: linear | Inputs (* required): urlOrId* (string): Linear review URL, diff slug, pull request ID, Linear full identifier, or GitHu…; threadId (string): Optional top-level thread/comment ID to return; resolved (boolean): Filter returned threads by resolved state; orderBy (string): Sort: createdAt | updatedAt\nlinear___list_milestones: List all milestones in a Linear project | MCP server: linear | Inputs (* required): project* (string): Project name, ID, or slug\nlinear___get_milestone: Retrieve details of a specific milestone by ID or name | MCP server: linear | Inputs (* required): project* (string): Project name, ID, or slug; query* (string): Milestone name or ID\nlinear___save_milestone: Create or update a milestone in a Linear project. If `id` is provided, updates the existing milestone; otherwise creates a new one. When creating, `name` is required. | MCP server: linear | Inputs (* required): project* (string): Project name, ID, or slug; id (string): Milestone name or ID; name (string): Milestone name (required when creating); description (string): Milestone description; targetDate (union): Target completion date (ISO format, null to remove)\nlinear___list_teams: List teams in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search query; includeArchived (boolean): Include archived items; +2 more\nlinear___get_team: Retrieve details of a specific Linear team | MCP server: linear | Inputs (* required): query* (string): Team UUID, key, or name\nlinear___list_users: Retrieve users in the Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Filter by name or email; team (string): Team name or ID\nlinear___get_user: Retrieve details of a specific Linear user | MCP server: linear | Inputs (* required): query* (string): User ID, name, email, or \"me\"\nlinear___search_documentation: Search Linear's documentation to learn about features and usage | MCP server: linear | Inputs (* required): query* (string): Search query; page (number): Page number\nlinear___list_customers: List customers in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search customer name; owner (string): User ID, name, email, or \"me\"; +6 more\nlinear___save_customer: Create or update a Linear customer. If `id` is provided, updates the existing customer; otherwise creates a new one. When creating, `name` is required. | MCP server: linear | Inputs: id (string): Customer ID. If provided, updates the existing customer; name (string): Customer name (required when creating); domains (array): Domains to add to this customer. Append-only; existing domains are never removed; externalIds (array): External system IDs to add. Append-only; existing IDs are never removed; owner (string): User ID, name, em…\nlinear___delete_customer: Delete a customer in Linear | MCP server: linear | Inputs (* required): id* (string): Customer ID\nlinear___save_customer_need: Create or update a customer need (request) in Linear. If `id` is provided, updates the existing need; otherwise creates a new one. When creating, `body` is required. | MCP server: linear | Inputs: id (string): Customer need ID. If provided, updates the existing need; body (string): Description of the customer need (required when creating); customer (string): Customer ID or name; issue (string): Issue ID or identifier (e.g., LIN-123) to associate with this need; project (string): Project ID or name to associate with this need; +1 more\nlinear___delete_customer_need: Archive a customer need in Linear | MCP server: linear | Inputs (* required): id* (string): Customer need ID\nlinear___list_initiatives: List initiatives in the user's Linear workspace | MCP server: linear | Inputs: limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; query (string): Search initiative name; status (string): Status of the initiative; +7 more\nlinear___get_initiative: Retrieve detailed information about a specific initiative in Linear | MCP server: linear | Inputs (* required): query* (string): Initiative ID or name; includeProjects (boolean): Include projects; includeSubInitiatives (boolean): Include sub-initiatives\nlinear___save_initiative: Create or update a Linear initiative. If `id` is provided, updates the existing initiative; otherwise creates a new one. When creating, `name` is required. | MCP server: linear | Inputs: id (string): Initiative ID. If provided, updates the existing initiative; name (string): Initiative name (required when creating); summary (string): Short summary (max 255 chars); description (string): Content as Markdown. Do not escape the string — use literal newlines and specia…; color (string): Hex color; +5 more\nlinear___get_status_updates: List or get project/initiative status updates. Pass `id` to get a specific update, or filter to list. | MCP server: linear | Inputs (* required): limit (number): Max results (default 50, max 250); cursor (string): Next page cursor; orderBy (string): Sort: createdAt | updatedAt; type* (string): Type of status update; id (string): Status update ID - if provided, returns this specific update; +6 more\nlinear___save_status_update: Create or update a project/initiative status update. Omit `id` to create, provide `id` to update. | MCP server: linear | Inputs (* required): type* (string): Type of status update; id (string): Status update ID - if provided, updates this existing update; project (string): Project name, ID, or slug; initiative (string): Initiative name or ID; body (string): Content as Markdown. Do not escape the string — use literal newlines and specia…; +2 more\nlinear___delete_status_update: Delete (archive) a project or initiative status update. | MCP server: linear | Inputs (* required): type* (string): Type of status update; id* (string): Status update ID\nnotion___notion-search: Perform a search over: | MCP server: notion | Inputs (* required): query* (string): Semantic search query over your entire Notion workspace and connected sources (…; query_type (string); content_search_mode (string); data_source_url (string): Optionally, provide the URL of a Data source to search. This will perform a sem…; page_url (string): Optionally, provide the URL or ID of a page to search within.…\nnotion___notion-create-pages: Overview — Creates one or more Notion pages, with the specified properties and content. | MCP server: notion | Inputs (* required): pages* (array): The pages to create.; parent (union): The parent under which the new pages will be created. This can be a page (page_…\nnotion___notion-update-page: Overview — Update a Notion page's properties or content. | MCP server: notion | Inputs (* required): page_id* (string): The ID of the page to update, with or without dashes.; command* (string); properties (object): Required for \"update_properties\" command. A JSON object that updates the page's…; new_str (string): Required for \"replace_content\" command. The new content string to replace the e…; content (string): Required for \"insert_con…\nnotion___notion-move-pages: Move one or more Notion pages or databases to a new parent. | MCP server: notion | Inputs (* required): page_or_database_ids* (array): An array of up to 100 page or database IDs to move. IDs are v4 UUIDs and can be…; new_parent* (union): The new parent under which the pages will be moved. This can be a page, the wor…\nnotion___notion-duplicate-page: Duplicate a Notion page. The page must be within the current workspace, and you must have permission to access it. The duplication completes asynchronously, so do not rely on the new page identified… | MCP server: notion | Inputs (* required): page_id* (string): The ID of the page to duplicate. This is a v4 UUID, with or without dashes, and…\nnotion___notion-create-database: Creates a new Notion database using SQL DDL syntax. | MCP server: notion | Inputs (* required): schema* (string): SQL DDL CREATE TABLE statement defining the database schema. Column names must…; parent (object): The parent under which to create the new database. If omitted, the database wil…; title (string): The title of the new database.; description (string): The description of the new database.\nnotion___notion-update-data-source: Update a Notion data source's schema, title, or attributes using SQL DDL statements. Returns Markdown showing updated structure and schema. | MCP server: notion | Inputs (* required): data_source_id* (string): The data source to update. Accepts a collection:// URI from <data-source> tags,…; statements (string): Semicolon-separated SQL DDL statements to update the schema. Supports ADD COLUM…; title (string): The new title of the data source.; description (string): The new description of the data source.; is_inline (bo…\nnotion___notion-create-comment: Add a comment to a page or specific content. | MCP server: notion | Inputs (* required): page_id* (string): The ID of the page to comment on (with or without dashes).; discussion_id (string): The ID or URL of an existing discussion to reply to (e.g., discussion://pageId/…; selection_with_ellipsis (string): Unique start and end snippet of the content to comment on. DO NOT provide the e…; rich_text (array): An array of rich t…\nnotion___notion-get-comments: Get comments and discussions from a Notion page. | MCP server: notion | Inputs (* required): page_id* (string): Identifier for a Notion page.; include_resolved (boolean); include_all_blocks (boolean); discussion_id (string): Fetch a specific discussion by ID or discussion URL (e.g., discussion://pageId/…\nnotion___notion-get-teams: Retrieves a list of teams (teamspaces) in the current workspace. Shows which teams exist, user membership status, IDs, names, and roles. | MCP server: notion | Inputs: query (string): Optional search query to filter teams by name (case-insensitive).\nnotion___notion-get-users: Retrieves a list of users in the current workspace. Shows workspace members and guests with their IDs, names, emails (if available), and types (person or bot). | MCP server: notion | Inputs: query (string): Optional search query to filter users by name or email (case-insensitive).; start_cursor (string): Cursor for pagination. Use the next_cursor value from the previous response to…; page_size (integer): Number of users to return per page (default: 100, max: 100).; user_id (string): Return only the user matching this ID. Pass \"self\" to…\nnotion___notion-query-data-sources: Query data from Notion databases using SQL or by specifying a view. | MCP server: notion | Inputs (* required): data* (union): The data required for querying data sources\nnotion___notion-query-meeting-notes: Query the current user's meeting notes data source. | MCP server: notion | Inputs: filter (object): Acceptable filter for querying current user's meeting notes data source.\nnotion___notion-create-view: Create a new view on a Notion database. | MCP server: notion | Inputs (* required): data_source_id* (string): The data source (collection) ID. Accepts a collection:// URI from <data-source>…; name* (string): The name of the view.; type* (string); database_id (string): The database to add a view tab to. Accepts a Notion URL or a bare UUID. Mutuall…; parent_page_id (string): A page to create an inline linked database vie…\nnotion___notion-update-view: Update a view's name, filters, sorts, or display configuration. | MCP server: notion | Inputs (* required): view_id* (string): The view to update. Accepts a view:// URI, a Notion URL with ?v= parameter, or…; name (string): New name for the view.; configure (string): View configuration DSL string. Supports FILTER, SORT BY, GROUP BY, CALENDAR BY,…\n</system-reminder>",
+          "timestamp": "2026-06-01T22:47:41.570Z"
+        },
+        {
+          "type": "user",
+          "text": "ok, output the rules to notion pls",
+          "timestamp": "2026-06-01T22:47:41.570Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "ToolSearch",
+          "input": {
+            "query": "select:notion___notion-update-page"
+          },
+          "timestamp": "2026-06-01T22:47:50.038Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/luke/Development/3factory-mono/packages/signal-core/src/signals/friction.ts",
+            "limit": 28,
+            "offset": 64
+          },
+          "timestamp": "2026-06-01T22:47:50.038Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "notion___notion-fetch",
+          "input": {
+            "id": "notion://docs/enhanced-markdown-spec"
+          },
+          "timestamp": "2026-06-01T22:47:57.841Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "notion___notion-update-page",
+          "input": {
+            "command": "insert_content",
+            "content": "\n\n## Codified LLM rules for mission-friction analysis\n\nMission sessions have an orchestrator, workers, handoffs, features, validation criteria, and architecture notes. Evaluate the mission as a whole: did coordination problems waste time, hide failures, or let the mission drift away from its contract?\n\nReport mission friction when you see concrete impact such as:\n\n- **Repeated worker handoff failures with the same unresolved cause.** Example: a validator worker fails twice with `factoryd appears to be unavailable`, the orchestrator keeps restarting workers for the same milestone, and the mission cannot continue until the user restarts Droid. This is friction because coordination stalled and the same failure recurred without recovery. Do not report a single daemon crash that is immediately resumed and completed.\n- **The same feature is worked on more than four times without a new reason each time.** Example: a mission shows `keychain-service` or a validator feature started, failed, or restarted many times with repeated `process exited unexpectedly` or timeout reasons. This is friction if the repeated attempts are retrying the same work or same failure. It is not friction when repeated validators are distinct review rounds over new commits with new blockers and clear progress.\n- **Validation criteria are weakened or overwritten to fit the implementation.** Example: a worker says a validation item cannot satisfy `checkout PR head SHA`, then the orchestrator marks the assertion as `builds include PR branch code via merge commit` and later treats it as passed without explicit user approval. This is high-confidence friction because the mission contract changed after implementation. In contrast, a failed assertion that remains failed, gets a fix feature, and passes on rerun is healthy mission behavior.\n- **Handoff items are dismissed instead of addressed.** Example: the same checkout-ref limitation appears in worker handoff, scrutiny findings, and dismissal logs; the orchestrator dismisses it as already addressed while the underlying mismatch remains. This is friction when dismissal prevents an actionable blocker or follow-up from being handled. It is not friction when the dismissal explicitly documents that an item is pre-existing, out of scope, or superseded and the later mission evidence supports that decision.\n- **Architecture decisions are ignored.** Example: an architecture note says a reusable workflow is off-limits or a design path is canonical, but workers solve the task by contradicting that plan or changing validation to match the deviation. This is weaker evidence on its own; report it only when the drift causes rework, failed validation, repeated handoffs, or user-visible uncertainty.\n\nPrefer findings that cite both the problematic event and the later impact, such as the original failed handoff plus the repeated restart, dismissal, validation-state change, or follow-up fix feature.\n\n### Negative examples: do not count as mission friction\n\n- A single worker/daemon failure that is immediately resumed and completed without repeated retries.\n- A validator feature run multiple times because each run reviews a new commit or a newly fixed blocker.\n- A validation failure that stays failed, leads to a dedicated fix feature, then passes on rerun.\n- A handoff item dismissed as pre-existing, out of scope, or superseded when later evidence supports that dismissal.\n- Architecture drift mentioned in isolation with no rework, failed validation, repeated handoffs, or user-visible uncertainty.\n",
+            "page_id": "3722517972c78034a739f60dd5f4e5f2",
+            "position": {
+              "type": "end"
+            }
+          },
+          "timestamp": "2026-06-01T22:48:08.663Z"
+        },
+        {
+          "type": "assistant",
+          "text": "## Done\n\nAdded the codified mission-friction rules and negative examples to the Notion page under **Codified LLM rules for mission-friction analysis**.",
+          "timestamp": "2026-06-01T22:48:18.584Z"
+        }
+      ],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 30,
+      "overriden_lines": 0
+    },
+    "3f3fa3633b71d451": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "a1fb13a1-7906-4125-a138-2d41459d1a5a",
+        "model": "gpt-5.5-fast"
+      },
+      "human_author": "Luke Alvoeiro",
+      "messages": [],
+      "total_additions": 45,
+      "total_deletions": 43,
+      "accepted_lines": 29,
+      "overriden_lines": 0
+    }
+  }
+}
