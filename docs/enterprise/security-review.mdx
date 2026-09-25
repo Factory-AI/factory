@@ -98,9 +98,10 @@ These are the Droid Action security inputs currently wired for the workflows doc
 | Input | Default | Description |
 | --- | --- | --- |
 | `automatic_security_review` | `false` | Run security review automatically on PRs without requiring `@droid security`. |
-| `security_model` | `""` | Override the model used for security review candidate generation and full-repository scans. Falls back to `review_model` if unset. |
 | `security_severity_threshold` | `medium` | Full-repository scans only: minimum severity to include in the generated report. |
 | `security_notify_team` | `""` | Full-repository scans only: GitHub team to cc in the generated scan PR body, such as `@org/security-team`. |
+
+PR security reviews use the same [`review_depth`](/guides/droid-exec/code-review#review-depth) preset as code review, so you don't need to choose a model.
 
 ## Methodology
 

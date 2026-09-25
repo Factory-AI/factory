@@ -88,7 +88,7 @@ For the security architecture behind the GitHub App, see [GitHub Integration Sec
 
 ## Review depth
 
-The `review_depth` input controls the thoroughness and cost of each review. You choose the depth during `/install-code-review` setup, or set it directly in your workflow.
+The `review_depth` input is the only setting you need to choose how reviews run. You pick the depth during `/install-code-review` setup, or set it directly in your workflow.
 
 - **`deep`** (default) — Thorough analysis with higher reasoning effort. Catches more subtle bugs but costs more per review. Best for production code and security-sensitive repos.
 - **`shallow`** — Faster, more cost-effective reviews that cover surface-level issues. Good for high-volume repos, draft PRs, or teams watching spend.
@@ -99,7 +99,33 @@ with:
   review_depth: deep  # or shallow
 ```
 
-You can also override the model or reasoning effort directly with `review_model` and `reasoning_effort`, which take precedence over the depth preset.
+Each preset picks the model and reasoning effort for you, and Factory keeps it on its recommended model as new models ship. Your reviews get upgrades without editing the workflow or updating `droid-action`. We recommend using a preset rather than choosing a model yourself.
+
+<Note>
+  If your workflow sets `review_model`, `security_model`, or `reasoning_effort` from an earlier setup, remove them so reviews follow the preset and stay current.
+</Note>
+
+<Accordion title="Advanced: model overrides">
+  Only needed if your organization requires a specific model provider. The `review_model`, `security_model`, `fill_model`, and `reasoning_effort` inputs take priority over the depth preset.
+
+  If you set a model, use a provider tier alias. Factory keeps each alias on its recommended model for that provider and tier, so your reviews still pick up new models automatically. An alias stays in the same price tier when its model changes.
+
+  | Provider | Aliases |
+  | --- | --- |
+  | OpenAI | `openai-latest-premium`, `openai-latest-balanced`, `openai-latest-fast` |
+  | Anthropic | `anthropic-latest-premium`, `anthropic-latest-balanced`, `anthropic-latest-fast` |
+  | Open-weight models | `oss-latest-premium`, `oss-latest-balanced`, `oss-latest-fast` |
+
+  ```yaml
+  with:
+    automatic_review: true
+    review_model: anthropic-latest-balanced
+  ```
+
+  Your organization's model policy is checked against the model an alias currently resolves to. If that model is not allowed, Droid falls back to your organization's default model and says so in the tracking comment.
+
+  Exact model IDs are also accepted, but they never upgrade on their own, so reviews stay on that model until you edit the workflow. We do not recommend them.
+</Accordion>
 
 ## Security review
 
@@ -153,16 +179,6 @@ Additional checks for this codebase:
 
 These guidelines are automatically picked up and injected into every review run. No workflow changes needed.
 
-### Change the model
-
-Use a different model for reviews:
-
-```yaml
-droid exec --auto high --model claude-sonnet-4-5-20250929 -f prompt.txt
-# Or use a faster model for quicker feedback:
-droid exec --auto high --model claude-haiku-4-5-20251001 -f prompt.txt
-```
-
 ### Skip certain PRs
 
 Add conditions to skip reviews for specific cases:
@@ -191,9 +207,7 @@ Guidelines:
 | Input | Default | Description |
 |-------|---------|-------------|
 | `automatic_review` | `false` | Automatically review PRs without `@droid review` |
-| `review_depth` | `deep` | Review preset: `deep` (thorough) or `shallow` (fast) |
-| `review_model` | (from depth) | Override model for code review |
-| `reasoning_effort` | (from depth) | Override reasoning effort |
+| `review_depth` | `deep` | Review preset: `deep` (thorough) or `shallow` (fast). See [Review depth](#review-depth). |
 | `include_suggestions` | `true` | Include code suggestion blocks in comments |
 
 Security review inputs are documented in [Security Review](/enterprise/security-review#configuration).
