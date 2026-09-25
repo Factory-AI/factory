@@ -101,6 +101,8 @@ with:
 
 Each preset picks the model and reasoning effort for you, and Factory keeps it on its recommended model as new models ship. Your reviews get upgrades without editing the workflow or updating `droid-action`. We recommend using a preset rather than choosing a model yourself.
 
+`deep` is what the Factory team uses on its own repositories. When you pick `deep`, you get the model Factory has hand-picked for code review: a strong, balanced model run with high reasoning effort, updated as better models ship.
+
 <Note>
   If your workflow sets `review_model`, `security_model`, or `reasoning_effort` from an earlier setup, remove them so reviews follow the preset and stay current.
 </Note>
@@ -124,7 +126,7 @@ If you set a model, use a provider tier alias. Factory keeps each alias on its r
 ```yaml
 with:
   automatic_review: true
-  review_model: anthropic-latest-balanced
+  review_model: openai-latest-premium  # or anthropic-latest-balanced
 ```
 
 Your organization's model policy is checked against the model an alias currently resolves to. If that model is not allowed, Droid falls back to your organization's default model and says so in the tracking comment.
