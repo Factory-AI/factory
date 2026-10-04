@@ -322,6 +322,7 @@ droid --worktree feature-b &
 | `--type <type>`            | サーバーのトランスポート: `http`（Streamable HTTP）、`sse`（レガシーな HTTP+SSE）、または `stdio`（ローカル） | `droid mcp add api https://api.example.com/mcp --type http`      |
 | `--env <KEY=VALUE>`        | stdio サーバー用の環境変数を設定（繰り返し可能）                                          | `droid mcp add gh "gh-mcp" --type stdio --env GH_TOKEN=$GH_TOKEN`|
 | `--header <KEY: VALUE>`    | リモートサーバー用の HTTP ヘッダーを追加（繰り返し可能）                                    | `droid mcp add api https://api.example.com/mcp --type http --header "Authorization: Bearer $TOKEN"` |
+| `--no-oauth`              | ヘッダー / API キーで認証するリモートサーバーの OAuth を無効化 | `droid mcp add api https://api.example.com/mcp --type http --header "Authorization: Bearer $TOKEN" --no-oauth` |
 
 #### `droid plugin` のフラグ
 

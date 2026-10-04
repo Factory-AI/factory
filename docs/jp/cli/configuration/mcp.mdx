@@ -53,7 +53,7 @@ HTTPサーバーはリモートMCPエンドポイントで、クラウドサー�
 **構文：**
 
 ```bash
-droid mcp add <name> <url> --type http [--header "KEY: VALUE"...]
+droid mcp add <name> <url> --type http [--header "KEY: VALUE"...] [--no-oauth]
 ```
 
 **引数：**
@@ -62,6 +62,7 @@ droid mcp add <name> <url> --type http [--header "KEY: VALUE"...]
 - `url` - MCPサーバーのHTTP/HTTPS URL
 - `--type http` - HTTPトランスポートを指定するための必須フラグ
 - `--header "KEY: VALUE"` - 認証用HTTPヘッダー（複数回使用可能）
+- `--no-oauth` - ヘッダーまたは API キーで認証するリモートサーバーの OAuth を無効化します。OAuth が必要なサーバーには指定しないでください。
 
 ### 人気のHTTP MCPサーバー
 

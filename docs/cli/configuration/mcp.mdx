@@ -53,7 +53,7 @@ HTTP servers are remote MCP endpoints - the recommended way to connect to cloud 
 **Syntax:**
 
 ```bash
-droid mcp add <name> <url> --type http [--header "KEY: VALUE"...]
+droid mcp add <name> <url> --type http [--header "KEY: VALUE"...] [--no-oauth]
 ```
 
 **Arguments:**
@@ -62,6 +62,7 @@ droid mcp add <name> <url> --type http [--header "KEY: VALUE"...]
 - `url` - HTTP/HTTPS URL of the MCP server
 - `--type http` - Required flag to specify HTTP transport
 - `--header "KEY: VALUE"` - HTTP headers for authentication (can be used multiple times)
+- `--no-oauth` - Disable OAuth for a remote server authenticated by headers or an API key. Do not use this for servers that require OAuth.
 
 ### Popular HTTP MCP Servers
 

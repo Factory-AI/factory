@@ -419,6 +419,7 @@ The `droid --resume` flag form supports the same picker, session ID, and `--last
 | `--type <type>`            | Server transport: `http` (streamable HTTP), `sse` (legacy HTTP+SSE), or `stdio` (local) | `droid mcp add api https://api.example.com/mcp --type http`      |
 | `--env <KEY=VALUE>`        | Set an environment variable for a stdio server (repeatable)              | `droid mcp add gh "gh-mcp" --type stdio --env GH_TOKEN=$GH_TOKEN`|
 | `--header <KEY: VALUE>`    | Add an HTTP header for a remote server (repeatable)                      | `droid mcp add api https://api.example.com/mcp --type http --header "Authorization: Bearer $TOKEN"` |
+| `--no-oauth`              | Disable OAuth for a header/API-key authenticated remote server           | `droid mcp add api https://api.example.com/mcp --type http --header "Authorization: Bearer $TOKEN" --no-oauth` |
 
 #### `droid plugin` flags
 
