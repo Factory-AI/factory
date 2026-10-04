@@ -133,7 +133,7 @@ Customize droid's behavior with command-line flags:
 | `--disable-builtin-skills`        | Disable Factory-provided builtin skills in interactive or exec sessions while preserving other skill sources | `droid --disable-builtin-skills` |
 | `--list-tools`                    | Print available tools and exit                                     | `droid exec --list-tools`                                    |
 | `-o, --output-format <format>`    | Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)    | `droid exec -o json "document API"`                          |
-| `--input-format <format>`         | Input format (`stream-jsonrpc` for multi-turn)                    | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
+| `--input-format <format>`         | `stream-jsonrpc` for JSON-RPC requests, or deprecated `stream-json` (requires `-o stream-json`) | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
 | `-r, --resume [sessionId]`        | Open the session picker, or resume the specified session directly. In `droid exec`, `-r` is `--reasoning-effort`. | `droid -r`                                                   |
 | `--last`                         | With a bare resume, skip the picker and resume the most recent session in the current folder | `droid --resume --last`                                     |
 | `-r, --reasoning-effort <level>`  | Override reasoning effort (`off`, `none`, `low`, `medium`, `high`). In `droid exec`, `-r` maps to this flag. | `droid exec -r high "debug flaky test"`                      |
