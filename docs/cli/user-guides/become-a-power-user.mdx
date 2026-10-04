@@ -196,7 +196,7 @@ Use it to check state, run a quick build, or capture output you want Droid to re
 
 ## Worktrees — Run parallel sessions on the same repo
 
-The `--worktree` flag launches Droid inside a fresh git worktree so multiple sessions can edit the same repository without stepping on each other. Combine it with `--worktree-dir` (or the `worktreeDirectory` setting) to keep all worktrees in one place.
+The `--worktree` flag launches Droid inside a git worktree so multiple sessions can edit the same repository without stepping on each other. To keep worktrees in one place, set `worktreeDirectory` in `~/.factory/settings.json` or the Factory desktop app under Settings > Worktrees. The deprecated `--worktree-dir` flag is rejected when used with `--worktree`.
 
 ```bash
 droid --worktree feature-auth

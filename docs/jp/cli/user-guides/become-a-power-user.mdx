@@ -196,7 +196,7 @@ TUI には、ほぼすべての一般的な操作のためのショートカッ�
 
 ## ワークツリー — 同一リポジトリで並列セッションを実行
 
-`--worktree` フラグを使うと、Droid を新しい git worktree 内で起動でき、複数のセッションが同じリポジトリを編集してもお互い干渉しません。`--worktree-dir`（または `worktreeDirectory` 設定）と組み合わせれば、すべての worktree を1か所にまとめられます。
+`--worktree` フラグを使うと、Droid を git worktree 内で起動でき、複数のセッションが同じリポジトリを編集してもお互い干渉しません。worktree を1か所にまとめるには、`~/.factory/settings.json` の `worktreeDirectory`、または Factory デスクトップアプリの Settings > Worktrees で設定してください。非推奨の `--worktree-dir` フラグを `--worktree` と一緒に使うとエラーになります。
 
 ```bash
 droid --worktree feature-auth
