@@ -26,7 +26,7 @@ CLIは2つのモードで動作します：
 | :----------------------------------- | :--------------------------------------------------------------------- | :--------------------------------------------- |
 | `droid`                              | インタラクティブREPLを開始                                                 | `droid`                                        |
 | `droid "query"`                      | 初期プロンプトでREPLを開始                                                | `droid "explain this project"`                 |
-| `droid --resume [sessionId]`         | セッションを再開（指定がない場合は最後に変更したものを使用）。エイリアス: `-r`     | `droid --resume`                               |
+| `droid --resume [sessionId]`         | セッションを再開（IDを省略するとセッション選択画面を表示）。エイリアス: `-r`     | `droid --resume`                               |
 | `droid --fork <sessionId>`           | セッションを fork して新しいコピーで再開                                      | `droid --fork session-abc123`                  |
 | `droid exec "query"`                 | インタラクティブモードなしでタスクを実行                                       | `droid exec "summarize src/auth"`              |
 | `droid exec -f prompt.md`            | ファイルからプロンプトを読み込み                                              | `droid exec -f .factory/prompts/review.md`     |
@@ -65,7 +65,8 @@ CLIは2つのモードで動作します：
 | `--list-tools`                       | 利用可能なツールを表示して終了                                                                               | `droid exec --list-tools`                                  |
 | `-o, --output-format <format>`       | 出力形式（`text`、`json`、`stream-json`、`stream-jsonrpc`）                                              | `droid exec -o json "document API"`                        |
 | `--input-format <format>`            | 入力形式（マルチターン用の`stream-jsonrpc`）                                                               | `droid exec --input-format stream-jsonrpc -o stream-jsonrpc` |
-| `-r, --resume [sessionId]`           | 前回のセッションを再開。インタラクティブモードでは `-r` は `--resume`、`droid exec` では `-r` は `--reasoning-effort` にマッピングされます。 | `droid -r`                                                 |
+| `-r, --resume [sessionId]`           | IDを省略するとセッション選択画面を表示し、IDを指定するとそのセッションを再開。インタラクティブモードでは `-r` は `--resume`、`droid exec` では `-r` は `--reasoning-effort` にマッピングされます。 | `droid -r`                                                 |
+| `--last`                             | IDを省略した再開で選択画面をスキップし、現在のフォルダーで最後に使用したセッションを再開 | `droid --resume --last` |
 | `-r, --reasoning-effort <level>`     | 推論努力レベルを上書き（`off`、`none`、`low`、`medium`、`high`）。`droid exec` では `-r` はこのフラグにマッピングされます。 | `droid exec -r high "debug flaky test"`                    |
 | `--spec-model <id>`                  | 仕様計画に別の[モデルID](/jp/models)を使用                                                              | `droid exec --spec-model claude-opus-4-7`                  |
 | `--spec-reasoning-effort <level>`    | specモードの推論努力を上書き                                                                      | `droid exec --use-spec --spec-reasoning-effort high`       |
