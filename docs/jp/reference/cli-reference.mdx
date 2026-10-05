@@ -262,18 +262,18 @@ Droid は Mermaid 図のコードブロックをターミナル上で直接 ASCI
 
 `-w, --worktree [name]` を使うと、ネイティブな [Git worktree](https://git-scm.com/docs/git-worktree) の中でセッションを実行できます。これにより、同じリポジトリの複数ブランチをファイル競合なしで並列に扱えます。このフラグは `droid`（インタラクティブ）と `droid exec` の両方で利用できます。
 
-各ワークツリーは、リポジトリの隣接ディレクトリ（`../<repo>-wt-<branch>/`）に作成され、独立したチェックアウトと専用ブランチを持ちます。
+各ワークツリーは、管理対象のルート（`<worktree root>/<id>/<repo>/`）の下に作成され、独立したチェックアウトとブランチを持ちます。ルートは `~/.factory/settings.json` の `worktreeDirectory` で設定できます。
 
 **ブランチ命名:**
 
-- **`--worktree`**（値なし） — `<current-branch>-wt` という名前のブランチでワークツリーを作成または再利用します。
+- **`--worktree`**（値なし） — `<current-branch>-<id>` というブランチでワークツリーを作成します。`<id>` は8文字の識別子です。
 - **`--worktree <name>`** — `<name>` をブランチ名として使用します。ブランチがすでに存在する場合はそのワークツリーでチェックアウトされ、存在しない場合は `HEAD` から作成されます。
 - 対象ブランチが別のワークツリーですでにチェックアウトされている場合、コマンドは明確なエラーを表示して失敗します。
 
 **例:**
 
 ```bash
-# Interactive: derive branch from current branch (creates <current>-wt)
+# Interactive: derive a unique branch from current branch (creates <current>-<id>)
 droid --worktree
 
 # Interactive: explicit branch name
