@@ -36,9 +36,9 @@ CLIは2つのモードで動作します：
 | `droid search "query"`               | ローカルセッション横断検索（メッセージ、ドキュメント、ツール結果）。エイリアス: `droid find` | `droid search "auth bug"`                      |
 | `droid mcp add <name> <url>`         | MCP サーバーを追加                                                         | `droid mcp add api https://api.example.com/mcp --type http`  |
 | `droid mcp remove <name>`            | MCP サーバーを削除                                                         | `droid mcp remove linear`                      |
-| `droid plugin install <plugin>`      | プラグインをインストール。エイリアス: `droid plugin i`                          | `droid plugin install factory/code-review`     |
-| `droid plugin uninstall <plugin>`    | プラグインをアンインストール。エイリアス: `droid plugin remove`                  | `droid plugin uninstall factory/code-review`   |
-| `droid plugin update <plugin>`       | プラグインを最新バージョンに更新                                              | `droid plugin update factory/code-review`      |
+| `droid plugin install <plugin@marketplace>` | プラグインをインストール。エイリアス: `droid plugin i`                 | `droid plugin install droid-control@factory-plugins`   |
+| `droid plugin uninstall <plugin@marketplace>` | プラグインをアンインストール。エイリアス: `droid plugin remove`         | `droid plugin uninstall droid-control@factory-plugins` |
+| `droid plugin update <plugin@marketplace>` | プラグインを最新バージョンに更新                                     | `droid plugin update droid-control@factory-plugins`    |
 | `droid plugin list`                  | インストール済みのプラグインを一覧表示                                         | `droid plugin list`                            |
 | `droid plugin marketplace`           | プラグインマーケットプレイスを管理                                            | `droid plugin marketplace`                     |
 | `droid computer register [name]`     | このマシンを Bring-Your-Own-Machine (BYOM) コンピューターとして登録         | `droid computer register laptop`               |
@@ -327,7 +327,7 @@ droid --worktree feature-b &
 
 | フラグ                  | 説明                                                                | 例                                                          |
 | :-------------------- | :----------------------------------------------------------------- | :--------------------------------------------------------- |
-| `-s, --scope <scope>` | インストール範囲: `user`（デフォルト）または `project`                    | `droid plugin install factory/code-review --scope project` |
+| `-s, --scope <scope>` | インストール範囲: `user`（デフォルト）または `project`                    | `droid plugin install droid-control@factory-plugins --scope project` |
 
 #### `droid computer register` のフラグ
 

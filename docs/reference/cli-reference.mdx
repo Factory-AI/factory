@@ -104,9 +104,9 @@ detail, so always pin a version and verify its checksum.
 | `droid search "query"`               | Search across local sessions (messages, documents, tool results). Alias: `droid find` | `droid search "auth bug"`                      |
 | `droid mcp add <name> <url>`         | Add an MCP server                                                      | `droid mcp add api https://api.example.com/mcp --type http`  |
 | `droid mcp remove <name>`            | Remove an MCP server                                                   | `droid mcp remove linear`                      |
-| `droid plugin install <plugin>`      | Install a plugin. Alias: `droid plugin i`                              | `droid plugin install factory/code-review`     |
-| `droid plugin uninstall <plugin>`    | Uninstall a plugin. Alias: `droid plugin remove`                       | `droid plugin uninstall factory/code-review`   |
-| `droid plugin update <plugin>`       | Update a plugin to the latest version                                  | `droid plugin update factory/code-review`      |
+| `droid plugin install <plugin@marketplace>` | Install a plugin. Alias: `droid plugin i`                        | `droid plugin install droid-control@factory-plugins`   |
+| `droid plugin uninstall <plugin@marketplace>` | Uninstall a plugin. Alias: `droid plugin remove`             | `droid plugin uninstall droid-control@factory-plugins` |
+| `droid plugin update <plugin@marketplace>` | Update a plugin to the latest version                           | `droid plugin update droid-control@factory-plugins`    |
 | `droid plugin list`                  | List installed plugins                                                 | `droid plugin list`                            |
 | `droid plugin marketplace`           | Manage plugin marketplaces                                             | `droid plugin marketplace`                     |
 | `droid computer register [name]`     | Register this machine as a Bring-Your-Own-Machine (BYOM) computer      | `droid computer register laptop`               |
@@ -424,7 +424,7 @@ The `droid --resume` flag form supports the same picker, session ID, and `--last
 
 | Flag                  | Description                                                              | Example                                                  |
 | :-------------------- | :----------------------------------------------------------------------- | :------------------------------------------------------- |
-| `-s, --scope <scope>` | Installation scope: `user` (default) or `project`                        | `droid plugin install factory/code-review --scope project` |
+| `-s, --scope <scope>` | Installation scope: `user` (default) or `project`                        | `droid plugin install droid-control@factory-plugins --scope project` |
 
 #### `droid computer register` flags
 
