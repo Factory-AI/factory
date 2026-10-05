@@ -249,8 +249,14 @@ JSON形式を使用する場面：
 
 カスタム統合では、Droid を長時間動作するサブプロセスとして起動し、stdin/stdout 経由で完全な JSON-RPC 制御インターフェースを操作できます：
 ```bash
-droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc --auto low
+droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc
 ```
+
+この長時間動作する JSON-RPC モードでは、`--auto`、`--model`、
+`--reasoning-effort`、`--disable-builtin-skills` などの CLI フラグは検証されますが、
+セッションの設定には適用されません。自律レベル、モデル、推論努力、スキルの設定は
+JSON-RPC のセッションリクエストで指定してください。特に、起動コマンドに
+`--auto low` を追加しても、セッションの権限は制限されません。
 
 これは、Droid のまわりに独自の対話モデルを構築するための最も低レベルな統合方法です。プロセス側からターン送信、アシスタント出力のストリーミング、権限処理、設定更新、MCP/ツール管理、作業の割り込み、セッションの再開や fork を行えます。
 

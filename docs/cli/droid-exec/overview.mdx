@@ -267,8 +267,14 @@ Use JSON format when you need to:
 For custom integrations, you can run Droid as a long-lived subprocess and drive the full JSON-RPC control surface over stdin/stdout:
 
 ```bash
-droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc --auto low
+droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc
 ```
+
+In this long-lived JSON-RPC mode, CLI flags such as `--auto`, `--model`,
+`--reasoning-effort`, and `--disable-builtin-skills` are validated but do not
+configure sessions. Set autonomy, model, reasoning effort, and skill settings
+in your JSON-RPC session requests instead. In particular, adding `--auto low`
+to the launch command does not limit the session's permissions.
 
 This is the lowest-level integration path for building your own interaction model around Droid. Your process can send turns, stream assistant output, handle permissions, update settings, manage MCP/tools, interrupt work, and resume or fork sessions.
 
