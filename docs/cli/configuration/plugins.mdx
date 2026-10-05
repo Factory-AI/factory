@@ -270,12 +270,7 @@ By default Droid tracks the marketplace's default branch and pulls the latest co
 }
 ```
 
-From the CLI, pass `--ref` or `--sha` when adding a marketplace:
-
-```bash
-droid plugin marketplace add https://github.com/your-org/internal-plugins --ref v1.2.0
-droid plugin marketplace add https://github.com/your-org/internal-plugins --sha 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
-```
+To pin a marketplace, add `ref` or `sha` to its `extraKnownMarketplaces` source object as shown above. `droid plugin marketplace add` accepts a URL but does not accept `--ref` or `--sha`.
 
 ## Discovering plugins
 
