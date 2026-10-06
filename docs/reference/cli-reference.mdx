@@ -255,6 +255,32 @@ Press `!` when the input is empty to toggle bash mode. In bash mode, commands ex
 
 The prompt changes from `>` to `$` when bash mode is active.
 
+### Vim mode
+
+Vim mode adds vim keybindings to the chat input. It is off by default.
+
+- **Turn on:** Run `/vim` or `/vim on`, or toggle **Vim keybindings** in `/settings`
+- **Turn off:** Run `/vim` again or `/vim off`
+
+Droid saves the choice as [`vimMode`](/cli/configuration/settings#display-and-ui) in your settings, so it stays on in new sessions.
+
+The input starts in INSERT mode, where typing works as usual. Press `Esc` for NORMAL mode and `i` to return to INSERT mode. A `-- INSERT --` or `-- NORMAL --` line below the input shows the current mode. Press `Enter` in either mode to submit; the next prompt starts in INSERT mode.
+
+In NORMAL mode, printable keys run vim commands. `Ctrl` shortcuts, arrow keys, and `Enter` keep their usual behavior. Vim mode supports a common subset of vim:
+
+| Category        | Keys                                                                       |
+| :-------------- | :------------------------------------------------------------------------- |
+| Motions         | `h` `j` `k` `l` `w` `W` `b` `B` `e` `E` `0` `^` `$` `gg` `G`               |
+| Find on line    | `f` `F` `t` `T` followed by a character                                    |
+| Counts          | A number before a motion or command, for example `3w` or `2dd`             |
+| Operators       | `d` (delete), `c` (change), `y` (yank), combined with a motion: `dw`, `c$` |
+| Line operations | `dd` `cc` `yy`                                                             |
+| Text objects    | `iw` `aw` `iW` `aW` after an operator, for example `diw` or `caw`          |
+| Edits           | `x` `X` `s` `S` `r` `C` `D` `J` `~`                                        |
+| Paste           | `p` `P`                                                                    |
+| Insert          | `i` `I` `a` `A` `o` `O`                                                    |
+| Undo            | `u`                                                                        |
+
 ### Mermaid diagram rendering
 
 Droid automatically renders Mermaid diagram code blocks as ASCII art directly in the terminal — no external viewer or browser required. When a response contains a fenced ```` ```mermaid ```` block of a supported diagram type, the diagram is drawn inline in the transcript.
@@ -322,6 +348,7 @@ Available when running `droid` in interactive mode. Type the command at the prom
 | `/statusline`                 | Configure custom status line                                   |
 | `/terminal-setup`             | Configure terminal keybindings for Shift+Enter                 |
 | `/themes`                     | Choose a color theme                                           |
+| `/vim`                        | Toggle [vim keybindings](#vim-mode) (`/vim on`, `/vim off`)    |
 
 For detailed information on slash commands, see the [interactive mode documentation](/cli/getting-started/quickstart#useful-slash-commands).
 
