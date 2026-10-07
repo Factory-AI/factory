@@ -47,9 +47,10 @@ jobs:
           # Get the diff
           git diff origin/${{ github.base_ref }}...HEAD > pr_changes.diff
 
-          # Review and fix issues (pipe diff to stdin)
-          cat pr_changes.diff | droid exec --auto low "
-          Review this PR diff and:
+          # Review and fix issues (droid exec ignores stdin when a prompt argument is given,
+          # so point the prompt at the diff file instead of piping it)
+          droid exec --auto low "
+          Review the PR diff in pr_changes.diff and:
           1. Fix any obvious bugs, typos, or linting errors
           2. Add missing error handling
           3. Improve code comments where unclear

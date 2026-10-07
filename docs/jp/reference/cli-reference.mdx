@@ -30,7 +30,7 @@ CLIは2つのモードで動作します：
 | `droid --fork <sessionId>`           | セッションを fork して新しいコピーで再開                                      | `droid --fork session-abc123`                  |
 | `droid exec "query"`                 | インタラクティブモードなしでタスクを実行                                       | `droid exec "summarize src/auth"`              |
 | `droid exec -f prompt.md`            | ファイルからプロンプトを読み込み                                              | `droid exec -f .factory/prompts/review.md`     |
-| `cat file \| droid exec`             | パイプされたコンテンツを処理                                                  | `git diff \| droid exec "draft release notes"` |
+| `cat file \| droid exec`             | パイプされたコンテンツをプロンプトとして使用（プロンプト引数も指定した場合、stdin は無視されます） | `cat review-prompt.md \| droid exec`           |
 | `droid exec -s <id> "query"`         | 既存セッションをexecモードで再開                                              | `droid exec -s session-123 "continue"`         |
 | `droid exec --list-tools`            | 利用可能なツールをリストして終了                                              | `droid exec --list-tools`                      |
 | `droid search "query"`               | ローカルセッション横断検索（メッセージ、ドキュメント、ツール結果）。エイリアス: `droid find` | `droid search "auth bug"`                      |
