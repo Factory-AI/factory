@@ -98,7 +98,7 @@ detail, so always pin a version and verify its checksum.
 | `droid --fork <sessionId>`           | Fork and resume a session in a new copy                                | `droid --fork session-abc123`                  |
 | `droid exec "query"`                 | Execute task without interactive mode                                  | `droid exec "summarize src/auth"`              |
 | `droid exec -f prompt.md`            | Load prompt from file                                                  | `droid exec -f .factory/prompts/review.md`     |
-| `cat file \| droid exec`             | Process piped content                                                  | `git diff \| droid exec "draft release notes"` |
+| `cat file \| droid exec`             | Use piped content as the prompt (stdin is ignored if a prompt argument is also given) | `cat review-prompt.md \| droid exec`           |
 | `droid exec -s <id> "query"`         | Resume existing session in exec mode                                   | `droid exec -s session-123 "continue"`         |
 | `droid exec --list-tools`            | List available tools, then exit                                        | `droid exec --list-tools`                      |
 | `droid search "query"`               | Search across local sessions (messages, documents, tool results). Alias: `droid find` | `droid search "auth bug"`                      |
