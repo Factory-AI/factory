@@ -261,14 +261,14 @@ MCP server configurations are loaded from local files at the following levels:
 | Level | Location | Purpose |
 | :---- | :------- | :------ |
 | **User** | `~/.factory/mcp.json` | Your personal servers, available in all projects |
-| **Folder** | `.factory/mcp.json` in any ancestor directory of the project | Servers shared across nested projects under a common parent folder |
+| **Folder** | `.factory/mcp.json` in a subdirectory between your working directory and the project root | Servers scoped to part of a repository, such as one package in a monorepo |
 | **Project** | `.factory/mcp.json` in the project root | Shared team servers, committed to the repo |
 
 Organization administrators can also centrally provide servers and restrict which ones are allowed via organization-managed settings (see [Enterprise MCP policy](#enterprise-mcp-policy)).
 
 ### How Layering Works
 
-When the same server is defined at multiple levels, user config takes priority, followed by folder-level config, then project config.
+When the same server is defined at multiple levels, folder-level config takes priority (the folder closest to your working directory wins), followed by project config, then user config. Servers provided by organization-managed settings take priority over all local levels.
 
 **Key behaviors:**
 - When you **enable/disable** a project-defined server, a copy is saved to your user config with the new state. The original project config remains unchanged, so your teammates aren't affected.
