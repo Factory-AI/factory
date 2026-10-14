@@ -86,6 +86,82 @@ To leave comments and approvals on your PRs, Droid needs a GitHub token. There a
 
 For the security architecture behind the GitHub App, see [GitHub Integration Security](/enterprise/github-integration-security).
 
+## BYOK code review
+
+Use [Bring Your Own Key (BYOK)](/cli/byok/overview) to run code reviews with your own model provider credentials. The example below uses Anthropic. You still need `FACTORY_API_KEY` to run Droid and the GitHub access described above to post reviews.
+
+Add `FACTORY_API_KEY` and `ANTHROPIC_API_KEY` as repository or organization Actions secrets, and install the Factory Droid GitHub App on the repository. Save this workflow as `.github/workflows/droid-review.yml`, or update your existing review workflow rather than adding a second one:
+
+```yaml .github/workflows/droid-review.yml
+name: Droid BYOK Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  code-review:
+    if: |
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Configure BYOK model
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.factory"
+          umask 077
+          cat > "$HOME/.factory/settings.json" <<'JSON'
+          {
+            "customModels": [
+              {
+                "model": "claude-sonnet-4-5-20250929",
+                "displayName": "byok-review",
+                "baseUrl": "https://api.anthropic.com",
+                "apiKey": "${ANTHROPIC_API_KEY}",
+                "provider": "anthropic",
+                "maxOutputTokens": 16384
+              }
+            ]
+          }
+          JSON
+
+      - name: Run BYOK code review
+        uses: Factory-AI/droid-action@main
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        with:
+          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+          automatic_review: true
+          review_model: "custom:byok-review-0"
+          reasoning_effort: high
+```
+
+The quoted `JSON` heredoc keeps `${ANTHROPIC_API_KEY}` as an environment variable reference in the settings file. Droid resolves it from the review step's environment, so you don't embed the provider key in the workflow or generated settings.
+
+`review_model` selects the custom model for both review passes. For the single model above, `displayName: "byok-review"` produces the ID `custom:byok-review-0`. Use that custom ID, not the provider's raw model ID, which can select a Factory-managed model instead. To use another provider, change the model configuration and secret using the [BYOK configuration reference](/cli/byok/overview#configuration-reference).
+
+<Note>
+  This example uses a fresh GitHub-hosted runner and skips fork PRs, where Actions secrets are unavailable. Don't switch to `pull_request_target` to expose secrets to untrusted PR code. On a self-hosted runner, merge the custom model into your existing settings instead of overwriting them.
+</Note>
+
+After the first run, check the workflow logs and tracking comment for model fallback warnings and confirm usage in your provider's dashboard. An invalid custom model ID or an organization policy restriction can cause the action to use your organization's default model instead.
+
 ## Review depth
 
 The `review_depth` input controls the thoroughness and cost of each review. You choose the depth during `/install-code-review` setup, or set it directly in your workflow.
