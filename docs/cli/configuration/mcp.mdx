@@ -291,7 +291,8 @@ Each server entry includes:
 | `disabled` | `boolean` | Temporarily disable the server (default: `false`) |
 | `enabledTools` | `string[]` | Allowlist of tool names to load from this server. When set, only listed tools are loaded into context. |
 | `disabledTools` | `string[]` | Blocklist of tool names to exclude from this server. Disabled tools are not loaded into context. |
-| `timeoutMs` | `number` | Per-server override for the MCP tool call timeout in milliseconds. Falls back to the global default when omitted. |
+| `timeout` | `number` | Timeout for each MCP tool call from this server, in milliseconds (default: 3 minutes). |
+| `connectTimeout` | `number` | Timeout for connecting to and initializing this server, in milliseconds (default: 30 seconds for stdio servers, 10 seconds for http and sse servers). |
 
 For **stdio** servers:
 - **command**: Executable to run
@@ -482,9 +483,9 @@ Servers can expose many tools, and not all of them need to be loaded into every 
 
 ### MCP call timeout
 
-By default, droid applies a global timeout to every MCP tool invocation. Long-running tools (large data exports, browser automations, model-backed servers) can exceed this default and fail with a timeout error.
+By default, droid waits up to 3 minutes for each MCP tool invocation. Long-running tools (large data exports, browser automations, model-backed servers) can exceed this default and fail with a timeout error.
 
-Override the timeout per server with `timeoutMs`:
+Override the timeout per server with `timeout` (milliseconds):
 
 ```json
 {
@@ -492,27 +493,13 @@ Override the timeout per server with `timeoutMs`:
     "slow-server": {
       "type": "stdio",
       "command": "my-long-running-server",
-      "timeoutMs": 120000
+      "timeout": 600000
     }
   }
 }
 ```
 
-You can also set a global default via the `mcp.callTimeoutMs` setting in `settings.json`:
-
-```json
-{
-  "mcp": {
-    "callTimeoutMs": 60000
-  }
-}
-```
-
-Resolution order, highest priority first:
-
-1. Per-server `timeoutMs` in `mcp.json`
-2. Global `mcp.callTimeoutMs` in `settings.json`
-3. Built-in default
+Servers that are slow to start can also set `connectTimeout` (milliseconds) to extend the connection and initialization deadline, which defaults to 30 seconds for stdio servers and 10 seconds for http and sse servers.
 
 <Note>
   Increasing the timeout only changes how long droid waits for a response — it does not extend any timeouts enforced by the MCP server itself or its upstream APIs.
