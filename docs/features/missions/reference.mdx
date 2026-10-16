@@ -19,13 +19,13 @@ Missions inherit your existing Droid configuration:
 Missions can also run non-interactively via `droid exec --mission`. This is useful for CI, scheduled jobs, and any environment where you want the orchestrator to plan and execute without a live TUI.
 
 ```bash
-droid exec --mission -f mission.md
+droid exec --mission --auto high -f mission.md
 ```
 
 You can override the models and reasoning effort used by the orchestrator's worker and validator agents:
 
 ```bash
-droid exec --mission \
+droid exec --mission --auto high \
   --worker-model claude-sonnet-4-6 \
   --worker-reasoning-effort medium \
   --validator-model claude-opus-4-7 \

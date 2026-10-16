@@ -19,13 +19,13 @@ Factory Missions は既存の Droid 設定を継承します：
 ミッションは `droid exec --mission` を使って非対話的に実行することもできます。これは CI、スケジュール実行、ライブ TUI なしでオーケストレーターに計画と実行を任せたい環境で便利です。
 
 ```bash
-droid exec --mission -f mission.md
+droid exec --mission --auto high -f mission.md
 ```
 
 オーケストレーターのワーカーエージェントと検証エージェントが使用するモデルや推論努力を上書きできます：
 
 ```bash
-droid exec --mission \
+droid exec --mission --auto high \
   --worker-model claude-sonnet-4-6 \
   --worker-reasoning-effort medium \
   --validator-model claude-opus-4-7 \

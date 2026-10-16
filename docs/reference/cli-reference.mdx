@@ -146,11 +146,11 @@ Customize droid's behavior with command-line flags:
 | `--tag <spec>`                    | Session tag (name or JSON, repeatable)                             | `droid exec --tag code-review`                               |
 | `--log-group-id <id>`             | Log group ID for filtering logs                                    | `droid exec --log-group-id grp-123`                          |
 | `--fork <id>`                     | Fork and resume an existing session into a new copy                | `droid exec --fork session-abc123`                           |
-| `--mission`                       | Run `droid exec` in [mission mode](/features/missions/overview) (multi-agent orchestration) | `droid exec --mission -f mission.md`                         |
-| `--worker-model <id>`             | Model used for mission worker agents                               | `droid exec --mission --worker-model claude-sonnet-4-6`      |
-| `--worker-reasoning-effort <level>` | Reasoning effort for mission worker agents (`off`, `none`, `low`, `medium`, `high`) | `droid exec --mission --worker-reasoning-effort medium`      |
-| `--validator-model <id>`          | Model used for mission validator agents                            | `droid exec --mission --validator-model claude-opus-4-7`     |
-| `--validator-reasoning-effort <level>` | Reasoning effort for mission validator agents                  | `droid exec --mission --validator-reasoning-effort high`     |
+| `--mission`                       | Run `droid exec` in [mission mode](/features/missions/overview) (multi-agent orchestration) | `droid exec --mission --auto high -f mission.md`                         |
+| `--worker-model <id>`             | Model used for mission worker agents                               | `droid exec --mission --auto high --worker-model claude-sonnet-4-6 -f mission.md`      |
+| `--worker-reasoning-effort <level>` | Reasoning effort for mission worker agents (`off`, `none`, `low`, `medium`, `high`) | `droid exec --mission --auto high --worker-reasoning-effort medium -f mission.md`      |
+| `--validator-model <id>`          | Model used for mission validator agents                            | `droid exec --mission --auto high --validator-model claude-opus-4-7 -f mission.md`     |
+| `--validator-reasoning-effort <level>` | Reasoning effort for mission validator agents                  | `droid exec --mission --auto high --validator-reasoning-effort high -f mission.md`     |
 | `--append-system-prompt <text>`   | Append custom text to the end of the system prompt                 | `droid --append-system-prompt "Always run tests."`           |
 | `--append-system-prompt-file <path>` | Append the contents of a file to the end of the system prompt   | `droid --append-system-prompt-file .factory/system.md`       |
 | `-v, --version`                   | Display CLI version                                                | `droid -v`                                                   |
