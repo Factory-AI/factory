@@ -63,9 +63,9 @@ Options:
   --spec-model <id>                     Model ID to use for spec mode
   --spec-reasoning-effort <level>       Reasoning effort for spec mode
   --use-spec                            Start in spec mode
-  --restrict-tools <ids>                Restrict the run to only the specified tools (comma or space separated list)
-  --additional-tools <ids>              Enable additional tools beyond the defaults (comma or space separated list)
-  --disabled-tools <ids>                Disable specific tools (comma or space separated list)
+  --only-tools <ids>                    Use only tool IDs or MCP:<server>[/<tool>] selectors
+  --add-tools <ids>                     Add tool IDs or MCP:<server>[/<tool>] selectors
+  --remove-tools <ids>                  Remove tool IDs or MCP:<server>[/<tool>] selectors
   --disable-builtin-skills              Disable Factory-provided builtin skills for this session
   --list-tools                          List available tools for the selected model and exit
   --cwd <path>                          Working directory path
@@ -373,13 +373,13 @@ Enable or disable specific tools:
 
 ```bash
 # Restrict to only specific tools
-droid exec --restrict-tools ApplyPatch "refactor files"
+droid exec --only-tools ApplyPatch "refactor files"
 
 # Enable additional tools
-droid exec --additional-tools ApplyPatch "refactor files"
+droid exec --add-tools ApplyPatch "refactor files"
 
 # Disable specific tools
-droid exec --auto medium --disabled-tools execute-cli "run edits only"
+droid exec --auto medium --remove-tools execute-cli "run edits only"
 ```
 
 ### Skill controls

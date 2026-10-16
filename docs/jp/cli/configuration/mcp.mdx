@@ -440,7 +440,7 @@ Droid は `mcp.json` の読み込み時に、`${VAR}` と `${VAR:-default}` の�
 
 ### ツールごとのフィルタリング
 
-サーバーは多数のツールを公開できますが、すべてを毎回のセッションに読み込む必要はありません。`enabledTools` と `disabledTools` を使うと、`mcp.json` でツールの公開範囲を永続的に絞り込めます。これは `droid exec` で使える `--restrict-tools` / `--disabled-tools` フラグに対応しています。
+サーバーは多数のツールを公開できますが、すべてを毎回のセッションに読み込む必要はありません。`enabledTools` と `disabledTools` を使うと、`mcp.json` でツールの公開範囲を永続的に絞り込めます。これは `droid exec` で使える `--only-tools` / `--remove-tools` フラグに対応しています。
 
 - `disabledTools`: ブロックリスト — サーバーが報告したツールのうち、列挙した名前**以外**を読み込みます。
 - `enabledTools`: 許可リスト — 列挙したツール**のみ**を読み込みます。
