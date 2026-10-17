@@ -121,7 +121,7 @@ Each subagent's model is resolved from its droid config plus the parent's comple
 
 1. **Droid config `model`** – set `model` in the droid's frontmatter to pin a specific model, or `inherit` (the default) to defer to the parent.
    - Built-in model IDs: e.g., `claude-sonnet-4-5-20250929`. See [Available Models](/models).
-   - Custom (BYOK) models: use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`.
+   - Custom (BYOK) models: use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `displayName`.
 2. **Complexity → model routing** – when the droid's model is `inherit` and the parent passes a `complexity` tier, Droid maps that tier to a model using the routing you configure in `/settings` → **Subagents**:
    - **Light task model**, **Medium task model**, and **Heavy task model** each map a complexity tier to a specific model (with an optional reasoning effort), or leave it on **Inherit** to use the spawning session's model. You can point a tier at a concrete model or at the Auto model router.
 3. **Inherit fallback** – if no explicit routing applies, the subagent uses the parent session's active model and reasoning effort.
@@ -229,7 +229,7 @@ Key metadata fields:
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `name`            | Required. Lowercase letters, digits, `-`, `_`. Drives the `subagent_type` value and filename.                                  |
 | `description`     | Optional. Shown in the UI list. Keep ≤500 chars.                                                                               |
-| `model`           | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `model_display_name`. See the [Available Models](/models) for model IDs. |
+| `model`           | `inherit` (use parent session's model), or specify a model identifier. For built-in models, use values like `claude-sonnet-4-5-20250929`. For custom models (BYOK), use `custom:` + the `model` field from your config (e.g., `custom:gpt-4o-mini`), **not** the `displayName`. See the [Available Models](/models) for model IDs. |
 | `reasoningEffort` | Optional. Set reasoning effort for models that support it (e.g., `low`, `medium`, `high`). Ignored when `model` is `inherit`. Must be compatible with the selected model. |
 | `tools`           | Tool selection: omit for all tools, use a category string (e.g., `read-only`), or specify an array of tool IDs like `["Read", "Edit", "Execute"]`. Case-sensitive. To restrict a droid to specific MCP tools, list their exact registered tool IDs here. |
 | `mcpServers`      | Optional. Array of configured [MCP server](/cli/configuration/mcp) names (e.g., `["linear", "github"]`) whose tools should be available to this droid. When set, only tools from the listed servers are exposed to the subagent; omit to fall back to your global MCP tool availability. See [Selecting MCP servers](#selecting-mcp-servers). |

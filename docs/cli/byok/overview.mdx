@@ -43,7 +43,22 @@ Add custom models to `~/.factory/settings.json` under the `customModels` array:
 </Tip>
 
 <Note>
-  **Legacy support**: Custom models in `~/.factory/config.json` using snake_case field names (`custom_models`, `base_url`, etc.) are still supported for backwards compatibility. Both files are loaded and merged, with `settings.json` taking priority. Env var expansion for `apiKey` applies to `settings.json`/`settings.local.json` and not to legacy `config.json`.
+  **Migrating from `config.json`**: The CLI no longer reads `custom_models` from `~/.factory/config.json`. Models defined there do not appear in `/model` and are rejected by `droid exec -m`. Move each entry into the `customModels` array in `~/.factory/settings.json` and rename its fields to camelCase:
+
+  | Old `config.json` field | `settings.json` field |
+  |-------------------------|-----------------------|
+  | `model`, `provider`, `bedrock` | unchanged |
+  | `model_display_name` | `displayName` |
+  | `base_url` | `baseUrl` |
+  | `api_key` | `apiKey` |
+  | `max_tokens` | `maxOutputTokens` |
+  | `max_context_limit` | `maxContextLimit` |
+  | `enable_thinking` | `enableThinking` |
+  | `thinking_max_tokens` | `thinkingMaxTokens` |
+  | `reasoning_effort` | `reasoningEffort` |
+  | `extra_args` | `extraArgs` |
+  | `extra_headers` | `extraHeaders` |
+  | `supports_images: false` | `noImageSupport: true` |
 </Note>
 
 ### Supported Fields
@@ -238,7 +253,8 @@ Custom models display with the name you set in `displayName`, making it easy to 
 ## Troubleshooting
 
 ### Model not appearing in selector
-- Check JSON syntax in `~/.factory/settings.json` (or `config.json` if using legacy format)
+- Check JSON syntax in `~/.factory/settings.json`
+- Custom models in `~/.factory/config.json` are no longer read; move them to `customModels` in `settings.json` (see the migration note above)
 - Settings changes are detected automatically via file watching
 - Verify all required fields are present
 

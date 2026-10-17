@@ -43,7 +43,22 @@ Factory管理モデルと倍率については、[利用可能なモデル](/jp/
 </Tip>
 
 <Note>
-  **レガシーサポート**: 後方互換性のため、`~/.factory/config.json`内でsnake_caseフィールド名（`custom_models`、`base_url`など）を使うカスタムモデルは引き続きサポートされます。両方のファイルが読み込まれてマージされ、`settings.json`が優先されます。`apiKey`の環境変数展開は`settings.json`/`settings.local.json`に適用され、レガシーの`config.json`には適用されません。
+  **`config.json`からの移行**: CLIは`~/.factory/config.json`の`custom_models`を読み込まなくなりました。そこに定義されたモデルは`/model`に表示されず、`droid exec -m`でも無効なモデルとして拒否されます。各エントリを`~/.factory/settings.json`の`customModels`配列に移動し、フィールド名をcamelCaseに変更してください：
+
+  | 旧`config.json`のフィールド | `settings.json`のフィールド |
+  |-------------------------|-----------------------|
+  | `model`、`provider`、`bedrock` | 変更なし |
+  | `model_display_name` | `displayName` |
+  | `base_url` | `baseUrl` |
+  | `api_key` | `apiKey` |
+  | `max_tokens` | `maxOutputTokens` |
+  | `max_context_limit` | `maxContextLimit` |
+  | `enable_thinking` | `enableThinking` |
+  | `thinking_max_tokens` | `thinkingMaxTokens` |
+  | `reasoning_effort` | `reasoningEffort` |
+  | `extra_args` | `extraArgs` |
+  | `extra_headers` | `extraHeaders` |
+  | `supports_images: false` | `noImageSupport: true` |
 </Note>
 
 ### サポートされているフィールド
@@ -176,7 +191,8 @@ Droid CLIは利用可能な場合にプロンプトキャッシングを自動�
 ## トラブルシューティング
 
 ### セレクターにモデルが表示されない
-- `~/.factory/settings.json`（レガシー形式を使用している場合は`config.json`）でJSON構文を確認
+- `~/.factory/settings.json`でJSON構文を確認
+- `~/.factory/config.json`内のカスタムモデルは読み込まれなくなりました。`settings.json`の`customModels`に移動してください（上記の移行に関する注記を参照）
 - 設定変更はファイル監視により自動的に検出されます
 - すべての必須フィールドが存在することを確認
 

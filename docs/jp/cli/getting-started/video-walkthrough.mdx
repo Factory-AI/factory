@@ -247,8 +247,7 @@ droid
 
 ```
 ~/.factory/
-├── config.json          # Model configuration and BYOK
-├── settings.json        # CLI settings and allow/deny lists
+├── settings.json        # CLI settings, allow/deny lists, and custom models (BYOK)
 ├── mcp.json            # MCP integrations
 ├── droids/             # Custom sub-agents
 ├── commands/           # Custom slash commands
@@ -260,18 +259,19 @@ droid
   詳しく見る: [設定](/jp/cli/configuration/settings) | [カスタムスラッシュコマンド](/jp/cli/configuration/custom-slash-commands) | [カスタムDroid](/jp/cli/configuration/custom-droids) | [MCP設定](/jp/cli/configuration/mcp)
 </Tip>
 
-### config.json - 独自キーの使用
+### カスタムモデル - 独自キーの使用
 
-独自のAPIキーを使用してカスタムモデルを構成：
+独自のAPIキーを使用してカスタムモデルを構成するには、`~/.factory/settings.json`の`customModels`配列に追加します：
 
 ```json
 {
-  "models": [
+  "customModels": [
     {
-      "provider": "openrouter",
-      "name": "anthropic/claude-3.5-sonnet",
-      "apiKey": "your-api-key-here",
-      "displayName": "Claude 3.5 Sonnet (OpenRouter)"
+      "model": "anthropic/claude-sonnet-4.5",
+      "displayName": "Claude Sonnet 4.5 (OpenRouter)",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "${OPENROUTER_API_KEY}",
+      "provider": "generic-chat-completion-api"
     }
   ]
 }
@@ -286,8 +286,8 @@ droid
     選択したプロバイダーのJSON設定をコピーします
   </Step>
 
-  <Step title="config.jsonに追加">
-    設定を`~/.factory/config.json`に貼り付け、APIキーを追加します
+  <Step title="settings.jsonに追加">
+    エントリを`~/.factory/settings.json`の`customModels`配列に貼り付け、APIキーを追加します。`~/.factory/config.json`内のカスタムモデルは読み込まれなくなりました。
   </Step>
 
   <Step title="モデルを選択">

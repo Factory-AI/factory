@@ -247,8 +247,7 @@ Access your configuration directory by pressing `Cmd + Shift + H` to show your r
 
 ```
 ~/.factory/
-├── config.json          # Model configuration and BYOK
-├── settings.json        # CLI settings and allow/deny lists
+├── settings.json        # CLI settings, allow/deny lists, and custom models (BYOK)
 ├── mcp.json            # MCP integrations
 ├── droids/             # Custom sub-agents
 ├── commands/           # Custom slash commands
@@ -260,18 +259,19 @@ Access your configuration directory by pressing `Cmd + Shift + H` to show your r
   Learn more: [Settings](/cli/configuration/settings) | [Custom Slash Commands](/cli/configuration/custom-slash-commands) | [Custom Droids](/cli/configuration/custom-droids) | [MCP Configuration](/cli/configuration/mcp)
 </Tip>
 
-### config.json - Bring Your Own Key
+### Custom models - Bring Your Own Key
 
-Configure custom models using your own API keys:
+Configure custom models using your own API keys by adding them to the `customModels` array in `~/.factory/settings.json`:
 
 ```json
 {
-  "models": [
+  "customModels": [
     {
-      "provider": "openrouter",
-      "name": "anthropic/claude-3.5-sonnet",
-      "apiKey": "your-api-key-here",
-      "displayName": "Claude 3.5 Sonnet (OpenRouter)"
+      "model": "anthropic/claude-sonnet-4.5",
+      "displayName": "Claude Sonnet 4.5 (OpenRouter)",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "${OPENROUTER_API_KEY}",
+      "provider": "generic-chat-completion-api"
     }
   ]
 }
@@ -286,8 +286,8 @@ Configure custom models using your own API keys:
     Copy the JSON configuration for your chosen provider
   </Step>
   
-  <Step title="Add to config.json">
-    Paste the configuration into `~/.factory/config.json` and add your API key
+  <Step title="Add to settings.json">
+    Paste the entry into the `customModels` array in `~/.factory/settings.json` and add your API key. Custom models in `~/.factory/config.json` are no longer read.
   </Step>
   
   <Step title="Select Model">
