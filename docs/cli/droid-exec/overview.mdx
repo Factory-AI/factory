@@ -354,11 +354,14 @@ Use `--use-spec` to start in specification mode, where the agent plans before ex
 droid exec --use-spec --auto low "refactor the auth module"
 ```
 
-You can also use a different model for the spec phase:
+You can also use a different model for the spec phase. `--spec-model` enables spec mode on its own (it implies `--use-spec`), so these two commands are equivalent:
 
 ```bash
+droid exec --spec-model claude-haiku-4-5-20251001 --auto medium "implement feature X"
 droid exec --use-spec --spec-model claude-haiku-4-5-20251001 --auto medium "implement feature X"
 ```
+
+`--spec-reasoning-effort` does not enable spec mode by itself; combine it with `--use-spec` or `--spec-model`.
 
 ### Tool controls
 

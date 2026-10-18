@@ -319,10 +319,12 @@ droid exec -m claude-sonnet-4-5-20250929 -r medium -f plan.md
 ```bash
 droid exec --use-spec --auto low "refactor the auth module"
 ```
-仕様フェーズで異なるモデルを使用することもできます：
+仕様フェーズで異なるモデルを使用することもできます。`--spec-model` は単独でspecモードを有効にする（`--use-spec` を含意する）ため、次の2つのコマンドは同じ動作になります：
 ```bash
+droid exec --spec-model claude-haiku-4-5-20251001 --auto medium "implement feature X"
 droid exec --use-spec --spec-model claude-haiku-4-5-20251001 --auto medium "implement feature X"
 ```
+`--spec-reasoning-effort` は単独ではspecモードを有効にしません。`--use-spec` または `--spec-model` と組み合わせて使用してください。
 ### ツール制御
 
 モデルで利用可能なツールを一覧表示する：
