@@ -69,20 +69,20 @@ Building AI features that understand codebases requires orchestrating multiple o
 
 ## 3. How It Works: The Core Pattern
 
-The Factory example uses a simple pattern: spawn `droid exec` with `--output-format debug` and stream the results via Server-Sent Events (SSE).
+The Factory example uses a simple pattern: spawn `droid exec` with `--output-format stream-json`, which writes one JSON event per line to stdout, and forward those events to the browser via Server-Sent Events (SSE).
 
 ### Running Droid Exec
 
 ```typescript
 // Simplified from src/server/chat.ts
 function runDroidExec(prompt: string, repoPath: string) {
-  const args = ["exec", "--output-format", "debug"];
+  const args = ["exec", "--output-format", "stream-json"];
   
-  // Optional: configure model (defaults to glm-4.7)
-  const model = process.env.DROID_MODEL_ID ?? "glm-4.7";
+  // Optional: configure model (falls back to glm-5.3)
+  const model = process.env.DROID_MODEL_ID ?? "glm-5.3";
   args.push("-m", model);
   
-  // Optional: reasoning level (off|low|medium|high)
+  // Optional: reasoning level (e.g. off|low|medium|high; supported levels vary by model)
   const reasoning = process.env.DROID_REASONING;
   if (reasoning) {
     args.push("-r", reasoning);
@@ -99,20 +99,21 @@ function runDroidExec(prompt: string, repoPath: string) {
 
 ### Key Flags Explained
 
-**`--output-format debug`**: Streams structured events as the agent works
-- Each tool call (file read, search, etc.) emits an event
+**`--output-format stream-json`**: Streams structured events as JSON Lines (one JSON object per line) while the agent works
+- Each tool call (file read, search, etc.) emits a `tool_call` event, followed by a `tool_result` event
 - Lets you show real-time progress to users
 - Alternative: `--output-format json` for final output only
 
 **`-m` (model)**: Choose your AI model
-- `glm-4.7` - Fast, cheap (default)
-- `gpt-5-codex` - Most powerful for complex code
+- `glm-5.3` - Fast, cheap (the snippet's fallback when `DROID_MODEL_ID` is unset)
+- `gpt-5.3-codex` - Most powerful for complex code
 - `claude-sonnet-4-5-20250929` - Best balance of speed and capability
 
 **`-r` (reasoning)**: Control thinking depth
 - `off` - No reasoning, fastest
-- `low` - Light reasoning (default)
+- `low` - Light reasoning
 - `medium|high` - Deeper analysis, slower
+- Supported levels vary by model; if you omit `-r`, droid uses the model's default reasoning effort
 
 **No `--auto` flag?**: Defaults to read-only (safest)
 - Can't modify files, only read/search/analyze
@@ -155,7 +156,7 @@ export async function handleChatRequest(req: Request): Promise<Response> {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
       };
       
-      // Read stdout and parse debug events
+      // Read stdout and parse stream-json events (one JSON object per line)
       const reader = proc.stdout.getReader();
       let buffer = "";
       
@@ -191,7 +192,17 @@ export async function handleChatRequest(req: Request): Promise<Response> {
 
 ### Event Types You'll Receive
 
-When `--output-format debug` is used, droid emits events like:
+With `--output-format stream-json`, droid writes one JSON object per line to stdout, starting with a `system` init event and ending with a `completion` event (an `error` event is emitted on failure, and `reasoning` events appear for models that expose reasoning). For example (abbreviated):
+
+```jsonl
+{"type":"system","subtype":"init","cwd":"/path/to/repo","session_id":"abc123","tools":["Read","LS","Grep","Glob"],"model":"glm-5.3","reasoning_effort":"high"}
+{"type":"tool_call","id":"call_1","messageId":"msg_1","toolId":"Grep","toolName":"Grep","parameters":{"pattern":"MCP"},"timestamp":1730000000000,"session_id":"abc123"}
+{"type":"tool_result","id":"call_1","messageId":"msg_1","toolId":"Grep","isError":false,"value":"src/billing.ts\nconfig/pricing.yml","timestamp":1730000000500,"session_id":"abc123"}
+{"type":"message","role":"assistant","id":"msg_2","text":"I found references to MCP servers in...","timestamp":1730000001000,"session_id":"abc123"}
+{"type":"completion","finalText":"I found references to MCP servers in...","numTurns":2,"durationMs":5400,"session_id":"abc123","timestamp":1730000001200,"usage":{"input_tokens":1200,"output_tokens":150,"cache_read_input_tokens":0,"cache_creation_input_tokens":0,"factory_credits":1}}
+```
+
+The example server parses these lines and re-emits them to the browser as its own SSE events, such as:
 
 ```
 event: tool_call
@@ -297,7 +308,7 @@ examples/droid-chat/
 │   │   ├── chat.ts        # SSE endpoint, runs droid exec
 │   │   ├── repo.ts        # Finds local repo in ./repos/
 │   │   ├── prompt.ts      # System prompt + history formatting
-│   │   └── stream.ts      # Parses debug output, strips paths
+│   │   └── stream.ts      # Parses stream-json output, strips paths
 │   ├── components/chat/   # React chat UI
 │   └── hooks/useChat.ts   # Client-side SSE parsing
 ├── repos/                 # Your repositories to chat with
@@ -311,10 +322,10 @@ The example supports environment variables:
 
 ```bash
 # .env
-DROID_MODEL_ID=gpt-5-codex  # Default: glm-4.7
-DROID_REASONING=low         # Default: low (off|low|medium|high)
-PORT=4000                   # Default: 4000
-HOST=localhost              # Default: localhost
+DROID_MODEL_ID=gpt-5.3-codex  # Default: glm-5.3
+DROID_REASONING=low           # Optional; when unset, -r is omitted and the model default applies
+PORT=4000                     # Default: 4000
+HOST=localhost                # Default: localhost
 ```
 
 ### Best Practices
@@ -324,7 +335,7 @@ HOST=localhost              # Default: localhost
 - Validate user input before passing to `droid exec`
 - Set timeouts (example uses 240 seconds)
 - Parse SSE events incrementally for responsive UI
-- Strip local file paths from debug output before sending to client
+- Strip local file paths from stream-json output before sending to client
 
 ⚠️ **Avoid:**
 - Using `--auto medium/high` in production without sandboxing
@@ -376,8 +387,8 @@ fs.writeFileSync('./repos/site-content/page.md', markdown);
 function runWithModel(prompt: string, model: string) {
   return Bun.spawn([
     "droid", "exec",
-    "-m", model,  // glm-4.7, gpt-5-codex, etc.
-    "--output-format", "debug",
+    "-m", model,  // glm-5.3, gpt-5.3-codex, etc.
+    "--output-format", "stream-json",
     prompt
   ], { cwd: repoPath });
 }
@@ -385,7 +396,7 @@ function runWithModel(prompt: string, model: string) {
 
 ### Add Tool Call Visibility
 
-The example's `stream.ts` parses debug events. You can surface them in the UI:
+The example's `stream.ts` parses stream-json events. You can surface them in the UI:
 
 ```typescript
 if (event === "tool_call") {
