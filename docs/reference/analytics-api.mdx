@@ -526,7 +526,7 @@ curl -H "Authorization: Bearer $FACTORY_API_KEY" \
 
 - **Format**: All dates must be `YYYY-MM-DD`
 - **Timezone**: UTC only (no timezone parameter)
-- **Data availability**: Data is available through yesterday (UTC). Requesting today's date returns a `400` error.
+- **Data availability**: Data is available through today (UTC). Today's data is partial and fills in as the day goes on. An `endDate` in the future returns a `400` error.
 - **Historical data**: Available from January 14, 2026
 
 ### Rate Limits
@@ -541,7 +541,7 @@ The API returns standard HTTP status codes:
 
 | Status | Description                                          |
 | :----- | :--------------------------------------------------- |
-| `400`  | Invalid date format, today's date requested, or limit out of range |
+| `400`  | Invalid date format, future end date requested, or limit out of range |
 | `401`  | Missing or invalid API key                           |
 | `403`  | Insufficient permissions (requires Manager or Owner role) |
 | `500`  | Internal error                                       |
@@ -551,7 +551,7 @@ The API returns standard HTTP status codes:
 ```json
 {
   "title": "Bad Request",
-  "detail": "Cannot query today's date - analytics data has a 24-hour lag",
+  "detail": "endDate cannot be in the future. Please use today (UTC) or earlier as the end date.",
   "status": 400,
   "requestId": "req_01HPMQ9WXYZ..."
 }
@@ -568,8 +568,8 @@ CLI/Daemon → OTEL Events → BigQuery (raw) → dbt models → API
 ```
 
 - **Source**: OpenTelemetry spans from the CLI and daemon
-- **Processing**: Daily batch aggregation via dbt
-- **Availability**: Data is available the day after it's generated
+- **Processing**: Incremental aggregation via dbt, refreshed throughout the day
+- **Availability**: Today's data (UTC) is partial until the day ends
 
 ---
 
