@@ -85,6 +85,24 @@ When creating a PR, the Slack integration will also use a subagent to handle CI 
 
 When a Slack thread is imported, Factory has access to the entire conversation history, allowing it to provide context-aware assistance.
 
+## Run Droid as yourself
+
+To use your own Droid from Slack, with your personal identity and connected apps, **DM the Factory app** directly. Sessions started from a DM with `@Factory` always run as you, never as a service account.
+
+You can also DM yourself and mention `@Factory`, but Slack doesn't let the Factory app join that conversation, so Factory will prompt you to open a code channel instead.
+
+Channel mentions follow the channel's **Run as** setting, which may be a service account. Keeping personal identity to DMs means you can't accidentally expose your credentials in a shared channel or give other people access to your connected apps.
+
+### Choose the computer, model, and instructions for your DMs
+
+Go to [**Settings** → **Session Defaults**](https://app.factory.ai/settings/session-defaults) and scroll to the **Delegations** section at the bottom of the page. There you can set:
+
+- **Compute**: the Droid Computer or workspace your Slack DM sessions run on
+- **Model**: the default model for those sessions
+- **Instructions**: custom instructions added to every delegated session
+
+If you don't set a computer, Factory runs the session on a computer it sets up for you.
+
 ## Slack settings
 
 After Slack is connected, click **Manage** from [**Settings** → **Organization**](https://app.factory.ai/settings/organization) to configure Slack channel settings. These settings are only needed for Incident Response and service-account workflows; standard `@Factory` mentions work without configuring channels here.
