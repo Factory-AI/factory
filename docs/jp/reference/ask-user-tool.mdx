@@ -1,0 +1,234 @@
+---
+title: "AskUser ツールリファレンス"
+description: "Droid の AskUser ツールのアンケート形式、制限、利用可否、JSON-RPC プロトコル"
+---
+
+`AskUser` は、続行する前にあなたの判断が必要なときに Droid が呼び出すツールです。短い選択式アンケートを表示し、回答を待ち、その結果をプレーンテキストとしてモデルに返します。
+
+このページでは、正確な入力形式とレスポンス形状を説明します。これにより、以下が可能になります。
+
+* Droid がいつどのように質問するかを制御するプロンプト、[スキル](/jp/cli/configuration/skills)、または [カスタムDroid](/jp/cli/configuration/custom-droids) を作成する
+* 独自ツールで AskUser アンケートを生成または検証する
+* [`droid exec` JSON-RPC](/jp/cli/droid-exec/overview#build-custom-flows-on-raw-json-rpc) や Droid SDK 上に構築したカスタムクライアントで AskUser の質問を表示し、回答を返す
+
+## 概要
+
+| 項目 | 値 |
+| --- | --- |
+| モデル向け名称 | `AskUser` |
+| ツール ID | `ask-user` |
+| 入力 | 1 つの文字列フィールド `questionnaire` |
+| 出力 | 各質問と選択された回答を並べたプレーンテキスト |
+| 実行場所 | クライアント側で実行され、ユーザーが回答またはキャンセルするまでブロック |
+| 利用可能 | インタラクティブな Droid CLI（TUI）、Factory App、`droid.ask_user` に応答する長寿命 JSON-RPC クライアント |
+| 利用不可 | サブエージェント（`Task`）、ワンショット `droid exec` |
+
+## 入力スキーマ
+
+AskUser は単一のパラメータを取ります。追加のプロパティは拒否されます。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "questionnaire": {
+      "type": "string",
+      "description": "ユーザーに提示するプレーンテキストのアンケート。"
+    }
+  },
+  "required": ["questionnaire"],
+  "additionalProperties": false
+}
+```
+
+## アンケート形式
+
+アンケートは、タグ付きの行で構成されるプレーンテキストです。各質問は `[question]` 行で始まり、必要に応じて 1 つの `[topic]` 行が続き、その後に対応する `[option]` 行が並びます。
+
+```text
+1. [question] Which features do you want to enable? (multi)
+[topic] Features
+[option] Auth handling
+[option] Login page
+
+2. [question] Which library should we use for date formatting?
+[topic] Library
+[option] date-fns
+[option] Day.js
+```
+
+### タグ
+
+| タグ | 必須 | 意味 |
+| --- | --- | --- |
+| `[question]` | はい | 新しい質問を開始します。行の残りが質問文になります。 |
+| `(multi)` | いいえ | `[question]` 行の末尾に置きます。ユーザーが複数の選択肢を選べるようにします。 |
+| `[topic]` | いいえ | アンケートのナビゲーションバーに表示される短いラベルです。対応する `[question]` の後に置く必要があります。 |
+| `[option]` | いいえ | 1 つの回答候補です。対応する `[question]` の後に置く必要があります。 |
+
+タグは大文字小文字を区別しません。
+
+### 解析ルール
+
+パーサーは、よくある書式の揺れを許容します。
+
+* **番号と箇条書き。** タグ行の先頭には `1.`、`1)`、`-`、`*`、`•` を付けられます。
+* **見出しとコードフェンス。** Markdown の見出し（`# ...`）とコードフェンス行は無視されます。アンケート全体がコードフェンスで囲まれている場合は、その中身だけが解析されます。
+* **前置きテキスト。** 最初の `[question]` 行より前にある内容はすべて無視されます。
+* **複数行の質問。** `[question]` 行の直後にあるタグなし行（`[topic]` や `[option]` より前）は、質問文に連結されます。
+* **タグのみの行。** 値を伴わない `[question]`、`[topic]`、`[option]` 行は、次の空でない行を値として使います。
+* **インラインタグ。** `[question]` と同じ行に書かれた `[topic]` と `[option]` は、別行として分割されます。
+* **暗黙の質問。** `[question]` タグのない番号付き行（たとえば `2. Which database?`）でも、次の空でない行が `[topic]` または `[option]` なら質問として扱われます。
+* **トピック。** 複数語のトピックは、空白をハイフンに置き換えて正規化されます（`My Topic` は `My-Topic` になります）。トピックが指定されない場合は、`Q1`、`Q2` のように補われます。
+* **デフォルトの選択肢。** `[option]` 行がない質問には、`Yes` と `No` が選択肢として付与されます。
+
+### 制限とバリデーション
+
+モデルには、アンケートを小さく保つよう指示されています。パーサー側ではもう少し緩いハード制限を設けているため、少し大きいアンケートでも動作します。
+
+| ルール | 推奨（モデルへのガイダンス） | 強制（パーサー） |
+| --- | --- | --- |
+| 1 回の呼び出しあたりの質問数 | 1 ～ 4 | 1 ～ 10 |
+| 1 問あたりの選択肢数 | 2 ～ 4 | 1 ～ 10 |
+| 重複する選択肢 | 不可 | 拒否（大文字小文字を区別しない） |
+| 空の質問文・トピック・選択肢 | 不可 | 拒否 |
+
+バリデーションに失敗したアンケートはユーザーに表示されません。ツールは次の形式でモデルにエラーを返し、モデルは修正したアンケートで再試行できます。
+
+```text
+Invalid AskUser questionnaire format at line 3: [option] must come after a [question]
+```
+
+### 作成ガイドライン
+
+これらは、Droid がアンケートを書くときに与えられているルールです。Droid に指示するときや、自分でアンケートを生成するときは、これに従ってください。
+
+* アンケートは短く、焦点を絞ってください。さらに質問が必要な場合は、AskUser を複数回呼び出せます。
+* AskUser を呼び出す前に、回答が必要な理由とトレードオフを説明する短い可視メッセージを送ってください。推論内容はデフォルトで非表示です。
+* 各 `[question]` は、それ単体で理解できるようにしてください。インターフェースによっては、周囲のメッセージが表示されず、質問だけが表示されます。
+* 選択肢ラベルは短くしてください。単一選択の質問では選択肢同士が相互排他的である必要があり、`(multi)` の質問では組み合わせて選べます。
+* `"Other"` や `"Own answer"` の選択肢は追加しないでください。どのインターフェースでも、ユーザーは自分で自由回答を入力できます。
+
+## 出力形式
+
+ユーザーが送信すると、AskUser はモデルにプレーンテキストの結果を返します。各質問は 1 始まりの番号で列挙され、その後に回答が続きます。
+
+```text
+1. [question] Which features do you want to enable?
+[answer] Auth handling, Login page
+
+2. [question] Which library should we use for date formatting?
+[answer] date-fns
+```
+
+* `(multi)` の質問では、選択された項目は `, ` で連結されます。
+* ユーザーが入力した自由回答は、そのまま返されます。
+
+回答数が質問数と一致しない場合、ツールは代わりにモデルへエラーを返します。
+
+### キャンセル
+
+ユーザーがアンケートをキャンセルすると、Droid はそれを割り込みとして扱います。モデルにエラーを返して続行するのではなく、現在のターンを停止します。
+
+## 利用可否
+
+AskUser は、人が回答できる場合にのみモデルへ提示されます。
+
+* **インタラクティブ CLI と Factory App。** デフォルトで有効です。
+* **仕様モード。** Droid が仕様を提案する前に要件を明確化できるよう、`ExitSpecMode` とあわせて有効になります。
+* **サブエージェント。** 無効です。`Task` ツールで開始されたサブエージェントは非対話で実行され、質問する代わりに結果を報告します。[カスタムDroid](/jp/cli/configuration/custom-droids) を参照してください。
+* **ワンショット `droid exec`。** プロンプトに答えるものがいないため無効です。これは `--use-spec` を使う場合や、`--enabled-tools` に `ask-user` を指定した場合でも同様です。
+* **長寿命 JSON-RPC（`--input-format stream-jsonrpc --output-format stream-jsonrpc`）。** クライアントは `droid.ask_user` リクエストを受け取り、それに応答する必要があります。詳しくは次のセクションを参照してください。
+
+JSON-RPC セッションで AskUser を無効にするには、`droid.initialize_session` または `droid.load_session` に `"disabledToolIds": ["ask-user"]` を渡します。その場合、Droid は質問せず、自身の判断で進行します。
+
+## JSON-RPC プロトコル
+
+`droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc` で Droid をサブプロセスとして実行すると、AskUser 呼び出しは stdout 上の server-to-client リクエストになります。Droid はすでにアンケートを解析済みなので、クライアントは構造化された質問を受け取り、テキスト形式を自分で解析する必要はありません。
+
+### リクエスト: `droid.ask_user`
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-42",
+  "method": "droid.ask_user",
+  "params": {
+    "toolCallId": "toolu_01ABC...",
+    "questions": [
+      {
+        "index": 1,
+        "topic": "Features",
+        "question": "Which features do you want to enable?",
+        "options": ["Auth handling", "Login page"],
+        "multiSelect": true
+      },
+      {
+        "index": 2,
+        "topic": "Library",
+        "question": "Which library should we use for date formatting?",
+        "options": ["date-fns", "Day.js"]
+      }
+    ]
+  }
+}
+```
+
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| `toolCallId` | `string` | このリクエストを発生させた AskUser ツール呼び出しの ID |
+| `questions[].index` | `number` | 質問の 1 始まりの位置 |
+| `questions[].topic` | `string` | ナビゲーション用の短いラベル（正規化済み。デフォルトは `Q<index>`） |
+| `questions[].question` | `string` | 質問文（改行を含む場合があります） |
+| `questions[].options` | `string[]` | 順番どおりの回答候補 |
+| `questions[].multiSelect` | `boolean?` | ユーザーが複数の選択肢を選べる場合は `true` |
+
+クライアントは、認識しないフィールドを無視する必要があります。
+
+### レスポンス
+
+同じ `id` を使った JSON-RPC レスポンスを stdin で返してください。各質問に対して 1 つの回答を返します。
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-42",
+  "result": {
+    "answers": [
+      { "index": 1, "question": "Which features do you want to enable?", "answer": "Auth handling, Login page" },
+      { "index": 2, "question": "Which library should we use for date formatting?", "answer": "date-fns" }
+    ]
+  }
+}
+```
+
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| `answers[].index` | `number` | 回答対象の質問の `index` |
+| `answers[].question` | `string` | そのまま返す質問文 |
+| `answers[].answer` | `string` | 選択された項目。`multiSelect` の場合は `, ` 連結のリスト、または自由回答 |
+| `cancelled` | `boolean?` | キャンセル時は空の `answers` 配列とともに `true` を設定します。これによりターンが中断されます |
+
+キャンセルする場合:
+
+```json
+{ "jsonrpc": "2.0", "id": "req-42", "result": { "cancelled": true, "answers": [] } }
+```
+
+Droid は AskUser 呼び出しを、通常のツール呼び出しとして `droid.session_notification` イベントにも出力します。その入力には生の `questionnaire` 文字列が含まれるため、トランスクリプトや UI で何が尋ねられたかを表示できます。
+
+型付きのリクエスト/レスポンスモデルについては、[TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript) と [Python SDK](https://github.com/Factory-AI/droid-sdk-python) を参照してください。
+
+## Hooks
+
+AskUser がアンケートを開くと、Droid は `notification_type` を `elicitation_dialog` に設定した [`Notification` フック](/jp/reference/hooks-reference#notification) を発火します。メッセージには質問内容は含まれず、質問数だけが含まれます。
+
+```json
+{
+  "hook_event_name": "Notification",
+  "notification_type": "elicitation_dialog",
+  "message": "Factory CLI is asking the user 2 question(s)"
+}
+```
+
+これを使うと、Droid があなたの回答待ちになったときに、デスクトップ通知やチャット通知を送れます。
