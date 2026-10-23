@@ -286,7 +286,7 @@ Each stdin line is one JSON-RPC request. Each stdout line is a JSON-RPC response
 - Sends turns with `droid.add_user_message`
 - Reads stdout line-by-line and matches responses by `id`
 - Handles `droid.session_notification` events for assistant text deltas, tool events, token usage, errors, and turn completion
-- Responds to server-to-client requests such as `droid.request_permission` and `droid.ask_user`
+- Responds to server-to-client requests such as `droid.request_permission` and `droid.ask_user` (see the [AskUser tool reference](/reference/ask-user-tool#json-rpc-protocol))
 - Calls other session methods to interrupt work, update settings, manage MCP servers/tools, inspect context, fork sessions, or compact history
 - Implements timeouts, process cleanup, and session persistence
 

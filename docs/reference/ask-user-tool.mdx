@@ -1,0 +1,234 @@
+---
+title: "AskUser tool reference"
+description: "Questionnaire format, limits, availability, and JSON-RPC protocol for Droid's AskUser tool"
+---
+
+`AskUser` is the tool Droid calls when it needs you to make a decision before it continues. It shows a short multiple-choice questionnaire, waits for your answers, and returns them to the model as plain text.
+
+This page documents the exact input format and response shape so you can:
+
+* Write prompts, [skills](/cli/configuration/skills), or [custom droids](/cli/configuration/custom-droids) that steer when and how Droid asks questions
+* Generate or validate AskUser questionnaires in your own tooling
+* Render AskUser questions and return answers from a custom client built on [`droid exec` JSON-RPC](/cli/droid-exec/overview#build-custom-flows-on-raw-json-rpc) or the Droid SDKs
+
+## At a glance
+
+| Property            | Value                                                                  |
+| ------------------- | ---------------------------------------------------------------------- |
+| Model-facing name   | `AskUser`                                                              |
+| Tool ID             | `ask-user`                                                             |
+| Input               | One string field, `questionnaire`                                      |
+| Output              | Plain text listing each question and the selected answer               |
+| Runs                | On the client, blocking until the user answers or cancels              |
+| Available in        | Interactive Droid CLI (TUI), Factory App, and long-lived JSON-RPC clients that answer `droid.ask_user` |
+| Not available in    | Subagents (`Task`), one-shot `droid exec`                              |
+
+## Input schema
+
+AskUser takes a single parameter. Extra properties are rejected.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "questionnaire": {
+      "type": "string",
+      "description": "A plain-text questionnaire to ask the user."
+    }
+  },
+  "required": ["questionnaire"],
+  "additionalProperties": false
+}
+```
+
+## Questionnaire format
+
+A questionnaire is plain text made of tagged lines. Each question starts with a `[question]` line, optionally followed by one `[topic]` line, followed by its `[option]` lines.
+
+```text
+1. [question] Which features do you want to enable? (multi)
+[topic] Features
+[option] Auth handling
+[option] Login page
+
+2. [question] Which library should we use for date formatting?
+[topic] Library
+[option] date-fns
+[option] Day.js
+```
+
+### Tags
+
+| Tag          | Required | Meaning                                                                                       |
+| ------------ | -------- | --------------------------------------------------------------------------------------------- |
+| `[question]` | Yes      | Starts a new question. The rest of the line is the question text.                             |
+| `(multi)`    | No       | Placed at the end of a `[question]` line. Lets the user select more than one option.          |
+| `[topic]`    | No       | Short label shown in the questionnaire's navigation bar. Must come after its `[question]`.    |
+| `[option]`   | No       | One answer choice. Must come after its `[question]`.                                          |
+
+Tags are case-insensitive.
+
+### Parsing rules
+
+The parser is tolerant of common formatting variations:
+
+* **Numbering and bullets.** A tag line may be prefixed with `1.`, `1)`, `-`, `*`, or `•`.
+* **Headers and code fences.** Markdown headers (`# ...`) and code fence lines are ignored. If the questionnaire is wrapped in a code fence, only the fenced content is parsed.
+* **Preamble text.** Anything before the first `[question]` line is ignored.
+* **Multi-line questions.** Untagged lines directly after a `[question]` line (before any `[topic]` or `[option]`) are appended to the question text.
+* **Tag on its own line.** A bare `[question]`, `[topic]`, or `[option]` line takes its value from the next non-empty line.
+* **Inline tags.** `[topic]` and `[option]` tags written on the same line as `[question]` are split onto separate lines.
+* **Implicit questions.** A numbered line without a `[question]` tag (for example `2. Which database?`) is treated as a question when the next non-empty line is a `[topic]` or `[option]`.
+* **Topics.** Multi-word topics are normalized by replacing whitespace with hyphens (`My Topic` becomes `My-Topic`). When no topic is given, the topic defaults to `Q1`, `Q2`, and so on.
+* **Default options.** A question with no `[option]` lines gets `Yes` and `No` as its options.
+
+### Limits and validation
+
+The model is instructed to keep questionnaires small. The parser enforces looser hard limits so slightly oversized questionnaires still work.
+
+| Rule                     | Recommended (model guidance) | Enforced (parser) |
+| ------------------------ | ---------------------------- | ----------------- |
+| Questions per call       | 1 to 4                       | 1 to 10           |
+| Options per question     | 2 to 4                       | 1 to 10           |
+| Duplicate options        | Not allowed                  | Rejected (case-insensitive) |
+| Empty question, topic, or option text | Not allowed     | Rejected          |
+
+A questionnaire that fails validation is not shown to the user. The tool returns an error to the model in this form, and the model can retry with a corrected questionnaire:
+
+```text
+Invalid AskUser questionnaire format at line 3: [option] must come after a [question]
+```
+
+### Authoring guidelines
+
+These are the rules Droid is given for writing questionnaires. Follow them when you instruct Droid, or when you generate questionnaires yourself.
+
+* Keep the questionnaire short and focused. AskUser can be called more than once if more questions are needed.
+* Before calling AskUser, send a brief visible message that explains why the answers are needed and any trade-offs. Reasoning is hidden by default.
+* Make each `[question]` understandable on its own. Some interfaces show only the question, not the surrounding message.
+* Keep option labels short. Options for single-choice questions must be mutually exclusive; options for `(multi)` questions may be combined.
+* Do not add an "Other" or "Own answer" option. Every interface lets the user type a custom answer automatically.
+
+## Output format
+
+When the user submits, AskUser returns a plain-text result to the model. Each question is listed by its 1-based index, followed by the answer:
+
+```text
+1. [question] Which features do you want to enable?
+[answer] Auth handling, Login page
+
+2. [question] Which library should we use for date formatting?
+[answer] date-fns
+```
+
+* For `(multi)` questions, selected options are joined with `, `.
+* A custom typed answer is returned as written.
+
+If the number of answers does not match the number of questions, the tool returns an error to the model instead.
+
+### Cancellation
+
+If the user cancels the questionnaire, Droid treats it as an interrupt: the current turn stops rather than the model receiving an error and continuing.
+
+## Availability
+
+AskUser is only offered to the model when a person can answer it.
+
+* **Interactive CLI and Factory App.** Enabled by default.
+* **Specification Mode.** Enabled alongside `ExitSpecMode` so Droid can clarify requirements before proposing a spec.
+* **Subagents.** Disabled. Subagents started with the `Task` tool run non-interactively and report back instead of asking. See [custom droids](/cli/configuration/custom-droids).
+* **One-shot `droid exec`.** Disabled, because nothing can answer the prompt. This applies even with `--use-spec` or when you list `ask-user` in `--enabled-tools`.
+* **Long-lived JSON-RPC (`--input-format stream-jsonrpc --output-format stream-jsonrpc`).** Your client receives `droid.ask_user` requests and must answer them. See the next section.
+
+To turn AskUser off in a JSON-RPC session, pass `"disabledToolIds": ["ask-user"]` in `droid.initialize_session` or `droid.load_session`. Droid then proceeds on its own judgment instead of asking.
+
+## JSON-RPC protocol
+
+When Droid runs as a subprocess with `droid exec --input-format stream-jsonrpc --output-format stream-jsonrpc`, an AskUser call becomes a server-to-client request on stdout. Droid has already parsed the questionnaire, so your client receives structured questions and does not need to parse the text format.
+
+### Request: `droid.ask_user`
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-42",
+  "method": "droid.ask_user",
+  "params": {
+    "toolCallId": "toolu_01ABC...",
+    "questions": [
+      {
+        "index": 1,
+        "topic": "Features",
+        "question": "Which features do you want to enable?",
+        "options": ["Auth handling", "Login page"],
+        "multiSelect": true
+      },
+      {
+        "index": 2,
+        "topic": "Library",
+        "question": "Which library should we use for date formatting?",
+        "options": ["date-fns", "Day.js"]
+      }
+    ]
+  }
+}
+```
+
+| Field                     | Type       | Description                                                          |
+| ------------------------- | ---------- | -------------------------------------------------------------------- |
+| `toolCallId`              | `string`   | ID of the AskUser tool call that triggered the request               |
+| `questions[].index`       | `number`   | 1-based position of the question                                     |
+| `questions[].topic`       | `string`   | Short label for navigation (normalized, defaults to `Q<index>`)      |
+| `questions[].question`    | `string`   | Question text (may contain newlines)                                 |
+| `questions[].options`     | `string[]` | Answer choices, in order                                             |
+| `questions[].multiSelect` | `boolean?` | `true` when the user may select several options                      |
+
+Clients should ignore fields they do not recognize.
+
+### Response
+
+Reply on stdin with a JSON-RPC response using the same `id`. Return one answer per question:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-42",
+  "result": {
+    "answers": [
+      { "index": 1, "question": "Which features do you want to enable?", "answer": "Auth handling, Login page" },
+      { "index": 2, "question": "Which library should we use for date formatting?", "answer": "date-fns" }
+    ]
+  }
+}
+```
+
+| Field                | Type       | Description                                                               |
+| -------------------- | ---------- | ------------------------------------------------------------------------- |
+| `answers[].index`    | `number`   | The `index` of the question being answered                                |
+| `answers[].question` | `string`   | The question text, echoed back                                            |
+| `answers[].answer`   | `string`   | The chosen option, a `, `-joined list for `multiSelect`, or free text     |
+| `cancelled`          | `boolean?` | Set to `true` with an empty `answers` array to cancel; this interrupts the turn |
+
+To cancel:
+
+```json
+{ "jsonrpc": "2.0", "id": "req-42", "result": { "cancelled": true, "answers": [] } }
+```
+
+Droid also emits the AskUser call as a normal tool call in `droid.session_notification` events, with the raw `questionnaire` string as its input, so transcripts and UIs can show what was asked.
+
+For typed request and response models, see the [TypeScript SDK](https://github.com/Factory-AI/droid-sdk-typescript) and [Python SDK](https://github.com/Factory-AI/droid-sdk-python).
+
+## Hooks
+
+When AskUser opens a questionnaire, Droid fires a [`Notification` hook](/reference/hooks-reference#notification) with `notification_type` set to `elicitation_dialog`. The message contains only the number of questions, never their content:
+
+```json
+{
+  "hook_event_name": "Notification",
+  "notification_type": "elicitation_dialog",
+  "message": "Factory CLI is asking the user 2 question(s)"
+}
+```
+
+Use this to send desktop or chat alerts when Droid is waiting on you.
