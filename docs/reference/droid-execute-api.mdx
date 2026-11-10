@@ -1,0 +1,173 @@
+---
+title: Droid Execute API
+description: Start a headless Droid turn with one API call, on a fresh computer from an environment, an existing computer, or an existing session.
+keywords:
+  [
+    "api",
+    "droid execute",
+    "headless",
+    "environments",
+    "droid computers",
+    "sessions",
+    "rest api",
+    "programmatic access",
+  ]
+---
+
+The Droid Execute API runs a Droid turn with a single request. You send a prompt and a target, and Factory finds or provisions the computer, starts (or continues) a session, and sends your prompt. You don't need to create a computer or session first.
+
+Use it to trigger Droid from CI pipelines, internal tools, webhooks, or scripts.
+
+---
+
+## Authentication
+
+All requests require a Factory API key in the `Authorization` header:
+
+```bash
+Authorization: Bearer fk-your-api-key
+```
+
+Generate API keys at [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys). Service account API keys are supported, and the session and any computer created for it are owned by the service account.
+
+---
+
+## Base URL
+
+```
+https://api.factory.ai
+```
+
+---
+
+## Execute a Droid turn
+
+```
+POST /api/v0/droid/execute
+```
+
+The request returns `202 Accepted` once the turn has started. Droid keeps working in the background; [poll the session](#getting-results) to follow progress and read the results.
+
+The full request and response schema, including every field and error status, is in the generated **Execute a Droid turn** page in the API Reference tab. This page explains how to use it.
+
+`model` and `reasoningEffort` apply only when the request starts a new session. Sending either one with a `session` target returns `400`.
+
+### Targets
+
+`target` is an object with a `kind` field and exactly one matching ID field.
+
+| `kind`        | ID field        | Behavior                                                                                                                    |
+| :------------ | :-------------- | :-------------------------------------------------------------------------------------------------------------------------- |
+| `environment` | `environmentId` | Provisions a fresh computer from the environment's active build, then starts a new session on it.                           |
+| `computer`    | `computerId`    | Starts a new session on an existing computer you own.                                                                       |
+| `session`     | `sessionId`     | Sends the prompt as a follow-up message in an existing session you own. The session keeps its computer, model, and history. |
+
+<Note>
+  An `environment` target waits for the new computer to finish provisioning
+  before it returns, so expect that request to take longer than the other
+  targets. The computer is not listed in your Droid Computers and is cleaned up
+  after it goes idle. To keep working on it, send follow-ups with a `session`
+  target and the returned `sessionId`.
+</Note>
+
+You can look up IDs with the rest of the API: `GET /api/v0/environments` lists environments, and `GET /api/v0/computers` lists computers.
+
+The response includes `sessionId`, `computerId`, and `messageId` (the user message created from your `prompt`).
+
+### Examples
+
+Start a session on a fresh computer from an environment:
+
+```bash
+curl -X POST "https://api.factory.ai/api/v0/droid/execute" \
+  -H "Authorization: Bearer $FACTORY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Fix the failing unit tests in packages/api and open a pull request.",
+    "target": { "kind": "environment", "environmentId": "env_123" },
+    "model": "claude-opus-5",
+    "reasoningEffort": "high"
+  }'
+```
+
+Start a session on a computer you already have:
+
+```bash
+curl -X POST "https://api.factory.ai/api/v0/droid/execute" \
+  -H "Authorization: Bearer $FACTORY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Summarize the open TODOs in this repository.",
+    "target": { "kind": "computer", "computerId": "3a7b9c1d-2e4f-4a6b-8c0d-1e2f3a4b5c6d" }
+  }'
+```
+
+Send a follow-up to an existing session:
+
+```bash
+curl -X POST "https://api.factory.ai/api/v0/droid/execute" \
+  -H "Authorization: Bearer $FACTORY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Also add a regression test for the bug you fixed.",
+    "target": { "kind": "session", "sessionId": "8f1c2d3e-4b5a-6c7d-8e9f-0a1b2c3d4e5f" }
+  }'
+```
+
+---
+
+## Getting results
+
+The execute call only starts the turn. Use the Sessions API with the returned IDs to follow it:
+
+1. Poll `GET /api/v0/sessions/{sessionId}?computerId={computerId}`. The `status` field is `pending` or `running` while Droid works and `idle` when it stops.
+2. Read the transcript with `GET /api/v0/sessions/{sessionId}/messages?computerId={computerId}`.
+
+Right after the call, the session can still report `idle` from the previous turn, especially when you send a follow-up to an existing session. Treat the turn as complete only when the session is `idle` **and** the transcript has an assistant message after the user message whose `id` is the returned `messageId`.
+
+```javascript
+const headers = {
+  Authorization: `Bearer ${process.env.FACTORY_API_KEY}`,
+  "Content-Type": "application/json",
+};
+const base = "https://api.factory.ai/api/v0";
+
+const started = await fetch(`${base}/droid/execute`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({
+    prompt: "Upgrade lodash to the latest version and run the tests.",
+    target: { kind: "environment", environmentId: "env_123" },
+  }),
+});
+if (started.status !== 202) throw new Error(await started.text());
+const { sessionId, computerId, messageId } = await started.json();
+
+const query = `computerId=${encodeURIComponent(computerId)}`;
+let replies = [];
+for (;;) {
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+  const session = await fetch(`${base}/sessions/${sessionId}?${query}`, {
+    headers,
+  });
+  if (!session.ok) continue;
+  const { status } = await session.json();
+  if (status !== "idle") continue;
+
+  const { messages } = await fetch(
+    `${base}/sessions/${sessionId}/messages?${query}&limit=100`,
+    { headers },
+  ).then((response) => response.json());
+  const promptIndex = messages.findIndex((message) => message.id === messageId);
+  replies =
+    promptIndex === -1
+      ? []
+      : messages
+          .slice(promptIndex + 1)
+          .filter((message) => message.role === "assistant");
+  if (replies.length > 0) break;
+}
+console.log(replies);
+```
+
+A newly created session can briefly return `404` before it is visible; retry until it appears.
