@@ -48,14 +48,7 @@ POST /api/v0/droid/execute
 
 The request returns `202 Accepted` once the turn has started. Droid keeps working in the background; [poll the session](#getting-results) to follow progress and read the results.
 
-### Request body
-
-| Field             | Type   | Required | Description                                                                                                       |
-| :---------------- | :----- | :------- | :---------------------------------------------------------------------------------------------------------------- |
-| `prompt`          | string | Yes      | The message to send to Droid. Must not be empty.                                                                  |
-| `target`          | object | Yes      | Where to run the turn. See [Targets](#targets).                                                                   |
-| `model`           | string | No       | Model ID for a new session, for example `claude-opus-5`. See [Models](/models). Defaults to your default model.   |
-| `reasoningEffort` | string | No       | Reasoning effort for a new session: `none`, `dynamic`, `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`. |
+The full request and response schema, including every field and error status, is in the generated **Execute a Droid turn** page in the API Reference tab. This page explains how to use it.
 
 `model` and `reasoningEffort` apply only when the request starts a new session. Sending either one with a `session` target returns `400`.
 
@@ -77,23 +70,9 @@ The request returns `202 Accepted` once the turn has started. Droid keeps workin
   target and the returned `sessionId`.
 </Note>
 
-You can look up IDs with the rest of the API: `GET /api/v0/environments` lists environments, and `GET /api/v0/computers` lists computers. See the API Reference tab for details.
+You can look up IDs with the rest of the API: `GET /api/v0/environments` lists environments, and `GET /api/v0/computers` lists computers.
 
-### Response
-
-```json
-{
-  "sessionId": "8f1c2d3e-4b5a-6c7d-8e9f-0a1b2c3d4e5f",
-  "computerId": "3a7b9c1d-2e4f-4a6b-8c0d-1e2f3a4b5c6d",
-  "messageId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e"
-}
-```
-
-| Field        | Type   | Description                                       |
-| :----------- | :----- | :------------------------------------------------ |
-| `sessionId`  | string | The session that is running the turn              |
-| `computerId` | string | The computer the session runs on                  |
-| `messageId`  | string | ID of the user message created from your `prompt` |
+The response includes `sessionId`, `computerId`, and `messageId` (the user message created from your `prompt`).
 
 ### Examples
 
@@ -180,18 +159,3 @@ console.log(messages);
 ```
 
 A newly created session can briefly return `404` before it is visible; retry until it appears.
-
----
-
-## Error responses
-
-| Status | Description                                                                                                                                                             |
-| :----- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `400`  | Invalid request body: empty `prompt`, unknown `target.kind`, mismatched ID field, model settings with a `session` target, or a session that is not backed by a computer |
-| `401`  | Missing or invalid API key                                                                                                                                              |
-| `402`  | A compute usage or billing limit blocks creating the computer                                                                                                           |
-| `403`  | An organization policy blocks this launch, or the caller is not allowed to use this environment or computer                                                             |
-| `404`  | The environment, computer, or session does not exist or is not owned by the caller                                                                                      |
-| `409`  | The environment is not ready to launch, for example because its build has not finished                                                                                  |
-| `500`  | Internal server error, including a computer that failed to provision                                                                                                    |
-| `503`  | The computer or its connection is temporarily unavailable; retry the request                                                                                            |
