@@ -120,8 +120,10 @@ curl -X POST "https://api.factory.ai/api/v0/droid/execute" \
 
 The execute call only starts the turn. Use the Sessions API with the returned IDs to follow it:
 
-1. Poll `GET /api/v0/sessions/{sessionId}?computerId={computerId}`. The `status` field is `pending` or `running` while Droid works and `idle` when the turn is done.
-2. Read the transcript with `GET /api/v0/sessions/{sessionId}/messages?computerId={computerId}`. Add `role=assistant` to return only Droid's replies.
+1. Poll `GET /api/v0/sessions/{sessionId}?computerId={computerId}`. The `status` field is `pending` or `running` while Droid works and `idle` when it stops.
+2. Read the transcript with `GET /api/v0/sessions/{sessionId}/messages?computerId={computerId}`.
+
+Right after the call, the session can still report `idle` from the previous turn, especially when you send a follow-up to an existing session. Treat the turn as complete only when the session is `idle` **and** the transcript has an assistant message after the user message whose `id` is the returned `messageId`.
 
 ```javascript
 const headers = {
@@ -139,23 +141,33 @@ const started = await fetch(`${base}/droid/execute`, {
   }),
 });
 if (started.status !== 202) throw new Error(await started.text());
-const { sessionId, computerId } = await started.json();
+const { sessionId, computerId, messageId } = await started.json();
 
 const query = `computerId=${encodeURIComponent(computerId)}`;
-let status;
-do {
+let replies = [];
+for (;;) {
   await new Promise((resolve) => setTimeout(resolve, 5000));
   const session = await fetch(`${base}/sessions/${sessionId}?${query}`, {
     headers,
   });
-  if (session.ok) ({ status } = await session.json());
-} while (status !== "idle");
+  if (!session.ok) continue;
+  const { status } = await session.json();
+  if (status !== "idle") continue;
 
-const messages = await fetch(
-  `${base}/sessions/${sessionId}/messages?${query}&role=assistant&limit=100`,
-  { headers },
-).then((response) => response.json());
-console.log(messages);
+  const { messages } = await fetch(
+    `${base}/sessions/${sessionId}/messages?${query}&limit=100`,
+    { headers },
+  ).then((response) => response.json());
+  const promptIndex = messages.findIndex((message) => message.id === messageId);
+  replies =
+    promptIndex === -1
+      ? []
+      : messages
+          .slice(promptIndex + 1)
+          .filter((message) => message.role === "assistant");
+  if (replies.length > 0) break;
+}
+console.log(replies);
 ```
 
 A newly created session can briefly return `404` before it is visible; retry until it appears.
