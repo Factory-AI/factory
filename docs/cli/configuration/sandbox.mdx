@@ -10,6 +10,8 @@ keywords:
     "isolation",
     "seatbelt",
     "bubblewrap",
+    "mxc",
+    "windows",
     "permissions",
     "denyWrite",
     "denyRead",
@@ -29,7 +31,8 @@ OS-level sandboxing lets users set filesystem and network boundaries for Droid. 
 Sandbox enforces its filesystem and network boundaries with the same operating-system primitives the OS uses to confine untrusted software, so a blocked read, write, or connection is denied by the kernel rather than relying on Droid to police itself:
 
 - **macOS** -- Seatbelt (the built-in macOS sandbox) profiles restrict filesystem and process access.
-- **Linux and WSL2** -- [bubblewrap](https://github.com/containers/bubblewrap) with a seccomp filter provides the same confinement.
+- **Linux** -- [bubblewrap](https://github.com/containers/bubblewrap) with a seccomp filter provides the same confinement.
+- **Windows** -- Microsoft MXC provides the same confinement natively, and the Linux sandbox is used when Droid runs in WSL2.
 - **Network (all platforms)** -- outbound traffic is routed through an HTTP/SOCKS filtering proxy that permits only the allowed domains (Factory's own domains are always allowed).
 
 Because Sandbox relies on these host primitives, it blocks rather than running without isolation when they are unavailable.
