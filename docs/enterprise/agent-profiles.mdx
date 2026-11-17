@@ -1,0 +1,194 @@
+---
+title: Agent Profiles
+description: Configure the model, instructions, plugins, computers, and access that Droid uses when people delegate work from Slack, Microsoft Teams, Google Chat, Linear, and Jira.
+---
+
+An agent profile sets up how Droid works when someone delegates a task from a delegation app: Slack, Microsoft Teams, Google Chat, Linear, or Jira. A profile sets the default model and reasoning level, custom instructions, plugins, the machine type and environment, and who may use it.
+
+Every profile has its own [service account](/enterprise/service-accounts). Delegated sessions that run on a profile run as that account, with its Git credentials, connectors, secrets, and computers, instead of as the person who asked. Direct messages to Droid in Slack, Microsoft Teams, or Google Chat run as the person who sent them, not as the profile's service account.
+
+<Info>
+  Agent profiles are available on Factory-hosted deployments. Delegation apps require a paid plan, and creating a custom profile requires a paid plan. [Contact us](mailto:sales@factory.ai) to learn more.
+</Info>
+
+---
+
+## Where to find agent profiles
+
+Agent profiles are on the **Identity** settings page, under **Settings** → **Identity** → **Agent Profiles**. The same page holds your **API Keys** and **Service Accounts**. Older links to the API keys and agent profiles settings pages open the Identity page.
+
+| Who                                       | What they see in Agent Profiles                                      |
+| ----------------------------------------- | -------------------------------------------------------------------- |
+| Managers and Owners on a paid plan        | Every profile, including **Org Default**.                            |
+| Users who own a custom profile            | Only the custom profiles they own.                                   |
+| Other Users                               | No Agent Profiles section.                                           |
+
+See [Organization Roles](/enterprise/organization-roles) for the difference between Users, Managers, and Owners.
+
+---
+
+## Org Default
+
+**Org Default** is the built-in profile that serves every delegation no other profile serves. It is always available to everyone in the organization.
+
+- It cannot be renamed or deleted, and it has no owners.
+- Only Managers and Owners can edit it.
+- Its access is always **Everyone**.
+- Its service account appears in the Service Accounts list as **Org Default Agent Profile**.
+- Until it is saved for the first time, its row shows **Set Up for Org**.
+
+### Set up Org Default before connecting a delegation app
+
+Delegation apps run as the Org Default profile, so a Manager must set it up before connecting one. While Org Default has never been saved, clicking **Connect** for a delegation app opens a **Set up Org Default Agent Profile** dialog instead of starting the connection. Click **Set Up Org Default Agent Profile** to open the Org Default editor on the Identity page, choose its settings, and save. Then return to **Settings** → **Delegations** and connect the app.
+
+Reconnecting an app that is already connected is not blocked.
+
+---
+
+## Create a custom profile
+
+Custom profiles let you give different teams a different setup, such as a different model, environment, or set of credentials. Managers and Owners on a paid plan can create them from **Settings** → **Identity** → **Agent Profiles**. An organization can have up to 500 custom profiles.
+
+When you create a profile in Settings, you become one of its [owners](#owners). You can remove yourself afterwards.
+
+The profile editor has these tabs:
+
+| Tab                 | What it configures                                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **General**         | Name, default model, default reasoning level, custom instructions, access, owners, and lock.                             |
+| **Plugins**         | Plugins installed for every session that runs on the profile, in addition to plugins enabled org-wide.                   |
+| **Computers**       | The machine type and the environment or computers the profile runs on.                                                  |
+| **API Keys**        | API keys for the profile's service account.                                                                              |
+| **Git Credentials** | Git credentials for the profile's service account.                                                                       |
+| **Secrets**         | Environment variables for the profile's managed computers. See [Computer secrets](/enterprise/service-accounts#computer-secrets). |
+| **Connectors**      | Connectors that sessions on the profile can use.                                                                         |
+
+Save the profile once before you add computers, API keys, Git credentials, secrets, or connectors. After the first save, the editor shows the profile's **Service Account ID**.
+
+### Profile settings
+
+| Setting                           | Details                                                                                                   |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Name                              | 1 to 100 characters. The profile's service account is named "*profile name* Agent Profile" and follows renames. |
+| Default model                     | The model delegated sessions start with.                                                                  |
+| Default reasoning level           | The reasoning level delegated sessions start with.                                                        |
+| Custom Instructions (optional)    | Up to 10,000 characters of instructions for sessions that run on the profile.                             |
+| Plugins                           | Up to 20 plugins, written as `plugin-name@marketplace`. The marketplace must be registered under **Enterprise Controls** → **Plugins**. |
+| Machine type                      | **Dynamic (recommended)** runs on an environment you choose. **Persistent** runs on the profile's computers, with a per machine parallel worker limit from 1 to 50 (default 3). |
+| Environment                       | A profile runs on one environment.                                                                        |
+| Access                            | **Everyone**, or **Specific people and groups**: up to 200 people and 50 directory groups. See [Access](#access). |
+
+Connectors on a profile are shared: anyone who can use the profile can use the connection with the permissions you grant.
+
+---
+
+## Access
+
+Access controls who a profile serves. Choose **Everyone**, or choose specific people and directory groups synced from your identity provider. See [Directory Sync (SCIM)](/enterprise/identity-sso-and-scim#directory-sync-scim-provisioning) for how groups reach Factory.
+
+A profile's access is saved to its service account, so it also controls who can run automations as that account. When a delegation app picks a profile for a request, Managers and owners get no exception: they are served by a profile only if its access includes them.
+
+---
+
+## Owners
+
+Owners are people who manage a specific profile without needing the Manager role. Owners must be active members of the organization. Directory groups cannot be owners. A profile can have up to 50 owners.
+
+Owners of a profile can:
+
+- Edit everything on the profile, including its access, model, and plugins.
+- Manage the profile's service account: its API keys, Git credentials, secrets, connectors, and computers.
+- Change the profile's owners.
+- Lock or unlock the profile.
+- Delete the profile.
+
+Owners who are not Managers cannot create profiles, duplicate profiles, assign profiles to delegation apps, or edit Org Default. Managers can also change a profile's owners while it is unlocked.
+
+---
+
+## Lock
+
+Lock a profile to stop other Managers from changing it. While a profile is locked, only its owners and organization Owners can change it, change who may use it, manage its service account, or delete it. Other Managers see it as read-only.
+
+Only the profile's owners and organization Owners can lock or unlock it. You can lock a profile that has no owners after confirming; until someone adds an owner, only organization Owners can change it.
+
+Org Default can also be locked. Only organization Owners can lock or unlock it.
+
+---
+
+## Assign profiles to delegation apps
+
+By default, every delegation runs on Org Default. To route some people to a custom profile, assign profiles to the app:
+
+<Steps>
+  <Step title="Open the app">
+    Go to **Settings** → **Delegations** and open the delegation app, such as Slack or Linear.
+  </Step>
+  <Step title="Open the assignment dialog">
+    Open the **...** menu and choose **Assign agent profiles**. Only Managers and Owners can do this.
+  </Step>
+  <Step title="Choose and order profiles">
+    Check the custom profiles the app should use and move them into order. You can check up to 50 profiles per app. Org Default is always checked and always last.
+  </Step>
+  <Step title="Save">
+    Click **Save**.
+  </Step>
+</Steps>
+
+### How a profile is chosen
+
+For each request, Factory goes down the checked profiles from the top and uses the first one the requester has access to. Profiles the requester cannot use are skipped without telling them. If none of the checked custom profiles includes the requester, Org Default serves the request. Org Default also serves every request when the app has no custom profiles assigned.
+
+The dialog warns you when a profile open to **Everyone** sits above other checked profiles, because the profiles below it would never serve anyone. Move it down or restrict its access.
+
+If a request waits in a queue, Factory chooses the profile again when the request leaves the queue.
+
+---
+
+## Duplicate a profile
+
+Managers and Owners can duplicate any saved profile, including Org Default, by choosing **Duplicate** on its row in the Agent Profiles list. The dialog suggests the name "*profile name* (copy)". After the copy is created, its editor opens.
+
+The copy gets its own new service account. Duplicating copies:
+
+- Custom instructions, default model, and default reasoning level
+- Machine type, parallel worker limit, and environment
+- Plugins
+- Access
+- Owners, plus you as an owner. People who are no longer in the organization are left out, and Factory tells you how many.
+
+Duplicating does not copy:
+
+- The lock. The copy starts unlocked.
+- App assignments.
+- API keys, computers, Git credentials, secrets, or connectors. Set these up again on the copy.
+
+Duplicating is refused when the source profile already has 50 owners and you are not one of them, or when a profile limited to specific people no longer includes anyone in the organization.
+
+---
+
+## Delete a profile
+
+Managers and the profile's owners can delete a custom profile. If the profile is locked, only its owners and organization Owners can delete it. Org Default cannot be deleted.
+
+Deleting a profile deactivates its service account, revokes its API keys, and removes its computers, Git credentials, and connectors. This cannot be undone.
+
+---
+
+## Things to know
+
+- Only custom profiles can be assigned to delegation apps. Org Default always serves whoever is left.
+- The service accounts that belong to custom profiles do not appear in the Service Accounts list or in **Run as** pickers. Manage them from the profile editor. Org Default's service account stays in the list.
+- In usage and the [audit log](/enterprise/audit-log), a custom profile's service account is shown by the profile's name.
+- Profiles, owners, lock, and access can also be managed through the Factory API. See the **API Reference** tab.
+
+## Learn more
+
+<CardGroup cols={2}>
+  <Card title="Service Accounts" icon="bot" href="/enterprise/service-accounts">
+    Service accounts, owners, lock, access, and computer secrets.
+  </Card>
+  <Card title="Organization Roles" icon="users" href="/enterprise/organization-roles">
+    What Users, Managers, and Owners can do.
+  </Card>
+</CardGroup>

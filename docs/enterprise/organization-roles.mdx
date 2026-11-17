@@ -24,6 +24,7 @@ Users can:
 - View their own analytics and activity.
 - Manage their own personal settings and connections.
 - View other members when the organization allows member visibility.
+- Manage the [service accounts](/enterprise/service-accounts#owners) and [agent profiles](/enterprise/agent-profiles#owners) they have been made an owner of.
 
 Users cannot manage organization-wide settings, billing, members, or shared administrative controls.
 
@@ -41,6 +42,7 @@ Managers can:
 - Manage usage limits and usage-related controls.
 - Manage organization settings and enterprise controls.
 - Manage service accounts and shared computer resources.
+- Create, edit, duplicate, and delete [agent profiles](/enterprise/agent-profiles), and assign them to delegation apps.
 - Purchase or configure extra usage where available.
 
 Managers cannot manage owner-only billing, payment, or identity-administration actions.
@@ -57,6 +59,24 @@ Owners can:
 - Configure SSO, domain verification, and directory sync where available.
 - Complete account onboarding or plan setup steps that require account ownership.
 - Manage owner-only usage and billing controls.
+- Change locked service accounts and agent profiles, and lock or unlock them, even when they are not one of their owners.
+- Lock or unlock the Org Default agent profile.
+- View the [audit log](/enterprise/audit-log) on Enterprise plans.
+
+## Organization roles and resource owners
+
+Service accounts and agent profiles can also have their own **owners**: individual members who manage that one resource. Being an owner of a resource is separate from the organization **Owner** role.
+
+| Action on a service account or custom agent profile        | User | User who owns it | Manager | Owner |
+| ---------------------------------------------------------- | ---- | ---------------- | ------- | ----- |
+| Create                                                     | No   | No               | Yes     | Yes   |
+| Edit, delete, or change owners and access (unlocked)       | No   | Yes              | Yes     | Yes   |
+| Edit, delete, or change owners and access (locked)         | No   | Yes              | No      | Yes   |
+| Lock or unlock                                             | No   | Yes              | No      | Yes   |
+| Duplicate an agent profile                                 | No   | No               | Yes     | Yes   |
+| Assign agent profiles to delegation apps                   | No   | No               | Yes     | Yes   |
+
+A Manager or Owner who is also an owner of a resource has both sets of permissions. See [Service Accounts](/enterprise/service-accounts#owners) and [Agent Profiles](/enterprise/agent-profiles#owners) for details.
 
 ## Notes
 
@@ -67,6 +87,9 @@ Exact access can vary based on your organization's plan, enabled features, and a
 <CardGroup cols={2}>
   <Card title="Service Accounts" icon="bot" href="/enterprise/service-accounts">
     Non-human identities for CI/CD pipelines, scripts, and Droid Computers.
+  </Card>
+  <Card title="Agent Profiles" icon="sliders" href="/enterprise/agent-profiles">
+    Configure how Droid works in delegation apps, and who each profile serves.
   </Card>
   <Card title="SSO, IdP & SCIM Provisioning" icon="key" href="/enterprise/identity-sso-and-scim">
     Configure single sign-on and automated member provisioning.

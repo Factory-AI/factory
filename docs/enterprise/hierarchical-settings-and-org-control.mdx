@@ -336,6 +336,10 @@ Below is the full schema for org-managed settings. These are configured by org a
   Marketplace sources that are strictly enforced. Each entry is a source object directly (e.g. `{ "source": "github", "repo": "owner/repo" }`), not wrapped in a `source` key like `extraKnownMarketplaces` values.
 </ResponseField>
 
+<ResponseField name="apiKeyMaxLifetimeDays" type="number">
+  Maximum lifetime, in days, of new and rotated Factory API keys, including service account keys. An integer from `1` to `365`. Keys created without an expiration date default to this lifetime, and later expirations are refused. Existing keys are not affected. Unset means no limit. See [API key lifetime limit](#api-key-lifetime-limit).
+</ResponseField>
+
 ### Supported model IDs
 
 The following model identifiers can be used in `allowedModelIds` and `blockedModelIds`:
@@ -598,8 +602,20 @@ Beyond the general hierarchy, several features have dedicated org‑level toggle
 - **AutoWiki Cloud Sync** (`wikiCloudSync`) – Controls whether Wikis can be generated and stored in the Factory App. When disabled, all AutoWiki API endpoints are blocked and the Droid CLI skips Cloud Sync and GitHub Wiki sync. Enabled by default. See [AutoWiki](/cli/features/wiki/overview#autowiki-cloud-sync).
 - **Cloud Session Sync** (`cloudSessionSync`) – Controls whether session data is synced to Factory's cloud.
 - **Built-in Tool Autonomy** (`builtInToolAutonomyOverrides`) – Sets the [autonomy level](/cli/user-guides/auto-run) required to run built-in network tools (Web Search, Fetch URL) without a confirmation prompt. Omitted tools default to `low`. Enforced from org settings only, so users and projects cannot weaken it.
+- **API key lifetime limit** (`apiKeyMaxLifetimeDays`) – Sets the longest lifetime new Factory API keys may have. See [API key lifetime limit](#api-key-lifetime-limit).
 
 These controls are managed by org administrators in the **Enterprise Controls** section at [app.factory.ai](https://app.factory.ai).
+
+### API key lifetime limit
+
+In **Enterprise Controls** → **Security**, turn on **Limit API Key Lifetime** and set a **Maximum lifetime** from 1 to 365 days. While the limit is on:
+
+- New and rotated Factory API keys, including [service account](/enterprise/service-accounts) keys, must expire within the maximum lifetime.
+- Keys created without an expiration date expire at the maximum lifetime.
+- A key requested with a later expiration is refused.
+- Existing keys keep their current expiration.
+
+The limit applies on Factory-hosted and self-hosted deployments.
 
 ---
 

@@ -6,7 +6,7 @@ description: Organization-level audit events that record who did what in your Fa
 The Factory audit log records organization-level events so you can track who did what in your organization. Each event captures **who** acted, **where** the action originated, **what** was affected, and structured details about the change.
 
 <Info>
-  **Enterprise Feature** — The audit log is available to **Enterprise organization owners only**. Owners can view the audit log in the Factory web app under Team Settings, or via the public API.
+  **Enterprise Feature** — The audit log is available to **Enterprise organization owners only** on Factory-hosted deployments. Owners can view the audit log in the Factory web app under **Settings** → **Audit Log**, or via the public API.
 </Info>
 
 ---
@@ -21,7 +21,7 @@ Every audit event shares the following fields:
 | `actor` | object or null | The user or service principal who initiated the event. `null` when the event was system-initiated (no human or service principal involved). |
 | `source` | string | The surface that originated the event (see below). |
 | `target` | object | Identifiers for the affected entity (e.g. `userId`, `email`, `serviceAccountId`). |
-| `payload` | object or null | Structured, event-specific details. Contains only IDs and enum values, never secrets. `null` when the event has no structured payload. |
+| `payload` | object or null | Structured, event-specific details, such as IDs, enum values, and resource names. Never contains secrets. `null` when the event has no structured payload. |
 | `createdAt` | string | ISO 8601 timestamp of the event. |
 
 ### Actor
@@ -50,6 +50,8 @@ The `source` field identifies where the event originated.
 | `web_settings_billing` | Billing and subscription page in the web app. |
 | `public_api_v0` | Public REST API (v0). |
 | `workos_event` | Directory sync or identity provider webhook event. |
+
+Events from other Factory surfaces can carry additional `source` values.
 
 ---
 
@@ -153,24 +155,25 @@ A member's role, invitation status, or membership in the organization changed.
 
 ### `api_key_lifecycle_change`
 
-A Factory API key was created or deleted.
+A Factory API key was created, rotated, or deleted.
 
-**Sources:** `web_settings_api_keys`, `web_settings_service_accounts`
+**Sources:** `web_settings_api_keys`, `web_settings_service_accounts`, `public_api_v0`
 
 **Target:**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `userId` | string | The key owner's user ID. |
-| `email` | string or null | The key owner's email. |
+| `userId` | string | The key owner's user ID. Present for user keys. |
+| `serviceAccountId` | string | The service account ID. Present for service account keys. |
 
 **Payload:**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `intent` | string | `"created"` or `"deleted"`. |
-| `apiKeyId` | string | The API key ID. |
+| `intent` | string | `"created"`, `"rotated"`, or `"deleted"`. |
+| `apiKeyId` | string | The API key ID. For `rotated`, the ID of the replacement key. |
 | `serviceAccountId` | string or null | Present only for service-account keys. Its presence distinguishes user keys from service-account keys. |
+| `rotatedFromApiKeyId` | string | The ID of the key that was replaced. Present for `rotated` only. |
 
 **Example:**
 
@@ -184,7 +187,7 @@ A Factory API key was created or deleted.
     "email": "dev@corp.com",
     "role": "user"
   },
-  "target": { "userId": "user_abc", "email": "dev@corp.com" },
+  "target": { "userId": "user_abc" },
   "payload": { "intent": "created", "apiKeyId": "key_xyz" }
 }
 ```
@@ -193,9 +196,9 @@ A Factory API key was created or deleted.
 
 ### `service_account_change`
 
-A service account was created, modified, deleted, or had its git credentials or act-as grants changed.
+A service account was created, modified, deleted, or had its owners, lock, access, git credentials, connectors, or act-as grants changed.
 
-**Sources:** `web_settings_service_accounts`
+**Sources:** `web_settings_service_accounts`, `web_settings_org`, `public_api_v0`
 
 **Target:**
 
@@ -209,9 +212,19 @@ A service account was created, modified, deleted, or had its git credentials or 
 |-------|------|-------------|
 | `intent` | string | The specific service-account action (see below). |
 | `serviceAccountId` | string | The service account ID. |
+| `agentProfileId` | string or null | Present when the account belongs to an [agent profile](/enterprise/agent-profiles). |
+| `name` | string or null | Present for `created` and `renamed` of an agent profile's account. |
+| `displayName` | string or null | Present for `created` and `renamed` of an agent profile's account. |
 | `toStatus` | string or null | New status. Present for `status_changed` only. |
 | `integration` | string or null | Integration name. Present for git-credential intents only. |
 | `grantId` | string or null | Act-as grant ID. Present for `act_as_grant_minted` only. Never includes the grant's secret value. |
+| `previousOwnerUserIds` | string[] or null | Owner user IDs before the change. Present for `owners_changed`. |
+| `ownerUserIds` | string[] or null | Owner user IDs after the change. Present for `owners_changed`. |
+| `previousLocked` | boolean or null | Lock state before the change. Present for `lock_changed`. |
+| `locked` | boolean or null | Lock state after the change. Present for `lock_changed`. |
+| `previousAccess` | object or null | Access before the change. `null` means everyone. Present for `access_changed`. |
+| `access` | object or null | Access after the change. `null` means everyone. Present for `access_changed`. |
+| `connector` | string or null | The connector identifier. Present for `connector_link_issued` and `connector_disconnected`. Never includes the link. |
 
 **Intent values:**
 
@@ -220,9 +233,15 @@ A service account was created, modified, deleted, or had its git credentials or 
 | `created` | A new service account was created. |
 | `status_changed` | The service account's status was changed (e.g. active or disabled). |
 | `deleted` | The service account was deleted. |
+| `renamed` | An agent profile's service account was renamed to follow the profile. |
 | `git_credential_set` | A git credential was set for the service account. |
 | `git_credential_revoked` | A git credential was revoked for the service account. |
 | `act_as_grant_minted` | An act-as delegation grant was minted for the service account. |
+| `owners_changed` | The service account's owners were changed. |
+| `lock_changed` | The service account was locked or unlocked. |
+| `access_changed` | Who can use the service account was changed. |
+| `connector_link_issued` | A link to connect a connector to the service account was issued. The connection itself completes at the connector provider and is not recorded here. |
+| `connector_disconnected` | A connector was disconnected from the service account. |
 
 **Example:**
 
@@ -237,7 +256,100 @@ A service account was created, modified, deleted, or had its git credentials or 
     "role": "manager"
   },
   "target": { "serviceAccountId": "sa_xyz" },
-  "payload": { "intent": "created", "serviceAccountId": "sa_xyz" }
+  "payload": {
+    "intent": "owners_changed",
+    "serviceAccountId": "sa_xyz",
+    "previousOwnerUserIds": ["user_abc"],
+    "ownerUserIds": ["user_abc", "user_def"]
+  }
+}
+```
+
+---
+
+### `remote_delegation_config_change`
+
+An [agent profile](/enterprise/agent-profiles) was created, changed, duplicated, deleted, or had its delegation app assignments changed. A save that changes nothing records no event.
+
+**Sources:** `web_settings_org`, `public_api_v0`
+
+**Target:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `configId` | string | The agent profile ID. |
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `changes` | object | Map of changed field name to `{ "before": ..., "after": ... }`. When a profile is created, `before` is `null`; when it is deleted, `after` is `null`. |
+| `instructionsChanged` | boolean | Whether the custom instructions changed. The instructions themselves are never recorded. |
+| `duplicatedFromProfileId` | string | Present when the profile was created by duplicating another profile. |
+
+**Fields that can appear in `changes`:** `name`, `serviceAccountId`, `model`, `reasoningEffort`, `parallelWorkerLimit`, `machineType`, `templateId`, `pluginIds`, `access`, `ownerUserIds`, `locked`, and `targets`. `targets` records the profile's delegation app assignments as a list of `{ kind, id, position }` entries.
+
+**Example:**
+
+```json
+{
+  "eventType": "remote_delegation_config_change",
+  "source": "web_settings_org",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "manager"
+  },
+  "target": { "configId": "profile_123" },
+  "payload": {
+    "changes": {
+      "model": { "before": "claude-opus-4-6", "after": "claude-opus-4-7" },
+      "locked": { "before": null, "after": true }
+    },
+    "instructionsChanged": false
+  }
+}
+```
+
+---
+
+### `computer_secrets_change`
+
+Computer secrets were added, replaced, or deleted for the organization or for one service account. Secret names and values are never recorded.
+
+**Sources:** `web_settings_service_accounts`, `public_api_v0`
+
+**Target:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `scope` | string | `"organization"` or `"service_account"`. |
+| `serviceAccountId` | string | The service account ID. Present when `scope` is `"service_account"`. |
+
+**Payload:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `addedCount` | number | Number of secrets added. |
+| `replacedCount` | number | Number of secrets whose values were replaced. |
+| `usagesChangedCount` | number | Number of existing secrets whose usage settings changed. |
+| `deletedCount` | number | Number of secrets deleted. |
+
+**Example:**
+
+```json
+{
+  "eventType": "computer_secrets_change",
+  "source": "web_settings_service_accounts",
+  "actor": {
+    "principalKind": "human",
+    "principalId": "user_abc",
+    "email": "admin@corp.com",
+    "role": "manager"
+  },
+  "target": { "scope": "service_account", "serviceAccountId": "sa_xyz" },
+  "payload": { "addedCount": 2, "replacedCount": 0, "usagesChangedCount": 0, "deletedCount": 0 }
 }
 ```
 

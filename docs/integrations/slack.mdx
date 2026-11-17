@@ -14,6 +14,7 @@ If the Factory Slack app is already installed in your workspace, rerun the Slack
 - A Factory account with admin privileges
 - Admin access to your Slack workspace
 - Ability to install apps in your Slack workspace
+- The Org Default agent profile set up in Factory. See [Set up Org Default](/enterprise/agent-profiles#set-up-org-default-before-connecting-a-delegation-app).
 
 ## Integration Steps
 
@@ -90,6 +91,16 @@ When a Slack thread is imported, Factory has access to the entire conversation h
 After Slack is connected, click **Manage** from [**Settings** → **Organization**](https://app.factory.ai/settings/organization) to configure Slack channel settings. These settings are only needed for Incident Response and service-account workflows; standard `@Factory` mentions work without configuring channels here.
 
 In channel settings, you can enable a channel, expand it, and configure **Run as**, **Incident Response**, **Machine Type**, **Computer** or **Workspace**, **Session Visibility**, **Model**, and **Custom Prompt**. Only channels where the Factory app has been invited appear in this list.
+
+## Agent profiles
+
+Slack runs delegated work on an [agent profile](/enterprise/agent-profiles). By default, every request runs on **Org Default**. To give some people a different model, environment, or credentials, a Manager or Owner can assign custom profiles to Slack:
+
+1. Go to **Settings** → **Delegations** and open **Slack**.
+2. Open the **...** menu and choose **Assign agent profiles**.
+3. Check the profiles to use, put them in order, and click **Save**.
+
+Each request runs on the first checked profile the requester has access to. People who are not included in any checked profile run on Org Default. Direct messages to Droid run as the person who sends them, not as a profile's service account.
 
 ## Service accounts
 
