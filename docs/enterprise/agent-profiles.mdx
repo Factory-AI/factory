@@ -86,7 +86,7 @@ Connectors on a profile are shared: anyone who can use the profile can use the c
 
 Access controls who a profile serves. Choose **Everyone**, or choose specific people and directory groups synced from your identity provider. See [Directory Sync (SCIM)](/enterprise/identity-sso-and-scim#directory-sync-scim-provisioning) for how groups reach Factory.
 
-A profile's access is saved to its service account, so it also controls who can run automations as that account. When a delegation app picks a profile for a request, Managers and owners get no exception: they are served by a profile only if its access includes them.
+When a delegation app picks a profile for a request, Managers and owners get no exception: they are served by a profile only if its access includes them.
 
 ---
 
@@ -171,7 +171,7 @@ Duplicating is refused when the source profile already has 50 owners and you are
 
 Managers and the profile's owners can delete a custom profile. If the profile is locked, only its owners and organization Owners can delete it. Org Default cannot be deleted.
 
-Deleting a profile deactivates its service account, revokes its API keys, and removes its computers, Git credentials, and connectors. This cannot be undone.
+Deleting a profile also deletes its service account, which revokes the account's API keys and removes its computers, Git credentials, and connectors. This cannot be undone.
 
 ---
 
