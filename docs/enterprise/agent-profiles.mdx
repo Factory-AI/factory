@@ -1,15 +1,39 @@
 ---
 title: Agent Profiles
-description: Configure the model, instructions, plugins, computers, and access that Droid uses when people delegate work from Slack, Microsoft Teams, Google Chat, Linear, and Jira.
+description: An agent profile decides how Droid works. Its service account decides who Droid is while it works.
 ---
 
-An agent profile sets up how Droid works when someone delegates a task from a delegation app: Slack, Microsoft Teams, Google Chat, Linear, or Jira. A profile sets the default model and reasoning level, custom instructions, plugins, the machine type and environment, and who may use it.
+An agent profile decides **how** Droid works: the default model and reasoning level, custom instructions, plugins, the machine type and environment it runs on, and who the profile serves.
 
-Every profile has its own [service account](/enterprise/service-accounts). Delegated sessions that run on a profile run as that account, with its Git credentials, connectors, secrets, and computers, instead of as the person who asked. Direct messages to Droid in Slack, Microsoft Teams, or Google Chat run as the person who sent them, not as the profile's service account.
+A [service account](/enterprise/service-accounts) decides **who** Droid is while it works: the Git credentials, connectors, secrets, computers, and API keys it uses, and the name its work appears under in usage and the [audit log](/enterprise/audit-log).
+
+Every agent profile has its own service account. Work that runs on a profile runs as that profile's service account, so choosing a profile chooses both how Droid works and who it is. You manage both from the profile editor.
 
 <Info>
   Agent profiles are available on Factory-hosted deployments. Delegation apps require a paid plan, and creating a custom profile requires a paid plan. [Contact us](mailto:sales@factory.ai) to learn more.
 </Info>
+
+---
+
+## Plan your profiles
+
+Because each profile carries its own identity, a profile sets both how work is done and what that work can access. Some ways to set them up:
+
+- **One profile per team.** For example, a backend profile whose Git credentials and connectors cover the backend team's repositories and tools, with access limited to that team's directory group.
+- **One profile per kind of work.** For example, a review profile with a stronger model and review instructions, separate from a profile for routine fixes.
+- **Org Default for everyone else.** Keep Org Default as the general setup, and add custom profiles only where a team needs a different model, environment, or credentials.
+
+Give each profile only the credentials its work needs. Anyone who can use a profile works with its service account's access, including its connectors.
+
+---
+
+## Where agent profiles are used
+
+### Delegation apps
+
+When someone delegates work from Slack, Microsoft Teams, Google Chat, Linear, or Jira, Factory picks a profile from the app's [assignments](#assign-profiles-to-delegation-apps): the first assigned profile the requester has access to, or Org Default if none applies. The work runs as that profile's service account.
+
+People outside a profile's access are skipped without being told, and the next assigned profile or Org Default serves them. Direct messages to Droid in Slack, Microsoft Teams, and Google Chat run as the person who sent them, not as the profile's service account.
 
 ---
 
@@ -29,7 +53,7 @@ See [Organization Roles](/enterprise/organization-roles) for the difference betw
 
 ## Org Default
 
-**Org Default** is the built-in profile that serves every delegation no other profile serves. It is always available to everyone in the organization.
+**Org Default** is the built-in profile. It serves every delegation request that no custom profile serves, and it is always available to everyone in the organization.
 
 - It cannot be renamed or deleted, and it has no owners.
 - Only Managers and Owners can edit it.
@@ -70,8 +94,8 @@ Save the profile once before you add computers, API keys, Git credentials, secre
 | Setting                           | Details                                                                                                   |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | Name                              | 1 to 100 characters. The profile's service account is named "*profile name* Agent Profile" and follows renames. |
-| Default model                     | The model delegated sessions start with.                                                                  |
-| Default reasoning level           | The reasoning level delegated sessions start with.                                                        |
+| Default model                     | The model that sessions on the profile start with.                                                        |
+| Default reasoning level           | The reasoning level that sessions on the profile start with.                                              |
 | Custom Instructions (optional)    | Up to 10,000 characters of instructions for sessions that run on the profile.                             |
 | Plugins                           | Up to 20 plugins, written as `plugin-name@marketplace`. The marketplace must be registered under **Enterprise Controls** → **Plugins**. |
 | Machine type                      | **Dynamic (recommended)** runs on an environment you choose. **Persistent** runs on the profile's computers, with a per machine parallel worker limit from 1 to 50 (default 3). |
