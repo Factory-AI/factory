@@ -10,6 +10,8 @@ keywords:
     "isolation",
     "seatbelt",
     "bubblewrap",
+    "mxc",
+    "windows",
     "permissions",
     "denyWrite",
     "denyRead",
@@ -29,7 +31,8 @@ OS レベルのサンドボックスにより、ユーザーは Droid に対し�
 サンドボックスは、OS が信頼できないソフトウェアを隔離するために使うのと同じオペレーティングシステムのプリミティブでファイルシステムおよびネットワークの境界を強制します。そのため、ブロックされた読み取り・書き込み・接続は、Droid が自身を取り締まることに頼るのではなく、カーネルによって拒否されます:
 
 - **macOS** -- Seatbelt（macOS 組み込みのサンドボックス）のプロファイルがファイルシステムおよびプロセスへのアクセスを制限します。
-- **Linux および WSL2** -- [bubblewrap](https://github.com/containers/bubblewrap) と seccomp フィルターが同等の隔離を提供します。
+- **Linux** -- [bubblewrap](https://github.com/containers/bubblewrap) と seccomp フィルターが同等の隔離を提供します。
+- **Windows** -- ネイティブ環境では Microsoft MXC が同等の隔離を提供し、Droid を WSL2 で実行する場合は Linux のサンドボックスが使用されます。
 - **ネットワーク（全プラットフォーム）** -- 送信トラフィックは HTTP/SOCKS フィルタリングプロキシ経由でルーティングされ、許可されたドメインのみを通過させます（Factory 自身のドメインは常に許可されます）。
 
 サンドボックスはこれらのホストのプリミティブに依存するため、それらが利用できない場合は、分離なしで実行するのではなくブロックします。
