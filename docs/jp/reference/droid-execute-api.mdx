@@ -1,0 +1,171 @@
+---
+title: "Droid Execute API"
+description: 環境から起動した新しいコンピューター、既存のコンピューター、または既存のセッション上で、1 回の API 呼び出しでヘッドレスな Droid ターンを開始します。
+keywords:
+  [
+    "api",
+    "droid execute",
+    "headless",
+    "environments",
+    "droid computers",
+    "sessions",
+    "rest api",
+    "programmatic access",
+  ]
+---
+
+Droid Execute API は、1 回のリクエストで Droid のターンを実行します。プロンプトとターゲットを送信すると、Factory がコンピューターを見つけるかプロビジョニングし、セッションを開始（または継続）して、そのプロンプトを送信します。事前にコンピューターやセッションを作成する必要はありません。
+
+CI パイプライン、内部ツール、Webhook、スクリプトから Droid をトリガーする用途に使えます。
+
+---
+
+## 認証
+
+すべてのリクエストには、`Authorization` ヘッダーに Factory API キーが必要です。
+
+```bash
+Authorization: Bearer fk-your-api-key
+```
+
+API キーは [app.factory.ai/settings/api-keys](https://app.factory.ai/settings/api-keys) で生成できます。サービスアカウントの API キーにも対応しており、その場合、セッションとそこで作成されたコンピューターの所有者はサービスアカウントになります。
+
+---
+
+## ベース URL
+
+```
+https://api.factory.ai
+```
+
+---
+
+## Droid ターンを実行する
+
+```
+POST /api/v0/droid/execute
+```
+
+このリクエストは、ターンが開始されると `202 Accepted` を返します。Droid はバックグラウンドで動作し続けるため、進捗を追跡して結果を読むには [セッションをポーリング](#getting-results) してください。
+
+すべてのフィールドとエラーステータスを含む完全なリクエスト/レスポンススキーマは、API Reference タブ内の自動生成された **Execute a Droid turn** ページにあります。このページでは使い方を説明します。
+
+`model` と `reasoningEffort` は、リクエストが新しいセッションを開始する場合にのみ適用されます。`session` ターゲットと一緒にいずれかを送ると `400` が返ります。
+
+### ターゲット
+
+`target` は `kind` フィールドと、それに対応する ID フィールドをちょうど 1 つ持つオブジェクトです。
+
+| `kind`        | ID フィールド   | 動作 |
+| :------------ | :-------------- | :--- |
+| `environment` | `environmentId` | 環境のアクティブなビルドから新しいコンピューターをプロビジョニングし、その上で新しいセッションを開始します。 |
+| `computer`    | `computerId`    | 自分が所有する既存のコンピューター上で新しいセッションを開始します。 |
+| `session`     | `sessionId`     | 自分が所有する既存のセッションにフォローアップメッセージとしてプロンプトを送信します。セッションはコンピューター、モデル、履歴をそのまま保持します。 |
+
+<Note>
+  `environment` ターゲットでは、新しいコンピューターのプロビジョニングが完了するまでレスポンスを返しません。そのため、ほかのターゲットよりリクエストに時間がかかることがあります。このコンピューターは Droid Computers には表示されず、アイドル状態になるとクリーンアップされます。継続して作業するには、`session` ターゲットと返された `sessionId` を使ってフォローアップを送信してください。
+</Note>
+
+ほかの API を使って ID を調べられます。`GET /api/v0/environments` で環境の一覧、`GET /api/v0/computers` でコンピューターの一覧を取得できます。
+
+レスポンスには `sessionId`、`computerId`、`messageId`（`prompt` から作成されたユーザーメッセージの ID）が含まれます。
+
+### 例
+
+環境から起動した新しいコンピューター上でセッションを開始する例:
+
+```bash
+curl -X POST "https://api.factory.ai/api/v0/droid/execute" \
+  -H "Authorization: Bearer $FACTORY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "packages/api で失敗しているユニットテストを修正して、プルリクエストを開いて。",
+    "target": { "kind": "environment", "environmentId": "env_123" },
+    "model": "claude-opus-5",
+    "reasoningEffort": "high"
+  }'
+```
+
+すでに持っているコンピューター上でセッションを開始する例:
+
+```bash
+curl -X POST "https://api.factory.ai/api/v0/droid/execute" \
+  -H "Authorization: Bearer $FACTORY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "このリポジトリで未対応の TODO を要約して。",
+    "target": { "kind": "computer", "computerId": "3a7b9c1d-2e4f-4a6b-8c0d-1e2f3a4b5c6d" }
+  }'
+```
+
+既存のセッションにフォローアップを送る例:
+
+```bash
+curl -X POST "https://api.factory.ai/api/v0/droid/execute" \
+  -H "Authorization: Bearer $FACTORY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "修正したバグのリグレッションテストも追加して。",
+    "target": { "kind": "session", "sessionId": "8f1c2d3e-4b5a-6c7d-8e9f-0a1b2c3d4e5f" }
+  }'
+```
+
+---
+
+<a id="getting-results"></a>
+
+## 結果の取得
+
+execute 呼び出しはターンを開始するだけです。返された ID を使って Sessions API で追跡してください。
+
+1. `GET /api/v0/sessions/{sessionId}?computerId={computerId}` をポーリングします。`status` フィールドは、Droid の動作中は `pending` または `running`、停止すると `idle` になります。
+2. `GET /api/v0/sessions/{sessionId}/messages?computerId={computerId}` でトランスクリプトを読み取ります。
+
+呼び出し直後は、特に既存のセッションにフォローアップを送る場合、前のターンの状態のままセッションが `idle` を返すことがあります。セッションが `idle` で、**かつ** トランスクリプトに、返された `messageId` を持つユーザーメッセージより後の assistant メッセージがあるときにのみ、そのターンが完了したとみなしてください。
+
+```javascript
+const headers = {
+  Authorization: `Bearer ${process.env.FACTORY_API_KEY}`,
+  "Content-Type": "application/json",
+};
+const base = "https://api.factory.ai/api/v0";
+
+const started = await fetch(`${base}/droid/execute`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({
+    prompt: "lodash を最新バージョンに更新してテストを実行して。",
+    target: { kind: "environment", environmentId: "env_123" },
+  }),
+});
+if (started.status !== 202) throw new Error(await started.text());
+const { sessionId, computerId, messageId } = await started.json();
+
+const query = `computerId=${encodeURIComponent(computerId)}`;
+let replies = [];
+for (;;) {
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+  const session = await fetch(`${base}/sessions/${sessionId}?${query}`, {
+    headers,
+  });
+  if (!session.ok) continue;
+  const { status } = await session.json();
+  if (status !== "idle") continue;
+
+  const { messages } = await fetch(
+    `${base}/sessions/${sessionId}/messages?${query}&limit=100`,
+    { headers },
+  ).then((response) => response.json());
+  const promptIndex = messages.findIndex((message) => message.id === messageId);
+  replies =
+    promptIndex === -1
+      ? []
+      : messages
+          .slice(promptIndex + 1)
+          .filter((message) => message.role === "assistant");
+  if (replies.length > 0) break;
+}
+console.log(replies);
+```
+
+新しく作成されたセッションは、表示されるまで短時間 `404` を返すことがあります。表示されるまでリトライしてください。
