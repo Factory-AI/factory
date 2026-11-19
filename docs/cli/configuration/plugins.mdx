@@ -193,6 +193,10 @@ droid plugin marketplace add https://gitlab.com/company/plugins.git
 droid plugin marketplace add /path/to/local/marketplace
 ```
 
+<Note>
+A local-path marketplace is registered under its directory name, not the `name` field in `marketplace.json`. For example, after `droid plugin marketplace add /path/to/local/marketplace`, install plugins with `droid plugin install <plugin-name>@marketplace`. Run `droid plugin marketplace list` to see the exact name to use.
+</Note>
+
 ### Managing marketplaces
 
 Via UI: `/plugins` → Marketplaces tab → select marketplace → choose action (Update, Disable auto-update, Delete)

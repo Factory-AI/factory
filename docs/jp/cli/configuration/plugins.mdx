@@ -179,6 +179,10 @@ droid plugin marketplace add https://gitlab.com/company/plugins.git
 # ローカルパスから（開発用）
 droid plugin marketplace add /path/to/local/marketplace
 ```
+
+<Note>
+ローカルパスのマーケットプレイスは、`marketplace.json`の`name`フィールドではなく、ディレクトリ名で登録されます。例えば、`droid plugin marketplace add /path/to/local/marketplace`の後は、`droid plugin install <plugin-name>@marketplace`でプラグインをインストールします。使用する正確な名前は`droid plugin marketplace list`で確認できます。
+</Note>
 ### マーケットプレースの管理
 
 UI経由: `/plugins` → マーケットプレースタブ → マーケットプレースを選択 → アクションを選択 (更新、自動更新を無効化、削除)
