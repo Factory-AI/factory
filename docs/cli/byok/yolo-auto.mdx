@@ -1,0 +1,50 @@
+---
+title: Yolo-Auto
+description: Flat-rate inference for the Yolo-Auto router's models
+keywords: ['yolo-auto', 'api key', 'byok', 'openai compatible', 'router', 'custom model']
+---
+
+Connect to Yolo-Auto, an OpenAI Chat Completions-compatible inference router that bills as a flat-rate subscription instead of per token.
+
+## Configuration
+
+Add to `~/.factory/settings.json`:
+
+```json
+{
+  "customModels": [
+    {
+      "model": "yolo",
+      "displayName": "Yolo [Yolo-Auto]",
+      "baseUrl": "https://yolo-auto.com/v1",
+      "apiKey": "${YOLO_AUTO_API_KEY}",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 16384
+    },
+    {
+      "model": "yolo-small",
+      "displayName": "Yolo Small [Yolo-Auto]",
+      "baseUrl": "https://yolo-auto.com/v1",
+      "apiKey": "${YOLO_AUTO_API_KEY}",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 16384
+    }
+  ]
+}
+```
+
+## Getting Started
+
+1. Sign up at [yolo-auto.com](https://yolo-auto.com)
+2. Create an API key in your dashboard
+3. Export it: `export YOLO_AUTO_API_KEY=your_key_here`
+4. Add the models above to your configuration
+
+## Notes
+
+- Base URL format: `https://yolo-auto.com/v1`
+- Yolo-Auto uses the `generic-chat-completion-api` provider type
+- `yolo` is the reasoning route and accepts the `minimal`, `low`, `medium`, `high`, and `xhigh` reasoning-effort values; `yolo-small` is a non-reasoning fast route
+- Both models accept image inputs and stream tool calls over SSE
+- Requests are capped to the context window of your subscription plan (131072 tokens on all plans except Pro); the gateway rejects oversized prompts rather than truncating them
+- Billing is a flat-rate subscription and the gateway does not meter per token, so any per-token cost Droid estimates for these models is not money the gateway charges
